@@ -1,0 +1,642 @@
+AllSystem.cpp:    int AllSystem::getNumSpecAtomConnect(int idxAtm, ID tChemType)
+AllSystem.cpp:    int AllSystem::getNumSpecAtomConnect(std::vector<AtomDict>::iterator iA,
+AllSystem.cpp:    int AllSystem::getNumOxyConnect(std::vector<AtomDict>::iterator iA)
+AllSystem.cpp:                    if (getNumOxyConnect(iAt)==1)
+AllSystem.cpp:            int nH = getNumSpecAtomConnect(tIdx2, "H");
+AllSystem.cpp:            for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+AllSystem.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+AllSystem.cpp:                int tSeriNum = allAtoms[*tNBA].seriNum;
+AllSystem.cpp:                    std::cout << "atom : " <<  allAtoms[*tNBA].id << std::endl;
+AllSystem.cpp:                for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+AllSystem.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+AllSystem.cpp:                    int tSeriNum = allAtoms[*tNBA].seriNum;
+AllSystem.cpp:                        //          << curAto.id << " : " << allAtoms[*tNBA].id
+AllSystem.cpp:                int tNewLev = curLev + 1;
+AllSystem.cpp:                if (tNewLev < iMax)
+AllSystem.cpp:                    for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+AllSystem.cpp:                         tNBA != curAto.connAtoms.end(); tNBA++)
+AllSystem.cpp:                        if (SeriNumPreAto != allAtoms[*tNBA].seriNum)
+AllSystem.cpp:                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;  
+AllSystem.cpp:                            checkOnePathSec(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum, 
+AllSystem.cpp:                                            tNewLev, seenAtomIDs, atomIDsInPath);
+AllSystem.cpp:                std::string tNum  = IntToStr(iSMa->second);
+AllSystem.cpp:                    tAtom.codClass.append(tNum + "x" + tSize);
+AllSystem.cpp:                std::string tNum  = IntToStr(iSMa->second);
+AllSystem.cpp:                    tS1.append(tNum + "x" + tSize);
+AllSystem.cpp:    void AllSystem::setsetupAllTargetValuesFromCOD(ID tOutName, ID tMonoName)
+AllSystem.cpp:       outMMCif(tOutName.c_str(),
+DictCifFILE.cpp:                int tNumEntry = (int)hasProps["compoundInfo"].size();
+DictCifFILE.cpp:                //std::cout << "n-entry-defined " << tNumEntry << std::endl;
+DictCifFILE.cpp:                if ((int)tF4.size() ==tNumEntry )
+DictCifFILE.cpp:            for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+DictCifFILE.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+DictCifFILE.cpp:                int tSeriNum = allAtoms[*tNBA].seriNum;
+DictCifFILE.cpp:                    std::cout << "atom : " <<  allAtoms[*tNBA].id << std::endl;
+DictCifFILE.cpp:                for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+DictCifFILE.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+DictCifFILE.cpp:                    int tSeriNum = allAtoms[*tNBA].seriNum;
+DictCifFILE.cpp:                        //          << curAto.id << " : " << allAtoms[*tNBA].id
+DictCifFILE.cpp:                int tNewLev = curLev + 1;
+DictCifFILE.cpp:                if (tNewLev < iMax)
+DictCifFILE.cpp:                    for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+DictCifFILE.cpp:                         tNBA != curAto.connAtoms.end(); tNBA++)
+DictCifFILE.cpp:                        if (SeriNumPreAto != allAtoms[*tNBA].seriNum)
+DictCifFILE.cpp:                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;  
+DictCifFILE.cpp:                            checkOnePathSec(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum, 
+DictCifFILE.cpp:                                        tNewLev, seenAtomIDs, atomIDsInPath);
+DictCifFILE.cpp:            for (std::vector<int>::iterator tNBAtom=tAtom.connAtoms.begin();
+DictCifFILE.cpp:                    tNBAtom != tAtom.connAtoms.end(); tNBAtom++)
+DictCifFILE.cpp:                if(allAtoms[*tNBAtom].seriNum != tOriAtom.seriNum)
+DictCifFILE.cpp:                    // tStrList.push_back(allAtoms[*tNBAtom].chemType);
+DictCifFILE.cpp:                    if(comps.find(allAtoms[*tNBAtom].chemType) != comps.end())
+DictCifFILE.cpp:                        comps[allAtoms[*tNBAtom].chemType] += 1;
+DictCifFILE.cpp:                        comps[allAtoms[*tNBAtom].chemType] = 1; 
+DictCifFILE.cpp:            for (std::vector<int>::iterator tNBA=tAtom.connAtoms.begin();
+DictCifFILE.cpp:                    tNBA != tAtom.connAtoms.end(); tNBA++)
+DictCifFILE.cpp:                setAtomCodClassName(allAtoms[*tNBA], tOriAtom, lowLev);
+DictCifFILE.cpp:                std::string tStr(allAtoms[*tNBA].chemType);
+DictCifFILE.cpp:                tStr.append(outRingSecStr(allAtoms[*tNBA]));
+DictCifFILE.cpp:                for (std::vector<int>::iterator tNNBA=allAtoms[*tNBA].connAtoms.begin();
+DictCifFILE.cpp:                        tNNBA != allAtoms[*tNBA].connAtoms.end(); tNNBA++)
+DictCifFILE.cpp:                    if(allAtoms[*tNNBA].id.compare(tAtom.id) !=0)
+DictCifFILE.cpp:                        tStrList.push_front(allAtoms[*tNNBA].chemType);
+DictCifFILE.cpp:                if(tIdMap.find(allAtoms[*tNBA].codClass) !=tIdMap.end())
+DictCifFILE.cpp:                    tIdMap[allAtoms[*tNBA].codClass]++;
+DictCifFILE.cpp:                    tIdMap[allAtoms[*tNBA].codClass] = 1;
+DictCifFILE.cpp:                std::string tNum  = IntToStr(iSMa->second);
+DictCifFILE.cpp:                    tAtom.codClass.append(tNum + "x" + tSize);
+DictCifFILE.cpp:                std::string tNum  = IntToStr(iSMa->second);
+DictCifFILE.cpp:                    tS1.append(tNum + "x" + tSize);
+DictCifFILE.cpp:                         ID tMonoRootName,
+DictCifFILE.cpp:                    << tMonoRootName <<"\t"<< tMonoRootName << "\t" << "'.\t\t'\t"
+DictCifFILE.cpp:                      <<"data_comp_" << tMonoRootName << std::endl
+DictCifFILE.cpp:                outRestrF << tMonoRootName << "\t" 
+DictCifFILE.cpp:                outRestrF << tMonoRootName << "\t" 
+DictCifFILE.cpp:                outRestrF << tMonoRootName << "\t"
+DictCifFILE.cpp:                    outRestrF << tMonoRootName << "\t" 
+DictCifFILE.cpp:                    outRestrF << tMonoRootName << "\t" 
+DictCifFILE.cpp:                                outRestrF << tMonoRootName << "\t" 
+DictCifFILE.cpp:                        outRestrF << tMonoRootName << "\t" << idxPStr + "\t"
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrBondList[j].atoms[0].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrBondList[j].atoms[1].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrTorsionList[j].atoms[0].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrTorsionList[j].atoms[1].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrTorsionList[j].atoms[2].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrTorsionList[j].atoms[3].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrChiralList[j].atoms[0].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrChiralList[j].atoms[1].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrChiralList[j].atoms[2].getName()
+ExtraRestrDictFile.cpp:                        << allRestrLists[i].restrChiralList[j].atoms[3].getName()
+ExtraRestrDictFile.cpp:                    aAtom.setName(curStrs[i+1]);
+ExtraRestrDictFile.cpp:                    aAtom.setName(TrimSpaces(curStrs[i+1]));
+ExtraRestrDictFile.cpp:                std::cout << itsCurRestrListSet->restrBondList[i].atoms[0].getName()
+ExtraRestrDictFile.cpp:                std::cout << itsCurRestrListSet->restrBondList[i].atoms[1].getName()
+ExtraRestrDictFile.cpp:                    aAtom.setName(curStrs[i+1]);
+ExtraRestrDictFile.cpp:                    aAtom.setName(curStrs[i+1]);
+ExtraRestrDictFile.cpp:                    aAtom.setName(curStrs[i+1]);
+MonomerLib.cpp:    MonomerLib::MonomerLib():itsMonoListName(NullPoint)
+MonomerLib.cpp:    FileName  MonomerLib::getMonoListName()
+MonomerLib.cpp:        return itsMonoListName;
+MonomerLib.cpp:    void MonomerLib::setMonoListName(FileName tF)
+MonomerLib.cpp:        itsMonoListName = tF;
+MonomerLib.cpp:            setMonoListName(tF);
+MonomerLib.cpp:            std::ifstream tDictFile(itsMonoListName);
+MonomerLib.cpp:            //        << itsMonoListName << std::endl;
+PDBFile.cpp:                        //        << allModels[i].chains[j].residues[k].getName()
+PDBFile.cpp:                        //            << allModels[i].chains[j].residues[k].atoms[l].getName()
+PDBFile.cpp:            if (!itsCurrentChain->getNumOfRes())
+PDBFile.cpp:                itsCurrentChain->setNumOfRes(StrToInt(tRecord.substr(13,4)));
+PDBFile.cpp:                tRes.setName((*iT));
+PDBFile.cpp:            if (itsCurrentChain->residues.size()==itsCurrentChain->getNumOfRes())
+PDBFile.cpp:            itsCurrentModRes->setName(tRecord.substr(12,3));
+PDBFile.cpp:                tRes1->setName(tRecord.substr(15,3));
+PDBFile.cpp:                tRes2->setName(tRecord.substr(27,3));
+PDBFile.cpp:            if ( itsCurrentSheet->getNumOfStrands() ==0 )
+PDBFile.cpp:                itsCurrentSheet->setNumOfStrands(StrToInt(tRecord.substr(14,2)));
+PDBFile.cpp:            tInitRes->setName(tRecord.substr(17,3));
+PDBFile.cpp:            tEndRes->setName(tRecord.substr(28,3));
+PDBFile.cpp:                tCurAtom->setName(tRecord.substr(41,4));
+PDBFile.cpp:                tPrevAtom->setName(tRecord.substr(56,4));
+PDBFile.cpp:            if( itsCurrentSheet->getNumOfStrands() == tStrand->getSeriNum() ) 
+PDBFile.cpp:            tSSBond->setName(tRecord.substr(0,6));
+PDBFile.cpp:            tResidue1->setName(tRecord.substr(11,3));
+PDBFile.cpp:            tResidue2->setName(tRecord.substr(26,3));
+PDBFile.cpp:            tLink->setName(tRecord.substr(0,6));
+PDBFile.cpp:            tAtom1->setName(TrimSpaces(tRecord.substr(12,4)));
+PDBFile.cpp:            tAtom2->setName(TrimSpaces(tRecord.substr(42,4)));
+PDBFile.cpp:        tAtom.setName(TrimSpaces(tRecord.substr(12,4)));
+PDBFile.cpp:        //std::cout << "Atom's Name: " << tAtom.getName() << std::endl;
+PDBFile.cpp:        //std::cout<< "atom name            : " << allAtomList[ii].getName() 
+PDBFile.cpp:        if (itsCurrentResidue->getName() == NullString)
+PDBFile.cpp:            itsCurrentResidue->setName(tAtom.getResName());
+PDBFile.cpp:        //std::cout << itsCurrentResidue->getName() << std::endl;
+PDBFile.cpp:        //std::cout << itsCurrentResidue->getName() << std::endl;
+PDBFile.cpp:            itsCurrentResidue->setName(tAtom.getResName());
+PDBFile.cpp:                       ID tMonoRootName,
+PDBFile.cpp:        std::string tName(tFName);    
+PDBFile.cpp:        StrUpper(tMonoRootName);
+PDBFile.cpp:        StrTokenize(tName, parts, '.');
+PDBFile.cpp:            outPDB << std::left << " MONOMER tests " << tMonoRootName;
+PDBFile.cpp:            outPDB << std::left << tMonoRootName;
+PDBFile.cpp:                outPDB << tMonoRootName.substr(0,3);
+angle.cpp:        itsName        = tA.getName();
+angle.cpp:        itsName        = tA.getName();
+angle.cpp:    Name Angle::getName() const
+angle.cpp:    void Angle::setName(Name tNa)
+angle.cpp:        itsName = tNa;
+atom.cpp:         itsName        = tAtom.getName();
+atom.cpp:    std::string Atom::getName() const
+atom.cpp:    void Atom::setName(std::string tName)
+atom.cpp:        itsName = tName;
+atom.cpp:    void Atom::setSeriNum(int tN)
+atom.cpp:        itsSeriNum = tN; 
+atom.cpp:    void Atom::setResName(ResName tName)
+atom.cpp:        itsResName=tName;
+atom.cpp:    void Atom::setSeqNum(SeriNumber tN)
+atom.cpp:        itsSeqNum=tN;
+atom.cpp:    void  Atom::setSegNum(SeriNumber tN)
+atom.cpp:        itsSegNum = tN;
+atom.cpp:    void Atom::setModSeriNum(SeriNumber tN)
+atom.cpp:        itsModNum = tN;
+atom.cpp:    int AtomDict::getNumAtomsWithin2stNB(std::vector<AtomDict> & tAllAtoms)
+atom.cpp:        int tN=0;
+atom.cpp:            tN +=(int)tAllAtoms[*iNB].connAtoms.size();    //should be (1+(int)tAllAtoms[*iNB].connAtoms-1)   
+atom.cpp:        return tN;
+atom.cpp:    void AtomDict::outNeighBAtoms()
+atomAssembly.cpp:             itsName(tAtomAssembly.getName()),
+atomAssembly.cpp:    Name AtomAssembly::getName() const
+atomAssembly.cpp:    void AtomAssembly::setName(Name tNa)
+atomAssembly.cpp:        itsName = tNa;
+atomAssembly.cpp:    Atom & AtomAssembly::getOneAtom(int tN)
+atomAssembly.cpp:        return atoms[tN-1];
+atomAssembly.cpp:    void  AtomAssembly::deletOneAtom(SeriNumber tN)
+atomAssembly.cpp:            if((*iA).getSeriNum()==tN)
+atomsTree.cpp:            int tN = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
+atomsTree.cpp:            std::cout << "tN " << tN << std::endl;
+atomsTree.cpp:                && tN > nMax)
+atomsTree.cpp:                nMax = tN;
+atomsTree.cpp:                int tN = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
+atomsTree.cpp:                    && tN > nMax)
+bond.cpp:            itsName(tBond.getName()),
+bond.cpp:        itsName    = tB.getName();
+bond.cpp:    Name Bond::getName() const
+bond.cpp:    void Bond::setName(Name tNa)
+bond.cpp:        itsName = tNa;
+chain.cpp:            itsName(tC.getName()),
+chain.cpp:        itsName = tC.getName();
+chain.cpp:    Name Chain::getName() const
+chain.cpp:    void Chain::setName(Name tNa)
+chain.cpp:        itsName = tNa;
+chain.cpp:    void  Chain::setModSeriNum(SeriNumber tN)
+chain.cpp:        itsModSeriNum = tN;
+chain.cpp:    Size  Chain::getNumOfRes() const
+chain.cpp:    void Chain::setNumOfRes(int tN)
+chain.cpp:        itsNumOfResidues = tN;
+chain.cpp:    void Chain::deleteOneResidue(ID tID, SeriNumber tN, Name tName)
+chain.cpp:            if (tID==iT->getID() && tN==iT->getSeriNum() 
+chain.cpp:                    && tName==iT->getName())
+checkEnvAndGetMode.cpp:                    IOEntries["userOutName"] = optarg;
+checkEnvAndGetMode.cpp:                    //          << IOEntries["userOutName"] << std::endl;
+checkEnvAndGetMode.cpp:                    IOEntries["monoRootName"] = optarg;
+checkEnvAndGetMode.cpp:                    //          << IOEntries["monoRootName"] << std::endl;
+checkEnvAndGetMode.cpp:                    //          << IOEntries["monoRootName"] << std::endl;
+checkEnvAndGetMode.cpp:                    IOEntries["AtomTypeOutName"] = optarg;
+checkEnvAndGetMode.cpp:                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+checkEnvAndGetMode.cpp:        iKeyFinder = IOEntries.find("monoRootName");
+checkEnvAndGetMode.cpp:            IOEntries["monoRootName"] ="XXX";
+checkEnvAndGetMode.cpp:            if (IOEntries["monoRootName"].empty())
+checkEnvAndGetMode.cpp:                IOEntries["monoRootName"] ="XXX";
+checkEnvAndGetMode.cpp:                    IOEntries["userOutName"] = optarg;
+checkEnvAndGetMode.cpp:                    IOEntries["monoRootName"] = optarg;
+checkEnvAndGetMode.cpp:                    IOEntries["AtomTypeOutName"] = optarg;
+checkEnvAndGetMode.cpp:                    iKeyFinder = IOEntries.find("AtomTypeOutName");
+checkEnvAndGetMode.cpp:                        if (!IOEntries["AtomTypeOutName"].empty())
+checkEnvAndGetMode.cpp:                        iKeyFinder =IOEntries.find("userOutName");
+checkEnvAndGetMode.cpp:                            IOEntries["userOutName"] = "libmol.out"; 
+checkEnvAndGetMode.cpp:            if(IOEntries.find("AtomTypeOutName") !=IOEntries.end())
+checkEnvAndGetMode.cpp:                if (!IOEntries["AtomTypeOutName"].empty())
+checkEnvAndGetMode.cpp:                    << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+checkEnvAndGetMode.cpp:                    << "The output library file(cif) : " << IOEntries["userOutName"] 
+checkEnvAndGetMode.cpp:                    << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+checkEnvAndGetMode.cpp:                    << "The output library file(cif) : " << IOEntries["userOutName"]
+checkEnvAndGetMode.cpp:                    << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+checkEnvAndGetMode.cpp:                    << "The output atom type file(txt) : " << IOEntries["AtomTypeOutName"]
+checkEnvAndGetMode.cpp:                    << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+checkEnvAndGetMode.cpp:                    << "The output atom type file(txt) : " << IOEntries["AtomTypeOutName"]
+chiral.cpp:            itsName(tC.getName()),
+chiral.cpp:    Name Chiral::getName() const
+chiral.cpp:    void Chiral::setName(Name tNa)
+chiral.cpp:        itsName = tNa;
+chiral.cpp:        std::cout << " Atom 1 " << tA1.getName() 
+chiral.cpp:        std::cout << " Atom 2 " << tA2.getName() 
+chiral.cpp:        std::cout << " Atom 3 " << tA3.getName() 
+chiral.cpp:        std::cout << " Atom 4 " << tA4.getName() 
+codBondAndAngleGroups.cpp:            // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:                ID tNBAtmChemType;
+codClassify.cpp:                std::vector<std::string> tNBAtmStrs;
+codClassify.cpp:                StrTokenize(symb1, tNBAtmStrs, '[');
+codClassify.cpp:                tNBAtmChemType= tNBAtmStrs[0];
+codClassify.cpp:                if (!isMetal(tMetab,tNBAtmChemType))
+codClassify.cpp:                                 std::vector<int> & tNB2s, 
+codClassify.cpp:            tNB2s.push_back(StrToInt(tS[1]));
+codClassify.cpp:    int CodClassify::codAtomsDist(std::vector<ID> tarStrs, std::vector<ID> tNBs, 
+codClassify.cpp:        codNBProps(tNBs, bCTs, bNB2s, bRis, bPls);
+codClassify.cpp:    int CodClassify::codAtomsNumNBDist(std::vector<int> & tNB2s,
+codClassify.cpp:        for (int i=0; i <(int)tNB2s.size(); i++)
+codClassify.cpp:            tDist+=(std::abs(tNB2s[i]-bNB2s[i])*tUnit);
+codClassify.cpp:            for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+codClassify.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+codClassify.cpp:                int tSeriNum = allAtoms[*tNBA].seriNum;
+codClassify.cpp:                    //std::cout << "Pass Next atom " << allAtoms[*tNBA].id << std::endl;
+codClassify.cpp:                        seenAtoms.push_back(allAtoms[*tNBA]);
+codClassify.cpp:                        seenIDs.insert(std::pair<int, ID>(allAtoms[*tNBA].seriNum,
+codClassify.cpp:                                                          allAtoms[*tNBA].id));
+codClassify.cpp:                        checkOnePathSec(seenAtoms, seenIDs, allAtoms[*tNBA], iMax, iAto);
+codClassify.cpp:                        seenIDs.erase(allAtoms[*tNBA].seriNum);
+codClassify.cpp:            for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+codClassify.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+codClassify.cpp:                int tSeriNum = allAtoms[*tNBA].seriNum;
+codClassify.cpp:                    std::cout << "atom : " <<  allAtoms[*tNBA].id << std::endl;
+codClassify.cpp:                for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+codClassify.cpp:                    tNBA != curAto.connAtoms.end(); tNBA++)
+codClassify.cpp:                    int tSeriNum = allAtoms[*tNBA].seriNum;
+codClassify.cpp:                        //          << curAto.id << " : " << allAtoms[*tNBA].id
+codClassify.cpp:                int tNewLev = curLev + 1;
+codClassify.cpp:                if (tNewLev < iMax)
+codClassify.cpp:                    for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+codClassify.cpp:                         tNBA != curAto.connAtoms.end(); tNBA++)
+codClassify.cpp:                        if (SeriNumPreAto != allAtoms[*tNBA].seriNum)
+codClassify.cpp:                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;  
+codClassify.cpp:                            checkOnePathSec(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum, 
+codClassify.cpp:                                        tNewLev, seenAtomIDs, atomIDsInPath);
+codClassify.cpp:            for (std::vector<int>::iterator tNBAtom=tAtom.connAtoms.begin();
+codClassify.cpp:                    tNBAtom != tAtom.connAtoms.end(); tNBAtom++)
+codClassify.cpp:                if(allAtoms[*tNBAtom].seriNum != tOriAtom.seriNum)
+codClassify.cpp:                    // tStrList.push_back(allAtoms[*tNBAtom].chemType);
+codClassify.cpp:                    if(comps.find(allAtoms[*tNBAtom].chemType) != comps.end())
+codClassify.cpp:                        comps[allAtoms[*tNBAtom].chemType] += 1;
+codClassify.cpp:                        comps[allAtoms[*tNBAtom].chemType] = 1; 
+codClassify.cpp:            for (std::vector<int>::iterator tNBA=tAtom.connAtoms.begin();
+codClassify.cpp:                    tNBA != tAtom.connAtoms.end(); tNBA++)
+codClassify.cpp:                AtomDict aNBAtom(allAtoms[*tNBA]);
+codClassify.cpp:                std::string tStr(allAtoms[*tNBA].chemType);
+codClassify.cpp:                tStr.append(outRingSecStr(allAtoms[*tNBA]));
+codClassify.cpp:                for (std::vector<int>::iterator tNNBA=allAtoms[*tNBA].connAtoms.begin();
+codClassify.cpp:                        tNNBA != allAtoms[*tNBA].connAtoms.end(); tNNBA++)
+codClassify.cpp:                    if(allAtoms[*tNNBA].id.compare(tAtom.id) !=0)
+codClassify.cpp:                        tStrList.push_front(allAtoms[*tNNBA].chemType);
+codClassify.cpp:                std::string tNum  = IntToStr(iSMa->second);
+codClassify.cpp:                    tAtom.codClass.append(tNum + "x" + tSize);
+codClassify.cpp:                std::string tNum  = IntToStr(iSMa->second);
+codClassify.cpp:                    tS1.append(tNum + "x" + tSize);
+codClassify.cpp:                // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:            // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:            // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:        std::vector<int> nonMetNB2;
+codClassify.cpp:                    nonMetNB2.push_back(*iN);
+codClassify.cpp:            ha2   = (int)nonMetNB2.size();
+codClassify.cpp:                    nonMetNB2.push_back(*iN);
+codClassify.cpp:            ha2   = (int)nonMetNB2.size();
+codClassify.cpp:            for (std::vector<int>::iterator iN= nonMetNB2.begin();
+codClassify.cpp:                 iN != nonMetNB2.end(); iN++)
+codClassify.cpp:        std::vector<std::vector<ID> > targetNBs;
+codClassify.cpp:            targetNBs.push_back(tV);
+codClassify.cpp:            if ((int)tIdV0.size() == (int)targetNBs[0].size() &&
+codClassify.cpp:                 (int)tIdV1.size() == (int)targetNBs[1].size()   )
+codClassify.cpp:                dist1 = codAtomsDist(targetNBs[0], tIdV0, tLev) 
+codClassify.cpp:                      + codAtomsDist(targetNBs[1], tIdV1, tLev);
+codClassify.cpp:            if ((int)tIdV0.size() == (int)targetNBs[1].size() &&
+codClassify.cpp:                 (int)tIdV1.size() == (int)targetNBs[0].size()   )
+codClassify.cpp:                dist2 = codAtomsDist(targetNBs[0], tIdV1, tLev) 
+codClassify.cpp:                      + codAtomsDist(targetNBs[1], tIdV0, tLev);
+codClassify.cpp:            // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:            // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:            // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
+codClassify.cpp:            std::string tNCName =  clibMonDir + "/allOrgAnglesWithNonCenteredMetalNB.table";
+codClassify.cpp:            std::ifstream codNonCenMetAngleFile(tNCName.c_str());
+codClassify.cpp:                        allDictNonCenMetAnglesIdx[tBuf[0]][tBuf[1]][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]] =nLine;
+codClassify.cpp:                int tNB2 = allAtoms[iNB1].connAtoms[j];
+codClassify.cpp:                                allAtoms[iAN->atoms[0]].connAtoms.end(), tNB2);
+codClassify.cpp:                    iNB2 = tNB2;
+codClassify.cpp:                 =allDictNonCenMetAnglesIdx.find(id1);
+codClassify.cpp:        if (iFind1 !=allDictNonCenMetAnglesIdx.end())
+codClassify.cpp:                 =allDictNonCenMetAnglesIdx[id1].find(idNB1);
+codClassify.cpp:            if (iFind2 !=allDictNonCenMetAnglesIdx[id1].end())
+codClassify.cpp:                 =allDictNonCenMetAnglesIdx[id1][idNB1].find(id2);
+codClassify.cpp:                if (iFind3 !=allDictNonCenMetAnglesIdx[id1][idNB1].end())
+codClassify.cpp:                     =allDictNonCenMetAnglesIdx[id1][idNB1][id2].find(idNB2);
+codClassify.cpp:                    if(iFind4 !=allDictNonCenMetAnglesIdx[id1][idNB1][id2].end())
+codClassify.cpp:                          =allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2].find(id3);
+codClassify.cpp:                        if (iFind5 !=allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2].end())
+codClassify.cpp:                            =allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3].find(idNB3);
+codClassify.cpp:                            if (iFind6 !=allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3].end())
+codClassify.cpp:                                int ida = allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3][idNB3];
+codClassify.cpp:                                    for (std::map<ID, int>::iterator iA=allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3].begin();
+codClassify.cpp:                                            iA != allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3].end(); iA++)
+codClassify.cpp:                                        int ida    = allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3][tKey];
+codClassify.cpp:                                for (std::map<ID, int>::iterator iA=allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3].begin();
+codClassify.cpp:                                            iA != allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3].end(); iA++)
+codClassify.cpp:                                    int ida    = allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2][id3][tKey];
+codClassify.cpp:                                 iA=allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2].begin();
+codClassify.cpp:                                 iA!=allDictNonCenMetAnglesIdx[id1][idNB1][id2][idNB2].end();
+codClassify.cpp:                                iA = allDictNonCenMetAnglesIdx[id1][idNB1][id2].begin();
+codClassify.cpp:                                iA != allDictNonCenMetAnglesIdx[id1][idNB1][id2].end();
+codClassify.cpp:                         iA = allDictNonCenMetAnglesIdx[id1][idNB1].begin();
+codClassify.cpp:                         iA != allDictNonCenMetAnglesIdx[id1][idNB1].end(); iA++)
+codClassify.cpp:                     iA = allDictNonCenMetAnglesIdx[id1].begin();
+codClassify.cpp:                     iA != allDictNonCenMetAnglesIdx[id1].end(); iA++)
+codClassify.cpp:        ID  tN = tTarget.substr(3,1); // non-metal neighbors
+codClassify.cpp:            if (tKeys[i].substr(3,1)==tN && allDictAngles[tIdxs[i]].numCodValues > 5)
+codClassify.cpp:            fID = "m" + IntToStr(tM1) + "n"+tN;
+codClassify.cpp:        std::vector<std::vector<ID> > targetNBs;
+codClassify.cpp:            targetNBs.push_back(tV);
+codClassify.cpp:        // std::cout << (int)targetNBs.size() << std::endl;
+codClassify.cpp:            if ((int)tIdV0.size() == (int)targetNBs[0].size() )
+codClassify.cpp:                int dist10 = codAtomsDist(targetNBs[0], tIdV0, tLev);
+codClassify.cpp:                if ((int)tIdV1.size() == (int)targetNBs[1].size()
+codClassify.cpp:                    && (int)tIdV2.size() == (int)targetNBs[2].size())
+codClassify.cpp:                    dist1 = dist10 + codAtomsDist(targetNBs[1], tIdV1, tLev) 
+codClassify.cpp:                            + codAtomsDist(targetNBs[2], tIdV2, tLev);
+codClassify.cpp:                if ((int)tIdV1.size() == (int)targetNBs[2].size()
+codClassify.cpp:                    && (int)tIdV2.size() == (int)targetNBs[1].size())
+codClassify.cpp:                    dist2 = dist10 + codAtomsDist(targetNBs[1], tIdV2, tLev)
+codClassify.cpp:                            + codAtomsDist(targetNBs[2], tIdV1, tLev);
+codClassify.cpp:        std::vector<std::vector<ID> > targetNBs;
+codClassify.cpp:            targetNBs.push_back(tV);
+codClassify.cpp:        // std::cout << (int)targetNBs.size() << std::endl;
+codClassify.cpp:            if ((int)tIdV0.size() == (int)targetNBs[0].size() )
+codClassify.cpp:                int dist10 = codAtomsDist(targetNBs[0], tIdV0, tLev);
+codClassify.cpp:                if ((int)tIdV1.size() == (int)targetNBs[1].size()
+codClassify.cpp:                    && (int)tIdV2.size() == (int)targetNBs[2].size())
+codClassify.cpp:                    dist1 = dist10 + codAtomsDist(targetNBs[1], tIdV1, tLev) 
+codClassify.cpp:                            + codAtomsDist(targetNBs[2], tIdV2, tLev);
+codClassify.cpp:                if ((int)tIdV1.size() == (int)targetNBs[2].size()
+codClassify.cpp:                    && (int)tIdV2.size() == (int)targetNBs[1].size())
+codClassify.cpp:                    dist2 = dist10 + codAtomsDist(targetNBs[1], tIdV2, tLev)
+codClassify.cpp:                            + codAtomsDist(targetNBs[2], tIdV1, tLev);
+codClassify.cpp:        std::string ttNameStr(tFileName);
+codClassify.cpp:        std::string tMonoName = ttNameStr.substr(0, 3);
+codClassify.cpp:        std::string tName(tFName);
+codClassify.cpp:        std::string ttNameStr(tFName);
+codClassify.cpp:        std::string tMonoName = ttNameStr.substr(0, 3);
+codClassify.cpp:        StrTokenize(tName, parts, '.');
+codClassify.cpp:        std::string tName(tFName);    
+codClassify.cpp:        StrTokenize(tName, parts, '.');
+codClassify.cpp:    void CodClassify::outAtomTypes(ID tMonoRootName)
+codClassify.cpp:        std::string    outAtomTypeName = tMonoRootName + "_CodAtomType.txt";
+getExtraRestrs.cpp:   /* GetExtraRestrs::GetExtraRestrs(Name inPDBName, Name inDictName, 
+getExtraRestrs.cpp:        restrDictObj  = new ExtraRestrDictFile(inDictName);
+getExtraRestrs.cpp:                                   FileName inDictName, 
+getExtraRestrs.cpp:        restrDictObj       = new ExtraRestrDictFile(inDictName);
+getExtraRestrs.cpp:    void GetExtraRestrs::setDim(int tN)
+getExtraRestrs.cpp:        itsDim = tN;
+getExtraRestrs.cpp:    void GetExtraRestrs::setErrLevel(int tN)
+getExtraRestrs.cpp:        itsErrLevel = tN;
+getExtraRestrs.cpp:        NeighbList   tNBListOfSystem(PDBObj->allAtomList, 
+getExtraRestrs.cpp:        tNBListOfSystem.building(1);
+getExtraRestrs.cpp:        autoFindBasePairList(tNBListOfSystem);
+getExtraRestrs.cpp:    void GetExtraRestrs::autoFindBasePairList(NeighbList & tNBList)
+getExtraRestrs.cpp:                    if(checkDNARNABase(iR->getName()))
+getExtraRestrs.cpp:                        tResID.resName = TrimSpaces(iR->getName());
+getExtraRestrs.cpp:                            if (tNBList.residueNBList.find(tID) !=
+getExtraRestrs.cpp:                                tNBList.residueNBList.end())
+getExtraRestrs.cpp:                                //          << tNBList.residueNBList[tID].size()
+getExtraRestrs.cpp:                                     tNBList.residueNBList[tID].begin();
+getExtraRestrs.cpp:                                     iR2 != tNBList.residueNBList[tID].end();
+getExtraRestrs.cpp:                                            //           << aResiduePair2[0].getName()
+getExtraRestrs.cpp:                                            //           << aResiduePair2[1].getName()
+getExtraRestrs.cpp:    bool GetExtraRestrs::checkDNARNABase(Name tNa)
+getExtraRestrs.cpp:        StrUpper(tNa);
+getExtraRestrs.cpp:        tNa = TrimSpaces(tNa);
+getExtraRestrs.cpp:            if(DnaRnaBaseList[i].compare(tNa) == 0)
+getExtraRestrs.cpp:    bool GetExtraRestrs::checkDNARNABasePair(Name tNa1, Name tNa2)
+getExtraRestrs.cpp:        StrUpper(tNa1);
+getExtraRestrs.cpp:        StrUpper(tNa2);
+getExtraRestrs.cpp:        //std::cout << tNa1 << " vs  " << tNa2 << std::endl;
+getExtraRestrs.cpp:        //std::cout << "number of elements " << DnaRnaBasePairs.count(tNa1) 
+getExtraRestrs.cpp:                = DnaRnaBasePairs.equal_range(tNa1);
+getExtraRestrs.cpp:            if (tIt->second.compare(tNa2) ==0)
+getExtraRestrs.cpp:            std::cout << "Residue " << tResSet[i].getName() 
+getExtraRestrs.cpp:        Name tP1 = tPair[0].getName();
+getExtraRestrs.cpp:        Name tP2 = tPair[1].getName();
+getExtraRestrs.cpp:        std::string tKey = iR->getName() + "_"+ IntToStr(iR->getSeqNum())
+getExtraRestrs.cpp:                        ==iR->getName()|| 
+getExtraRestrs.cpp:                 * searchAddAngles(tNN);
+getExtraRestrs.cpp:                 * searchAddTorsions(tNN);
+getExtraRestrs.cpp:                 * searchAddChirals(tNN);
+getExtraRestrs.cpp:                 * searchAddPlanes(tNN);
+getExtraRestrs.cpp:                if(TrimSpaces(iA1->getName()) == TrimSpaces(iRA->getName()))
+getExtraRestrs.cpp:                    std::string tNa = 
+getExtraRestrs.cpp:                    if(tNa.find(".") !=std::string::npos
+getExtraRestrs.cpp:                       || iRe->getName() == tNa)
+getExtraRestrs.cpp:                                   if(iB->atoms[iTT].getName() 
+getExtraRestrs.cpp:                                           == iRe->atoms[iRR].getName())
+getExtraRestrs.cpp:            if (TrimSpaces(iRA->getResName()) == TrimSpaces(R1.getName()))
+getExtraRestrs.cpp:                    if(TrimSpaces(iA1->getName()) == TrimSpaces(iRA->getName()))
+getExtraRestrs.cpp:            else if (TrimSpaces(iRA->getResName()) == TrimSpaces(R2.getName()))
+getExtraRestrs.cpp:                    if(TrimSpaces(iA2->getName()) == TrimSpaces(iRA->getName()))
+getExtraRestrs.cpp:    void GetExtraRestrs::searchAddAngles(int tN)
+getExtraRestrs.cpp:                    std::string tNa = 
+getExtraRestrs.cpp:                    if(tNa.find(".") !=std::string::npos
+getExtraRestrs.cpp:                       || iRe->getName() == tNa)
+getExtraRestrs.cpp:                                   if(iA->atoms[iTT].getName() 
+getExtraRestrs.cpp:                                           == iRe->atoms[iRR].getName())
+getExtraRestrs.cpp:            if (iRA->getResName() == R1.getName())
+getExtraRestrs.cpp:                    if(iA1->getName() == iRA->getName())
+getExtraRestrs.cpp:            else if (iRA->getResName() == R2.getName())
+getExtraRestrs.cpp:                    if(iA2->getName() == iRA->getName())
+getExtraRestrs.cpp:            //std::cout << "Target atom " << iTT->getName() << std::endl;
+getExtraRestrs.cpp:                if(TrimSpaces(iAA->getName()) == TrimSpaces(iTA->getName()))
+getExtraRestrs.cpp:                    //std::cout << "found atom " << iAA->getName() 
+getExtraRestrs.cpp:                    std::string tNa = 
+getExtraRestrs.cpp:                    if(tNa.find(".") !=std::string::npos
+getExtraRestrs.cpp:                       || iRe->getName() == tNa)
+getExtraRestrs.cpp:                                   if(iT->atoms[iTT].getName() 
+getExtraRestrs.cpp:                                           == iRe->atoms[iRR].getName())
+getExtraRestrs.cpp:        //std::cout << "Residue 1 Name " << R1.getName() 
+getExtraRestrs.cpp:        //std::cout << "Residue 2 Name " << R2.getName() 
+getExtraRestrs.cpp:            //std::cout << "Target atom " << iTT->getName() << std::endl;
+getExtraRestrs.cpp:            if (TrimSpaces(iTT->getResName()) == TrimSpaces(R1.getName()))
+getExtraRestrs.cpp:                    if(TrimSpaces(iAA->getName()) == TrimSpaces(iTT->getName()))
+getExtraRestrs.cpp:                        //std::cout << "found atom " << iAA->getName() 
+getExtraRestrs.cpp:            else if (TrimSpaces(iTT->getResName()) == TrimSpaces(R2.getName()))
+getExtraRestrs.cpp:                    if(TrimSpaces(iBB->getName()) == TrimSpaces(iTT->getName()))
+getExtraRestrs.cpp:                        // std::cout << "found atom " << iBB->getName() 
+getExtraRestrs.cpp:    void GetExtraRestrs::searchAddChirals(int tN)
+getExtraRestrs.cpp:                    std::string tNa = 
+getExtraRestrs.cpp:                    if(tNa.find(".") !=std::string::npos
+getExtraRestrs.cpp:                       || iRe->getName() == tNa)
+getExtraRestrs.cpp:                                   if(iA->atoms[iTT].getName() 
+getExtraRestrs.cpp:                                           == iRe->atoms[iRR].getName())
+getExtraRestrs.cpp:        std::cout << "Residue 1 Name " << R1.getName() 
+getExtraRestrs.cpp:        std::cout << "Residue 2 Name " << R2.getName() 
+getExtraRestrs.cpp:            //std::cout << "Target atom " << iTT->getName() << std::endl;
+getExtraRestrs.cpp:            if (TrimSpaces(iTT->getResName()) == TrimSpaces(R1.getName()))
+getExtraRestrs.cpp:                    if(TrimSpaces(iAA->getName()) == TrimSpaces(iTT->getName()))
+getExtraRestrs.cpp:                         // std::cout << "found atom " << iAA->getName() 
+getExtraRestrs.cpp:            else if (TrimSpaces(iTT->getResName()) == TrimSpaces(R2.getName()))
+getExtraRestrs.cpp:                    if(TrimSpaces(iBB->getName()) == TrimSpaces(iTT->getName()))
+getExtraRestrs.cpp:                        // std::cout << "found atom " << iBB->getName() 
+getExtraRestrs.cpp:    void GetExtraRestrs::searchAddPlanes(int tN)
+getExtraRestrs.cpp:                                    << iRe->getName() << " of seq number "
+getExtraRestrs.cpp:            if(!TrimSpaces(iRe->getName()).compare(TrimSpaces(iM->first)))
+getExtraRestrs.cpp:                //<< iRe->getName() << " group type : " 
+getExtraRestrs.cpp:            std::string rName = TrimSpaces(iRe->getName());
+getExtraRestrs.cpp:               << " atom " << tA1.getName() 
+getExtraRestrs.cpp:               << " atom " << tA2.getName();
+getExtraRestrs.cpp:               << " atom " << tA1.getName() 
+getExtraRestrs.cpp:               << " atom " << tA2.getName()
+getExtraRestrs.cpp:               << " atom " << tA3.getName();
+getExtraRestrs.cpp:               << " atom " << tA1.getName() 
+getExtraRestrs.cpp:               << " atom " << tA2.getName()
+getExtraRestrs.cpp:               << " atom " << tA3.getName()                    
+getExtraRestrs.cpp:               << " atom " << tA4.getName();
+getExtraRestrs.cpp:               << " atom " << tA1.getName() 
+getExtraRestrs.cpp:               << " atom " << tA2.getName()
+getExtraRestrs.cpp:               << " atom " << tA3.getName()                    
+getExtraRestrs.cpp:               << " atom " << tA4.getName();
+getExtraRestrs.cpp:            //    std::cout << "Atom 1 " << iBB->atoms[0].getName() 
+getExtraRestrs.cpp:            //    std::cout << "Atom 2 " << iBB->atoms[1].getName() 
+getExtraRestrs.cpp:        //        std::cout << "Atom 1 " << iBo->atoms[0].getName() 
+getExtraRestrs.cpp:        //        std::cout << "Atom 2 " << iBo->atoms[1].getName() 
+inputParams.cpp:            userOutName(NullPoint),
+inputParams.cpp:            monoRootName(NullString),
+inputParams.cpp:            userOutName(NullPoint),
+inputParams.cpp:            monoRootName(NullString),
+inputParams.cpp:                    userOutName = optarg;
+inputParams.cpp:                              << userOutName << std::endl;
+inputParams.cpp:                    monoRootName = optarg;
+inputParams.cpp:                        <<  monoRootName << std::endl;
+libglink.cpp:    Link::Link(const Link & tLink): itsName(tLink.getName()),
+libglink.cpp:     Name Link::getName() const
+libglink.cpp:    void Link::setName(Name tNa)
+libglink.cpp:        itsName = tNa;
+libgmodel.cpp:        for (int i=0; i < (int)tM.getNumOfChains(); i++)
+libgmodel.cpp:        for (int i=0; i < (int)tM.getNumOfHelices(); i++)
+libgmodel.cpp:        for (int i=0; i < (int)tM.getNumOfSheets(); i++)
+libgmodel.cpp:    Size Model::getNumOfChains() const
+libgmodel.cpp:    Size Model::getNumOfLinks() const
+libgmodel.cpp:    Link & Model::getOneLink(SeriNumber tN)
+libgmodel.cpp:        return links[tN];
+libgmodel.cpp:    bool Model::deleteOneLink(SeriNumber tN)
+libgmodel.cpp:        if (tN < (int)links.size())
+libgmodel.cpp:            links.erase(links.begin()+tN-1);
+libgmodel.cpp:    Size Model::getNumOfHelices() const
+libgmodel.cpp:    Size Model::getNumOfSheets() const
+libgmodel.cpp:    bool Model::deleteOneSheet(SeriNumber tN)
+libgmodel.cpp:        if (tN < (int)sheets.size())
+libgmodel.cpp:            sheets.erase(sheets.begin()+tN-1);
+neighbList.cpp:    NeighbList::NeighbList(const NeighbList & tNB):itsDim(tNB.getDim()),
+neighbList.cpp:            itsCutOff(tNB.getCutOff()),
+neighbList.cpp:            itsNBShell(tNB.getNBShell()),
+neighbList.cpp:            itsErrInfo(tNB.getErrInfo()),
+neighbList.cpp:            itsErrLevel(tNB.getErrLevel())
+neighbList.cpp:        int i = tNB.getDim();
+neighbList.cpp:            for (std::vector<REAL>::const_iterator iT=tNB.coordsMax.begin();
+neighbList.cpp:                    iT != tNB.coordsMax.end(); iT++)
+neighbList.cpp:            for (std::vector<REAL>::const_iterator iT=tNB.coordsMin.begin();
+neighbList.cpp:                    iT != tNB.coordsMin.end(); iT++)
+neighbList.cpp:        for (std::vector<Atom>::const_iterator iA=tNB.allAtoms.begin();
+neighbList.cpp:                iA != tNB.allAtoms.end(); iA++)
+neighbList.cpp:        for (std::vector<NBCell>::const_iterator iNC = tNB.allCells.begin();
+neighbList.cpp:                iNC != tNB.allCells.end(); iNC++)
+neighbList.cpp:        for (std::vector<NBCell>::const_iterator iNC = tNB.allNECells.begin();
+neighbList.cpp:                iNC != tNB.allNECells.end(); iNC++)
+neighbList.cpp:                tNB.atomNBlist.begin(); 
+neighbList.cpp:                iAN != tNB.atomNBlist.end() ; iAN++)
+neighbList.cpp:                tNB.residueNBList.begin(); 
+neighbList.cpp:                iRe != tNB.residueNBList.end(); iRe++)
+neighbList.cpp:            int tDim, REAL tNBC, REAL tNBS):itsDim(tDim),
+neighbList.cpp:            itsCutOff(tNBC),
+neighbList.cpp:            itsNBShell(tNBS),
+neighbList.cpp:    void NeighbList::setErrLevel(int tN)
+neighbList.cpp:        itsErrLevel = tN;
+neighbList.cpp:    REAL NeighbList::getNBShell() const
+neighbList.cpp:    void NeighbList::setNBShell(REAL tC)
+neighbList.cpp:            REAL tCL = getCutOff() + getNBShell();
+neighbList.cpp:    void NeighbList::buildCellNBList(std::vector<NBCell>::iterator tNB)
+neighbList.cpp:        int tN0, tN1, tN2;
+neighbList.cpp:        for (tN0 =-1; tN0 < 2; tN0++)
+neighbList.cpp:            tI0 = tNB->index[0] + tN0;
+neighbList.cpp:                for (tN1 =-1; tN1 < 2; tN1++)
+neighbList.cpp:                    tI1 = tNB->index[1]+tN1;
+neighbList.cpp:                        for (tN2 =-1; tN2 < 2; tN2++)
+neighbList.cpp:                            tI2 = tNB->index[2]+tN2;
+neighbList.cpp:                               if (!(tNB->index[0]==tI0 && tNB->index[1]==tI1
+neighbList.cpp:                                       &&tNB->index[2]==tI2))
+neighbList.cpp:                                           tNB->nbcellList.push_back(tIdx);
+neighbList.cpp:                                    int tDim, REAL tNBCutoff, REAL tNBShell)
+neighbList.cpp:            REAL tCL = tNBCutoff + tNBShell;
+neighbList.cpp:    void NeighbListDict::buildCellNBList(std::vector<NBCellDict>::iterator tNB)
+neighbList.cpp:        int tN0, tN1, tN2;
+neighbList.cpp:        for (tN0 =-1; tN0 < 2; tN0++)
+neighbList.cpp:            tI0 = tNB->index[0] + tN0;
+neighbList.cpp:                for (tN1 =-1; tN1 < 2; tN1++)
+neighbList.cpp:                    tI1 = tNB->index[1]+tN1;
+neighbList.cpp:                        for (tN2 =-1; tN2 < 2; tN2++)
+neighbList.cpp:                            tI2 = tNB->index[2]+tN2;
+neighbList.cpp:                               if (!(tNB->index[0]==tI0 && tNB->index[1]==tI1
+neighbList.cpp:                                       &&tNB->index[2]==tI2))
+neighbList.cpp:                                           tNB->nbcellList.push_back(tIdx);
+neighbList.cpp:                                  int tDim, REAL tNBCutoff, 
+neighbList.cpp:                                  REAL tNBShell, int tMode)
+neighbList.cpp:        buildCellSystem(aAtomList, tDim, tNBCutoff, tNBShell);
+neighbList.cpp:        REAL fullL = tNBCutoff + tNBShell;
+neighbList.cpp:                                  int tDim, REAL tNBCutoff, 
+neighbList.cpp:                                  REAL tNBShell, int tMode)
+neighbList.cpp:        buildCellSystem(aAtomList, tDim, tNBCutoff, tNBShell);
+neighbList.cpp:        REAL fullL = tNBCutoff + tNBShell;
+plane.cpp:    Plane::Plane(const Plane& tP):itsName(tP.getName()),
+plane.cpp:    Name Plane::getName() const
+plane.cpp:    void Plane::setName(Name tNa)
+plane.cpp:        itsName = tNa;
+plane.cpp:    REAL Plane::getValue(bool tN) const
+plane.cpp:       if (tN)
+plane.cpp:    void Plane::setValue(REAL tV, bool tN)
+plane.cpp:        if(tN)
+residue.cpp:    Residue::Residue(const Residue & tRes) : itsName(tRes.getName()),
+residue.cpp:        itsName         = tR.getName();
+residue.cpp:    Name Residue::getName() const
+residue.cpp:    void Residue::setName(Name tNa)
+residue.cpp:        itsName = tNa;
+residue.cpp:    void Residue::setSeqNum(SeriNumber tN)
+residue.cpp:        itsSeqNum = tN;
+residue.cpp:    void  Residue::setChainSeriNum(SeriNumber tN)
+residue.cpp:        itsChainSeriNum = tN;
+residue.cpp:    void Residue::setModelSeriNum(SeriNumber tN)
+residue.cpp:        itsModelSeriNum = tN;
+residue.cpp:        itsName            = tM.getName();
+secondaryStructures.cpp:    Residue * Strand::getTerResidue(int tN)
+secondaryStructures.cpp:        if (tN == 1)
+secondaryStructures.cpp:        else if (tN == -1)
+secondaryStructures.cpp:    void Strand::setTerResidue(Residue& tRes, int tN)
+secondaryStructures.cpp:        if (tN == 1)
+secondaryStructures.cpp:        else if (tN == -1)
+secondaryStructures.cpp:    Atom * Strand::getRegistAtom(int tN)
+secondaryStructures.cpp:        if (tN == 1)
+secondaryStructures.cpp:        else if (tN == -1)
+secondaryStructures.cpp:    void Strand::setRegistAtom(Atom & tAtom, int tN)
+secondaryStructures.cpp:        if (tN == 1)
+secondaryStructures.cpp:        else if (tN == -1)
+ssbond.cpp:    SSBond::SSBond(const SSBond & tSSBond):itsName(tSSBond.getName()),
+torsion.cpp:            itsName(tT.getName()),
+torsion.cpp:    Name Torsion::getName() const
+torsion.cpp:    void Torsion::setName(Name tNa)
+torsion.cpp:        itsName = tNa;
+torsion.cpp:        std::cout << " Atom 1 " << tA1.getName() 
+torsion.cpp:        std::cout << " Atom 2 " << tA2.getName() 
+torsion.cpp:        std::cout << " Atom 3 " << tA3.getName() 
+torsion.cpp:        std::cout << " Atom 4 " << tA4.getName() 
+utility.cpp:        int   tNum;
+utility.cpp:        convert >> tNum;
+utility.cpp:        return tNum;
+utility.cpp:    std::string IntToStr(int tN)
+utility.cpp:        convert << tN;
+utility.cpp:        REAL tNum;
+utility.cpp:        convert >> tNum;
+utility.cpp:        return tNum;
+utility.cpp:    std::string RealToStr(REAL tN)
+utility.cpp:        convert << tN;
+utility.cpp:    extern void MatNormolization(int      n_size,
+utility.cpp:    extern void MatNormolization(int      n_size,
+utility.cpp:    extern void MatNormolization(int        n_size,
