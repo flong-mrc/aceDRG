@@ -199,9 +199,13 @@ namespace LIBMOL
                     lEnd     =false;
                 }
             }
+            if (itsCurMol->atoms.size() !=0)
+            {
+                allMols.push_back(*itsCurMol);
+            }
             inFile.close();
         }
-        
+       
         for (unsigned i=0; i < allMols.size(); i++)
         {
             addHAtomToMols(i);
@@ -370,6 +374,10 @@ namespace LIBMOL
             aBo.atomsIdx.push_back(iHA->seriNum);
             aBo.order = "1";
             aBo.seriNum = (int)allMols[tIdxMol].bonds.size();
+            aBo.atoms.push_back(allMols[tIdxMol].atoms[iHA->connAtoms[0]].id);
+            aBo.atoms.push_back(iHA->id);
+            aBo.fullAtoms[iHA->id] = iHA->seriNum;
+            aBo.fullAtoms[allMols[tIdxMol].atoms[iHA->connAtoms[0]].id] = allMols[tIdxMol].atoms[iHA->connAtoms[0]].seriNum;
             allMols[tIdxMol].bonds.push_back(aBo);
         }
     }
@@ -411,6 +419,7 @@ namespace LIBMOL
             aH.connAtoms.push_back(allMols[tIdxMol].atoms[tIdxAtm].seriNum);
             allMols[tIdxMol].atoms[tIdxAtm].connAtoms.push_back(aH.seriNum);
             allMols[tIdxMol].atoms[tIdxAtm].connHAtoms.push_back(aH.seriNum);
+            
             allMols[tIdxMol].extraHAtoms.push_back(aH);
             
         }
