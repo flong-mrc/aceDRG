@@ -21,6 +21,11 @@ namespace LIBMOL
         
         myNBDepth = tNBDepth;
         
+        // std::cout << "myNBDepth " << myNBDepth << std::endl;
+        
+        std::cout << "Number of crystals " << tCifObj.allCryst.size() << std::endl;
+        
+        
         for (std::vector<CrystInfo>::const_iterator iC=tCifObj.allCryst.begin();
                 iC!=tCifObj.allCryst.end(); iC++)
         {
@@ -32,7 +37,8 @@ namespace LIBMOL
         {
             initAtoms.push_back(*iA);
         }
-        std::cout << "number of unique atoms " << initAtoms.size() << std::endl;
+        std::cout << "number of initial atoms " << initAtoms.size() << std::endl;
+        
     }
     
     MolGenerator::MolGenerator(const DictCifFile & tCifObj, int tNBDepth)
@@ -73,15 +79,39 @@ namespace LIBMOL
                                 iCryst->itsCell->b, iCryst->itsCell->c, iCryst->itsCell->alpha,
                                 iCryst->itsCell->beta, iCryst->itsCell->gamma);
                     allAtoms.push_back(*iA);
+                    refAtoms.push_back(*iA);
                 }
-                
+                //outPDB("initAtoms.pdb", "UNL", initAtoms);
+                   
                 buildRefAtoms(iCryst);
-                 
+                
+                std::cout << "Number of atoms read from the input file "
+                          << initAtoms.size() << std::endl; 
+                std:: cout << "number of ref atoms associated with initial atoms " 
+                           << refAtoms.size() << std::endl;
                 symmAtomGen(iCryst, aPTable);
+                
+                std::cout << "number of atoms in a unit cell " 
+                          << allAtoms.size() << std::endl;
+                std::cout << "Number of atoms in refAtoms " 
+                          << refAtoms.size() << std::endl;
                 
                 getUniqueBonds(aPTable);
                 
+                std::cout << "The following are the bonds we have found :" << std::endl;
+                for (std::vector<BondDict>::iterator iB=bonds.begin();
+                        iB !=bonds.end(); iB++)
+                {
+                    std::cout << "Bond between atom " << refAtoms[iB->atomsIdx[0]].id 
+                              << " and " << refAtoms[iB->atomsIdx[1]].id << std::endl 
+                              << "Its bond length is " << iB->value << std::endl;
+                }
+                
+                exit(1);
+                
                 getUniqAngles();
+                
+                
                 
             }
         }
@@ -103,8 +133,8 @@ namespace LIBMOL
                         AtomDict aAtom(*iA);
                         if(!(i==0 && j==0 && k==0))
                         {
-                            aAtom.id += label;
-                        
+                            aAtom.sId = label;
+                            aAtom.seriNum = (int)refAtoms.size();
                             aAtom.fracCoords[0] = iA->fracCoords[0] + i;
                             aAtom.fracCoords[1] = iA->fracCoords[1] + j;
                             aAtom.fracCoords[2] = iA->fracCoords[2] + k;
@@ -112,8 +142,10 @@ namespace LIBMOL
                             FractToOrtho(aAtom.fracCoords, aAtom.coords, iCryst->itsCell->a,
                                 iCryst->itsCell->b, iCryst->itsCell->c, iCryst->itsCell->alpha,
                                 iCryst->itsCell->beta, iCryst->itsCell->gamma);
+                            refAtoms.push_back(aAtom);
                         }
-                        refAtoms.push_back(aAtom);
+                        
+                        // std::cout << "size of refAtoms " << refAtoms.size() << std::endl;
                     }
                 }
             }
@@ -123,13 +155,15 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iRA=refAtoms.begin();
                 iRA != refAtoms.end(); iRA++)
         {
-            std::cout << "For atom " << iRA->id << " : " << std::endl;
-            std::cout << "x = " << iRA->coords[0] << std::endl
-                      << "y = " << iRA->coords[1] << std::endl
-                      << "z = " << iRA->coords[2] << std::endl;
+          
+                std::cout << "For atom " << iRA->id << " and ref ID " << iRA->sId  
+                          << " : " << std::endl;
+                std::cout << "x = " << iRA->fracCoords[0] << std::endl
+                          << "y = " << iRA->fracCoords[1] << std::endl
+                          << "z = " << iRA->fracCoords[2] << std::endl;  
         }
         */
-        
+       
         
     }
     
@@ -139,20 +173,14 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=initAtoms.begin();
                     iA !=initAtoms.end(); iA++)
         {
-            int tDictMult = iA->symmMult;
-            iA->symmMult =1;
+            // int tDictMult = iA->symmMult;
+            // iA->symmMult =1;
             for (std::map<std::string, std::vector<std::vector<REAL> > >::iterator
                         iOp=tCrys->itsSpaceGroup->sgOp.begin();
                         iOp!=tCrys->itsSpaceGroup->sgOp.end(); iOp++)
             {
                 getOneSymmAtom(iA, iOp, tCrys, tPTable);
             }
-            std::cout << "After symm Opts: " << std::endl
-                      << "atom site-symm-mult in the input file " 
-                      << tDictMult << std::endl
-                      << "atom site-symm-mult from symm opts " 
-                      << iA->symmMult << std::endl;
-        
         }
         
     }
@@ -163,7 +191,7 @@ namespace LIBMOL
                                       PeriodicTable & tPTab)
     {
         
-        std::vector<REAL>   tFracCoords, tCoords, startFracCoords, endFracCoords;
+        std::vector<REAL>  startFracCoords, endFracCoords;
         for (unsigned i=0; i <3; i++)
         {
             startFracCoords.push_back(tCurAtom->fracCoords[i]);
@@ -173,8 +201,7 @@ namespace LIBMOL
         endFracCoords.push_back(0.0);
         
         matMultVec(tOp->second, startFracCoords, endFracCoords);
-        
-        TranslateIntoUnitCell(endFracCoords, tFracCoords);
+        //TranslateIntoUnitCell(endFracCoords, tFracCoords);
         
         std::cout << "effects of symm operators" << std::endl;
         std::cout << "initial fract coords " << std::endl;
@@ -195,30 +222,16 @@ namespace LIBMOL
             }
             std::cout << std::endl;
         }
-                
-        std::cout << "symm-site fract coords " << std::endl;
-        for (std::vector<REAL>::iterator iX=tFracCoords.begin();
-                iX != tFracCoords.end(); iX++)
-        {
-            std::cout << *iX << std::endl;
-        }
-       
-        bool tUnique = checkUniqueAtom(tFracCoords);
         
-        
-        std::cout << "initial  coords " << std::endl;
-        for (std::vector<REAL>::iterator iX=tCurAtom->coords.begin();
-                iX != tCurAtom->coords.end(); iX++)
+            
+        std::cout << "symm-site fract coords" << std::endl;
+        for (std::vector<REAL>::iterator iX=endFracCoords.begin();
+                iX != endFracCoords.end(); iX++)
         {
             std::cout << *iX << std::endl;
         }
         
-        std::cout << "symm-site coords " << std::endl;
-        for (std::vector<REAL>::iterator iX=tCoords.begin();
-                iX != tCoords.end(); iX++)
-        {
-            std::cout << *iX << std::endl;
-        }
+        bool tUnique = checkUniqueAtom(endFracCoords);
         
         if (tUnique)
         {   
@@ -226,27 +239,40 @@ namespace LIBMOL
                       << std::endl;
             
             AtomDict tAtom(*tCurAtom);
-            tAtom.sId = tOp->first;
+            tAtom.id.append("_"+tOp->first);
             tAtom.coords.clear();
+            std::cout << tAtom.id << std::endl;
             
-            for (std::vector<REAL>::iterator iFX=tFracCoords.begin();
-                    iFX !=tFracCoords.end(); iFX++)
+            for (std::vector<REAL>::iterator iFX=endFracCoords.begin();
+                    iFX !=endFracCoords.end(); iFX++)
             {
                 tAtom.fracCoords.push_back(*iFX);
             }
             
-            FractToOrtho(tFracCoords, tAtom.coords, tCryst->itsCell->a,
+            FractToOrtho(endFracCoords, tAtom.coords, tCryst->itsCell->a,
                      tCryst->itsCell->b, tCryst->itsCell->c, tCryst->itsCell->alpha,
                      tCryst->itsCell->beta, tCryst->itsCell->gamma);
-            
+            tAtom.seriNum = (int)allAtoms.size();
             allAtoms.push_back(tAtom);
-       
-            std::cout << "number of atoms the unit cell " << allAtoms.size() << std::endl;
+            tAtom.seriNum = (int)refAtoms.size();
+            refAtoms.push_back(tAtom);
+            //std::cout << "the last atom in allAtoms is now atom " << allAtoms[(int)allAtoms.size()-1].seriNum << std::endl;
+            //std::cout << "the last atom in refAtoms is now atom " << refAtoms[(int)refAtoms.size()-1].seriNum << std::endl;
+            /*
+            std::cout << "symm-site coords " << std::endl;
+            for (std::vector<REAL>::iterator iX=tAtom.coords.begin();
+                    iX != tAtom.coords.end(); iX++)
+            {
+                std::cout << *iX << std::endl;
+            }
+            */
+            // std::cout << "number of atoms the unit cell " << allAtoms.size() << std::endl;
             addOneSetRefAtoms(tAtom, tCryst);
-            std::cout << "number of ref atoms " << refAtoms.size() << std::endl;
-            tCurAtom->symmMult++;
+            // std::cout << "number of ref atoms " << refAtoms.size() << std::endl;
+            //tCurAtom->symmMult++;
             
         }
+        
         /*
         // check symmMult
         if (tCurAtom->symmMult !=tDictMult)
@@ -255,7 +281,7 @@ namespace LIBMOL
                       << "  Value read from the cif is " << tDictMult << std::endl;
             exit(1);
         } 
-         */  
+        */  
     }
     
     bool MolGenerator::checkUniqueAtom(std::vector<REAL> & tFracX)
@@ -266,9 +292,9 @@ namespace LIBMOL
                 iA !=allAtoms.end(); iA++)
         {
             
-            if (fabs(iA->fracCoords[0]-tFracX[0]) <0.0001 &&
-                fabs(iA->fracCoords[1]-tFracX[1]) <0.0001 &&
-                fabs(iA->fracCoords[2]-tFracX[2]) <0.0001)
+            if (fabs(iA->fracCoords[0]-tFracX[0]) <0.0005 &&
+                fabs(iA->fracCoords[1]-tFracX[1]) <0.0005 &&
+                fabs(iA->fracCoords[2]-tFracX[2]) <0.0005)
             {
                 tU = false;
                 break;
@@ -294,15 +320,25 @@ namespace LIBMOL
                     if(!(i==0 && j==0 && k==0))
                     {
                         aAtom.sId = label;
-                    
+                        aAtom.seriNum = (int)refAtoms.size();
                         aAtom.fracCoords[0] = tCurAtom.fracCoords[0] + i;
                         aAtom.fracCoords[1] = tCurAtom.fracCoords[1] + j;
                         aAtom.fracCoords[2] = tCurAtom.fracCoords[2] + k;
-                        
                         FractToOrtho(aAtom.fracCoords, aAtom.coords, tCryst->itsCell->a,
                                      tCryst->itsCell->b, tCryst->itsCell->c, tCryst->itsCell->alpha,
                                      tCryst->itsCell->beta, tCryst->itsCell->gamma);
                         refAtoms.push_back(aAtom);
+                        /*
+                        std::cout << "Added ref atom: ID-> " << aAtom.id 
+                                  << "  symm ID  " << aAtom.sId << std::endl
+                                  << "Coords : " << std::endl;
+                       
+                        for (std::vector<REAL>::iterator iC=aAtom.coords.begin();
+                                iC != aAtom.coords.end(); iC++)
+                        {
+                            std::cout << *iC << std::endl;
+                        }
+                        */
                     }
                 }
             }
@@ -347,14 +383,20 @@ namespace LIBMOL
         
         tNBListOfSystem.building(refAtoms, aDim, tCellL, tCellShell, aMode);
         
-        std::vector<std::string>   existBondID;
+        // std::cout << "NB list for refAtoms set " << std::endl;   
         
+        
+        // std::vector<std::string>   existBondID;
+        int j=0;
         for (unsigned i=0; i <refAtoms.size(); i++)
         {
-            if (refAtoms[i].fracCoords[0] >=0.0 && refAtoms[i].fracCoords[0] <1.0
-                 && refAtoms[i].fracCoords[1] >=0.0 && refAtoms[i].fracCoords[1] <1.0
-                 && refAtoms[i].fracCoords[2] >=0.0 && refAtoms[i].fracCoords[2] <1.0 )
+            if (refAtoms[i].sId=="")
             {
+                j++;
+                std::cout << "Look for bonds to atom " << refAtoms[i].id 
+                           << " its sID " << refAtoms[i].sId << std::endl;
+                std::cout << "Its has " << refAtoms[i].neighbAtoms.size() 
+                          << " neighbor atoms. " <<std::endl;
                 for (std::vector<int>::iterator iNB=refAtoms[i].neighbAtoms.begin();
                         iNB !=refAtoms[i].neighbAtoms.end(); iNB++)
                 {
@@ -363,6 +405,13 @@ namespace LIBMOL
                     getBondingRangePairAtoms(refAtoms[i], refAtoms[(*iNB)],
                                          covalent_sensitivity, tPTab, 
                                          bondRange);
+                    
+                    std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
+                              << refAtoms[(*iNB)].sId << std::endl;
+                    std::cout << "Distance " << rD << std::endl;
+                    std::cout << "Range between " << bondRange[0]
+                              << " and " << bondRange[1] << std::endl;
+                              
                 
                     if (bondRange[0] >0.20 && bondRange[1] >0.20)
                     {
@@ -379,8 +428,10 @@ namespace LIBMOL
                 }
             }
         }
-        
+        std::cout << "Number of atoms in the unit cell considered " << j << std::endl;
+        std::cout << "Number of bonds (not unique bonds) : " << bonds.size() << std::endl;
         setUniqueAtomLinks(tPTab);
+        
         
     }
     
@@ -394,30 +445,34 @@ namespace LIBMOL
         tRange.push_back(-1.0);
         tRange.push_back(-1.0);
         
+        //std::cout << "atom 1 " << tAtm1.chemType << std::endl;
+        //std::cout << "atom 2 " << tAtm2.chemType << std::endl;
         
         if (tPTab.elements.find(tAtm1.chemType) !=tPTab.elements.end()
             && tPTab.elements.find(tAtm2.chemType) !=tPTab.elements.end())
         {
-            if (tPTab.elements[tAtm1.chemType].find("cova") 
-                     !=tPTab.elements[tAtm1.chemType].end()
-                && tPTab.elements[tAtm2.chemType].find("cova") 
-                     !=tPTab.elements[tAtm2.chemType].end() )
+            if (tPTab.elemProps[tAtm1.chemType].find("cova") 
+                     !=tPTab.elemProps[tAtm1.chemType].end()
+                && tPTab.elemProps[tAtm2.chemType].find("cova") 
+                     !=tPTab.elemProps[tAtm2.chemType].end() )
             {
-                if(tPTab.elements[tAtm1.chemType]["cova"] > 0.2
-                   && tPTab.elements[tAtm2.chemType]["cova"] > 0.2)
+                if(tPTab.elemProps[tAtm1.chemType]["cova"] > 0.2
+                   && tPTab.elemProps[tAtm2.chemType]["cova"] > 0.2)
                 {
-                    tRange[0] =  tPTab.elements[tAtm1.chemType]["cova"]
-                                +tPTab.elements[tAtm2.chemType]["cova"]
+                    tRange[0] =  tPTab.elemProps[tAtm1.chemType]["cova"]
+                                +tPTab.elemProps[tAtm2.chemType]["cova"]
                                 -tExtraD;
-                    tRange[1] =  tPTab.elements[tAtm1.chemType]["cova"]
-                                +tPTab.elements[tAtm2.chemType]["cova"]
+                    tRange[1] =  tPTab.elemProps[tAtm1.chemType]["cova"]
+                                +tPTab.elemProps[tAtm2.chemType]["cova"]
                                 +tExtraD;
                 }
                 else
                 {
-                    std::cout << "Bug! At least one of covalent radius for "
-                              << tAtm1.id << " or " << tAtm2.id 
-                              << " is wrong " << std::endl;
+                    std::cout << "Bug in at least one of atom covalent radius! "
+                              << std::endl << "atom " << tAtm1.id << " coval: "
+                              << tPTab.elemProps[tAtm1.chemType]["cova"] << std::endl
+                              << "atom " << tAtm2.id  << " coval: " 
+                              << tPTab.elemProps[tAtm2.chemType]["cova"] << std::endl;
                 }
             }
             else 
@@ -466,6 +521,10 @@ namespace LIBMOL
         {
             aBond.value = rD;
             bonds.push_back(aBond);
+            std::cout << "a bond between " << refAtoms[tIdxAtm1].id << " and "
+                      << refAtoms[tIdxAtm2].id << " is added to the b_list " 
+                      << std::endl << "Its bond length is " << aBond.value 
+                      << std::endl;
         }
     }
     

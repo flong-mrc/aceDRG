@@ -103,6 +103,8 @@ namespace LIBMOL
         // Destructor
         ~ChiralDict();
         
+        void setMutTable(int tChiralIdx);
+        
         ID                  id;       
         ID                  archID;
         int                 archPos;

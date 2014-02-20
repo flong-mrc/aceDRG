@@ -112,9 +112,8 @@ int main(int argc, char** argv) {
             
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
         
-            LIBMOL::AllSystem   aTargetSystem(dataFromCif);
-       
-        
+            LIBMOL::AllSystem   aTargetSystem(dataFromCif); 
+  
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
@@ -195,7 +194,6 @@ int main(int argc, char** argv) {
                         tOutName.append(LIBMOL::IntToStr(i));
                         aTargetSystem.setupAllTargetValuesFromCOD(tOutName.c_str(), 
                                                                   AJob.IOEntries["monoRootName"]);
-                        
                         // aTargetSystem.chiralExch();
                         if ( !aTargetSystem.containMetal()) 
                         {
@@ -206,8 +204,6 @@ int main(int argc, char** argv) {
                                                             AJob.IOEntries["monoRootName"]);           
                             aGlobMinSystem.Driver();
             
-                            
-                
                             LIBMOL::outMMCif(tOutName.c_str(),
                                              AJob.IOEntries["monoRootName"], 
                                              aGlobMinSystem.allAtoms,

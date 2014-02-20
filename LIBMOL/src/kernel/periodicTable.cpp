@@ -42,8 +42,8 @@ namespace LIBMOL
         elements["H"]["matType"] = 1;
         elements["H"]["atomNum"] = 1;
         elements["H"]["val"]     = 1;
-        elements["H"]["vdw"]     = 1.20;
-        elements["H"]["cova"]    = 0.23;
+        elemProps["H"]["vdw"]     = 1.20;
+        elemProps["H"]["cova"]    = 0.23;
         elemProps["H"]["vdw"]    = 1.20;
         elemProps["H"]["cova"] = 0.23;
         
@@ -55,8 +55,8 @@ namespace LIBMOL
         elements["C"]["matType"] = 2;
         elements["C"]["atomNum"] = 6;
         elements["C"]["val"]     = 4;
-        elements["H"]["vdw"]     = 1.20;
-        elements["H"]["cova"]    = 0.68;
+        elemProps["C"]["vdw"]     = 1.20;
+        elemProps["C"]["cova"]    = 0.68;
         elemProps["C"]["vdw"]    = 1.70;
         elemProps["C"]["cova"]   = 0.83;
         
@@ -66,8 +66,8 @@ namespace LIBMOL
         elements["N"]["matType"] = 2;
         elements["N"]["atomNum"] = 7;
         elements["N"]["val"]     = 3;
-        elements["N"]["vdw"]     = 1.55;
-        elements["N"]["cova"]    = 0.68;
+        elemProps["N"]["vdw"]     = 1.55;
+        elemProps["N"]["cova"]    = 0.68;
         elemProps["N"]["vdw"]    = 1.55;
         elemProps["N"]["cova"]   = 0.68;
          
@@ -77,18 +77,18 @@ namespace LIBMOL
         elements["O"]["matType"] = 2;
         elements["O"]["atomNum"] = 8;
         elements["O"]["val"]     = 2;
-        elements["O"]["vdw"]     = 1.52;
-        elements["O"]["cova"]    = 0.68;
-        elemProps["O"]["vdw"]      = 1.52;
-        elemProps["O"]["cova"]     = 0.68;
+        elemProps["O"]["vdw"]     = 1.52;
+        elemProps["O"]["cova"]    = 0.68;
+        elemProps["O"]["vdw"]    = 1.52;
+        elemProps["O"]["cova"]   = 0.68;
         
         elements["P"]["row"]       = 3;
         elements["P"]["group"]     = 15;
         elements["P"]["matType"]   = 2;
         elements["P"]["atomNum"]   = 15;
         elements["P"]["val"]       = 5;
-        elements["P"]["vdw"]       = 1.52;
-        elements["P"]["cova"]      = 0.68;
+        elemProps["P"]["vdw"]       = 1.52;
+        elemProps["P"]["cova"]      = 0.68;
         elemProps["P"]["vdw"]      = 1.80;
         elemProps["P"]["cova"]     = 1.05;
         
@@ -98,8 +98,8 @@ namespace LIBMOL
         elements["S"]["matType"]   = 2;
         elements["S"]["atomNum"]   = 16;
         elements["S"]["val"]       = 6;
-        elements["S"]["vdw"]       = 1.80;
-        elements["S"]["cova"]      = 1.05;
+        elemProps["S"]["vdw"]       = 1.80;
+        elemProps["S"]["cova"]      = 1.05;
         elemProps["S"]["vdw"]      = 1.80;
         elemProps["S"]["cova"]     = 1.02;
         
@@ -753,8 +753,8 @@ namespace LIBMOL
         extraValences["S"].push_back(2);
         extraValences["S"].push_back(4);
         
-        extraValences["C"].push_back(2);
-        extraValences["C"].push_back(3);  //rarely 
+        //extraValences["C"].push_back(2);
+        //extraValences["C"].push_back(3);  //rarely 
         
         extraValences["Hg"].push_back(1);
         extraValences["Cu"].push_back(1);

@@ -224,6 +224,85 @@ namespace LIBMOL
     {
     }
     
+    void ChiralDict::setMutTable(int tChiralIdx)
+    {
+        
+        
+                if((int)atoms.size() ==5)
+                { 
+                    if (tChiralIdx==1 ||
+                        tChiralIdx==2)
+                    {
+                        mutTable[atoms[1]].push_back(atoms[4]);
+                        mutTable[atoms[1]].push_back(atoms[3]);
+                        mutTable[atoms[1]].push_back(atoms[2]);
+
+                        mutTable[atoms[2]].push_back(atoms[1]);
+                        mutTable[atoms[2]].push_back(atoms[3]);
+                        mutTable[atoms[2]].push_back(atoms[4]);
+
+                        mutTable[atoms[3]].push_back(atoms[1]);
+                        mutTable[atoms[3]].push_back(atoms[2]);
+                        mutTable[atoms[3]].push_back(atoms[4]);
+
+                        mutTable[atoms[4]].push_back(atoms[3]);
+                        mutTable[atoms[4]].push_back(atoms[1]);
+                        mutTable[atoms[4]].push_back(atoms[2]);
+                    }
+
+                    if (tChiralIdx==-1)
+                    {
+                        mutTable[atoms[1]].push_back(atoms[2]);
+                        mutTable[atoms[1]].push_back(atoms[3]);
+                        mutTable[atoms[1]].push_back(atoms[4]);
+
+                        mutTable[atoms[2]].push_back(atoms[3]);
+                        mutTable[atoms[2]].push_back(atoms[1]);
+                        mutTable[atoms[2]].push_back(atoms[4]);
+
+                        mutTable[atoms[3]].push_back(atoms[2]);
+                        mutTable[atoms[3]].push_back(atoms[1]);
+                        mutTable[atoms[3]].push_back(atoms[4]);
+
+                        mutTable[atoms[4]].push_back(atoms[1]);
+                        mutTable[atoms[4]].push_back(atoms[3]);
+                        mutTable[atoms[4]].push_back(atoms[2]);
+                    }
+                }
+                else if((int)atoms.size() ==4)
+                {
+                    if (tChiralIdx==1 ||
+                        tChiralIdx==2)
+                    {
+                        mutTable[atoms[1]].push_back(atoms[3]);
+                        mutTable[atoms[1]].push_back(atoms[2]);
+
+                        mutTable[atoms[2]].push_back(atoms[1]);
+                        mutTable[atoms[2]].push_back(atoms[3]);
+
+                        mutTable[atoms[3]].push_back(atoms[1]);
+                        mutTable[atoms[3]].push_back(atoms[2]);
+
+                    }
+
+                    if (tChiralIdx==-1)
+                    {
+                        mutTable[atoms[1]].push_back(atoms[2]);
+                        mutTable[atoms[1]].push_back(atoms[3]);
+
+                        mutTable[atoms[2]].push_back(atoms[3]);
+                        mutTable[atoms[2]].push_back(atoms[1]);
+
+                        mutTable[atoms[3]].push_back(atoms[2]);
+                        mutTable[atoms[3]].push_back(atoms[1]);
+
+                    }
+                }
+
+                
+        
+        
+    }
     extern int inChirals(std::vector<ChiralDict> tChirals, 
                           AtomDict & tInAtom)
     {

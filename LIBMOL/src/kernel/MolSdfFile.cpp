@@ -209,6 +209,8 @@ namespace LIBMOL
         for (unsigned i=0; i < allMols.size(); i++)
         {
             addHAtomToMols(i);
+            setAtomsBondingAndChiralCenter(i);
+            setChiral(i);
         }
        
         
@@ -421,9 +423,450 @@ namespace LIBMOL
             allMols[tIdxMol].atoms[tIdxAtm].connHAtoms.push_back(aH.seriNum);
             
             allMols[tIdxMol].extraHAtoms.push_back(aH);
-            
         }
+        allMols[tIdxMol].hasCoords = false;
+        
         std::cout << tNumH << " H atoms have been added to bind atom " 
                   << allMols[tIdxMol].atoms[tIdxAtm].id << std::endl;  
+    }
+    
+    int MolSdfFile::getNumOxyConnect(int tIdxMol, std::vector<AtomDict>::iterator iA)
+    {
+        int nO=0;
+        for (std::vector<int>::iterator iC=iA->connAtoms.begin();
+                iC !=iA->connAtoms.end(); iC++)
+        {
+            if (allMols[tIdxMol].atoms[*iC].chemType.compare("O")==0)
+            {
+                nO++;
+            }
+        }
+        return nO;
+    }
+    
+    void MolSdfFile::setAtomsBondingAndChiralCenter(int tIdxMol)
+    {
+                // First round
+        for (std::vector<AtomDict>::iterator iAt = allMols[tIdxMol].atoms.begin();
+                iAt != allMols[tIdxMol].atoms.end(); iAt++)
+        {
+            int t_len =0;
+            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                    iConn !=iAt->connAtoms.end(); iConn++)
+            {
+                if(!allMols[tIdxMol].atoms[*iConn].isMetal)
+                {
+                    t_len++;
+                }
+            }
+
+            if (iAt->chemType.compare("C")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    if (iAt->chiralIdx ==0)
+                    {
+                        iAt->chiralIdx  = 2;
+                    }
+                    iAt->bondingIdx = 3;
+                }
+                else if (t_len ==3)
+                {
+                    iAt->chiralIdx  = 0;
+                    iAt->bondingIdx = 2;
+                }
+                else if(t_len==2)
+                {
+                    iAt->chiralIdx  = 0;
+                    if (getNumOxyConnect(tIdxMol, iAt)==1)
+                    {
+                        // water is removed 
+                        iAt->bondingIdx=2;
+                    }
+                    else
+                    {
+                        iAt->bondingIdx=1;
+                    }
+                }
+            }
+            else if (iAt->chemType.compare("N")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    if (iAt->chiralIdx ==0)
+                    {
+                        iAt->chiralIdx  = 2;
+                    } 
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3;  
+                }
+                //else if (t_len==3) // temp
+                //{
+                //    iAt->chiralIdx  = -1;
+                //    iAt->bondingIdx =  2;
+                //}
+                else if (t_len ==2)
+                {
+                    iAt->chiralIdx  = 0;
+                    iAt->bondingIdx = 2;
+                } 
+                else if (t_len==1)
+                {
+                    // triple bond 
+                    iAt->chiralIdx = 0;
+                    iAt->bondingIdx= 1;
+                }
+            }
+            else if (iAt->chemType.compare("B")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3;
+                }
+            }
+            else if (iAt->chemType.compare("O")==0)
+            {
+                if ((int)iAt->connAtoms.size()==2)
+                {
+                    iAt->bondingIdx = 2;
+                }
+            }
+            else if (iAt->chemType.compare("SI")==0 
+                    || iAt->chemType.compare("P")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    
+                    if (iAt->chiralIdx ==0)
+                    {
+                        std::vector<ID> atps;
+                        for (std::vector<int>::iterator iNA=iAt->connAtoms.begin();
+                                iNA !=iAt->connAtoms.end(); iNA++)
+                        {
+                            if (std::find(atps.begin(), atps.end(), allMols[tIdxMol].atoms[*iNA].chemType)==atps.end())
+                            {
+                                atps.push_back(allMols[tIdxMol].atoms[*iNA].chemType);
+                            }
+                        }
+                        if ((int)atps.size() >2)
+                        {
+                            iAt->chiralIdx  = 2;
+                        }
+                        else
+                        {
+                            iAt->chiralIdx =0;
+                        }
+                        // iAt->chiralIdx  = 2;
+                    }
+                   
+                    iAt->bondingIdx = 3; 
+                }
+                else if (t_len==3)
+                {
+                    if (iAt->chiralIdx ==0)
+                    {
+                        iAt->chiralIdx  = 2;
+                    }
+                    
+                    iAt->bondingIdx = 2; 
+                }
+            }
+            else if (iAt->chemType.compare("S")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4 || t_len==3)
+                {
+                    if (iAt->chiralIdx ==0)
+                    {
+                        iAt->chiralIdx  = 2;
+                    }
+                    iAt->bondingIdx = 3; 
+                }
+            }
+        }
+        
+        // more conditions 
+        
+        for (std::vector<AtomDict>::iterator iAt = allMols[tIdxMol].atoms.begin();
+                iAt != allMols[tIdxMol].atoms.end(); iAt++)
+        {   
+            int t_len =0;
+            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                    iConn !=iAt->connAtoms.end(); iConn++)
+            {
+                if(!allMols[tIdxMol].atoms[*iConn].isMetal)
+                {
+                    t_len++;
+                }
+            }
+
+            if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==3)
+                {
+                    bool l_sp2 = false;
+                    for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                            iCA != iAt->connAtoms.end(); iCA++)
+                    {
+                        if(allMols[tIdxMol].atoms[*iCA].bondingIdx == 2)
+                        {
+                            l_sp2 = true;
+                        }
+                    }
+                    if (l_sp2)
+                    {
+                        // Now we can say this atom is in sp2 orbits 
+                        iAt->chiralIdx  =  0;
+                        iAt->bondingIdx =  2;
+                    }
+                    else
+                    {
+                        if (iAt->chiralIdx ==0)
+                        {
+                            iAt->chiralIdx  = 2;
+                        }
+           
+                        iAt->bondingIdx =  3;
+                    }
+                } 
+            }
+        }
+        
+        // Further check if a chiral center is a real one
+        for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
+                iA != allMols[tIdxMol].atoms.end(); iA++)
+        {
+            if (iA->chiralIdx !=0)
+            {
+                
+                std::vector<ID> chirRAtms;
+                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
+                        iNB != iA->connAtoms.end(); iNB++)
+                {
+                    std::size_t tFind = allMols[tIdxMol].atoms[*iNB].chemType.find("H");
+                    if (tFind !=std::string::npos)
+                    {
+                        chirRAtms.push_back(allMols[tIdxMol].atoms[*iNB].id);
+                    }
+                }
+                
+                if ((int)chirRAtms.size() >1 && (int)iA->connAtoms.size() <=4)
+                {
+                    iA->chiralIdx = 0;
+                }
+            }
+        }
+        
+        /*
+                // First round
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            int t_len =0;
+            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                    iConn !=iAt->connAtoms.end(); iConn++)
+            {
+                if(!allAtoms[*iConn].isMetal)
+                {
+                    t_len++;
+                }
+            }
+            if (iAt->chemType.compare("C")==0)
+            {
+                //int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3;
+                }
+                else if (t_len ==3)
+                {
+                    iAt->chiralIdx  = -1;
+                    iAt->bondingIdx = 2;
+                } 
+            }
+            else if (iAt->chemType.compare("N")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3;  
+                }
+                //else if (t_len==3) // temp 
+                //{   // should do on the next round when all NB atoms are set
+                //    iAt->chiralIdx  = -1;
+                //    iAt->bondingIdx =  2;
+                // }
+                else if (t_len ==2)
+                {
+                    iAt->chiralIdx  = -1;
+                    iAt->bondingIdx =  2;
+                } 
+            }
+            else if (iAt->chemType.compare("B")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3;
+                }
+            }
+            else if (iAt->chemType.compare("SI")==0 
+                    || iAt->chemType.compare("P")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3; 
+                }
+                else if (t_len==3)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 2; 
+                }
+            }
+            else if (iAt->chemType.compare("S")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4 || t_len==3)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 3; 
+                }
+            }
+        }
+        
+        // more conditions 
+        
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {            
+            if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                int t_len =0;
+                for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                     iConn !=iAt->connAtoms.end(); iConn++)
+                {
+                    if(!allAtoms[*iConn].isMetal)
+                    {
+                        t_len++;
+                    }
+                }
+                if(t_len==3)
+                {
+                    
+                    bool l_sp2 = false;
+                    for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                            iCA != iAt->connAtoms.end(); iCA++)
+                    {
+                        if(allAtoms[*iCA].bondingIdx == 2)
+                        {
+                            l_sp2 = true;
+                        }
+                    }
+                    if (l_sp2)
+                    {
+                        // Now we can say this atom is in sp2 orbits 
+                        iAt->chiralIdx  = -1;
+                        iAt->bondingIdx =  2;
+                    }
+                    else
+                    {
+                        iAt->chiralIdx  =  1;
+                        iAt->bondingIdx =  3;
+                    }
+                } 
+            }
+        }
+ 
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA != allAtoms.end(); iA++)
+        {
+            if (iA->chiralIdx ==1)
+            {
+                std::vector<ID> chirRAtms;
+                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
+                        iNB != iA->connAtoms.end(); iNB++)
+                {
+                    std::size_t tFind = allAtoms[*iNB].chemType.find("H");
+                    if (tFind !=std::string::npos)
+                    {
+                        chirRAtms.push_back(allAtoms[*iNB].id);
+                    }
+                }
+                if ((int)chirRAtms.size() >1 && (int)iA->connAtoms.size() <=4)
+                {
+                    iA->chiralIdx = 0;
+                }
+            }
+        }
+        */
+        // No need for the third round, those could be defined in 
+        // the first round
+        // Check
+        /*
+        std::cout << "Chiral and plane feather for atoms in the system" 
+                  << std::endl;
+        
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            if (iAt->chiralIdx == -1)
+            {
+                std::cout << "Atom " << iAt->id << " may be in planes " 
+                        << std::endl;
+            }
+            else if (iAt->chiralIdx == 1)
+            {
+                std::cout << "Atom " << iAt->id << " may be in a chiral center "
+                        << std::endl;
+            }
+            else if (iAt->chiralIdx==2)
+            {
+                std::cout << "Atom " << iAt->id 
+                        << " may be in a chiral center but the volume sign undefined "
+                        << std::endl;
+            }
+            else 
+            {
+                std::cout << "Atom " << iAt->id << " is not a chiral center "
+                        << std::endl;
+            }
+        } 
+         */  
+        
+    }
+    
+    void MolSdfFile::setChiral(int tIdxMol)
+    {
+        for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
+                iA !=allMols[tIdxMol].atoms.end(); iA++)
+        {
+            if (iA->chiralIdx !=0)
+            {
+                int tChIdx = (int)allMols[tIdxMol].chirals.size();
+                iA->inChirals.push_back(tChIdx);
+                ChiralDict aCh;
+                aCh.atoms.push_back(iA->seriNum);
+                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
+                        iNB !=iA->connAtoms.end(); iNB++)
+                {
+                    aCh.atoms.push_back(*iNB);
+                    allMols[tIdxMol].atoms[*iNB].inChirals.push_back(tChIdx);
+                }
+                aCh.setMutTable(iA->chiralIdx);
+                allMols[tIdxMol].chirals.push_back(aCh);
+            }
+        }
     }
 }

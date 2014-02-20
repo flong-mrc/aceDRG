@@ -214,7 +214,8 @@ namespace LIBMOL
                           << "y:   " << iA->coords[1] << std::endl
                           << "z:   " << iA->coords[2] << std::endl;           
             }
-           
+            
+            
             
             /*
             std::cout << "There are " << (int)allHydroAtoms.size() 
@@ -939,7 +940,7 @@ namespace LIBMOL
                 if (itsCurAtom->existProps.find("fract_x") !=itsCurAtom->existProps.end()
                     && getCoords)
                 {
-                    TranslateIntoUnitCell(itsCurAtom->fracCoords);
+                    // TranslateIntoUnitCell(itsCurAtom->fracCoords);
                     FractToOrtho(itsCurAtom->fracCoords, itsCurAtom->coords, itsCurCryst->itsCell->a, 
                             itsCurCryst->itsCell->b, itsCurCryst->itsCell->c, itsCurCryst->itsCell->alpha,
                             itsCurCryst->itsCell->beta, itsCurCryst->itsCell->gamma);
@@ -950,12 +951,18 @@ namespace LIBMOL
                     OrthoToFract(itsCurAtom->coords, itsCurAtom->fracCoords, itsCurCryst->itsCell->a, 
                             itsCurCryst->itsCell->b, itsCurCryst->itsCell->c, itsCurCryst->itsCell->alpha,
                             itsCurCryst->itsCell->beta, itsCurCryst->itsCell->gamma);
-                    TranslateIntoUnitCell(itsCurAtom->fracCoords);
+                    // TranslateIntoUnitCell(itsCurAtom->fracCoords);
                     itsCurAtom->coords.clear();
                     FractToOrtho(itsCurAtom->fracCoords, itsCurAtom->coords, itsCurCryst->itsCell->a, 
                             itsCurCryst->itsCell->b, itsCurCryst->itsCell->c, itsCurCryst->itsCell->alpha,
                             itsCurCryst->itsCell->beta, itsCurCryst->itsCell->gamma);
                     hasCoords = true;
+                }
+                
+                if (hasProps["atom"].find("chemType") == hasProps["atom"].end() 
+                    && hasProps["atom"].find("id") != hasProps["atom"].end() )
+                {
+                    fromIdToChemType(itsCurAtom->id, itsCurAtom->chemType);
                 }
                
                 allAtoms.push_back(*itsCurAtom);
@@ -5752,6 +5759,7 @@ namespace LIBMOL
                             break;
                         }
                     }
+                    
                     if (allAtoms[itsCurChiral->atoms[0]].chiralIdx==1 ||
                         allAtoms[itsCurChiral->atoms[0]].chiralIdx==2)
                     {
@@ -5770,7 +5778,6 @@ namespace LIBMOL
                             itsCurChiral->mutTable[itsCurChiral->atoms[3]].push_back(idxA);
                             
                             // table for the atom not in the chiral list
-                        
                             for(int i=1; i < (int)itsCurChiral->atoms.size(); i++)
                             {
                                 itsCurChiral->mutTable[idxA].push_back(itsCurChiral->atoms[i]);
@@ -6336,7 +6343,7 @@ namespace LIBMOL
             outRestrF.close();
         }
     }
-    
+    /*
     extern void FractToOrtho(std::vector<REAL> & tFractCoords,
                              std::vector<REAL> & tOrthoCoords,
                              REAL a, REAL b, REAL c,
@@ -6357,7 +6364,8 @@ namespace LIBMOL
         
         tOrthoCoords[0] = tFractCoords[0]*a + tFractCoords[1]*b*coG + tFractCoords[2]*c*coB;
         tOrthoCoords[1] = tFractCoords[1]*b*siG + tFractCoords[2]*c*(coA-coB*coG)/siG;
-        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*coA*coB*coG)/siG;
+        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*b*c*coA*coB*coG)/siG;
     }
+     */
     
 }

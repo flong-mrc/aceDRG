@@ -51,6 +51,10 @@
 #include "neighbList.h"
 #endif
 
+#ifndef PDBFILE_H
+#include "PDBFile.h"
+#endif
+
 namespace LIBMOL
 {
     class SpaceGroupMember;

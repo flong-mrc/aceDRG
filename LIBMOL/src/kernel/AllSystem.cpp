@@ -105,6 +105,7 @@ namespace LIBMOL
     {
         AddAtoms(tMol.atoms);
         AddBonds(tMol.bonds);
+        AddChirals(tMol.chirals);
         setSysProps();
     }
     

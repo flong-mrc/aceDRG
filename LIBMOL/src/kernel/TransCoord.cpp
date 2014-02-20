@@ -231,8 +231,8 @@ namespace LIBMOL
   
         n_conn = (int)tAtoms[i_atom].tree["children"].size();
 
-        std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
-        std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
+        //std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
+        //std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
  
 
         while((n_conn > 0 && n_stack >= 0)|| (n_conn== 0 && n_stack > 0) )
@@ -240,7 +240,7 @@ namespace LIBMOL
             if ( n_conn > 1 &&  n_stack >= 0 ) 
             {
                 i_next = tAtoms[i_atom].tree["children"][i_conn];
-                std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
+                //std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
 	        // cin.get();
 	        //   if(tAllAtoms[i_next].occupancy < 0.001)  && tAllAtoms[i_next].type != "R")
 	   
@@ -532,9 +532,9 @@ namespace LIBMOL
                         iSSB != iSB->second.end(); iSSB++)
                 {
                     // Build a branch of the tree beginning with 3 atoms   
-                    std::cout << "Branch 1st atom " << tAtoms[iBr->first].id 
-                              << " 2nd " << tAtoms[iSB->first].id
-                              << " 3rd " << tAtoms[*iSSB].id << std::endl;
+                    //std::cout << "Branch 1st atom " << tAtoms[iBr->first].id 
+                    //          << " 2nd " << tAtoms[iSB->first].id
+                    //          << " 3rd " << tAtoms[*iSSB].id << std::endl;
                     
                     if ((int)tAtoms[*iSSB].tree["children"].size() > 0)
                     {
@@ -570,9 +570,9 @@ namespace LIBMOL
     {
         
         
-        std::cout << "Branch growth from " << tAtoms[sAtom1].id
-                << " and atom " << tAtoms[sAtom2].id 
-                << " and atom " << tAtoms[sAtom3].id << std::endl;
+        //std::cout << "Branch growth from " << tAtoms[sAtom1].id
+        //        << " and atom " << tAtoms[sAtom2].id 
+        //        << " and atom " << tAtoms[sAtom3].id << std::endl;
         
         const int NSTLIM2 = 3;
         const int NSTLIM =  10000;
@@ -726,8 +726,8 @@ namespace LIBMOL
   
         n_conn = (int)tAtoms[i_atom].tree["children"].size();
 
-        std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
-        std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
+        //std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
+        //std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
  
         std::vector<AtomDict> dAtms;
         std::vector<int>   aStartSet;
@@ -741,7 +741,7 @@ namespace LIBMOL
                 int i_prev   = tAtoms[i_atom].tree["parent"][0];
                 int i1 = tAtoms[i_atom].tree["children"][i_conn];
                 int i2 = -1;
-                std::cout << "new atom id " << tAtoms[i1].id << std::endl;
+                //std::cout << "new atom id " << tAtoms[i1].id << std::endl;
                 
                 if (tAtoms[i1].chemType=="H")
                 {
@@ -786,10 +786,10 @@ namespace LIBMOL
                 aSSet.push_back(i_prev);
                 aSSet.push_back(i_atom);
                 
-                std::cout << " The grand parent atom " << tAtoms[i_pprev].id << std::endl;
-                std::cout << " The parent atom " << tAtoms[i_prev].id << std::endl;
-                std::cout << " The current atom " << tAtoms[i_atom].id << std::endl;
-                std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
+                //std::cout << " The grand parent atom " << tAtoms[i_pprev].id << std::endl;
+                //std::cout << " The parent atom " << tAtoms[i_prev].id << std::endl;
+                //std::cout << " The current atom " << tAtoms[i_atom].id << std::endl;
+                //std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
                 
 	        // cin.get();
 	        //   if(tAllAtoms[i_next].occupancy < 0.001)  && tAllAtoms[i_next].type != "R")
@@ -810,10 +810,9 @@ namespace LIBMOL
                     //    PolToCart(tAtoms,i_atom, i_next, tBo, tTha, tPhi,  A);
                     //}
                     doneList.push_back(i_next);
-                    std::cout <<  tAtoms[i_next].id << " done0 " << std::endl;
-                    std::cout << " atom " << tAtoms[i_atom].id 
-                              << " chiral idx " <<tAtoms[i_atom].chiralIdx << std::endl;
-                    
+                    //std::cout <<  tAtoms[i_next].id << " done0 " << std::endl;
+                    //std::cout << " atom " << tAtoms[i_atom].id 
+                    //          << " chiral idx " <<tAtoms[i_atom].chiralIdx << std::endl;
                     
                     // grow other atoms linked to i_atom (like i_next)
                     // int i_chir = tAtoms[i_atom].chiralIdx;
@@ -850,22 +849,22 @@ namespace LIBMOL
                         for (std::vector<int>::iterator iNodeA=rTable.begin();
                                 iNodeA !=rTable.end(); iNodeA++)
                         {
-                            std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
+                            //std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
                             
                             int bIdx    = getBond(tBonds, i_atom, *iNodeA);
                             tBo         = tBonds[bIdx].valueST;
                             int aIdx    = getAngle(tAngles, i_atom, i_prev, *iNodeA);
                             tTha        = tAngles[aIdx].valueST;
-                            std::cout << "iL= " << iL << std::endl
-                                      << " tPhi" << tPhi << std::endl
-                                      << " deltal " << 2.0*PI/3.0 << std::endl;
+                            //std::cout << "iL= " << iL << std::endl
+                            //          << " tPhi" << tPhi << std::endl
+                            //          << " deltal " << 2.0*PI/3.0 << std::endl;
                             REAL tPhiI  = tPhi +iL*2.0*PI/3.0;
                             if (std::find(doneList.begin(), doneList.end(), *iNodeA) ==doneList.end())
                             {
                                 // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
                                 growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
                                 doneList.push_back(*iNodeA);
-                                std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                                //std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
                             }
                             iL++;
                         }
@@ -888,7 +887,7 @@ namespace LIBMOL
                                     growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
+                                    //std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
                                     iL++;
                                 }
                                 else if (tAtoms[i_atom].bondingIdx==2)
@@ -897,7 +896,7 @@ namespace LIBMOL
                                     growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
+                                    //std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
                                 }
                             }
                         }    
@@ -906,7 +905,7 @@ namespace LIBMOL
                     
                     optSubSystem(doneList, tAtoms, tBonds, tAngles,
                                  tTorsions, tRings, tPlas, tChs, false);
-                    std::cout << "The sub-system is optimized \n";
+                    //std::cout << "The sub-system is optimized \n";
                     
                     // Ring growth
                     
@@ -919,8 +918,8 @@ namespace LIBMOL
                         {
                             if (! tRings[*iRi].isPlanar)
                             {
-                                std::cout << "Grow the ring contain " << tAtoms[i_next].id
-                                          << std::endl;
+                                //std::cout << "Grow the ring contain " << tAtoms[i_next].id
+                                //          << std::endl;
                                 aStartSet.clear();
                                 if (i_atom == sAtom3)
                                 {
@@ -933,22 +932,22 @@ namespace LIBMOL
                                 }
                                 aStartSet.push_back(i_atom);
                                 aStartSet.push_back(i_next);
-                                std::cout << "S1 set " << aStartSet[0] << "\t"
-                                          << aStartSet[1] << "\t" << aStartSet[2] << std::endl;
+                                //std::cout << "S1 set " << aStartSet[0] << "\t"
+                                //          << aStartSet[1] << "\t" << aStartSet[2] << std::endl;
                                 ringBuilder(aStartSet, tRings[*iRi], tAtoms, tBonds, 
                                             tAngles, tTorsions, tRings, tPlas, tChs, iTurn, doneList);
                  
                                 
                                 optSubSystem(doneList, tAtoms, tBonds, tAngles,
                                               tTorsions, tRings, tPlas, tChs, false);
-                                std::cout << "The sub-system is optimized \n";
+                                //std::cout << "The sub-system is optimized \n";
                                
                                 iTurn++;    
                             }
                             else
                             {
-                                std::cout << "Grow the planar ring contain " << tAtoms[i_next].id
-                                          << std::endl;
+                                //std::cout << "Grow the planar ring contain " << tAtoms[i_next].id
+                                //          << std::endl;
                                 aStartSet.clear();
                                 if (i_atom == sAtom3)
                                 {
@@ -961,8 +960,8 @@ namespace LIBMOL
                                 }
                                 aStartSet.push_back(i_atom);
                                 aStartSet.push_back(i_next);
-                                std::cout << "S1 set " << tAtoms[aStartSet[0]].id << "\t"
-                                          << tAtoms[aStartSet[1]].id << "\t" << tAtoms[aStartSet[2]].id << std::endl;
+                                //std::cout << "S1 set " << tAtoms[aStartSet[0]].id << "\t"
+                                //          << tAtoms[aStartSet[1]].id << "\t" << tAtoms[aStartSet[2]].id << std::endl;
                                 ringBuilder(aStartSet, tRings[*iRi], tAtoms, tBonds, 
                                             tAngles, tTorsions, tRings, tPlas, tChs, iTurn, doneList);
                  
@@ -979,7 +978,7 @@ namespace LIBMOL
                     {
                         dAtms.push_back(tAtoms[*iD]);
                     }
-                  
+                    /*
                     int  a1    = (int)doneList.size();
                     if ( a1 > 5 )
                     {
@@ -987,6 +986,7 @@ namespace LIBMOL
                     
                         LIBMOL::outPDB(tName.c_str(), "XXX", dAtms);
                     }
+                     */
                     /*
                     else if (a1 > 50)
                     {
@@ -996,8 +996,8 @@ namespace LIBMOL
                      */
                 }
                 
-                std::cout << "0 i_conn " << i_conn << std::endl;
-                std::cout << "n_conn "   << n_conn << std::endl;
+                //std::cout << "0 i_conn " << i_conn << std::endl;
+                //std::cout << "n_conn "   << n_conn << std::endl;
 	                                     
                 if (i_conn < n_conn )
                 {
@@ -1051,8 +1051,8 @@ namespace LIBMOL
                     n_conn = 0;
                 }
                
-	        std::cout << " new i_atom: " << tAtoms[i_atom].id << std::endl;
-	        std::cout << " new n_conn: " << n_conn << std::endl;
+	        //std::cout << " new i_atom: " << tAtoms[i_atom].id << std::endl;
+	        //std::cout << " new n_conn: " << n_conn << std::endl;
 	  
             }
             else if (n_conn == 1)
@@ -1073,9 +1073,9 @@ namespace LIBMOL
                 }
                 
                 //= tAtoms[i_prev].tree["parent"][0];
-                std::cout << "3 grand parent atom is " << tAtoms[i_pprev].id << std::endl 
-                          << "3 prev atom is " << tAtoms[i_prev].id << std::endl
-                          << "3 current atom is " << tAtoms[i_atom].id << std::endl;
+                //std::cout << "3 grand parent atom is " << tAtoms[i_pprev].id << std::endl 
+                //          << "3 prev atom is " << tAtoms[i_prev].id << std::endl
+                //          << "3 current atom is " << tAtoms[i_atom].id << std::endl;
                 
                 i_next = tAtoms[i_atom].tree["children"][i_conn];
                 std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
@@ -1129,7 +1129,7 @@ namespace LIBMOL
                     
                     optSubSystem(doneList, tAtoms, tBonds, tAngles,
                                  tTorsions, tRings, tPlas, tChs, false);
-                    std::cout << "tree Node end: The sub-system is optimized \n";
+                    //std::cout << "tree Node end: The sub-system is optimized \n";
                     //REAL tLeng  = tAtoms[i_next].treeBond;
                     //REAL tAng   = PI-tAtoms[i_next].treeAngle; 
                     //REAL tTor   = tAtoms[i_next].treeTorsion;   
@@ -1147,13 +1147,16 @@ namespace LIBMOL
                     dAtms.push_back(tAtoms[*iD]);
                 }
                   
+                /*
                 int  a1    = (int)doneList.size();
+               
                 if ( a1 > 5 )
                 {
                     std::string tName = "atoms_" + IntToStr(a1) + ".pdb";
                     
                     LIBMOL::outPDB(tName.c_str(), "XXX", dAtms);
                 }
+                 */
                     /*
                     else if (a1 > 50)
                     {
@@ -1464,10 +1467,10 @@ namespace LIBMOL
         th_i   = PI-tAng; 
         phi_i  = tTor;
         
-        std::cout << "in: Current atom is "   << tAtoms[i_next].id << std::endl
-                  << " its tree bond is " << length << std::endl
-                  << " its angle is "     << th_i << "(" << th_i*PID180 << ")"  << std::endl
-                  << " its torsion is "   << phi_i  << std::endl;
+        //std::cout << "in: Current atom is "   << tAtoms[i_next].id << std::endl
+        //          << " its tree bond is " << length << std::endl
+        //          << " its angle is "     << th_i << "(" << th_i*PID180 << ")"  << std::endl
+        //          << " its torsion is "   << phi_i  << std::endl;
        
                    
         c_th_i = cos(th_i);
@@ -1938,7 +1941,7 @@ namespace LIBMOL
                                       int                         iSeq,                                          
                                       int tIdx, std::vector<int>& tDoneSet)
     {
-        std::cout << "growOneRingNode " << std::endl;
+        //std::cout << "growOneRingNode " << std::endl;
         int dim = (int)tAtoms[0].coords.size();
 
         REAL **A = new REAL * [dim];
@@ -2131,38 +2134,38 @@ namespace LIBMOL
                             rTable.push_back(*irA2);
                         }
                         
-                        std::cout << "Chiral center " << tAtoms[sSet[2]].id << std::endl;
-                        std::cout << "chiral description  " << tChs[aCh].signST << std::endl;
-                        std::cout << "Atom arrangement " << std::endl;
-                        std::cout << "from atom " << tAtoms[sSet[1]].id  << " clockwise " << std::endl;
-                        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
-                        for (std::vector<int>::iterator iNA=rTable.begin();
-                                iNA !=rTable.end(); iNA++)
-                        {
-                            std::cout << "Atom " << tAtoms[*iNA].id << std::endl;
-                        }
+                        //std::cout << "Chiral center " << tAtoms[sSet[2]].id << std::endl;
+                        //std::cout << "chiral description  " << tChs[aCh].signST << std::endl;
+                        //std::cout << "Atom arrangement " << std::endl;
+                        //std::cout << "from atom " << tAtoms[sSet[1]].id  << " clockwise " << std::endl;
+                        //std::cout << "atom " << tAtoms[tIdx].id << std::endl;
+                        //for (std::vector<int>::iterator iNA=rTable.begin();
+                        //        iNA !=rTable.end(); iNA++)
+                        //{
+                        //    std::cout << "Atom " << tAtoms[*iNA].id << std::endl;
+                        //}
                         
                         int iL=1;
                         
                         for (std::vector<int>::iterator iNodeA=rTable.begin();
                                 iNodeA !=rTable.end(); iNodeA++)
                         {
-                            std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
+                            //std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
                             
                             int bIdx    = getBond(tBonds, sSet[2], *iNodeA);
                             REAL tBo         = tBonds[bIdx].value;
                             int aIdx    = getAngle(tAngles, sSet[2], sSet[1], *iNodeA);
                             REAL tTha        = tAngles[aIdx].valueST;
-                            std::cout << "iL= " << iL << std::endl
-                                      << " tTor" << aTor << std::endl
-                                      << " deltal " << 2.0*PI/3.0 << std::endl;
+                            //std::cout << "iL= " << iL << std::endl
+                            //          << " tTor" << aTor << std::endl
+                            //          << " deltal " << 2.0*PI/3.0 << std::endl;
                             REAL tPhiI  = aTor +iL*2.0*PI/3.0;
                             if (std::find(doneList.begin(), doneList.end(), *iNodeA) ==doneList.end())
                             {
                                 // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
                                 growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
                                 doneList.push_back(*iNodeA);
-                                std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                                //std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
                             }
                             iL++;
                         }
@@ -2187,7 +2190,7 @@ namespace LIBMOL
                                     growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
+                                    //std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
                                     iL++;
                                 }
                                 else if (tAtoms[sSet[2]].bondingIdx==2)
@@ -2196,7 +2199,7 @@ namespace LIBMOL
                                     growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
+                                    //std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
                                 }
                             }
                         }
@@ -2312,7 +2315,7 @@ namespace LIBMOL
                                        int                         iSeq,                                          
                                        int tIdx, std::vector<int>& tDoneSet)
     {
-        std::cout << "growOneRingNode2 " << std::endl;
+        //std::cout << "growOneRingNode2 " << std::endl;
         int dim = (int)tAtoms[0].coords.size();
 
         REAL **A = new REAL * [dim];
@@ -2472,10 +2475,10 @@ namespace LIBMOL
             {
                 aTor = getTorsion(tAtoms[sSet[0]], tAtoms[sSet[1]], tAtoms[sSet[2]], tAtoms[tIdx])*PI180;
                 // debug 
-                std::cout << "atom " << tAtoms[tIdx].id << "has already had coords "
-                          << " it is torsion value is " 
-                          << aTor
-                          << std::endl;
+                //std::cout << "atom " << tAtoms[tIdx].id << "has already had coords "
+                //          << " it is torsion value is " 
+                //          << aTor
+                //          << std::endl;
                 
             }
             
@@ -2511,38 +2514,38 @@ namespace LIBMOL
                             rTable.push_back(*irA2);
                         }
                         
-                        std::cout << "Chiral center " << tAtoms[sSet[2]].id << std::endl;
-                        std::cout << "chiral description  " << tChs[aCh].signST << std::endl;
-                        std::cout << "Atom arrangement " << std::endl;
-                        std::cout << "from atom " << tAtoms[sSet[1]].id  << " clockwise " << std::endl;
-                        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
-                        for (std::vector<int>::iterator iNA=rTable.begin();
-                                iNA !=rTable.end(); iNA++)
-                        {
-                            std::cout << "Atom " << tAtoms[*iNA].id << std::endl;
-                        }
+                        //std::cout << "Chiral center " << tAtoms[sSet[2]].id << std::endl;
+                        //std::cout << "chiral description  " << tChs[aCh].signST << std::endl;
+                        //std::cout << "Atom arrangement " << std::endl;
+                        //std::cout << "from atom " << tAtoms[sSet[1]].id  << " clockwise " << std::endl;
+                        //std::cout << "atom " << tAtoms[tIdx].id << std::endl;
+                        //for (std::vector<int>::iterator iNA=rTable.begin();
+                        //        iNA !=rTable.end(); iNA++)
+                        //{
+                        //    std::cout << "Atom " << tAtoms[*iNA].id << std::endl;
+                        //}
                         
                         int iL=1;
                         
                         for (std::vector<int>::iterator iNodeA=rTable.begin();
                                 iNodeA !=rTable.end(); iNodeA++)
                         {
-                            std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
+                            //std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
                             
                             int bIdx    = getBond(tBonds, sSet[2], *iNodeA);
                             REAL tBo         = tBonds[bIdx].valueST;
                             int aIdx    = getAngle(tAngles, sSet[2], sSet[1], *iNodeA);
                             REAL tTha        = tAngles[aIdx].valueST;
-                            std::cout << "iL= " << iL << std::endl
-                                      << " tTor" << aTor << std::endl
-                                      << " deltal " << 2.0*PI/3.0 << std::endl;
+                            //std::cout << "iL= " << iL << std::endl
+                            //          << " tTor" << aTor << std::endl
+                            //          << " deltal " << 2.0*PI/3.0 << std::endl;
                             REAL tPhiI  = aTor +iL*2.0*PI/3.0;
                             if (std::find(doneList.begin(), doneList.end(), *iNodeA) ==doneList.end())
                             {
                                 // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
                                 growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
                                 doneList.push_back(*iNodeA);
-                                std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                                //std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
                             }
                             iL++;
                         }
@@ -2567,7 +2570,7 @@ namespace LIBMOL
                                     growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
+                                    //std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
                                     iL++;
                                 }
                                 else if (tAtoms[sSet[2]].bondingIdx==2)
@@ -2576,7 +2579,7 @@ namespace LIBMOL
                                     growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
+                                    //std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
                                 }
                             }
                         }
@@ -2703,18 +2706,18 @@ namespace LIBMOL
         std::string tD;
         int iNext;
         
-        std::cout << "sSet[2]=" << sSet[2] << "  " << tAtoms[sSet[2]].id << std::endl
-                  << " c "  << tRing.atomsLink[sSet[2]]["c"] << "  " 
-                  << tAtoms[tRing.atomsLink[sSet[2]]["c"]].id 
-                  << " ac " << tRing.atomsLink[sSet[2]]["ac"] << "  " 
-                  << tAtoms[tRing.atomsLink[sSet[2]]["ac"]].id  << std::endl;
+        //std::cout << "sSet[2]=" << sSet[2] << "  " << tAtoms[sSet[2]].id << std::endl
+        //          << " c "  << tRing.atomsLink[sSet[2]]["c"] << "  " 
+        //          << tAtoms[tRing.atomsLink[sSet[2]]["c"]].id 
+        //          << " ac " << tRing.atomsLink[sSet[2]]["ac"] << "  " 
+        //          << tAtoms[tRing.atomsLink[sSet[2]]["ac"]].id  << std::endl;
         
-        std::cout << "Done set : \n";
-        for (std::vector<int>::iterator iD=doneSet.begin();
-                iD !=doneSet.end(); iD++)
-        {
-            std::cout << *iD << "\t" << tAtoms[*iD].id << std::endl;
-        }
+        //std::cout << "Done set : \n";
+        //for (std::vector<int>::iterator iD=doneSet.begin();
+        //        iD !=doneSet.end(); iD++)
+        //{
+        //    std::cout << *iD << "\t" << tAtoms[*iD].id << std::endl;
+        //}
        
         std::vector<int> idxR;
         for (std::vector<AtomDict>::iterator iA=tRing.atoms.begin();
@@ -2754,7 +2757,7 @@ namespace LIBMOL
         int tRingAtmSeq =1;
         while (iL < iSize-1)
         {
-            std::cout << "ring atom grow  " << iNext << "  " << tAtoms[iNext].id << std::endl;
+            //std::cout << "ring atom grow  " << iNext << "  " << tAtoms[iNext].id << std::endl;
             std::vector<int> curSSet;
             setCurStartSet(sSet, curSSet, iNext, tD, tRing, doneSet);
             //growOneAtom(curSSet, tAtoms, tBonds, tAngles, tTorsions, iNext);
@@ -2764,8 +2767,8 @@ namespace LIBMOL
             {
                 tInR=true;
             }
-            std::cout << "sSet[0] " << tAtoms[sSet[0]].id << std::endl;
-            std::cout << "tInR "  << tInR << std::endl;
+            //std::cout << "sSet[0] " << tAtoms[sSet[0]].id << std::endl;
+            //std::cout << "tInR "  << tInR << std::endl;
             
             //if (std::find(doneSet.begin(), doneSet.end(), iNext)==doneSet.end())
             //{
@@ -2787,14 +2790,14 @@ namespace LIBMOL
         }
         optSubSystem(doneList, tAtoms, tBonds, tAngles,
                      tTorsions, tRings, tPlas, tChs, false);
-        std::cout << "tree Node end: The sub-system is optimized \n";
+        //std::cout << "tree Node end: The sub-system is optimized \n";
         
         // Then grow the atoms linked to the last atom in the ring
         std::vector<int> curSSet;
         setCurStartSet(sSet, curSSet, iNext, tD, tRing, doneSet);
         bool tInR=true;
-        std::cout << "Grow atoms linked to the last atom in the ring" << std::endl;
-        std::cout << "sSet[0] " << tAtoms[sSet[0]].id << std::endl;
+        //std::cout << "Grow atoms linked to the last atom in the ring" << std::endl;
+        //std::cout << "sSet[0] " << tAtoms[sSet[0]].id << std::endl;
         growOneRingNode2(curSSet, tAtoms, tBonds, tAngles, tTorsions, tChs, tInR, tRingAtmSeq, iNext, doneSet);
     }
     
@@ -2810,7 +2813,7 @@ namespace LIBMOL
     {
         int i =0;
         std::map<int, int> idxCov;
-        std::cout << "in sub-system " << std::endl;
+        //std::cout << "in sub-system " << std::endl;
         
         // get atoms in sub-systems, re-set its serial number
         for (std::vector<int>::iterator iA=tDoneSet.begin();
@@ -2818,7 +2821,7 @@ namespace LIBMOL
         {
             
             tSubSys.allAtoms.push_back(tAllAtoms[*iA]);
-            std::cout << "the " << i+1 << " atom is " << tSubSys.allAtoms[i].id << std::endl;
+            // std::cout << "the " << i+1 << " atom is " << tSubSys.allAtoms[i].id << std::endl;
             tSubSys.allAtoms[i].seriNum = i;
             idxCov[*iA] = i;
             tSubSys.allAtoms[i].connAtoms.clear();
@@ -2952,7 +2955,7 @@ namespace LIBMOL
                   << (int)aSubSys.allTorsions.size() << " torsions "    << std::endl
                   << (int)aSubSys.allPlanes.size()   << " planes "      << std::endl;
                  // << (int)aSubSys.allRingsV.size() << " rings  "   << std::endl;
-        LIBMOL::outPDB("sub_tree.pdb", "XXX", aSubSys.allAtoms);
+        // LIBMOL::outPDB("sub_tree.pdb", "XXX", aSubSys.allAtoms);
         
         
         
@@ -2972,8 +2975,8 @@ namespace LIBMOL
            GO::FindGlobMin toolGO(aSubSys);
            toolGO.Driver(true, 0);
         }
-        std::string tSubName = "sub_tree_" + IntToStr((int)aSubSys.allAtoms.size()) + "_opt.pdb";
-        LIBMOL::outPDB(tSubName.c_str(), "XXX", aSubSys.allAtoms);
+        //std::string tSubName = "sub_tree_" + IntToStr((int)aSubSys.allAtoms.size()) + "_opt.pdb";
+        //LIBMOL::outPDB(tSubName.c_str(), "XXX", aSubSys.allAtoms);
        
         int tSize= (int)tAllAtoms.size();
         for (std::vector<AtomDict>::iterator iSA=aSubSys.allAtoms.begin();

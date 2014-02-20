@@ -176,7 +176,7 @@ namespace GO
                                  tTors,  tRings, tPlas, tChs, tAllAtoms);
                 
                 curObjValue = finObj;
-                std::cout << "After local min by L-BFGS, the objective value is "
+                std::cout << "After a local min, the objective value is "
                         << curObjValue << std::endl;
                 
             }
@@ -334,7 +334,7 @@ namespace GO
                                  tTors,  tRings, tPlas, tChs);
                 
                 curObjValue = finObj;
-                std::cout << "After local min by L-BFGS, the objective value is "
+                std::cout << "After a local min, the objective value is "
                         << curObjValue << std::endl;
                 
             }

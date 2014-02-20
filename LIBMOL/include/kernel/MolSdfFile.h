@@ -135,9 +135,12 @@ namespace LIBMOL
         void addHAtoms(int tIdxMol, 
                        int tIdxAtm,
                        REAL tNumH);
+        
         REAL  getBondOrder(int tIdxMol,
                           int tIdx1, int tIdx2);
-        
+        int  getNumOxyConnect(int tIdxMol, std::vector<AtomDict>::iterator iA);
+        void setAtomsBondingAndChiralCenter(int tIdxMol);
+        void setChiral(int tIdxMol);
 
         ID                      molName;
         ID                      creatProg; 

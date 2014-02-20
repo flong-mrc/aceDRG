@@ -1,3 +1,47 @@
-MolSdfFile.cpp:                    std::cout << "Here " << std::endl;
-chiral.cpp:            // std::cout << "Here " << std::endl;
-codClassify.cpp:        std::cout << "Here " << std::endl;
+AllSystem.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+AllSystem.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+AllSystem.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+AllSystem.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+AllSystem.cpp:        if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+AllSystem.cpp:            int iCh = allAtoms[tIdx1].inChirals[0];
+AllSystem.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+AllSystem.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+AllSystem.cpp:        if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+AllSystem.cpp:            int iCh = allAtoms[tIdx1].inChirals[0];
+AllSystem.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+AllSystem.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+AllSystem.cpp:            if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+AllSystem.cpp:                int iCh = allAtoms[tIdx1].inChirals[0];
+AllSystem.cpp:            if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+AllSystem.cpp:                int iCh = allAtoms[tIdx1].inChirals[0];
+DictCifFILE.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+DictCifFILE.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+DictCifFILE.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+DictCifFILE.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+DictCifFILE.cpp:        if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+DictCifFILE.cpp:            int iCh = allAtoms[tIdx1].inChirals[0];
+DictCifFILE.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+DictCifFILE.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+DictCifFILE.cpp:        if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+DictCifFILE.cpp:            int iCh = allAtoms[tIdx1].inChirals[0];
+DictCifFILE.cpp:        if ((int)allAtoms[tIdx2].inChirals.size() !=0)
+DictCifFILE.cpp:            int iCh = allAtoms[tIdx2].inChirals[0];
+DictCifFILE.cpp:            if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+DictCifFILE.cpp:                int iCh = allAtoms[tIdx1].inChirals[0];
+DictCifFILE.cpp:            if ((int)allAtoms[tIdx1].inChirals.size() !=0)
+DictCifFILE.cpp:                int iCh = allAtoms[tIdx1].inChirals[0];
+DictCifFILE.cpp:                        allAtoms[iPos].inChirals.push_back(itsCurChiralSeriNum);
+TransCoord.cpp:                    if (tAtoms[i_atom].chiralIdx !=0 && (int)tChs[tAtoms[i_atom].inChirals[0]].mutTable.size() !=0)
+TransCoord.cpp:                        int aCh = tAtoms[i_atom].inChirals[0];
+TransCoord.cpp:                        int aCh = tAtoms[sSet[2]].inChirals[0];
+TransCoord.cpp:                        int aCh = tAtoms[sSet[2]].inChirals[0];
+atom.cpp:        for(std::vector<int>::const_iterator iCh=tAtom.inChirals.begin();
+atom.cpp:                iCh!=tAtom.inChirals.end(); iCh++)
+atom.cpp:            inChirals.push_back(*iCh);
+atomsTree.cpp:                  << " is in " << (int)tAtoms[startAtom].inChirals.size() << std::endl;
+atomsTree.cpp:        if ((int)tAtoms[startAtom].inChirals.size() !=0)
+atomsTree.cpp:            int iCh = tAtoms[startAtom].inChirals[0];
+chiral.cpp:    extern int inChirals(std::vector<ChiralDict> tChirals, 
+chiral.cpp:                std::find(tInAtom.inChirals.begin(), tInAtom.inChirals.end(), iCh)
+chiral.cpp:                    ==tInAtom.inChirals.end())
+chiral.cpp:                tInAtom.inChirals.push_back(iCh);

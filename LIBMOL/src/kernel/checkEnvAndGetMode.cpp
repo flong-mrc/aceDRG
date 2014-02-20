@@ -159,13 +159,13 @@ namespace LIBMOL
         iKeyFinder = IOEntries.find("monoRootName");
         if (iKeyFinder ==IOEntries.end() )
         {
-            IOEntries["monoRootName"] ="XXX";
+            IOEntries["monoRootName"] ="UNL";
         }
         else
         {
             if (IOEntries["monoRootName"].empty())
             {
-                IOEntries["monoRootName"] ="XXX";
+                IOEntries["monoRootName"] ="UNL";
             }
         }
         
@@ -405,7 +405,13 @@ namespace LIBMOL
         }
         else if (workMode==31 || workMode==32)
         {
-            
+            std::cout << "Your job is to deduce values of bond and bond-angle"
+                      << " and build molecules from your input cif file "
+                      << std::endl
+                      << "Your input cif file : " << IOEntries["inCifNameB"] << std::endl
+                      << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+                      << "The output dictionary file(cif) : " << IOEntries["userOutName"]
+                      << std::endl;
         }   
         else if (workMode==41)
         {

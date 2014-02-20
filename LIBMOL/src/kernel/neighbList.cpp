@@ -1001,12 +1001,12 @@ namespace LIBMOL
                 }
             }
             
-            std::cout << "Max coords " <<  coordsMax[0]
-                      << ", " << coordsMax[1] << ", "
-                      << coordsMax[2] << std::endl;
-            std::cout << "min coords " <<  coordsMin[0]
-                      << ", " << coordsMin[1] << ", "
-                      << coordsMin[2] << std::endl;      
+            //std::cout << "Max coords " <<  coordsMax[0]
+            //          << ", " << coordsMax[1] << ", "
+            //          << coordsMax[2] << std::endl;
+            //std::cout << "min coords " <<  coordsMin[0]
+            //          << ", " << coordsMin[1] << ", "
+            //          << coordsMin[2] << std::endl;      
             
             // get cell length and number of cells in each dimension
             
@@ -1090,9 +1090,11 @@ namespace LIBMOL
        
         
         
-        //std::cout << "Non-empty cells " <<  allNECells.size() << std::endl;
-        /*
+        
         // Check nonempty cell;
+        /*
+        std::cout << "Non-empty cells " <<  allNECells.size() << std::endl;
+        int tT=0;
         for (std::vector<NBCellDict>::iterator iNB =allNECells.begin(); 
                 iNB != allNECells.end(); iNB++)
         {
@@ -1101,11 +1103,12 @@ namespace LIBMOL
                 <<std::endl;
              std::cout << "Number of atoms in the cell " 
                       << iNB->atomsInCell.size() << std::endl;
+             tT+=((int)iNB->atomsInCell.size());
              //std::cout << "Number of residues in the cell " 
              //         << iNB->residueList.size() << std::endl;
         }
-         */
-        
+        std::cout << "Total number of atoms in all NB cells is " << tT << std::endl;
+        */
         
        
     }
@@ -1157,7 +1160,7 @@ namespace LIBMOL
     
     void NeighbListDict::putAtomsAndResiduesInCell(std::vector<AtomDict> & aAtomList)
     {   
-        //std::cout << "Number of atoms is " << allAtoms.size() << std::endl;
+        // std::cout << "Number of atoms is " << aAtomList.size() << std::endl;
         
         for (std::vector<AtomDict>::iterator iT=aAtomList.begin();
                 iT != aAtomList.end(); iT++)
@@ -1327,7 +1330,7 @@ namespace LIBMOL
                     iA1!=tCell1.atomsInCell.end(); iA1++)
         {
             
-            // std::cout << "Build NBList for atom " << *iA1 << std::endl;
+            std::cout << "1 Build NBList for atom " << *iA1 << std::endl;
             for (std::vector<int>::iterator iA2 = tCell2.atomsInCell.begin();
                         iA2 != tCell2.atomsInCell.end(); iA2++)
             {
@@ -1338,8 +1341,8 @@ namespace LIBMOL
                         aAtomList[*iA1].neighbAtoms.end(), *iA2) ==aAtomList[*iA1].neighbAtoms.end())
                     {
                         aAtomList[*iA1].neighbAtoms.push_back((*iA2));
-                        // std::cout << "atom " << aAtomList[*iA2].id
-                        //          << " has been added to the list" << std::endl;
+                        std::cout << "atom " << aAtomList[*iA2].id
+                                  << " has been added to the list" << std::endl;
                     }
                     if (std::find(aAtomList[*iA2].neighbAtoms.begin(),
                         aAtomList[*iA2].neighbAtoms.end(), *iA1) ==aAtomList[*iA2].neighbAtoms.end())
@@ -1541,12 +1544,12 @@ namespace LIBMOL
           
        */
         
-        //std::cout << std::endl << "------------------------------------------"
-        //          << std::endl;
+        // std::cout << std::endl << "------------------------------------------"
+        //           << std::endl;
         // std::cout << "Build neighbor list System " << std::endl;
-        //time_t rtime;
-        //time(&rtime);
-        //std::cout << "Current time is " << ctime(&rtime);
+        // time_t rtime;
+        // time(&rtime);
+        // std::cout << "Current time is " << ctime(&rtime);
         
         for (std::vector<AtomDict>::iterator iA=aAtomList.begin();
                 iA != aAtomList.end(); iA++)

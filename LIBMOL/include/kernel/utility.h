@@ -62,6 +62,7 @@ namespace LIBMOL
     }
     
     */
+    
     // numerical transform 
     extern bool isInt(std::string tS);
     extern int StrToInt(std::string tS);
@@ -223,15 +224,14 @@ namespace LIBMOL
     extern void Plane_and_Deriv_Find(int  num_atoms, REAL  **coords_atoms,
                                      REAL   *coeffs, REAL **d_coeffs);    
     
-    // Random number generator
+    // some math functions such as Random number generator
     extern REAL GetRand();
-    
-    // Function dealt with environment variables and scripts
-    
     extern void initPrimeTab(std::vector<int> & tPrimeTab);
     
+    // Chemical properties related functions 
     extern void initMetalTab(std::vector<ID> & tMeTab);
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID);
+    extern void fromIdToChemType(ID tId, ID & tChemType);
     
     // symmetry related operations 
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 
@@ -248,11 +248,18 @@ namespace LIBMOL
     
     extern void TranslateIntoUnitCell(std::vector<REAL> & tFracX);
     
+    
+    extern void FractToOrtho(std::vector<REAL> & tFractCoords,
+                             std::vector<REAL> & tOrthoCoords,
+                             REAL a, REAL b, REAL c,
+                             REAL alpha, REAL beta, REAL gamma);
+    
     extern void OrthoToFract(std::vector<REAL> tOrthoCoords,
                              std::vector<REAL> tFractCoords,
                              REAL a,     REAL b,    REAL c,
                              REAL alpha, REAL beta, REAL gamma);
     
+    // Function dealt with environment variables and scripts
     // executing external program using command line arguments
     extern void cmdExecute(std::string & tCom);
 

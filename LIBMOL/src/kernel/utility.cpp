@@ -1511,6 +1511,29 @@ namespace LIBMOL
         return iFound;
     }
     
+    extern void fromIdToChemType(ID tId, ID & tChemType)
+    {
+        unsigned j=0;
+        for (unsigned i=0; i < tId.size(); i++)
+        {
+            char tCh=tId[i];
+            if (!std::isdigit(tCh))
+            {
+                std::string tStr(tId.substr(i, 1));
+                if(j==0)
+                {
+                    StrUpper(tStr);
+                }
+                else
+                {
+                    StrLower(tStr);
+                }
+                tChemType.append(TrimSpaces(tStr));
+                j++;
+            }
+        }
+    }
+    
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 
                              std::vector<std::vector<REAL> >    & tMat)
     {
@@ -1631,9 +1654,8 @@ namespace LIBMOL
         
     }
     
-    /*
     extern void FractToOrtho(std::vector<REAL> & tFractCoords,
-                      std::vector<REAL> & tOrthoCoords,
+                             std::vector<REAL> & tOrthoCoords,
                              REAL a, REAL b, REAL c,
                              REAL alpha, REAL beta, REAL gamma)
     {
@@ -1652,9 +1674,9 @@ namespace LIBMOL
         
         tOrthoCoords[0] = tFractCoords[0]*a + tFractCoords[1]*b*coG + tFractCoords[2]*c*coB;
         tOrthoCoords[1] = tFractCoords[1]*b*siG + tFractCoords[2]*c*(coA-coB*coG)/siG;
-        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*coA*coB*coG)/siG;
+        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*b*c*coA*coB*coG)/siG;
     }
-    */
+    
     extern void OrthoToFract(std::vector<REAL> tOrthoCoords,
                              std::vector<REAL> tFractCoords,
                              REAL a, REAL b, REAL c,
@@ -1673,9 +1695,9 @@ namespace LIBMOL
         REAL coG   = cos(gamma*PI180);
         REAL siG   = sin(gamma*PI180);
         REAL tgG   = coG/siG;
-        REAL reV   = sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA, 2.0) + 2*coA*coB*coG);
+        REAL reV   = sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA, 2.0) + 2*b*c*coA*coB*coG);
         
-        tFractCoords[0] = tOrthoCoords[0]/a - tOrthoCoords[1]*tgG/a + tOrthoCoords[2]*tgG*(coA-2*coB*coG)/(a*reV);
+        tFractCoords[0] = tOrthoCoords[0]/a - tOrthoCoords[1]*tgG/a + tOrthoCoords[2]*tgG*(coA-coB*coG)/(a*reV);
         tFractCoords[1] = tOrthoCoords[1]/(b*siG) - tOrthoCoords[2]*(coA - coB*coG)/(b*reV*siG);
         tFractCoords[2] = tOrthoCoords[2]*siG/(c*reV);
         
@@ -1685,26 +1707,25 @@ namespace LIBMOL
     // a simple version 
     extern void cmdExecute(std::string & tCom)
     {
-       
-        //pid_t  pid=fork();
-        //int    status;
+        pid_t  pid=fork();
+        int    status;
 
-        //if (pid < 0) 
-       // {     
+        if (pid < 0) 
+        {     
             /* fork a child process           */
-       //     std::cout << "*** ERROR: forking child process failed for command lines: " 
-       //               << std::endl << tCom << std::endl;
-       //     exit(1);
-       // }
-       // else if (pid == 0)
-       // {
+            std::cout << "*** ERROR: forking child process failed for command lines: " 
+                      << std::endl << tCom << std::endl;
+            exit(1);
+        }
+        else if (pid == 0)
+        {
             /* for the child process:         */
-       //     system(tCom.c_str());              /* execute the command  */
-       // }
-       // else
-       // {                                        /* for the parent:      */
-       //     while (wait(&status) != pid);        /* wait for completion  */
-       // }
+            system(tCom.c_str());              /* execute the command  */
+        }
+        else
+        {                                        /* for the parent:      */
+            while (wait(&status) != pid);        /* wait for completion  */
+        }
 
     }
     
