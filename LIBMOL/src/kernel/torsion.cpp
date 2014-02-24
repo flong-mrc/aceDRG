@@ -304,7 +304,7 @@ namespace LIBMOL
                  || (iT->atoms[0]==tAt4 && iT->atoms[1]==tAt3 && iT->atoms[2]==tAt2 && iT->atoms[3]==tAt1))
             {
                 tTor = iT->seriNum;
-                std::cout << "Torsion seriNumb " << iT->seriNum << std::endl;
+                // std::cout << "Torsion seriNumb " << iT->seriNum << std::endl;
                 break;
             }
             

@@ -33,7 +33,16 @@ namespace LIBMOL
         if (tOpenMode == std::ios::in)
         {
             inFile.open(tFname.c_str(), tOpenMode);
-            setupSystem();
+            if (inFile.is_open())
+            {
+                setupSystem();
+            }
+            else
+            {
+                std::cout << tFname << " can not be open for reading. Check the file "
+                         << std::endl;
+                exit(1);
+            }
         }
         else
         {
@@ -150,7 +159,7 @@ namespace LIBMOL
                             {
                                 AtomDict aAtom;
                                 aAtom.seriNum = tAtomIdx;
-                                std::cout << "aAtom.seriNum " << tAtomIdx << std::endl;
+                                // std::cout << "aAtom.seriNum " << tAtomIdx << std::endl;
                                 aAtom.coords[0] = StrToReal(tBuf[0]);
                                 aAtom.coords[1] = StrToReal(tBuf[1]);
                                 aAtom.coords[2] = StrToReal(tBuf[2]);
@@ -176,7 +185,7 @@ namespace LIBMOL
                                 aBond.fullAtoms[itsCurMol->atoms[t2].id] = t2;
                                 aBond.order   = tBuf[2];
                                 aBond.seriNum = tBondIdx;
-                                std::cout << "aBond.seriNum " << aBond.seriNum << std::endl;
+                                // std::cout << "aBond.seriNum " << aBond.seriNum << std::endl;
                                 itsCurMol->bonds.push_back(aBond);
                                 tBondIdx++;
                             }
@@ -1073,13 +1082,13 @@ namespace LIBMOL
                     iNB !=tIA->connAtoms.end(); iNB++)
         {
             REAL aOrd = getBondOrder(tMol, tIA->seriNum, *iNB);
-            std::cout << "bond order between atom " << tIA->seriNum+1 
-                      << " and " << tMol.atoms[*iNB].seriNum+1
-                      << " is " << aOrd << std::endl;
+            //std::cout << "bond order between atom " << tIA->seriNum+1 
+            //          << " and " << tMol.atoms[*iNB].seriNum+1
+            //          << " is " << aOrd << std::endl;
             if (aOrd >0)
             {
                 tVal +=aOrd;
-                std::cout << "total order now " << tVal << std::endl;
+                // std::cout << "total order now " << tVal << std::endl;
             }
             else
             {
@@ -1112,8 +1121,8 @@ namespace LIBMOL
                     tOrd = 1.5;
                 }
                 
-                std::cout << "Bond order " << iB->order << std::endl
-                          << tOrd << std::endl;
+                //std::cout << "Bond order " << iB->order << std::endl
+                //          << tOrd << std::endl;
                 break;
             }
         }

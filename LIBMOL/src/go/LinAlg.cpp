@@ -269,7 +269,7 @@ namespace GO
                 //}while(k < maxIter && tTol < maxTol && tSumDx < maxSumDX);
                  
                 delete [] deltaX;
-                deltaX  = 0;    
+                deltaX  = NULL;    
             }
             else if (workMode==1)
             {       
@@ -601,25 +601,25 @@ namespace GO
             // release memory and null all local points
             
             delete [] A_dia;
-            A_dia = 0;
+            A_dia = NULL;
 
             delete [] res_cur;
-            res_cur = 0;
+            res_cur = NULL;
 
             delete []  res_pre;
-            res_pre =0;
+            res_pre =NULL;
 
             delete []  res_prepre;
-            res_prepre = 0;
+            res_prepre = NULL;
 
             delete [] p_cur;
-            p_cur =0;
+            p_cur =NULL;
   
             delete []  p_pre;
-            p_pre =0;
+            p_pre =NULL;
 
             delete [] tm4;
-            tm4 =0;
+            tm4 =NULL;
 
             //pPrecondition   = 0;
             //pUnPrecondition = 0;
@@ -891,25 +891,25 @@ namespace GO
         // release memory and null all local points
 
         delete [] A_dia;
-        A_dia = 0;
+        A_dia = NULL;
 
         delete [] res_cur;
-        res_cur = 0;
+        res_cur = NULL;
 
         delete []  res_pre;
-        res_pre =0;
+        res_pre =NULL;
 
         delete []  res_prepre;
-        res_prepre = 0;
+        res_prepre = NULL;
 
         delete [] p_cur;
-        p_cur =0;
+        p_cur = NULL;
   
         delete []  p_pre;
-        p_pre =0;
+        p_pre = NULL;
 
         delete [] tm4;
-        tm4 =0;
+        tm4 = NULL;
   
         return vs;
     }
@@ -1056,13 +1056,13 @@ namespace GO
           // cout << "my obj after line search " <<myObjValue << endl;
           
           delete [] xa;
-          xa =0;
+          xa =NULL;
 
           delete [] xb;
-          xb =0;
+          xb =NULL;
   
           delete xc;
-          xc =0;
+          xc =NULL;
     }
     
     
@@ -1321,19 +1321,19 @@ namespace GO
         //  cout << "obj_c =" << obj_c << endl;
         
         delete [] x_r;
-        x_r =0;
+        x_r = NULL;
 
         delete [] x_q;
-        x_q =0;
+        x_q = NULL;
 
         delete [] x_u;
-        x_u =0;
+        x_u = NULL;
 
         delete [] x_ulim;
-        x_ulim =0;
+        x_ulim = NULL;
 
         delete [] x_temp;
-        x_temp =0;
+        x_temp = NULL;
   
     }
     
@@ -1559,13 +1559,13 @@ namespace GO
         //  std::cin.get();
 
         delete [] x0;
-        x0 =0;
+        x0 = NULL;
         delete [] x1;
-        x1 =0;
+        x1 = NULL;
         delete x2;
-        x2 =0;
+        x2 = NULL;
         delete x3;
-        x3 =0;
+        x3 = NULL;
  
     }
    

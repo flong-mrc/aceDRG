@@ -303,7 +303,7 @@ namespace GO
         tTransTool.generateCoordTorsToCart2(allAtoms,allBonds, allAngles, allTorsions, 
                                             allRingsV, allPlanes, allChirals);
         
-        std::cout << "Done a set of coordinates based on the tree structure " << std::endl;
+        // std::cout << "Done a set of coordinates based on the tree structure " << std::endl;
         std::vector<std::string> parts;
         LIBMOL::StrTokenize(itsFileNameRoot, parts, '.');
         

@@ -1024,13 +1024,22 @@ namespace LIBMOL
         if (tOpenMode == std::ios::in)
         {
             inFile.open(tFname.c_str(), tOpenMode);
-            itsCurAtom    = new AtomDict();
-            itsCurBond    = new BondDict();
-            itsCurAngle   = new AngleDict();
-            itsCurTorsion = new TorsionDict();
-            itsCurChiral  = new ChiralDict();
+            if (inFile.is_open())
+            {
+                itsCurAtom    = new AtomDict();
+                itsCurBond    = new BondDict();
+                itsCurAngle   = new AngleDict();
+                itsCurTorsion = new TorsionDict();
+                itsCurChiral  = new ChiralDict();
             
-            setupSystem();
+                setupSystem();
+            }
+            else
+            {
+                std::cout << tFname << " can not be open for reading. Check the file "
+                         << std::endl;
+                exit(1);
+            }
             
         }
         else
@@ -1066,13 +1075,22 @@ namespace LIBMOL
         if (tOpenMode == std::ios::in)
         {
             inFile.open(tFname, tOpenMode);
-            itsCurAtom    = new AtomDict();
-            itsCurBond    = new BondDict();
-            itsCurAngle   = new AngleDict();
-            itsCurTorsion = new TorsionDict();
-            itsCurChiral  = new ChiralDict();
+            if (inFile.is_open())
+            {
+                itsCurAtom    = new AtomDict();
+                itsCurBond    = new BondDict();
+                itsCurAngle   = new AngleDict();
+                itsCurTorsion = new TorsionDict();
+                itsCurChiral  = new ChiralDict();
             
-            setupSystem();
+                setupSystem();
+            }
+            else
+            {
+                std::cout << tFname << " can not be open for reading. Check the file ! "
+                         << std::endl;
+                exit(1);
+            }
             
         }
         else
@@ -6083,12 +6101,12 @@ namespace LIBMOL
             for (std::vector<BondDict>::iterator iB=tBonds.begin();
                     iB !=tBonds.end(); iB++)
             {
-                outRestrF << tMonoRootName << "    " 
-                          << iB->atoms[0] << "    "
-                          << iB->atoms[1] << "    "
-                          << iB->order << "    "
+                outRestrF << tMonoRootName << std::setw(6) 
+                          << iB->atoms[0]  << std::setw(6)
+                          << iB->atoms[1]  << std::setw(6)
+                          << iB->order << std::setw(6)
                           << std::setprecision(3) << std::fixed
-                          << iB->value << "    " 
+                          << iB->value <<  std::setw(6)
                           << std::setprecision(3) << std::fixed
                           << iB->sigValue << std::endl;
                 

@@ -1187,8 +1187,8 @@ namespace LIBMOL
                     n_conn = 0;
                 }
                 
-	        std::cout << " new i_atom: " << tAtoms[i_atom].id << std::endl;
-	        std::cout << " new n_conn: " << n_conn   << std::endl;
+	        //std::cout << " new i_atom: " << tAtoms[i_atom].id << std::endl;
+	        //std::cout << " new n_conn: " << n_conn   << std::endl;
             }
             else if (n_conn == 0 && n_stack > 0)
             {
@@ -1260,34 +1260,34 @@ namespace LIBMOL
         // Release memory and null point variables
 
         delete [] v1;
-        v1 = 0;
+        v1 = NULL;
 
         delete v2;
-        v2 = 0;
+        v2 = NULL;
 
         delete [] v3;
-        v3 = 0;
+        v3 = NULL;
   
         delete [] tmp_v;
         tmp_v = 0;
   
         delete [] X_new;
-        X_new = 0;
+        X_new = NULL;
 
         delete [] Y_new;
-        Y_new = 0;
+        Y_new = NULL;
 
         delete [] Z_new;
-        Z_new = 0;
+        Z_new = NULL;
   
         for ( i =0; i < dim; i++)
         {
             delete [] rotate_tem[i];
-            rotate_tem[i] =0;
+            rotate_tem[i] =NULL;
         }
 
         delete [] rotate_tem;
-        rotate_tem = 0;
+        rotate_tem = NULL;
   
         for (i =0; i < dim; i++)
         {
@@ -1791,7 +1791,7 @@ namespace LIBMOL
     }
     
     
-    void TransCoords::growOneAtom(std::vector<int>        & sSet,
+    void TransCoords::growOneAtom(std::vector<int>           & sSet,
                                      std::vector<AtomDict>   & tAtoms,
                                      REAL                      tBondV, 
                                      REAL                      tAngV, 
@@ -1903,30 +1903,30 @@ namespace LIBMOL
         // Release memory and null point variables
 
         delete [] v1;
-        v1 = 0;
+        v1 = NULL;
 
         delete v2;
-        v2 = 0;
+        v2 = NULL;
   
         delete [] tmp_v;
-        tmp_v = 0;
+        tmp_v = NULL;
   
         delete [] X_new;
-        X_new = 0;
+        X_new = NULL;
 
         delete [] Y_new;
-        Y_new = 0;
+        Y_new = NULL;
 
         delete [] Z_new;
-        Z_new = 0;
+        Z_new = NULL;
         
         for (int i =0; i < dim; i++)
         {
             delete [] A[i];
-            A[i] = 0;
+            A[i] = NULL;
         }
         delete [] A;
-        A = 0;
+        A = NULL;
   
     }
     

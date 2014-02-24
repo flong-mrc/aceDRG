@@ -112,6 +112,12 @@ namespace LIBMOL
                 
                 CodClassify aCodSys(allAtoms);
                 aCodSys.codAtomClassify(2);
+                allAtoms.clear();
+                for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();
+                        iAt!=aCodSys.allAtoms.end(); iAt++)
+                {
+                    allAtoms.push_back(*iAt);
+                }
                 
                 outTables(tOutName);
                 
@@ -669,23 +675,27 @@ namespace LIBMOL
             for (std::vector<AtomDict>::iterator iAt=allAtoms.begin(); 
                     iAt !=allAtoms.end(); iAt++)
             {
-                outTableF << iAt->seriNum  << "     " 
-                          << iAt->id       << "     "
-                          << iAt->chemType << "     " 
-                          << iAt->codClass << "     " << std::endl;
+                outTableF << std::setw(6) << iAt->seriNum   
+                          << std::setw(6) << iAt->id    
+                          << std::setw(5) << iAt->chemType << "    "
+                          << iAt->codClass << std::endl;
             }
             
             std::cout << std::endl;
             outTableF << "loop_" << std::endl
                       << "_chem_comp_bond.atom_serial_number_1" << std::endl
                       << "_chem_comp_bond.atom_serial_number_2" << std::endl
+                      << "_chem_comp_bond.atom_element_symbol_1" << std::endl
+                      << "_chem_comp_bond.atom_element_symbol_2" << std::endl
                       << "_chem_comp_bond.value_dist"<< std::endl;
             for (std::vector<BondDict>::iterator iBo=bonds.begin();
                     iBo !=bonds.end(); iBo++)
             {
-                outTableF << iBo->atomsIdx[0] << "      " 
-                          << iBo->atomsIdx[1] << "      "
-                          << iBo->value << std::endl;
+                outTableF << std::setw(6) << iBo->atomsIdx[0] + 1 
+                          << std::setw(6) << iBo->atomsIdx[1] + 1
+                          << std::setw(4) << allAtoms[iBo->atomsIdx[0]].chemType
+                          << std::setw(4) << allAtoms[iBo->atomsIdx[1]].chemType
+                          << std::setw(10)<< iBo->value << std::endl;
             }
             
             std::cout << std::endl;
@@ -693,18 +703,29 @@ namespace LIBMOL
                       << "_chem_comp_angle.atom_serial_number_1" << std::endl
                       << "_chem_comp_angle.atom_serial_number_2" << std::endl
                       << "_chem_comp_angle.atom_serial_number_3" << std::endl
+                      << "_chem_comp_angle.atom_element_symbol_1" << std::endl
+                      << "_chem_comp_angle.atom_element_symbol_2" << std::endl
+                      << "_chem_comp_angle.atom_element_symbol_3" << std::endl
                       << "_chem_comp_angle.value_angle"          << std::endl;
             for (std::vector<AngleDict>::iterator iAn=angles.begin();
                     iAn !=angles.end(); iAn++)
             {
-                outTableF << iAn->atoms[0] << "      "
-                          << iAn->atoms[1] << "      "
-                          << iAn->atoms[2] << "      "
-                          << iAn->value << std::endl;
+                outTableF << std::setw(6)  << iAn->atoms[0] +1 
+                          << std::setw(6)  << iAn->atoms[1] +1
+                          << std::setw(6)  << iAn->atoms[2] +1
+                          << std::setw(4)  << allAtoms[iAn->atoms[0]].chemType 
+                          << std::setw(4)  << allAtoms[iAn->atoms[1]].chemType 
+                          << std::setw(4)  << allAtoms[iAn->atoms[2]].chemType 
+                          << std::setw(10) << iAn->value*PID180 << std::endl;
             }
             
             outTableF.close();
             
+        }
+        else
+        {
+            std::cout << tOutName << " can not been opened for writing ! "
+                      << std::endl;
         }
     }
 }
