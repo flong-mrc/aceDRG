@@ -260,7 +260,9 @@ namespace LIBMOL // temp
         ID       id; 
         ID       chemType;
         Name     enerType;
+        REAL     charge;
         REAL     parCharge;
+        REAL     formalCharge;
         REAL     radius;
         REAL     ionRadius;
         int      chiralIdx;
@@ -290,6 +292,7 @@ namespace LIBMOL // temp
         
         // symmetry-related 
         ID       sId;
+        ID       symmOp;
         // int      bondingIdx;
         /* meaning of curBondingIdx
          * 0      undetermined  

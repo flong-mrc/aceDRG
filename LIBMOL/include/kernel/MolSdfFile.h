@@ -120,7 +120,7 @@ namespace LIBMOL
                    std::ios_base::openmode tOpenMode);
         
         MolSdfFile(FileName                    tFname,
-                    std::ios_base::openmode     tOpenMode);
+                   std::ios_base::openmode     tOpenMode);
         
         // destructor
         ~MolSdfFile();
@@ -132,12 +132,24 @@ namespace LIBMOL
         void deleteCurMol();
         
         void addHAtomToMols(int tIdxMol);
+        REAL checkProtonated(std::vector<AtomDict>::iterator tIA, 
+                             int   tMolIdx);           // This is a temp function. the other
+                                                       // overloaded function should be a 
+                                                       // proper one
+        REAL checkProtonated(std::vector<AtomDict>::iterator tIA, 
+                             int   tMolIdx,     
+                             REAL  tTotalVal,
+                             REAL  tPka, REAL tPh);
+        
         void addHAtoms(int tIdxMol, 
                        int tIdxAtm,
                        REAL tNumH);
-        
+        /*
+        REAL  getTotalBondOrder(int tIdxMol,
+                                std::vector<AtomDict>::iterator  tIA);
         REAL  getBondOrder(int tIdxMol,
                           int tIdx1, int tIdx2);
+        */
         int  getNumOxyConnect(int tIdxMol, std::vector<AtomDict>::iterator iA);
         void setAtomsBondingAndChiralCenter(int tIdxMol);
         void setChiral(int tIdxMol);
@@ -160,7 +172,35 @@ namespace LIBMOL
         
         Molecule            *   itsCurMol;
         
-    };    
+    };  
+    
+    // should be added to separated chemistry part of source codes.
+    extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol);
+    extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh);
+    extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol);
+    extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh);
+    extern REAL checkProtonateS(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol);
+    extern REAL checkProtonateS(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh);
+    extern REAL checkProtonateC(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol);
+    extern REAL checkProtonateC(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh);
+    
+    extern REAL  getTotalBondOrder(Molecule   & tMol,
+                                   std::vector<AtomDict>::iterator  tIA);
+    extern REAL  getBondOrder(Molecule   & tMol,
+                              int tIdx1, int tIdx2);
+    
 }
 
 

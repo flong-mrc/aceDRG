@@ -120,15 +120,15 @@ namespace LIBMOL
                               int     tIdxAtm2, 
                               REAL    rD);
         
-        void checkBondOneForming(
-                                 PeriodicTable & tPTab);
-        
+        void checkBondOneForming(PeriodicTable & tPTab);
         
         void getUniqAngles();
         
         void getMolsInCell();
         
-        void execute();   
+        void outTables(FileName tOutName);
+        
+        void execute(FileName tOutName);   
         
         std::vector<CCP4DictParas>      ccp4DictParas;
         std::vector<AtomDict>           initAtoms;

@@ -302,35 +302,28 @@ namespace LIBMOL
     {
         
         PeriodicTable aPTab;
+        std::vector<std::string> orgElems;
+        orgElems.push_back("C");
+        orgElems.push_back("O");
+        orgElems.push_back("N");
+        orgElems.push_back("S");
         
         for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
                 iA !=allMols[tIdxMol].atoms.end(); iA++)
         {
-            REAL tVal = 0;
-            for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
-                    iNB !=iA->connAtoms.end(); iNB++)
+            
+            if (std::find(orgElems.begin(), orgElems.end(), iA->chemType)
+                 !=orgElems.end())
             {
-                REAL aOrd = getBondOrder(tIdxMol, iA->seriNum, *iNB);
-                std::cout << "bond order between atom " << iA->seriNum+1 
-                          << " and " << allMols[tIdxMol].atoms[*iNB].seriNum+1
-                          << " is " << aOrd << std::endl;
-                if (aOrd >0)
+                // need to check protonated form
+                REAL addH =checkProtonated(iA, tIdxMol);
+                if (addH >0)
                 {
-                    tVal +=aOrd;
-                    std::cout << "total order now " << tVal << std::endl;
-                }
-                else
-                {
-                    std::cout << "Can not find the bond between atoms " << iA->id 
-                              << " serial number " << iA->seriNum + 1
-                              << " and " << allMols[tIdxMol].atoms[*iNB].id 
-                              << " serial number " << allMols[tIdxMol].atoms[*iNB].seriNum+1
-                              << std::endl;
-                    std::cout << "Some thing is wrong in the Bond list " << std::endl;
-                    exit(1);
+                    addHAtoms(tIdxMol, iA->seriNum, addH);
                 }
             }
             
+            /*
             if (aPTab.elements.find(iA->chemType) !=aPTab.elements.end())
             {
                 if (tVal !=aPTab.elements[iA->chemType]["val"] 
@@ -363,6 +356,7 @@ namespace LIBMOL
                           << std::endl;
                 exit(1);
             }
+             */
         }
         
         // Now add newly generated H atoms to atoms in the molecule
@@ -384,6 +378,61 @@ namespace LIBMOL
         }
     }
     
+    REAL MolSdfFile::checkProtonated(std::vector<AtomDict>::iterator tAt, 
+                                     int                  tMolIdx)
+    {
+        // consider protonated state based atom's property
+        REAL addedH =0.0;
+        if (tAt->chemType.compare("O")==0)
+        {
+            addedH=checkProtonateO(tAt, allMols[tMolIdx]);
+        }
+        else if (tAt->chemType.compare("S")==0)
+        {
+            addedH=checkProtonateS(tAt, allMols[tMolIdx]);
+        }
+        else if (tAt->chemType.compare("N")==0)
+        {
+            addedH=checkProtonateN(tAt, allMols[tMolIdx]);
+        }
+        else if (tAt->chemType.compare("C")==0)
+        {
+            addedH=checkProtonateC(tAt, allMols[tMolIdx]);
+        }
+        
+        return addedH;
+    }
+    
+    
+    REAL MolSdfFile::checkProtonated(std::vector<AtomDict>::iterator tAt, 
+                                     int                  tMolIdx,
+                                     REAL                 tTotalVal, 
+                                     REAL tPka,           REAL tPh)
+    {
+        // consider protonated state based atom's property
+        REAL addedH=0.0;
+        
+        if (tAt->chemType.compare("O")==0)
+        {
+            addedH=checkProtonateO(tAt, allMols[tMolIdx], tPka, tPh);
+        }
+        else if (tAt->chemType.compare("S")==0)
+        {
+            addedH=checkProtonateS(tAt, allMols[tMolIdx], tPka, tPh);
+        }
+        else if (tAt->chemType.compare("N")==0)
+        {
+            addedH=checkProtonateN(tAt, allMols[tMolIdx], tPka, tPh);
+        }
+        else if (tAt->chemType.compare("C")==0)
+        {
+            addedH=checkProtonateN(tAt, allMols[tMolIdx], tPka, tPh);
+        }
+        
+        return addedH;
+    }
+    
+    /*
     REAL MolSdfFile::getBondOrder(int tIdxMol, int tIdx1, int tIdx2)
     {
         REAL tOrd = -1.0;
@@ -408,10 +457,11 @@ namespace LIBMOL
         
         return tOrd;
     }
+    */
     
     void MolSdfFile::addHAtoms(int tIdxMol, int tIdxAtm, REAL tNumH)
     {
-        for (int i=0; i < tNumH; i++)
+        for (int i=0; i < (int)tNumH; i++)
         {
             AtomDict aH;
             aH.chemType = "H";
@@ -868,5 +918,206 @@ namespace LIBMOL
                 allMols[tIdxMol].chirals.push_back(aCh);
             }
         }
+    }
+    
+    
+    extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol)
+    {
+        REAL aNumH = 0.0;
+        StrUpper(tIA->resName);
+        // Currently using PH=7 
+        // 1. O in Carboxy-Terminus, PKa=2, in ASP and GLU pKa=4
+        // No H need to be added
+        
+        // 2. O in Tyrosine, Pka=10
+        if (tIA->connAtoms.size()==1 && tIA->charge==0 )
+        {
+            if(tIA->resName.compare("TYR")==0)
+            {
+                aNumH=1.0;
+            }
+        }
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh)
+    {
+        REAL aNumH=0.0;
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol)
+    {
+        REAL aNumH = 0.0;
+        StrUpper(tIA->resName);
+        REAL tVal = getTotalBondOrder(tMol, tIA);
+        // std::cout << "tVal for N " << tVal << std::endl;
+        
+        if (tVal < 4)
+        {
+            if(tIA->resName.compare("LYS")==0 
+               || tIA->resName.compare("ARG")==0)
+            {
+                REAL tD = 4 - tVal;  
+                aNumH=tD;
+                tIA->formalCharge = tD;
+            }
+            else
+            {
+                // check Amino-Terminus, pKa=10 
+                int tC=0, tH=0, tOther=0;
+                for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
+                        iNB != tIA->connAtoms.end(); iNB++)
+                {
+                    if(tMol.atoms[*iNB].chemType.compare("C")==0)
+                    {
+                        tC++;
+                    }
+                    else if(tMol.atoms[*iNB].chemType.compare("H")==0)
+                    {
+                        tH++;
+                    }
+                    else
+                    {
+                        tOther++;
+                    }
+                }
+                
+                if (tC==1 && tOther==0)
+                {
+                    //It is Amino-Terminus, need to put a charge here
+                    aNumH =4 - tVal;
+                    
+                }
+                
+            }
+        }
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh)
+    {
+        REAL aNumH=0.0;
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateS(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol)
+    {
+        REAL aNumH = 0.0;
+        
+        REAL tVal = getTotalBondOrder(tMol, tIA);
+        
+        if (tVal==1 && tIA->formalCharge==0 )
+        {
+            aNumH=1.0;
+        }
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateS(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh)
+    {
+        REAL aNumH=0.0;
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateC(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol)
+    {
+        REAL aNumH = 0.0;
+        
+        REAL tVal = getTotalBondOrder(tMol, tIA);
+        
+        if (tVal < 4)
+        {
+            aNumH = 4-tVal;
+        }
+        else if (tVal > 4)
+        {
+            std::cout << "Warning: Atom " << tIA->id << " has bond order "
+                      << tVal << std::endl;
+        }
+        
+        return aNumH;
+    }
+    
+    extern REAL checkProtonateC(std::vector<AtomDict>::iterator tIA, 
+                                Molecule   & tMol,
+                                REAL tPka,           REAL tPh)
+    {
+        REAL aNumH=0.0;
+        
+        return aNumH;
+        
+    }
+    
+    extern REAL getTotalBondOrder(Molecule   & tMol, 
+                                  std::vector<AtomDict>::iterator tIA)
+    {
+        REAL tVal = 0.0;
+        for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
+                    iNB !=tIA->connAtoms.end(); iNB++)
+        {
+            REAL aOrd = getBondOrder(tMol, tIA->seriNum, *iNB);
+            std::cout << "bond order between atom " << tIA->seriNum+1 
+                      << " and " << tMol.atoms[*iNB].seriNum+1
+                      << " is " << aOrd << std::endl;
+            if (aOrd >0)
+            {
+                tVal +=aOrd;
+                std::cout << "total order now " << tVal << std::endl;
+            }
+            else
+            {
+                std::cout << "Can not find the bond between atoms " << tIA->id 
+                          << " serial number " << tIA->seriNum + 1
+                          << " and " << tMol.atoms[*iNB].id 
+                          << " serial number " << tMol.atoms[*iNB].seriNum+1
+                          << std::endl;
+                std::cout << "Some thing is wrong in the Bond list " << std::endl;
+                exit(1);
+            }
+        }
+        
+        return tVal;
+    }
+    
+    extern REAL getBondOrder(Molecule & tMol, int tIdx1, int tIdx2)
+    {
+        REAL tOrd = -1.0;
+        
+        for (std::vector<BondDict>::iterator iB=tMol.bonds.begin();
+                iB !=tMol.bonds.end(); iB++)
+        {
+            if ((iB->atomsIdx[0]==tIdx1 && iB->atomsIdx[1]==tIdx2)
+                || (iB->atomsIdx[0]==tIdx2 && iB->atomsIdx[1]==tIdx1))
+            {
+                tOrd = StrToReal(iB->order);
+                if (tOrd ==4.0)
+                {
+                    tOrd = 1.5;
+                }
+                
+                std::cout << "Bond order " << iB->order << std::endl
+                          << tOrd << std::endl;
+                break;
+            }
+        }
+        
+        return tOrd;
     }
 }

@@ -272,14 +272,14 @@ int main(int argc, char** argv) {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-            aMolCreator.execute();
+            aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
         }
         else if (AJob.workMode==32)
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifName"] << std::endl;
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-            aMolCreator.execute();
+            aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
         }
         
     }

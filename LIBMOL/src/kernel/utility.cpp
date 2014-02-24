@@ -1707,25 +1707,28 @@ namespace LIBMOL
     // a simple version 
     extern void cmdExecute(std::string & tCom)
     {
+        /*
         pid_t  pid=fork();
         int    status;
 
         if (pid < 0) 
         {     
-            /* fork a child process           */
+            // fork a child process           
             std::cout << "*** ERROR: forking child process failed for command lines: " 
                       << std::endl << tCom << std::endl;
             exit(1);
         }
         else if (pid == 0)
         {
-            /* for the child process:         */
-            system(tCom.c_str());              /* execute the command  */
+            // for the child process:         
+            system(tCom.c_str());              // execute the command  
         }
         else
-        {                                        /* for the parent:      */
-            while (wait(&status) != pid);        /* wait for completion  */
+        {                                        // for the parent:      
+            while (wait(&status) != pid);        // wait for completion  
         }
+        
+        */
 
     }
     
