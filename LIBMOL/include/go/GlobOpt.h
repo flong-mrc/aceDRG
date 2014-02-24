@@ -113,6 +113,8 @@ namespace GO
         void PreIdealization();
         void ProIdealization();
         void singleCompsIdealization();
+        
+        
          
         /* !!!!!!!!! Different Global min schemes
          * 
@@ -620,6 +622,7 @@ namespace GO
        
        void LocalMin();
        void AddToOptim();
+       void SelectBestOpt();
        
        std::vector<LIBMOL::AtomDict>                            allAtoms;
        std::vector<int>                                         allHAtomIdx; //repeated ones

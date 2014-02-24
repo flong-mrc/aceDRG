@@ -1330,7 +1330,7 @@ namespace LIBMOL
                     iA1!=tCell1.atomsInCell.end(); iA1++)
         {
             
-            std::cout << "1 Build NBList for atom " << *iA1 << std::endl;
+            // std::cout << "1 Build NBList for atom " << *iA1 << std::endl;
             for (std::vector<int>::iterator iA2 = tCell2.atomsInCell.begin();
                         iA2 != tCell2.atomsInCell.end(); iA2++)
             {
@@ -1341,8 +1341,8 @@ namespace LIBMOL
                         aAtomList[*iA1].neighbAtoms.end(), *iA2) ==aAtomList[*iA1].neighbAtoms.end())
                     {
                         aAtomList[*iA1].neighbAtoms.push_back((*iA2));
-                        std::cout << "atom " << aAtomList[*iA2].id
-                                  << " has been added to the list" << std::endl;
+                        // std::cout << "atom " << aAtomList[*iA2].id
+                        //           << " has been added to the list" << std::endl;
                     }
                     if (std::find(aAtomList[*iA2].neighbAtoms.begin(),
                         aAtomList[*iA2].neighbAtoms.end(), *iA1) ==aAtomList[*iA2].neighbAtoms.end())

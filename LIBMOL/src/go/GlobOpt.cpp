@@ -636,6 +636,19 @@ namespace GO
         */
         
     }
+    
+    void FindGlobMin::SelectBestOpt()
+    {
+        if (allOptimSets.size() > 0)
+        {
+            allAtoms.clear();
+            for (std::vector<LIBMOL::AtomDict>::iterator iA=allOptimSets[0].atoms.begin();
+                    iA !=allOptimSets[0].atoms.end(); iA++)
+            {
+                allAtoms.push_back(*iA);
+            }
+        }
+    }
     // 1 The global optimization scheme combing barrier tunneling 
     // and local minimization techniques
     
@@ -1019,6 +1032,8 @@ namespace GO
             std::cout << "Set objective value " << iO->objValue << std::endl;
         }
         
+        SelectBestOpt();
+        
         std::time(&tEnd);
         std::cout << " Geometrical optimization finished at " << std::ctime(&tEnd);
       
@@ -1054,6 +1069,8 @@ namespace GO
         }
         
         ProIdealization();
+        
+        SelectBestOpt();
        
     }
         

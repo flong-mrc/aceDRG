@@ -282,7 +282,7 @@ namespace GO
                 LIBMOL::REAL tCellL     = 3.0;
                 LIBMOL::REAL tCellShell = 0.5;
                 
-                std::cout << "Number of atoms in Subsystem " << (int)tAtoms.size() << std::endl;
+                // std::cout << "Number of atoms in Subsystem " << (int)tAtoms.size() << std::endl;
                 
         
                 tNBListOfSystem.building(tAtoms, aDim, tCellL, tCellShell, aMode);

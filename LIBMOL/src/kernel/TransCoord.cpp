@@ -75,9 +75,9 @@ namespace LIBMOL
                                               int sAtom1, int sAtom2, int sAtom3)
     {
         
-        std::cout << "Branch growth from " << tAtoms[sAtom1].id
-                  << " and atom " << tAtoms[sAtom2].id 
-                  << " and atom " << tAtoms[sAtom3].id << std::endl;
+        //std::cout << "Branch growth from " << tAtoms[sAtom1].id
+        //          << " and atom " << tAtoms[sAtom2].id 
+        //          << " and atom " << tAtoms[sAtom3].id << std::endl;
         
         const int NSTLIM2 = 3;
         const int NSTLIM  = 10000;
@@ -1078,7 +1078,7 @@ namespace LIBMOL
                 //          << "3 current atom is " << tAtoms[i_atom].id << std::endl;
                 
                 i_next = tAtoms[i_atom].tree["children"][i_conn];
-                std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
+                // std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
                 
 	        //  cout << " The next atom is " << i_next+1 << endl;
                 if (std::find(doneList.begin(), doneList.end(), i_next) ==doneList.end())
@@ -2948,13 +2948,15 @@ namespace LIBMOL
         
         setSubSystem(tSubSet, tAllAtoms, tAllBonds, tAllAngles,
                      tAllTorsions, tAllRings, tAllPlanes, tAllChirals, aSubSys);
+        /*
         std::cout << "a subsystem is set, it contains " << std::endl
                   << (int)aSubSys.allAtoms.size()    << " atoms "       << std::endl
                   << (int)aSubSys.allBonds.size()    << " bonds "       << std::endl
                   << (int)aSubSys.allAngles.size()   << " angles "      << std::endl
                   << (int)aSubSys.allTorsions.size() << " torsions "    << std::endl
                   << (int)aSubSys.allPlanes.size()   << " planes "      << std::endl;
-                 // << (int)aSubSys.allRingsV.size() << " rings  "   << std::endl;
+                 // << (int)aSubSys.allRingsV.size() << " rings  "      << std::endl;
+         */
         // LIBMOL::outPDB("sub_tree.pdb", "XXX", aSubSys.allAtoms);
         
         
