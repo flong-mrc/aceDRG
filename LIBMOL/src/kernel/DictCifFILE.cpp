@@ -6006,7 +6006,7 @@ namespace LIBMOL
                     << "_chem_comp.desc_level" << std::endl
                     << tMonoRootName <<"\t"<< tMonoRootName << "\t" << "'.\t\t'\t"
                     << "non-polymer\t" << (int)tAtoms.size() << "\t" 
-                    << (int)tHydroAtoms.size() << "\t."
+                    << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
                     << std::endl;
             
             outRestrF <<"# ------------------------------------------------------" << std::endl
