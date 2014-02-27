@@ -119,8 +119,17 @@ namespace LIBMOL
                     allAtoms.push_back(*iAt);
                 }
                 
-                outTables(tOutName);
+                getMolByEqClassInCell();
                 
+                if (moleculesInCell.size() > 1)
+                {
+                    for (int  i=0; i < (int)moleculesInCell.size(); i++)
+                    {
+                        Name tFName(tOutName);
+                        tFName.append("_" + IntToStr(i));
+                        outTables(tFName.c_str());
+                    }
+                }
             }
         }
     }
@@ -594,7 +603,7 @@ namespace LIBMOL
         }
     }
     
-    void MolGenerator::getMolsInCell()
+    void MolGenerator::getMolByEqClassInCell()
     {
         std::map<int, int> classNum;
         classNum[0] = 0;
@@ -624,6 +633,45 @@ namespace LIBMOL
         for (unsigned i=0; i < classNum.size(); i++)
         {
             moleculesInCell[classNum[i]].push_back(i);
+        }
+        
+        std::cout << "Number of molecules is " << moleculesInCell.size() << std::endl;
+        
+        int i_mol =0;
+        for (std::map<unsigned, std::vector<int> >::iterator iMol=moleculesInCell.begin(); 
+                  iMol !=moleculesInCell.end(); iMol++)
+        {
+            i_mol++;
+            std::cout << "Molecule " << i_mol << " contains " 
+                      << iMol->second.size() << " atoms " << std::endl 
+                      << "The are: " << std::endl;
+            for (std::vector<int>::iterator iAt=iMol->second.begin();
+                    iAt !=iMol->second.end(); iAt++)
+            {
+                std::cout << "Atom " << allAtoms[*iAt].seriNum << " "
+                          << allAtoms[*iAt].id << std::endl;
+            }                   
+        }
+        
+        getMolsInCell();
+     
+    }
+    
+    void MolGenerator::getMolsInCell()
+    {
+        int i=0;
+        for (std::map<unsigned, std::vector<int> >::iterator iMol=moleculesInCell.begin(); 
+                  iMol !=moleculesInCell.end(); iMol++)
+        {
+            Molecule aMol;
+            aMol.seriNum = i;
+            i++;
+            for (std::vector<int>::iterator iAt=iMol->second.begin(); 
+                    iAt !=iMol->second.end(); iMol++)
+            {
+                aMol.atoms.push_back(allAtoms[*iAt]);
+                
+            }
         }
     }
     

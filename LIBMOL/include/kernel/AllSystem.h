@@ -287,6 +287,7 @@ namespace LIBMOL
    
         // member variables
         bool                                     hasCoords;
+        bool                                     hasCCP4Type;
         
         std::vector<AtomDict>                    allAtoms;
         std::vector<int>                         allHAtomIdx;      //repeated ones

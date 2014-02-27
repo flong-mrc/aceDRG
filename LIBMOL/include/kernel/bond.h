@@ -164,6 +164,7 @@ namespace LIBMOL
         // destructor 
         ~BondDict();
                 
+        std::string bondOrderNumToStr();
         
         ID                      resName;
         SeriNumber              seriNum;

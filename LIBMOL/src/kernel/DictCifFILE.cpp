@@ -1009,6 +1009,7 @@ namespace LIBMOL
                              hasConnect(false),
                              hasCoords(false),
                              hasH(false),
+                             hasCCP4Type(false),
                              itsCurAtomSeriNum(ZeroInt),
                              itsCurAtom(NullPoint),
                              itsCurBondSeriNum(ZeroInt),
@@ -1054,6 +1055,7 @@ namespace LIBMOL
                              hasConnect(false),
                              hasCoords(false),
                              hasH(false),
+                             hasCCP4Type(false),
                              itsCurAtomSeriNum(ZeroInt),
                              itsCurAtom(NullPoint),
                              itsCurBondSeriNum(ZeroInt),
@@ -1335,51 +1337,9 @@ namespace LIBMOL
                 exit(1);
             }
             
-            // check
-            std::cout << "There are " << (int)allAtoms.size() 
-                    << " atoms in the system. They are " << std::endl;
             
-            for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-                   iA !=allAtoms.end(); iA++)
-            {
-                std::cout << "Atom " << iA->id << std::endl;
-            }
-            
-            std::cout << "There are " << (int)allHydroAtoms.size() 
-                    << " Hydrogen atoms in the system. They are " << std::endl;
-            
-            for (std::vector<int>::iterator iA=allHydroAtoms.begin();
-                   iA !=allHydroAtoms.end(); iA++)
-            {
-                std::cout << "Atom " << allAtoms[*iA].id << std::endl;
-            }
-            
-            std::cout << "There are " << (int)allBonds.size() 
-                    << " bonds in the system. They are : " << std::endl;
-            for (std::vector<BondDict>::iterator iB = allBonds.begin();
-                    iB !=allBonds.end(); iB++)
-            {
-                std::cout << "Bond between atom " << iB->atoms[0]  
-                          << " and atom " << iB->atoms[1] << std::endl ; 
-            }
-            
-            std::cout << "There are " << (int)allChirals.size() 
-                      << " chirals in the system. They are: " <<std::endl;
-            
-            for (std::vector<ChiralDict>::iterator iCh = allChirals.begin();
-                        iCh != allChirals.end(); iCh++)
-            {
-                std::cout << iCh->id  << "\t";
-                for (std::vector<int>::iterator iAt=iCh->atoms.begin();
-                            iAt != iCh->atoms.end(); iAt++)
-                {
-                    std::cout << allAtoms[*iAt].id << "\t";
-                }
-                std::cout << iCh->sign << std::endl;
-            }
                 
             setHydroAtomConnect();
-            
             // addMissHydroAtoms();
             
             setAtomsBondingAndChiralCenter();
@@ -1396,8 +1356,12 @@ namespace LIBMOL
             
             ringDetecting();
             
-            setAtomsCCP4Type();
-        
+            if (!hasCCP4Type)
+            {
+                
+                setAtomsCCP4Type();
+            }
+          
             /*
             setAllAngles();
             ringDetecting();
@@ -1423,10 +1387,9 @@ namespace LIBMOL
             
            
             
-            
             // std::cout << "finish reading the input cif file: " 
             //          << std::endl
-            /*   
+            
             if (hasCoords)
             {
                 std::cout << "The system has coords " << std::endl;
@@ -1441,7 +1404,7 @@ namespace LIBMOL
                 std::cout << "\nAtom " << iA->seriNum << " : " << std::endl
                         << "Its ID : " << iA->id << std::endl
                         << "Its Chemical Type : " << iA->chemType << std::endl
-                        << "Its COD chemical type " << iA->cChemType << std::endl
+                        << "Its CCP4 chemical type " << iA->ccp4Type << std::endl
                         << "Its bonding index : "   << iA->bondingIdx << std::endl
                         << "Its residue Name: " << iA->resName<< std::endl;
                 std::cout << "Its connected atoms are : " << std::endl;
@@ -1476,9 +1439,6 @@ namespace LIBMOL
                 //std::cout << "Its sigLength : " << iBo->sigLength << std::endl;
                 //std::cout << "its order : " << iBo->order << std::endl;
             }
-            */
-            
-     
         }
     }
         
@@ -1791,6 +1751,7 @@ namespace LIBMOL
                 else if(tF1[1].find("type_energy") !=std::string::npos)
                 {
                     hasProps["atom"].insert(std::pair<std::string, int>("enerType",curBlockLine));
+                    hasCCP4Type = true;
                     //std::cout << curBlockLine << std::endl;
                     //curBlockLine++;
                 }
@@ -1897,7 +1858,7 @@ namespace LIBMOL
             if (hasProps["atom"].find("enerType") != hasProps["atom"].end())
             {
                 itsCurAtom->existProps["enerType"] = hasProps["atom"]["enerType"];
-                itsCurAtom->enerType = TrimSpaces(tF[itsCurAtom->existProps["enerType"]]);
+                itsCurAtom->ccp4Type = TrimSpaces(tF[itsCurAtom->existProps["enerType"]]);
                 //std::cout << "Its energy type : " << itsCurAtom->enerType << std::endl;
             }
             if (hasProps["atom"].find("parCharge") != hasProps["atom"].end())
@@ -6075,16 +6036,16 @@ namespace LIBMOL
                 //double r3 =  (double) rand()/RAND_MAX;
                 StrUpper(iA->chemType);
                 StrUpper(iA->ccp4Type);
-                outRestrF << tMonoRootName << "   " 
-                          << iA->id << "   "
-                          << iA->chemType << "   "
-                          << iA->ccp4Type << "   " 
-                          << iA->parCharge << "    "
-                          << std::setprecision(3) << std::fixed 
-                          << iA->coords[0] << "    " 
-                          << std::setprecision(3) << std::fixed 
-                          << iA->coords[1] << "    "
-                          << std::setprecision(3) << std::fixed 
+                outRestrF << tMonoRootName  
+                          << std::setw(6) << iA->id 
+                          << std::setw(6) << iA->chemType 
+                          << std::setw(6) << iA->ccp4Type 
+                          << std::setw(8) << iA->parCharge 
+                          << std::setw(12) << std::setprecision(3) << std::fixed 
+                          << iA->coords[0] 
+                          << std::setw(12) << std::setprecision(3) << std::fixed 
+                          << iA->coords[1]
+                          << std::setw(12) << std::setprecision(3) << std::fixed 
                           << iA->coords[2] << std::endl;
             }
             
@@ -6101,13 +6062,13 @@ namespace LIBMOL
             for (std::vector<BondDict>::iterator iB=tBonds.begin();
                     iB !=tBonds.end(); iB++)
             {
-                outRestrF << tMonoRootName << std::setw(6) 
-                          << iB->atoms[0]  << std::setw(6)
-                          << iB->atoms[1]  << std::setw(6)
-                          << iB->order << std::setw(6)
-                          << std::setprecision(3) << std::fixed
-                          << iB->value <<  std::setw(6)
-                          << std::setprecision(3) << std::fixed
+                outRestrF << tMonoRootName  
+                          << std::setw(6)  << iB->atoms[0]  
+                          << std::setw(6)  << iB->atoms[1]  
+                          << std::setw(10) << iB->order 
+                          << std::setw(10) << std::setprecision(3)
+                          << iB->value 
+                          << std::setw(8) << std::setprecision(3)
                           << iB->sigValue << std::endl;
                 
              //   if(iB->hasCodValue)
@@ -6146,22 +6107,23 @@ namespace LIBMOL
                     for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
                             iCA !=iA->codAngleValues.end(); iCA++)
                     {
-                        outRestrF << tMonoRootName << "    "
-                              << tAtoms[iA->atoms[1]].id << "    "
-                              << tAtoms[iA->atoms[0]].id << "    "
-                              << tAtoms[iA->atoms[2]].id << "    ";
-                       outRestrF << std::setprecision(3) <<  *iCA << "    "
-                                 << std::setprecision(2) << iA->sigValue << std::endl;
+                        outRestrF << tMonoRootName << std::setw(6)
+                              << tAtoms[iA->atoms[1]].id << std::setw(6)
+                              << tAtoms[iA->atoms[0]].id << std::setw(6)
+                              << tAtoms[iA->atoms[2]].id ;
+                       outRestrF << std::setw(6) << std::setprecision(3) <<  *iCA << "    "
+                                 << std::setw(6) << std::setprecision(2) << iA->sigValue << std::endl;
                     }
                 }
                 else
                 {
-                    outRestrF << tMonoRootName << "    "
-                              << tAtoms[iA->atoms[1]].id << "    "
-                              << tAtoms[iA->atoms[0]].id << "    "
-                              << tAtoms[iA->atoms[2]].id << "    ";
-                    outRestrF << std::setprecision(3) <<  iA->value << "    "
-                               << std::setprecision(2) << iA->sigValue << std::endl;
+                    outRestrF << tMonoRootName 
+                              << std::setw(6) << tAtoms[iA->atoms[1]].id
+                              << std::setw(6) << tAtoms[iA->atoms[0]].id 
+                              << std::setw(8) << tAtoms[iA->atoms[2]].id;
+                    outRestrF << std::setw(10) << std::setprecision(3) <<  iA->value
+                              << std::setw(8) << std::setprecision(2) << iA->sigValue 
+                              << std::endl;
                 }
               
                 
@@ -6209,15 +6171,15 @@ namespace LIBMOL
                     //          << iT->atoms[2] << std::endl
                     //          << iT->atoms[3] << std::endl;
                 
-                    outRestrF << tMonoRootName << "    " 
-                            << iT->id  <<"    " 
-                            <<  tAtoms[iT->atoms[0]].id <<"    "
-                            <<  tAtoms[iT->atoms[1]].id <<"    "
-                            <<  tAtoms[iT->atoms[2]].id <<"    "
-                            <<  tAtoms[iT->atoms[3]].id <<"    "
-                            << iT->value << "    " 
-                            << std::setprecision(2) << std::fixed << "10.00    " 
-                            << iT->period << std::endl;
+                    outRestrF << tMonoRootName 
+                              << std::setw(16) << iT->id
+                              << std::setw(8)  << tAtoms[iT->atoms[0]].id 
+                              << std::setw(8)  << tAtoms[iT->atoms[1]].id 
+                              << std::setw(8)  << tAtoms[iT->atoms[2]].id 
+                              << std::setw(8)  << tAtoms[iT->atoms[3]].id 
+                              << std::setw(12) << iT->value  
+                              << std::setw(8)  << std::setprecision(2) << std::fixed << "10.00    " 
+                              << std::setw(6)  << iT->period << std::endl;
                     idxTor++;        
                 }
                 
@@ -6317,14 +6279,14 @@ namespace LIBMOL
                                 
                                 // Not let H in as possible
                                   
-                                outRestrF << tMonoRootName << "    " 
-                                      << idxStr << "    "
-                                      << iA->id  << "    " ;
+                                outRestrF << tMonoRootName 
+                                          << std::setw(10) << idxStr 
+                                          << std::setw(6)  << iA->id;
                        
-                                outRestrF << chirAtms[0] << "    ";
-                                outRestrF << chirAtms[1] << "    ";
-                                outRestrF << chirAtms[2] << "    ";
-                                outRestrF << "BOTH" << std::endl;
+                                outRestrF << std::setw(6) << chirAtms[0] << "    ";
+                                outRestrF << std::setw(6) << chirAtms[1] << "    ";
+                                outRestrF << std::setw(6) << chirAtms[2] << "    ";
+                                outRestrF << std::setw(6) << "BOTH" << std::endl;
                                 idxC++;
                             }
                         }
@@ -6346,16 +6308,20 @@ namespace LIBMOL
                 for (std::vector<PlaneDict>::iterator iP=tPlas.begin();
                         iP !=tPlas.end(); iP++)
                 {
-                    std::string idxPStr = IntToStr(idxP);
-                    idxPStr = "plan-" + idxPStr;
-                    for(std::map<ID, int>::iterator iAt=iP->atoms.begin();
-                           iAt != iP->atoms.end(); iAt++)
+                    if (iP->atoms.size() > 3)
                     {
-                        outRestrF << tMonoRootName << "    " << idxPStr + "    "
-                                  << iAt->first << "    " 
-                                  << "0.020    " << std::endl;
+                        std::string idxPStr = IntToStr(idxP);
+                        idxPStr = "plan-" + idxPStr;
+                        for(std::map<ID, int>::iterator iAt=iP->atoms.begin();
+                                iAt != iP->atoms.end(); iAt++)
+                        {
+                            outRestrF << tMonoRootName 
+                                      << std::setw(10) << idxPStr
+                                      << std::setw(6)  << iAt->first 
+                                      << std::setw(8)  << "0.020" << std::endl;
+                        }
+                        idxP++;
                     }
-                    idxP++;
                 }
             }
             outRestrF.close();

@@ -11,6 +11,7 @@
 namespace LIBMOL
 {
     AllSystem::AllSystem():hasCoords(false),
+                           hasCCP4Type(false),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -22,6 +23,7 @@ namespace LIBMOL
     }
  
     AllSystem::AllSystem(const AllSystem& tAllSys):hasCoords(tAllSys.hasCoords),
+                                                   hasCCP4Type(tAllSys.hasCCP4Type),
                                                    itsContainMetal(tAllSys.itsContainMetal),
                                                    itsCurAngleSeriNum(ZeroInt),
                                                    itsCurAngle(NullPoint),
@@ -50,6 +52,7 @@ namespace LIBMOL
                          const std::vector<PlaneDict>& tAllPlanes, 
                          const std::map<ID, std::vector<RingDict> >& tAllRings)
                           :hasCoords(false),
+                           hasCCP4Type(false),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -78,6 +81,7 @@ namespace LIBMOL
     
     
     AllSystem::AllSystem(DictCifFile& tCifObj):hasCoords(tCifObj.hasCoords),
+                                               hasCCP4Type(tCifObj.hasCCP4Type),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -289,8 +293,9 @@ namespace LIBMOL
         setHydroAtomConnect();
             
         setAtomsBondingAndChiralCenter();
-            
+      
         setAtomsCChemType();
+   
             
         setAtomsMetalType();
         
@@ -362,7 +367,10 @@ namespace LIBMOL
        
         setAllTorsions2();
         
-        setAtomsCCP4Type();
+        if (!hasCCP4Type)
+        {
+            setAtomsCCP4Type();
+        }
         
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)

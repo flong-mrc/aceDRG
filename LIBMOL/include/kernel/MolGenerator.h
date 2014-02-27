@@ -104,7 +104,7 @@ namespace LIBMOL
         
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         
-        void getMolByEqClassInAsyCell();
+        void getMolByEqClassInCell();
         
         void getMolByEqClassInCrys();
         
@@ -126,6 +126,7 @@ namespace LIBMOL
         
         void getMolsInCell();
         
+        
         void outTables(FileName tOutName);
         
         void execute(FileName tOutName);   
@@ -135,7 +136,8 @@ namespace LIBMOL
         std::vector<AtomDict>           allAtoms;       // these are all atoms (including symmetrically generated atoms)
                                                         // in a unit cell
         std::vector<AtomDict>           refAtoms;       
-        std::vector<AtomDict>           uniqueAtoms;     
+        std::vector<AtomDict>           uniqueAtoms; 
+        std::vector<Molecule>           allMolecules;
         std::vector<CrystInfo>          allCryst;
         
         std::vector<BondDict>           bonds;

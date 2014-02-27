@@ -502,6 +502,7 @@ namespace LIBMOL
         bool                       hasConnect;
         bool                       hasCoords;
         bool                       hasH;
+        bool                       hasCCP4Type;
         
     private:
             

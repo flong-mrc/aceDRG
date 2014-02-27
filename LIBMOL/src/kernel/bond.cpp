@@ -267,6 +267,11 @@ namespace LIBMOL
         
     }
     
+    std::string BondDict::bondOrderNumToStr()
+    {
+        
+    }
+    
     MetBond::MetBond() : resName(NullString),
             seriNum(ZeroInt),
             order(ZeroShort),
