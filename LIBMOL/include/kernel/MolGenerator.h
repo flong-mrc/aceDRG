@@ -125,9 +125,9 @@ namespace LIBMOL
         void getUniqAngles();
         
         void getMolsInCell();
+        bool checkAtomOcp(std::vector<int> & tMol);
         
-        
-        void outTables(FileName tOutName);
+        void outTables(FileName tOutName, Molecule & tMol);
         
         void execute(FileName tOutName);   
         

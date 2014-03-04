@@ -6016,131 +6016,136 @@ namespace LIBMOL
                       <<"#" << std::endl
                       <<"data_comp_" << tMonoRootName << std::endl
                       <<"#" << std::endl; 
-            
-            // atom info section           
-            outRestrF << "loop_" << std::endl
-                      << "_chem_comp_atom.comp_id" << std::endl
-                      << "_chem_comp_atom.atom_id" << std::endl
-                      << "_chem_comp_atom.type_symbol" << std::endl
-                      << "_chem_comp_atom.type_energy" << std::endl
-                      << "_chem_comp_atom.partial_charge" << std::endl
-                      << "_chem_comp_atom.x" << std::endl
-                      << "_chem_comp_atom.y" << std::endl
-                      << "_chem_comp_atom.z" << std::endl;
-            
-            for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
-                    iA != tAtoms.end(); iA++)
+        
+            if (tAtoms.size() >0)
             {
-                //double r1 =  (double) rand()/RAND_MAX;
-                //double r2 =  (double) rand()/RAND_MAX;
-                //double r3 =  (double) rand()/RAND_MAX;
-                StrUpper(iA->chemType);
-                StrUpper(iA->ccp4Type);
-                outRestrF << tMonoRootName  
-                          << std::setw(6) << iA->id 
-                          << std::setw(6) << iA->chemType 
-                          << std::setw(6) << iA->ccp4Type 
-                          << std::setw(8) << iA->parCharge 
-                          << std::setw(12) << std::setprecision(3) << std::fixed 
-                          << iA->coords[0] 
-                          << std::setw(12) << std::setprecision(3) << std::fixed 
-                          << iA->coords[1]
-                          << std::setw(12) << std::setprecision(3) << std::fixed 
-                          << iA->coords[2] << std::endl;
+                // atom info section           
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_atom.comp_id" << std::endl
+                          << "_chem_comp_atom.atom_id" << std::endl
+                          << "_chem_comp_atom.type_symbol" << std::endl
+                          << "_chem_comp_atom.type_energy" << std::endl
+                          << "_chem_comp_atom.partial_charge" << std::endl
+                          << "_chem_comp_atom.x" << std::endl
+                          << "_chem_comp_atom.y" << std::endl
+                          << "_chem_comp_atom.z" << std::endl;
+                
+                for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
+                        iA != tAtoms.end(); iA++)
+                {
+                    //double r1 =  (double) rand()/RAND_MAX;
+                    //double r2 =  (double) rand()/RAND_MAX;
+                    //double r3 =  (double) rand()/RAND_MAX;
+                    StrUpper(iA->chemType);
+                    StrUpper(iA->ccp4Type);
+                    outRestrF << tMonoRootName  
+                              << std::setw(6) << iA->id 
+                              << std::setw(6) << iA->chemType 
+                              << std::setw(6) << iA->ccp4Type 
+                              << std::setw(8) << iA->parCharge 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[0] 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[2] << std::endl;
+                }
             }
             
-            // Bond sections 
-            outRestrF << "loop_" << std::endl
-                    << "_chem_comp_bond.comp_id" << std::endl
-                    << "_chem_comp_bond.atom_id_1" << std::endl
-                    << "_chem_comp_bond.atom_id_2" << std::endl
-                    << "_chem_comp_bond.type" << std::endl
-                    << "_chem_comp_bond.value_dist"<< std::endl
-                    << "_chem_comp_bond.value_dist_esd" << std::endl;
-                   // << "_chem_comp_bond.exact_cod_dist" << std::endl;
-            
-            for (std::vector<BondDict>::iterator iB=tBonds.begin();
-                    iB !=tBonds.end(); iB++)
+            if (tBonds.size() >0)
             {
-                outRestrF << tMonoRootName  
-                          << std::setw(6)  << iB->atoms[0]  
-                          << std::setw(6)  << iB->atoms[1]  
-                          << std::setw(10) << iB->order 
-                          << std::setw(10) << std::setprecision(3)
-                          << iB->value 
-                          << std::setw(8) << std::setprecision(3)
-                          << iB->sigValue << std::endl;
+                // Bond sections 
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_bond.comp_id" << std::endl
+                          << "_chem_comp_bond.atom_id_1" << std::endl
+                          << "_chem_comp_bond.atom_id_2" << std::endl
+                          << "_chem_comp_bond.type" << std::endl
+                          << "_chem_comp_bond.value_dist"<< std::endl
+                          << "_chem_comp_bond.value_dist_esd" << std::endl;
+                          // << "_chem_comp_bond.exact_cod_dist" << std::endl;
                 
-             //   if(iB->hasCodValue)
-             //   {
-             //       outRestrF << "Yes " << std::endl;
-             //   }
-             //   else
-             //   {
-             //       outRestrF << "No "  << std::endl;
-             //   }
+                for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                          iB !=tBonds.end(); iB++)
+                {
+                    outRestrF << tMonoRootName  
+                              << std::setw(6)  << iB->atoms[0]  
+                              << std::setw(6)  << iB->atoms[1]  
+                              << std::setw(10) << iB->order 
+                              << std::setw(10) << std::setprecision(3)
+                              << iB->value 
+                              << std::setw(8) << std::setprecision(3)
+                              << iB->sigValue << std::endl;
+                    
+                    //   if(iB->hasCodValue)
+                    //   {
+                    //       outRestrF << "Yes " << std::endl;
+                    //   }
+                    //   else
+                    //   {
+                    //       outRestrF << "No "  << std::endl;
+                    //   }
                         
+                }
             }
            
-            // Angle section
-            outRestrF << "loop_" << std::endl
-                      << "_chem_comp_angle.comp_id"   << std::endl
-                      << "_chem_comp_angle.atom_id_1" << std::endl
-                      << "_chem_comp_angle.atom_id_2" << std::endl
-                      << "_chem_comp_angle.atom_id_3" << std::endl
-                      << "_chem_comp_angle.value_angle"     << std::endl
-                      << "_chem_comp_angle.value_angle_esd" << std::endl;
-                    //  << "_chem_comp_angle.exact_cod_dist"  << std::endl;
-            
-            for (std::vector<AngleDict>::iterator iA=tAngs.begin();
-                    iA != tAngs.end(); iA++)
+            if (tAngs.size() > 0)
             {
-                //for (std::vector<int>::iterator iAt=iA->atoms.begin();
-                //        iAt !=iA->atoms.end(); iAt++)
-                //{
-                // difference in comp atom definitions between cod and
-                // dictionary: inner-out1-out2(cod),
-                // atom1-atom2(center)-atom3(dictionary)
-              
-                if (tAtoms[iA->atoms[0]].isMetal)
+                // Angle section
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_angle.comp_id"   << std::endl
+                          << "_chem_comp_angle.atom_id_1" << std::endl
+                          << "_chem_comp_angle.atom_id_2" << std::endl
+                          << "_chem_comp_angle.atom_id_3" << std::endl
+                          << "_chem_comp_angle.value_angle"     << std::endl
+                          << "_chem_comp_angle.value_angle_esd" << std::endl;
+                          //  << "_chem_comp_angle.exact_cod_dist"  << std::endl;
+                
+                for (std::vector<AngleDict>::iterator iA=tAngs.begin();
+                          iA != tAngs.end(); iA++)
                 {
-                    for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
-                            iCA !=iA->codAngleValues.end(); iCA++)
+                    //for (std::vector<int>::iterator iAt=iA->atoms.begin();
+                    //        iAt !=iA->atoms.end(); iAt++)
+                    //{
+                    // difference in comp atom definitions between cod and
+                    // dictionary: inner-out1-out2(cod),
+                    // atom1-atom2(center)-atom3(dictionary)
+                    
+                    if (tAtoms[iA->atoms[0]].isMetal)
                     {
-                        outRestrF << tMonoRootName << std::setw(6)
-                              << tAtoms[iA->atoms[1]].id << std::setw(6)
-                              << tAtoms[iA->atoms[0]].id << std::setw(6)
-                              << tAtoms[iA->atoms[2]].id ;
-                       outRestrF << std::setw(6) << std::setprecision(3) <<  *iCA << "    "
-                                 << std::setw(6) << std::setprecision(2) << iA->sigValue << std::endl;
+                        for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
+                                iCA !=iA->codAngleValues.end(); iCA++)
+                        {
+                            outRestrF << tMonoRootName << std::setw(6)
+                                      << tAtoms[iA->atoms[1]].id << std::setw(6)
+                                      << tAtoms[iA->atoms[0]].id << std::setw(6)
+                                      << tAtoms[iA->atoms[2]].id ;
+                            outRestrF << std::setw(6) << std::setprecision(3) <<  *iCA << "    "
+                                      << std::setw(6) << std::setprecision(2) << iA->sigValue << std::endl;
+                        }
                     }
+                    else
+                    {
+                        outRestrF << tMonoRootName 
+                                  << std::setw(6) << tAtoms[iA->atoms[1]].id
+                                  << std::setw(6) << tAtoms[iA->atoms[0]].id 
+                                  << std::setw(8) << tAtoms[iA->atoms[2]].id;
+                        outRestrF << std::setw(10) << std::setprecision(3) <<  iA->value
+                                  << std::setw(8) << std::setprecision(2) << iA->sigValue 
+                                  << std::endl;
+                    }
+                    /*
+                    if(iA->hasCodValue)
+                     {
+                       outRestrF << "Yes " << std::endl;
+                     }
+                     else
+                     {
+                       outRestrF << "No "  << std::endl;
+                     }
+                     */
                 }
-                else
-                {
-                    outRestrF << tMonoRootName 
-                              << std::setw(6) << tAtoms[iA->atoms[1]].id
-                              << std::setw(6) << tAtoms[iA->atoms[0]].id 
-                              << std::setw(8) << tAtoms[iA->atoms[2]].id;
-                    outRestrF << std::setw(10) << std::setprecision(3) <<  iA->value
-                              << std::setw(8) << std::setprecision(2) << iA->sigValue 
-                              << std::endl;
-                }
-              
-                
-                
-                /*
-                if(iA->hasCodValue)
-                {
-                    outRestrF << "Yes " << std::endl;
-                }
-                else
-                {
-                    outRestrF << "No "  << std::endl;
-                }
-                */
-                
             }
-            
+        
             // Torsion section 
             if((int)tTorsions.size() !=0)
             {
@@ -6177,8 +6182,8 @@ namespace LIBMOL
                               << std::setw(8)  << tAtoms[iT->atoms[1]].id 
                               << std::setw(8)  << tAtoms[iT->atoms[2]].id 
                               << std::setw(8)  << tAtoms[iT->atoms[3]].id 
-                              << std::setw(12) << iT->value  
-                              << std::setw(8)  << std::setprecision(2) << std::fixed << "10.00    " 
+                              << std::setw(12) << std::setprecision(3) << iT->value  
+                              << std::setw(8)  << "10.00" 
                               << std::setw(6)  << iT->period << std::endl;
                     idxTor++;        
                 }

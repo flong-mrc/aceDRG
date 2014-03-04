@@ -121,13 +121,16 @@ namespace LIBMOL
                 
                 getMolByEqClassInCell();
                 
-                if (moleculesInCell.size() > 1)
+                if (allMolecules.size() > 0)
                 {
-                    for (int  i=0; i < (int)moleculesInCell.size(); i++)
+                    for (unsigned  i=0; i < allMolecules.size(); i++)
                     {
-                        Name tFName(tOutName);
-                        tFName.append("_" + IntToStr(i));
-                        outTables(tFName.c_str());
+                        if (allMolecules[i].atoms.size() >0)
+                        {
+                            Name tFName(tOutName);
+                            tFName.append("_" + IntToStr(i));
+                            outTables(tFName.c_str(), allMolecules[i]);
+                        }
                     }
                 }
             }
@@ -663,18 +666,70 @@ namespace LIBMOL
         for (std::map<unsigned, std::vector<int> >::iterator iMol=moleculesInCell.begin(); 
                   iMol !=moleculesInCell.end(); iMol++)
         {
-            Molecule aMol;
-            aMol.seriNum = i;
-            i++;
-            for (std::vector<int>::iterator iAt=iMol->second.begin(); 
-                    iAt !=iMol->second.end(); iMol++)
+            // check if there is any atom with occupancy less than 0.95 
+            // and then set individual molecules
+            if (checkAtomOcp(iMol->second))
             {
-                aMol.atoms.push_back(allAtoms[*iAt]);
+                Molecule aMol;
+                aMol.seriNum = i;
+                i++;
+            
+                for (std::vector<int>::iterator iAt=iMol->second.begin(); 
+                        iAt !=iMol->second.end(); iMol++)
+                {
+                    aMol.atoms.push_back(allAtoms[*iAt]);
+                }
+            
+                for (std::vector<BondDict>::iterator iB=bonds.begin();
+                      iB !=bonds.end(); iB++)
+                {
+                    if (iB->atomsIdx.size()==2)
+                    {
+                        if ((std::find(iMol->second.begin(), iMol->second.end(), iB->atomsIdx[0])
+                               != iMol->second.end()) 
+                             && (std::find(iMol->second.begin(), iMol->second.end(), iB->atomsIdx[1])
+                               != iMol->second.end()) )
+                        {
+                            aMol.bonds.push_back(*iB);
+                        }
+                    }
+                }
                 
+                for (std::vector<AngleDict>::iterator iAn=angles.begin();
+                        iAn !=angles.end(); iAn++)
+                {
+                    if (iAn->atoms.size() == 3)
+                    {
+                        if ( (std::find(iMol->second.begin(), iMol->second.end(), iAn->atoms[0])
+                                !=iMol->second.end())  &&
+                             (std::find(iMol->second.begin(), iMol->second.end(), iAn->atoms[1])
+                                !=iMol->second.end())  && 
+                             (std::find(iMol->second.begin(), iMol->second.end(), iAn->atoms[2])
+                                !=iMol->second.end()) )
+                        {
+                            aMol.angles.push_back(*iAn);
+                        }
+                    }
+                }
             }
         }
     }
     
+    bool MolGenerator::checkAtomOcp(std::vector<int>& tMol)
+    {
+        bool tOcpOne = true;
+        for (std::vector<int>::iterator iAt=tMol.begin();
+                iAt !=tMol.end(); iAt++)
+        {
+            if (allAtoms[*iAt].ocp < 0.95)
+            {
+                tOcpOne = false;
+                break;
+            }
+        }
+        
+        return tOcpOne;
+    }
     void MolGenerator::getMolByEqClassInCrys()
     {
         
@@ -709,62 +764,91 @@ namespace LIBMOL
         }
     }
     
-    void MolGenerator::outTables(FileName tOutName)
+    void MolGenerator::outTables(FileName tOutName,
+                                 Molecule & tMol)
     {
         std::ofstream outTableF(tOutName);
         
         if (outTableF.is_open())
         {
-            outTableF << "loop_" << std::endl
-                      << "_chem_comp_atom.serial_number" << std::endl
-                      << "_chem_comp_atom.atom_id " << std::endl
-                      << "_chem_comp_atom.element_symbol" << std::endl
-                      << "_chem_comp_atom.cod_type" << std::endl;
-            for (std::vector<AtomDict>::iterator iAt=allAtoms.begin(); 
-                    iAt !=allAtoms.end(); iAt++)
+            if (tMol.atoms.size() >0)
             {
-                outTableF << std::setw(6) << iAt->seriNum   
-                          << std::setw(6) << iAt->id    
-                          << std::setw(5) << iAt->chemType << "    "
-                          << iAt->codClass << std::endl;
+                outTableF << "loop_" << std::endl
+                          << "_chem_comp_atom.serial_number" << std::endl
+                          << "_chem_comp_atom.atom_id " << std::endl
+                          << "_chem_comp_atom.element_symbol" << std::endl
+                          << "_chem_comp_atom.cod_type" << std::endl;
+                for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin(); 
+                        iAt !=tMol.atoms.end(); iAt++)
+                {
+                    outTableF << std::setw(6) << iAt->seriNum   
+                              << std::setw(6) << iAt->id    
+                              << std::setw(5) << iAt->chemType << "    "
+                              << iAt->codClass << std::endl;
+                }
+                
+                outTableF << std::endl;
+            }
+            else
+            {
+                std::cout << "There is no atoms in the molecule" << std::endl;
             }
             
-            std::cout << std::endl;
-            outTableF << "loop_" << std::endl
+            if (tMol.bonds.size() >0)
+            {
+                std::cout << std::endl;
+                outTableF << "loop_" << std::endl
                       << "_chem_comp_bond.atom_serial_number_1" << std::endl
                       << "_chem_comp_bond.atom_serial_number_2" << std::endl
                       << "_chem_comp_bond.atom_element_symbol_1" << std::endl
                       << "_chem_comp_bond.atom_element_symbol_2" << std::endl
                       << "_chem_comp_bond.value_dist"<< std::endl;
-            for (std::vector<BondDict>::iterator iBo=bonds.begin();
-                    iBo !=bonds.end(); iBo++)
+                int nBo = 1;
+                for (std::vector<BondDict>::iterator iBo=tMol.bonds.begin();
+                        iBo !=tMol.bonds.end(); iBo++)
+                {
+                    outTableF << std::setw(6) << nBo
+                              << std::setw(6) << iBo->atomsIdx[0] + 1 
+                              << std::setw(6) << iBo->atomsIdx[1] + 1
+                              << std::setw(4) << allAtoms[iBo->atomsIdx[0]].chemType
+                              << std::setw(4) << allAtoms[iBo->atomsIdx[1]].chemType
+                              << std::setw(10)<< iBo->value << std::endl;
+                    nBo++;
+                }
+            
+                std::cout << std::endl;
+            }
+            else
             {
-                outTableF << std::setw(6) << iBo->atomsIdx[0] + 1 
-                          << std::setw(6) << iBo->atomsIdx[1] + 1
-                          << std::setw(4) << allAtoms[iBo->atomsIdx[0]].chemType
-                          << std::setw(4) << allAtoms[iBo->atomsIdx[1]].chemType
-                          << std::setw(10)<< iBo->value << std::endl;
+                std::cout << "There is no bonds in the molecule" << std::endl;
             }
             
-            std::cout << std::endl;
-            outTableF << "loop_" << std::endl
-                      << "_chem_comp_angle.atom_serial_number_1" << std::endl
-                      << "_chem_comp_angle.atom_serial_number_2" << std::endl
-                      << "_chem_comp_angle.atom_serial_number_3" << std::endl
-                      << "_chem_comp_angle.atom_element_symbol_1" << std::endl
-                      << "_chem_comp_angle.atom_element_symbol_2" << std::endl
-                      << "_chem_comp_angle.atom_element_symbol_3" << std::endl
-                      << "_chem_comp_angle.value_angle"          << std::endl;
-            for (std::vector<AngleDict>::iterator iAn=angles.begin();
-                    iAn !=angles.end(); iAn++)
+            if (tMol.angles.size() > 0)
             {
-                outTableF << std::setw(6)  << iAn->atoms[0] +1 
-                          << std::setw(6)  << iAn->atoms[1] +1
-                          << std::setw(6)  << iAn->atoms[2] +1
-                          << std::setw(4)  << allAtoms[iAn->atoms[0]].chemType 
-                          << std::setw(4)  << allAtoms[iAn->atoms[1]].chemType 
-                          << std::setw(4)  << allAtoms[iAn->atoms[2]].chemType 
-                          << std::setw(10) << iAn->value*PID180 << std::endl;
+                outTableF << "loop_" << std::endl
+                          << "_chem_comp_angle.atom_serial_number_1" << std::endl
+                          << "_chem_comp_angle.atom_serial_number_2" << std::endl
+                          << "_chem_comp_angle.atom_serial_number_3" << std::endl
+                          << "_chem_comp_angle.atom_element_symbol_1" << std::endl
+                          << "_chem_comp_angle.atom_element_symbol_2" << std::endl
+                          << "_chem_comp_angle.atom_element_symbol_3" << std::endl
+                          << "_chem_comp_angle.value_angle"          << std::endl;
+                int nAn = 1;
+                for (std::vector<AngleDict>::iterator iAn=tMol.angles.begin();
+                        iAn !=tMol.angles.end(); iAn++)
+                {
+                    outTableF << std::setw(6)  << nAn
+                              << std::setw(6)  << iAn->atoms[0] +1 
+                              << std::setw(6)  << iAn->atoms[1] +1
+                              << std::setw(6)  << iAn->atoms[2] +1
+                              << std::setw(4)  << allAtoms[iAn->atoms[0]].chemType 
+                              << std::setw(4)  << allAtoms[iAn->atoms[1]].chemType 
+                              << std::setw(4)  << allAtoms[iAn->atoms[2]].chemType 
+                              << std::setw(10) << iAn->value*PID180 << std::endl;
+                    nAn++;
+                }
+                
+                std::cout << std::endl;
             }
             
             outTableF.close();

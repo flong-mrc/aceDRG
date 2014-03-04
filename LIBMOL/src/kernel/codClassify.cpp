@@ -5331,6 +5331,13 @@ namespace LIBMOL
                 
                 codAngleFile.close();
             }
+            else
+            {
+                std::cout << iAF->second 
+                << " can not be open for reading. Check if $CLIBD_MON/allOrgAngleTables contains that file! "
+                << std::endl;
+                exit(1);
+            }
         }
         
         std::time(&tEnd);

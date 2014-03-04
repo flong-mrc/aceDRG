@@ -4142,14 +4142,17 @@ namespace LIBMOL
         for (std::map<int, std::vector<int> >::iterator iPC=allPlsClasses.begin();
                 iPC!=allPlsClasses.end(); iPC++ )
         {
-            PlaneDict aPl;
-            
-            for (std::vector<int>::iterator iId=iPC->second.begin();
-                   iId !=iPC->second.end(); iId++ )
+            if (iPC->second.size() >3 )
             {
-                aPl.atoms[allAtoms[*iId].id]=*iId;
-            }  
-            allPlanes.push_back(aPl);
+                PlaneDict aPl;
+            
+                for (std::vector<int>::iterator iId=iPC->second.begin();
+                       iId !=iPC->second.end(); iId++ )
+                {
+                    aPl.atoms[allAtoms[*iId].id]=*iId;
+                }
+                allPlanes.push_back(aPl);
+            }
         } 
     }
 

@@ -263,7 +263,7 @@ int main(int argc, char** argv) {
         aCodSystem.outPDB(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
        
     }
-    else if (AJob.workMode==31 || AJob.workMode==32 )
+    else if (AJob.workMode==31 || AJob.workMode==32 || AJob.workMode==33)
     {
         std::cout << "WorkMode: Molecule generation" << std::endl;
         int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
@@ -276,10 +276,17 @@ int main(int argc, char** argv) {
         }
         else if (AJob.workMode==32)
         {
+            
             std::cout << "Input cif " << AJob.IOEntries["inCifName"] << std::endl;
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
             aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+        }
+        else if (AJob.workMode==33)
+        {
+            std::cout << "The directory of input cif files " 
+                      << AJob.IOEntries["inCifNameB"] << std::endl;
+            
         }
         
     }

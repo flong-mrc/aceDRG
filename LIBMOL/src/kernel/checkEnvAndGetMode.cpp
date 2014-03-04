@@ -121,7 +121,12 @@ namespace LIBMOL
                     IOEntries["inSdfName"] = optarg;
                     //std::cout << "Monomer root name is : " 
                     //          << IOEntries["monoRootName"] << std::endl;
-                    break;   
+                    break; 
+                 case 't':
+                    IOEntries["tabGen"] = optarg;
+                    std::cout << "Table generator mode :  " 
+                              << IOEntries["tabGen"] << std::endl;
+                    break;
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
                     //std::cout << "COD atom types are output to : " 
@@ -315,12 +320,18 @@ namespace LIBMOL
                 }
             }
         }
-        else if (IOEntries.find("inCifNameB") !=IOEntries.end() 
-                && IOEntries.find("molGen") != IOEntries.end())
+        else if (IOEntries.find("inCifNameB") !=IOEntries.end())
         {
-            // This mode takes a general cif file and generate a whole molecule 
-            // and unique bonds and angles within the molecule
-            workMode = 31;
+            if (IOEntries.find("molGen") != IOEntries.end())
+            {
+                // This mode takes a general cif file and generate a whole molecule 
+                // and unique bonds and angles within the molecule
+                workMode = 31;
+            }
+            else if (IOEntries.find("tabGen") != IOEntries.end())
+            {
+                workMode = 33;
+            }
         }
         else if (IOEntries.find("inSdfName") !=IOEntries.end())
         {
