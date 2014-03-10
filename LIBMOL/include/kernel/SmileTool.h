@@ -107,7 +107,7 @@ namespace LIBMOL
         void setOneBondProp(ID & tSS, ID tId);
         
         
-        void SmileToCifUsingLibcheck(FileName tSmiFileName,
+        void SmileToCifUsingLibcheck(FileName       tSmiFileName,
                                      std::string  & tOutLibName);
         
         // Predefined Organic set of element 

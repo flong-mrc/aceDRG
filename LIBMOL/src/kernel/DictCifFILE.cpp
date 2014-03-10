@@ -1358,9 +1358,32 @@ namespace LIBMOL
             
             if (!hasCCP4Type)
             {
-                
                 setAtomsCCP4Type();
             }
+            
+            /*
+            std::map<unsigned, ID> tCMap;
+            // check 
+            for (unsigned i=0; i < allAtoms.size(); i++)
+            {
+                tCMap[i] = allAtoms[i].ccp4Type;
+            }
+            setAtomsCCP4Type();
+            
+            std::cout << "CCP4 atom types : " << std::endl;
+            
+            for (unsigned i=0; i < allAtoms.size(); i++)
+            {
+                if (allAtoms[i].ccp4Type.compare(tCMap[i]) !=0)
+                {
+                    std::cout << "For atom " << i << " id : " << allAtoms[i].id
+                            << std::endl << "Its CCP4 type: " << allAtoms[i].ccp4Type
+                            << " and " << tCMap[i] << std::endl;
+                }
+            }
+                
+            */
+            //}
           
             /*
             setAllAngles();

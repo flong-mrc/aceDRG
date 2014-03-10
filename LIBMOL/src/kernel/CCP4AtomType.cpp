@@ -148,6 +148,7 @@ namespace LIBMOL
         // Hydrogen atom types are decided in the last step.
         // Only covalence bonds to H are considered for CCP4 type 
         //in this stage. Hydrogen bonds will be added in sometime later
+        
         tAtom.ccp4Type = "H";
         /*
         if ((int)tAtom.connAtoms.size() == 1 && (int)tAtom.ccp4Type.size()==0)   

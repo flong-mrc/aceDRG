@@ -2911,11 +2911,19 @@ namespace LIBMOL
                 ha1 = IntToStr(allAtoms[iBo->atomsIdx[0]].hashingValue);
             }
                 
-            ID haNum = allBoIdx[ha0][ha1];
-            std::map<ID, ID>::iterator iFind = codOrgBondFiles2.find(haNum);
-            if (iFind ==codOrgBondFiles2.end())
+            ID haNum;
+            
+            if (allBoIdx.find(ha0) != allBoIdx.end())
             {
-                codOrgBondFiles2[haNum] = fRoot + haNum + ".table";
+                if (allBoIdx[ha0].find(ha1) != allBoIdx[ha0].end())
+                {
+                    haNum = allBoIdx[ha0][ha1];
+                    std::map<ID, ID>::iterator iFind = codOrgBondFiles2.find(haNum);
+                    if (iFind ==codOrgBondFiles2.end())
+                    {
+                        codOrgBondFiles2[haNum] = fRoot + haNum + ".table";
+                    }
+                }
             }
         }
         /*
@@ -4616,7 +4624,7 @@ namespace LIBMOL
                                     {
                                         if (tBuf[1].find(".") == std::string::npos)
                                         {
-                                            std::cout << tRecord << std::endl;
+                                            // std::cout << tRecord << std::endl;
                                             ccp4Bonds[tBuf[0]][tBuf[1]]["order"] = aOrder;
                                             ccp4Bonds[tBuf[0]][tBuf[1]]["length"]= StrToReal(tBuf[4]);
                                             if (tBuf[5].find('.') == std::string::npos)
@@ -4670,7 +4678,7 @@ namespace LIBMOL
                 exit(1);
             }
             
-        
+            /*
             std::cout << "Number of ccp4 bonds " << nBond << std::endl;
       
             if (ccp4Bonds.size() > 0)
@@ -4713,7 +4721,7 @@ namespace LIBMOL
                     }
                 }
             }
-            
+            */
         }
         else
         {
