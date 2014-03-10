@@ -116,9 +116,13 @@ namespace LIBMOL
                                       PeriodicTable & tPTab,
                                       std::vector<REAL> & tRange);
         
-        void setOneUniqueBond(int     tIdxAtm1,
-                              int     tIdxAtm2, 
-                              REAL    rD);
+        void setOneUniqueBondCrys(int     tIdxAtm1,
+                                  int     tIdxAtm2, 
+                                  REAL    rD);
+        
+        void setOneUniqueBondCell(int     tIdxAtm1,
+                                  int     tIdxAtm2, 
+                                  REAL    rD);
         
         void checkBondOneForming(PeriodicTable & tPTab);
         

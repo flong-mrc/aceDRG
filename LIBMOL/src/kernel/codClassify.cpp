@@ -306,6 +306,8 @@ namespace LIBMOL
         
         setAtomsBondingAndChiralCenter();
         
+        getCCP4BondAndAngles();
+        
         // detectPlaneGroups();
         
         // initTargetAngles();
@@ -3107,6 +3109,13 @@ namespace LIBMOL
                        
                     codBondFile.close();
                 }
+                else 
+                {
+                    std::cout << "Error in setup the programs. " << std::endl;
+                    std::cout << iBF->second << " can not be open for reading "
+                              << std::endl;
+                    exit(1);
+                }
                 
             }
             catch (std::exception & e)
@@ -3805,70 +3814,111 @@ namespace LIBMOL
                     }
                     else // One atom pair does not match 2NB space (both not match 2NB confs), iFind2
                     {
-                        std::vector<BondDict> tBs6;
-                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > > >::iterator iB2
+                        if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                            && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                        {
+                            std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
+                                      << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
+                                      << std::endl;
+                            getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                        }
+                        else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
+                            && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                        {
+                            std::cout << "atom 1 " << allAtoms[tPair[1]].ccp4Type
+                                      << "  atom 2 " << allAtoms[tPair[0]].ccp4Type
+                                      << std::endl;
+                            getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                        }
+                        else
+                        {
+                            std::vector<BondDict> tBs6;
+                            for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > > >::iterator iB2
                                  =allDictBondsIdx[ha1][ha2][a1NB2].begin();
                                  iB2 !=allDictBondsIdx[ha1][ha2][a1NB2].end();
                                  iB2++)
-                        {
-                            for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > >::iterator iB3=iB2->second.begin();
-                                    iB3!=iB2->second.end(); iB3++)
                             {
-                                for(std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iB4=iB3->second.begin();
-                                    iB4!=iB3->second.end(); iB4++)
+                                for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > >::iterator iB3=iB2->second.begin();
+                                    iB3!=iB2->second.end(); iB3++)
                                 {
-                                    for(std::map<ID, std::map<ID, int> >::iterator iB5=iB4->second.begin();
-                                        iB5!=iB4->second.end(); iB5++)
+                                    for(std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iB4=iB3->second.begin();
+                                    iB4!=iB3->second.end(); iB4++)
                                     {
-                                        for (std::map<ID, int>::iterator iB6=iB5->second.begin();
-                                                iB6 !=iB5->second.end(); iB6++)
+                                        for(std::map<ID, std::map<ID, int> >::iterator iB5=iB4->second.begin();
+                                            iB5!=iB4->second.end(); iB5++)
                                         {
-                                            tBs6.push_back(allDictBonds[iB6->second]);
+                                            for (std::map<ID, int>::iterator iB6=iB5->second.begin();
+                                                 iB6 !=iB5->second.end(); iB6++)
+                                            {
+                                                tBs6.push_back(allDictBonds[iB6->second]);
+                                            }
                                         }
                                     }
                                 }
                             }
+                        
+                        
+                            dLev = 2;
+                            setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
                         }
-                        dLev = 2;
-                        setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
+                        
                         std::cout << "iFind 2" << std::endl;
                     }
                 }
                 else // Both atom pairs do not match 2NB spaces, corresponding to iFind1
                 {
-                    std::vector<BondDict> tBs6;
-                    for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                            std::map<ID, std::map<ID, int> > > > > >::iterator iB1
-                            =allDictBondsIdx[ha1][ha2].begin();
-                            iB1 !=allDictBondsIdx[ha1][ha2].end();
-                            iB1++)
+                    if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                        && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                        !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
                     {
-                        for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
+                        getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                    }
+                    else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
+                            && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                    {
+                        getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                    }
+                    else
+                    {
+                        
+                        std::vector<BondDict> tBs6;
+                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
+                                std::map<ID, std::map<ID, int> > > > > >::iterator iB1
+                                =allDictBondsIdx[ha1][ha2].begin();
+                                iB1 !=allDictBondsIdx[ha1][ha2].end();
+                                iB1++)
+                        {
+                            for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
                                 std::map<ID, int> > > > >::iterator iB2=iB1->second.begin();
                                     iB2!=iB1->second.end(); iB2++)
-                        {
-                            for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > >::iterator iB3=iB2->second.begin();
-                                    iB3!=iB2->second.end(); iB3++)
                             {
-                                for(std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iB4=iB3->second.begin();
-                                    iB4!=iB3->second.end(); iB4++)
+                                for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > >::iterator iB3=iB2->second.begin();
+                                    iB3!=iB2->second.end(); iB3++)
                                 {
-                                    for(std::map<ID, std::map<ID, int> >::iterator iB5=iB4->second.begin();
-                                        iB5!=iB4->second.end(); iB5++)
+                                    for(std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iB4=iB3->second.begin();
+                                        iB4!=iB3->second.end(); iB4++)
                                     {
-                                        for (std::map<ID, int>::iterator iB6=iB5->second.begin();
-                                                iB6 !=iB5->second.end(); iB6++)
+                                        for(std::map<ID, std::map<ID, int> >::iterator iB5=iB4->second.begin();
+                                            iB5!=iB4->second.end(); iB5++)
                                         {
-                                            tBs6.push_back(allDictBonds[iB6->second]);
+                                            for (std::map<ID, int>::iterator iB6=iB5->second.begin();
+                                                 iB6 !=iB5->second.end(); iB6++)
+                                            {
+                                                tBs6.push_back(allDictBonds[iB6->second]);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                         
+                        dLev = 1;
+                        setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
+                        std::cout << "iFind 1" << std::endl;
                     }
-                    dLev = 1;
-                    setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
-                    std::cout << "iFind 1" << std::endl;
                 }
             }
             else
@@ -3897,6 +3947,14 @@ namespace LIBMOL
             //              << "either averaging or shortest distance to COD"
             //              << std::endl;
             //}
+    }
+    
+    void CodClassify::getCCP4Bonds(std::vector<BondDict>::iterator tB, 
+                                   ID tAtm1, ID tAtm2)
+    {
+        tB->order    = RealToStr(ccp4Bonds[tAtm1][tAtm2]["order"]);
+        tB->value    = ccp4Bonds[tAtm1][tAtm2]["length"];
+        tB->sigValue = ccp4Bonds[tAtm1][tAtm2]["sigValue"];
     }
     
     void CodClassify::groupCodMetBonds()
@@ -3984,6 +4042,8 @@ namespace LIBMOL
         }
         std::cout << "Group COD bonds involving metal elements " << std::endl;
     }
+    
+    
     
     void CodClassify::searchCodMetBonds(std::vector<BondDict>::iterator iMB)
     {
@@ -4486,11 +4546,190 @@ namespace LIBMOL
         tB->numCodValues = nTot;
     }
     
+    void CodClassify::getCCP4BondAndAngles()
+    {
+        // Currently CCP4 suite is the only requited thing 
+        char * pClibdMon = std::getenv("CLIBD_MON");
+        if (pClibdMon !=NULL)
+        {
+            std::string enerFName(pClibdMon);
+            enerFName.append("ener_lib.cif");
+            std::ifstream   enerF(enerFName.c_str());
+            int nBond = 0;
+            int nAng  = 0;
+            if (enerF.is_open())
+            {
+                bool lBond  = false;
+                bool lAngle = false;
+                bool tOK    = true;       // stop reading if false
+                
+                std::string tRecord="";
+                
+                while(!enerF.eof() && tOK)
+                {
+                    std::getline(enerF, tRecord);
+                    tRecord = TrimSpaces(tRecord);
+                    
+                    std::string tFC=tRecord.substr(0,1);
+                    
+                    if (tFC.find('#') ==std::string::npos && 
+                        tFC.find('.') ==std::string::npos &&  
+                        tRecord.size() >0 )
+                    {
+                        // std::cout << tRecord << std::endl;
+                        // std::cout << "C1 " << std::endl;
+                        std::vector<std::string> tBuf, tBuf2;
+                       
+                        if (tRecord.find('#') !=std::string::npos)
+                        {
+                           StrTokenize(tRecord, tBuf2);
+                           if (tBuf2.size() > 1)
+                           {
+                               StrTokenize(tBuf2[0], tBuf);
+                           }
+                           else
+                           {
+                               std::cout<< "What line is that ? " << std::endl 
+                                        << std::endl;
+                           }
+                        }
+                        else
+                        {
+                            StrTokenize(tRecord, tBuf);
+                        }
+                        if (tBuf.size() > 0)
+                        {
+                            if (lBond && tBuf.size()==6)
+                            {
+                                
+                                REAL aOrder = StrToOrder(tBuf[2]);
+                                if (aOrder < 0.0)
+                                {
+                                    std::cout << "Unknown bond order " << tRecord 
+                                              << std::endl;
+                                    exit(1);
+                                }
+                                else
+                                {
+                                    // std::cout << tRecord << std::endl;
+                                    if (tBuf[4].size() !=1 )
+                                    {
+                                        if (tBuf[1].find(".") == std::string::npos)
+                                        {
+                                            std::cout << tRecord << std::endl;
+                                            ccp4Bonds[tBuf[0]][tBuf[1]]["order"] = aOrder;
+                                            ccp4Bonds[tBuf[0]][tBuf[1]]["length"]= StrToReal(tBuf[4]);
+                                            if (tBuf[5].find('.') == std::string::npos)
+                                            {
+                                                ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = StrToReal(tBuf[5]);
+                                            }
+                                            else
+                                            {
+                                                ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = 0.20; 
+                                            }
+                                            nBond++;
+                                        }
+                                    }
+                                }
+                            }
+                            else if (lAngle && tBuf.size()==5)
+                            {
+                                ccp4Angles[tBuf[1]][tBuf[0]][tBuf[2]] =  StrToReal(tBuf[4]);
+                                nAng++;
+                            }
+                            else if (tRecord.find("_lib_bond.value_esd") !=std::string::npos)
+                            {
+                                lBond = true;
+                            }
+                            else if (tRecord.find("loop_") !=std::string::npos && lBond)
+                            {
+                                lBond = false;
+                            }
+                            else if (tRecord.find("_lib_angle.value") !=std::string::npos)
+                            {
+                                lAngle = true;
+                            }
+                            else if (tRecord.find("loop_") !=std::string::npos && lAngle)
+                            {
+                                tOK = false;
+                                lAngle = false;
+                            }
+                        }
+                        
+                    }
+                }
+                
+                enerF.close();
+                
+            }
+            else
+            {
+                std::cout << enerFName << " can not be open for reading "
+                          << std::endl;
+                
+                exit(1);
+            }
+            
+        
+            std::cout << "Number of ccp4 bonds " << nBond << std::endl;
+      
+            if (ccp4Bonds.size() > 0)
+            {
+                std::cout << "The following are the bonds between atoms of different CCP4 types"
+                          << std::endl;
+                for (std::map<ID, std::map<ID, std::map<ID, REAL> > >::iterator iBA1=ccp4Bonds.begin();
+                         iBA1 != ccp4Bonds.end(); iBA1++)
+                {
+                    for (std::map<ID, std::map<ID, REAL> >::iterator iBA2=iBA1->second.begin();
+                            iBA2 !=iBA1->second.end(); iBA2++)
+                    {
+                        std::cout << iBA1->first << " ----- " << iBA2->first  << std::endl
+                                  << " order  : " << iBA2->second["order"]    << std::endl
+                                  << " length : " << iBA2->second["length"]   << std::endl
+                                  << " stdVar : " << iBA2->second["sigValue"] << std::endl;
+                    }  
+                }   
+            }
+            
+            std::cout << "Number of ccp4 Angles " << nAng << std::endl;
+            if (ccp4Angles.size() > 0)
+            {
+                std::cout << "The following are the angles between atoms of different CCP4 types "
+                          << std::endl;
+            
+                for (std::map<ID, std::map<ID, std::map<ID, REAL> > >::iterator iAn=ccp4Angles.begin();
+                    iAn !=ccp4Angles.end(); iAn++)
+                {
+                    for (std::map<ID, std::map<ID, REAL> >::iterator iAn1=iAn->second.begin();
+                             iAn1 !=iAn->second.end(); iAn1++)
+                    {
+                        for (std::map<ID, REAL>::iterator iAn2=iAn1->second.begin(); 
+                                 iAn2 !=iAn1->second.end(); iAn2++)
+                        {
+                            std::cout << "Center atom " << iAn1->first << " and atoms "
+                                      << iAn->first << " and " << iAn2->first << std::endl 
+                                      << iAn2->second << std::endl;
+                        }
+                    }
+                }
+            }
+            
+        }
+        else
+        {
+            std::cerr << "You need to setup CCP4 suite first " << std::endl;
+            exit(1);
+        }
+        
+        
+        
+        
+    }
+    
     void CodClassify::setupTargetBonds()
     {    
         
         groupCodOrgBonds2();
-        
         
         groupCodMetBonds();
         searchCodBonds();
@@ -5212,11 +5451,24 @@ namespace LIBMOL
                 ha2 = IntToStr(allAtoms[iAn->atoms[1]].hashingValue);
             }
                 
-            ID haNum = allAngIdx[ha0][ha1][ha2];
-            std::map<ID, ID>::iterator iFind = codOrgAngleFiles2.find(haNum);
-            if (iFind ==codOrgAngleFiles2.end())
+            ID haNum;
+            if (allAngIdx.find(ha0) != allAngIdx.end())
             {
-                codOrgAngleFiles2[haNum] = fRoot + haNum + ".table";
+                if(allAngIdx[ha0].find(ha1) !=allAngIdx[ha0].end())
+                {
+                    if (allAngIdx[ha0][ha1].find(ha2) !=allAngIdx[ha0][ha1].end())
+                    {
+                        haNum = allAngIdx[ha0][ha1][ha2];
+                    
+                        std::map<ID, ID>::iterator iFind = codOrgAngleFiles2.find(haNum);
+                        // std::cout << "ha0 " << ha0 << " ha1 " << ha1 << " ha2 " << ha2 << " haNum " << haNum 
+                        //          << std::endl;
+                        if (iFind ==codOrgAngleFiles2.end())
+                        {
+                            codOrgAngleFiles2[haNum] = fRoot + haNum + ".table";
+                        }
+                    }
+                }
             }
         }
         /*
@@ -6696,7 +6948,7 @@ namespace LIBMOL
                 std::vector<aValueSet> > > >::iterator  iFind1 
                 =allDictAnglesIdx2[ha1][ha2][ha3].find(a1NB2);
                 
-                
+                /*
                 if (iFind1 !=allDictAnglesIdx2[ha1][ha2][ha3].end())
                 {
                     std::cout << "Found " << a1NB2 << std::endl;
@@ -6705,7 +6957,7 @@ namespace LIBMOL
                 {
                     std::cout << "not Found " << a1NB2 << " iFind1 " << std::endl;
                 }
-                
+                */
                 
                 if(iFind1 != allDictAnglesIdx2[ha1][ha2][ha3].end())
                 {
@@ -6714,7 +6966,7 @@ namespace LIBMOL
                     std::vector<aValueSet> > >::iterator iFind2=
                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2].find(a2NB2);
                 
-                        
+                    /*   
                     if (iFind2 !=allDictAnglesIdx2[ha1][ha2][ha3][a1NB2].end())
                     {
                         std::cout << "Found " << a2NB2 << std::endl;
@@ -6725,7 +6977,7 @@ namespace LIBMOL
                         std::cout << "not Found " << a2NB2 << " iFind2 " << std::endl;
                     }
                     
-                    
+                    */
                     
                     if (iFind2 !=allDictAnglesIdx2[ha1][ha2][ha3][a1NB2].end())
                     {
@@ -6734,7 +6986,7 @@ namespace LIBMOL
                         std::map<ID,  std::vector<aValueSet> >::iterator iFind3
                         = allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2].find(a3NB2);
                         
-                        
+                        /*
                         if (iFind3 !=allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2].end())
                         {
                             std::cout << "Found " << a3NB2 << std::endl;
@@ -6743,7 +6995,7 @@ namespace LIBMOL
                         {
                             std::cout << "not Found " << a3NB2 << " iFind3 " << std::endl;
                         }
-                        
+                        */
                         
                         if (iFind3 != allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2].end())
                         {
@@ -6753,6 +7005,7 @@ namespace LIBMOL
                             int > > > > > >::iterator iFind4  
                             =allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].find(a1NB);
                             
+                            /*
                             if (iFind4 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].end())
                             {
                                 std::cout << "Found " << a1NB << std::endl;
@@ -6761,7 +7014,7 @@ namespace LIBMOL
                             {
                                 std::cout << "not Found " << a1NB << " iFind4 " << std::endl;
                             }
-                            
+                            */
                             
                             if (iFind4 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].end())
                             {
@@ -6772,7 +7025,7 @@ namespace LIBMOL
                                 int > > > > >::iterator iFind5
                                 =allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].find(a2NB);
                                 
-                                
+                                /*
                                 if (iFind5 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].end())
                                 {
                                     std::cout << "Found " << a2NB << std::endl;
@@ -6781,7 +7034,7 @@ namespace LIBMOL
                                 {
                                     std::cout << "not Found " << a2NB << " iFind5 " << std::endl;
                                 }
-                                
+                                */
                                 
                                 if (iFind5 != allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].end())
                                 {
@@ -6790,7 +7043,7 @@ namespace LIBMOL
                                     std::map<ID, int > > > >::iterator iFind6
                                     =allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].find(a3NB);
                                     
-                                    
+                                    /*
                                     if (iFind6 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].end())
                                     {
                                     std::cout << "Found " << a3NB << std::endl;
@@ -6799,7 +7052,7 @@ namespace LIBMOL
                                     {
                                     std::cout << "not Found " << a3NB << " iFind6 " << std::endl;
                                     }
-                                    
+                                    */
                                     
                                     if (iFind6 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].end())
                                     {
@@ -6808,7 +7061,7 @@ namespace LIBMOL
                                         int > > >::iterator iFind7 = 
                                         allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].find(a1C);
                                         
-                                        
+                                        /*
                                         if (iFind7 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].end())
                                         {
                                             std::cout << "Found " << a1C << std::endl;
@@ -6817,7 +7070,7 @@ namespace LIBMOL
                                         {
                                             std::cout << "not Found " << a1C << " iFind7 "<< std::endl;
                                         }
-                                        
+                                        */
                                         
                                         if(iFind7 != allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].end())
                                         {
@@ -6825,7 +7078,7 @@ namespace LIBMOL
                                             std::map<ID, std::map<ID, int > >::iterator iFind8 =
                                             allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].find(a2C);
                                             
-                                            
+                                            /*
                                             if (iFind8 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].end())
                                             {
                                                 std::cout << "Found " << a2C << std::endl;
@@ -6834,7 +7087,7 @@ namespace LIBMOL
                                             {
                                                 std::cout << "not Found " << a2C << " iFind8 " << std::endl;
                                             }
-                                            
+                                            */
                                              
                                             if(iFind8 != allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].end())
                                             {
@@ -6842,6 +7095,7 @@ namespace LIBMOL
                                                 std::map<ID, int >::iterator iFind9 =
                                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].find(a3C);
                                                 
+                                                /*
                                                 if (iFind9 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].end())
                                                 { 
                                                    std::cout << "Found " << a3C << std::endl;
@@ -6851,7 +7105,7 @@ namespace LIBMOL
                                                     std::cout << "not Found " << a3C << " iFind9 " << std::endl;
                                                   // exit(1);
                                                 }
-                                                
+                                                */
                                                 
                                                 if(iFind9 !=
                                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].end())
@@ -7067,49 +7321,119 @@ namespace LIBMOL
                         }
                         else // iFind3
                         {
+                            
+                            bool aCCP4S=getCCP4Angle(iAN);
+                            
+                            if (!aCCP4S)
+                            {
+                                // Finding the bond with shortest atomic distances 
+                                // (or the lowest substitute costs)
+                            
+                                // std::vector<AngleDict> tDictANs;
+                                std::vector<REAL> tAllValues;
+                                std::vector<int>  tAllNums;
+                                for (std::map<ID, std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                     std::map<ID, std::map<ID, int> > > > > > >::iterator iDictANs1 
+                                     = allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].begin();
+                                     iDictANs1 !=
+                                     allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].end();
+                                     iDictANs1++)
+                                {
+                                    for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                        std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs2
+                                        = iDictANs1->second.begin(); 
+                                        iDictANs2 != iDictANs1->second.end(); iDictANs2++)
+                                    {
+                                        for(std::map<ID, std::map <ID, std::map<ID,  
+                                            std::map<ID, std::map<ID, int > > > > >::iterator iDictANs3
+                                            = iDictANs2->second.begin(); 
+                                            iDictANs3 != iDictANs2->second.end(); iDictANs3++)
+                                        {
+                                            for(std::map<ID, std::map <ID, 
+                                                std::map<ID, std::map<ID, int > > > >::iterator iDictANs4
+                                                = iDictANs3->second.begin(); 
+                                                iDictANs4 != iDictANs3->second.end(); iDictANs4++)
+                                            {
+                                                for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs5
+                                                     =iDictANs4->second.begin();
+                                                     iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
+                                                {
+                                                    for (std::map<ID, std::map<ID, int > >::iterator iDictANs6
+                                                         =iDictANs5->second.begin();
+                                                         iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
+                                                    {
+                                                        for (std::map<ID, int >::iterator iDictANs7
+                                                             =iDictANs6->second.begin();
+                                                             iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
+                                                        {
+                                                            // tDictANs.push_back(allDictAngles[iDictANs7->second]);
+                                                            tAllValues.push_back(allDictAngles[iDictANs7->second].value);
+                                                            tAllNums.push_back(allDictAngles[iDictANs7->second].numCodValues);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                //dLev = 3;
+                                //setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
+                                setupTargetAngleUsingMean3(tAllValues, tAllNums, iAN);
+                            }
+                        }
+                    }
+                    else // iFind2 
+                    {
+                        bool aCCP4S=getCCP4Angle(iAN);
+                            
+                        if (!aCCP4S)
+                        {
                             // Finding the bond with shortest atomic distances 
                             // (or the lowest substitute costs)
-                            
-                            // std::vector<AngleDict> tDictANs;
-                            std::vector<REAL> tAllValues;
-                            std::vector<int>  tAllNums;
-                            for (std::map<ID, std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, std::map<ID, int> > > > > > >::iterator iDictANs1 
-                                 = allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].begin();
+                            std::vector<AngleDict> tDictANs;
+                            for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
+                                 std::map<ID, std::map<ID, std::map<ID, 
+                                 std::map<ID, int> > > > > > > >::iterator iDictANs1 
+                                 = allDictAnglesIdx[ha1][ha2][ha3][a1NB2].begin();
                                  iDictANs1 !=
-                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].end();
+                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2].end();
                                  iDictANs1++)
                             {
-                                for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                    std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs2
+                                for(std::map<ID, std::map <ID, std::map<ID, 
+                                    std::map<ID, std::map<ID, std::map<ID,  
+                                    std::map<ID, int > > > > > > >::iterator iDictANs2
                                     = iDictANs1->second.begin(); 
                                     iDictANs2 != iDictANs1->second.end(); iDictANs2++)
                                 {
-                                    for(std::map<ID, std::map <ID, std::map<ID,  
-                                        std::map<ID, std::map<ID, int > > > > >::iterator iDictANs3
+                                    for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                        std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs3
                                         = iDictANs2->second.begin(); 
-                                       iDictANs3 != iDictANs2->second.end(); iDictANs3++)
+                                        iDictANs3 != iDictANs2->second.end(); iDictANs3++)
                                     {
-                                        for(std::map<ID, std::map <ID, 
-                                            std::map<ID, std::map<ID, int > > > >::iterator iDictANs4
+                                        for(std::map<ID, std::map <ID, std::map<ID,  
+                                            std::map<ID, std::map<ID, int > > > > >::iterator iDictANs4
                                             = iDictANs3->second.begin(); 
                                             iDictANs4 != iDictANs3->second.end(); iDictANs4++)
                                         {
-                                            for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs5
-                                                 =iDictANs4->second.begin();
-                                                 iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
+                                            for(std::map<ID, std::map <ID, 
+                                                std::map<ID, std::map<ID, int > > > >::iterator iDictANs5
+                                                = iDictANs4->second.begin(); 
+                                                iDictANs5 != iDictANs4->second.end(); iDictANs5++)
                                             {
-                                                for (std::map<ID, std::map<ID, int > >::iterator iDictANs6
+                                                for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs6
                                                      =iDictANs5->second.begin();
                                                      iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
                                                 {
-                                                    for (std::map<ID, int >::iterator iDictANs7
+                                                    for (std::map<ID, std::map<ID, int > >::iterator iDictANs7
                                                          =iDictANs6->second.begin();
                                                          iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
                                                     {
-                                                        // tDictANs.push_back(allDictAngles[iDictANs7->second]);
-                                                        tAllValues.push_back(allDictAngles[iDictANs7->second].value);
-                                                        tAllNums.push_back(allDictAngles[iDictANs7->second].numCodValues);
+                                                        for (std::map<ID, int >::iterator iDictANs8
+                                                             =iDictANs7->second.begin();
+                                                             iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
+                                                        {
+                                                            tDictANs.push_back(allDictAngles[iDictANs8->second]);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -7117,58 +7441,70 @@ namespace LIBMOL
                                     }
                                 }
                             }
-                            //dLev = 3;
-                            //setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
-                            setupTargetAngleUsingMean3(tAllValues, tAllNums, iAN);
+                            dLev = 2;
+                            setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
                         }
                     }
-                    else // iFind2 
+                }
+                else // iFind1
+                {
+                    bool aCCP4S=getCCP4Angle(iAN);
+                            
+                    if (!aCCP4S)
                     {
                         // Finding the bond with shortest atomic distances 
                         // (or the lowest substitute costs)
                         std::vector<AngleDict> tDictANs;
                         for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
-                             std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, int> > > > > > > >::iterator iDictANs1 
-                             = allDictAnglesIdx[ha1][ha2][ha3][a1NB2].begin();
+                             std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
+                             std::map<ID, int> > > > > > > > >::iterator iDictANs1 
+                             = allDictAnglesIdx[ha1][ha2][ha3].begin();
                              iDictANs1 !=
-                             allDictAnglesIdx[ha1][ha2][ha3][a1NB2].end();
-                                 iDictANs1++)
+                             allDictAnglesIdx[ha1][ha2][ha3].end();
+                             iDictANs1++)
                         {
                             for(std::map<ID, std::map <ID, std::map<ID, 
-                                std::map<ID, std::map<ID, std::map<ID,  
-                                std::map<ID, int > > > > > > >::iterator iDictANs2
-                                    = iDictANs1->second.begin(); 
-                                    iDictANs2 != iDictANs1->second.end(); iDictANs2++)
+                                std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
+                                std::map<ID, int > > > > > > > >::iterator iDictANs2
+                                = iDictANs1->second.begin(); 
+                                iDictANs2 != iDictANs1->second.end(); iDictANs2++)
                             {
-                                for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                    std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs3
-                                        = iDictANs2->second.begin(); 
+                                for(std::map<ID, std::map <ID, std::map<ID, 
+                                    std::map<ID, std::map<ID, std::map<ID,  
+                                    std::map<ID, int > > > > > > >::iterator iDictANs3
+                                    = iDictANs2->second.begin(); 
                                     iDictANs3 != iDictANs2->second.end(); iDictANs3++)
                                 {
-                                    for(std::map<ID, std::map <ID, std::map<ID,  
-                                        std::map<ID, std::map<ID, int > > > > >::iterator iDictANs4
+                                    for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                        std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs4
                                         = iDictANs3->second.begin(); 
-                                       iDictANs4 != iDictANs3->second.end(); iDictANs4++)
+                                        iDictANs4 != iDictANs3->second.end(); iDictANs4++)
                                     {
-                                        for(std::map<ID, std::map <ID, 
-                                            std::map<ID, std::map<ID, int > > > >::iterator iDictANs5
+                                        for(std::map<ID, std::map <ID, std::map<ID,  
+                                            std::map<ID, std::map<ID, int > > > > >::iterator iDictANs5
                                             = iDictANs4->second.begin(); 
                                             iDictANs5 != iDictANs4->second.end(); iDictANs5++)
                                         {
-                                            for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs6
-                                                 =iDictANs5->second.begin();
-                                                 iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
+                                            for(std::map<ID, std::map <ID, 
+                                                std::map<ID, std::map<ID, int > > > >::iterator iDictANs6
+                                                = iDictANs5->second.begin(); 
+                                                iDictANs6 != iDictANs5->second.end(); iDictANs6++)
                                             {
-                                                for (std::map<ID, std::map<ID, int > >::iterator iDictANs7
+                                                for (std::map<ID, std::map<ID, 
+                                                     std::map<ID, int > > >::iterator iDictANs7
                                                      =iDictANs6->second.begin();
                                                      iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
                                                 {
-                                                    for (std::map<ID, int >::iterator iDictANs8
+                                                    for (std::map<ID, std::map<ID, int > >::iterator iDictANs8
                                                          =iDictANs7->second.begin();
                                                          iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
                                                     {
-                                                        tDictANs.push_back(allDictAngles[iDictANs8->second]);
+                                                        for (std::map<ID, int >::iterator iDictANs9
+                                                             =iDictANs8->second.begin();
+                                                             iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
+                                                        {
+                                                            tDictANs.push_back(allDictAngles[iDictANs9->second]);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -7177,75 +7513,9 @@ namespace LIBMOL
                                 }
                             }
                         }
-                        dLev = 2;
+                        dLev = 1;
                         setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
                     }
-                }
-                else // iFind1
-                {
-                    // Finding the bond with shortest atomic distances 
-                    // (or the lowest substitute costs)
-                    std::vector<AngleDict> tDictANs;
-                    for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
-                         std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                         std::map<ID, int> > > > > > > > >::iterator iDictANs1 
-                             = allDictAnglesIdx[ha1][ha2][ha3].begin();
-                         iDictANs1 !=
-                             allDictAnglesIdx[ha1][ha2][ha3].end();
-                         iDictANs1++)
-                    {
-                        for(std::map<ID, std::map <ID, std::map<ID, 
-                            std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                            std::map<ID, int > > > > > > > >::iterator iDictANs2
-                            = iDictANs1->second.begin(); 
-                            iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                        {
-                            for(std::map<ID, std::map <ID, std::map<ID, 
-                                std::map<ID, std::map<ID, std::map<ID,  
-                                std::map<ID, int > > > > > > >::iterator iDictANs3
-                                    = iDictANs2->second.begin(); 
-                                iDictANs3 != iDictANs2->second.end(); iDictANs3++)
-                            {
-                                for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                    std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs4
-                                        = iDictANs3->second.begin(); 
-                                    iDictANs4 != iDictANs3->second.end(); iDictANs4++)
-                                {
-                                    for(std::map<ID, std::map <ID, std::map<ID,  
-                                        std::map<ID, std::map<ID, int > > > > >::iterator iDictANs5
-                                        = iDictANs4->second.begin(); 
-                                       iDictANs5 != iDictANs4->second.end(); iDictANs5++)
-                                    {
-                                        for(std::map<ID, std::map <ID, 
-                                            std::map<ID, std::map<ID, int > > > >::iterator iDictANs6
-                                            = iDictANs5->second.begin(); 
-                                            iDictANs6 != iDictANs5->second.end(); iDictANs6++)
-                                        {
-                                            for (std::map<ID, std::map<ID, 
-                                                 std::map<ID, int > > >::iterator iDictANs7
-                                                 =iDictANs6->second.begin();
-                                                 iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                            {
-                                                for (std::map<ID, std::map<ID, int > >::iterator iDictANs8
-                                                     =iDictANs7->second.begin();
-                                                     iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                {
-                                                    for (std::map<ID, int >::iterator iDictANs9
-                                                         =iDictANs8->second.begin();
-                                                         iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
-                                                    {
-                                                        tDictANs.push_back(allDictAngles[iDictANs9->second]);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    dLev = 1;
-                    setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
                 }
                 //std::cout << "Final angle is " << iAN->value << std::endl;
                 //if (iAN->hasCodValue)
@@ -7282,9 +7552,44 @@ namespace LIBMOL
                 }
                  
             }
-            
-            
+    }
+    
+    bool CodClassify::getCCP4Angle(std::vector<AngleDict>::iterator iAN)
+    {
+        bool aFound = false;
         
+        ID atmCen = allAtoms[iAN->atoms[0]].ccp4Type;
+        std::cout << "center atom CCP4 type  " << atmCen << std::endl; 
+        if (ccp4Angles.find(atmCen) !=ccp4Angles.end())
+        {
+            ID atm1 = allAtoms[iAN->atoms[1]].ccp4Type;
+            ID atm2 = allAtoms[iAN->atoms[2]].ccp4Type;
+             
+            if (ccp4Angles[atmCen].find(atm1) !=ccp4Angles[atmCen].end())
+            {
+                std::cout << "atom 1 " << atm1;
+                if (ccp4Angles[atmCen][atm1].find(atm2) 
+                        != ccp4Angles[atmCen][atm1].end() )
+                {
+                    std::cout << " atom 2 " << atm2 << std::endl;
+                    iAN->value = ccp4Angles[atmCen][atm1][atm2];
+                    aFound = true;
+                }
+            }
+            else if (ccp4Angles[atmCen].find(atm2) !=ccp4Angles[atmCen].end())
+            {
+                std::cout << "atom 1 " << atm2;
+                if (ccp4Angles[atmCen][atm2].find(atm1) 
+                        != ccp4Angles[atmCen][atm2].end() )
+                {
+                    std::cout << " atom 2 " << atm1 << std::endl;
+                    iAN->value = ccp4Angles[atmCen][atm2][atm1];
+                    aFound = true;
+                }
+            }      
+        }
+        
+        return aFound;
     }
     
     void CodClassify::searchOneOrgAngleFromCodUsingSqlite(sqlite3* tCombDB, 

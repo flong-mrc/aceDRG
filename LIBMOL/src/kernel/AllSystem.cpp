@@ -569,6 +569,7 @@ namespace LIBMOL
                 {
                     iAt->chiralIdx  = 1;
                     iAt->bondingIdx = 3;
+                    iAt->formalCharge = -1;
                 }
             }
             else if (iAt->chemType.compare("O")==0)

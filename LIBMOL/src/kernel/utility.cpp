@@ -190,7 +190,7 @@ namespace LIBMOL
         {
              return  true;
         }
-        else
+        else if (first.length() < second.length())
         {
             return false;
         }
@@ -1476,6 +1476,8 @@ namespace LIBMOL
             primFile.close();
         }
     }
+    
+    // Chemistry-related 
 
     extern void initMetalTab(std::vector<ID> & tMeTab)
     {
@@ -1533,6 +1535,52 @@ namespace LIBMOL
             }
         }
     }
+    
+    extern REAL StrToOrder(std::string  & tStrOrder)
+    {
+        REAL tOrder = -1.0;
+        
+        StrUpper(tStrOrder);
+        std::string a4 = tStrOrder.substr(0,4);
+        if (a4.find("SING") !=std::string::npos)
+        {
+            tOrder = 1.0;
+        }
+        else if (a4.find("DOUB") !=std::string::npos)
+        {
+            tOrder = 2.0;
+        }
+        else if (a4.find("TRIP") !=std::string::npos)
+        {
+            tOrder = 3.0;
+        }        
+        else if (a4.find("AROM") !=std::string::npos)
+        {
+            tOrder = 4.0;
+        }
+        else if (a4.find("BOTH") !=std::string::npos)
+        {
+            tOrder = 5.0;
+        }
+        else if (a4.find("DELO") !=std::string::npos)
+        {
+            tOrder = 9.0;
+        }
+        else if (a4.find("META") !=std::string::npos)
+        {
+            tOrder = 10.0;
+        }
+        else if (a4.find(".") !=std::string::npos)
+        {
+            tOrder = 100.0;
+        }
+        // what about "single or aromatic"->6, "double or aromatic"->7
+        // and "any" -> 8
+        return tOrder;
+        
+    }
+    
+    // Symmetry-related functions
     
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 
                              std::vector<std::vector<REAL> >    & tMat)

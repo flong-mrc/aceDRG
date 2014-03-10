@@ -13,7 +13,6 @@ namespace LIBMOL
     CheckEnvAndGetMode::CheckEnvAndGetMode():workMode(0)
     {
         // Currently CCP4 suite is the only requited thing 
-        
         char * pClibdMon = std::getenv("CLIBD_MON");
         if (pClibdMon !=NULL)
         {

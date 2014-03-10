@@ -209,6 +209,9 @@ namespace LIBMOL
         
         void setupSystem();
         
+        // get CCP4 energy lib 
+        void getCCP4BondAndAngles();
+        
         // General functions
         int atomPosition(ID tID);
         
@@ -297,6 +300,8 @@ namespace LIBMOL
                                           std::vector<BondDict>::iterator tB);
         void searchCodBonds();
         
+        void getCCP4Bonds(std::vector<BondDict>::iterator tB, ID tAtm1, ID tAtm2);
+        
         // !!!!!!! These are newly added for using sqlite3 search engine
         void searchCodBondsUsingSqlite3();
         void searchOneOrgBondFromCodUsingSqlite(sqlite3 * tCombDB,  
@@ -346,6 +351,7 @@ namespace LIBMOL
         void searchCodOrgAngles2(std::vector<AngleDict>::iterator iAN);
         bool searchCodOrgAnglesCen(std::vector<AngleDict>::iterator iAN, 
                                    int tHa1, int tHal2, int tHa3);
+        bool getCCP4Angle(std::vector<AngleDict>::iterator tAN);
         
         // bond-angles involving metal atoms as NB atoms 
         void groupCodMetAngles();
@@ -504,6 +510,7 @@ namespace LIBMOL
         int> > > > > >                                      allDictNonCenMetAnglesIdx;
         
         
+        
         std::vector<TorsionDict>                            allTorsions;
         std::vector<ChiralDict>                             allChirals;
         std::vector<PlaneDict>                              allPlanes;
@@ -516,6 +523,9 @@ namespace LIBMOL
         std::map<ID, ID>                                    codOrgBondFiles2;
         std::map<int, ID>                                   codOrgAngleFiles;
         std::map<ID, ID>                                    codOrgAngleFiles2;
+        
+        std::map<ID, std::map<ID, std::map<ID, REAL> > >    ccp4Bonds;
+        std::map<ID, std::map<ID, std::map<ID, REAL> > >    ccp4Angles;
     };
     
     class CodBonds 
