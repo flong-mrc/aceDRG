@@ -119,7 +119,6 @@ int main(int argc, char** argv) {
             {   
                 aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                                                           AJob.IOEntries["monoRootName"]);
-                exit(1);
                
                 // aTargetSystem.chiralExch();
                 if ( !aTargetSystem.containMetal()) 
