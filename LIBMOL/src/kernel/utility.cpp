@@ -557,10 +557,11 @@ namespace LIBMOL
         REAL MOD1, MOD2, MOD;
         REAL  Angle;
         
-        // for (i =0; i < dim; i++)
-        //  {
-        //    cout << "v1["<<i<<"]= " << v1[i] << endl;
-        //  }
+        for (int i =0; i < 3; i++)
+        {
+            std::cout << "v1["<<i<<"]= " << v1[i] << std::endl;
+            std::cout << "v2["<<i<<"]= " << v1[i] << std::endl;
+        }
 
         MOD1 = sqrt(DotP(v1,v1));
         MOD2 = sqrt(DotP(v2,v2));
@@ -1577,6 +1578,44 @@ namespace LIBMOL
         // what about "single or aromatic"->6, "double or aromatic"->7
         // and "any" -> 8
         return tOrder;
+        
+    }
+    
+    
+    extern void OrderToStr(REAL tOrder, std::string  & sOrder)
+    {
+        if (tOrder == 1.0)
+        {
+            sOrder = "SINGLE";   
+        }
+        else if (tOrder == 2.0)
+        {
+            sOrder = "DOUBLE";
+        }
+        else if (tOrder == 3.0)
+        {
+            sOrder = "TRIP";
+        }
+        else if (tOrder == 4.0)
+        {
+            sOrder = "AROMATIC";
+        }      
+        else if (tOrder == 5.0)
+        {
+            sOrder = "BOTH";
+        } 
+        else if (tOrder == 9.0)
+        {
+            sOrder = "DELOC";
+        } 
+        else if (tOrder == 10.0)
+        {
+            sOrder = "METAL";
+        }
+        else if (tOrder == 100.0)
+        {
+            sOrder = ".";
+        }
         
     }
     

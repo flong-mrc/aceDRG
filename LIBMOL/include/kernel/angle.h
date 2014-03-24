@@ -92,6 +92,7 @@ namespace LIBMOL // temp
         
         bool            isItTouched;
         
+        
         std::vector<Atom>    atoms;
         
     private:
@@ -139,6 +140,9 @@ namespace LIBMOL // temp
         
         ID                      anchorID;
         int                     anchorPos;
+        
+        bool                    isFixed;
+        int                     levelCodValue;
         
         std::vector<int>        atoms;
         std::vector<ID>         atomsCodClasses;

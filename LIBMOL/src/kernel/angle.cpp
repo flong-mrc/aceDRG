@@ -181,7 +181,9 @@ namespace LIBMOL
             sigValueP(3.00),
             numCodValuesP(ZeroInt),
             anchorID(NullString),
-            anchorPos(ZeroInt)
+            anchorPos(ZeroInt),
+            isFixed(false),
+            levelCodValue(10)
     {
     }
     
@@ -197,7 +199,9 @@ namespace LIBMOL
             sigValueP(tAngle.sigValueP),
             numCodValuesP(tAngle.numCodValuesP),
             anchorID(tAngle.anchorID),
-            anchorPos(tAngle.anchorPos)
+            anchorPos(tAngle.anchorPos),
+            isFixed(tAngle.isFixed),
+            levelCodValue(tAngle.levelCodValue)
     {
            
         for (std::vector<int>::const_iterator iAt=tAngle.atoms.begin();
@@ -243,7 +247,9 @@ namespace LIBMOL
             hasCodValue(false),
             numCodValues(ZeroInt),
             anchorID(tAnchID),
-            anchorPos(tAnchPos)
+            anchorPos(tAnchPos),
+            isFixed(false),
+            levelCodValue(10)
     {
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)

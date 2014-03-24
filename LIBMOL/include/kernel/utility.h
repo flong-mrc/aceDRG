@@ -233,6 +233,7 @@ namespace LIBMOL
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID);
     extern void fromIdToChemType(ID tId, ID & tChemType);
     extern REAL StrToOrder(std::string  & tStrOrder);
+    extern void OrderToStr(REAL tOrder, std::string  & sOrder);
     
     // symmetry related operations 
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 

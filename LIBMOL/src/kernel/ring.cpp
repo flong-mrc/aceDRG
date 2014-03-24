@@ -177,6 +177,7 @@ namespace LIBMOL
         // std::cout << "The ring connection are " << std::endl;
         
         // std::cout << "Clockwise : " << std::endl;
+        /*
         int i =0;
         std::map<int, std::map<ID, int> >::iterator iA=atomsLink.begin();
         iCur = iA->first;
@@ -189,7 +190,7 @@ namespace LIBMOL
             iLink = atomsLink[iCur]["c"];
             i++;        
         }while(i < tRSize);
-        
+        */
     }
     extern bool AtomsInSameRing(AtomDict & tAt1, AtomDict tAt2, 
                 std::vector<RingDict> & tRings)

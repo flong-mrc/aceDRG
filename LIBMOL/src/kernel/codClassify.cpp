@@ -3056,7 +3056,7 @@ namespace LIBMOL
                         std::vector<std::string> tBuf;
                         StrTokenize(tRecord, tBuf);
                         
-                        if ((int)tBuf.size() ==17)
+                        if ((int)tBuf.size() ==20)
                         {
                             int ha1, ha2;
                         
@@ -3110,6 +3110,12 @@ namespace LIBMOL
                             tV2.sigValue = StrToReal(tBuf[15]);
                             tV2.numCodValues = StrToInt(tBuf[16]);
                             allDictBondsIdx2[ha1][ha2][tBuf[2]][tBuf[3]].push_back(tV2);
+                            
+                            aValueSet tV3;
+                            tV3.value    = StrToReal(tBuf[17]);
+                            tV3.sigValue = StrToReal(tBuf[18]);
+                            tV3.numCodValues = StrToInt(tBuf[19]);
+                            allDictBondsIdx3[ha1][ha2].push_back(tV3);
                             
                         }
                         
@@ -3822,7 +3828,15 @@ namespace LIBMOL
                     }
                     else // One atom pair does not match 2NB space (both not match 2NB confs), iFind2
                     {
-                        if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                        if (allDictBondsIdx3[ha1][ha2][0].numCodValues > 10 && allDictBondsIdx3[ha1][ha2][0].sigValue <0.04)
+                        {
+                            iB->value        =allDictBondsIdx3[ha1][ha2][0].value;
+                            iB->valueST      =iB->value;
+                            iB->sigValue     =allDictBondsIdx3[ha1][ha2][0].sigValue;
+                            iB->sigValueST   =iB->sigValue;
+                            iB->numCodValues =allDictBondsIdx3[ha1][ha2][0].numCodValues;
+                        }
+                        else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
                             && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                                 !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
                         {
@@ -3867,7 +3881,6 @@ namespace LIBMOL
                                 }
                             }
                         
-                        
                             dLev = 2;
                             setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
                         }
@@ -3877,7 +3890,16 @@ namespace LIBMOL
                 }
                 else // Both atom pairs do not match 2NB spaces, corresponding to iFind1
                 {
-                    if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                    
+                    if (allDictBondsIdx3[ha1][ha2][0].numCodValues > 10 && allDictBondsIdx3[ha1][ha2][0].sigValue <0.04)
+                    {
+                        iB->value        =allDictBondsIdx3[ha1][ha2][0].value;
+                        iB->valueST      =iB->value;
+                        iB->sigValue     =allDictBondsIdx3[ha1][ha2][0].sigValue;
+                        iB->sigValueST   =iB->sigValue;
+                        iB->numCodValues =allDictBondsIdx3[ha1][ha2][0].numCodValues;
+                    }
+                    else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
                         && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                         !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
                     {
@@ -3929,11 +3951,33 @@ namespace LIBMOL
                     }
                 }
             }
+            else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                            && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+            {
+                // Without hash code matching for those combination of two atoms. try CCP4 type matching
+                // It is very unlikely we have ccp4 type matching when hash code matching failed.
+                std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
+                          << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
+                                      << std::endl;
+                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+            }
+            else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
+                            && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+            {
+                // Without hash code matching for those combination of two atoms. try CCP4 type matching
+                // It is very unlikely we have ccp4 type matching when hash code matching failed.
+                std::cout << "atom 1 " << allAtoms[tPair[1]].ccp4Type
+                          << "  atom 2 " << allAtoms[tPair[0]].ccp4Type
+                                      << std::endl;
+                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+            }
             else
             {
-                std::cout << "Could not find the basic bond classes in Cod " << std::endl
-                        << "for dictionary bond of atoms " <<iB->atoms[0] << " and "
-                        << iB->atoms[1] <<std::endl;
+                std::cout << "Could not find the basic bond classes in Cod and CCP4-energy-type" << std::endl
+                          << "for the dictionary bond of atoms " <<iB->atoms[0] << " and "
+                          << iB->atoms[1] <<std::endl;
                 
                 for (std::map<ID, int>::iterator iAt=iB->fullAtoms.begin();
                         iAt != iB->fullAtoms.end(); iAt++)
@@ -3960,7 +4004,8 @@ namespace LIBMOL
     void CodClassify::getCCP4Bonds(std::vector<BondDict>::iterator tB, 
                                    ID tAtm1, ID tAtm2)
     {
-        tB->order    = RealToStr(ccp4Bonds[tAtm1][tAtm2]["order"]);
+        // tB->order    = RealToStr(ccp4Bonds[tAtm1][tAtm2]["order"]);
+        OrderToStr(ccp4Bonds[tAtm1][tAtm2]["order"], tB->order);
         tB->value    = ccp4Bonds[tAtm1][tAtm2]["length"];
         tB->sigValue = ccp4Bonds[tAtm1][tAtm2]["sigValue"];
     }
@@ -5521,7 +5566,7 @@ namespace LIBMOL
                     std::vector<std::string> tBuf;
                     StrTokenize(tRecord, tBuf);
                     
-                    if ((int)tBuf.size() ==21)
+                    if ((int)tBuf.size() ==24)
                     {
                         int ha1, ha2, ha3;
                         
@@ -5540,18 +5585,28 @@ namespace LIBMOL
                         allDictAnglesIdx[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]]
                                 =nLine;
                         
+                        aValueSet aAngS3;
+                        aAngS3.value        = StrToReal(tBuf[21]);
+                        aAngS3.sigValue     = StrToReal(tBuf[22]);
+                        aAngS3.numCodValues = StrToInt(tBuf[23]);
+                        if (allDictAnglesIdx3[ha1][ha2][ha3].size()==0)
+                        {
+                            allDictAnglesIdx3[ha1][ha2][ha3].push_back(aAngS3);
+                        }
+                        
                         aValueSet aAngS2;
-                        aAngS2.value        = StrToReal(tBuf[15]);
-                        aAngS2.sigValue     = StrToReal(tBuf[16]);
-                        aAngS2.numCodValues = StrToInt(tBuf[17]);
+                        aAngS2.value        = StrToReal(tBuf[18]);
+                        aAngS2.sigValue     = StrToReal(tBuf[19]);
+                        aAngS2.numCodValues = StrToInt(tBuf[20]);
                         if (allDictAnglesIdx2[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]].size()==0)
                         {
                             allDictAnglesIdx2[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]].push_back(aAngS2);
                         }
+                        
                         aValueSet aAngS1;
-                        aAngS1.value        = StrToReal(tBuf[18]);
-                        aAngS1.sigValue     = StrToReal(tBuf[19]);
-                        aAngS1.numCodValues = StrToInt(tBuf[20]);
+                        aAngS1.value        = StrToReal(tBuf[15]);
+                        aAngS1.sigValue     = StrToReal(tBuf[16]);
+                        aAngS1.numCodValues = StrToInt(tBuf[17]);
                         if (allDictAnglesIdx1[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]].size()==0)
                         {
                             allDictAnglesIdx1[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]].push_back(aAngS1);
@@ -5711,6 +5766,8 @@ namespace LIBMOL
     
     void CodClassify::searchCodAngles()
     {
+        std::map<int, std::vector<AngleDict> > specialAngs;
+        
         for (std::vector<AngleDict>::iterator iA=allAngles.begin();
                 iA !=allAngles.end(); iA++)
         { 
@@ -5734,7 +5791,15 @@ namespace LIBMOL
             {
                 //std::cout << "searchCodOrgAngles " << std::endl;
                 // searchCodOrgAngles(iA
-                searchCodOrgAngles2(iA);
+                bool lSpeAng = checkSpeAng(iA);  
+                if (lSpeAng)
+                {
+                    specialAngs[iA->atoms[0]].push_back(*iA);
+                }
+                else
+                {
+                    searchCodOrgAngles2(iA);
+                }
             }
             else 
             {
@@ -5749,7 +5814,15 @@ namespace LIBMOL
             
         }
         
+        // Deal with the special angles when other angles are done 
+        if (specialAngs.size())
+        {
+            setSpecialAngles(specialAngs);
+        }
+        
+        // Final check all constraints 
         checkAngConstraints();
+        
         
     }
     
@@ -6956,7 +7029,7 @@ namespace LIBMOL
                 std::vector<aValueSet> > > >::iterator  iFind1 
                 =allDictAnglesIdx2[ha1][ha2][ha3].find(a1NB2);
                 
-                /*
+                
                 if (iFind1 !=allDictAnglesIdx2[ha1][ha2][ha3].end())
                 {
                     std::cout << "Found " << a1NB2 << std::endl;
@@ -6965,7 +7038,7 @@ namespace LIBMOL
                 {
                     std::cout << "not Found " << a1NB2 << " iFind1 " << std::endl;
                 }
-                */
+               
                 
                 if(iFind1 != allDictAnglesIdx2[ha1][ha2][ha3].end())
                 {
@@ -6974,7 +7047,7 @@ namespace LIBMOL
                     std::vector<aValueSet> > >::iterator iFind2=
                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2].find(a2NB2);
                 
-                    /*   
+                     
                     if (iFind2 !=allDictAnglesIdx2[ha1][ha2][ha3][a1NB2].end())
                     {
                         std::cout << "Found " << a2NB2 << std::endl;
@@ -6985,7 +7058,7 @@ namespace LIBMOL
                         std::cout << "not Found " << a2NB2 << " iFind2 " << std::endl;
                     }
                     
-                    */
+                   
                     
                     if (iFind2 !=allDictAnglesIdx2[ha1][ha2][ha3][a1NB2].end())
                     {
@@ -6994,7 +7067,7 @@ namespace LIBMOL
                         std::map<ID,  std::vector<aValueSet> >::iterator iFind3
                         = allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2].find(a3NB2);
                         
-                        /*
+                        
                         if (iFind3 !=allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2].end())
                         {
                             std::cout << "Found " << a3NB2 << std::endl;
@@ -7003,7 +7076,7 @@ namespace LIBMOL
                         {
                             std::cout << "not Found " << a3NB2 << " iFind3 " << std::endl;
                         }
-                        */
+                        
                         
                         if (iFind3 != allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2].end())
                         {
@@ -7013,7 +7086,7 @@ namespace LIBMOL
                             int > > > > > >::iterator iFind4  
                             =allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].find(a1NB);
                             
-                            /*
+                            
                             if (iFind4 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].end())
                             {
                                 std::cout << "Found " << a1NB << std::endl;
@@ -7022,7 +7095,7 @@ namespace LIBMOL
                             {
                                 std::cout << "not Found " << a1NB << " iFind4 " << std::endl;
                             }
-                            */
+                            
                             
                             if (iFind4 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].end())
                             {
@@ -7033,7 +7106,7 @@ namespace LIBMOL
                                 int > > > > >::iterator iFind5
                                 =allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].find(a2NB);
                                 
-                                /*
+                                
                                 if (iFind5 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].end())
                                 {
                                     std::cout << "Found " << a2NB << std::endl;
@@ -7042,7 +7115,7 @@ namespace LIBMOL
                                 {
                                     std::cout << "not Found " << a2NB << " iFind5 " << std::endl;
                                 }
-                                */
+                                
                                 
                                 if (iFind5 != allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].end())
                                 {
@@ -7051,7 +7124,7 @@ namespace LIBMOL
                                     std::map<ID, int > > > >::iterator iFind6
                                     =allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].find(a3NB);
                                     
-                                    /*
+                                    
                                     if (iFind6 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].end())
                                     {
                                     std::cout << "Found " << a3NB << std::endl;
@@ -7060,7 +7133,7 @@ namespace LIBMOL
                                     {
                                     std::cout << "not Found " << a3NB << " iFind6 " << std::endl;
                                     }
-                                    */
+                                    
                                     
                                     if (iFind6 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].end())
                                     {
@@ -7069,7 +7142,7 @@ namespace LIBMOL
                                         int > > >::iterator iFind7 = 
                                         allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].find(a1C);
                                         
-                                        /*
+                                        
                                         if (iFind7 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].end())
                                         {
                                             std::cout << "Found " << a1C << std::endl;
@@ -7078,7 +7151,7 @@ namespace LIBMOL
                                         {
                                             std::cout << "not Found " << a1C << " iFind7 "<< std::endl;
                                         }
-                                        */
+                                        
                                         
                                         if(iFind7 != allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].end())
                                         {
@@ -7086,7 +7159,7 @@ namespace LIBMOL
                                             std::map<ID, std::map<ID, int > >::iterator iFind8 =
                                             allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].find(a2C);
                                             
-                                            /*
+                                            
                                             if (iFind8 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].end())
                                             {
                                                 std::cout << "Found " << a2C << std::endl;
@@ -7095,7 +7168,7 @@ namespace LIBMOL
                                             {
                                                 std::cout << "not Found " << a2C << " iFind8 " << std::endl;
                                             }
-                                            */
+                                            
                                              
                                             if(iFind8 != allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].end())
                                             {
@@ -7128,6 +7201,7 @@ namespace LIBMOL
                                                     iAN->sigValue     = allDictAngles[iPos].sigValue;
                                                     iAN->numCodValues = allDictAngles[iPos].numCodValues;
                                                     iAN->hasCodValue  = true;
+                                                    iAN->levelCodValue = 0;
                                                     std::cout << "COD finds the exact value " << iAN->value << std::endl;
                                                     std::cout << "the sigma value " << iAN->sigValue << std::endl;
                                                     
@@ -7153,7 +7227,7 @@ namespace LIBMOL
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].sigValue;
                                                     iAN->numCodValues = 
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].numCodValues;
-                                                     
+                                                    iAN->levelCodValue = 1;
                                                 }
                                             }
                                             else // iFind8
@@ -7184,7 +7258,7 @@ namespace LIBMOL
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].sigValue;
                                                 iAN->numCodValues = 
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].numCodValues;
-                                                
+                                                iAN->levelCodValue = 1;
                                             }
                                         }
                                         else //iFind7
@@ -7221,7 +7295,7 @@ namespace LIBMOL
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].sigValue;
                                             iAN->numCodValues = 
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].numCodValues;
-                                             
+                                            iAN->levelCodValue =1;
                                         }
                                         
                                     }
@@ -7254,7 +7328,7 @@ namespace LIBMOL
                                         }
 
                                         setupTargetAngleUsingMean2(tDictANs, iAN, ha1, ha2, ha3, a1NB2, a2NB2, a3NB2);
-                                        
+                                        iAN->levelCodValue = 2;
                                         /*                                        
                                         iAN->value        = 
                                                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].value;
@@ -7303,6 +7377,7 @@ namespace LIBMOL
                                     }
                                     
                                     setupTargetAngleUsingMean2(tDictANs, iAN, ha1, ha2, ha3, a1NB2, a2NB2, a3NB2);
+                                    iAN->levelCodValue = 2;
                                     
                                     //iAN->value        = 
                                     //                allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].value;
@@ -7324,59 +7399,149 @@ namespace LIBMOL
                                                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].sigValue;
                                 iAN->numCodValues = 
                                                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].numCodValues;
+                                iAN->levelCodValue = 2;
                                 
                             }
                         }
                         else // iFind3
                         {
                             
+                            if (allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues >=10 
+                                    && allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue < 5.00)
+                            {
+                                iAN->value        = 
+                                                    allDictAnglesIdx3[ha1][ha2][ha3][0].value;
+                                iAN->sigValue     =
+                                                    allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue;
+                                iAN->numCodValues = 
+                                                    allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues;
+                            }
+                            else
+                            {
+                                bool aCCP4S=getCCP4Angle(iAN);
+                            
+                                if (!aCCP4S)
+                                {
+                                    // Finding the bond with shortest atomic distances 
+                                    // (or the lowest substitute costs)
+                            
+                                    // std::vector<AngleDict> tDictANs;
+                                    std::vector<REAL> tAllValues;
+                                    std::vector<int>  tAllNums;
+                                    for (std::map<ID, std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                         std::map<ID, std::map<ID, int> > > > > > >::iterator iDictANs1 
+                                         = allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].begin();
+                                         iDictANs1 !=
+                                         allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].end();
+                                         iDictANs1++)
+                                    {
+                                        for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                            std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs2
+                                            = iDictANs1->second.begin(); 
+                                            iDictANs2 != iDictANs1->second.end(); iDictANs2++)
+                                        {
+                                            for(std::map<ID, std::map <ID, std::map<ID,  
+                                                std::map<ID, std::map<ID, int > > > > >::iterator iDictANs3
+                                                = iDictANs2->second.begin(); 
+                                                iDictANs3 != iDictANs2->second.end(); iDictANs3++)
+                                            {
+                                                for(std::map<ID, std::map <ID, 
+                                                    std::map<ID, std::map<ID, int > > > >::iterator iDictANs4
+                                                    = iDictANs3->second.begin(); 
+                                                    iDictANs4 != iDictANs3->second.end(); iDictANs4++)
+                                                {
+                                                    for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs5
+                                                         =iDictANs4->second.begin();
+                                                         iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
+                                                    {
+                                                        for (std::map<ID, std::map<ID, int > >::iterator iDictANs6
+                                                             =iDictANs5->second.begin();
+                                                             iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
+                                                        {
+                                                            for (std::map<ID, int >::iterator iDictANs7
+                                                                 =iDictANs6->second.begin();
+                                                                 iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
+                                                            {
+                                                                // tDictANs.push_back(allDictAngles[iDictANs7->second]);
+                                                                tAllValues.push_back(allDictAngles[iDictANs7->second].value);
+                                                                tAllNums.push_back(allDictAngles[iDictANs7->second].numCodValues);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                
+                                    //dLev = 3;
+                                    //setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
+                                    setupTargetAngleUsingMean3(tAllValues, tAllNums, iAN);
+                                }
+                            }
+                            iAN->levelCodValue = 3;
+                        }
+                    }
+                    else // iFind2 
+                    {
+                        if (allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues >=10 
+                                    && allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue < 5.00)
+                        {
+                            iAN->value        = allDictAnglesIdx3[ha1][ha2][ha3][0].value;
+                            iAN->sigValue     = allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue;
+                            iAN->numCodValues = allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues;
+                        }
+                        else
+                        {
                             bool aCCP4S=getCCP4Angle(iAN);
                             
                             if (!aCCP4S)
                             {
                                 // Finding the bond with shortest atomic distances 
                                 // (or the lowest substitute costs)
-                            
-                                // std::vector<AngleDict> tDictANs;
-                                std::vector<REAL> tAllValues;
-                                std::vector<int>  tAllNums;
-                                for (std::map<ID, std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                     std::map<ID, std::map<ID, int> > > > > > >::iterator iDictANs1 
-                                     = allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].begin();
+                                std::vector<AngleDict> tDictANs;
+                                for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
+                                     std::map<ID, std::map<ID, std::map<ID, 
+                                     std::map<ID, int> > > > > > > >::iterator iDictANs1 
+                                     = allDictAnglesIdx[ha1][ha2][ha3][a1NB2].begin();
                                      iDictANs1 !=
-                                     allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2].end();
+                                     allDictAnglesIdx[ha1][ha2][ha3][a1NB2].end();
                                      iDictANs1++)
                                 {
-                                    for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                        std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs2
+                                    for(std::map<ID, std::map <ID, std::map<ID, 
+                                        std::map<ID, std::map<ID, std::map<ID,  
+                                        std::map<ID, int > > > > > > >::iterator iDictANs2
                                         = iDictANs1->second.begin(); 
                                         iDictANs2 != iDictANs1->second.end(); iDictANs2++)
                                     {
-                                        for(std::map<ID, std::map <ID, std::map<ID,  
-                                            std::map<ID, std::map<ID, int > > > > >::iterator iDictANs3
+                                        for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                            std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs3
                                             = iDictANs2->second.begin(); 
                                             iDictANs3 != iDictANs2->second.end(); iDictANs3++)
                                         {
-                                            for(std::map<ID, std::map <ID, 
-                                                std::map<ID, std::map<ID, int > > > >::iterator iDictANs4
+                                            for(std::map<ID, std::map <ID, std::map<ID,  
+                                                std::map<ID, std::map<ID, int > > > > >::iterator iDictANs4
                                                 = iDictANs3->second.begin(); 
                                                 iDictANs4 != iDictANs3->second.end(); iDictANs4++)
                                             {
-                                                for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs5
-                                                     =iDictANs4->second.begin();
-                                                     iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
+                                                for(std::map<ID, std::map <ID, 
+                                                    std::map<ID, std::map<ID, int > > > >::iterator iDictANs5
+                                                    = iDictANs4->second.begin(); 
+                                                    iDictANs5 != iDictANs4->second.end(); iDictANs5++)
                                                 {
-                                                    for (std::map<ID, std::map<ID, int > >::iterator iDictANs6
+                                                    for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs6
                                                          =iDictANs5->second.begin();
                                                          iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
                                                     {
-                                                        for (std::map<ID, int >::iterator iDictANs7
+                                                        for (std::map<ID, std::map<ID, int > >::iterator iDictANs7
                                                              =iDictANs6->second.begin();
                                                              iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
                                                         {
-                                                            // tDictANs.push_back(allDictAngles[iDictANs7->second]);
-                                                            tAllValues.push_back(allDictAngles[iDictANs7->second].value);
-                                                            tAllNums.push_back(allDictAngles[iDictANs7->second].numCodValues);
+                                                            for (std::map<ID, int >::iterator iDictANs8
+                                                                 =iDictANs7->second.begin();
+                                                                 iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
+                                                            {
+                                                                tDictANs.push_back(allDictAngles[iDictANs8->second]);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -7384,13 +7549,23 @@ namespace LIBMOL
                                         }
                                     }
                                 }
-                                //dLev = 3;
-                                //setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
-                                setupTargetAngleUsingMean3(tAllValues, tAllNums, iAN);
+                                dLev = 2;
+                                setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
                             }
                         }
+                        iAN->levelCodValue =3;
                     }
-                    else // iFind2 
+                }
+                else // iFind1
+                {
+                    if (allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues >=10 
+                                    && allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue < 5.00)
+                    {
+                        iAN->value        = allDictAnglesIdx3[ha1][ha2][ha3][0].value;
+                        iAN->sigValue     = allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue;
+                        iAN->numCodValues = allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues;
+                    }
+                    else
                     {
                         bool aCCP4S=getCCP4Angle(iAN);
                             
@@ -7400,47 +7575,55 @@ namespace LIBMOL
                             // (or the lowest substitute costs)
                             std::vector<AngleDict> tDictANs;
                             for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
-                                 std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, int> > > > > > > >::iterator iDictANs1 
-                                 = allDictAnglesIdx[ha1][ha2][ha3][a1NB2].begin();
+                                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
+                                 std::map<ID, int> > > > > > > > >::iterator iDictANs1 
+                                 = allDictAnglesIdx[ha1][ha2][ha3].begin();
                                  iDictANs1 !=
-                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2].end();
+                                 allDictAnglesIdx[ha1][ha2][ha3].end();
                                  iDictANs1++)
                             {
                                 for(std::map<ID, std::map <ID, std::map<ID, 
-                                    std::map<ID, std::map<ID, std::map<ID,  
-                                    std::map<ID, int > > > > > > >::iterator iDictANs2
+                                    std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
+                                    std::map<ID, int > > > > > > > >::iterator iDictANs2
                                     = iDictANs1->second.begin(); 
                                     iDictANs2 != iDictANs1->second.end(); iDictANs2++)
                                 {
-                                    for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                        std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs3
+                                    for(std::map<ID, std::map <ID, std::map<ID, 
+                                        std::map<ID, std::map<ID, std::map<ID,  
+                                        std::map<ID, int > > > > > > >::iterator iDictANs3
                                         = iDictANs2->second.begin(); 
                                         iDictANs3 != iDictANs2->second.end(); iDictANs3++)
                                     {
-                                        for(std::map<ID, std::map <ID, std::map<ID,  
-                                            std::map<ID, std::map<ID, int > > > > >::iterator iDictANs4
+                                        for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
+                                            std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs4
                                             = iDictANs3->second.begin(); 
                                             iDictANs4 != iDictANs3->second.end(); iDictANs4++)
                                         {
-                                            for(std::map<ID, std::map <ID, 
-                                                std::map<ID, std::map<ID, int > > > >::iterator iDictANs5
+                                            for(std::map<ID, std::map <ID, std::map<ID,  
+                                                std::map<ID, std::map<ID, int > > > > >::iterator iDictANs5
                                                 = iDictANs4->second.begin(); 
                                                 iDictANs5 != iDictANs4->second.end(); iDictANs5++)
                                             {
-                                                for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs6
-                                                     =iDictANs5->second.begin();
-                                                     iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
+                                                for(std::map<ID, std::map <ID, 
+                                                    std::map<ID, std::map<ID, int > > > >::iterator iDictANs6
+                                                    = iDictANs5->second.begin(); 
+                                                    iDictANs6 != iDictANs5->second.end(); iDictANs6++)
                                                 {
-                                                    for (std::map<ID, std::map<ID, int > >::iterator iDictANs7
+                                                    for (std::map<ID, std::map<ID, 
+                                                         std::map<ID, int > > >::iterator iDictANs7
                                                          =iDictANs6->second.begin();
                                                          iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
                                                     {
-                                                        for (std::map<ID, int >::iterator iDictANs8
+                                                        for (std::map<ID, std::map<ID, int > >::iterator iDictANs8
                                                              =iDictANs7->second.begin();
                                                              iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
                                                         {
-                                                            tDictANs.push_back(allDictAngles[iDictANs8->second]);
+                                                            for (std::map<ID, int >::iterator iDictANs9
+                                                                 =iDictANs8->second.begin();
+                                                                 iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
+                                                            {
+                                                                tDictANs.push_back(allDictAngles[iDictANs9->second]);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -7449,82 +7632,13 @@ namespace LIBMOL
                                     }
                                 }
                             }
-                            dLev = 2;
+                            dLev = 1;
                             setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
                         }
                     }
+                    iAN->levelCodValue =3;
                 }
-                else // iFind1
-                {
-                    bool aCCP4S=getCCP4Angle(iAN);
-                            
-                    if (!aCCP4S)
-                    {
-                        // Finding the bond with shortest atomic distances 
-                        // (or the lowest substitute costs)
-                        std::vector<AngleDict> tDictANs;
-                        for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
-                             std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, int> > > > > > > > >::iterator iDictANs1 
-                             = allDictAnglesIdx[ha1][ha2][ha3].begin();
-                             iDictANs1 !=
-                             allDictAnglesIdx[ha1][ha2][ha3].end();
-                             iDictANs1++)
-                        {
-                            for(std::map<ID, std::map <ID, std::map<ID, 
-                                std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                                std::map<ID, int > > > > > > > >::iterator iDictANs2
-                                = iDictANs1->second.begin(); 
-                                iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                            {
-                                for(std::map<ID, std::map <ID, std::map<ID, 
-                                    std::map<ID, std::map<ID, std::map<ID,  
-                                    std::map<ID, int > > > > > > >::iterator iDictANs3
-                                    = iDictANs2->second.begin(); 
-                                    iDictANs3 != iDictANs2->second.end(); iDictANs3++)
-                                {
-                                    for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                        std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs4
-                                        = iDictANs3->second.begin(); 
-                                        iDictANs4 != iDictANs3->second.end(); iDictANs4++)
-                                    {
-                                        for(std::map<ID, std::map <ID, std::map<ID,  
-                                            std::map<ID, std::map<ID, int > > > > >::iterator iDictANs5
-                                            = iDictANs4->second.begin(); 
-                                            iDictANs5 != iDictANs4->second.end(); iDictANs5++)
-                                        {
-                                            for(std::map<ID, std::map <ID, 
-                                                std::map<ID, std::map<ID, int > > > >::iterator iDictANs6
-                                                = iDictANs5->second.begin(); 
-                                                iDictANs6 != iDictANs5->second.end(); iDictANs6++)
-                                            {
-                                                for (std::map<ID, std::map<ID, 
-                                                     std::map<ID, int > > >::iterator iDictANs7
-                                                     =iDictANs6->second.begin();
-                                                     iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                                {
-                                                    for (std::map<ID, std::map<ID, int > >::iterator iDictANs8
-                                                         =iDictANs7->second.begin();
-                                                         iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                    {
-                                                        for (std::map<ID, int >::iterator iDictANs9
-                                                             =iDictANs8->second.begin();
-                                                             iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
-                                                        {
-                                                            tDictANs.push_back(allDictAngles[iDictANs9->second]);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        dLev = 1;
-                        setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
-                    }
-                }
+                
                 //std::cout << "Final angle is " << iAN->value << std::endl;
                 //if (iAN->hasCodValue)
                 //{
@@ -7534,6 +7648,7 @@ namespace LIBMOL
                 //{
                 //    std::cout << "It is generated by either averaging or shortest distance " << std::endl;
                 //}
+                
             }
             else   
             {
@@ -7544,6 +7659,7 @@ namespace LIBMOL
                 {
                     // std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
                     iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                    iAN->levelCodValue = 4;
                 }
                 else
                 {
@@ -7566,12 +7682,12 @@ namespace LIBMOL
     {
         bool aFound = false;
         
-        ID atmCen = allAtoms[iAN->atoms[0]].ccp4Type;
+        ID atmCen = allAtoms[iAN->atoms[0]].id;
         std::cout << "center atom CCP4 type  " << atmCen << std::endl; 
         if (ccp4Angles.find(atmCen) !=ccp4Angles.end())
         {
-            ID atm1 = allAtoms[iAN->atoms[1]].ccp4Type;
-            ID atm2 = allAtoms[iAN->atoms[2]].ccp4Type;
+            ID atm1 = allAtoms[iAN->atoms[1]].id;
+            ID atm2 = allAtoms[iAN->atoms[2]].id;
              
             if (ccp4Angles[atmCen].find(atm1) !=ccp4Angles[atmCen].end())
             {
@@ -8735,7 +8851,7 @@ namespace LIBMOL
         {
             std::cout << "number of candidate angles " << tAngles.size() << std::endl;
             std::cout << "selected angle position " << iPos << std::endl;
-            if (tAngles.size() >=5)
+            if (tAngles[iPos].numCodValues >=5)
             {
                 tA->value        = tAngles[iPos].value;
                 tA->sigValue     = tAngles[iPos].sigValue;
@@ -9117,7 +9233,28 @@ namespace LIBMOL
     {
         std::map<int, std::vector<int> >  tSP2Angs, tSP3Angs;
         
-        // Get all sp2 and sp3 angles centered at different atoms
+        
+        std::cout << "There are " << allRings.size() << " rings " << std::endl
+                  << "These are: " << std::endl;
+        for (std::map<ID, std::vector<RingDict> >::iterator iR=allRings.begin();
+                iR !=allRings.end(); iR++)
+        {
+            std::cout << "Ring " << iR->first << "." << std::endl;
+            for (std::vector<RingDict>::iterator iRV=iR->second.begin();
+                    iRV !=iR->second.end(); iRV++)
+            {
+                std::cout << "Ring size:  " << iRV->atoms.size() << std::endl;;
+                for (std::vector<AtomDict>::iterator iA=iRV->atoms.begin(); 
+                        iA != iRV->atoms.end(); iA++)
+                {
+                    std::cout<< "Atom " << iA->id << std::endl;
+                }
+                checkRingAngleConstraints(iRV);
+            }
+        }
+        
+        
+        // Check all sp2 and sp3 angles centered at different atoms
         
         for (unsigned i=0;  i < allAngles.size(); i++)
         {
@@ -9145,68 +9282,357 @@ namespace LIBMOL
         {
             checkSP3Constraints(iSetAngs->second);
         }
+        
+    }
+    
+    void CodClassify::checkRingAngleConstraints(std::vector<RingDict>::iterator tRv)
+    {
+        std::vector<ID> atomIDs;
+        std::vector<int> angIdxs;
+        std::map<int, REAL> moF;
+        moF[0] = 0.0;
+        moF[1] = 0.25;
+        moF[2] = 0.50;
+        moF[3] = 0.75;
+        for (int i=4; i <=10; i++)
+        {
+            moF[i] = 1.0;
+        }
+        
+        if (tRv->atoms.size()==0)
+        {
+            std::cout << "Ring " << tRv->rep << " contains no atoms , Bug?"
+                    << std::endl;
+            return;
+        }
+        
+        for (std::vector<AtomDict>::iterator iA=tRv->atoms.begin();
+                iA!=tRv->atoms.end(); iA++)
+        {
+            atomIDs.push_back(iA->id);
+        }
+        
+        for (unsigned i=0; i < allAngles.size(); i++)
+        {
+            if (std::find(atomIDs.begin(), atomIDs.end(), allAtoms[allAngles[i].atoms[0]].id)
+                    !=atomIDs.end())
+            {
+                if(std::find(atomIDs.begin(), atomIDs.end(), allAtoms[allAngles[i].atoms[1]].id)
+                    !=atomIDs.end() && 
+                    std::find(atomIDs.begin(), atomIDs.end(), allAtoms[allAngles[i].atoms[2]].id)
+                    !=atomIDs.end())
+                {
+                    angIdxs.push_back(i);
+                }
+                
+            }
+        }
+        
+        // check 
+        if (angIdxs.size() !=atomIDs.size())
+        {
+            std::cout << "Some of ring angles are missing, Bug? " << std::endl;
+            exit(1);
+        }
+        else
+        {
+            int rSize = (int)atomIDs.size();
+            REAL aSum=0.0, aM=(rSize-2)*180.0/rSize, aMDev=0.0;
+            int aSize =0;
+            REAL curDev = 0.0;
+            // First round 
+            for (std::vector<int>::iterator iAd=angIdxs.begin();
+                    iAd !=angIdxs.end(); iAd++)
+            {
+                if (allAngles[*iAd].levelCodValue==0)
+                {
+                    allAngles[*iAd].isFixed = true;
+                }
+                else
+                {
+                    aSum+=allAngles[*iAd].value;
+                    aSize++;
+                }
+            }
+            
+            if (aSize !=0)
+            {
+                aMDev = aM-aSum/aSize;
+            
+                for (std::vector<int>::iterator iIdx=angIdxs.begin();
+                        iIdx !=angIdxs.end(); iIdx++)
+                {
+                    if(!allAngles[*iIdx].isFixed)
+                    {
+                        curDev=allAngles[*iIdx].value-aM;
+                        allAngles[*iIdx].value-=(moF[allAngles[*iIdx].levelCodValue]*curDev);
+                            
+                       
+                    }
+                    
+                }
+            }
+            // Second round 
+            
+            
+            aSum=0.0;
+            for (std::vector<int>::iterator iAd=angIdxs.begin();
+                    iAd !=angIdxs.end(); iAd++)
+            {
+                aSum+=allAngles[*iAd].value;
+            }
+            
+            aMDev = aM -aSum/rSize;
+            
+            for (std::vector<int>::iterator iAd=angIdxs.begin();
+                    iAd !=angIdxs.end(); iAd++)
+            {
+                allAngles[*iAd].value +=(aMDev);
+                allAngles[*iAd].isFixed = true;
+            }
+        }
+        
+        // output the angle values
+        /*
+        std::cout << "Internal angles in the ring " << tRv->rep << std::endl;
+        REAL aSum=0.0;
+        for (std::vector<int>::iterator iAd=angIdxs.begin();
+               iAd !=angIdxs.end(); iAd++)
+        {
+            aSum+=allAngles[*iAd].value;
+            std::cout << "Angle between " << allAtoms[allAngles[*iAd].atoms[0]].id 
+                      << "(center) and " << allAtoms[allAngles[*iAd].atoms[1]].id
+                      << " and " << allAtoms[allAngles[*iAd].atoms[2]].id
+                      << " value: " << allAngles[*iAd].value << std::endl;
+                    
+        }
+        std::cout << "Sum for the values of all internal angles " 
+                  << aSum << std::endl;
+        */
     }
     
     void CodClassify::checkSP2Constraints(std::vector<int> tAngIdxs)
     {
-        REAL sp2Sum  =360.00;
-        REAL sp2Diff =0.0;
-        REAL tAngSum = 0.0;
+        
         if (tAngIdxs.size()==3)
         {
+            REAL sp2Sum;
+            REAL sp2Diff =0.0;
+            REAL tAngSum = 0.0;
+            int  nNonF=0;
+            REAL vF   =0.0;
             for (std::vector<int>::iterator iA=tAngIdxs.begin();
                     iA !=tAngIdxs.end(); iA++)
             {
-                tAngSum+=(allAngles[*iA].value);
-            }
-            
-            sp2Diff = sp2Sum - tAngSum;
-            
-            if (fabs(sp2Diff) >0.01)
-            {
-                sp2Diff= sp2Diff/3.0;
-            
-                // add the diff to individual angles
-                tAngSum=0.0;
-                for (std::vector<int>::iterator iA=tAngIdxs.begin();
-                        iA !=tAngIdxs.end(); iA++)
+                if (!allAngles[*iA].isFixed)
                 {
-                    allAngles[*iA].value +=sp2Diff;
                     tAngSum+=(allAngles[*iA].value);
+                    nNonF+=1;
                 }
-                
-                // Further check.  
-                sp2Diff = sp2Sum - tAngSum;
-                //  Now sp2Diff should be negligible small, add it to an angle
-                allAngles[tAngIdxs[0]].value += sp2Diff;
+                else
+                {
+                    vF+=(allAngles[*iA].value);
+                }
             }
-            else 
+            
+            if (nNonF >0)
             {
-                // very small, just add it to an angle 
-                allAngles[tAngIdxs[0]].value += sp2Diff;
+                sp2Sum  = (360.0-vF);
+                sp2Diff = (sp2Sum - tAngSum)/nNonF;
+            
+                if (fabs(sp2Diff) >0.01)
+                {
+                    // add the diff to individual angles
+                    tAngSum=0.0;
+                    for (std::vector<int>::iterator iA=tAngIdxs.begin();
+                            iA !=tAngIdxs.end(); iA++)
+                    {
+                        if (!allAngles[*iA].isFixed)
+                        {
+                            allAngles[*iA].value +=sp2Diff;
+                            tAngSum+=(allAngles[*iA].value);
+                        }
+                    }
+                    // Further check.  
+                    sp2Diff = sp2Sum - tAngSum;
+                    //  Now sp2Diff should be negligible small, add it to an angle
+                    allAngles[tAngIdxs[0]].value += sp2Diff;
+                }
+                else 
+                {
+                    // very small, just add it to an angle 
+                    allAngles[tAngIdxs[0]].value += sp2Diff;
+                }
             }
             
             //Debug, output  the modified sum, should be 360.00
+            /*
+            std::cout << "values for angles centered at atom "
+                      << allAtoms[allAngles[tAngIdxs[0]].atoms[0]].id 
+                      << std::endl;
             tAngSum=0.0;
             for (std::vector<int>::iterator iA=tAngIdxs.begin();
                         iA !=tAngIdxs.end(); iA++)
             {
+                std::cout << "Angle between atoms " 
+                          << allAtoms[allAngles[*iA].atoms[0]].id
+                          << "(center), " << allAtoms[allAngles[*iA].atoms[1]].id
+                          << " and " << allAtoms[allAngles[*iA].atoms[2]].id
+                          << ", value: "<< allAngles[*iA].value << std::endl;
                 tAngSum+=(allAngles[*iA].value);
             }
-            /*
+            
             std::cout << "Sum of values for angles centered at atom " 
                       << allAtoms[allAngles[tAngIdxs[0]].atoms[0]].id 
                       << " is " << tAngSum << std::endl;
-             */
+            */
         }
     }
     
     void CodClassify::checkSP3Constraints(std::vector<int> tAngIdxs)
     {
-        
     }
     
+    bool CodClassify::checkSpeAng(std::vector<AngleDict>::iterator tA)
+    {
+        // at the moment, check if the center
+        // atom of the angle is B with 5 connections
+        // or C with 6 connections 
+        if ((allAtoms[tA->atoms[0]].chemType == "C" && allAtoms[tA->atoms[0]].connAtoms.size()==6)
+             || (allAtoms[tA->atoms[0]].chemType == "B" && allAtoms[tA->atoms[0]].connAtoms.size()==5))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     
+    void CodClassify::setSpecialAngles(std::map<int, std::vector<AngleDict> > & tAngs)
+    {
+        // If atom is B with 5 connections or C with 6 connections,
+        // we do not search the database but set the values of those angles
+        // via special configuration the atoms are in
+        
+        for (std::map<int, std::vector<AngleDict> >::iterator iAs=tAngs.begin();
+                iAs !=tAngs.end(); iAs++)
+        {
+            if (allAtoms[iAs->first].chemType=="B" 
+                && allAtoms[iAs->first].connAtoms.size()==5)
+            {
+                setOneSetBoronAngles(iAs);
+            }
+            else if (allAtoms[iAs->first].chemType=="C" 
+                     && allAtoms[iAs->first].connAtoms.size()==6)
+            {
+                setOneSetCarbonAngles(iAs);
+            }
+            else
+            {
+                std::cout << "Bug:: This set of angles should not appear in function setSpecialAngles() "
+                          << std::endl << "This set of angles centered about atom "
+                          << allAtoms[iAs->first].id << ". It bonds to " 
+                          << allAtoms[iAs->first].connAtoms.size() << " atoms "
+                          << std::endl;
+                exit(1);
+            }
+        }
+    }
+    
+    void CodClassify::setOneSetBoronAngles(std::map<int,std::vector<AngleDict> >::iterator tAs)
+    {
+        // Deal with Boron with 5 bonds
+        for (std::vector<AngleDict>::iterator iA=tAs->second.begin();
+                iA !=tAs->second.end(); iA++)
+        {
+            if (std::find(allAtoms[iA->atoms[1]].connAtoms.begin(), 
+                          allAtoms[iA->atoms[1]].connAtoms.end(), iA->atoms[2]) 
+                    != allAtoms[iA->atoms[1]].connAtoms.end())
+            {
+                // two atoms connected within a triangle
+                iA->value = 60.0;
+                iA->valueST = iA->value;
+                iA->sigValue = 3.0;
+            }
+            else
+            {
+                // Two are not connected. There is only option
+                iA->value = 108.0;
+                iA->valueST = iA->value;
+                iA->sigValue = 3.0;
+            }
+        }
+    }
+    
+    void CodClassify::setOneSetCarbonAngles(std::map<int,std::vector<AngleDict> >::iterator tAs)
+    {
+        // Deal with Carbon atoms with 6 bonds
+        // 1. In all atoms the center atom connected, there should be one atom
+        //    that does not any other atoms (except the center atom). Find that one
+        int aUp=-1;
+        for (unsigned i=0; i < allAtoms[tAs->first].connAtoms.size(); i++)
+        {
+            aUp =allAtoms[tAs->first].connAtoms[i];
+            for (unsigned j=i+1; j < allAtoms[tAs->first].connAtoms.size(); j++)
+            {
+                if (std::find(allAtoms[allAtoms[tAs->first].connAtoms[j]].connAtoms.begin(), 
+                              allAtoms[allAtoms[tAs->first].connAtoms[j]].connAtoms.end(),
+                              aUp) !=allAtoms[allAtoms[tAs->first].connAtoms[j]].connAtoms.end())
+                {
+                    // aUp is connected to allAtoms[tAs->first].connAtoms[j]
+                    aUp = -1;
+                    break;
+                }
+            }
+            if (aUp !=-1)
+            {
+                break;
+            }
+        }
+        
+        if (aUp !=-1)
+        {
+            // These values are for top angles
+            REAL A1 = 54.0 * PI180;
+            REAL C1 = 1.0/(2.0*cos(A1));
+            REAL T1 = 90.0 + acos(C1)*PID180;
+            REAL dT = 3.0;
+            for (std::vector<AngleDict>::iterator iA=tAs->second.begin();
+                iA !=tAs->second.end(); iA++)
+            {
+                if (std::find(iA->atoms.begin(), iA->atoms.end(), aUp)
+                    ==iA->atoms.end())
+                {
+                    // The top atom is not at this angle 
+                    if (std::find(allAtoms[iA->atoms[1]].connAtoms.begin(), 
+                        allAtoms[iA->atoms[1]].connAtoms.end(), iA->atoms[2]) 
+                        != allAtoms[iA->atoms[1]].connAtoms.end())
+                    {
+                        // Two atoms connected within a triangle
+                        iA->value    = 60.0;
+                        iA->valueST  = iA->value;
+                        iA->sigValue = dT; 
+                    }
+                    else
+                    {
+                        // Two are not connected. There is only option
+                        iA->value    = 108.0;
+                        iA->valueST  = iA->value;
+                        iA->sigValue = dT;
+                    }
+                }
+                else
+                {
+                    //This angle contain the top atom
+                    iA->value    = T1;
+                    iA->valueST  = iA->value;
+                    iA->sigValue = dT;
+                }
+            }
+        }
+        
+    }
     void CodClassify::setupTargetTorsions()
     {
         // search COD for torsion angle values, no needed at the moments.

@@ -417,6 +417,11 @@ namespace LIBMOL
         void checkAngConstraints();
         void checkSP2Constraints(std::vector<int> tAngIdxs);
         void checkSP3Constraints(std::vector<int> tAngIdxs);
+        void checkRingAngleConstraints(std::vector<RingDict>::iterator iRv);
+        bool checkSpeAng(std::vector<AngleDict>::iterator tA);
+        void setSpecialAngles(std::map<int, std::vector<AngleDict> > & tAngs);
+        void setOneSetBoronAngles(std::map<int, std::vector<AngleDict> >::iterator tAs);
+        void setOneSetCarbonAngles(std::map<int, std::vector<AngleDict> >::iterator tAs);
         
         // Torsion angles related 
         void setupTargetTorsions();
@@ -474,6 +479,9 @@ namespace LIBMOL
         std::map<int, std::map<int, std::map<ID, 
                 std::map<ID, std::vector<aValueSet> > > > > allDictBondsIdx2;
         
+        std::map<int, std::map<int, 
+                 std::vector<aValueSet> > >                 allDictBondsIdx3;
+        
         std::map<ID, std::map<ID, std::map<int, 
                      std::map<int, std::map<ID, REAL> > > > >  allDictPreMetBonds;
         std::map<ID, std::map<ID, std::map<int, std::map<int, 
@@ -499,6 +507,9 @@ namespace LIBMOL
         std::map<int, std::map<int, std::map<int, 
         std::map<ID,  std::map<ID,  std::map<ID, 
         std::vector<aValueSet> > > > > > >                  allDictAnglesIdx2;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::vector<aValueSet> > > >                        allDictAnglesIdx3;
         
         std::map<int, REAL>                                 DefaultOrgAngles;
         

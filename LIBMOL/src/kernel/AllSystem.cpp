@@ -318,7 +318,7 @@ namespace LIBMOL
         }
         
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-                iA !=allAtoms.end(); iA++)
+               iA !=allAtoms.end(); iA++)
         {
             iA->inRings.clear();
         }
@@ -342,8 +342,25 @@ namespace LIBMOL
                 }
             }
         }
-        
-        
+        /*
+        std::cout << "There are " << allRingsV.size() << " rings " << std::endl
+                  << "These are: " << std::endl;
+        for (std::map<ID, std::vector<RingDict> >::iterator iR=allRings.begin();
+                iR !=allRings.end(); iR++)
+        {
+            std::cout << "Ring " << iR->first << "." << std::endl;
+            for (std::vector<RingDict>::iterator iRV=iR->second.begin();
+                    iRV !=iR->second.end(); iRV++)
+            {
+                std::cout << "Ring size:  " << iRV->atoms.size() << std::endl;;
+                for (std::vector<AtomDict>::iterator iA=iRV->atoms.begin(); 
+                        iA != iRV->atoms.end(); iA++)
+                {
+                    std::cout<< "Atom " << iA->id << std::endl;
+                }
+            }
+        }
+        */
         // Double check 
         /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
