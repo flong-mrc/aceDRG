@@ -175,6 +175,7 @@ namespace LIBMOL
                             else if (iBl->find("_symmetry_equiv_pos_as_xyz") !=std::string::npos)
                             {
                                 getCifSymOps(iBs);
+                                break;
                             }
                             else if (iBl->find("_atom_site_label") !=std::string::npos
                                      && iBl->size()==16)
@@ -350,6 +351,9 @@ namespace LIBMOL
         std::string clibMonDir(std::getenv("CLIBD_MON"));
         std::string fName(clibMonDir);
         fName.append("/list/cif_tag.list");
+        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        //std::string fName(clibMonDir);
+        //fName.append("/lib/cif_tag.list");
         
         std::ifstream fCifKeys(fName.c_str());
         if (fCifKeys.is_open())
@@ -2611,7 +2615,7 @@ namespace LIBMOL
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                      "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                      "Sc", "sc", "Y",  "y",
-                     "B",  "b",  "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
+                     "B", "b", "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
                      "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
                      "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
                      "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
@@ -2624,14 +2628,15 @@ namespace LIBMOL
                      "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
                      "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         
-        MetalTable.assign(metals, metals+122);
-        
-        //std::cout << "Metal Elements :" << std::endl;
-        //for (std::vector<ID>::iterator iM =MetalTable.begin();
-        //       iM !=MetalTable.end(); iM++)
-        //{
-        //    std::cout << *iM << std::endl;
-        //}
+        MetalTable.assign(metals, metals+123);
+        /*
+        std::cout << "Metal Elements :" << std::endl;
+        for (std::vector<ID>::iterator iM =MetalTable.begin();
+               iM !=MetalTable.end(); iM++)
+        {
+            std::cout << *iM << std::endl;
+        }
+        */
         
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA != allAtoms.end(); iA++)
@@ -2674,6 +2679,7 @@ namespace LIBMOL
                           << iA->metalGeo << std::endl;
             }
         }
+        
     }
     
     void DictCifFile::addMissHydroAtoms()
@@ -5855,6 +5861,8 @@ namespace LIBMOL
         
         std::string clibMonDir(std::getenv("CLIBD_MON"));
         std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
+        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        //std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())
@@ -6355,29 +6363,6 @@ namespace LIBMOL
             outRestrF.close();
         }
     }
-    /*
-    extern void FractToOrtho(std::vector<REAL> & tFractCoords,
-                             std::vector<REAL> & tOrthoCoords,
-                             REAL a, REAL b, REAL c,
-                             REAL alpha, REAL beta, REAL gamma)
-    {
-        if (tOrthoCoords.size()==0)
-        {
-            for (unsigned i=0; i < tFractCoords.size(); i++)
-            {
-                tOrthoCoords.push_back(0.0);
-            }
-        }
-        
-        REAL coA   = cos(alpha*PI180);
-        REAL coB   = cos(beta*PI180);
-        REAL coG   = cos(gamma*PI180);
-        REAL siG   = sin(gamma*PI180);
-        
-        tOrthoCoords[0] = tFractCoords[0]*a + tFractCoords[1]*b*coG + tFractCoords[2]*c*coB;
-        tOrthoCoords[1] = tFractCoords[1]*b*siG + tFractCoords[2]*c*(coA-coB*coG)/siG;
-        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*b*c*coA*coB*coG)/siG;
-    }
-     */
+    
     
 }

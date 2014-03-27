@@ -15,11 +15,11 @@
 #endif
 
 #ifndef __PI180__
-#define   PI180       PI/180
+#define   PI180       PI/180.0
 #endif
 
 #ifndef __PID180__
-#define   PID180      180/3.141592653589 
+#define   PID180      180.0/3.141592653589 
 #endif
 
 #ifndef __GOLD__

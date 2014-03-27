@@ -537,10 +537,6 @@ namespace LIBMOL
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs);
     
-    //extern void FractToOrtho(std::vector<REAL> & tFractCoords,
-    //                         std::vector<REAL> & tOrthoCoords,
-    //                         REAL a, REAL b, REAL c,
-    //                         REAL alpha, REAL beta, REAL gamma);
 }
 
 

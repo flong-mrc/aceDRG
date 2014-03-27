@@ -310,7 +310,6 @@ int main(int argc, char** argv) {
         aCodSystem.outAtomTypes(AJob.IOEntries["monoRootName"]);
     }
     
-        
     return 0;
 }
 

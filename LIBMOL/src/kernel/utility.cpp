@@ -202,7 +202,7 @@ namespace LIBMOL
             else if (std::toupper(first[i])>std::toupper(second[i])) return false;
             ++i;
         }
-        
+        return true;
     }
     
     bool sortStrByLen(std::string first, std::string second)
@@ -556,12 +556,13 @@ namespace LIBMOL
     {
         REAL MOD1, MOD2, MOD;
         REAL  Angle;
-        
+        /*
         for (int i =0; i < 3; i++)
         {
             std::cout << "v1["<<i<<"]= " << v1[i] << std::endl;
             std::cout << "v2["<<i<<"]= " << v1[i] << std::endl;
         }
+         */
 
         MOD1 = sqrt(DotP(v1,v1));
         MOD2 = sqrt(DotP(v2,v2));
@@ -1227,7 +1228,7 @@ namespace LIBMOL
         {
             A[i1] = new REAL [dim];
             for(i2 = 0; i2 < dim; i2++)
-            {
+            { 
                 A[i1][i2] = 0.0;
                 for(i3 = 0; i3 < n_points; i3++)
                 {
@@ -1460,7 +1461,9 @@ namespace LIBMOL
     {
         // should use a env variable related path
         std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string primName = clibMonDir + "/primes.table";
+        std::string primName = clibMonDir + "primes.table";
+        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        //std::string primName = clibMonDir + "/lib/primes.table";
         std::ifstream primFile;
         primFile.open(primName.c_str(), std::ios::in);
         

@@ -97,8 +97,8 @@ namespace LIBMOL
                 std::cout << "Number of atoms in refAtoms " 
                           << refAtoms.size() << std::endl;
                 
-                getUniqueBonds(aPTable);
-                
+                // getUniqueBonds(aPTable);
+                getUniqueBonds(aPTable, iCryst);
                 std::cout << "The following are the bonds we have found :" << std::endl;
                 for (std::vector<BondDict>::iterator iB=bonds.begin();
                         iB !=bonds.end(); iB++)
@@ -108,7 +108,7 @@ namespace LIBMOL
                               << "Its bond length is " << iB->value << std::endl;
                 }
                 
-                getUniqAngles();
+                getUniqAngles(iCryst);
                 
                 CodClassify aCodSys(allAtoms);
                 aCodSys.codAtomClassify(2);
@@ -122,13 +122,14 @@ namespace LIBMOL
                 
                 getMolByEqClassInCell();
                 
+                
                 if (allMolecules.size() > 0)
                 {
+               
                     for (unsigned  i=0; i < allMolecules.size(); i++)
                     {
                         if (allMolecules[i].atoms.size() >0 &&
-                            allMolecules[i].bonds.size() >0 &&
-                            allMolecules[i].angles.size() >0)
+                            allMolecules[i].bonds.size() >0 )
                         {
                             Name aFName(tOutName);
                             std::vector<std::string> nameComps;
@@ -273,12 +274,12 @@ namespace LIBMOL
             AtomDict tAtom(*tCurAtom);
             tAtom.symmOp=tOp->first;
             tAtom.coords.clear();
+            tAtom.fracCoords.clear();
             //std::cout << tAtom.id << std::endl;
             //std::cout << "symm atom ocp " << tAtom.ocp << std::endl;
-            for (std::vector<REAL>::iterator iFX=endFracCoords.begin();
-                    iFX !=endFracCoords.end(); iFX++)
+            for (unsigned ix=0; ix < endFracCoords.size()-1; ix++)
             {
-                tAtom.fracCoords.push_back(*iFX);
+                tAtom.fracCoords.push_back(endFracCoords[ix]);
             }
             
             FractToOrtho(endFracCoords, tAtom.coords, tCryst->itsCell->a,
@@ -355,9 +356,10 @@ namespace LIBMOL
                         std::string label = "_"+ IntToStr(i) + IntToStr(j) + IntToStr(k);
                         aAtom.sId = label;
                         aAtom.seriNum = (int)refAtoms.size();
-                        aAtom.fracCoords[0] = tCurAtom.fracCoords[0] + i;
-                        aAtom.fracCoords[1] = tCurAtom.fracCoords[1] + j;
-                        aAtom.fracCoords[2] = tCurAtom.fracCoords[2] + k;
+                        aAtom.fracCoords.clear();
+                        aAtom.fracCoords.push_back(tCurAtom.fracCoords[0] + i);
+                        aAtom.fracCoords.push_back(tCurAtom.fracCoords[1] + j);
+                        aAtom.fracCoords.push_back(tCurAtom.fracCoords[2] + k);
                         FractToOrtho(aAtom.fracCoords, aAtom.coords, tCryst->itsCell->a,
                                      tCryst->itsCell->b, tCryst->itsCell->c, tCryst->itsCell->alpha,
                                      tCryst->itsCell->beta, tCryst->itsCell->gamma);
@@ -388,7 +390,55 @@ namespace LIBMOL
         {
             for (unsigned j=i+1; j < allAtoms.size(); j++)
             {
+               // REAL rD = distanceV(allAtoms[i].coords, allAtoms[j].coords);
                 REAL rD = distanceV(allAtoms[i].coords, allAtoms[j].coords);
+                std::vector<REAL> linkRange;
+                getBondingRangePairAtoms(allAtoms[i], allAtoms[j],
+                                         covalent_sensitivity, tPTab,
+                                         linkRange);
+                if (linkRange[0] >0.20 && linkRange[1] >0.20)
+                {
+                    if (rD > linkRange[0] && rD < linkRange[1])
+                    {
+                        setOneUniqueBondCell(i, j, rD);
+                        allAtoms[i].connAtoms.push_back(j);
+                        allAtoms[j].connAtoms.push_back(i);
+                    }
+                }
+            }
+        }
+        
+        std::cout << "Number of atoms in cell " << allAtoms.size() << std::endl;
+        std::cout << "Number of bonds (not unique bonds) : " << bonds.size() << std::endl;
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin(); 
+                iAt !=allAtoms.end(); iAt++)
+        {
+            std::cout << "atom " << iAt->seriNum << " is connected to the following atoms :"
+                      << std::endl;
+            for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                    iNB !=iAt->connAtoms.end(); iNB++)
+            {
+                std::cout << "atom " << *iNB << std::endl;
+            }
+        }
+       
+        
+    }
+    
+    void MolGenerator::setUniqueAtomLinks(PeriodicTable & tPTab,
+                                          std::vector<CrystInfo>::iterator tCryst)
+    {
+        REAL covalent_sensitivity =0.35;
+        
+        for (unsigned i=0; i < allAtoms.size(); i++)
+        {
+            for (unsigned j=i+1; j < allAtoms.size(); j++)
+            {
+                // REAL rD = distanceV(allAtoms[i].coords, allAtoms[j].coords);
+                REAL rD = getBondLenFromFracCoords(allAtoms[i].fracCoords, allAtoms[j].fracCoords,
+                                                  tCryst->itsCell->a, tCryst->itsCell->b, 
+                                                  tCryst->itsCell->c, tCryst->itsCell->alpha,
+                                                  tCryst->itsCell->beta, tCryst->itsCell->gamma);
                 std::vector<REAL> linkRange;
                 getBondingRangePairAtoms(allAtoms[i], allAtoms[j],
                                          covalent_sensitivity, tPTab,
@@ -486,6 +536,77 @@ namespace LIBMOL
         
     }
     
+    
+    void MolGenerator::getUniqueBonds(PeriodicTable & tPTab, 
+                                      std::vector<CrystInfo>::iterator tCryst)
+    {
+        REAL covalent_sensitivity =0.35;
+        NeighbListDict  tNBListOfSystem;
+        
+        int aDim  = 3;
+        int aMode = 0;
+        LIBMOL::REAL tCellL     = 3.5;
+        LIBMOL::REAL tCellShell = 0.5;
+        
+        tNBListOfSystem.building(refAtoms, aDim, tCellL, tCellShell, aMode);
+        
+        // std::cout << "NB list for refAtoms set " << std::endl;   
+        
+        
+        // std::vector<std::string>   existBondID;
+        int j=0;
+        for (unsigned i=0; i <refAtoms.size(); i++)
+        {
+            if (refAtoms[i].sId=="")
+            {
+                j++;
+                std::cout << "Look for bonds to atom " << refAtoms[i].id 
+                           << " its sID " << refAtoms[i].sId << std::endl;
+                std::cout << "Its has " << refAtoms[i].neighbAtoms.size() 
+                          << " neighbor atoms. " <<std::endl;
+                for (std::vector<int>::iterator iNB=refAtoms[i].neighbAtoms.begin();
+                        iNB !=refAtoms[i].neighbAtoms.end(); iNB++)
+                {
+                    // REAL rD = distanceV(refAtoms[i].coords, refAtoms[(*iNB)].coords);
+                    std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
+                              << refAtoms[(*iNB)].sId << std::endl;
+                    REAL rD = getBondLenFromFracCoords(refAtoms[i].fracCoords, refAtoms[(*iNB)].fracCoords,
+                                                       tCryst->itsCell->a, tCryst->itsCell->b, 
+                                                       tCryst->itsCell->c, tCryst->itsCell->alpha,
+                                                       tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                    std::vector<REAL> bondRange;
+                    getBondingRangePairAtoms(refAtoms[i], refAtoms[(*iNB)],
+                                         covalent_sensitivity, tPTab, 
+                                         bondRange);
+                    
+                    
+                    std::cout << "Distance " << rD << std::endl;
+                    std::cout << "Range between " << bondRange[0]
+                              << " and " << bondRange[1] << std::endl;
+                              
+                
+                    if (bondRange[0] >0.20 && bondRange[1] >0.20)
+                    {
+                        if (rD > bondRange[0] && rD < bondRange[1])
+                        {
+                            // setOneUniqueBondCrys(i, *iNB, rD);
+                            if (std::find(refAtoms[i].connAtoms.begin(), refAtoms[i].connAtoms.end(), *iNB)
+                                    ==refAtoms[i].connAtoms.end())
+                            {
+                                refAtoms[i].connAtoms.push_back(*iNB);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // std::cout << "Number of atoms in the unit cell considered " << j << std::endl;
+        
+        setUniqueAtomLinks(tPTab, tCryst);
+        
+        
+    }
+    
     void MolGenerator::getBondingRangePairAtoms(AtomDict          & tAtm1, 
                                                 AtomDict          & tAtm2, 
                                                 REAL              tExtraD,
@@ -496,8 +617,7 @@ namespace LIBMOL
         tRange.push_back(-1.0);
         tRange.push_back(-1.0);
         
-        //std::cout << "atom 1 " << tAtm1.chemType << std::endl;
-        //std::cout << "atom 2 " << tAtm2.chemType << std::endl;
+        
         
         if (tPTab.elements.find(tAtm1.chemType) !=tPTab.elements.end()
             && tPTab.elements.find(tAtm2.chemType) !=tPTab.elements.end())
@@ -617,6 +737,41 @@ namespace LIBMOL
         }
     }
     
+    REAL MolGenerator::getBondLenFromFracCoords(std::vector<REAL>& tCoord1, 
+                                                std::vector<REAL>& tCoord2, 
+                                                REAL a, REAL b, REAL c, 
+                                                REAL alpha, REAL beta, REAL gamma)
+    {   
+        if (tCoord1.size() == tCoord2.size() && tCoord1.size()==3)
+        {
+            std::vector<REAL> deltX;
+            for (unsigned i=0; i <3; i++ )
+            {
+                deltX.push_back((tCoord2[i]-tCoord1[i]));
+            }
+            /*
+            std::cout << "a2 " << a*a << std::endl;
+            std::cout << "beta " << beta << std::endl;
+            std::cout << "c " << c << std::endl;
+            std::cout << "a " << a << std::endl;
+            std::cout << "PI180 " << PI180 << std::endl;
+            std::cout << "3.141592653589/180.0 " <<  3.141592653589/180.0 << std::endl;
+            std::cout << "cos(beta*PI180) " << cos(beta*PI180) << std::endl;
+            std::cout << "c*a*cos(beta*PI180) " << c*a*cos(beta*PI180) << std::endl;
+             */
+            return sqrt(a*a*deltX[0]*deltX[0] + b*b*deltX[1]*deltX[1] + c*c*deltX[2]*deltX[2]
+                    + 2*b*c*deltX[1]*deltX[2]*cos(alpha*PI180)
+                    + 2*c*a*deltX[2]*deltX[0]*cos(beta*PI180)
+                    + 2*a*b*deltX[0]*deltX[1]*cos(gamma*PI180));
+        }
+        else
+        {
+            std::cout << "Error: dim of atom 1 coords " << tCoord1.size() << std::endl;
+            std::cout << "Error: dim of atom 2 coords " << tCoord2.size() << std::endl;
+            return -1.0;
+        }
+    }
+    
     void MolGenerator::getUniqAngles()
     {
         for(int i=0; i < (int)allAtoms.size(); i++)
@@ -659,7 +814,7 @@ namespace LIBMOL
                     angles.push_back(aAng);
                 }
             }
-        }   
+        } 
         
         for (std::vector<AngleDict>::iterator iA=angles.begin();
                 iA !=angles.end(); iA++)
@@ -669,6 +824,114 @@ namespace LIBMOL
                       << " and " << allAtoms[iA->atoms[2]].id 
                       << " is " << iA->value*PID180 << std::endl;
         }
+    }
+    
+    void MolGenerator::getUniqAngles(std::vector<CrystInfo>::iterator tCryst)
+    {
+        for(int i=0; i < (int)allAtoms.size(); i++)
+        {   
+            for (int j=0; j < (int)allAtoms[i].connAtoms.size(); j++)
+            {
+                for (int k=j+1; k < (int)allAtoms[i].connAtoms.size(); k++)
+                {
+                    int i1 = allAtoms[i].connAtoms[j];
+                    int i2 = allAtoms[i].connAtoms[k];
+                    //std::cout << "Angle between " << allAtoms[i].id 
+                    //          << "(center) and " << allAtoms[i1].id
+                    //          << " and " << allAtoms[i2].id << std::endl;
+                        
+                    AngleDict aAng;
+                    aAng.anchorID  = allAtoms[i].id;
+                    aAng.anchorPos = i;
+                    aAng.atoms.push_back(i);
+                       
+                    if ((int) allAtoms[i1].connAtoms.size() >=
+                        (int) allAtoms[i1].connAtoms.size())
+                    {
+                        aAng.atoms.push_back(i1);
+                        aAng.atoms.push_back(i2);
+                    }
+                    else
+                    {
+                        aAng.atoms.push_back(i2);
+                        aAng.atoms.push_back(i1);
+                    }
+                    /*
+                    std::vector<REAL> tV1, tV2;    
+                    for (int iC=0; iC < (int)allAtoms[i].coords.size(); iC++)
+                    {
+                        tV1.push_back(allAtoms[i1].coords[iC]-allAtoms[i].coords[iC]);
+                        tV2.push_back(allAtoms[i2].coords[iC]-allAtoms[i].coords[iC]);
+                    }
+                     */
+                    // aAng.value        = getAngle2V(tV1, tV2);
+                    aAng.value  = getAngleValueFromFracCoords(allAtoms[i],
+                                    allAtoms[i1], allAtoms[i2],
+                                    tCryst->itsCell->a, tCryst->itsCell->b, 
+                                    tCryst->itsCell->c, tCryst->itsCell->alpha,
+                                    tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                    
+                    aAng.sigValue     = 3.0;
+                    aAng.numCodValues = 0;
+                    angles.push_back(aAng);
+                }
+            }
+        } 
+        
+        for (std::vector<AngleDict>::iterator iA=angles.begin();
+                iA !=angles.end(); iA++)
+        {
+            std::cout << "angle between " << allAtoms[iA->atoms[0]].id 
+                      << "(center) and " <<  allAtoms[iA->atoms[1]].id
+                      << " and " << allAtoms[iA->atoms[2]].id 
+                      << " is " << iA->value*PID180 << std::endl;
+        }
+        
+    }
+    
+    REAL MolGenerator::getAngleValueFromFracCoords(AtomDict  & tAtCen,
+                                                   AtomDict  & tAt1, 
+                                                   AtomDict  & tAt2,
+                                                   REAL a, REAL b, REAL c, 
+                                                   REAL alpha, REAL beta, REAL gamma)
+    {
+        
+        
+        if (tAtCen.fracCoords.size()==3 && tAtCen.fracCoords.size()== tAt1.fracCoords.size()
+              && tAtCen.fracCoords.size()== tAt2.fracCoords.size())
+        {
+            std::vector<REAL> tV1, tV2;
+            for (unsigned i=0; i < 3; i++)
+            {
+                tV1.push_back(tAt1.fracCoords[i] - tAtCen.fracCoords[i]);
+                tV2.push_back(tAt2.fracCoords[i] - tAtCen.fracCoords[i]);
+            }
+            
+            REAL lenTv1=getBondLenFromFracCoords(tAtCen.fracCoords, tAt1.fracCoords,
+                                                 a, b, c, alpha, beta, gamma);
+            REAL lenTv2=getBondLenFromFracCoords(tAtCen.fracCoords, tAt2.fracCoords,
+                                                 a, b, c, alpha, beta, gamma);
+            if (lenTv1 > 0.000001 && lenTv2 > 0.000001)
+            {
+                REAL coF=  (a*a*tV1[0]*tV2[0] + b*b*tV1[1]*tV2[1] + c*c*tV1[2]*tV2[2]
+                           + b*c*(tV1[1]*tV2[2]+tV1[2]*tV2[1])*cos(alpha*PI180)
+                           + c*a*(tV1[2]*tV2[0]+tV1[0]*tV2[2])*cos(beta*PI180)
+                           + a*b*(tV1[0]*tV2[1]+tV1[1]*tV2[0])*cos(gamma*PI180))/(lenTv1*lenTv2);
+                std::cout << "Cof " << coF << std::endl;
+                return acos(coF);
+            }
+            else
+            {
+                std::cout << "There is at least one pair of atoms overlapped " << std::endl;
+                return 0.0;
+            }
+        }
+        else
+        {
+            std::cout << "Error: check atom coordinate dimensions " << std::endl;
+            return 0.0;
+        }
+        
     }
     
     void MolGenerator::getMolByEqClassInCell()

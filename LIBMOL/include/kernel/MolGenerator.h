@@ -103,12 +103,16 @@ namespace LIBMOL
                                std::vector<CrystInfo>::iterator   tCryst);
         
         void setUniqueAtomLinks(PeriodicTable & tPTab);
+        void setUniqueAtomLinks(PeriodicTable & tPTab,
+                                std::vector<CrystInfo>::iterator tCryst);
         
         void getMolByEqClassInCell();
         
         void getMolByEqClassInCrys();
         
         void getUniqueBonds(PeriodicTable & tPTab);
+        void getUniqueBonds(PeriodicTable & tPTab,
+                            std::vector<CrystInfo>::iterator tCryst);
         
         void getBondingRangePairAtoms(AtomDict & tAtm1,
                                       AtomDict & tAtm2,
@@ -126,8 +130,16 @@ namespace LIBMOL
         
         void checkBondOneForming(PeriodicTable & tPTab);
         
-        void getUniqAngles();
+        REAL getBondLenFromFracCoords(std::vector<REAL> & tCoord1, std::vector<REAL> & tCoord2,
+                                      REAL a, REAL b, REAL c, REAL alpha, REAL beta, REAL gamma);
         
+        void getUniqAngles();
+        void getUniqAngles(std::vector<CrystInfo>::iterator tCryst);
+        REAL getAngleValueFromFracCoords(AtomDict  & tAtCen,
+                                         AtomDict  & tAt1, 
+                                         AtomDict  & tAt2,
+                                         REAL a, REAL b, REAL c, 
+                                         REAL alpha, REAL beta, REAL gamma);
         void getMolsInCell();
         bool checkAtomOcp(std::vector<int> & tMol);
         
