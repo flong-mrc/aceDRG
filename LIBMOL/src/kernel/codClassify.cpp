@@ -3734,12 +3734,42 @@ namespace LIBMOL
                         }
                         else // both atom pair do not match 2NB conf not matching, iFind3 
                         {
-                            iB->value        =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].value;
-                            iB->valueST      =iB->value;
-                            iB->sigValue     =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].sigValue;
-                            iB->sigValueST   =iB->sigValue;
-                            iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
-                            std::cout << "iFind 3" << std::endl;
+                            if (allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues > 10 && allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].sigValue <0.04)
+                            {
+                                iB->value        =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].value;
+                                iB->valueST      =iB->value;
+                                iB->sigValue     =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].sigValue;
+                                iB->sigValueST   =iB->sigValue;
+                                iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
+                                std::cout << "iFind 3" << std::endl;
+                            }
+                            else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                                     && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                     !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                            {
+                                std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
+                                      << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
+                                      << std::endl;
+                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                            }
+                            else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
+                                     && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                     !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                            {
+                                std::cout << "atom 1 " << allAtoms[tPair[1]].ccp4Type
+                                          << "  atom 2 " << allAtoms[tPair[0]].ccp4Type
+                                          << std::endl;
+                               getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                            }
+                            else
+                            {
+                                iB->value        =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].value;
+                                iB->valueST      =iB->value;
+                                iB->sigValue     =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].sigValue;
+                                iB->sigValueST   =iB->sigValue;
+                                iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
+                                std::cout << "iFind 3" << std::endl;
+                            }
                         }
                     }
                     else // One atom pair does not match 2NB space (both not match 2NB confs), iFind2
