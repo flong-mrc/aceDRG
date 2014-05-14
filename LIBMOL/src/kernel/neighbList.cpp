@@ -895,12 +895,17 @@ namespace LIBMOL
         
         //std::cout << std::endl << "------------------------------------------"
         //          << std::endl;
-        //std::cout << "Build neighbor list System " << std::endl;
-        //time_t rtime;
-        //time(&rtime);
-        //std::cout << "Current time is " << ctime(&rtime);
+        /*
+        std::cout << "Build neighbor list System " << std::endl;
+        time_t rtime;
+        time(&rtime);
+        std::cout << "Before building cell, the time is " 
+                  << ctime(&rtime) << std::endl;
         
         buildCellSystem();
+        std::cout <<  "After building cell, the time is " 
+                  << ctime(&rtime) << std::endl;
+        */
         if (!itsErrLevel)
         {
             if (tMode ==0)
@@ -1550,6 +1555,8 @@ namespace LIBMOL
         // time_t rtime;
         // time(&rtime);
         // std::cout << "Current time is " << ctime(&rtime);
+        std::cout << "Here " << std::endl;
+        exit(1);
         
         for (std::vector<AtomDict>::iterator iA=aAtomList.begin();
                 iA != aAtomList.end(); iA++)
@@ -1559,8 +1566,18 @@ namespace LIBMOL
                 iA->neighbAtoms.clear();
             }
         }
+        std::cout << "Build neighbor list System " << std::endl;
+        time_t rtime;
+        time(&rtime);
+        std::cout << "Before building cell, the time is " 
+                  << ctime(&rtime) << std::endl;
         
         buildCellSystem(aAtomList, tDim, tNBCutoff, tNBShell);
+        
+        std::cout <<  "After building cell, the time is " 
+                  << ctime(&rtime) << std::endl;
+        
+        exit(1);
         
         REAL fullL = tNBCutoff + tNBShell;
         // std::cout << "error level " << itsErrLevel << std::endl;

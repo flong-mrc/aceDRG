@@ -338,8 +338,8 @@ namespace LIBMOL
         for (int i=0; i < (int)allAtoms.size(); i++)
         {
             setAtomCodClassName2(allAtoms[i], allAtoms[i], dLev);
-            std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl 
-                      << "class is " << allAtoms[i].codClass << std::endl;            
+            //std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl 
+            //          << "class is " << allAtoms[i].codClass << std::endl;            
         }
         
         // set a hashing code and primeNB symbol to each atom.
@@ -347,6 +347,53 @@ namespace LIBMOL
         hashingAtoms();
         
         setAtomsNBSymb();
+        
+        /*
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+               iA !=allAtoms.end(); iA++)
+        {
+            setAtomCodClassName(*iA, *iA, iLev);
+            std::cout <<std::endl << "For atom " << iA->id << std::endl 
+                      << "class is " << iA->codClass << std::endl; 
+                
+        }
+        */ 
+    }
+    
+    void CodClassify::codAtomClassify2(int dLev)
+    {
+        ringDetecting2();
+        /*
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            if ((int)iA->ringRep.size() >0)
+            {
+                std::cout << "\nAtom " << iA->id << " is in  " 
+                        << (int)iA->ringRep.size() << " ring(s)" << std::endl;
+                for (std::map<std::string, int>::iterator iRR=iA->ringRep.begin();
+                        iRR != iA->ringRep.end(); iRR++)
+                {
+                    std::cout << "Ring: " << iRR->first << ", size : "
+                            << iRR->second << std::endl;
+                }
+            }
+        }
+        */
+        // std::cout <<std::endl << "Output Atom COD classes now " << std::endl << std::endl;
+        
+        for (int i=0; i < (int)allAtoms.size(); i++)
+        {
+            setAtomCodClassName2(allAtoms[i], allAtoms[i], dLev);
+            //std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl 
+            //          << "class is " << allAtoms[i].codClass << std::endl;            
+        }
+        
+        // set a hashing code and primeNB symbol to each atom.
+        
+        //hashingAtoms();
+        
+        //setAtomsNBSymb();
         
         /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
@@ -872,6 +919,67 @@ namespace LIBMOL
        
     }
     
+    void CodClassify::ringDetecting2()
+    {
+        // tempo, set ring size to 6
+        int maxSize = 7;
+        // std::vector<AtomDict> atomsInPath;
+        std::map<int, ID>  atomsInPath;
+        std::map<int, ID>  atomsSeen;
+       
+        // 1. loops beginning from all atoms in the system
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            /*
+                std::cout << "-----------------" << std::endl;
+                std::cout << "starting atom  " << iA->id << std::endl;
+                std::cout << "-----------------" << std::endl;
+            */
+            //if((int)tempIDs.size() !=0)
+            //{
+            //    tempIDs.clear();
+            //}
+            if (!iA->isMetal)
+            {
+                int preSeriNum = -999;
+                int startLev   = 1;
+                atomsInPath.clear();
+                atomsSeen.clear();
+                // atomsInPath.push_back((*iA));
+                // atomsInPath.insert(std::pair<int, ID>(iA->seriNum, iA->chemType))
+                // tempIDs.insert(std::pair<int, ID>(iA->seriNum, iA->id));
+            
+                // 2. loop from its bonded atoms recursively
+                // checkOnePathSec(atomsInPath, tempIDs, *iA, maxSize, iA);
+                // checkOnePathSec(atomsInPath, *iA, maxSize, iA);
+                checkOnePathSec2(*iA, maxSize, iA, preSeriNum,  startLev, atomsSeen, atomsInPath);
+            
+                /*
+                if ((int)iA->ringRep.size() >0)
+                {
+                
+                    std::cout << "\nAtom " << iA->id << " is in "
+                            << (int)iA->ringRep.size() << " rings "
+                            << std::endl;
+                    for (std::map<std::string, int>::iterator iMa = iA->ringRep.begin();
+                           iMa != iA->ringRep.end(); iMa++ )
+                    {
+                        std::cout << "Ring: " << iMa->first << "; Size " << iMa->second 
+                                <<std::endl;
+                    } 
+                } 
+                else
+                {
+                    std::cout << "\nAtom " << iA->id << " is in no ring" <<std::endl;
+                }
+               */
+            }
+        }
+       
+    }
+    
+    
     void CodClassify::checkOnePathSec(std::vector<AtomDict> & seenAtoms,
                                       std::map<int, ID>     & seenIDs,
                                       AtomDict              & curAto,
@@ -1164,6 +1272,184 @@ namespace LIBMOL
                             // and call function checkOnePathSec() recursively
                             int tPreSeriNum = curAto.seriNum; 
                             checkOnePathSec(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum, 
+                                        tNewLev, seenAtomIDs, atomIDsInPath);
+                        }
+                    }
+                    atomIDsInPath.erase(curAto.seriNum);
+                    seenAtomIDs.erase(curAto.seriNum);
+                }
+                atomIDsInPath.erase(curAto.seriNum);
+                seenAtomIDs.erase(curAto.seriNum);
+            }
+        }
+        else
+        {
+            atomIDsInPath.erase(curAto.seriNum);
+            seenAtomIDs.erase(curAto.seriNum);
+        }
+    }
+    
+    void CodClassify::checkOnePathSec2(AtomDict                & curAto,
+                                      int                       iMax,
+                                      std::vector<AtomDict>::iterator iOriAto,
+                                      int                       SeriNumPreAto,  
+                                      int                       curLev,
+                                      std::map<int, ID>       & seenAtomIDs,
+                                      std::map<int, ID>       & atomIDsInPath)
+    {
+        
+       
+        if ( curLev <iMax )
+        {  
+            int NachbarpunkteDetected = 0;
+            
+            // Check Nachbarpunkte
+            for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+                    tNBA != curAto.connAtoms.end(); tNBA++)
+            {
+                int tSeriNum = allAtoms[*tNBA].seriNum;
+                
+                // Find  Nachbarpunkte of the current path if the current atom
+                // (1) should not be the the atom beginning the path. (it is a ring)
+                // (2) should not be the one just walked through in the last step
+                // (3) is in a list of atoms we have seen
+                if (tSeriNum != iOriAto->seriNum && tSeriNum != SeriNumPreAto 
+                        && seenAtomIDs.find(tSeriNum) !=seenAtomIDs.end())
+                {
+                    
+                    NachbarpunkteDetected = 1;
+                    
+                    // found Nachbarpunkte, stop this path
+                    /*
+                    
+                    std::cout << "atom : " <<  allAtoms[*tNBA].id << std::endl;
+                    
+                    std::cout << "Nachbarpunkte found, stop this path " << std::endl;
+                    for (std::map<int, ID>::iterator iS=seenAtomIDs.begin();
+                            iS != seenAtomIDs.end(); iS++)
+                    {
+                        std::cout << "atom : " << iS->first 
+                                << " : " << iS ->second << std::endl;
+                    }
+                    */              
+                }  
+            }
+            
+            // check if a ring is formed 
+            if (!NachbarpunkteDetected)
+            {
+                for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+                    tNBA != curAto.connAtoms.end(); tNBA++)
+                {
+                    int tSeriNum = allAtoms[*tNBA].seriNum;
+                    
+                    if (tSeriNum == iOriAto->seriNum && tSeriNum != SeriNumPreAto
+                        && curLev > 2)
+                    {
+                        //std::cout << iOriAto->id << " : "
+                        //          << curAto.id << " : " << allAtoms[*tNBA].id
+                        //          << " : " << SeriNumPreAto 
+                        //          << " Find a ring." << std::endl;    
+                        //   sort the atoms in the seenAtom vector and 
+                        //   check if this ring is already found (the same 
+                        //   ring of the same atom should be found twice at
+                        //   least because of the walking algorithm.
+                        // FIND A RING !
+                        atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                        std::list<std::string> tAllIds;
+                        std::vector <AtomDict> ttAtoms;
+                        for (std::map<int, ID>::iterator iSee = atomIDsInPath.begin();
+                                iSee != atomIDsInPath.end(); iSee++)
+                        {
+                            //if (iSee->first != iOriAto->seriNum)
+                            //{
+                            tAllIds.push_back(iSee->second);
+                            int posIdx = atomPosition(iSee->second);
+                            ttAtoms.push_back(allAtoms[posIdx]);
+                                // tRing.atoms.push_back(*tAt);
+                                //std::cout << iSee->second << std::endl;   
+                            //}
+                        }
+                        RingDict aRingDict(ttAtoms);                 
+                        
+                        tAllIds.sort(compareNoCase);
+                        //std::string tRepStr(iOriAto->id);
+                        std::string tRepStr;
+                        for (std::list<std::string>::iterator iAI =tAllIds.begin();
+                                    iAI != tAllIds.end(); iAI++)
+                        {
+                            tRepStr.append(*iAI);
+                        }
+                            
+                        iOriAto->ringRep[tRepStr] = (int)atomIDsInPath.size();
+                        
+                        aRingDict.rep = tRepStr;
+                        std::map<ID, std::vector<RingDict> >::iterator iFindRing=allRings.find(tRepStr);
+                        if (iFindRing == allRings.end())
+                        {
+                            allRings[tRepStr].push_back(aRingDict);
+                        }
+                        
+                        atomIDsInPath.erase(curAto.seriNum);  
+                        NachbarpunkteDetected = 1;
+                        
+                    }
+                    
+                }
+            }
+              
+            if (! NachbarpunkteDetected)
+            {
+                // found no Nachbarpunkte and no ring
+                // descend the new path in the neighborhood graph:
+                
+                
+                int tNewLev = curLev + 1;
+                seenAtomIDs.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                if (tNewLev < iMax)
+                {
+                   /*
+                        std::cout << "atom " << curAto.id 
+                                  << " finds no Nachbarpunkte in it neighbor  " 
+                                  << std::endl << "Descend into the next atom "
+                                  << std::endl;
+                    
+                    */
+                    
+                    atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                    for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+                         tNBA != curAto.connAtoms.end(); tNBA++)
+                    {
+                        if(curLev==1)
+                        {
+                            // tempo list of atoms in a path
+                            if((int)seenAtomIDs.size() !=0)
+                            {
+                                seenAtomIDs.clear();
+                            }
+                            if((int)atomIDsInPath.size() !=0)
+                            {
+                                atomIDsInPath.clear();
+                            }
+                            //std::cout << "after clear, the size is " 
+                            //          << (int)seenAtomIDs.size() << std::endl;
+                            seenAtomIDs.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                            atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                        }
+                        if (SeriNumPreAto != allAtoms[*tNBA].seriNum && ! allAtoms[*tNBA].isMetal)
+                        {
+                            /*
+                                std::cout << std::endl << "Current size " << curLev << std::endl;
+                                std::cout << "Orig atom : " << iOriAto->id
+                                          << " Prev atom : " << SeriNumPreAto
+                                          << " Curent atom :  " << curAto.id 
+                                          << std::endl << std::endl;
+                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;  
+                            */
+                            // This is a new atom and append the atom to seen-atom list
+                            // and call function checkOnePathSec() recursively
+                            int tPreSeriNum = curAto.seriNum; 
+                            checkOnePathSec2(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum, 
                                         tNewLev, seenAtomIDs, atomIDsInPath);
                         }
                     }
@@ -2424,10 +2710,10 @@ namespace LIBMOL
             tLinkedHA[i]  = -1;
         }
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string inFileLHAName = clibMonDir + "allOrgLinkedHashCode.table";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string inFileLHAName = clibMonDir + "/lib/allOrgLinkedHashCode.table";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string inFileLHAName = clibMonDir + "allOrgLinkedHashCode.table";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string inFileLHAName = clibMonDir + "/lib/allOrgLinkedHashCode.table";
         std::ifstream inFileLHA;
         inFileLHA.open(inFileLHAName.c_str(), std::ios::in);
         //inFileLHA.open("/Users/flong/COD/New_EXP/Current/derivedData/allOrgLinkedHashCode.table",
@@ -2607,8 +2893,8 @@ namespace LIBMOL
                           << iAt->codClass << std::endl;
             }
             
-           std::cout << "Atom " << iAt->id << " has hashing code : " 
-                     << iAt->hashingValue << std::endl;
+           //std::cout << "Atom " << iAt->id << " has hashing code : " 
+           //          << iAt->hashingValue << std::endl;
         }   
     }
     
@@ -2837,14 +3123,14 @@ namespace LIBMOL
     
     void CodClassify::setOrgBondHeadHashList()
     {
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
         for (std::vector<BondDict>::iterator iB = allBonds.begin();
                 iB != allBonds.end(); iB++)
         {
             
-            std::string fRoot = clibMonDir + "allOrgBondTables/";
-            //std::string fRoot = clibMonDir + "/lib/allOrgBondTables/";
+            //std::string fRoot = clibMonDir + "allOrgBondTables/";
+            std::string fRoot = clibMonDir + "/lib/allOrgBondTables/";
             int iSmall = 2*wSize;
             for (std::map<ID, int>::iterator iA=iB->fullAtoms.begin();
                     iA != iB->fullAtoms.end(); iA++)
@@ -2876,10 +3162,10 @@ namespace LIBMOL
         
         std::map<ID, std::map<ID, ID> >  allBoIdx;
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string fRoot = clibMonDir + "allOrgBondTables/";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string fRoot = clibMonDir + "/lib/allOrgBondTables/";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string fRoot = clibMonDir + "allOrgBondTables/";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string fRoot = clibMonDir + "/lib/allOrgBondTables/";
         std::string fIdx  = fRoot + "bond_idx.table";
         std::ifstream codBondIdxFile(fIdx.c_str());
         if (codBondIdxFile.is_open())
@@ -3639,6 +3925,9 @@ namespace LIBMOL
                       << " a1NB "  << a1NB  << " a2NB " << a2NB << std::endl
                       << " a1C "   << a1C   << " a2C "  << a2C << std::endl;
             
+            std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
+                      << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
+                      << std::endl;
             
             if (allDictBondsIdx1.find(ha1) != allDictBondsIdx1.end()
                 && allDictBondsIdx1[ha1].find(ha2) != allDictBondsIdx1[ha1].end())
@@ -3742,24 +4031,36 @@ namespace LIBMOL
                                 iB->sigValueST   =iB->sigValue;
                                 iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
                                 std::cout << "iFind 3" << std::endl;
+                                
                             }
                             else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
                                      && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                                      !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
                             {
-                                std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
-                                      << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
-                                      << std::endl;
+                                
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                             }
                             else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
                                      && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
                                      !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
                             {
-                                std::cout << "atom 1 " << allAtoms[tPair[1]].ccp4Type
-                                          << "  atom 2 " << allAtoms[tPair[0]].ccp4Type
-                                          << std::endl;
                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                               std::cout << "iFind 3 C" << std::endl;
+                                
+                            }
+                            else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
+                                     && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(".")
+                                     !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                            {
+                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
+                                std::cout << "iFind 3 C" << std::endl;
+                            }
+                            else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
+                                     && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(".")
+                                     !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                            {
+                               getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
+                               std::cout << "iFind 3 C" << std::endl;
                             }
                             else
                             {
@@ -3769,6 +4070,7 @@ namespace LIBMOL
                                 iB->sigValueST   =iB->sigValue;
                                 iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
                                 std::cout << "iFind 3" << std::endl;
+                                
                             }
                         }
                     }
@@ -3786,18 +4088,12 @@ namespace LIBMOL
                             && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                                 !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
                         {
-                            std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
-                                      << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
-                                      << std::endl;
                             getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                         }
                         else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
                             && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
                                 !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
                         {
-                            std::cout << "atom 1 " << allAtoms[tPair[1]].ccp4Type
-                                      << "  atom 2 " << allAtoms[tPair[0]].ccp4Type
-                                      << std::endl;
                             getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                         }
                         else
@@ -3903,9 +4199,6 @@ namespace LIBMOL
             {
                 // Without hash code matching for those combination of two atoms. try CCP4 type matching
                 // It is very unlikely we have ccp4 type matching when hash code matching failed.
-                std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
-                          << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
-                                      << std::endl;
                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
             }
             else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
@@ -3914,9 +4207,6 @@ namespace LIBMOL
             {
                 // Without hash code matching for those combination of two atoms. try CCP4 type matching
                 // It is very unlikely we have ccp4 type matching when hash code matching failed.
-                std::cout << "atom 1 " << allAtoms[tPair[1]].ccp4Type
-                          << "  atom 2 " << allAtoms[tPair[0]].ccp4Type
-                                      << std::endl;
                 getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
             }
             else
@@ -3963,10 +4253,10 @@ namespace LIBMOL
             // std::cout << "Clustering all COD Metal bonds " << std::endl;
             
             // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
-            std::string clibMonDir(std::getenv("CLIBD_MON"));
-            std::string fName = clibMonDir+"allMetalBonds.table";
-            //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            //std::string fName = clibMonDir+"/lib/allMetalBonds.table";
+            //std::string clibMonDir(std::getenv("CLIBD_MON"));
+            //std::string fName = clibMonDir+"allMetalBonds.table";
+            std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+            std::string fName = clibMonDir+"/lib/allMetalBonds.table";
             std::ifstream codMetBondFile(fName.c_str());
             if(codMetBondFile.is_open())
             {
@@ -4630,6 +4920,20 @@ namespace LIBMOL
                                             }
                                             nBond++;
                                         }
+                                        else
+                                        {
+                                            ccp4Bonds[tBuf[0]][tBuf[1]]["order"] = aOrder;
+                                            ccp4Bonds[tBuf[0]][tBuf[1]]["length"]= StrToReal(tBuf[4]);
+                                            if (tBuf[5].find('.') == std::string::npos)
+                                            {
+                                                ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = StrToReal(tBuf[5]);
+                                            }
+                                            else
+                                            {
+                                                ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = 0.20; 
+                                            }
+                                            nBond++;
+                                        }
                                     }
                                 }
                             }
@@ -4722,7 +5026,7 @@ namespace LIBMOL
             exit(1);
         }
         
-        
+       
         
         
     }
@@ -4750,10 +5054,10 @@ namespace LIBMOL
         
         int rC=0;   
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string combDBName = clibMonDir + "allOrg.db";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string combDBName = clibMonDir + "/lib/allOrg.db";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string combDBName = clibMonDir + "allOrg.db";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string combDBName = clibMonDir + "/lib/allOrg.db";
         
         rC=sqlite3_open(combDBName.c_str(), &combDB);
         if (rC)
@@ -5270,10 +5574,10 @@ namespace LIBMOL
         DefaultCoordGeos[11] = "ALL-FACE-CAPPED-TRIGONAL-PRISMATIC";
         DefaultCoordGeos[12] = "CUBOCTAHEDRON";
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string metDefCoordGeoFileName = clibMonDir + "allMetalDefCoordGeos.table";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string metDefCoordGeoFileName = clibMonDir + "allMetalDefCoordGeos.table";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())
@@ -5303,12 +5607,11 @@ namespace LIBMOL
     {
         try
         {
-            std::string clibMonDir(std::getenv("CLIBD_MON"));
-            std::string codAngleFileName = clibMonDir + "allOrgAngles.table";
-            //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            //std::string codAngleFileName = clibMonDir + "/lib/allOrgAngles.table";
+            //std::string clibMonDir(std::getenv("CLIBD_MON"));
+            //std::string codAngleFileName = clibMonDir + "allOrgAngles.table";
+            std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+            std::string codAngleFileName = clibMonDir + "/lib/allOrgAngles.table";
             std::ifstream codAngleFile(codAngleFileName.c_str());
-            // std::ifstream codAngleFile("/Users/flong/COD/New_EXP/Current/derivedData/allOrgAngles.table");
             
             if(codAngleFile.is_open())
             {
@@ -5377,8 +5680,8 @@ namespace LIBMOL
     
     void CodClassify::setOrgAngleHeadHashList()
     {
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        // std::string clibMonDir(std::getenv("CLIBD_MON"));
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
         for (std::vector<AngleDict>::iterator iAn = allAngles.begin();
                 iAn != allAngles.end(); iAn++)
         {
@@ -5414,10 +5717,10 @@ namespace LIBMOL
     {
         std::map<ID, std::map<ID, std::map<ID, ID> > > allAngIdx;
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string fRoot = clibMonDir + "allOrgAngleTables/";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string fRoot = clibMonDir + "/lib/allOrgAngleTables/";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string fRoot = clibMonDir + "allOrgAngleTables/";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string fRoot = clibMonDir + "/lib/allOrgAngleTables/";
         std::string fIdx  = fRoot + "angle_idx.table";
         std::ifstream codAngleIdxFile(fIdx.c_str());
         if (codAngleIdxFile.is_open())
@@ -5623,10 +5926,10 @@ namespace LIBMOL
     {
         try
         {
-            std::string clibMonDir(std::getenv("CLIBD_MON"));
-            std::string tAName = clibMonDir + "allMetalCoordGeoAngles.table";
-            // std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            // std::string tAName = clibMonDir + "/lib/allMetalCoordGeoAngles.table";
+            //std::string clibMonDir(std::getenv("CLIBD_MON"));
+            //std::string tAName = clibMonDir + "allMetalCoordGeoAngles.table";
+            std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+            std::string tAName = clibMonDir + "/lib/allMetalCoordGeoAngles.table";
             
             std::ifstream codMetAngleFile(tAName.c_str());
             if(codMetAngleFile.is_open())
@@ -5668,10 +5971,10 @@ namespace LIBMOL
         try
         {
             // should be something like std::string tNewCodBondFileName(clibMonDir + "/list/bonds.txt");
-            std::string clibMonDir(std::getenv("CLIBD_MON"));
-            std::string tNCName =  clibMonDir + "allOrgAnglesWithNonCenteredMetalNB.table";
-            //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            //std::string tNCName =  clibMonDir + "/lib/allOrgAnglesWithNonCenteredMetalNB.table";
+            // std::string clibMonDir(std::getenv("CLIBD_MON"));
+            // std::string tNCName =  clibMonDir + "allOrgAnglesWithNonCenteredMetalNB.table";
+            std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+            std::string tNCName =  clibMonDir + "/lib/allOrgAnglesWithNonCenteredMetalNB.table";
             
             std::ifstream codNonCenMetAngleFile(tNCName.c_str());
             if(codNonCenMetAngleFile.is_open())
@@ -5794,10 +6097,10 @@ namespace LIBMOL
         int rC=0;   
         // Temp name 
         // FileName  combDBName = "/Users/flong/COD/New_EXP/Current/derivedData/SQLite_related/allOrg.db";
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string combDBName = clibMonDir + "allOrg.db";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string combDBName = clibMonDir + "/lib/allOrg.db";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string combDBName = clibMonDir + "allOrg.db";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string combDBName = clibMonDir + "/lib/allOrg.db";
         
         rC=sqlite3_open(combDBName.c_str(), &combDB);
         if (rC)

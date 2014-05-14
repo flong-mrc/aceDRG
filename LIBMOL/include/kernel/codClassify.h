@@ -217,6 +217,7 @@ namespace LIBMOL
         
         // Transfering between atoms and COD classes
         void codAtomClassify(int dLev);
+        void codAtomClassify2(int dLev);
         void codClassToAtom(ID & tCC, AtomDict & tAt);
         void codClassToAtomAng(ID & tCC, AtomDict & tAt);
         void codNBProps(std::vector<ID> tarStrs, std::vector<ID> & tCTs,
@@ -236,6 +237,7 @@ namespace LIBMOL
         
         // Ring detecting related methods 
         void ringDetecting();
+        void ringDetecting2();
         //a recursive function
         void checkOnePathSec(std::vector<AtomDict> & seenAtoms,
                              std::map<int, ID>     & seenIDs,
@@ -249,6 +251,14 @@ namespace LIBMOL
                              int                       curLev,
                              std::map<int, ID>       & seenAtomIDs,
                              std::map<int, ID>       & atomIDsInPath);
+        
+        void checkOnePathSec2(AtomDict                & curAto,
+                              int                       iMax,
+                              std::vector<AtomDict>::iterator iOriAto,
+                              int                       SeriNumPreAto,  
+                              int                       curLev,
+                              std::map<int, ID>       & seenAtomIDs,
+                              std::map<int, ID>       & atomIDsInPath);
         
         void setAtomCodClassName(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void setAtomCodClassName2(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);

@@ -145,6 +145,7 @@ namespace LIBMOL // temp
         int                     levelCodValue;
         
         std::vector<int>        atoms;
+        std::vector<ID>         atomChemTypes;
         std::vector<ID>         atomsCodClasses;
         std::vector<ID>         atomsNB2Rep;
         std::vector<ID>         atomsNBRep;

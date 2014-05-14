@@ -152,13 +152,29 @@ namespace LIBMOL
         virtual ~GenCifFile();
         
         void setupSystem();
+        void setupSystem2();
+        void getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines,
+                            std::map<std::string, std::string>  & tRowProps,
+                            std::map<int, std::map<ID, std::vector<std::string> > > & tColProps,
+                            int   & tIdx);
+        void selectPropsToMaps(std::map<std::string, std::string>  & tRowProps,
+                               std::map<int, std::map<ID, std::vector<std::string> > > & tColProps);
         
         void initAllCifKeys();
         
         void getCifCrystInfo(std::vector<std::vector<std::string> >::iterator iBs);
+        void getCifCrystInfo(std::map<std::string,std::string> & tRowProps, 
+                             std::map<int,std::map<ID,std::vector<std::string> > > & tColProps);
+        
         void getCifSymOps(std::vector<std::vector<std::string> >::iterator iBs);
+        void getCifSymOps(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
+        
         void getCifAtomInfo(std::vector<std::vector<std::string> >::iterator iBs);
         void getCifAtomInfo2(std::vector<std::vector<std::string> >::iterator iBs);
+        void getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
+        void getAtomInfoFromLine(std::vector<std::string> & tStrs,
+                                 int tP1, int tP2, int tP3, 
+                                 int tP4, int tP5, int tPOcp);
         
         void setFlags(std::map<std::string, bool> & tL,
                       std::string tS);
@@ -171,6 +187,7 @@ namespace LIBMOL
         
         // Atoms related 
         void getAtomInfo(std::vector<std::string> tF);
+        void checkAtomElementID();
         void setAtomsCCP4Type();
         int  atomPosition(ID tID);
         void setAtomsPartialCharges();

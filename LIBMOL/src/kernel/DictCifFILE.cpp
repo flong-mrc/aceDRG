@@ -38,7 +38,7 @@ namespace LIBMOL
             if (inFile.is_open())
             {
                 itsCurAtom    = new AtomDict();
-                setupSystem();
+                setupSystem2();
             }
             else
             {
@@ -345,15 +345,400 @@ namespace LIBMOL
         
     } 
     
+    void GenCifFile::setupSystem2()
+    {
+       if (inFile.is_open() )
+        { 
+            std::vector<std::vector<std::string> > tBlocs;
+            // make sure
+            itsCurBlock = "";
+            std::string tRecord="";
+            
+            std::vector<std::string>     tBlocLines;
+            
+            while(!inFile.eof())
+            {   
+                std::getline(inFile, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                // std::cout <<  tRecord << std::endl;
+                std::vector<std::string> tBuf;
+                std::vector<std::string> tBuf_t;
+                // only use a few blocks in the cif file
+                
+                
+                if (tRecord.find("loop_") !=std::string::npos 
+                    || tRecord.find("data_") !=std::string::npos)
+                {
+                    if (!tBlocLines.empty())
+                    {
+                        tBlocs.push_back(tBlocLines);
+                        tBlocLines.clear();
+                    }
+                    
+                    itsCurBlock = "loop";
+                }
+                else if (itsCurBlock=="loop" && tRecord.size() >0 )
+                {
+                    if (tRecord[0] !='#')
+                    {
+                        tBlocLines.push_back(tRecord);
+                    }
+                }
+            }
+            
+            if (!tBlocLines.empty())
+            {
+                tBlocs.push_back(tBlocLines);
+                tBlocLines.clear();
+            }
+            inFile.close();
+            
+            std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
+            // 
+            if ((int)tBlocs.size()!=0)
+            {
+                
+                std::map<std::string, std::string>   rowProps;
+                std::map<int, std::map<ID, std::vector<std::string> > > colProps;
+           
+                int idxB=0;
+                for (std::vector<std::vector<std::string> >::iterator iBs=
+                        tBlocs.begin(); iBs !=tBlocs.end(); iBs++)
+                {
+                    
+                    if((int)iBs->size() !=0)
+                    {
+                        getPropsToMaps(iBs, rowProps, colProps, idxB);
+                    }
+                    
+                }
+                 
+                
+                // Check 
+                /*
+                std::cout << "There are " << rowProps.size() 
+                          << " properties. They are: " << std::endl;
+                for (std::map<std::string, std::string>::iterator iRPs=rowProps.begin();
+                        iRPs !=rowProps.end(); iRPs++)
+                {
+                    std::cout << iRPs->first << " -> " << iRPs->second << std::endl;
+                }
+                
+                std::cout << std::endl << "There are " << colProps.size() 
+                          << " blocks of properties. They are: " << std::endl;
+                
+                for (std::map<int, std::map<ID, std::vector<std::string> > >::iterator 
+                        iCPs=colProps.begin(); iCPs != colProps.end(); iCPs++)
+                {
+                    std::cout << "For block " << iCPs->first << " : " << std::endl;
+                    std::cout << "Property labels: " << std::endl;
+                    for (std::vector<std::string>::iterator 
+                          iOneB=iCPs->second["lab"].begin(); 
+                          iOneB != iCPs->second["lab"].end(); iOneB++)
+                    {
+                        std::cout << (*iOneB) << std::endl;
+                    }
+                    std::cout << "The lines associated : " << std::endl;
+                    for (std::vector<std::string>::iterator 
+                          iOneB=iCPs->second["cont"].begin(); 
+                          iOneB != iCPs->second["cont"].end(); iOneB++)
+                    {
+                        std::cout << (*iOneB) << std::endl;
+                    }
+                }
+                 */
+                // Now select what we need from the input cif file.
+                selectPropsToMaps(rowProps, colProps);
+                
+                checkAtomElementID();
+                
+                setAtomsMetalType();
+                
+                // Check
+                
+                std::cout << "There are " << (int)allAtoms.size() 
+                          << " atoms in the system. They are " << std::endl;
+            
+               for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                     iA !=allAtoms.end(); iA++)
+               {
+                   std::cout << "Atom " << iA->id << std::endl
+                             << " serial Number " << iA->seriNum << std::endl
+                             << "Its type symbol " << iA->chemType << std::endl
+                             << "Is it metal ";
+                   if (iA->isMetal)
+                   {
+                       std::cout << " Yes " << std::endl;
+                   }
+                   else
+                   {
+                       std::cout << " No " << std::endl;
+                   }
+                   std::cout << "Its form charge " << iA->formalCharge << std::endl;
+                   std::cout << "Its occupancy " << iA->ocp << std::endl;
+                   std::cout << "Its coordinates (fractional) " << std::endl
+                             << "x:   " << iA->fracCoords[0] << std::endl
+                             << "y:   " << iA->fracCoords[1] << std::endl
+                             << "z:   " << iA->fracCoords[2] << std::endl
+                             << "Its coordinates  " << std::endl
+                             << "x:   " << iA->coords[0] << std::endl
+                             << "y:   " << iA->coords[1] << std::endl
+                             << "z:   " << iA->coords[2] << std::endl;           
+               }
+            }
+       }
+       
+    }
     
+    void GenCifFile::checkAtomElementID()
+    {
+        PeriodicTable aPTab;
+       
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+        {
+            // std::cout << "Atom id " << iAt->id << std::endl;
+            if (iAt->chemType.empty() && ! iAt->id.empty())
+            {
+                if (iAt->id.size() >=2)
+                {
+                    if(aPTab.elements.find(iAt->id.substr(0,2)) 
+                            !=aPTab.elements.end())
+                    {
+                        iAt->chemType=iAt->id.substr(0,2);
+                    }
+                    else if (aPTab.elements.find(iAt->id.substr(0,1))
+                            !=aPTab.elements.end())
+                    {
+                        iAt->chemType=iAt->id.substr(0,1);
+                    }
+                }
+                else if(iAt->id.size()==1)
+                {
+                    if (aPTab.elements.find(iAt->id)
+                            !=aPTab.elements.end())
+                    {
+                        iAt->chemType=iAt->id;
+                    }
+                }
+            }
+            else if (iAt->chemType.size() >2)
+            {        
+                if (iAt->chemType.find("+") !=std::string::npos
+                    || iAt->chemType.find("-") !=std::string::npos)
+                {
+                    std::string aSC, aSN;
+                    for (unsigned i =0; i < iAt->chemType.size(); i++)
+                    {
+                        if(std::isdigit(iAt->chemType[i]))
+                        {
+                           aSN+=(iAt->chemType[i]); 
+                        }
+                        else if (iAt->chemType[i]=='-')
+                        {
+                            aSN = iAt->chemType[i]+ aSN;
+                        }
+                        else if (iAt->chemType[i] !='+')
+                        {
+                            aSC+=(iAt->chemType[i]);
+                        }
+                    }
+                    
+                    
+                    
+                    if (aSC.size() < 3)
+                    {
+                        iAt->chemType=aSC;
+                    }
+                    else
+                    {
+                        std::cout << "Bug: atom " << iAt->id << " is a element "
+                                  << iAt->chemType << std::endl;
+                    }
+                    
+                    if(aSN.size() !=0)
+                    {
+                        iAt->formalCharge=StrToReal(aSN);
+                    }
+                    
+                }
+            }
+            // std::cout << "Its atom element type " << iAt->chemType << std::endl;
+            
+        }
+    }
+    
+    void GenCifFile::setAtomsMetalType()
+    {
+        std::vector<ID>  allMetals;
+        
+        initMetalTab(allMetals);
+        
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                     iA !=allAtoms.end(); iA++)
+        {
+            iA->isMetal = isMetal(allMetals, iA->chemType);
+        }
+        
+    }
+    
+    void GenCifFile::getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines, 
+                                    std::map<std::string,std::string>       & tRowProps, 
+                                    std::map<int,std::map<ID,std::vector<std::string> > > & tColProps,
+                                    int & tIdxB)
+    {
+        bool lLab=false;
+        
+        for (std::vector<std::string>::iterator iBl=tOneBlockLines->begin();
+                               iBl != tOneBlockLines->end(); iBl++)
+        {
+            (*iBl) = TrimSpaces((*iBl));
+            // std::cout << (*iBl) << std::endl;
+            std::vector<std::string> tBuf0, tBuf;
+            if (iBl->find('\'') != std::string::npos && iBl->substr(0,1).compare("_")==0)
+            {
+                StrTokenize(*iBl, tBuf0, '\'');
+                // std::cout << "line " << (*iBl) << std::endl;
+                // std::cout << "strgrp size " << tBuf0.size() << std::endl;
+                for (unsigned i0=0; i0 < tBuf0.size(); i0++)
+                {
+                    // std::cout << "string " << i0+1 << tBuf0[i0] << std::endl;
+                    if (!tBuf0[i0].empty())
+                    {
+                        tBuf.push_back(tBuf0[i0]);
+                    }
+                }
+                /*
+                for (unsigned i0=0; i0 < tBuf.size(); i0++)
+                {
+                    std::cout << "after string  " << i0+1 << tBuf[i0] << std::endl;
+                }
+                 */
+            }
+            else if (iBl->find('\"') != std::string::npos)
+            {
+                std::vector<std::string> tBuf0;
+                StrTokenize(*iBl, tBuf0, '\"');
+                for (unsigned i0=0; i0 < tBuf0.size(); i0++)
+                {
+                    if (tBuf0[i0].size() >0)
+                    {
+                        tBuf.push_back(tBuf0[i0]);
+                    }
+                }
+            }
+            else if (iBl->find('\'') != std::string::npos)
+            {
+                tBuf.push_back((*iBl));
+            }
+            else
+            {
+                StrTokenize(*iBl, tBuf);
+            }
+            
+            
+            if (tBuf.size()==1)
+            {
+                if (tBuf[0].find("_") !=std::string::npos)
+                {
+                    if (lLab) 
+                    {
+                        tColProps[tIdxB]["lab"].push_back(tBuf[0]);
+                    }
+                    else
+                    {
+                        lLab=true;
+                        tIdxB++;
+                        tColProps[tIdxB]["lab"].push_back(tBuf[0]);
+                    }
+                }
+                else
+                {
+                    if (lLab)
+                    {
+                        lLab  = false;
+                    }
+                    tColProps[tIdxB]["cont"].push_back((*iBl));
+                }
+                
+            }
+            else if (tBuf.size() ==2 && tBuf[0].find("_") !=std::string::npos)
+            {
+                tRowProps[TrimSpaces(tBuf[0])] = TrimSpaces(tBuf[1]);
+                
+            }
+            else if (tBuf.size() > 1 && tBuf[0].find("_") ==std::string::npos)
+            {
+                // if(tBuf.size()==tColProps[tIdxB]["lab"].size())
+                //{
+                    if (lLab)
+                    {
+                        lLab  = false;
+                    }
+                    tColProps[tIdxB]["cont"].push_back((*iBl));
+                // }
+            }
+        } 
+        
+    }
+    
+    void GenCifFile::selectPropsToMaps(std::map<std::string,std::string> & tRowProps, 
+                                       std::map<int,std::map<ID,std::vector<std::string> > > & tColProps)
+    {   
+        getCifCrystInfo(tRowProps, tColProps);
+      
+        bool lSymOps=false, lAtms=false;
+        for (std::map<int,std::map<ID,std::vector<std::string> > >::iterator 
+              iBl=tColProps.begin(); iBl != tColProps.end(); iBl++)
+        {
+            if (!lSymOps)
+            {
+                int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
+                                            iBl->second["lab"]);
+                if (aPos !=-1)
+                {
+                    lSymOps=true;
+                    getCifSymOps(iBl->second);
+                }
+            }
+            
+            if(!lAtms)
+            {
+                if (getKeyWordPos("_atom_site_type_symbol", iBl->second["lab"]) !=-1
+                    || getKeyWordPos("_atom_site_label", iBl->second["lab"]) !=-1)
+                {
+                    lAtms = true;
+                    getCifAtomInfo(iBl->second);
+                }
+                else
+                {
+                    
+                }
+            }
+            
+        }
+        
+        if (itsCurCryst !=NullPoint)
+        {
+            
+            allCryst.push_back(*itsCurCryst);
+        }
+        else
+        {
+            std::cout << "No crystal " << std::endl;
+        }
+        
+        
+        
+    }
     void GenCifFile::initAllCifKeys()
     {
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string fName(clibMonDir);
-        fName.append("/list/cif_tag.list");
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string fName(clibMonDir);
-        //fName.append("/lib/cif_tag.list");
+        //fName.append("/list/cif_tag.list");
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string fName(clibMonDir);
+        fName.append("/lib/cif_tag.list");
         
         std::ifstream fCifKeys(fName.c_str());
         if (fCifKeys.is_open())
@@ -538,7 +923,7 @@ namespace LIBMOL
                     if(tBuf[1].find("(") !=std::string::npos)
                     {
                         std::vector<ID> tBuf2;
-                        StrTokenize(tBuf[1], tBuf2); 
+                        StrTokenize(tBuf[1], tBuf2, '('); 
                         itsCurCryst->itsCell->alpha = StrToReal(tBuf2[0]);
                     }
                     else
@@ -562,7 +947,7 @@ namespace LIBMOL
                     if(tBuf[1].find("(") !=std::string::npos)
                     {
                         std::vector<ID> tBuf2;
-                        StrTokenize(tBuf[1], tBuf2); 
+                        StrTokenize(tBuf[1], tBuf2, '('); 
                         itsCurCryst->itsCell->beta = StrToReal(tBuf2[0]);
                     }
                     else
@@ -586,7 +971,7 @@ namespace LIBMOL
                     if(tBuf[1].find("(") !=std::string::npos)
                     {
                         std::vector<ID> tBuf2;
-                        StrTokenize(tBuf[1], tBuf2); 
+                        StrTokenize(tBuf[1], tBuf2, '('); 
                         itsCurCryst->itsCell->gamma = StrToReal(tBuf2[0]);
                     }
                     else
@@ -682,6 +1067,200 @@ namespace LIBMOL
         
     }
     
+    void GenCifFile::getCifCrystInfo(std::map<std::string,std::string>& tRowProps, 
+                                     std::map<int,std::map<ID,std::vector<std::string> > >& tColProps)
+    {
+        if (itsCurCryst ==NullPoint)
+        {
+            itsCurCryst = new CrystInfo(); 
+        }
+        
+        if (itsCurCryst->itsSpaceGroup == NullPoint)
+        {
+            itsCurCryst->itsSpaceGroup = new SpaceGroupMember();
+        }
+        
+        if (itsCurCryst->itsCell==NullPoint)
+        {
+            itsCurCryst->itsCell  = new Cell();
+        }
+        
+        // Space group related 
+        
+        
+        if (tRowProps.find("_space_group_IT_number") !=tRowProps.end())
+        {
+            itsCurCryst->itsSpaceGroup->sgNum = StrToInt(tRowProps["_space_group_IT_number"]);
+        }
+        if (tRowProps.find("_symmetry_cell_setting") !=tRowProps.end())
+        {
+            itsCurCryst->itsCell->lattice =tRowProps["_symmetry_cell_setting"];
+        }
+        if (tRowProps.find("_symmetry_space_group_name_Hall") !=tRowProps.end())
+        {
+            itsCurCryst->itsSpaceGroup->sgSymb["Hall"].push_back(tRowProps["_symmetry_space_group_name_Hall"]);
+            std::cout << "Here " << "space group " << itsCurCryst->itsSpaceGroup->sgSymb["Hall"][0] << std::endl;
+        }
+        if (tRowProps.find("_symmetry_space_group_name_H-M") !=tRowProps.end())
+        {
+            itsCurCryst->itsSpaceGroup->sgSymb["xHM"].push_back(tRowProps["_symmetry_space_group_name_H-M"]);
+        }
+        
+        // Cell parameters related 
+        if (tRowProps.find("_cell_length_a") !=tRowProps.end())
+        {
+            itsCurCryst->itsCell->a =StrToReal(tRowProps["_cell_length_a"]);
+        }
+        else
+        {
+            std::cout << "No cell length a in the input cif file " << std::endl;
+            exit(1);
+        }
+        
+        if (tRowProps.find("_cell_length_b") !=tRowProps.end())
+        {
+            itsCurCryst->itsCell->b =StrToReal(tRowProps["_cell_length_b"]);
+        }
+        else
+        {
+            std::cout << "No cell length b in the input cif file " << std::endl;
+            exit(1);
+        }
+        
+        if (tRowProps.find("_cell_length_c") !=tRowProps.end())
+        {
+            itsCurCryst->itsCell->c =StrToReal(tRowProps["_cell_length_c"]);
+        }
+        else
+        {
+            std::cout << "No cell length c in the input cif file " << std::endl;
+            exit(1);
+        }
+        
+        if (tRowProps.find("_cell_angle_alpha") !=tRowProps.end())
+        {
+            if(tRowProps["_cell_angle_alpha"].find("(") !=std::string::npos)
+            {
+                std::vector<ID> tBuf2;
+                StrTokenize(tRowProps["_cell_angle_alpha"], tBuf2, '('); 
+                itsCurCryst->itsCell->alpha = StrToReal(tBuf2[0]);
+            }
+            else
+            {
+                itsCurCryst->itsCell->alpha =StrToReal(tRowProps["_cell_angle_alpha"]);
+            }
+            
+        }
+        else
+        {
+            std::cout << "No cell angle alpha in the input cif file " << std::endl;
+            exit(1);
+        }
+        
+        if (tRowProps.find("_cell_angle_beta") !=tRowProps.end())
+        {
+            if(tRowProps["_cell_angle_beta"].find("(") !=std::string::npos)
+            {
+                std::vector<ID> tBuf2;
+                StrTokenize(tRowProps["_cell_angle_beta"], tBuf2, '('); 
+                itsCurCryst->itsCell->beta = StrToReal(tBuf2[0]);
+            }
+            else
+            {
+                itsCurCryst->itsCell->beta =StrToReal(tRowProps["_cell_angle_beta"]);
+            }
+            
+        }
+        else
+        {
+            std::cout << "No cell angle beta in the input cif file " << std::endl;
+            exit(1);
+        }
+        
+        if (tRowProps.find("_cell_angle_gamma") !=tRowProps.end())
+        {
+            if(tRowProps["_cell_angle_gamma"].find("(") !=std::string::npos)
+            {
+                std::vector<ID> tBuf2;
+                StrTokenize(tRowProps["_cell_angle_gamma"], tBuf2, '('); 
+                itsCurCryst->itsCell->gamma = StrToReal(tBuf2[0]);
+            }
+            else
+            {
+                itsCurCryst->itsCell->gamma =StrToReal(tRowProps["_cell_angle_gamma"]);
+            }
+        }
+        else
+        {
+            std::cout << "No cell angle gamma in the input cif file " << std::endl;
+            exit(1);
+        }
+        
+        if (tRowProps.find("_cell_volume") !=tRowProps.end())
+        {
+            if(tRowProps["_cell_volume"].find("(") !=std::string::npos)
+            {
+                std::vector<ID> tBuf2;
+                StrTokenize(tRowProps["_cell_volume"], tBuf2, '('); 
+                itsCurCryst->itsCell->vol = StrToReal(tBuf2[0]);
+            }
+            else
+            {
+                itsCurCryst->itsCell->vol =StrToReal(tRowProps["_cell_volume"]);
+            }
+        }
+        
+        // Check the content obtained.
+        std::cout << "Inside the crystal information container generated, there are, "  
+                  << std::endl;
+        std::cout << "1. Space Group related : " << std::endl;
+        
+        if (itsCurCryst->itsSpaceGroup->sgNum !=-1)
+        {
+            std::cout << "Space group number " 
+                      << itsCurCryst->itsSpaceGroup->sgNum << std::endl;
+        }
+                
+        if (itsCurCryst->itsSpaceGroup->sgSymb.size() !=0)
+        {
+            
+            std::cout << "Space group names : " << std::endl;
+            for (std::map<ID, std::vector<ID> >::iterator iSN=itsCurCryst->itsSpaceGroup->sgSymb.begin();
+                    iSN != itsCurCryst->itsSpaceGroup->sgSymb.end(); iSN++)
+            {
+                std::cout << iSN->first << " <--> ";
+                for (std::vector<ID>::iterator iSV=iSN->second.begin();
+                        iSV != iSN->second.end(); iSV++)
+                {
+                    std::cout << *iSV << "  " ;
+                }
+                std::cout << std::endl;
+            }
+        }
+
+        if(itsCurCryst->itsCell)
+        {
+            std::cout << "2. Cell parameters : " << std::endl;
+            std::cout << "Cell length a " << itsCurCryst->itsCell->a << std::endl
+                      << "Cell length b " << itsCurCryst->itsCell->b << std::endl
+                      << "Cell length c " << itsCurCryst->itsCell->c << std::endl
+                      << "Cell angle alpha " << itsCurCryst->itsCell->alpha << std::endl
+                      << "Cell angle beta "  << itsCurCryst->itsCell->beta << std::endl
+                      << "Cell angle gamma " << itsCurCryst->itsCell->gamma << std::endl;
+            
+            if (itsCurCryst->itsCell->vol !=0.0)
+            {
+                std::cout << "Cell volume " << itsCurCryst->itsCell->vol << std::endl;
+            }
+            if (!itsCurCryst->itsCell->lattice.empty())
+            {
+                std::cout << "Crystal lattice " << itsCurCryst->itsCell->lattice << std::endl;
+            }
+        }
+
+        
+    }
+    
     void GenCifFile::getCifSymOps(std::vector<std::vector<std::string> >::iterator iBs)
     {   
         if (itsCurCryst==NullPoint)
@@ -723,6 +1302,74 @@ namespace LIBMOL
                 std::cout << std::endl;
             }
         }
+    }
+    
+    void GenCifFile::getCifSymOps(std::map<ID,std::vector<std::string> >  & tOnePropGroup)
+    {
+        if (itsCurCryst==NullPoint)
+        {
+            itsCurCryst = new CrystInfo();
+        }
+        if (itsCurCryst->itsSpaceGroup==NullPoint)
+        {
+            itsCurCryst->itsSpaceGroup = new SpaceGroupMember();
+        }
+        
+        int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
+                               tOnePropGroup["lab"]);
+        
+        if(aPos !=-1)
+        {
+            for (std::vector<std::string>::iterator iOps=tOnePropGroup["cont"].begin();
+                    iOps !=tOnePropGroup["cont"].end(); iOps++)
+            {
+                std::vector<std::string> tBuf0, tBuf1, tBuf2;
+                if ((*iOps).find('\'') !=std::string::npos)
+                {
+                    
+                   // cleanChar(tOnePropGroup["cont"][aPos], '\'');
+                   StrTokenize((*iOps), tBuf0, '\'');
+                   for (std::vector<std::string>::iterator iT=tBuf0.begin();
+                           iT !=tBuf0.end(); iT++)
+                   {
+                       if(!(*iT).empty())
+                       {
+                           tBuf1.push_back((*iT));
+                       }
+                   }
+                   
+                   StrTokenize(tBuf1[aPos], tBuf2,',');
+                }
+                else
+                {
+                    StrTokenize((*iOps), tBuf1);
+                    StrTokenize(tBuf1[aPos], tBuf2,',');
+                }
+                
+                StrToSymmOps(tBuf2, itsCurCryst->itsSpaceGroup->sgOp[(*iOps)]);
+            }
+        } 
+        
+        // Check
+        std::cout << "Symmetry operators for the lattice: " << std::endl; 
+        for (std::map<std::string, std::vector<std::vector<REAL> > >::iterator 
+                iOp =  itsCurCryst->itsSpaceGroup->sgOp.begin();
+                iOp != itsCurCryst->itsSpaceGroup->sgOp.end(); iOp++ )
+        {
+            std::cout << "For operator  "    << iOp->first 
+                      << ", its matrix is: "  << std::endl;
+            for (std::vector<std::vector<REAL> >::iterator iMatRow=iOp->second.begin();
+                    iMatRow !=iOp->second.end(); iMatRow++)
+            {
+                for (std::vector<REAL>::iterator iMatEle=iMatRow->begin();
+                        iMatEle !=iMatRow->end(); iMatEle++)
+                {
+                    std::cout << *iMatEle << "    ";
+                }
+                std::cout << std::endl;
+            }
+        }
+        
     }
     
     void GenCifFile::getCifAtomInfo(std::vector<std::vector<std::string> >::iterator iBs)
@@ -977,7 +1624,196 @@ namespace LIBMOL
         
     }
     
+    void GenCifFile::getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup)
+    {
+        int pos1, pos2, pos3, pos4, pos5, posOcp;
+        pos1 = getKeyWordPos("_atom_site_type_symbol", 
+                               tOnePropGroup["lab"]);
+        pos2 = getKeyWordPos("_atom_site_label", tOnePropGroup["lab"]);
+        pos3 = getKeyWordPos("_atom_site_fract_x", 
+                               tOnePropGroup["lab"]);
+        pos4 = getKeyWordPos("_atom_site_fract_y", 
+                               tOnePropGroup["lab"]);
+        pos5 = getKeyWordPos("_atom_site_fract_z", 
+                               tOnePropGroup["lab"]);
+        
+        posOcp = getKeyWordPos("_atom_site_occupancy", tOnePropGroup["lab"]);
+        if ((pos1 !=-1 || pos2 != -1) && pos3 !=-1
+             && pos4 !=-1 && pos5 !=-1)
+        {
+            // All required properties are there 
+            for (std::vector<std::string>::iterator iAtm=tOnePropGroup["cont"].begin();
+                    iAtm!=tOnePropGroup["cont"].end(); iAtm++)
+            {
+                std::vector<std::string> tBuf;
+                StrTokenize((*iAtm), tBuf);
+                if (tBuf.size()==tOnePropGroup["lab"].size())
+                {
+                    getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp);
+                }
+                else
+                {
+                    std::cout << "Line: " << (*iAtm) << std::endl 
+                             << " is not consitant with the following tags of this loop_ " 
+                             << std::endl;
+                    for (std::vector<std::string>::iterator iLab=tOnePropGroup["lab"].begin();
+                    iLab!=tOnePropGroup["lab"].end(); iLab++)
+                    {
+                        std::cout << (*iLab) << std::endl;
+                    }
+                    exit(1);
+                }
+            }
+        }
+        
+        
+    }
    
+    void GenCifFile::getAtomInfoFromLine(std::vector<std::string> & tStrs,
+                                         int tP1, int tP2, int tP3, 
+                                         int tP4, int tP5, int tPOcp)
+    {
+        if (itsCurAtom !=NullPoint)
+        {
+            delete itsCurAtom;
+            itsCurAtom = NullPoint;
+        }
+        itsCurAtom = new AtomDict();
+        itsCurAtom->seriNum = itsCurAtomSeriNum;
+        itsCurAtom->isInPreCell = true;
+        itsCurAtomSeriNum ++;
+
+        if (tP1 !=-1)
+        {
+            itsCurAtom->chemType = TrimSpaces(tStrs[tP1]);
+        }
+        //std::cout << "Its chemType : " << itsCurAtom->chemType << std::endl;
+        
+        if (tP2 !=-1)
+        {
+            cleanSymbol(tStrs[tP2], "\"");
+            itsCurAtom->id = TrimSpaces(tStrs[tP2]);
+        }
+        //std::cout << "Its ID: " << itsCurAtom->id << std::endl;
+        
+        std::string tSX = TrimSpaces(tStrs[tP3]);
+                     
+        if (tSX.find("(") ==std::string::npos)
+        {
+            // std::cout << StrToReal(tSX) << std::endl;
+            itsCurAtom->fracCoords[0]=StrToReal(tSX);
+        }
+        else
+        {  
+            std::vector<std::string> tXV;
+            StrTokenize(tSX, tXV, '(');
+            if ((int)tXV.size() >1)
+            {
+                itsCurAtom->fracCoords[0]=StrToReal(tXV[0]);
+                
+            }
+            else
+            {
+                std::cout << "the string for coordinate x is " << tSX << std::endl;
+            }
+        }    
+        //std::cout << "Its (fractional) coord x : " 
+        //          << itsCurAtom->fracCoords[0] << std::endl;   
+
+        std::string tSY = TrimSpaces(tStrs[tP4]);
+                     
+        if (tSY.find("(") ==std::string::npos)
+        {
+            itsCurAtom->fracCoords[1]=StrToReal(tSY);
+        }
+        else
+        {  
+            std::vector<std::string> tXV;
+            StrTokenize(tSY, tXV, '(');
+            if ((int)tXV.size() >1)
+            {
+                itsCurAtom->fracCoords[1]=StrToReal(tXV[0]);
+                
+            }
+            else
+            {
+                std::cout << "the string for coordinate y is " << tSY << std::endl;
+                exit(1);
+            }
+        }    
+        //std::cout << "Its (fractional) coord y : " 
+        //          << itsCurAtom->fracCoords[1] << std::endl;   
+        
+        std::string tSZ = TrimSpaces(tStrs[tP5]);
+                     
+        if (tSZ.find("(") ==std::string::npos)
+        {
+            itsCurAtom->fracCoords[2]=StrToReal(tSZ);
+        }
+        else
+        {  
+            std::vector<std::string> tXV;
+            StrTokenize(tSZ, tXV, '(');
+            if ((int)tXV.size() >1)
+            {
+                itsCurAtom->fracCoords[2]=StrToReal(tXV[0]);
+                
+            }
+            else
+            {
+                std::cout << "the string for coordinate z is " << tSZ << std::endl;
+                exit(1);
+            }
+        }    
+        // std::cout << "Its (fractional) coord z : " 
+        //          << itsCurAtom->fracCoords[2] << std::endl; 
+        
+        if (tPOcp > -1 && tPOcp < (int)tStrs.size())
+        {
+            std::string sOcp = TrimSpaces(tStrs[tPOcp]);
+                     
+            if (sOcp.find("(") ==std::string::npos)
+            {
+                if (sOcp.find("?") !=std::string::npos)
+                {
+                    itsCurAtom->ocp = 1.0;
+                }
+                else
+                {
+                    itsCurAtom->ocp=StrToReal(sOcp);
+                }
+            }
+            else 
+            {
+                std::vector<std::string> tXV;
+                StrTokenize(sOcp, tXV, '(');
+                if ((int)tXV.size() >1)
+                {
+                    itsCurAtom->ocp=StrToReal(tXV[0]);
+                }
+                else
+                {
+                    std::cout << "Bug: The line related to Occupancy is-> "
+                              << sOcp << std::endl;
+                }
+            }
+        }    
+        
+        //std::cout << "Its occupancy is : " 
+        //          << itsCurAtom->ocp << std::endl; 
+        
+       
+        FractToOrtho(itsCurAtom->fracCoords, itsCurAtom->coords, itsCurCryst->itsCell->a, 
+                     itsCurCryst->itsCell->b, itsCurCryst->itsCell->c, itsCurCryst->itsCell->alpha,
+                     itsCurCryst->itsCell->beta, itsCurCryst->itsCell->gamma);
+        hasCoords = true;
+       
+        
+        allAtoms.push_back(*itsCurAtom);
+        delete itsCurAtom;
+        itsCurAtom = NULL;
+        
+    }
     /*
     void GenCifFile::getCifAtomInfo(std::vector<std::vector<std::string> >::iterator iBs)
     {
@@ -1992,6 +2828,7 @@ namespace LIBMOL
         }
        
     }
+    
     
     void DictCifFile::setAtomsCCP4Type()
     {
@@ -5859,10 +6696,10 @@ namespace LIBMOL
         DefaultCoordGeos[11] = "ALL-FACE-CAPPED-TRIGONAL-PRISMATIC";
         DefaultCoordGeos[12] = "CUBOCTAHEDRON";
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())

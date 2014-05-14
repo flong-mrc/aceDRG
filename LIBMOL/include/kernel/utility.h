@@ -102,11 +102,14 @@ namespace LIBMOL
     
     extern bool desSortMapKey2(const sortMap2 & a ,const sortMap2 & b);
     
+    extern bool desSortMapKey3(const sortMap3 & a ,const sortMap3 & b);
+    
     extern bool compareNoCaseClass(const sortLine & tL1, const sortLine & tL2);
     
     extern void cleanSymbol(std::string & tStr, std::string symb);
     
-    
+    extern int getKeyWordPos(std::string  tKey, 
+                             std::vector<std::string> & tKeyVect);
     
     // File checking related functions, Unix/Linux/MacOs not Windows
     extern int isFileExist(FileName aF);
@@ -117,6 +120,11 @@ namespace LIBMOL
     
     // Math functions for lengths, angles, torsion angles
     // and matrix manipulations 
+    
+    extern bool inVect(std::vector<REAL>  & tVect,
+                       REAL tVal, REAL tErr);
+    extern bool inVectABS(std::vector<REAL>  & tVect,
+                          REAL tVal, REAL tErr);
     
     extern REAL lengthV(std::vector<REAL> & tV1);
     
@@ -240,6 +248,8 @@ namespace LIBMOL
                              std::vector<std::vector<REAL> >    & tMat);
     extern void StrToSymmOneRow(std::string       & tStr,
                                 std::vector<REAL> & tRow);
+    extern void StrToSymmOneRow2(std::string       & tStr,
+                                 std::vector<REAL> & tRow);
     //extern void FractToOrtho(std::vector<REAL> tFractCoords,
     //                        std::vector<REAL> tOrthoCoords,
     //                        REAL a, REAL b, REAL c,

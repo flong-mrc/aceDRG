@@ -77,6 +77,7 @@ typedef  std::string urnID;        // turn ID
 #define NullString ""
 #define NullPoint  NULL
 
+// May be better using template here
 class sortMap
 {
   public:
@@ -89,6 +90,12 @@ struct sortMap2
     std::string key;
     int val;
     int nNB;
+};
+
+struct sortMap3
+{
+    std::string key;
+    std::string val;
 };
 
 class sortLine

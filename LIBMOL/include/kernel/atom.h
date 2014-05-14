@@ -289,6 +289,7 @@ namespace LIBMOL // temp
         int      hashingValue;
         
         bool     isCChemTypeSet;
+        bool     isInPreCell;
         
         // symmetry-related 
         ID       sId;

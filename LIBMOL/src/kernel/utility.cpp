@@ -240,6 +240,11 @@ namespace LIBMOL
         }
     }
     
+    bool desSortMapKey3(const sortMap3 & a ,const sortMap3 & b)
+    {
+        return compareNoCase2(a.key, b.key);
+    }
+    
     bool compareNoCaseClass(const sortLine & first, const sortLine & second)
     {
         unsigned int i=0;
@@ -263,6 +268,20 @@ namespace LIBMOL
         }
     }
 
+    int getKeyWordPos(std::string  tKey, std::vector<std::string> & tKeyVect)
+    {
+        int aP=-1;
+        for (int i=0; i < (int)tKeyVect.size(); i++)
+        {
+            if (tKeyVect[i].compare(tKey)==0)
+            {
+                aP=i;
+                break;
+            }
+        }
+        
+        return aP;
+    }
     
     /*  end of string processing parts */
     
@@ -290,6 +309,35 @@ namespace LIBMOL
      *  acting on REAL type (change them to template later on)
      */
 
+    extern bool inVect(std::vector<REAL> & tVect,
+                       REAL tVal, REAL tErr)
+    {
+        for (std::vector<REAL>::iterator iV=tVect.begin();
+                iV !=tVect.end(); iV++)
+        {
+            if (*iV-tVal <tErr)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    extern bool inVectABS(std::vector<REAL> & tVect,
+                       REAL tVal, REAL tErr)
+    {
+        for (std::vector<REAL>::iterator iV=tVect.begin();
+                iV !=tVect.end(); iV++)
+        {
+            if (fabs(*iV-tVal) <tErr)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     extern REAL lengthV(std::vector<REAL> & tV1)
     {
         REAL tBuf = 0.0;
@@ -1460,10 +1508,10 @@ namespace LIBMOL
     extern void initPrimeTab(std::vector<int> & tPrimeTab)
     {
         // should use a env variable related path
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string primName = clibMonDir + "primes.table";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string primName = clibMonDir + "/lib/primes.table";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string primName = clibMonDir + "primes.table";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string primName = clibMonDir + "/lib/primes.table";
         std::ifstream primFile;
         primFile.open(primName.c_str(), std::ios::in);
         
@@ -1488,7 +1536,7 @@ namespace LIBMOL
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                        "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                        "Sc", "sc", "Y",  "y",
-                       "B",  "b",  "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po", 
+                       "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po", 
                        "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
                        "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
                        "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
@@ -1501,20 +1549,19 @@ namespace LIBMOL
                        "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
                        "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         
-        tMeTab.assign(metals, metals+122);
+        tMeTab.assign(metals, metals+120);
     }
     
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID)
     {
-        bool iFound = false;
          
         std::vector<ID>::iterator iFind = std::find(tMeTab.begin(), tMeTab.end(), tID);
         if (iFind != tMeTab.end())
         {
-            iFound = true;
+            return true;
         }
         
-        return iFound;
+        return false;
     }
     
     extern void fromIdToChemType(ID tId, ID & tChemType)
@@ -1635,7 +1682,7 @@ namespace LIBMOL
             tV.push_back(0.0);
             tV.push_back(0.0);
             tV.push_back(0.0);
-            StrToSymmOneRow(*iS, tV);
+            StrToSymmOneRow2(*iS, tV);
             tMat.push_back(tV);
         }
         
@@ -1698,6 +1745,142 @@ namespace LIBMOL
             }
         }
     }
+    
+    extern void StrToSymmOneRow2(std::string         & tStr,
+                          std::vector<double> & tRow)
+    { 
+        StrLower(tStr);
+        std::vector<std::string> tBuf;
+        if (tStr.find("+") != std::string::npos)
+        {
+           StrTokenize(tStr, tBuf, '+');
+           for (unsigned j=0; j < tBuf.size(); j++)
+           {
+              if(tBuf[j].find("/") != std::string::npos)
+              {
+                 tRow[3] = StrFractToReal(tBuf[j]);
+              }
+              else if (tBuf[j].find(".") != std::string::npos)
+              {
+                 tRow[3] = StrToReal(tBuf[j]);
+              }
+              else if (tBuf[j].find("x")!= std::string::npos)
+              {
+                 if (tBuf[j].find("-")!= std::string::npos)
+                 {
+                    tRow[0]=-1.0;
+                 }
+                 else
+                 {
+                    tRow[0]=1.0;
+                 }
+              }
+              else if (tBuf[j].find("y")!= std::string::npos)
+              {
+                 if (tBuf[j].find("-")!= std::string::npos)
+                 {
+                    tRow[1]=-1.0;
+                 }
+                 else
+                 {
+                    tRow[1]=1.0;
+                 }
+              }
+              else if (tBuf[j].find("z")!= std::string::npos)
+              {
+                 if (tBuf[j].find("-")!= std::string::npos)
+                 {
+                    tRow[2]=-1.0;
+                 }
+                 else
+                 {
+                    tRow[2]=1.0;
+                 }
+              }
+           }
+        }
+        else if (tStr.find("-") != std::string::npos)
+        {
+           std::string  tB="";
+           for (unsigned i=0; i < tStr.size(); i++)
+           {
+              if (tStr[i]=='-')
+              {
+                  if (tB.size()==0)
+                  {
+                    tB.append("-");
+                  }
+                  else
+                  {
+                     if (tB.find("/") != std::string::npos)
+                     {
+                         tRow[3] = StrFractToReal(tB);
+                         tB.clear();
+                     }
+                     else if (tB.find(".") != std::string::npos)
+                     {
+                         tRow[3] = StrToReal(tB);
+                         tB.clear();
+                     }
+                     tB.append("-");
+                  }
+               }
+               else if (tStr[i]=='x')
+               {
+                   tB.append("1");
+                   tRow[0]=StrToReal(tB);
+                   tB.clear();
+               }
+               else if (tStr[i]=='y')
+               {
+                   tB.append("1");
+                   tRow[1]=StrToReal(tB);
+                   tB.clear();
+               }
+               else if (tStr[i]=='z')
+               { 
+                   tB.append("1");
+                   tRow[2]=StrToReal(tB);
+                   tB.clear();
+               }
+               else if (i==(tStr.size()-1))
+               {
+                  tB.push_back(tStr[i]);
+                  if (tB.find("/") != std::string::npos)
+                  {
+                     tRow[3] = StrFractToReal(tB);
+                     tB.clear();
+                  }
+                  else if (tB.find(".") != std::string::npos)
+                  {
+                     tRow[3] = StrToReal(tB);
+                     tB.clear();
+                  }
+               }
+               else
+               {
+                  tB.push_back(tStr[i]);
+               }
+           }
+        }
+        else
+        {
+           if (tStr.find("x") != std::string::npos)
+           {
+              tRow[0]=1.0;
+           }
+           else if (tStr.find("y") != std::string::npos)
+           {
+              tRow[1]=1.0;
+           }
+           else if (tStr.find("z") != std::string::npos)
+           {
+              tRow[2]=1.0;
+           }
+
+        }
+    }
+              
     
     extern void TranslateIntoUnitCell(std::vector<REAL> & tInitFracX,
                                     std::vector<REAL> & tFinFracX)
@@ -1762,9 +1945,12 @@ namespace LIBMOL
         REAL coG   = cos(gamma*PI180);
         REAL siG   = sin(gamma*PI180);
         
+        
         tOrthoCoords[0] = tFractCoords[0]*a + tFractCoords[1]*b*coG + tFractCoords[2]*c*coB;
         tOrthoCoords[1] = tFractCoords[1]*b*siG + tFractCoords[2]*c*(coA-coB*coG)/siG;
-        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*b*c*coA*coB*coG)/siG;
+        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*coA*coB*coG)/siG;
+        
+        
     }
     
     extern void OrthoToFract(std::vector<REAL> tOrthoCoords,

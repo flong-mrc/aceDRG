@@ -331,6 +331,7 @@ namespace LIBMOL
             codNB2Symb(tAtom.codNB2Symb),
             hashingValue(tAtom.hashingValue),
             isCChemTypeSet(tAtom.isCChemTypeSet),
+            isInPreCell(tAtom.isInPreCell),
             sId(tAtom.sId),
             symmOp(tAtom.symmOp),
             treeBond(tAtom.treeBond),

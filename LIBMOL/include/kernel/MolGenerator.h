@@ -87,8 +87,7 @@ namespace LIBMOL
         
         // Generate a "molecule"(not normal sense) using a set of atoms and 
         // a set of symmetry operators
-        void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst);
-        
+      
         void symmAtomGen(std::vector<CrystInfo>::iterator    tCrys,
                          PeriodicTable & tPTab);
         
@@ -97,24 +96,49 @@ namespace LIBMOL
                             std::vector<CrystInfo>::iterator   tCrys, 
                             PeriodicTable & tPTab);
         
-        bool checkUniqueAtom(std::vector<REAL>      & tFracX);
+        void packAtomIntoCell(AtomDict & tAtm);
         
+        bool checkUniqueAtom(std::vector<REAL>      & tFracX);
+      
+        // Create a system of atom including some of atoms in unit cells around 
+        // the center unit cell.
+        
+        void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst);
         void addOneSetRefAtoms(AtomDict                         & tCurAtom,
                                std::vector<CrystInfo>::iterator   tCryst);
+        void swithAtoms(std::vector<CrystInfo>::iterator tCryst);
+        void cleanUnconnAtoms();
+        void reIdxConnAtoms();
         
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         void setUniqueAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
         
         void getMolByEqClassInCell();
-        
         void getMolByEqClassInCrys();
+        void deleteNonCenCellMols(std::map<unsigned, std::vector<int> >  
+                                   & tMoleculesInCell);
+        void deleteNonASUAtomCellMols(std::map<unsigned, std::vector<int> >  
+                                      & tMoleculesInCell);
         
+        
+        bool inBonds(int tIdx1, int tIdx2, 
+                     std::vector<BondDict> & tBonds);
         void getUniqueBonds(PeriodicTable & tPTab);
-        void getUniqueBonds(PeriodicTable & tPTab,
+        void getUniqueAtomLinks(PeriodicTable & tPTab,
                             std::vector<CrystInfo>::iterator tCryst);
+        void getUniqueBondsMols(Molecule    & tMol, 
+                                std::vector<CrystInfo>::iterator tCryst);
+        
+        void getBondsInOneMol(std::vector<AtomDict> & tAtoms);
         
         void getBondingRangePairAtoms(AtomDict & tAtm1,
+                                      AtomDict & tAtm2,
+                                      REAL tExtraD,
+                                      PeriodicTable & tPTab,
+                                      std::vector<REAL> & tRange);
+        
+        void getBondingRangePairAtoms2(AtomDict & tAtm1,
                                       AtomDict & tAtm2,
                                       REAL tExtraD,
                                       PeriodicTable & tPTab,
@@ -135,15 +159,46 @@ namespace LIBMOL
         
         void getUniqAngles();
         void getUniqAngles(std::vector<CrystInfo>::iterator tCryst);
+        void getUniqAngleMols(Molecule    & tMol,
+                              std::vector<CrystInfo>::iterator tCryst);
+        
         REAL getAngleValueFromFracCoords(AtomDict  & tAtCen,
                                          AtomDict  & tAt1, 
                                          AtomDict  & tAt2,
                                          REAL a, REAL b, REAL c, 
                                          REAL alpha, REAL beta, REAL gamma);
-        void getMolsInCell();
-        bool checkAtomOcp(std::vector<int> & tMol);
         
-        void outTables(FileName tOutName, Molecule & tMol);
+        
+        // Validate all molecules 
+        void buildAndValidMols(PeriodicTable & tPTab,
+                           std::vector<CrystInfo>::iterator  iCryst);
+        void checkAtomElementID(std::vector<AtomDict> & tAtoms);
+        bool colidAtom(AtomDict               & tAtom,
+                       std::vector<AtomDict>  &  tRefAtoms);
+        bool isASUAtomInMol(std::map<unsigned, std::vector<int> >::iterator tMol);
+        bool connMetal(std::vector<int>      & tIdxs, 
+                       std::vector<AtomDict> & tAtoms);
+        bool checkAtomOcp(Molecule  & tMol, std::string  & tErrInfo);
+        bool validateBonds(std::vector<BondDict>::iterator tBo, 
+                           std::string & tErrInfo,
+                           PeriodicTable & tPTab);
+        bool validateBonds(std::vector<BondDict>::iterator tBo, 
+                           Molecule    & tMol,
+                           std::string & tErrInfo,
+                           PeriodicTable & tPTab);
+        bool validateAtomLinks(Molecule    & tMol,
+                               PeriodicTable & tPTab,
+                               std::string & tErrInfo);
+        bool validateMolecule(Molecule    & tMol, PeriodicTable & tPTab,
+                              std::string & tErrInfo);
+        
+        void getAtomTypeMols();
+        void getAtomTypeOneMol(Molecule    & tMol);
+        void getOverallBondAndAngles();
+        
+        void outTableMols(std::ofstream & tMolTabs, Molecule & tMol);
+        void outTableBAndA(FileName tBAndAFName);
+        void outTables(FileName tOutName);
         
         void execute(FileName tOutName);   
         

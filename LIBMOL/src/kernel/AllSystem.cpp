@@ -963,10 +963,10 @@ namespace LIBMOL
         DefaultCoordGeos[11] = "ALL-FACE-CAPPED-TRIGONAL-PRISMATIC";
         DefaultCoordGeos[12] = "CUBOCTAHEDRON";
         
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
-        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        //std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
+        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())
