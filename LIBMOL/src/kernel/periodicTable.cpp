@@ -72,7 +72,7 @@ namespace LIBMOL
         elemProps["N"]["cova"]     = 0.68;
         elemProps["N"]["ionM-"]   = 1.32;
         elemProps["N"]["ionM+"]   = 0.30;
-        elemProps["N"]["cova"]   = 0.27;
+      
          
         
         elements["O"]["row"]       = 2;

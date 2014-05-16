@@ -497,29 +497,58 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
-            // std::cout << "Atom id " << iAt->id << std::endl;
-            if (iAt->chemType.empty() && ! iAt->id.empty())
+            /*
+            std::cout << "Atom id " << iAt->id << std::endl;
+            if (iAt->chemType.empty())
             {
-                if (iAt->id.size() >=2)
+                std::cout << "empty " << iAt->chemType.empty() << std::endl;
+            }
+            
+            if (aPTab.elements.find(iAt->chemType) == aPTab.elements.end())
+            {
+                std::cout << "Not find " << std::endl;
+            }
+             */
+            if (iAt->chemType.empty() || ((iAt->chemType.size() < 3) &&
+                aPTab.elements.find(iAt->chemType) == aPTab.elements.end()))
+                     
+            {
+                bool tFind = false;
+                
+                if (!iAt->id.empty())
                 {
-                    if(aPTab.elements.find(iAt->id.substr(0,2)) 
-                            !=aPTab.elements.end())
+                    if (iAt->id.size() >=2)
                     {
-                        iAt->chemType=iAt->id.substr(0,2);
+                        if(aPTab.elements.find(iAt->id.substr(0,2)) 
+                                !=aPTab.elements.end())
+                        {
+                            iAt->chemType=iAt->id.substr(0,2);
+                            tFind = true;
+                        }
+                        else if (aPTab.elements.find(iAt->id.substr(0,1))
+                                  !=aPTab.elements.end())
+                        {
+                            iAt->chemType=iAt->id.substr(0,1);
+                            tFind = true;
+                        }
                     }
-                    else if (aPTab.elements.find(iAt->id.substr(0,1))
-                            !=aPTab.elements.end())
+                    else if(iAt->id.size()==1)
                     {
-                        iAt->chemType=iAt->id.substr(0,1);
+                        if (aPTab.elements.find(iAt->id)
+                              !=aPTab.elements.end())
+                        {
+                            iAt->chemType=iAt->id;
+                            tFind = true;
+                        }
                     }
+                    
                 }
-                else if(iAt->id.size()==1)
+                
+                if (!tFind)
                 {
-                    if (aPTab.elements.find(iAt->id)
-                            !=aPTab.elements.end())
-                    {
-                        iAt->chemType=iAt->id;
-                    }
+                    std::cout << "Atom " << iAt->id << "'s element type could not be handled with in this program "
+                              << std::endl;
+                    exit(1);
                 }
             }
             else if (iAt->chemType.size() >2)
@@ -563,6 +592,7 @@ namespace LIBMOL
                     
                 }
             }
+
             // std::cout << "Its atom element type " << iAt->chemType << std::endl;
             
         }
@@ -700,6 +730,7 @@ namespace LIBMOL
                     lSymOps=true;
                     getCifSymOps(iBl->second);
                 }
+                
             }
             
             if(!lAtms)
@@ -726,6 +757,14 @@ namespace LIBMOL
         else
         {
             std::cout << "No crystal " << std::endl;
+            exit(1);
+        }
+        
+        if (!lSymOps)
+        {
+            std::cout << "No symmetry operators, can not generator molecules "
+                      << std::endl;
+            exit(1);
         }
         
         
@@ -1654,7 +1693,7 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "Line: " << (*iAtm) << std::endl 
-                             << " is not consitant with the following tags of this loop_ " 
+                             << " is not consistent with the following tags of this loop_ " 
                              << std::endl;
                     for (std::vector<std::string>::iterator iLab=tOnePropGroup["lab"].begin();
                     iLab!=tOnePropGroup["lab"].end(); iLab++)
@@ -1665,7 +1704,6 @@ namespace LIBMOL
                 }
             }
         }
-        
         
     }
    
