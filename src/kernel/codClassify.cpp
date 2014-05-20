@@ -5578,7 +5578,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string metDefCoordGeoFileName = clibMonDir + "allMetalDefCoordGeos.table";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
+        std::string metDefCoordGeoFileName = clibMonDir + "/tables/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())
@@ -5611,7 +5611,7 @@ namespace LIBMOL
             //std::string clibMonDir(std::getenv("CLIBD_MON"));
             //std::string codAngleFileName = clibMonDir + "allOrgAngles.table";
             std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            std::string codAngleFileName = clibMonDir + "/lib/allOrgAngles.table";
+            std::string codAngleFileName = clibMonDir + "/tables/allOrgAngles.table";
             std::ifstream codAngleFile(codAngleFileName.c_str());
             
             if(codAngleFile.is_open())
@@ -5686,7 +5686,7 @@ namespace LIBMOL
         for (std::vector<AngleDict>::iterator iAn = allAngles.begin();
                 iAn != allAngles.end(); iAn++)
         {
-            std::string fRoot = clibMonDir + "allOrgAngleTables/";
+            std::string fRoot = clibMonDir + "/tabes/allOrgAngleTables/";
             // std::string fRoot = clibMonDir + "/lib/allOrgAngleTables/";
             int iSmall = 2*wSize;
             for (std::vector<int>::iterator iA=iAn->atoms.begin();
@@ -5721,7 +5721,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string fRoot = clibMonDir + "allOrgAngleTables/";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string fRoot = clibMonDir + "/lib/allOrgAngleTables/";
+        std::string fRoot = clibMonDir + "/tables/allOrgAngleTables/";
         std::string fIdx  = fRoot + "angle_idx.table";
         std::ifstream codAngleIdxFile(fIdx.c_str());
         if (codAngleIdxFile.is_open())
