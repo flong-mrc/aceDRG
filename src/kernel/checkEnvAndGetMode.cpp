@@ -31,6 +31,7 @@ namespace LIBMOL
         char * pLibMon = std::getenv("LIBMOL_ROOT");
         if (pLibMon !=NULL)
         {
+            if ()
             if (envVars.find("LIBMOL_ROOT") !=envVars.end())
             {
                 envVars["LIBMOL_ROOT"].clear();
