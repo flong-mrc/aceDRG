@@ -332,7 +332,10 @@ namespace LIBMOL
                 }
             }
         }
+        
         */
+      
+        
         // std::cout <<std::endl << "Output Atom COD classes now " << std::endl << std::endl;
         
         for (int i=0; i < (int)allAtoms.size(); i++)
@@ -2713,7 +2716,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string inFileLHAName = clibMonDir + "allOrgLinkedHashCode.table";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string inFileLHAName = clibMonDir + "/lib/allOrgLinkedHashCode.table";
+        std::string inFileLHAName = clibMonDir + "/tables/allOrgLinkedHashCode.table";
       
         std::ifstream inFileLHA;
         inFileLHA.open(inFileLHAName.c_str(), std::ios::in);
@@ -2740,7 +2743,6 @@ namespace LIBMOL
             
             inFileLHA.close();
         }
-        
     }
     
     void CodClassify::hashingAtoms()
@@ -2753,7 +2755,6 @@ namespace LIBMOL
         
         std::vector<int> aPrimTab;
         initPrimeTab(aPrimTab);
-        
         
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
@@ -2897,6 +2898,7 @@ namespace LIBMOL
            //std::cout << "Atom " << iAt->id << " has hashing code : " 
            //          << iAt->hashingValue << std::endl;
         }   
+        
     }
     
     void CodClassify::setAtomsNBSymb()
@@ -3131,7 +3133,7 @@ namespace LIBMOL
         {
             
             //std::string fRoot = clibMonDir + "allOrgBondTables/";
-            std::string fRoot = clibMonDir + "/lib/allOrgBondTables/";
+            std::string fRoot = clibMonDir + "/tables/allOrgBondTables/";
             int iSmall = 2*wSize;
             for (std::map<ID, int>::iterator iA=iB->fullAtoms.begin();
                     iA != iB->fullAtoms.end(); iA++)
@@ -3166,7 +3168,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string fRoot = clibMonDir + "allOrgBondTables/";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string fRoot = clibMonDir + "/lib/allOrgBondTables/";
+        std::string fRoot = clibMonDir + "/tables/allOrgBondTables/";
         std::string fIdx  = fRoot + "bond_idx.table";
         std::ifstream codBondIdxFile(fIdx.c_str());
         if (codBondIdxFile.is_open())
@@ -3219,6 +3221,7 @@ namespace LIBMOL
                 }
             }
         }
+       
         /*
         std::cout << "Bonds are in the following files :" << std::endl;
         for (std::map<ID, ID>::iterator iBF = codOrgBondFiles2.begin();
@@ -3226,7 +3229,8 @@ namespace LIBMOL
         {
             std::cout << iBF->second << std::endl;
         } 
-         */        
+        */
+       
     }
  
 
@@ -3326,6 +3330,7 @@ namespace LIBMOL
        
         std::time (&tStart);
         std::cout << "Clustering COD org bonds started at " << std::ctime(&tStart);
+        
         int nline = 0;
         for (std::map<ID, ID>::iterator iBF=codOrgBondFiles2.begin();
                     iBF !=codOrgBondFiles2.end(); iBF++)
@@ -3409,7 +3414,7 @@ namespace LIBMOL
                             tV3.sigValue = StrToReal(tBuf[18]);
                             tV3.numCodValues = StrToInt(tBuf[19]);
                             allDictBondsIdx3[ha1][ha2].push_back(tV3);
-                            
+                           
                         }
                         
                     }
@@ -3430,6 +3435,7 @@ namespace LIBMOL
                 std::cout << e.what() << std::endl;
             }
         }
+        
         std::cout << "Finish clustering COD org bonds " << std::endl;
         std::time(&tEnd);
         std::cout << "finished at " << std::ctime(&tEnd);
@@ -3437,6 +3443,7 @@ namespace LIBMOL
         tDiff = std::difftime(tEnd,tStart);
         std::cout  << "it takes " << std::setprecision(3) <<tDiff 
                    << " seconds to finish group COD bonds " << std::endl;
+        
     }
     
         
@@ -4257,7 +4264,7 @@ namespace LIBMOL
             //std::string clibMonDir(std::getenv("CLIBD_MON"));
             //std::string fName = clibMonDir+"allMetalBonds.table";
             std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            std::string fName = clibMonDir+"/lib/allMetalBonds.table";
+            std::string fName = clibMonDir+"/tables/allMetalBonds.table";
             std::ifstream codMetBondFile(fName.c_str());
             if(codMetBondFile.is_open())
             {
@@ -4976,6 +4983,8 @@ namespace LIBMOL
                 exit(1);
             }
             
+          
+            
             /*
             std::cout << "Number of ccp4 bonds " << nBond << std::endl;
       
@@ -5051,6 +5060,7 @@ namespace LIBMOL
     
     void CodClassify::searchCodBondsUsingSqlite3()
     {
+        /*
         sqlite3 * combDB;
         
         int rC=0;   
@@ -5058,7 +5068,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string combDBName = clibMonDir + "allOrg.db";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string combDBName = clibMonDir + "/lib/allOrg.db";
+        std::string combDBName = clibMonDir + "/tables/allOrg.db";
         
         rC=sqlite3_open(combDBName.c_str(), &combDB);
         if (rC)
@@ -5108,12 +5118,14 @@ namespace LIBMOL
         
         
         sqlite3_close(combDB);
+         */
     }
     
     
     void CodClassify::searchOneOrgBondFromCodUsingSqlite(sqlite3 * tCombDB,  
                                                          std::vector<BondDict>::iterator tB)
     {
+        /*
         std::vector<int> tPair;
         for (std::map<ID, int>::iterator iA=tB->fullAtoms.begin();
                 iA !=tB->fullAtoms.end(); iA++)
@@ -5237,7 +5249,7 @@ namespace LIBMOL
             dLev = 5;
             searchOneOrgBondUsingSqliteL(tCombDB, tB, dLev, propNB, propHash);
         }  
-        
+        */
         
     }
     
@@ -5248,6 +5260,7 @@ namespace LIBMOL
                                                    std::map<ID, ID>  tPropNB,
                                                    std::map<ID, ID> tPropHash)
     {
+        /*
         
         bool iFind = false;
         std::string tQue;
@@ -5272,6 +5285,7 @@ namespace LIBMOL
         }
           
         return iFind;
+         */
 
     }
     
@@ -5686,8 +5700,7 @@ namespace LIBMOL
         for (std::vector<AngleDict>::iterator iAn = allAngles.begin();
                 iAn != allAngles.end(); iAn++)
         {
-            std::string fRoot = clibMonDir + "/tabes/allOrgAngleTables/";
-            // std::string fRoot = clibMonDir + "/lib/allOrgAngleTables/";
+            std::string fRoot = clibMonDir + "/tables/allOrgAngleTables/";
             int iSmall = 2*wSize;
             for (std::vector<int>::iterator iA=iAn->atoms.begin();
                     iA != iAn->atoms.end(); iA++)
@@ -5930,7 +5943,7 @@ namespace LIBMOL
             //std::string clibMonDir(std::getenv("CLIBD_MON"));
             //std::string tAName = clibMonDir + "allMetalCoordGeoAngles.table";
             std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            std::string tAName = clibMonDir + "/lib/allMetalCoordGeoAngles.table";
+            std::string tAName = clibMonDir + "/tables/allMetalCoordGeoAngles.table";
             
             std::ifstream codMetAngleFile(tAName.c_str());
             if(codMetAngleFile.is_open())
@@ -5975,7 +5988,7 @@ namespace LIBMOL
             // std::string clibMonDir(std::getenv("CLIBD_MON"));
             // std::string tNCName =  clibMonDir + "allOrgAnglesWithNonCenteredMetalNB.table";
             std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-            std::string tNCName =  clibMonDir + "/lib/allOrgAnglesWithNonCenteredMetalNB.table";
+            std::string tNCName =  clibMonDir + "/tables/allOrgAnglesWithNonCenteredMetalNB.table";
             
             std::ifstream codNonCenMetAngleFile(tNCName.c_str());
             if(codNonCenMetAngleFile.is_open())
@@ -6092,7 +6105,7 @@ namespace LIBMOL
     
     void CodClassify::searchCodAnglesUsingSqlite()
     {
-        
+        /*
         sqlite3 * combDB;
         
         int rC=0;   
@@ -6101,7 +6114,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string combDBName = clibMonDir + "allOrg.db";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string combDBName = clibMonDir + "/lib/allOrg.db";
+        std::string combDBName = clibMonDir + "/tables/allOrg.db";
         
         rC=sqlite3_open(combDBName.c_str(), &combDB);
         if (rC)
@@ -6148,6 +6161,7 @@ namespace LIBMOL
                 std::cout << "Target angle value : " << iA->value << std::endl;
             }   
         }
+         */
     }
     
     void CodClassify::getIdealCNGeoAngles(std::vector<AngleDict>::iterator iAN)

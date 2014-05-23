@@ -1525,7 +1525,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string primName = clibMonDir + "primes.table";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string primName = clibMonDir + "/lib/primes.table";
+        std::string primName = clibMonDir + "/tables/primes.table";
         std::ifstream primFile;
         primFile.open(primName.c_str(), std::ios::in);
         

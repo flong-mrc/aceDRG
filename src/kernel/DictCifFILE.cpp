@@ -366,10 +366,10 @@ namespace LIBMOL
                 std::vector<std::string> tBuf;
                 std::vector<std::string> tBuf_t;
                 // only use a few blocks in the cif file
-                
-                
+                        
                 if (tRecord.find("loop_") !=std::string::npos 
-                    || tRecord.find("data_") !=std::string::npos)
+                    || (tRecord.find("data_") !=std::string::npos
+                        && tRecord.find("_data_") ==std::string::npos))
                 {
                     if (!tBlocLines.empty())
                     {
@@ -395,8 +395,9 @@ namespace LIBMOL
             }
             inFile.close();
             
-            std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
-           
+            // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
+            
+            /*
             for (std::vector<std::vector<std::string> >::iterator iBloc=tBlocs.begin();
                     iBloc !=tBlocs.end(); iBloc++)
             {
@@ -407,6 +408,7 @@ namespace LIBMOL
                     std::cout << *iLine << std::endl;
                 }
             }
+            */
             
             // 
             if ((int)tBlocs.size()!=0)
@@ -430,6 +432,7 @@ namespace LIBMOL
                 
                 // Check 
                 
+                /*
                 std::cout << "There are " << rowProps.size() 
                           << " properties. They are: " << std::endl;
                 for (std::map<std::string, std::string>::iterator iRPs=rowProps.begin();
@@ -437,6 +440,7 @@ namespace LIBMOL
                 {
                     std::cout << iRPs->first << " -> " << iRPs->second << std::endl;
                 }
+                
                 
                 std::cout << std::endl << "There are " << colProps.size() 
                           << " blocks of properties. They are: " << std::endl;
@@ -460,8 +464,8 @@ namespace LIBMOL
                         std::cout << (*iOneB) << std::endl;
                     }
                 }
-                
-                exit(1);
+                */
+               
                 
                 // Now select what we need from the input cif file.
                 selectPropsToMaps(rowProps, colProps);
@@ -639,7 +643,7 @@ namespace LIBMOL
                                iBl != tOneBlockLines->end(); iBl++)
         {
             (*iBl) = TrimSpaces((*iBl));
-            std::cout << (*iBl) << std::endl;
+            // std::cout << (*iBl) << std::endl;
             std::vector<std::string> tBuf0, tBuf;
             if (iBl->find('\'') != std::string::npos && iBl->substr(0,1).compare("_")==0)
             {
@@ -686,22 +690,16 @@ namespace LIBMOL
             if (tBuf.size()==1)
             {
                 if (tBuf[0].find("_") !=std::string::npos)
-                {
-                    std::cout << "One string line " << std::endl
-                              << tBuf[0] << std::endl; 
+                { 
                     if (lLab) 
                     {
                         tColProps[tIdxB]["lab"].push_back(tBuf[0]);
-                        std::cout << tBuf[0] << " has been sent to block labels " << tIdxB << std::endl;
                     }
                     else
                     {
                         lLab=true;
                         tIdxB++;
                         tColProps[tIdxB]["lab"].push_back(tBuf[0]);
-                        std::cout << "New block " << tIdxB << std::endl;
-                        std::cout << tBuf[0] << " has been sent to block labels " 
-                                  << tIdxB << std::endl;
                     }
                 }
                 else
@@ -710,8 +708,7 @@ namespace LIBMOL
                     {
                         lLab  = false;
                     }
-                    tColProps[tIdxB]["cont"].push_back((*iBl));
-                    std::cout << *iBl << " has been sent to block contents  " << tIdxB << std::endl;
+                    tColProps[tIdxB]["cont"].push_back((*iBl));   
                 }
                 
             }
@@ -1160,7 +1157,6 @@ namespace LIBMOL
         if (tRowProps.find("_symmetry_space_group_name_Hall") !=tRowProps.end())
         {
             itsCurCryst->itsSpaceGroup->sgSymb["Hall"].push_back(tRowProps["_symmetry_space_group_name_Hall"]);
-            std::cout << "Here " << "space group " << itsCurCryst->itsSpaceGroup->sgSymb["Hall"][0] << std::endl;
         }
         if (tRowProps.find("_symmetry_space_group_name_H-M") !=tRowProps.end())
         {
@@ -1378,6 +1374,7 @@ namespace LIBMOL
         
         int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
                                tOnePropGroup["lab"]);
+        std::cout << "symm opt pos " << aPos << std::endl;
         
         if(aPos !=-1)
         {
@@ -2335,7 +2332,7 @@ namespace LIBMOL
             
             // std::cout << "finish reading the input cif file: " 
             //          << std::endl
-            
+            /*
             if (hasCoords)
             {
                 std::cout << "The system has coords " << std::endl;
@@ -2385,6 +2382,7 @@ namespace LIBMOL
                 //std::cout << "Its sigLength : " << iBo->sigLength << std::endl;
                 //std::cout << "its order : " << iBo->order << std::endl;
             }
+             */
         }
     }
         
@@ -2418,7 +2416,7 @@ namespace LIBMOL
                          TrimSpaces(tF[0]).find("_chem_comp_atom")
                          !=std::string::npos)
                 {
-                    std::cout<< "Setup flag atom " <<std::endl;
+                    // std::cout<< "Setup flag atom " <<std::endl;
                     curBlockLine = 0;
                     setFlags(tL, "atom");
                 }
@@ -2426,7 +2424,7 @@ namespace LIBMOL
                          TrimSpaces(tF[0]).find("_chem_comp_bond")
                          !=std::string::npos)
                 {
-                    std::cout << "setup bond flag " << std::endl;
+                    // std::cout << "setup bond flag " << std::endl;
                     curBlockLine = 0;
                     setFlags(tL, "bond");
                 }
@@ -3087,7 +3085,7 @@ namespace LIBMOL
         }
         
         // Check
-        
+        /*
         for(std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA!=allAtoms.end(); iA++)
         {
@@ -3103,6 +3101,7 @@ namespace LIBMOL
                 }
             }
         }
+         */
        
         
     }
@@ -3446,7 +3445,7 @@ namespace LIBMOL
         // No need for the third round, those could be defined in 
         // the first round
         // Check
-        
+        /*
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
@@ -3499,6 +3498,7 @@ namespace LIBMOL
                         << " is not a chiral center" << std::endl;
             }
         }
+         */
     }
     
     void DictCifFile::setAtomsCChemType()

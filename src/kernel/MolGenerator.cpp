@@ -82,10 +82,13 @@ namespace LIBMOL
                     //FractToOrtho(iA->fracCoords, iA->coords, iCryst->itsCell->a,
                     //            iCryst->itsCell->b, iCryst->itsCell->c, iCryst->itsCell->alpha,
                     //            iCryst->itsCell->beta, iCryst->itsCell->gamma);
-                    packAtomIntoCell((*iA));
-                    iA->sId ="555";
-                    allAtoms.push_back(*iA);
-                    refAtoms.push_back(*iA);
+                    if (iA->ocp < 1.0000001)
+                    {
+                        packAtomIntoCell((*iA));
+                        iA->sId ="555";
+                        allAtoms.push_back(*iA);
+                        refAtoms.push_back(*iA);
+                    }
                 }
                 
                 //outPDB("initAtoms.pdb", "UNL", initAtoms);
@@ -151,13 +154,17 @@ namespace LIBMOL
         {
             // int tDictMult = iA->symmMult;
             // iA->symmMult =1;
-            for (std::map<std::string, std::vector<std::vector<REAL> > >::iterator
+            if (iA->ocp < 1.000001)
+            {
+                for (std::map<std::string, std::vector<std::vector<REAL> > >::iterator
                         iOp=tCrys->itsSpaceGroup->sgOp.begin();
                         iOp!=tCrys->itsSpaceGroup->sgOp.end(); iOp++)
-            {
-                getOneSymmAtom(iA, iOp, tCrys, tPTable);
+                {
+                    getOneSymmAtom(iA, iOp, tCrys, tPTable);
+                }
             }
         }
+        
         
     }
     
@@ -254,6 +261,9 @@ namespace LIBMOL
     
     void MolGenerator::packAtomIntoCell(AtomDict & tAtm)
     {   
+        
+        
+        
         for (std::vector<REAL>::iterator iX=tAtm.fracCoords.begin();
                 iX != tAtm.fracCoords.end(); iX++)
         {
@@ -296,6 +306,8 @@ namespace LIBMOL
         
         getFracReal(tCM, fraCell, aShell);
         
+        std::cout << "fraCell " << fraCell << std::endl;
+        
         
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                             iA !=allAtoms.end(); iA++)
@@ -316,9 +328,9 @@ namespace LIBMOL
                            
                             // Take a zone surround the center cell 
                             REAL tRange1 = -fraCell, tRange2 = 1+fraCell;
-                            
+                            //REAL tRange1 = -0.8, tRange2 = 1.8;
                             if ((tFx[0] > tRange1 && tFx[0] <=tRange2)
-                                && (tFx[1] > tRange1 && tFx[1] < tRange2)
+                                && (tFx[1] > tRange1 && tFx[1] <=tRange2)
                                 && (tFx[2] > tRange1 && tFx[2] <=tRange2)
                                 && !colidAtom(tFx, refAtoms))
                             {
@@ -333,6 +345,9 @@ namespace LIBMOL
                                 //             iCryst->itsCell->a, iCryst->itsCell->b, 
                                 //             iCryst->itsCell->c, iCryst->itsCell->alpha,
                                 //             iCryst->itsCell->beta, iCryst->itsCell->gamma);
+                                aAtom.fracCoords[0] = tFx[0];
+                                aAtom.fracCoords[1] = tFx[1];
+                                aAtom.fracCoords[2] = tFx[2];
                                 refAtoms.push_back(aAtom);
                             }
                         }   
@@ -345,15 +360,17 @@ namespace LIBMOL
         swithAtoms(iCryst);
         
         /*
-        for (std::vector<AtomDict>::iterator iRA=refAtoms.begin();
-                iRA != refAtoms.end(); iRA++)
+        for (std::vector<AtomDict>::iterator iRA=allAtoms.begin();
+                iRA != allAtoms.end(); iRA++)
         {
-          
+            if (iRA->sId=="555" )
+            {
                 std::cout << "For atom " << iRA->id << " and ref ID " << iRA->sId  
                           << " : " << std::endl;
-                std::cout << "x = " << iRA->fracCoords[0] << std::endl
-                          << "y = " << iRA->fracCoords[1] << std::endl
-                          << "z = " << iRA->fracCoords[2] << std::endl;  
+                std::cout << "x = " << iRA->coords[0] << std::endl
+                          << "y = " << iRA->coords[1] << std::endl
+                          << "z = " << iRA->coords[2] << std::endl;
+            }
         }
         */
        
@@ -370,9 +387,7 @@ namespace LIBMOL
             for (int j=-myNBDepth; j < myNBDepth+1; j++)
             {
                 for (int k=-myNBDepth; k <myNBDepth+1; k++)
-                {
-                    
-                    
+                {           
                     if(!(i==0 && j==0 && k==0))
                     {
                         AtomDict aAtom(tCurAtom);
@@ -428,7 +443,7 @@ namespace LIBMOL
         std::cout << "Number of atoms in allAtoms " 
                   << allAtoms.size() << std::endl;
         
-        /*
+        
         int iC=0;
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
@@ -440,7 +455,7 @@ namespace LIBMOL
         }
         std::cout << "number of atoms in the center unit cell is " 
                   << iC << std::endl;
-       */
+      
     }
     
     void MolGenerator::cleanUnconnAtoms()
@@ -720,11 +735,11 @@ namespace LIBMOL
     }
     
     
-    void MolGenerator::getUniqueAtomLinks(PeriodicTable & tPTab, 
-                                      std::vector<CrystInfo>::iterator tCryst)
+    void MolGenerator::getUniqueAtomLinks(PeriodicTable                 & tPTab, 
+                                          std::vector<CrystInfo>::iterator tCryst)
     {
       
-        /*
+        /*  
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
@@ -753,9 +768,8 @@ namespace LIBMOL
         tNBListOfSystem.building(allAtoms, aDim, tCellL, tCellShell, aMode);
         
        
-        std::cout << "NB list for allAtoms set " << std::endl;   
+        // std::cout << "NB list for allAtoms set " << std::endl;   
        
-        exit(1);
         
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
@@ -765,6 +779,7 @@ namespace LIBMOL
                 std::cout << "atom "<< iAt->id << "(serial number " 
                           << iAt->seriNum  <<") has " << iAt->neighbAtoms.size() 
                           << " NB atoms " << std::endl;
+                /*
                 if (iAt->id =="C22")
                 {
                     for (std::vector<int>::iterator iNB=iAt->neighbAtoms.begin();
@@ -773,7 +788,7 @@ namespace LIBMOL
                         std::cout << "NB atom " << allAtoms[*iNB].id << std::endl;
                     }
                 }
-                
+                */
             }
         }
        

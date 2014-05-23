@@ -111,9 +111,8 @@ int main(int argc, char** argv) {
             }
             
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-        
+            
             LIBMOL::AllSystem   aTargetSystem(dataFromCif); 
-  
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
