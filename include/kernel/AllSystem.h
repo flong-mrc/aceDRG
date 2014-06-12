@@ -342,34 +342,6 @@ namespace LIBMOL
     
     void extern optSubsys(AllSystem  & tSubSys);
        
-    class AtomTypeTool
-    {
-    public:
-        
-        //Default constructor
-        AtomTypeTool();
-        
-        // The constructor using a file name, file type indicator, which an integer 
-        // File types are e.g. CIF, MOL/SDF, PDB, SMILE, inChi etc
-        // Atom types are COD, CCP4 etc
-        AtomTypeTool(FileName  tFname, FileType tFType);
-        
-        // The constructor using atoms, bonds, and rings
-        AtomTypeTool(std::vector<AtomDict>                  & tAtoms,
-                     std::vector<BondDict>                  & tBonds,
-                     std::map<ID, std::vector<RingDict> >   & tRings);
-        
-        // Default destructor 
-        ~AtomTypeTool();
-        
-        void execute();
-        
-        
-        std::vector<AtomDict>                    allAtoms;
-        std::vector<BondDict>                    allBonds;
-        std::map<ID, std::vector<RingDict> >     allRings;
-        
-    };
 
 }
 

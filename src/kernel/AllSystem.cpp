@@ -4513,50 +4513,5 @@ namespace LIBMOL
     {   
     }
      */
-    
-    AtomTypeTool::AtomTypeTool()
-    {
-    }
-    
-    AtomTypeTool::AtomTypeTool(FileName tFname, FileType tFType)
-    {
-        if (tFType==CIF)
-        {
-            
-        }
-        
-    }
-    
-    AtomTypeTool::AtomTypeTool(std::vector<AtomDict>& tAtoms, 
-                               std::vector<BondDict>& tBonds, 
-                               std::map<ID,std::vector<RingDict> > & tRings)
-    {
-        for (std::vector<AtomDict>::const_iterator iAt=tAtoms.begin();
-                iAt !=  tAtoms.end(); iAt++)
-        {
-            allAtoms.push_back(*iAt);
-        }
-        
-        for (std::vector<BondDict>::const_iterator iBo=tBonds.begin();
-                iBo !=tBonds.end(); iBo++)
-        {
-            allBonds.push_back(*iBo);
-        }
-        
-        for (std::map<ID, std::vector<RingDict> > ::const_iterator iRS=tRings.begin();
-                iRS !=tRings.end(); iRS++)
-        {
-            for (std::vector<RingDict>::const_iterator iR=iRS->second.begin();
-                    iR !=iRS->second.end(); iR++)
-            {
-                allRings[iRS->first].push_back(*iR);
-            }
-        }
-        
-    }
-    
-    AtomTypeTool::~AtomTypeTool()
-    {
-    }
-    
+
 }
