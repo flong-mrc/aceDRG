@@ -3013,7 +3013,8 @@ namespace LIBMOL
             
             if (hasProps["bond"].find("order") != hasProps["bond"].end())
             {
-                itsCurBond->order = tF[hasProps["bond"]["order"]];
+                itsCurBond->order  = tF[hasProps["bond"]["order"]];
+                itsCurBond->orderN = StrToOrder(itsCurBond->order);
             }
             
             if (hasProps["bond"].find("length") != hasProps["bond"].end())
@@ -3052,7 +3053,19 @@ namespace LIBMOL
                         && iPos2 >=0 && iPos2 < (int)allAtoms.size())
                 {
                     allAtoms[iPos1].connAtoms.push_back(iPos2);
+                    if (std::find(allAtoms[iPos1].inBonds.begin(), 
+                                  allAtoms[iPos1].inBonds.end(), itsCurBond->seriNum)
+                            ==allAtoms[iPos1].inBonds.end())
+                    {
+                        allAtoms[iPos1].inBonds.push_back(itsCurBond->seriNum);
+                    }
                     allAtoms[iPos2].connAtoms.push_back(iPos1);
+                    if (std::find(allAtoms[iPos2].inBonds.begin(), 
+                                  allAtoms[iPos2].inBonds.end(), itsCurBond->seriNum)
+                            ==allAtoms[iPos2].inBonds.end())
+                    {
+                        allAtoms[iPos2].inBonds.push_back(itsCurBond->seriNum);
+                    }
                 }
             } 
             

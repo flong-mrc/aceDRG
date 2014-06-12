@@ -273,6 +273,24 @@ namespace LIBMOL
         allRingsV.push_back(tRing);
     }
     
+    bool AllSystem::isOrgSys()
+    {
+        std::vector<std::string> aOrgTab;
+        initOrgTable(aOrgTab);
+        
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+        {
+            if (std::find(aOrgTab.begin(), aOrgTab.end(), iAt->chemType)==aOrgTab.end())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    
     int AllSystem::atomPosition(ID tID)
     {
         for (int i=0; i<(int)allAtoms.size(); i++)
@@ -452,8 +470,37 @@ namespace LIBMOL
         return nO;
     }
     
+    REAL AllSystem::getTotalOrderOneAtom(std::vector<AtomDict>::iterator iA)
+    {
+        REAL nBO=0;
+        for (std::vector<int>::iterator iB=iA->inBonds.begin();
+                iB !=iA->inBonds.end(); iB++)
+        {
+            nBO+=(allBonds[*iB].orderN);
+        }
+        
+        return nBO;
+    }
+    
+    void AllSystem::addMissHydroAtoms()
+    {
+        std::vector<AtomDict> extHAtoms;
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+        {
+            
+            
+        }
+    }
+    
     void AllSystem::setHydroAtomConnect()
     {
+        // Check incomplete ligand(with H atom miss) and add the miss H
+        if (isOrgSys())
+        {
+            
+        }
+        
         for(std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA!=allAtoms.end(); iA++)
         {
@@ -4466,4 +4513,50 @@ namespace LIBMOL
     {   
     }
      */
+    
+    AtomTypeTool::AtomTypeTool()
+    {
+    }
+    
+    AtomTypeTool::AtomTypeTool(FileName tFname, FileType tFType)
+    {
+        if (tFType==CIF)
+        {
+            
+        }
+        
+    }
+    
+    AtomTypeTool::AtomTypeTool(std::vector<AtomDict>& tAtoms, 
+                               std::vector<BondDict>& tBonds, 
+                               std::map<ID,std::vector<RingDict> > & tRings)
+    {
+        for (std::vector<AtomDict>::const_iterator iAt=tAtoms.begin();
+                iAt !=  tAtoms.end(); iAt++)
+        {
+            allAtoms.push_back(*iAt);
+        }
+        
+        for (std::vector<BondDict>::const_iterator iBo=tBonds.begin();
+                iBo !=tBonds.end(); iBo++)
+        {
+            allBonds.push_back(*iBo);
+        }
+        
+        for (std::map<ID, std::vector<RingDict> > ::const_iterator iRS=tRings.begin();
+                iRS !=tRings.end(); iRS++)
+        {
+            for (std::vector<RingDict>::const_iterator iR=iRS->second.begin();
+                    iR !=iRS->second.end(); iR++)
+            {
+                allRings[iRS->first].push_back(*iR);
+            }
+        }
+        
+    }
+    
+    AtomTypeTool::~AtomTypeTool()
+    {
+    }
+    
 }

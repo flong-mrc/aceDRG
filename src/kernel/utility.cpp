@@ -1545,6 +1545,16 @@ namespace LIBMOL
     
     // Chemistry-related 
 
+    extern void initOrgTable(std::vector<std::string> & tOrgTab)
+    {
+        ID orgSet[] = {"AT", "At", "at", "B", "b", "BR", "Br", "br", 
+                       "C", "c", "CL", "Cl", "cl", "F", "f", "H", "h",
+                       "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", 
+                       "SE", "Se", "se"};
+        tOrgTab.assign(orgSet, orgSet+30);
+        
+    }
+    
     extern void initMetalTab(std::vector<ID> & tMeTab)
     {
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
@@ -1621,7 +1631,8 @@ namespace LIBMOL
         }        
         else if (a4.find("AROM") !=std::string::npos)
         {
-            tOrder = 4.0;
+            //tOrder = 4.0;
+            tOrder = 1.5;
         }
         else if (a4.find("BOTH") !=std::string::npos)
         {

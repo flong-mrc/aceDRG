@@ -239,6 +239,7 @@ namespace LIBMOL
     extern void initPrimeTab(std::vector<int> & tPrimeTab);
     
     // Chemical properties related functions 
+    extern void initOrgTable(std::vector<std::string> & tOrgTab);
     extern void initMetalTab(std::vector<ID> & tMeTab);
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID);
     extern void fromIdToChemType(ID tId, ID & tChemType);

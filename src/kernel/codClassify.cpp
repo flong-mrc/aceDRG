@@ -5254,13 +5254,14 @@ namespace LIBMOL
     }
     
     // a recursive function for searching 
+    /*
     bool CodClassify::searchOneOrgBondUsingSqliteL(sqlite3* tCombDB,  
                                                    std::vector<BondDict>::iterator tB, 
                                                    int  & tLev,
                                                    std::map<ID, ID>  tPropNB,
                                                    std::map<ID, ID> tPropHash)
     {
-        /*
+        
         
         bool iFind = false;
         std::string tQue;
@@ -5285,10 +5286,11 @@ namespace LIBMOL
         }
           
         return iFind;
-         */
+         
+        
 
     }
-    
+    */
     void CodClassify::setQueStr(std::string & tQue, int tLev,
                                 std::map<ID, ID>  tPropNB,
                                 std::map<ID, ID> tPropHash)
