@@ -10261,6 +10261,11 @@ namespace LIBMOL
                                     // upper bound 
                                     tDiff = (tDistMat[i][j]-tDist)/(tDist + 1.0e-8);
                                 }
+                                else
+                                {
+                                    REAL tDiff1 = (tDistMat[i][j] - tDistMat[j][i])/2.0;
+                                    tDiff = tDiff1/tDist;
+                                }
                                 //std::cout << "Diff " << fabs(tDiff) << std::endl;
                                 if (fabs(tDiff) > 0.00001)
                                 {

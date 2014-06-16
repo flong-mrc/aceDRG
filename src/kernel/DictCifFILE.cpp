@@ -794,9 +794,9 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string fName(clibMonDir);
         //fName.append("/list/cif_tag.list");
-        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string clibMonDir(std::getenv(""));
         std::string fName(clibMonDir);
-        fName.append("/lib/cif_tag.list");
+        fName.append("/tables/cif_tag.list");
         
         std::ifstream fCifKeys(fName.c_str());
         if (fCifKeys.is_open())
@@ -6795,7 +6795,7 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
         std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string metDefCoordGeoFileName = clibMonDir + "/lib/allMetalDefCoordGeos.table";
+        std::string metDefCoordGeoFileName = clibMonDir + "/tables/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())
