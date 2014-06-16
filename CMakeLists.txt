@@ -70,4 +70,4 @@ add_executable(acedrg ${SRC})
 target_link_libraries(acedrg ${SQLITE3_LIBRARY})
 
 install(TARGETS acedrg DESTINATION bin)
-install(DIRECTORY lib/ DESTINATION share/acedrg/tables)
+install(DIRECTORY tables DESTINATION share/acedrg/)
