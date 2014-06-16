@@ -2654,7 +2654,7 @@ namespace LIBMOL
         {
            ID tID = TrimSpaces(tF1[1]);
            if(std::find(allCifKeys["dataDesc"].begin(), allCifKeys["dataDesc"].end(),  
-                     tID) != allCifKeys["dataDesc"].end()); 
+                     tID) != allCifKeys["dataDesc"].end())
            {
                dataDesc[tID] = tF[1];
            }
