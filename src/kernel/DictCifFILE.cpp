@@ -6081,7 +6081,7 @@ namespace LIBMOL
                     {
                         iniValue= 60.0 +  n*perValue;
                     }
-                    else if (tF=="old")
+                    else if (tF=="odd")
                     {
                         iniValue= -60.0 +  n*perValue;
                     }

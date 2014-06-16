@@ -3093,7 +3093,7 @@ namespace LIBMOL
                     {
                         iniValue= 60.0 +  n*perValue;
                     }
-                    else if (tF=="old")
+                    else 
                     {
                         iniValue= -60.0 +  n*perValue;
                     }
