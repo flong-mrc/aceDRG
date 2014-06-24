@@ -422,17 +422,17 @@ namespace LIBMOL
         {
             std::cout << "You will get an output cif file for a list of dictionary restraints"
                     << std::endl << "based on the input SMILE file" << std::endl
-                    << "Your input SMILE file : " << IOEntries["inSmiStr"] << std::endl
-                    << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+                    << "Your input SMILE file : " << IOEntries["inSmiStr"]      << std::endl
+                    << "Your monomer name : "     << IOEntries["monoRootName"]  << std::endl
                     << "The output dictionary file(cif) : " << IOEntries["userOutName"] 
                     << std::endl;
         }
         else if (workMode==13)
         {
             std::cout << "You will get an output cif file for a list of dictionary restraints"
-                    << std::endl << "based on the input MOL/SDF file" << std::endl
-                    << "Your input MOL/SDF file : " <<  IOEntries["inSdfName"]<< std::endl
-                    << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
+                    << std::endl << "based on the input MOL/SDF file"          << std::endl
+                    << "Your input MOL/SDF file : " <<  IOEntries["inSdfName"] << std::endl
+                    << "Your monomer name : "   << IOEntries["monoRootName"]   << std::endl
                     << "The output dictionary file(cif) : " << IOEntries["userOutName"] 
                     << std::endl;
         }

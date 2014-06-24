@@ -3980,8 +3980,8 @@ namespace LIBMOL
                                 {
                                     
                                     std::cout << " find " << a1C << std::endl; 
-                                    std::cout << "size " << (int)allDictBondsIdx[ha1][ha2][a1NB2][a2NB2][a1NB][a2NB][a1C].size() 
-                                              << std::endl;
+                                    //std::cout << "size " << (int)allDictBondsIdx[ha1][ha2][a1NB2][a2NB2][a1NB][a2NB][a1C].size() 
+                                    //          << std::endl;
                                     
                                     std::map<ID, int>::iterator iFind6 
                                     = allDictBondsIdx[ha1][ha2][a1NB2][a2NB2][a1NB][a2NB][a1C].find(a2C);
@@ -4019,13 +4019,33 @@ namespace LIBMOL
                                     std::cout << "iFind 5" << std::endl;
                                 }
                             }
-                            else // one 2NB space not matching (both 2NB conf not match) iFind4 
+                            else // one 2NB space not matching, iFind4 
                             {
+                                /*
                                 iB->value        =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].value;
                                 iB->valueST      =iB->value;
                                 iB->sigValue     =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].sigValue;
                                 iB->sigValueST   =iB->sigValue;
                                 iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
+                                 */
+                                std::vector<aValueSet> tBs6;
+                                
+                                //std::cout << (int)allDictBondsIdx[ha1][ha2][a1NB2][a2NB2][a1NB].size()
+                                //       << std::endl;
+                                
+                                for (std::map<ID, std::vector<aValueSet> >::iterator iB4
+                                          =allDictBondsIdx1[ha1][ha2][a1NB2][a2NB2][a1NB].begin();
+                                         iB4 !=allDictBondsIdx1[ha1][ha2][a1NB2][a2NB2][a1NB].end();
+                                         iB4++)
+                                {
+                                    
+                                    for(std::vector<aValueSet>::iterator iB5=iB4->second.begin();
+                                            iB5!=iB4->second.end(); iB5++)
+                                    {
+                                        tBs6.push_back(*iB5);
+                                    }
+                                }
+                                setupTargetBondsUsingValueSetMean(tBs6, iB);
                                 std::cout << "iFind 4" << std::endl;
                             }
                         }
@@ -4038,7 +4058,7 @@ namespace LIBMOL
                                 iB->sigValue     =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].sigValue;
                                 iB->sigValueST   =iB->sigValue;
                                 iB->numCodValues =allDictBondsIdx2[ha1][ha2][a1NB2][a2NB2][0].numCodValues;
-                                std::cout << "iFind 3" << std::endl;
+                                std::cout << "iFind 3 A" << std::endl;
                                 
                             }
                             else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
@@ -4047,6 +4067,7 @@ namespace LIBMOL
                             {
                                 
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                                std::cout << "iFind 3 B" << std::endl;
                             }
                             else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
                                      && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
@@ -4061,14 +4082,14 @@ namespace LIBMOL
                                      !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
                             {
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
-                                std::cout << "iFind 3 C" << std::endl;
+                                std::cout << "iFind 3 D" << std::endl;
                             }
                             else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
                                      && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(".")
                                      !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
                             {
                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
-                               std::cout << "iFind 3 C" << std::endl;
+                               std::cout << "iFind 3 E" << std::endl;
                             }
                             else
                             {
@@ -4845,6 +4866,49 @@ namespace LIBMOL
         tB->numCodValues = nTot;
     }
     
+    void CodClassify::setupTargetBondsUsingValueSetMean(std::vector<aValueSet>& tSets, 
+                                                        std::vector<BondDict>::iterator tB)
+    {
+        if (tSets.size() !=0)
+        {
+            REAL aSum=0.0, vSum1=0.0, vSum2=0.0, vSum3=0.0;
+            REAL aCount = 0;
+            for (std::vector<aValueSet>::iterator iSet=tSets.begin();
+                    iSet != tSets.end(); iSet++)
+            {
+                aSum+=(iSet->value*iSet->numCodValues);
+                aCount+=iSet->numCodValues;
+                vSum1 +=((iSet->numCodValues-1)*iSet->sigValue*iSet->sigValue 
+                          + iSet->numCodValues*iSet->value*iSet->value);
+                vSum2 +=(iSet->value*iSet->numCodValues);
+            }
+            
+            if (aCount > 0)
+            {
+                tB->value = (aSum/aCount);
+                tB->hasCodValue  = false;
+                tB->numCodValues = aCount;
+                vSum3 =vSum2*vSum2/aCount;
+                if(aCount ==1)
+                {
+                    tB->sigValue = sqrt(fabs(vSum1-vSum3)/aCount);
+                }
+                else
+                {
+                    tB->sigValue = sqrt(fabs(vSum1-vSum3)/(aCount-1));
+                }
+            }
+            else
+            {
+                std::cout << "Bond DB contains a set with zero member. Bug in the DB"
+                          << std::endl;
+                exit(1);
+            }
+        }
+        
+        
+    }
+    
     void CodClassify::getCCP4BondAndAngles()
     {
         // Currently CCP4 suite is the only requited thing 
@@ -5378,7 +5442,7 @@ namespace LIBMOL
                                        std::vector<BondDict>::iterator tB)
     {
     }
-    
+    /*
     void CodClassify::sqlite3Query(sqlite3 *      tDB,
                                    SqliteStatment tQue,
                                    std::vector<std::vector<std::string> >  & tResults)
@@ -5427,7 +5491,7 @@ namespace LIBMOL
             std::cout << tQue << " " << error << std::endl;
         }   
     }
-    
+    */
     void CodClassify::constrBondSigmas()
     {
         // a temporary functions for constrain the sigmas of the bonds 
@@ -7998,6 +8062,7 @@ namespace LIBMOL
         return aFound;
     }
     
+    /*
     void CodClassify::searchOneOrgAngleFromCodUsingSqlite(sqlite3* tCombDB, 
                                                           std::vector<AngleDict>::iterator iAN)
     {
@@ -8008,12 +8073,12 @@ namespace LIBMOL
             a1NB2 = allAtoms[iAN->atoms[0]].codNB2Symb;
             a1NB  = allAtoms[iAN->atoms[0]].codNBSymb;
             a1C   = allAtoms[iAN->atoms[0]].codClass;
-            /*
+            
             std::cout << "Atom1 " <<  allAtoms[iAN->atoms[0]].id 
                       << " Its Cod class " <<  a1C <<  " and Hashing "
                       << ha1 <<std::endl;
             std::cout << " Its codNBSymb " <<  a1NB << " its codNB2Symb " << a1NB2 << std::endl;
-            */
+           
             
             if ((int)allAtoms[iAN->atoms[1]].hashingValue
                     <(int)allAtoms[iAN->atoms[2]].hashingValue )
@@ -8091,7 +8156,7 @@ namespace LIBMOL
                 
             }
             
-            /*
+            
             std::cout << "Atom2 " <<  id2 
                       << " Its Cod class " <<  a2C << " and Hashing " << ha2 <<std::endl;
             std::cout << " Its codNBSymb " <<  a2NB << " its codNB2Symb " << a2NB2 << std::endl;
@@ -8099,7 +8164,7 @@ namespace LIBMOL
             std::cout << "Atom3 " <<  id3 
                       << " Its Cod class " <<  a3C  << " and Hashing "    << ha3 <<std::endl;
             std::cout << " Its codNBSymb " <<  a3NB << " its codNB2Symb " << a3NB2 << std::endl;
-            */
+            
             
             int dLev = 0;
             
@@ -8183,6 +8248,7 @@ namespace LIBMOL
         return iFind;
         
     }
+    */
     
     void CodClassify::setQueStrAn(std::string& tQue, int tLev, 
                                   std::map<ID,ID> tPropNB, std::string tA1C)

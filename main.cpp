@@ -175,7 +175,8 @@ int main(int argc, char** argv) {
         else if (AJob.workMode == 13)
         {
             LIBMOL::MolSdfFile dataFromSdf(AJob.IOEntries["inSdfName"], std::ios::in);
-            std::cout << "Here ";
+            
+            
             if (dataFromSdf.allMols.size() !=0)
             {
                 int i =1;
