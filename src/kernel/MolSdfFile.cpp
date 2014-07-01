@@ -163,6 +163,7 @@ namespace LIBMOL
                                 aAtom.coords[0] = StrToReal(tBuf[0]);
                                 aAtom.coords[1] = StrToReal(tBuf[1]);
                                 aAtom.coords[2] = StrToReal(tBuf[2]);
+                                aAtom.coordExist = true;
                                 aAtom.chemType = TrimSpaces(tBuf[3]);
                                 tIDs[aAtom.chemType].push_back(aAtom.seriNum);
                                 int tSize = (int)tIDs[aAtom.chemType].size();
@@ -220,6 +221,7 @@ namespace LIBMOL
             addHAtomToMols(i);
             setAtomsBondingAndChiralCenter(i);
             setChiral(i);
+            setHAtomCoordsMols(i);
         }
        
         
@@ -289,7 +291,7 @@ namespace LIBMOL
                 }
             }
         }
-        
+       
     }
     
     void MolSdfFile::createCurMol()
@@ -387,6 +389,47 @@ namespace LIBMOL
         }
     }
     
+    void MolSdfFile::setHAtomCoordsMols(int tIdxMol)
+    {
+        
+        for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
+                iA !=allMols[tIdxMol].atoms.end(); iA++)
+        {
+            if (iA->chemType=="H" && iA->coordExist==false)
+            {
+                if (iA->connAtoms.size() ==1 )
+                {
+                    if (allMols[tIdxMol].atoms[iA->connAtoms[0]].bondingIdx==3)
+                    {
+                        
+                        setOneHAtomCoordsSP3(allMols[tIdxMol].atoms, iA);
+                    }
+                    else if (allMols[tIdxMol].atoms[iA->connAtoms[0]].bondingIdx==2)
+                    {
+                        setOneHAtomCoordsSP2(allMols[tIdxMol].atoms, iA);
+                    }
+                    else if (allMols[tIdxMol].atoms[iA->connAtoms[0]].bondingIdx==1)
+                    {
+                        setOneHAtomCoordsSP(allMols[tIdxMol].atoms, iA);
+                    }
+                    else
+                    {
+                        std::cout << "The bondingIdx for atom " 
+                                  <<  allMols[tIdxMol].atoms[iA->connAtoms[0]].id
+                                  << " is " << allMols[tIdxMol].atoms[iA->connAtoms[0]].bondingIdx
+                                  << std::endl;
+                    }
+                }
+                else
+                {
+                    std::cout << "Bug. H atom " << iA->id << " connects to "
+                              << iA->connAtoms.size() << " atom(s)" << std::endl;
+                    exit(1);
+                }
+            }
+        }
+    }
+    
     REAL MolSdfFile::checkProtonated(std::vector<AtomDict>::iterator tAt, 
                                      int                  tMolIdx)
     {
@@ -410,6 +453,7 @@ namespace LIBMOL
         }
         
         return addedH;
+        
     }
     
     
@@ -483,7 +527,7 @@ namespace LIBMOL
             
             allMols[tIdxMol].extraHAtoms.push_back(aH);
         }
-        allMols[tIdxMol].hasCoords = false;
+        // allMols[tIdxMol].hasCoords = false;
         
         std::cout << tNumH << " H atoms have been added to bind atom " 
                   << allMols[tIdxMol].atoms[tIdxAtm].id << std::endl;  
@@ -985,7 +1029,7 @@ namespace LIBMOL
                                 REAL tTolBondOrder, 
                                 std::vector<AtomDict> & tAllAtoms)
     {
-               REAL aNumH = 0.0;
+        REAL aNumH = 0.0;
         StrUpper(tIA->resName);
         // REAL tVal = getTotalBondOrder(tMol, tIA);
         // std::cout << "tVal for N " << tVal << std::endl;
@@ -1233,4 +1277,269 @@ namespace LIBMOL
         
         return tOrd;
     }
+    
+    extern void  setOneHAtomCoordsSP3(std::vector<AtomDict> & tAtoms,
+                                      std::vector<AtomDict>::iterator tIA)
+    {   
+        
+        TransCoords   aTransTool;
+        
+        int           aCen=tIA->connAtoms[0];
+        
+        int           root1=-1, root2=-1;
+       
+        for (std::vector<int>::iterator iR1=tAtoms[aCen].connAtoms.begin();
+                iR1 !=tAtoms[aCen].connAtoms.end(); iR1++)
+        {
+            root1 = -1;
+            root2 = -1;
+            if(tAtoms[*iR1].chemType !="H")
+            {
+                root1 = tAtoms[*iR1].seriNum;
+                for (std::vector<int>::iterator iR2=tAtoms[root1].connAtoms.begin();
+                        iR2 !=tAtoms[root1].connAtoms.end(); iR2++)
+                {
+                    if (tAtoms[*iR2].chemType !="H" 
+                        && tAtoms[*iR2].id !=tAtoms[aCen].id)
+                    {
+                        root2=tAtoms[*iR2].seriNum;
+                        break;
+                    }
+                }
+            }
+            if (root1 !=-1 && root2 !=-1)
+            {
+                break;
+            }
+        }
+        
+        if (root1 !=-1 && root2 !=-1)
+        {
+            //std::cout << "root1 atom " << tAtoms[root1].id << std::endl;
+            //std::cout << "root2 atom " << tAtoms[root2].id << std::endl;
+            if (tIA->coords.size() ==0)
+            {
+                tIA->coords.push_back(0.0);
+                tIA->coords.push_back(0.0);
+                tIA->coords.push_back(0.0);
+            }
+            
+            std::vector<int> refAtmIdx;
+            
+            for (std::vector<int>::iterator iR1=tAtoms[aCen].connAtoms.begin();
+                iR1 !=tAtoms[aCen].connAtoms.end(); iR1++)
+            {
+                if (tAtoms[*iR1].id != tAtoms[root1].id 
+                     && tAtoms[*iR1].id != tIA->id
+                     && tAtoms[*iR1].coordExist)
+                {
+                    refAtmIdx.push_back(tAtoms[*iR1].seriNum);
+                }
+            }
+            
+            REAL d = 0.95, alpha= 109.5*PI180;  // the guide values
+            REAL aTor;
+            
+            // std::cout << "number of ref atom is " << refAtmIdx.size() << std::endl;
+            if  (refAtmIdx.size() ==1)
+            {
+                aTor  = getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen],tAtoms[refAtmIdx[0]])*PI180
+                             + 120.0*PI180;
+            }
+            else if  (refAtmIdx.size() ==2)
+            {
+                int tIdx;
+                REAL tTor, tTor1, tTor2;
+                /*
+                for (unsigned i=0; i < 3; i++)
+                {
+                    std::cout << tAtoms[refAtmIdx[0]].id << "  "  << i << "  "
+                               << tAtoms[refAtmIdx[0]].coords[i] << std::endl;
+                    std::cout << tAtoms[refAtmIdx[1]].id << "  "  << i << "  "
+                               << tAtoms[refAtmIdx[1]].coords[i] << std::endl;
+                }
+                */
+                tTor1 = getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen],tAtoms[refAtmIdx[0]]);
+                tTor2 = getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen],tAtoms[refAtmIdx[1]]);
+                
+                if (tTor1 > tTor2)
+                {
+                    tTor  = tTor1;
+                    tIdx  = refAtmIdx[0];
+                    tTor1 = tTor2;
+                    refAtmIdx[0] = refAtmIdx[1];
+                    tTor2 = tTor;
+                    refAtmIdx[1] = tIdx;
+                    
+                }
+                
+                if (tTor2-tTor1 >=180)
+                {
+                    aTor  = (tTor1 + 120.0)*PI180;
+                }
+                else
+                {
+                    aTor  =  (tTor2 + 120.0)*PI180;
+                }
+                if (aTor > PI)
+                {
+                    aTor = aTor-2*PI;
+                }
+            }
+            else
+            {
+                // only two atoms connect to tAtoms[aCen]
+                aTor  = 180*PI180;
+            }
+            
+            //std::cout << "Tor is " << aTor*PID180 << std::endl;
+            aTransTool.growOneAtom(tAtoms[root2], tAtoms[root1], tAtoms[aCen], 
+                                       tIA, d, alpha, aTor);
+            
+            //for (unsigned i=0; i < 3; i++)
+            //{
+            //    std::cout << i << " " << tIA->coords[i] << std::endl;
+            //}
+            //std::cout << "coords Tor = " << getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen], *tIA)
+            //          << std::endl << std::endl;;
+            tIA->coordExist = true;
+        }
+        
+    }
+    
+    extern void  setOneHAtomCoordsSP2(std::vector<AtomDict> & tAtoms,
+                                      std::vector<AtomDict>::iterator tIA)
+    {
+        TransCoords   aTransTool;
+        
+        int           aCen=tIA->connAtoms[0] , aRef=-1;
+        
+        int           root1=-1, root2=-1;
+       
+        for (std::vector<int>::iterator iR1=tAtoms[aCen].connAtoms.begin();
+                iR1 !=tAtoms[aCen].connAtoms.end(); iR1++)
+        {
+            root1 = -1;
+            root2 = -1;
+            if(tAtoms[*iR1].chemType !="H")
+            {
+                root1 = tAtoms[*iR1].seriNum;
+                for (std::vector<int>::iterator iR2=tAtoms[root1].connAtoms.begin();
+                        iR2 !=tAtoms[root1].connAtoms.end(); iR2++)
+                {
+                    if (tAtoms[*iR2].chemType !="H" 
+                        && tAtoms[*iR2].id !=tAtoms[aCen].id)
+                    {
+                        root2=tAtoms[*iR2].seriNum;
+                        break;
+                    }
+                }
+            }
+            if (root1 !=-1 && root2 !=-1)
+            {
+                break;
+            }
+        }
+        
+        if (root1 !=-1 && root2 !=-1)
+        {
+            if (tIA->coords.size() ==0)
+            {
+                tIA->coords.push_back(0.0);
+                tIA->coords.push_back(0.0);
+                tIA->coords.push_back(0.0);
+            }
+            for (std::vector<int>::iterator iR1=tAtoms[aCen].connAtoms.begin();
+                iR1 !=tAtoms[aCen].connAtoms.end(); iR1++)
+            {
+                if (tAtoms[*iR1].id != tAtoms[root1].id 
+                    && tAtoms[*iR1].id != tIA->id)
+                {
+                    aRef = tAtoms[*iR1].seriNum;
+                    break;
+                }
+                
+            }
+            
+            REAL d = 0.95, alpha= 120*PI180;  // the guide values
+            REAL aTor;
+            if (aRef==-1)
+            {
+                // only two atoms connect to tAtoms[aCen]
+                aTor  = PI;
+            }
+            else
+            {
+                aTor  = getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen],tAtoms[aRef])*PI180
+                             + PI;
+            }
+            aTransTool.growOneAtom(tAtoms[root2], tAtoms[root1], tAtoms[aCen], 
+                                       tIA, d, alpha, aTor);
+            tIA->coordExist = true;
+        }
+        else
+        {
+            std::cout <<"The molecule is an isolated 4-atom cluster with "
+                      << tAtoms[aCen].id << " at the center " << std::endl;
+            exit(1);
+        }
+        
+    }
+    
+    extern void  setOneHAtomCoordsSP(std::vector<AtomDict> & tAtoms,
+                                     std::vector<AtomDict>::iterator tIA)
+    {
+        TransCoords   aTransTool;
+        
+        int           aCen=tIA->connAtoms[0];
+        
+        int           root1=-1, root2=-1;
+       
+        for (std::vector<int>::iterator iR1=tAtoms[aCen].connAtoms.begin();
+                iR1 !=tAtoms[aCen].connAtoms.end(); iR1++)
+        {
+            root1 = -1;
+            root2 = -1;
+            if(tAtoms[*iR1].chemType !="H")
+            {
+                root1 = tAtoms[*iR1].seriNum;
+                for (std::vector<int>::iterator iR2=tAtoms[root1].connAtoms.begin();
+                        iR2 !=tAtoms[root1].connAtoms.end(); iR2++)
+                {
+                    if (tAtoms[*iR2].chemType !="H" 
+                        && tAtoms[*iR2].id !=tAtoms[aCen].id)
+                    {
+                        root2=tAtoms[*iR2].seriNum;
+                        break;
+                    }
+                }
+            }
+            if (root1 !=-1 && root2 !=-1)
+            {
+                break;
+            }
+        }
+        
+        if (root1 !=-1 && root2 !=-1)
+        {
+            if (tIA->coords.size() ==0)
+            {
+                tIA->coords.push_back(0.0);
+                tIA->coords.push_back(0.0);
+                tIA->coords.push_back(0.0);
+            }
+            REAL d = 0.95, alpha= 120*PI180;  // the guide values
+            REAL aTor =  PI;
+            aTransTool.growOneAtom(tAtoms[root2], tAtoms[root1], tAtoms[aCen], 
+                                       tIA, d, alpha, aTor);
+            tIA->coordExist = true;
+        }
+        else
+        {
+            std::cout <<"The molecule is an isolated 4-atom cluster with "
+                      << tAtoms[aCen].id << " at the center " << std::endl;
+            exit(1);
+        }
+    }
+    
 }

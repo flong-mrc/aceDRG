@@ -201,7 +201,8 @@ int main(int argc, char** argv) {
                             // coordinate generator works only for a system of "organic" atoms. Tempo!
                             GO::FindGlobMin  aGlobMinSystem(aTargetSystem, 
                                                             tOutName.c_str(),
-                                                            AJob.IOEntries["monoRootName"]);           
+                                                            AJob.IOEntries["monoRootName"]);  
+                            
                             aGlobMinSystem.Driver();
             
                             LIBMOL::outMMCif(tOutName.c_str(),

@@ -80,6 +80,10 @@
 #include "utility.h"
 #endif
 
+#ifndef TRANSCOORD_H
+#include "TransCoord.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
@@ -132,6 +136,8 @@ namespace LIBMOL
         void deleteCurMol();
         
         void addHAtomToMols(int tIdxMol);
+        void setHAtomCoordsMols(int tIdxMol);
+        
         REAL checkProtonated(std::vector<AtomDict>::iterator tIA, 
                              int   tMolIdx);           // This is a temp function. the other
                                                        // overloaded function should be a 
@@ -210,6 +216,15 @@ namespace LIBMOL
                                    std::vector<AtomDict>::iterator  tIA);
     extern REAL  getBondOrder(Molecule   & tMol,
                               int tIdx1, int tIdx2);
+    
+    extern void  setOneHAtomCoords();
+    
+    extern void  setOneHAtomCoordsSP3(std::vector<AtomDict> & tAtoms,
+                                      std::vector<AtomDict>::iterator tIA);
+    extern void  setOneHAtomCoordsSP2(std::vector<AtomDict> & tAtoms,
+                                      std::vector<AtomDict>::iterator tIA);
+    extern void  setOneHAtomCoordsSP(std::vector<AtomDict> & tAtoms,
+                                      std::vector<AtomDict>::iterator tIA);
     
 }
 

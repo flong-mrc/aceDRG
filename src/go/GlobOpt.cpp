@@ -137,7 +137,6 @@ namespace GO
         for (std::vector<LIBMOL::AtomDict>::const_iterator iAt=aSystem.allAtoms.begin();
                 iAt != aSystem.allAtoms.end(); iAt++)
         {
-            
             allAtoms.push_back(*iAt);
         }
         

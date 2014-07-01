@@ -383,11 +383,11 @@ namespace LIBMOL
                 //std::cout << "tR1 " << i+1 << "  "
                 //        <<  tA2.coords[i]-tA1.coords[i] << std::endl;
                 tR2.push_back(tA3.coords[i]-tA2.coords[i]);
-                //std::cout << "tR2 " << i+1 << "  "
-                //        <<  tA3.coords[i]-tA2.coords[i] << std::endl;
+                // std::cout << "tR2 " << i+1 << "  "
+                //          <<  tA3.coords[i]-tA2.coords[i] << std::endl;
                 tR3.push_back(tA4.coords[i]-tA3.coords[i]);
-                //std::cout << "tR3 " << i+1 << "  "
-                //        <<  tA4.coords[i]-tA3.coords[i] << std::endl;
+                // std::cout << "tR3 " << i+1 << "  "
+                //          <<  tA4.coords[i]-tA3.coords[i] << std::endl;
             }
             
             return getTorsion3V(tR1, tR2, tR3);
