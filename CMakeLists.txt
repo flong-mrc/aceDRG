@@ -64,6 +64,7 @@ set(SRC
     src/go/LinAlg.cpp
     src/kernel/ExtraRestrDictFile.cpp
     src/kernel/MonomerLib.cpp
+    src/kernel/chemPropSet.cpp
 )
 
 add_executable(acedrg ${SRC})
