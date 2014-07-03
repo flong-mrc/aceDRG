@@ -43,6 +43,10 @@
 #include "periodicTable.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 #ifndef UTILITY_H
 #include "utility.h"
 #endif
@@ -54,6 +58,7 @@
 #ifndef PDBFILE_H
 #include "PDBFile.h"
 #endif
+
 
 namespace LIBMOL
 {
@@ -128,7 +133,10 @@ namespace LIBMOL
         void getUniqueBondsMols(Molecule    & tMol, 
                                 std::vector<CrystInfo>::iterator tCryst);
         
-        void getBondsInOneMol(std::vector<AtomDict> & tAtoms);
+        void getUniqueBondsMols2(Molecule    & tMol);
+        
+        void getAllBondsInOneMol(Molecule    & tMol, 
+                                 std::vector<CrystInfo>::iterator tCryst);
         
         void getBondingRangePairAtoms(AtomDict & tAtm1,
                                       AtomDict & tAtm2,

@@ -6939,6 +6939,16 @@ namespace LIBMOL
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs)
     {
+        
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            if (iA->id.find("\'") !=std::string::npos)
+            {
+                iA->id = "\"" + iA->id + "\"";
+            }
+        }
+        
         std::ofstream outRestrF(tFName);
         
         
@@ -7003,7 +7013,7 @@ namespace LIBMOL
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
                     outRestrF << tMonoRootName  
-                              << std::setw(6) << iA->id 
+                              << std::setw(12) << iA->id 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
                               << std::setw(8) << iA->parCharge 
@@ -7032,9 +7042,9 @@ namespace LIBMOL
                           iB !=tBonds.end(); iB++)
                 {
                     outRestrF << tMonoRootName  
-                              << std::setw(6)  << iB->atoms[0]  
-                              << std::setw(6)  << iB->atoms[1]  
-                              << std::setw(10) << iB->order 
+                              << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
+                              << std::setw(12)   << tAtoms[iB->atomsIdx[1]].id  
+                              << std::setw(12)  << iB->order 
                               << std::setw(10) << std::setprecision(3)
                               << iB->value 
                               << std::setw(8) << std::setprecision(3)
@@ -7079,9 +7089,9 @@ namespace LIBMOL
                         for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
                                 iCA !=iA->codAngleValues.end(); iCA++)
                         {
-                            outRestrF << tMonoRootName << std::setw(6)
-                                      << tAtoms[iA->atoms[1]].id << std::setw(6)
-                                      << tAtoms[iA->atoms[0]].id << std::setw(6)
+                            outRestrF << tMonoRootName << std::setw(12)
+                                      << tAtoms[iA->atoms[1]].id << std::setw(12)
+                                      << tAtoms[iA->atoms[0]].id << std::setw(12)
                                       << tAtoms[iA->atoms[2]].id ;
                             outRestrF << std::setw(6) << std::setprecision(3) <<  *iCA << "    "
                                       << std::setw(6) << std::setprecision(2) << iA->sigValue << std::endl;
@@ -7090,9 +7100,9 @@ namespace LIBMOL
                     else
                     {
                         outRestrF << tMonoRootName 
-                                  << std::setw(6) << tAtoms[iA->atoms[1]].id
-                                  << std::setw(6) << tAtoms[iA->atoms[0]].id 
-                                  << std::setw(8) << tAtoms[iA->atoms[2]].id;
+                                  << std::setw(12) << tAtoms[iA->atoms[1]].id
+                                  << std::setw(12) << tAtoms[iA->atoms[0]].id 
+                                  << std::setw(12) << tAtoms[iA->atoms[2]].id;
                         outRestrF << std::setw(10) << std::setprecision(3) <<  iA->value
                                   << std::setw(8) << std::setprecision(2) << iA->sigValue 
                                   << std::endl;
@@ -7142,10 +7152,10 @@ namespace LIBMOL
                 
                     outRestrF << tMonoRootName 
                               << std::setw(16) << iT->id
-                              << std::setw(8)  << tAtoms[iT->atoms[0]].id 
-                              << std::setw(8)  << tAtoms[iT->atoms[1]].id 
-                              << std::setw(8)  << tAtoms[iT->atoms[2]].id 
-                              << std::setw(8)  << tAtoms[iT->atoms[3]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[0]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[1]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[2]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[3]].id 
                               << std::setw(12) << std::setprecision(3) << iT->value  
                               << std::setw(8)  << "10.00" 
                               << std::setw(6)  << iT->period << std::endl;
@@ -7250,12 +7260,12 @@ namespace LIBMOL
                                   
                                 outRestrF << tMonoRootName 
                                           << std::setw(10) << idxStr 
-                                          << std::setw(6)  << iA->id;
+                                          << std::setw(10)  << iA->id;
                        
-                                outRestrF << std::setw(6) << chirAtms[0] << "    ";
-                                outRestrF << std::setw(6) << chirAtms[1] << "    ";
-                                outRestrF << std::setw(6) << chirAtms[2] << "    ";
-                                outRestrF << std::setw(6) << "BOTH" << std::endl;
+                                outRestrF << std::setw(10) << chirAtms[0] << "    ";
+                                outRestrF << std::setw(10) << chirAtms[1] << "    ";
+                                outRestrF << std::setw(10) << chirAtms[2] << "    ";
+                                outRestrF << std::setw(12) << "BOTH" << std::endl;
                                 idxC++;
                             }
                         }
@@ -7286,7 +7296,7 @@ namespace LIBMOL
                         {
                             outRestrF << tMonoRootName 
                                       << std::setw(10) << idxPStr
-                                      << std::setw(6)  << iAt->first 
+                                      << std::setw(12)  << iAt->first 
                                       << std::setw(8)  << "0.020" << std::endl;
                         }
                         idxP++;

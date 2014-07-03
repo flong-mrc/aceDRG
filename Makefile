@@ -76,7 +76,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/kernel/MolSdfFile.o \
 	${OBJECTDIR}/src/go/LinAlg.o \
 	${OBJECTDIR}/src/kernel/ExtraRestrDictFile.o \
-	${OBJECTDIR}/src/kernel/MonomerLib.o 
+	${OBJECTDIR}/src/kernel/MonomerLib.o \
+	${OBJECTDIR}/src/kernel/chemPropSet.o
 
 
 # C Compiler Flags
@@ -322,6 +323,11 @@ ${OBJECTDIR}/src/kernel/MolGenerator.o: src/kernel/MolGenerator.cpp
 	${MKDIR} -p ${OBJECTDIR}/src/kernel
 	${RM} $@.d
 	$(COMPILE.cc) -Wall -Iinclude/kernel -Iinclude/math -Iinclude/go -Iinclude/forcefield -I/Applications/ccp4-6.3.0/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/kernel/MolGenerator.o src/kernel/MolGenerator.cpp
+
+${OBJECTDIR}/src/kernel/chemPropSet.o: src/kernel/chemPropSet.cpp
+	${MKDIR} -p ${OBJECTDIR}/src/kernel
+	${RM} $@.d
+	$(COMPILE.cc) -Wall -Iinclude/kernel -Iinclude/math -Iinclude/go -Iinclude/forcefield -I/Applications/ccp4-6.3.0/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/kernel/chemPropSet.o src/kernel/chemPropSet.cpp
 
 
 # Clean Targets

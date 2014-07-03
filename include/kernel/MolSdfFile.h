@@ -84,6 +84,10 @@
 #include "TransCoord.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
@@ -181,7 +185,7 @@ namespace LIBMOL
     };  
     
     // should be added to separated chemistry part of source codes.
-    
+    /*
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
                                 REAL tTolBondOrder);
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
@@ -224,8 +228,8 @@ namespace LIBMOL
     extern void  setOneHAtomCoordsSP2(std::vector<AtomDict> & tAtoms,
                                       std::vector<AtomDict>::iterator tIA);
     extern void  setOneHAtomCoordsSP(std::vector<AtomDict> & tAtoms,
-                                      std::vector<AtomDict>::iterator tIA);
-    
+                                     std::vector<AtomDict>::iterator tIA);
+   */ 
 }
 
 

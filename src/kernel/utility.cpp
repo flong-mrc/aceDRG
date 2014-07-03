@@ -1661,31 +1661,31 @@ namespace LIBMOL
     {
         if (tOrder == 1.0)
         {
-            sOrder = "SINGLE";   
+            sOrder = "single";   
         }
         else if (tOrder == 2.0)
         {
-            sOrder = "DOUBLE";
+            sOrder = "double";
         }
         else if (tOrder == 3.0)
         {
-            sOrder = "TRIP";
+            sOrder = "trip";
         }
         else if (tOrder == 4.0)
         {
-            sOrder = "AROMATIC";
+            sOrder = "aromatic";
         }      
         else if (tOrder == 5.0)
         {
-            sOrder = "BOTH";
+            sOrder = "both";
         } 
         else if (tOrder == 9.0)
         {
-            sOrder = "DELOC";
+            sOrder = "deloc";
         } 
         else if (tOrder == 10.0)
         {
-            sOrder = "METAL";
+            sOrder = "metal";
         }
         else if (tOrder == 100.0)
         {

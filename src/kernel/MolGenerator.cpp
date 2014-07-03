@@ -964,6 +964,61 @@ namespace LIBMOL
         }
     }
     
+    void MolGenerator::getUniqueBondsMols2(Molecule& tMol)
+    {
+        
+        std::vector<REAL> aV;
+        
+        for (std::vector<BondDict>::iterator iB=tMol.allBonds.begin();
+                iB !=tMol.allBonds.end(); iB++)
+        {
+            // Consider bonds involve atoms in an assym-cell only 
+            if (tMol.atoms[iB->atomsIdx[0]].isInPreCell 
+                || tMol.atoms[iB->atomsIdx[1]].isInPreCell)
+            {
+                if (!inVectABS(aV, iB->value, 0.00001))
+                {
+                    tMol.bonds.push_back(*iB);
+                }
+                
+                aV.push_back(iB->value);
+            }
+        }
+    }
+    
+    void MolGenerator::getAllBondsInOneMol(Molecule & tMol, 
+                                           std::vector<CrystInfo>::iterator tCryst)
+    {
+        for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin();
+                iAt != tMol.atoms.end(); iAt++)
+        {
+            for (std::vector<int>::iterator iCo=iAt->connAtoms.begin();
+                      iCo !=iAt->connAtoms.end(); iCo++)
+            {
+                if ((*iCo) > iAt->seriNum)         
+                {
+                    REAL rD = getBondLenFromFracCoords(iAt->fracCoords, tMol.atoms[(*iCo)].fracCoords,
+                                                       tCryst->itsCell->a, tCryst->itsCell->b, 
+                                                       tCryst->itsCell->c, tCryst->itsCell->alpha,
+                                                       tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                    BondDict aBond;
+                    aBond.atomsIdx.push_back(iAt->seriNum);
+                    aBond.atomsIdx.push_back(*iCo);
+                    aBond.value = rD;
+                    tMol.allBonds.push_back(aBond);            
+                    //std::cout << "a bond between " << iAt->id << " and "
+                    //          << tMol.atoms[(*iCo)].id << " is added to the bond_list_cell " 
+                    //          << std::endl << "Its bond length is " << aBond.value 
+                    //          << std::endl;
+                }
+            }
+        }
+        
+        getUniqueBondsMols2(tMol);
+   
+    }
+    
+    
     void MolGenerator::getBondingRangePairAtoms(AtomDict          & tAtm1, 
                                                 AtomDict          & tAtm2, 
                                                 REAL              tSens,
@@ -1694,8 +1749,8 @@ namespace LIBMOL
                
                */
             
-               getUniqueBondsMols(aMol, tCryst);
-            
+               // getUniqueBondsMols(aMol, tCryst);
+               getAllBondsInOneMol(aMol, tCryst);
                
                /*
                for (std::vector<AngleDict>::iterator iAn=angles.begin();
