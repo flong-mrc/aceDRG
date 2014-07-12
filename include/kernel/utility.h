@@ -75,6 +75,8 @@ namespace LIBMOL
     
     extern REAL StrFractToReal(std::string tS);
     
+    extern void getDigitSec(std::string & tStrIn, std::string & tStrOut);
+    
     // Handlers with string 
     extern std::string TrimSpaces( std::string  tStr);
     
@@ -245,6 +247,7 @@ namespace LIBMOL
     extern void fromIdToChemType(ID tId, ID & tChemType);
     extern REAL StrToOrder(std::string  & tStrOrder);
     extern void OrderToStr(REAL tOrder, std::string  & sOrder);
+    extern void OrderStrToStr(std::string & tOrder, std::string  & sOrder);
     
     // symmetry related operations 
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 

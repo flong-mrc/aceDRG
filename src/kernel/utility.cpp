@@ -91,6 +91,16 @@ namespace LIBMOL
         return tR;
     }
     
+    void getDigitSec(std::string & tStrIn, std::string & tStrOut)
+    {
+        for (unsigned i=0; i < tStrIn.size(); i++)
+        {
+            if (std::isdigit(tStrIn[i]))
+            {
+                tStrOut.push_back(tStrIn[i]);
+            }
+        }
+    }
     std::string TrimSpaces( std::string  tStr)
     {
         // Trim Both leading and trailing spaces
@@ -630,19 +640,28 @@ namespace LIBMOL
         MOD2 = sqrt(DotP(v2,v2));
         MOD  = DotP(v1,v2);
 
-        if (MOD1 <=1.0e-16 || MOD2 <= 1.0e-16 )
+        if (MOD1 <=1.0e-8 || MOD2 <= 1.0e-8 )
         {
             std::cout << " one of vectors constructing the angle is zero. " << std::endl;
             exit(1);
         }
         else 
         {  
-            Angle = acos(MOD/(MOD1*MOD2));  
- 
+            REAL MOLT= MOD/(MOD1*MOD2);
+            if(MOLT>0.9999)
+            {
+                Angle = PI;
+            }
+            else
+            {
+                Angle = acos(MOD/(MOD1*MOD2));
+            }
+            
+            //std::cout << "MOD1 " << MOD1 << std::endl;
+            //std::cout << "MOD2 " << MOD2 << std::endl;
+            //std::cout << "MOD  " << MOD  << std::endl;
             return Angle;
-            //  cout << "MOD1 " << MOD1 << endl;
-            //  cout << "MOD2 " << MOD2 << endl;
-            //  cout << "MOD  " << MOD  << endl;
+            
         }
         
     }
@@ -1659,35 +1678,72 @@ namespace LIBMOL
     
     extern void OrderToStr(REAL tOrder, std::string  & sOrder)
     {
-        if (tOrder == 1.0)
+        if (tOrder == 1)
         {
             sOrder = "single";   
         }
-        else if (tOrder == 2.0)
+        else if (tOrder == 2)
         {
             sOrder = "double";
         }
-        else if (tOrder == 3.0)
+        else if (tOrder == 3)
         {
             sOrder = "trip";
         }
-        else if (tOrder == 4.0)
+        else if (tOrder == 4)
         {
             sOrder = "aromatic";
         }      
-        else if (tOrder == 5.0)
+        else if (tOrder == 5)
         {
             sOrder = "both";
         } 
-        else if (tOrder == 9.0)
+        else if (tOrder == 9)
         {
             sOrder = "deloc";
         } 
-        else if (tOrder == 10.0)
+        else if (tOrder == 10)
         {
             sOrder = "metal";
         }
-        else if (tOrder == 100.0)
+        else if (tOrder == 100)
+        {
+            sOrder = ".";
+        }
+        
+    }
+    
+    extern void OrderStrToStr(std::string & tOrder, std::string  & sOrder)
+    {
+        if (tOrder == "1")
+        {
+            sOrder = "single";   
+        }
+        else if (tOrder == "2")
+        {
+            sOrder = "double";
+        }
+        else if (tOrder == "3")
+        {
+            sOrder = "trip";
+        }
+        else if (tOrder == "4")
+        {
+            sOrder = "aromatic";
+        }      
+        else if (tOrder == "5")
+        {
+            sOrder = "both";
+        } 
+        else if (tOrder == "9")
+        {
+            sOrder = "deloc";
+        } 
+        else if (tOrder == "10")
+        {
+            sOrder = "metal";
+        }
+        else
         {
             sOrder = ".";
         }

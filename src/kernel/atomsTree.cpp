@@ -662,31 +662,33 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
-            // std::cout << "For atom " << iAt->id << std::endl;
+            //std::cout << "For atom " << iAt->id << std::endl;
             int idxP = iAt->tree["parent"][0];
-            // std::cout << ", its parent  " << idxP << std::endl;
+            //std::cout << "its parent  " << std::endl;
             if (idxP >=0)
             {
                 // std::cout << tAtoms[iAt->tree["parent"][0]].id << std::endl;
                 setTreeAtomBondValue(tAtoms, tBonds, iAt);
                 int idxGp=tAtoms[idxP].tree["parent"][0];
-                // std::cout << " its grand-p " << idxGp << std::endl;
+                //std::cout << " its grand-p " << idxGp << std::endl;
                 if (idxGp >=0)
                 {
-                    //std::cout << tAtoms[idxGp].id << std::endl;
+                    // std::cout << tAtoms[idxGp].id << std::endl;
                     setTreeAtomAngleValue(tAtoms, tAngles, iAt);
                     int idxGgp = tAtoms[idxGp].tree["parent"][0];
                     //std::cout << "its great grand-pa " << idxGgp << std::endl;
-                    //std::cout << "1st " << iAt->seriNum << " 2nd " 
-                    //          << idxP << " 3rd " << idxGp 
-                    //          << " 4th " << idxGgp << std::endl;
+                    //std::cout << "1st "   << iAt->seriNum << " 2nd " 
+                    //          << idxP     << " 3rd " << idxGp 
+                    //          << " 4th "  << idxGgp << std::endl;
                     if (idxGgp >=0)
                     {
-                        //std::cout << "Target: " << std::endl 
-                        //          << "atom 1 " << iAt->id << "\t atom 2 " << tAtoms[idxP].id 
+                        //std::cout << "condition 1 " << std::endl;
+                        //std::cout << "Target: "   << std::endl 
+                        //          << "atom 1 "    << iAt->id 
+                        //          << "\t atom 2 " << tAtoms[idxP].id 
                         //          << "\t atom 3 " << tAtoms[idxGp].id
                         //          << "\t atom4 "  << tAtoms[idxGgp].id 
-                        //         << std::endl;
+                        //          << std::endl;
                         setTreeAtomTorsionValue(tAtoms, tTorsions,  iAt, -1);
                     }
                     else
@@ -705,6 +707,7 @@ namespace LIBMOL
                        
                         if(tRoot >=0)
                         {
+                            //std::cout << "condition 2 " << std::endl;
                             //std::cout << "Target: " << std::endl 
                             //          << "atom 1 " << iAt->id 
                             //          << "\t atom 2 " << tAtoms[idxP].id 
@@ -723,7 +726,62 @@ namespace LIBMOL
                 else if (idxGp==-1)
                 {
                     // Now no need to set these torsions
-                    //setTreeAtomTorsionValue(tAtoms, tTorsions, tPlas, tChs, tDAts, iAt);
+                    //std::cout << "Select Grand P from the start pack " << std::endl;
+                    int iGp  =-2;
+                    int iGgp =-2;
+                    std::vector<int> tVec;
+                    for (std::vector<int>::iterator iNB=tAtoms[iAt->tree["parent"][0]].connAtoms.begin();
+                            iNB!=tAtoms[iAt->tree["parent"][0]].connAtoms.end(); iNB++)
+                    {
+                        if (tAtoms[*iNB].id !=iAt->id 
+                             && tAtoms[*iNB].chemType !="H")
+                        {
+                            iGp = *iNB;
+                            for (std::vector<int>::iterator iNNB=tAtoms[*iNB].connAtoms.begin();
+                                    iNNB!=tAtoms[*iNB].connAtoms.end(); iNNB++)
+                            {
+                                if (tAtoms[*iNNB].id !=tAtoms[iAt->tree["parent"][0]].id
+                                    && tAtoms[*iNNB].id !=iAt->id
+                                    && tAtoms[*iNNB].chemType !="H")
+                                {
+                                    iGgp = *iNNB;
+                                    break;
+                                }
+                            }
+                            if (iGgp ==-2)
+                            {
+                                for (std::vector<int>::iterator iNNB=tAtoms[*iNB].connAtoms.begin();
+                                    iNNB!=tAtoms[*iNB].connAtoms.end(); iNNB++)
+                                {
+                                    if (tAtoms[*iNNB].id !=tAtoms[iAt->tree["parent"][0]].id
+                                        && tAtoms[*iNNB].id !=iAt->id)
+                                    {
+                                        iGgp = *iNNB;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (iGgp !=-2)
+                            {
+                                 break;       
+                            }
+                        }
+                    }
+                    if (iGp==-2 || iGgp==-2)
+                    {
+                        std::cout << "Can not find the torsion angle for atom  " 
+                                  << iAt->id << std::endl;
+                        exit(1);
+                    }
+                    else if (iGp !=-2)
+                    {
+                        setTreeAtomAngleValue(tAtoms, tAngles, iAt, idxP, iGp);
+                        tVec.push_back(iGp);
+                        if (iGgp !=-2)
+                        tVec.push_back(iGgp);
+                    }
+                    
+                    setTreeAtomTorsionValue(tAtoms, tTorsions, iAt, tVec);
                 }
             }
             
@@ -733,6 +791,7 @@ namespace LIBMOL
                       << "\tIts tree torsion " << iAt->treeTorsion << std::endl; 
                
         }
+        
     }
     
     void buildAtomTree::setTreeAtomValues(std::vector<AtomDict>& tAtoms)
@@ -778,6 +837,25 @@ namespace LIBMOL
         }
     }
     
+    void buildAtomTree::setTreeAtomAngleValue(std::vector<AtomDict>& tAtoms, 
+                                              std::vector<AngleDict>& tAngs,
+                                              std::vector<AtomDict>::iterator tAt,
+                                              int tP, int tGp)
+    {
+        int tAn = getAngle(tAngs, tP, tAt->seriNum, tGp); 
+        if (tAn >=0)
+        {
+            tAt->treeAngle = tAngs[tAn].value*PI180; 
+        }
+        else
+        {
+            std::cout << "Could not find the angle between " 
+                      << tAtoms[tP].id << "(center) and " << tAt->id 
+                      << " and " << tAtoms[tGp].id << std::endl;
+            exit(1);
+        }
+    }
+    
     void buildAtomTree::setTreeAtomTorsionValue(std::vector<AtomDict>& tAtoms, 
                                                 std::vector<TorsionDict>& tTors,  
                                                 std::vector<AtomDict>::iterator tAt,
@@ -814,6 +892,69 @@ namespace LIBMOL
                     << tAt->id  << std::endl
                     << " 4 atoms are: 1 " << tAt->id << " 2 " << tAtoms[P].id 
                     << " 3 " << tAtoms[Gp].id << " 4 " << tAtoms[Ggp].id << std::endl;
+                exit(1);
+            }
+        }
+        else
+        {
+            std::cout << "No torsion angle is found for atoms " 
+                    << tAtoms[Ggp].id << "->" << tAtoms[Gp].id 
+                    << "->" << tAtoms[P].id << "->" << tAt->id << std::endl;
+            exit(1);
+        }
+        
+    }
+    
+    void buildAtomTree::setTreeAtomTorsionValue(std::vector<AtomDict>& tAtoms, 
+                                               std::vector<TorsionDict>& tTors,  
+                                               std::vector<AtomDict>::iterator tAt,
+                                               std::vector<int> &   tR)
+    {
+        
+        int P  = tAt->tree["parent"][0];
+        int Gp;
+        int Ggp = -1;
+        //  bool rev = false;
+        int curT;
+        if (tR.size()==0)
+        {
+            Gp  = tAtoms[P].tree["parent"][0];
+            Ggp = tAtoms[Gp].tree["parent"][0];
+        }
+        else if (tR.size()==1)
+        {
+            Gp  = tAtoms[P].tree["parent"][0];
+            Ggp = tR[0];
+        }
+        else
+        {
+            Gp  = tR[0];
+            Ggp = tR[1];
+        }
+        
+        //std::cout   << tAt->id  << std::endl
+        //            << " 4 atoms are: 1 " << tAt->id << " 2 " << tAtoms[P].id 
+        //            << " 3 " << tAtoms[Gp].id << " 4 " << tAtoms[Ggp].id << std::endl;
+        
+        curT=getTorsion(tTors, tAt->seriNum, P, Gp, Ggp);
+            
+        if (curT >=0)
+        {
+            if (tAt->seriNum == tTors[curT].atoms[0] && Ggp==tTors[curT].atoms[3])
+            {
+                tAt->treeTorsion = tTors[curT].value*PI180;
+            }
+            else if (tAt->seriNum == tTors[curT].atoms[3] && Ggp==tTors[curT].atoms[0])
+            {
+                tAt->treeTorsion = -tTors[curT].value*PI180;
+            }
+            else
+            {
+                std::cout << "Two ending atoms in torsion angle are not right for torsion " 
+                    << tAt->id  << std::endl
+                    << " 4 atoms are: 1 " << tAt->id << " 2 " << tAtoms[P].id 
+                    << " 3 " << tAtoms[Gp].id << " 4 " << tAtoms[Ggp].id << std::endl;
+               
                 exit(1);
             }
         }

@@ -473,20 +473,20 @@ namespace GO
     {
          for (std::vector<LIBMOL::AngleDict>::iterator iA=allAngles.begin();
                 iA !=allAngles.end(); iA++)
-        {
+         {
             //iA->value      = iA->value*PI180;
             iA->valueST    = iA->valueST*PI180;
             // iA->sigValue   = iA->sigValue*PI180;
             iA->sigValueST = iA->sigValueST*PI180;
             //std::cout << "Dict value Converted to " << iA->valueST << std::endl;
             //std::cout << "Dict sigma value converted to " << iA->sigValueST << std::endl;
-        }   
+         }   
         
-        // A set of initial coordinates is done
-        if (!hasIniCoords)
-        {
-            SetDefinedInitPositions();
-        }
+         // A set of initial coordinates is done
+         if (!hasIniCoords)
+         {
+             SetDefinedInitPositions();
+         }
         
         //else
         //{

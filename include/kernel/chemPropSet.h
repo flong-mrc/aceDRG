@@ -113,6 +113,8 @@ namespace LIBMOL
     extern int getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,
                                 std::vector<AtomDict>::iterator iA);
     
+    extern void getHydroAtomConnect(std::vector<AtomDict>  &  tAtoms);
+    
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms);
     
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
@@ -127,6 +129,11 @@ namespace LIBMOL
                                 std::vector<AtomDict> &tAllAtoms);
     extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
                                 Molecule   & tMol);
+    
+    extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
+                                  Molecule   & tMol, 
+                                  PeriodicTable & tTab);
+    
     extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
                                 Molecule   & tMol,
                                 REAL tPka,           REAL tPh);

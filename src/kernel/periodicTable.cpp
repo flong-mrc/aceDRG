@@ -68,10 +68,8 @@ namespace LIBMOL
         elements["N"]["val"]       = 3;
         elemProps["N"]["vdw"]      = 1.55;
         elemProps["N"]["cova"]     = 0.68;
-        elemProps["N"]["vdw"]      = 1.55;
-        elemProps["N"]["cova"]     = 0.68;
-        elemProps["N"]["ionM-"]   = 1.32;
-        elemProps["N"]["ionM+"]   = 0.30;
+        elemProps["N"]["ionM-"]    = 1.32;
+        elemProps["N"]["ionM+"]    = 0.30;
       
          
         
@@ -958,13 +956,15 @@ namespace LIBMOL
         
         // some elements have multiple valences
         
+        extraValences["P"].push_back(3);
+        
         extraValences["N"].push_back(5);
         
         extraValences["S"].push_back(2);
         extraValences["S"].push_back(4);
         
-        //extraValences["C"].push_back(2);
-        //extraValences["C"].push_back(3);  //rarely 
+        extraValences["Se"].push_back(2);
+        extraValences["Se"].push_back(4);   
         
         extraValences["Hg"].push_back(1);
         extraValences["Cu"].push_back(1);

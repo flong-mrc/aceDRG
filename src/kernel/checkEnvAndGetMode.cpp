@@ -146,6 +146,7 @@ namespace LIBMOL
                     break;
                 case 'r':
                     IOEntries["monoRootName"] = optarg;
+                    
                     //std::cout << "Monomer root name is : " 
                     //          << IOEntries["monoRootName"] << std::endl;
                     break;
@@ -163,7 +164,13 @@ namespace LIBMOL
                     IOEntries["AtomTypeOutName"] = optarg;
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
-                    break;   
+                    break;
+                case 'O':
+                    IOEntries["NoGeoOpt"] = optarg;
+                    StrLower(IOEntries["NoGeoOpt"]);
+                    //std::cout << "COD atom types are output to : " 
+                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    break;
                 case '?':
                     if (std::isprint(optopt))
                     {

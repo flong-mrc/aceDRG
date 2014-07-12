@@ -629,6 +629,7 @@ namespace LIBMOL
         
         // Pick up the starting atom according to the selected torsion angle
         
+        
         REAL *v1    = new REAL [dim];
         REAL *v2    = new REAL [dim];
         REAL *v3    = new REAL [dim];
@@ -726,8 +727,8 @@ namespace LIBMOL
   
         n_conn = (int)tAtoms[i_atom].tree["children"].size();
 
-        //std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
-        //std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
+        // std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
+        // std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
  
         std::vector<AtomDict> dAtms;
         std::vector<int>   aStartSet;
@@ -769,7 +770,7 @@ namespace LIBMOL
                 {
                     i_next = i1;
                 }
-                // std::cout << "Final pick " << tAtoms[i_next].id << std::endl; 
+                //std::cout << "Final pick " << tAtoms[i_next].id << std::endl; 
                 std::vector<int> aSSet;
                 int i_pprev;
                 if (tAtoms[i_atom].id !=tAtoms[sAtom3].id)
@@ -810,8 +811,8 @@ namespace LIBMOL
                     //    PolToCart(tAtoms,i_atom, i_next, tBo, tTha, tPhi,  A);
                     //}
                     doneList.push_back(i_next);
-                    //std::cout <<  tAtoms[i_next].id << " done0 " << std::endl;
-                    //std::cout << " atom " << tAtoms[i_atom].id 
+                    // std::cout <<  tAtoms[i_next].id << " done0 " << std::endl;
+                    // std::cout << " atom " << tAtoms[i_atom].id 
                     //          << " chiral idx " <<tAtoms[i_atom].chiralIdx << std::endl;
                     
                     // grow other atoms linked to i_atom (like i_next)
@@ -864,7 +865,7 @@ namespace LIBMOL
                                 // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
                                 growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
                                 doneList.push_back(*iNodeA);
-                                //std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                                // std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
                             }
                             iL++;
                         }
@@ -938,10 +939,10 @@ namespace LIBMOL
                                             tAngles, tTorsions, tRings, tPlas, tChs, iTurn, doneList);
                  
                                 
-                                optSubSystem(doneList, tAtoms, tBonds, tAngles,
-                                              tTorsions, tRings, tPlas, tChs, false);
-                                //std::cout << "The sub-system is optimized \n";
-                               
+                                //optSubSystem(doneList, tAtoms, tBonds, tAngles,
+                                //              tTorsions, tRings, tPlas, tChs, false);
+                                // std::cout << "The sub-system is optimized \n";
+                                
                                 iTurn++;    
                             }
                             else
@@ -1242,16 +1243,16 @@ namespace LIBMOL
             
             // std::cout << "here " << std::endl;
         }
-        //  cout << "New coordiantes after angle-to-coordinates transfer are " << endl;
+        //std::cout << "New coordinates after angle-to-coordinates transfer are " << std::endl;
 
-        // for (i =0; i < numAtoms; i++)
-        //   {
-        //     cout << "The " <<i+1<<"th atom is at" << endl;
-        //     for (j=0; j < dim; j++)
+        //for (int i =0; i < (int)tAtoms.size(); i++)
+        //{
+        //    std::cout << "The " <<i+1<<"th atom is at" << std::endl;
+        //    for (int j=0; j < dim; j++)
         // 	{
-        //        cout << tAllAtoms[i].coords[j] << "\t";
+        //        std::cout << tAtoms[i].coords[j] << "\t";
         //      }
-        //    cout << endl;
+        //    std::cout << std::endl;
         //  }
   
         // cout << " Continue ? " << endl;
@@ -1315,6 +1316,7 @@ namespace LIBMOL
         }
         delete [] aMatStack;
         aMatStack = 0; 
+       
     }
     
     
@@ -1333,10 +1335,10 @@ namespace LIBMOL
         th_i   = PI-tAtoms[i_next].treeAngle; 
         phi_i  = tAtoms[i_next].treeTorsion;
         
-        std::cout << "Current atom is "   << tAtoms[i_next].id << std::endl
-                  << " its tree bond is " << length << std::endl
-                  << " its angle is "     << th_i   << "(" << th_i*PID180 << ")" << std::endl
-                  << " its torsion is "   << phi_i  << std::endl;
+        //std::cout << "Current atom is "   << tAtoms[i_next].id << std::endl
+        //          << " its tree bond is " << length << std::endl
+        //          << " its angle is "     << th_i   << "(" << th_i*PID180 << ")" << std::endl
+        //          << " its torsion is "   << phi_i  << std::endl;
        
                    
         c_th_i = cos(th_i);
@@ -1467,7 +1469,8 @@ namespace LIBMOL
         th_i   = PI-tAng; 
         phi_i  = tTor;
         
-        //std::cout << "in: Current atom is "   << tAtoms[i_next].id << std::endl
+        //std::cout << "in: Current atom is atom number " << tAtoms[i_next].seriNum    
+        //          << " id " << tAtoms[i_next].id << std::endl
         //          << " its tree bond is " << length << std::endl
         //          << " its angle is "     << th_i << "(" << th_i*PID180 << ")"  << std::endl
         //          << " its torsion is "   << phi_i  << std::endl;
@@ -1553,27 +1556,28 @@ namespace LIBMOL
             {
                 dY[i] = 0.0;
             }
-            //    cout << " dX["<< i <<"]= " << dX[i] << endl; 
-            //    cout << " dY["<< i <<"]= " << dY[i] << endl;
+            //std::cout << " dX["<< i <<"]= " << dX[i] << std::endl; 
+            //std::cout << " dY["<< i <<"]= " << dY[i] << std::endl;
         }
  
  
-        //  cout << " Before transfering " << endl;
-        // for (i =0; i < dim; i++)
-        //    {
-        //      cout << "atoms[" << i_next+1 << "].coord["<<i<<"] = " 
-        //           << atoms[i_next].coords[i] << endl; 
-        //    }
+         //std::cout << " Before transfering " << std::endl;
+         //for (i =0; i < dim; i++)
+         //   {
+         //     std::cout << "tAtoms[" << i_next << "].coord["<<i<<"] = " 
+         //               << tAtoms[i_next].coords[i] << std::endl; 
+         //   }
         
         
-        // cout <<" after transfer " << endl;
+        // std::cout <<" after transfer " << std::endl;
         
         for ( i =0; i < dim; i++)
         {
             tAtoms[i_next].coords[i]  = tAtoms[i_cur].coords[i]+ dY[i];
-      
+            //std::cout << "tAtoms[" << i_next << "].coord["<<i<<"] = " 
+            //          << tAtoms[i_next].coords[i] << std::endl; 
         }
-
+        
         //  cout << "continue " << endl;
         //  cin.get();
         
@@ -2500,8 +2504,19 @@ namespace LIBMOL
             }
             if (std::find(doneList.begin(), doneList.end(), tIdx) ==doneList.end())
             {
+                //std::cout << "Bond  " << aBond << std::endl;
+                //std::cout << "Angle " << aAng  << std::endl;
+                //std::cout << "Tor "   << aTor << std::endl;
+                //std::cout << "start Atom " << tAtoms[sSet[2]].id << std::endl;
+                //std::cout << "next Atom " << tAtoms[tIdx].id << std::endl;
                 PolToCart(tAtoms, sSet[2], tIdx, aBond, aAng, aTor, A);
                 tDoneSet.push_back(tIdx);
+                
+                for (unsigned i=0; i << tAtoms[tIdx].coords.size(); i++)
+                {
+                    std::cout << tAtoms[tIdx].coords[i] << std::endl;
+                }
+               
             }
             
             
@@ -2602,7 +2617,7 @@ namespace LIBMOL
                                     growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    //std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
+                                    // std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
                                 }
                             }
                         }
@@ -3155,6 +3170,8 @@ namespace LIBMOL
             return ;
         }
        
+      
+        
         int iL=0, iSize=(int)tRing.atoms.size();
         //while (std::find(doneSet.begin(), doneSet.end(), iNext)==doneSet.end())
         int tRingAtmSeq =1;
@@ -3175,25 +3192,32 @@ namespace LIBMOL
             
             //if (std::find(doneSet.begin(), doneSet.end(), iNext)==doneSet.end())
             //{
+            
             if (!tTurn)
             {
+                //std::cout << "Grow node 1 " << std::endl;
                 growOneRingNode(curSSet, tAtoms, tBonds, tAngles, tTorsions, tChs, tInR, tRingAtmSeq, iNext, doneSet);
             }
             else
             {
+                //std::cout << "Grow node 2 " << std::endl;
                 growOneRingNode2(curSSet, tAtoms, tBonds, tAngles, tTorsions, tChs, tInR, tRingAtmSeq, iNext, doneSet);
             }
+          
+            
             //}
             // tRingAtmSeq = -tRingAtmSeq;    
             sSet.erase(sSet.begin());
             sSet.push_back(iNext);
             iNext = tRing.atomsLink[iNext][tD];
-            // std::cout << "ring atom next " << tAtoms[iNext].id << std::endl;
+            //std::cout << "ring atom next " << tAtoms[iNext].id << std::endl;
             iL++;
         }
+        
         optSubSystem(doneList, tAtoms, tBonds, tAngles,
                      tTorsions, tRings, tPlas, tChs, false);
         //std::cout << "tree Node end: The sub-system is optimized \n";
+       
         
         // Then grow the atoms linked to the last atom in the ring
         std::vector<int> curSSet;
@@ -3202,6 +3226,8 @@ namespace LIBMOL
         //std::cout << "Grow atoms linked to the last atom in the ring" << std::endl;
         //std::cout << "sSet[0] " << tAtoms[sSet[0]].id << std::endl;
         growOneRingNode2(curSSet, tAtoms, tBonds, tAngles, tTorsions, tChs, tInR, tRingAtmSeq, iNext, doneSet);
+        // std::cout << "done one ring " << std::endl;
+        
     }
     
     void TransCoords::setSubSystem(std::vector<int>          & tDoneSet, 
@@ -3224,10 +3250,14 @@ namespace LIBMOL
         {
             
             tSubSys.allAtoms.push_back(tAllAtoms[*iA]);
-            // std::cout << "the " << i+1 << " atom is " << tSubSys.allAtoms[i].id << std::endl;
+            //std::cout << "the " << i+1 << " atom is " << tSubSys.allAtoms[i].id << std::endl;
             tSubSys.allAtoms[i].seriNum = i;
             idxCov[*iA] = i;
             tSubSys.allAtoms[i].connAtoms.clear();
+            //for (unsigned iS=0; iS < tSubSys.allAtoms[i].coords.size(); iS++)
+            //{
+            //    std::cout << "coords: " << tSubSys.allAtoms[i].coords[iS] << std::endl;
+            //}
             i++;
         }
          
@@ -3351,15 +3381,15 @@ namespace LIBMOL
         
         setSubSystem(tSubSet, tAllAtoms, tAllBonds, tAllAngles,
                      tAllTorsions, tAllRings, tAllPlanes, tAllChirals, aSubSys);
-        /*
-        std::cout << "a subsystem is set, it contains " << std::endl
-                  << (int)aSubSys.allAtoms.size()    << " atoms "       << std::endl
-                  << (int)aSubSys.allBonds.size()    << " bonds "       << std::endl
-                  << (int)aSubSys.allAngles.size()   << " angles "      << std::endl
-                  << (int)aSubSys.allTorsions.size() << " torsions "    << std::endl
-                  << (int)aSubSys.allPlanes.size()   << " planes "      << std::endl;
-                 // << (int)aSubSys.allRingsV.size() << " rings  "      << std::endl;
-         */
+        
+        //std::cout << "a subsystem is set, it contains " << std::endl
+        //          << (int)aSubSys.allAtoms.size()    << " atoms "       << std::endl
+        //          << (int)aSubSys.allBonds.size()    << " bonds "       << std::endl
+        //          << (int)aSubSys.allAngles.size()   << " angles "      << std::endl
+        //          << (int)aSubSys.allTorsions.size() << " torsions "    << std::endl
+        //          << (int)aSubSys.allPlanes.size()   << " planes "      << std::endl;
+                  // << (int)aSubSys.allRingsV.size() << " rings  "      << std::endl;
+        
         // LIBMOL::outPDB("sub_tree.pdb", "XXX", aSubSys.allAtoms);
         
         
@@ -3374,6 +3404,7 @@ namespace LIBMOL
                                 aSubSys.allAngles,  aSubSys.allTorsions,
                                 aSubSys.allRingsV,  aSubSys.allPlanes, 
                                 aSubSys.allChirals);
+            
         }
         else
         {
@@ -3388,11 +3419,16 @@ namespace LIBMOL
                 iSA != aSubSys.allAtoms.end(); iSA++)
         {
             int tPos = iSA->atomPosition(tAllAtoms);
+            
+            //std::cout << tAllAtoms[tPos].id << " and sub atom " << iSA->id << std::endl;
+            //std::cout << "atom in subsystem coord size " << iSA->coords.size() << std::endl;
+            //std::cout << "atom in all system coord size " << tAllAtoms[tPos].coords.size() << std::endl;
             if (tPos >=0 && tPos < tSize)
             {
                 for(int i=0; i < (int)tAllAtoms[tPos].coords.size(); i++)
                 {
                     tAllAtoms[tPos].coords[i]=iSA->coords[i];
+                    //std::cout << iSA->coords[i] << std::endl;
                 }
                     
             }
@@ -3402,9 +3438,9 @@ namespace LIBMOL
                           << " does not exist "           << std::endl;
             }
         }
-        
+       
     }
-    
+   
 }
 
 

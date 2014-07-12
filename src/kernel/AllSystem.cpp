@@ -99,6 +99,7 @@ namespace LIBMOL
     }
     
     AllSystem::AllSystem(Molecule& tMol):hasCoords(tMol.hasCoords),
+                                         hasCCP4Type(false),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -308,7 +309,7 @@ namespace LIBMOL
     
     void AllSystem::setSysProps()
     {
-        setHydroAtomConnect();
+        // setHydroAtomConnect();
             
         setAtomsBondingAndChiralCenter();
       
@@ -322,6 +323,13 @@ namespace LIBMOL
         setAllAngles();
            
         ringDetecting();
+        
+        if (!hasCCP4Type)
+        {
+            
+            setAtomsCCP4Type();
+        }
+       
         
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
@@ -976,9 +984,9 @@ namespace LIBMOL
                  StrLower(iA->cChemType);
             }
             
-            //std::cout << "Atom ID: " << iA->id << std::endl
-            //        << "Atom chemType: " << iA->chemType << std::endl
-            //        << "Atom chemType of COD classes: " << iA->cChemType << std::endl;
+            std::cout << "Atom ID: " << iA->id << std::endl
+                      << "Atom chemType: " << iA->chemType << std::endl
+                      << "Atom chemType of COD classes: " << iA->cChemType << std::endl;
         }
     }
     
@@ -991,10 +999,12 @@ namespace LIBMOL
         for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
         {
             allAtoms[i].ccp4Type = aCPP4TypeTool.allAtoms[i].ccp4Type;
-            //std::cout << "Atom " << allAtoms[i].id 
-            //          << " CCP4 atom type is " << allAtoms[i].ccp4Type 
-            //          << std::endl;
+            std::cout << "Atom " << allAtoms[i].id 
+                      << " Its sp idx " << allAtoms[i].bondingIdx 
+                      << " CCP4 atom type is " << allAtoms[i].ccp4Type 
+                      << std::endl;
         }
+      
     }
     void AllSystem::setDefaultCoordGeos()
     {
@@ -3444,8 +3454,21 @@ namespace LIBMOL
             }
         }
         
+        /*
         std::cout << "All torsions have been setup " << std::endl;
        
+        for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor != allTorsions.end(); iTor++)
+        {
+            std::cout << "Torsion angle " << iTor->seriNum << std::endl;
+            std::cout << "Its atoms are : " << std::endl;
+            for (std::vector<int>::iterator iA=iTor->atoms.begin();
+                    iA !=iTor->atoms.end(); iA++)
+            {
+                std::cout << "atom " << allAtoms[*iA].id << std::endl;
+            }
+        }
+        */
     }
     
     void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs, 

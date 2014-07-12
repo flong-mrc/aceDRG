@@ -151,6 +151,8 @@ namespace LIBMOL
                              REAL  tTotalVal,
                              REAL  tPka, REAL tPh);
         
+        void setAtomsCCP4Type(int idxMol);
+        
         void addHAtoms(int tIdxMol, 
                        int tIdxAtm,
                        REAL tNumH);

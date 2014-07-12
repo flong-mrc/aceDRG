@@ -184,9 +184,9 @@ namespace LIBMOL
                                 itsCurMol->atoms[t2].connAtoms.push_back(t1);
                                 aBond.fullAtoms[itsCurMol->atoms[t1].id] = t1;
                                 aBond.fullAtoms[itsCurMol->atoms[t2].id] = t2;
-                                aBond.order   = tBuf[2];
+                                aBond.order = tBuf[2];
                                 aBond.seriNum = tBondIdx;
-                                // std::cout << "aBond.seriNum " << aBond.seriNum << std::endl;
+                                std::cout << "aBond.seriNum " << aBond.seriNum << std::endl;
                                 itsCurMol->bonds.push_back(aBond);
                                 tBondIdx++;
                             }
@@ -215,15 +215,25 @@ namespace LIBMOL
             }
             inFile.close();
         }
-       
+      
+        
         for (unsigned i=0; i < allMols.size(); i++)
         {
             addHAtomToMols(i);
             setAtomsBondingAndChiralCenter(i);
+            
             setChiral(i);
             setHAtomCoordsMols(i);
+           
+            
+            for (std::vector<BondDict>::iterator iB=allMols[i].bonds.begin();
+                    iB !=allMols[i].bonds.end(); iB++)
+            {
+                std::string tS = iB->order;
+                OrderStrToStr(tS, iB->order);
+            }
+            allMols[i].hasCoords = false;
         }
-       
         
         // check 
         std::cout << "There are " << (int)allMols.size() 
@@ -262,6 +272,11 @@ namespace LIBMOL
                     {
                         std::cout << "Atom " << *iNB+1 << std::endl;
                     }
+                }
+                if (iA->connHAtoms.size() !=0)
+                {
+                    std::cout << "It bonds to " << iA->connHAtoms.size()  
+                              << "H atoms " << std::endl;
                 }
             }
             std::cout << "There are " << (int)iM->bonds.size() 
@@ -312,12 +327,18 @@ namespace LIBMOL
     void MolSdfFile::addHAtomToMols(int  tIdxMol)
     {
         
-        PeriodicTable aPTab;
         std::vector<std::string> orgElems;
         orgElems.push_back("C");
         orgElems.push_back("O");
         orgElems.push_back("N");
         orgElems.push_back("S");
+        orgElems.push_back("P");
+        orgElems.push_back("B");
+        
+        orgElems.push_back("Si");
+        orgElems.push_back("S");
+        
+        PeriodicTable aPTab;
         
         for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
                 iA !=allMols[tIdxMol].atoms.end(); iA++)
@@ -327,7 +348,8 @@ namespace LIBMOL
                  !=orgElems.end())
             {
                 // need to check protonated form
-                REAL addH =checkProtonated(iA, tIdxMol);
+                REAL addH =checkProtonateAll(iA, allMols[tIdxMol], aPTab);
+                // REAL addH =checkProtonated(iA, tIdxMol);
                 if (addH >0)
                 {
                     addHAtoms(tIdxMol, iA->seriNum, addH);
@@ -434,7 +456,11 @@ namespace LIBMOL
                                      int                  tMolIdx)
     {
         // consider protonated state based atom's property
+        
         REAL addedH =0.0;
+        
+        
+            
         if (tAt->chemType.compare("O")==0)
         {
             addedH=checkProtonateO(tAt, allMols[tMolIdx]);
@@ -451,7 +477,7 @@ namespace LIBMOL
         {
             addedH=checkProtonateC(tAt, allMols[tMolIdx]);
         }
-        
+       
         return addedH;
         
     }
@@ -518,7 +544,16 @@ namespace LIBMOL
         {
             AtomDict aH;
             aH.chemType = "H";
-            aH.id  = aH.chemType + allMols[tIdxMol].atoms[tIdxAtm].id+IntToStr(i+1);
+            std::string tS;
+            getDigitSec(allMols[tIdxMol].atoms[tIdxAtm].id, tS);
+            if (allMols[tIdxMol].atoms[tIdxAtm].chemType=="C")
+            {
+                aH.id  = aH.chemType + tS +IntToStr(i+1);
+            }
+            else
+            {
+                aH.id  = aH.chemType + allMols[tIdxMol].atoms[tIdxAtm].id;
+            }
             aH.seriNum =  (int)allMols[tIdxMol].atoms.size()
                          +(int)allMols[tIdxMol].extraHAtoms.size();
             aH.connAtoms.push_back(allMols[tIdxMol].atoms[tIdxAtm].seriNum);
@@ -952,25 +987,44 @@ namespace LIBMOL
     
     void MolSdfFile::setChiral(int tIdxMol)
     {
+    
         for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
                 iA !=allMols[tIdxMol].atoms.end(); iA++)
         {
             if (iA->chiralIdx !=0)
             {
+                
                 int tChIdx = (int)allMols[tIdxMol].chirals.size();
                 iA->inChirals.push_back(tChIdx);
                 ChiralDict aCh;
+                
                 aCh.atoms.push_back(iA->seriNum);
+               
+                // aCh.seriNum = (int)allMols[tIdxMol].chirals.size();
+                int aNum = (int)allMols[tIdxMol].chirals.size() + 1;
+                aCh.id = "chi" + IntToStr(aNum);
+                aCh.sign = "both";
+                
+                int i=0;
                 for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
                         iNB !=iA->connAtoms.end(); iNB++)
                 {
-                    aCh.atoms.push_back(*iNB);
-                    allMols[tIdxMol].atoms[*iNB].inChirals.push_back(tChIdx);
+                    if (i < 3)
+                    {
+                        aCh.atoms.push_back(*iNB);
+                        allMols[tIdxMol].atoms[*iNB].inChirals.push_back(tChIdx);
+                        i++;
+                    }
                 }
+               
                 aCh.setMutTable(iA->chiralIdx);
+                
                 allMols[tIdxMol].chirals.push_back(aCh);
+                
             }
         }
     }
+    
+   
    
 }

@@ -118,8 +118,26 @@ int main(int argc, char** argv) {
             {   
                 aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                                                           AJob.IOEntries["monoRootName"]);
-               
+                if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
+                {
+                    LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
+                                     AJob.IOEntries["monoRootName"], 
+                                     aTargetSystem.allAtoms,
+                                     aTargetSystem.allHAtomIdx,
+                                     aTargetSystem.allBonds,
+                                     aTargetSystem.allAngles,
+                                     aTargetSystem.allTorsions,
+                                     aTargetSystem.allRings,
+                                     aTargetSystem.allPlanes,
+                                     aTargetSystem.allChirals);
+            
+                    LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
+                                   AJob.IOEntries["monoRootName"], 
+                                   aTargetSystem.allAtoms);
+                }
                 // aTargetSystem.chiralExch();
+                else
+                {
                 if ( !aTargetSystem.containMetal()) 
                 {
                     // coordinate generator works only for a system of "organic" atoms. Tempo!
@@ -165,6 +183,7 @@ int main(int argc, char** argv) {
                               << "No atom coordinates will be generated at the momemt. " << std::endl
                               << "They will be available soon. " << std::endl;
                 }
+                }
             }
             else
             {
@@ -190,11 +209,32 @@ int main(int argc, char** argv) {
                     if ( (int)aTargetSystem.allAtoms.size() > 0)
                     {
                         std::string tOutName(AJob.IOEntries["userOutName"]);
-                        tOutName.append("_");
-                        tOutName.append(LIBMOL::IntToStr(i));
+                        if(dataFromSdf.allMols.size()>1)
+                        {
+                            tOutName.append("_");
+                            tOutName.append(LIBMOL::IntToStr(i));
+                        }
                         aTargetSystem.setupAllTargetValuesFromCOD(tOutName.c_str(), 
-                                                                  AJob.IOEntries["monoRootName"]);
+                                                   AJob.IOEntries["monoRootName"]);
+                        
+                        LIBMOL::outMMCif(tOutName.c_str(),
+                                         AJob.IOEntries["monoRootName"], 
+                                             aTargetSystem.allAtoms,
+                                             aTargetSystem.allHAtomIdx,
+                                             aTargetSystem.allBonds,
+                                             aTargetSystem.allAngles,
+                                             aTargetSystem.allTorsions,
+                                             aTargetSystem.allRings,
+                                             aTargetSystem.allPlanes,
+                                             aTargetSystem.allChirals);
+            
+                            LIBMOL::outPDB(tOutName.c_str(),
+                                           AJob.IOEntries["monoRootName"], 
+                                           aTargetSystem.allAtoms);
+                        
                         // aTargetSystem.chiralExch();
+                        
+                        /*
                         if ( !aTargetSystem.containMetal()) 
                         {
                              
@@ -202,9 +242,10 @@ int main(int argc, char** argv) {
                             GO::FindGlobMin  aGlobMinSystem(aTargetSystem, 
                                                             tOutName.c_str(),
                                                             AJob.IOEntries["monoRootName"]);  
-                            
+            
                             aGlobMinSystem.Driver();
             
+                            
                             LIBMOL::outMMCif(tOutName.c_str(),
                                              AJob.IOEntries["monoRootName"], 
                                              aGlobMinSystem.allAtoms,
@@ -241,8 +282,13 @@ int main(int argc, char** argv) {
                                       << "Restraint cif is the only output. "
                                       << "No atom coordinates will be generated at the momemt. " << std::endl
                                       << "They will be available soon. " << std::endl;
-                        }
+                        ]
+                         */
+                        
                     }
+                    
+                    
+                    
                     i++;
                 }
             }

@@ -366,13 +366,14 @@ namespace LIBMOL
     void CodClassify::codAtomClassify2(int dLev)
     {
         ringDetecting2();
-        /*
+        
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
             if ((int)iA->ringRep.size() >0)
             {
-                std::cout << "\nAtom " << iA->id << " is in  " 
+                std::cout << "From ring rep view " << std::endl;
+                std::cout << "Atom " << iA->id << " is in  " 
                         << (int)iA->ringRep.size() << " ring(s)" << std::endl;
                 for (std::map<std::string, int>::iterator iRR=iA->ringRep.begin();
                         iRR != iA->ringRep.end(); iRR++)
@@ -381,8 +382,26 @@ namespace LIBMOL
                             << iRR->second << std::endl;
                 }
             }
+            
+            //if (iA->inRings.size() >0)
+            //{
+            //    std::cout << "From ring number view " << std::endl;
+            //    std::cout << "Atom " << iA->id << " is in  " 
+            //            << (int)iA->inRings.size() << " ring(s)" << std::endl;
+                
+            //    for (std::vector<int>::iterator iI=iA->inRings.begin();
+            //            iI !=iA->inRings.end(); iI++)
+            //    {
+            //        std::cout << "Ring: " << *iI << std::endl;
+            //    }
+            //}
+            if (iA->ringRep.size() !=iA->inRings.size())
+            {
+               exit(1);
+            }
         }
-        */
+        
+        
         // std::cout <<std::endl << "Output Atom COD classes now " << std::endl << std::endl;
         
         for (int i=0; i < (int)allAtoms.size(); i++)
@@ -391,6 +410,8 @@ namespace LIBMOL
             //std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl 
             //          << "class is " << allAtoms[i].codClass << std::endl;            
         }
+        
+        
         
         // set a hashing code and primeNB symbol to each atom.
         
@@ -943,6 +964,7 @@ namespace LIBMOL
             //{
             //    tempIDs.clear();
             //}
+   
             if (!iA->isMetal)
             {
                 int preSeriNum = -999;
@@ -1293,15 +1315,13 @@ namespace LIBMOL
     }
     
     void CodClassify::checkOnePathSec2(AtomDict                & curAto,
-                                      int                       iMax,
+                                      int                        iMax,
                                       std::vector<AtomDict>::iterator iOriAto,
-                                      int                       SeriNumPreAto,  
-                                      int                       curLev,
-                                      std::map<int, ID>       & seenAtomIDs,
-                                      std::map<int, ID>       & atomIDsInPath)
-    {
-        
-       
+                                      int                        SeriNumPreAto,  
+                                      int                        curLev,
+                                      std::map<int, ID>       &  seenAtomIDs,
+                                      std::map<int, ID>       &  atomIDsInPath)
+    {   
         if ( curLev <iMax )
         {  
             int NachbarpunkteDetected = 0;
@@ -1369,10 +1389,12 @@ namespace LIBMOL
                             tAllIds.push_back(iSee->second);
                             int posIdx = atomPosition(iSee->second);
                             ttAtoms.push_back(allAtoms[posIdx]);
-                                // tRing.atoms.push_back(*tAt);
-                                //std::cout << iSee->second << std::endl;   
+                            
+                            // tRing.atoms.push_back(*tAt);
+                            //std::cout << iSee->second << std::endl;   
                             //}
                         }
+                        
                         RingDict aRingDict(ttAtoms);                 
                         
                         tAllIds.sort(compareNoCase);
@@ -1390,6 +1412,12 @@ namespace LIBMOL
                         std::map<ID, std::vector<RingDict> >::iterator iFindRing=allRings.find(tRepStr);
                         if (iFindRing == allRings.end())
                         {
+                            for (std::map<int, ID>::iterator iSee = atomIDsInPath.begin();
+                                iSee != atomIDsInPath.end(); iSee++)
+                            {
+                                int posIdx = atomPosition(iSee->second);
+                                allAtoms[posIdx].inRings.push_back((int)allRings.size());
+                            }
                             allRings[tRepStr].push_back(aRingDict);
                         }
                         

@@ -1,0 +1,348 @@
+#!/usr/bin/env python
+# Python script
+#
+#
+#
+#     Copyright (C) 2014 --- 2019 Fei Long,  Murshudov
+#
+#     This code is distributed under the terms and conditions of the
+#     CCP4 Program Suite Licence Agreement as a CCP4 Library.
+#
+#====================================================================
+## The date of last modification: 11/07/2014
+
+import os,os.path,sys
+import glob,shutil
+import re,string
+from optparse import OptionParser 
+import time
+
+if not os.environ.has_key("CCP4") :
+    print "Please activate ccp4.setup"
+    sys.exit() 
+
+class Acedrg:
+
+    def __init__( self, t_argvs):
+
+        self.errMessage       = []
+        self.errLevel         = 0
+
+        self.inStdCifName     = ""
+        self.inMmCifName      = ""
+        self.inSmiName        = ""
+        self.inMdlName        = ""
+        self.inSDFName        = ""
+        self.outRoot          = ""
+        self.outRstCifName    = ""
+        self.outRstPdb        = ""
+        self.monomRoot        = ""
+
+        self.acedrgTable      = ""
+        self.libmol           = ""
+        self.libmolLogName    = ""
+        self.libcheck         = ""
+        self.libcheckLogName  = ""
+        self.refmac           = ""
+        self.refmacLogName    = ""
+
+        self.cmdLine          = ""
+        self.workMode         = 0
+
+        inputOptionsP         = self.InputParser(t_argvs) 
+        self.checkDependency()
+        self.setWorkMode(inputOptionsP)
+       
+        self.execute()  
+
+    def InputParser(self, t_argvs):
+
+        usage = "Look for help: %s -h "%"acedrg"
+
+        self.inputParser = OptionParser(usage=usage)
+
+        # Options 
+        # input file format 
+        self.inputParser.add_option("-b",  "--stdcif", dest="inStdCifName", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input small molecule CIF File containing coordinates and crystal information")
+
+        self.inputParser.add_option("-c",  "--mmcif", dest="inMmCifName", metavar="FILE", 
+                                    action="store", type="string", help="Input MMCIF File containing coordinates and bonds")
+
+        self.inputParser.add_option("-i",  "--smi", dest="inSmiName", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input  File containing a SMILE string")
+
+        self.inputParser.add_option("-m",  "--mdl", dest="inMdlName", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File of MDL format containing coordinates and bonds")
+
+        self.inputParser.add_option("-o",  "--out", dest="outRoot", 
+                                    action="store", type="string", 
+                                    help="A name root that users want their output files called(without extension)")
+
+        self.inputParser.add_option("-r",  "--res", dest="monomRoot",  
+                                    action="store", type="string", 
+                                    help="The name of the chemical components users want to put into output files(e.g. PDB or MMCIF)")
+
+        self.inputParser.add_option("-s",  "--sdf", dest="inSdfName", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File of SDF format containing coordinates and bonds")
+
+        self.inputParser.add_option("-t", "--mol",
+                  action="store_false", dest="buildMol", default=False,
+                  help="Use this keyword if you want to generate molecules and a set of bonds and angles from a small molecule cif file ")
+
+        (inputOptionsP, inputOptionsU) = self.inputParser.parse_args(t_argvs)
+
+        if inputOptionsU:    
+            print "Line arguments for those keywords are missing "
+            for a_opt in t_inputOptionsU:
+                print "Keyword %s ?"%a_opt
+            sys.exit()
+
+        return inputOptionsP 
+
+    def checkDependency(self):
+     
+        if os.environ.has_key("CCP4"):
+            tRefmac = os.path.join(os.environ['CBIN'], "refmac5")
+            if not glob.glob(tRefmac):
+                print "refmac5 could not be found"
+                sys.exit()
+            else:
+                self.refmac = tRefmac
+
+            tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
+            if not glob.glob(tLibcheck):
+                print "libcheck could not be found"
+                sys.exit()
+            else:
+                self.libcheck = tLibcheck
+
+            tLibmol = os.path.join(os.environ['CBIN'], "libmol")
+            if glob.glob(tLibmol):
+                self.libmol = tLibmol
+
+            tAcedrgTables = os.path.join(os.environ['CCP4'], "share/Acedrg/tables")
+            if glob.glob(tAcedrgTables):
+                self.acedrgTables = tAcedrgTables
+        else :
+            print "You need to install CCP4 suite"
+            sys.exit()
+
+        if not self.libmol or not self.acedrgTables:
+            if os.environ.has_key("LIBMOL_ROOT"):
+                tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "bin/libmol")
+                if glob.glob(tLibmol):
+                    self.libmol = tLibmol
+                else:
+                    print "libmol could not be found at %s"%tLibmol
+                    sys.exit()
+
+                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "tables")
+                if os.path.isdir(tAcedrgTables):
+                    self.acedrgTables = tAcedrgTables
+                else:
+                    print "Tables required could not be found at %s"%tAcedrgTables
+                    sys.exit()
+            else:
+                print "You need to define 'LIBMOL_ROOT"
+                sys.exit()
+                                
+    def setWorkMode(self, t_inputOptionsP = None):
+       
+        if t_inputOptionsP.inMmCifName: 
+            self.inMmCifName = t_inputOptionsP.inMmCifName
+            self.workMode    = 11            
+        elif t_inputOptionsP.inSmiName: 
+            self.inSmiName = t_inputOptionsP.inSmiName
+            self.workMode    = 12            
+        elif t_inputOptionsP.inMdlName: 
+            self.inMdlName = t_inputOptionsP.inMdlName
+            self.workMode    = 13
+        elif t_inputOptionsP.inSdfName: 
+            self.inSdfName = t_inputOptionsP.inSdfName
+            self.workMode    = 14
+        elif t_inputOptionsP.inStdCifName: 
+            self.inStdCifName = t_inputOptionsP.inStdCifName
+            self.workMode     = 21
+                        
+        if t_inputOptionsP.monomRoot:
+            self.monomRoot   = t_inputOptionsP.monomRoot
+        else:
+            self.monomRoot   = "UNL"
+
+        if t_inputOptionsP.outRoot:
+            self.outRoot   = t_inputOptionsP.outRoot
+        else:
+            self.outRoot   = "AcedrgOut"
+
+    def runLibmol(self, tIn=None):
+ 
+        self.cmdLine = self.libmol
+        if self.workMode == 11 or self.workMode == 12:
+            if tIn:
+                self.inMmCifName    = tIn
+            
+            self.libmolLogName  = self.outRoot + ".log"
+            self.outRstCifName  = self.outRoot + ".rst"   
+            self.outRstPdbName  = self.outRoot + ".pdb"
+
+            self.cmdLine +=" -c %s  "%self.inMmCifName
+            self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
+            os.system(self.cmdLine)
+        if self.workMode == 13 or self.workMode == 14:
+            if tIn:
+                self.inMmCifName = tIn
+            self.libmolLogName  = self.outRoot + ".log"
+            self.outRstCifName  = self.outRoot + ".rst"
+            self.outRstPdbName  = self.outRoot + ".pdb"
+
+            self.cmdLine += " -s %s  "%self.inMmCifName
+            self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
+            os.system(self.cmdLine)
+
+        if self.workMode == 21 :
+            if tIn:
+                self.inStdCifName = tIn
+
+            self.libmolLogName  = self.outRoot + ".log"
+            self.outRstCifName  = self.outRoot + ".rst"
+	    self.outMolsName    = self.monomRoot + "_all_mols.txt"
+            self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
+
+            self.cmdLine += " -b %s  "%self.inStdCifName
+            self.cmdLine += " -m yes -r %s -o %s >  %s "%(self.monomRoot, self.outRstCifName, self.libmolLogNam)
+            os.system(self.cmdLine)
+
+             
+    def setLibcheckBat(self, tSmiName, tOutRoot, tLogNme):
+
+        self.cmdLine = self.libcheck 
+
+        libcheckBatName = self.outRoot + "_libcheck.bat"
+        try:
+            libcheckBat = open(libcheckBatName,"w")
+        except IOError:
+            print libcheckBatName, " could not be opened for write "
+            sys.exit()
+        else:
+            libcheckBat.write(" N \n")
+            libcheckBat.write("FILE_SMILE %s\n"%tSmiName) 
+            libcheckBat.write("FILE_O  %s \n\n"%tOutRoot)
+            libcheckBat.close()
+
+            self.cmdLine +=" < %s > %"%(libcheckBatName, tLogNme)
+            print self.cmdLine
+    
+    def runLibcheck(self, tSmiName=None):
+
+        if tSmiName:
+            self.inSmiName = tSmiName
+        self.libcheckLogName  = self.outRoot + "_libcheck.log"
+        self.libcheckOutRoot  = self.outRoot + "_libcheck"
+        self.libcheckLibName  = self.libcheckOutRoot +".lib"
+        self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot, self.libcheckLogName)
+        os.system(self.cmdLine)
+            
+    def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tLogName):
+      
+        self.cmdline = self.refmac 
+        self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
+        self.cmdline += "mode newe \n"
+        self.cmdline += "end       \n"
+	self.cmdline += "eof       \n\n"
+
+        print self.cmdLine
+
+    def runRefmac(self, tPdbIn, tLibIn):
+      
+        self.refmacLogName  = self.outRoot + "_refmac.log"
+        self.refmacXYZOUTName = self.outRoot + "_refmac.pdb"
+        self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, self.refmacLogName)
+        os.system(self.cmdline)
+
+    def execute(self):
+       
+        print "Current workMode ", self.workMode
+        
+        if self.workMode == 11:
+
+            # Stage 1: dictionary generation using a mmcif file 
+            if os.path.isfile(self.inMmCifName):
+                self.runLibmol(self.inMmCifName)
+            else:
+                print "%s does not exist"%self.inMmCifName
+                sys.exit()
+
+            # Stage 2: optimization
+            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
+                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+    
+        if self.workMode == 12:
+            
+            # Stage 1: Transfer the SMILE input into a mmcif file
+            if os.path.isfile(self.inSmiName):
+                self.runLibcheck(self.inSmiName)
+            else:
+                print "%s does not exist"%self.inSmiName
+                sys.exit()
+
+            # Stage 2: dictionary generation using a mmcif file
+            if os.path.isfile(self.libcheckLibName):
+                self.runLibmol(self.libcheckLibName)
+            else:
+                print "%s does not exist"%self.inMmCifName
+                sys.exit()
+
+            # Stage 3: optimization
+            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
+                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                else:
+                    print "%s or %s does not contain enough information "%(self.outRstPdbName, self.outRstCifName)
+            else:
+                print "%s and/or %s do not exist "%(self.outRstPdbName, self.outRstCifName)
+
+        if self.workMode == 13:
+            
+            # Stage 1: dictionary generation using  a mdl file
+            if os.path.isfile(self.inMdlName):
+                self.runLibmol(self.inMdlName)
+                print "Dictionary output %s"%self.outRstCifName
+                print "PDB output %s"%self.outRstPdbName
+              
+            # Stage 2: optimization
+            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
+                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+    
+        if self.workMode == 14:
+            
+            # Stage 1: dictionary generation using  a sdf file
+            if os.path.isfile(self.inSdfName):
+                self.runLibmol(self.inSdfName)
+            
+            # Stage 2: optimization
+            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
+                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+
+        if self.workMode == 21:
+            
+            # Stage 1: generate molecules and the associated bond and bond-angle values 
+            # using a small molecule cif file
+
+            if os.path.isfile(self.inStdCifName):
+                self.runLibmol(self.inStdCifName)
+            
+
+def main():
+    acedrgObj = Acedrg(sys.argv[1:])
+
+if __name__ == "__main__":
+    main()
+

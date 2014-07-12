@@ -2341,6 +2341,7 @@ namespace LIBMOL
             {
                 std::cout << "The system has no coords " << std::endl;
             }
+             */
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
             {
@@ -2370,7 +2371,7 @@ namespace LIBMOL
                 
             }
             
-           
+            
             for (std::vector<BondDict>::iterator iBo = allBonds.begin();
                     iBo != allBonds.end(); iBo++)
             {
@@ -2382,7 +2383,8 @@ namespace LIBMOL
                 //std::cout << "Its sigLength : " << iBo->sigLength << std::endl;
                 //std::cout << "its order : " << iBo->order << std::endl;
             }
-             */
+             
+            
         }
     }
         
@@ -6952,8 +6954,10 @@ namespace LIBMOL
         std::ofstream outRestrF(tFName);
         
         
+        
         if(outRestrF.is_open())
         {
+            
             srand((unsigned)std::time( NULL ));
             // Temp 
             // 1. Global section 
@@ -6965,6 +6969,8 @@ namespace LIBMOL
             
             
             // 'LIST OF MONOMERS' section
+            
+            std::string sName =tMonoRootName.substr(0,3);
             outRestrF << "# ------------------------------------------------" << std::endl
                     << "#" << std::endl
                     << "# ---   LIST OF MONOMERS ---" << std::endl
@@ -6978,10 +6984,11 @@ namespace LIBMOL
                     << "_chem_comp.number_atoms_all" << std::endl
                     << "_chem_comp.number_atoms_nh" << std::endl
                     << "_chem_comp.desc_level" << std::endl
-                    << tMonoRootName <<"\t"<< tMonoRootName << "\t" << "'.\t\t'\t"
+                    << tMonoRootName <<"\t"<< sName << "\t" << "'.\t\t'\t"
                     << "non-polymer\t" << (int)tAtoms.size() << "\t" 
                     << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
                     << std::endl;
+            
             
             outRestrF <<"# ------------------------------------------------------" << std::endl
                       <<"# ------------------------------------------------------" << std::endl
@@ -7012,7 +7019,7 @@ namespace LIBMOL
                     //double r3 =  (double) rand()/RAND_MAX;
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
-                    outRestrF << tMonoRootName  
+                    outRestrF << sName 
                               << std::setw(12) << iA->id 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
@@ -7041,7 +7048,7 @@ namespace LIBMOL
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
                 {
-                    outRestrF << tMonoRootName  
+                    outRestrF << sName 
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)   << tAtoms[iB->atomsIdx[1]].id  
                               << std::setw(12)  << iB->order 
@@ -7089,7 +7096,7 @@ namespace LIBMOL
                         for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
                                 iCA !=iA->codAngleValues.end(); iCA++)
                         {
-                            outRestrF << tMonoRootName << std::setw(12)
+                            outRestrF << sName << std::setw(12)
                                       << tAtoms[iA->atoms[1]].id << std::setw(12)
                                       << tAtoms[iA->atoms[0]].id << std::setw(12)
                                       << tAtoms[iA->atoms[2]].id ;
@@ -7099,7 +7106,7 @@ namespace LIBMOL
                     }
                     else
                     {
-                        outRestrF << tMonoRootName 
+                        outRestrF << sName 
                                   << std::setw(12) << tAtoms[iA->atoms[1]].id
                                   << std::setw(12) << tAtoms[iA->atoms[0]].id 
                                   << std::setw(12) << tAtoms[iA->atoms[2]].id;
@@ -7150,7 +7157,7 @@ namespace LIBMOL
                     //          << iT->atoms[2] << std::endl
                     //          << iT->atoms[3] << std::endl;
                 
-                    outRestrF << tMonoRootName 
+                    outRestrF << sName 
                               << std::setw(16) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id 
                               << std::setw(12)  << tAtoms[iT->atoms[1]].id 
@@ -7199,7 +7206,7 @@ namespace LIBMOL
                         iCh != tChs.end(); iCh++)
                 {
                     inputChiralID.push_back(iCh->archID);
-                    outRestrF << tMonoRootName << "    " 
+                    outRestrF << sName << "    " 
                               << iCh->id  << "    ";
                     for (std::vector<int>::iterator iAt=iCh->atoms.begin();
                             iAt != iCh->atoms.end(); iAt++)
@@ -7258,7 +7265,7 @@ namespace LIBMOL
                                 
                                 // Not let H in as possible
                                   
-                                outRestrF << tMonoRootName 
+                                outRestrF << sName 
                                           << std::setw(10) << idxStr 
                                           << std::setw(10)  << iA->id;
                        
@@ -7294,7 +7301,7 @@ namespace LIBMOL
                         for(std::map<ID, int>::iterator iAt=iP->atoms.begin();
                                 iAt != iP->atoms.end(); iAt++)
                         {
-                            outRestrF << tMonoRootName 
+                            outRestrF << sName
                                       << std::setw(10) << idxPStr
                                       << std::setw(12)  << iAt->first 
                                       << std::setw(8)  << "0.020" << std::endl;

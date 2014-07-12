@@ -26,6 +26,46 @@ namespace LIBMOL
         return nO;
     }
     
+    extern void getHydroAtomConnect(std::vector<AtomDict>  &  tAtoms)
+    {
+        for(std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA!=tAtoms.end(); iA++)
+        {
+            if(!iA->chemType.compare("H")==0)
+            {
+                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
+                    iNB !=iA->connAtoms.end(); iNB++)
+                {
+                    if (tAtoms[*iNB].chemType.compare("H")==0)
+                    {
+                        iA->connHAtoms.push_back(*iNB);
+                    }
+                }
+            }
+        }
+        
+        // Check
+        /*
+        for(std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA!=allAtoms.end(); iA++)
+        {
+            std::cout << "Atom " << iA->id << " connects to " 
+                    << (int)iA->connHAtoms.size() << " H atoms " << std::endl;
+            if ((int)iA->connHAtoms.size() !=0)
+            {
+                std::cout << "These atoms are : " << std::endl;
+                for (std::vector<int>::iterator iH=iA->connHAtoms.begin();
+                        iH !=iA->connHAtoms.end(); iH++)
+                {
+                    std::cout << "Atom " << allAtoms[*iH].id << std::endl;
+                }
+            }
+        }
+         */
+       
+        
+    }
+    
     // Set atom's bonding features (sp, sp2, sp3 and chiral center) based on 
     // the atom's connections.
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms)
@@ -251,6 +291,64 @@ namespace LIBMOL
     
     // Check protonation state of an atom and decide how many H atoms will added 
     // to bond it.
+    
+    extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
+                                  Molecule   & tMol, 
+                                  PeriodicTable & tTab)
+    {
+        // REAL aNumH=0.0;
+        
+        REAL Order  = getTotalBondOrder(tMol, tIA);
+        REAL Diff1  = Order -tIA->formalCharge;
+        
+        ;
+        std::map<int, int> Vals;
+        
+        Vals[1] = tTab.elements[tIA->chemType]["val"];
+        if (tTab.extraValences.find(tIA->chemType) !=tTab.extraValences.end())
+        {
+            int i=2;
+            for (std::vector<int>::iterator iM=tTab.extraValences[tIA->chemType].begin();
+                    iM !=tTab.extraValences[tIA->chemType].end(); iM++)
+            {
+                 Vals[i] = *iM;
+                 i++;
+            }
+        }
+        
+        // Now check all possibilities of element valences 
+        REAL minD=100.0;
+        
+        for (std::map<int, int>::iterator iM=Vals.begin();
+                iM !=Vals.end(); iM++)
+        {
+            REAL Diff2  = (REAL)tTab.elements[tIA->chemType]["val"]
+                           -Diff1;
+            
+            if (fabs(Diff2) <0.000001)
+            {
+                return 0.0;
+            }
+            else if (Diff2 >0 && Diff2 < minD )
+            {
+                minD = Diff2;
+            }
+            
+            if (minD >8)
+            {
+                std::cout << "Bond order or valance error " << std::endl;
+                exit(1);
+            }
+            
+            
+        }
+        std::cout << minD <<" H atom should be added to bind atom " 
+                  << tIA->id << std::endl;
+        
+        return minD;
+   
+    }
+    
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
                                 REAL tTolBondOrder)
     {
@@ -261,12 +359,12 @@ namespace LIBMOL
         // No H need to be added
         
         // 2. O in Tyrosine, Pka=10
+        //std::cout << "Protonated stat " << tIA->id << std::endl;
+        //std::cout << "total order << " << tTolBondOrder << std::endl;
         if (tTolBondOrder==1.0 && tIA->charge==0 )
         {
-            //if(tIA->resName.compare("TYR")==0)
-            //{
-                aNumH=1.0;
-            //}
+            aNumH=1.0;
+          
         }
         
         return aNumH;
@@ -277,17 +375,15 @@ namespace LIBMOL
     {
         REAL aNumH = 0.0;
         StrUpper(tIA->resName);
+        REAL tVal = getTotalBondOrder(tMol, tIA);
         // Currently using PH=7 
         // 1. O in Carboxy-Terminus, PKa=2, in ASP and GLU pKa=4
         // No H need to be added
         
         // 2. O in Tyrosine, Pka=10
-        if (tIA->connAtoms.size()==1 && tIA->charge==0 )
+        if (tVal==1.0 && tIA->charge==0 )
         {
-            if(tIA->resName.compare("TYR")==0)
-            {
-                aNumH=1.0;
-            }
+            aNumH=1.0;
         }
         
         return aNumH;
@@ -359,9 +455,12 @@ namespace LIBMOL
                                 Molecule   & tMol)
     {
         REAL aNumH = 0.0;
-        StrUpper(tIA->resName);
+        //StrUpper(tIA->resName);
         REAL tVal = getTotalBondOrder(tMol, tIA);
+        
+        
         // std::cout << "tVal for N " << tVal << std::endl;
+        
         
         if (tVal < 4)
         {
@@ -402,6 +501,7 @@ namespace LIBMOL
                 
             }
         }
+        
         
         return aNumH;
     }
@@ -563,7 +663,23 @@ namespace LIBMOL
     extern void setAllBondOrders(std::vector<AtomDict> & tAtoms,
                                  std::vector<BondDict> & tBonds)
     {
+        std::vector<int> unAssigned;
         
+        for (unsigned int i=0; i < tBonds.size(); i++)
+        {
+            if (tAtoms[tBonds[i].atomsIdx[0]].chemType=="H" 
+               || tAtoms[tBonds[i].atomsIdx[1]].chemType=="H"
+               || tAtoms[tBonds[i].atomsIdx[0]].bondingIdx==3
+               || tAtoms[tBonds[i].atomsIdx[1]].bondingIdx==3)
+            {
+                tBonds[i].order = "single";
+            }
+            else
+            {
+                unAssigned.push_back(i);
+            }
+            
+        }
     }
     
     // Set Coordinates for added H atoms
@@ -571,6 +687,8 @@ namespace LIBMOL
     extern void  setOneHAtomCoordsSP3(std::vector<AtomDict> & tAtoms,
                                       std::vector<AtomDict>::iterator tIA)
     {   
+        
+        std::cout << "set H atom " << tIA->id  << " coords " << std::endl;
         
         TransCoords   aTransTool;
         
@@ -597,10 +715,13 @@ namespace LIBMOL
                     }
                 }
             }
+            
             if (root1 !=-1 && root2 !=-1)
             {
                 break;
             }
+            
+            
         }
         
         if (root1 !=-1 && root2 !=-1)
@@ -630,7 +751,8 @@ namespace LIBMOL
             REAL d = 0.95, alpha= 109.5*PI180;  // the guide values
             REAL aTor;
             
-            // std::cout << "number of ref atom is " << refAtmIdx.size() << std::endl;
+            std::cout << "number of ref atom is " << refAtmIdx.size() << std::endl;
+            
             if  (refAtmIdx.size() ==1)
             {
                 aTor  = getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen],tAtoms[refAtmIdx[0]])*PI180
@@ -682,9 +804,15 @@ namespace LIBMOL
                 aTor  = 180*PI180;
             }
             
-            //std::cout << "Tor is " << aTor*PID180 << std::endl;
+            std::cout << "Tor is " << aTor*PID180 << std::endl;
+            std::cout << "atom1 " << tAtoms[root2].id << " atom2 " 
+                      << tAtoms[root1].id << " atom3 " << tAtoms[aCen].id
+                      << "H atom added " << tIA->id << std::endl;
             aTransTool.growOneAtom(tAtoms[root2], tAtoms[root1], tAtoms[aCen], 
                                        tIA, d, alpha, aTor);
+            std::cout << "check distance " << distanceV(tAtoms[aCen].coords,
+                                                        tIA->coords) 
+                                           << std::endl;
             
             //for (unsigned i=0; i < 3; i++)
             //{
@@ -700,6 +828,7 @@ namespace LIBMOL
     extern void  setOneHAtomCoordsSP2(std::vector<AtomDict> & tAtoms,
                                       std::vector<AtomDict>::iterator tIA)
     {
+        std::cout << "set H atom " << tIA->id  << " coords " << std::endl;
         TransCoords   aTransTool;
         
         int           aCen=tIA->connAtoms[0] , aRef=-1;
@@ -763,8 +892,16 @@ namespace LIBMOL
                 aTor  = getTorsion(tAtoms[root2], tAtoms[root1], tAtoms[aCen],tAtoms[aRef])*PI180
                              + PI;
             }
+            
             aTransTool.growOneAtom(tAtoms[root2], tAtoms[root1], tAtoms[aCen], 
                                        tIA, d, alpha, aTor);
+            std::cout << "Tor is " << aTor*PID180 << std::endl;
+            std::cout << "atom1 " << tAtoms[root2].id << " atom2 " 
+                      << tAtoms[root1].id << " atom3 " << tAtoms[aCen].id
+                      << "H atom added " << tIA->id << std::endl;
+            std::cout << "check distance " << distanceV(tAtoms[aCen].coords,
+                                                        tIA->coords) 
+                                           << std::endl;
             tIA->coordExist = true;
         }
         else

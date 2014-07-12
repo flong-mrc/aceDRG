@@ -1,0 +1,298 @@
+#!/usr/bin/env python
+# Python script
+#
+import os, os.path, sys
+import glob, re, shutil
+import string, time
+import math
+
+from Utilities import isOrganic
+from Utilities import listComp2
+from Utilities import dictObjCmp
+from Utilities import getMax
+
+def  isOrganicSys(allLs):
+      
+     tBo = False
+      
+     for aL in allLs:
+         if aL.find("Center_Atom_COD_type") !=-1 and aL.find("Angle_") ==-1:
+             return True
+         elif tBo :
+             strGrp = aL.strip().split()
+             if len(strGrp)==5:
+                 if not isOrganic(strGrp[2].strip()) or not isOrganic(strGrp[3].strip()):
+                     return False
+         elif aL.find("Bond_length") != -1:
+             tBo = True
+
+     return True
+     
+def  getBondsAndAngles(aInFileName, tACs, tBOs, tANs):
+     
+     aSetStrs = os.path.basename(aInFileName).strip().split("_")
+     print aInFileName
+     if len(aSetStrs) ==5:
+         aFileIdx = aSetStrs[0]
+         try:
+             aF = open(aInFileName, "r")
+         except IOError:
+             print "%s can not be open for reading"%aInFileName
+         else:
+             allLs = aF.readlines()
+             aF.close()
+             if isOrganicSys(allLs):
+                 lBo = False
+                 lAn = False
+                 for aL in allLs:
+                     strGrp = aL.strip().split()
+                     if lBo and len(strGrp)==5:
+                         # get sorted bonds
+                         aSet  = [strGrp[0], strGrp[2]]                  
+                         bSet  = [strGrp[1], strGrp[3]]   
+                         tSets = [aSet, bSet]
+                         tSets.sort(listComp2)
+                         if not tBOs["org"].has_key(tSets[0][1]):         # element 1
+                             tBOs["org"][tSets[0][1]] = {}
+                         if not tBOs["org"][tSets[0][1]].has_key(tSets[1][1]): # element 2 
+                             tBOs["org"][tSets[0][1]][tSets[1][1]] = {}
+                         if not tBOs["org"][tSets[0][1]][tSets[1][1]].has_key(tSets[0][0]): # class 1
+                             tBOs["org"][tSets[0][1]][tSets[1][1]][tSets[0][0]] ={}
+                         if not tBOs["org"][tSets[0][1]][tSets[1][1]][tSets[0][0]].has_key(tSets[1][0]): # class 2
+                             tBOs["org"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]] = []
+                         aTup = [strGrp[4], aFileIdx]                          # bond length and the file index
+                         tBOs["org"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]].append(aTup) 
+                         # Get sorted atom types
+                         if not tACs["org"].has_key(strGrp[2]):            # atom 1 element type
+                             tACs["org"][strGrp[2]] = {}
+                         if not tACs["org"][strGrp[2]].has_key(strGrp[0]): # atom 1 class type
+                             tACs["org"][strGrp[2]][strGrp[0]] = 1
+                         else:
+                             tACs["org"][strGrp[2]][strGrp[0]] +=1
+                         if not tACs["org"].has_key(strGrp[3]):            # atom 2 element type
+                             tACs["org"][strGrp[3]] = {}
+                         if not tACs["org"][strGrp[3]].has_key(strGrp[1]): # atom 2 class type
+                             tACs["org"][strGrp[3]][strGrp[1]] = 1
+                         else:
+                             tACs["org"][strGrp[3]][strGrp[1]] +=1
+                     elif lAn and len(strGrp)==7:
+                         aSet  = [strGrp[0], strGrp[3]]                  
+                         bSet  = [strGrp[1], strGrp[4]]   
+                         cSet  = [strGrp[2], strGrp[5]]   
+                         tSets = [bSet, cSet]
+                         tSets.sort(listComp2)
+                         if not tANs["org"].has_key(aSet[1]):         # center atom element  
+                             tANs["org"][aSet[1]] = {}
+                         if not tANs["org"][aSet[1]].has_key(tSets[0][1]): # atom1 element 
+                             tANs["org"][aSet[1]][tSets[0][1]] = {}
+                         if not tANs["org"][aSet[1]][tSets[0][1]].has_key(tSets[1][1]) : # atom2 elment 
+                             tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]] = {}
+                         if not tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]].has_key(aSet[0]): # center atom class
+                             tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]] = {}
+                         if not tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]].has_key(tSets[0][0]): #  atom1 class
+                             tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]] = {}
+                         if not tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]].has_key(tSets[1][0]): #  atom1 class
+                             tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]] = []
+                         aTup = [strGrp[6], aFileIdx]
+                         tANs["org"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]].append(aTup)
+                     elif aL.find("Bond_length") != -1:
+                         lBo = True
+                     elif aL.find("Angle_") !=-1:
+                         lAn = True
+                         lBo = False
+                 """
+                 # check only when this function is first used
+                 print "All bonds: " 
+                 for elem1 in sorted(tBOs["org"].iterkeys()):
+                     for elem2 in sorted(tBOs["org"][elem1].iterkeys()):
+                         for class1 in sorted(tBOs["org"][elem1][elem2].iterkeys()):
+                             for class2 in sorted(tBOs["org"][elem1][elem2][class1].iterkeys()):
+                                 for aTup in tBOs["org"][elem1][elem2][class1][class2]:
+                                     print "%s       %s     %s    %s      %s      %s  "%(aTup[0], elem1, elem2, class1, class2, aTup[1])     
+                 print "All angles: "
+                 for elem_cen in sorted(tANs["org"].iterkeys()):
+                     for elem1 in sorted(tANs["org"][elem_cen].iterkeys()):
+                         for elem2 in sorted(tANs["org"][elem_cen][elem1].iterkeys()):
+                             for class_cen in sorted(tANs["org"][elem_cen][elem1][elem2].iterkeys()):
+                                 for class1 in sorted(tANs["org"][elem_cen][elem1][elem2][class_cen].iterkeys()):
+                                     for class2 in sorted(tANs["org"][elem_cen][elem1][elem2][class_cen][class1].iterkeys()):
+                                         for aTup in tANs["org"][elem_cen][elem1][elem2][class_cen][class1][class2]:
+                                             print "%s     %s     %s    %s     %s     %s    %s      %s" \
+                                                   %(aTup[0], elem_cen, elem1, elem2, class_cen, class1, class2, aTup[1])
+                 """
+
+def  getStats(tValueSet):
+
+     tMean  = 0.0
+     tSigma = 0.0
+     eLen = len(tValueSet)
+     
+     if eLen !=0:
+         # get average 
+         sum = 0.0
+         for a_v in tValueSet:
+             sum = sum + a_v
+              
+         tMean = sum/eLen
+         # get sigma of values
+         sumDiffSq = 0.0
+         for a_v in tValueSet:
+             sumDiffSq += ((a_v-tMean)*(a_v-tMean))
+         if eLen > 1:   
+             tSigma = math.sqrt(sumDiffSq/(eLen-1))
+         else:
+             tSigma = 0.0
+
+     return tMean, tSigma
+
+
+#--------------------------------------------------
+#
+#   __main__ part starts from here
+#
+#--------------------------------------------------
+
+if len(sys.argv) < 3:
+    print "Usage : tableGenerator  directory_where_input_cif_are  directory_where_output_will_be " 
+    print "For example: tableGenerator /xxxxxx/xxxxxxxx/xxxxxxxx   my_output "
+    sys.exit()
+
+
+if not os.path.isdir(sys.argv[1]):
+    print "Directory, %s, does not exists " %sys.argv[1]
+    sys.exit()
+
+else:
+    if not os.environ.has_key("LIBMOL_ROOT"):
+        print "Need to define the environment variable $LIBMOL_ROOT to the location where LIBMOL package is,  "
+        print "e.g, export LIBMOL_ROOT=/xxxxx/xxxx/LIBMOL/ "
+        print "or setenv LIBMOL_ROOT /xxxxx/xxxx/LIBMOL/ "
+        sys.exit()
+
+    #tExe = os.path.join("/Users/flong/NetBeansProjects/LIBMOL/dist/Debug/GNU-MacOSX/libmol")     # modify this later on
+    tExe1 = os.path.join(os.getenv("LIBMOL_ROOT"),"bin/libmol")
+    tExe2 = os.path.join(os.getenv("LIBMOL_ROOT"),"bin/acedrg")
+    if os.path.isfile(tExe1):
+        tExe = tExe1
+    elif os.path.isfile(tExe2):
+        tExe = tExe2
+    else:
+        print "executable 'acedrg' was not be found under %s"%os.path.join(os.getenv("LIBMOL_ROOT"),"bin")
+        print "Check if the environment variable $LIBMOL_ROOT is defined to the location where LIBMOL package is."
+        print "or the package is sucessfully compiled"
+        sys.exit()
+
+    if not os.path.isdir(sys.argv[2]):
+        os.mkdir(sys.argv[2])
+
+    # Generate all dictionary files
+
+    allFiles = os.path.join(sys.argv[1], "*.cif")
+    
+    allLog   = os.path.join(sys.argv[2], "libmol.log") 
+    for aFName in glob.glob(allFiles):
+        if os.path.isfile(aFName):
+            aMonName = os.path.basename(aFName).split(".")[0]
+            if aMonName =="":
+                aMonName = "UNL"
+            aOutFile = os.path.join(sys.argv[2], aMonName + ".dict")
+            aCmd = "%s  -b %s  -m yes -r %s  -o %s >> %s "%(tExe, aFName, aMonName, aOutFile, allLog)
+            print aCmd
+            os.system(aCmd)
+
+    allCodAtomClasses = {}
+    allCodAtomClasses["org"]   = {}
+    allCodAtomClasses["nonOrg"] = {}
+    
+    allBonds  = {}
+    allBonds["org"]     = {}
+    allBonds["nonOrg"]  = {}
+
+    allAngles = {}
+    allAngles["org"]    = {}
+    allAngles["nonOrg"] = {}
+ 
+
+    # Read all bond and angle files
+
+    for aFile in glob.glob(sys.argv[2] +"/*_unique_bond_and_angles.txt"):
+        if os.path.isfile(aFile):
+            getBondsAndAngles(aFile, allCodAtomClasses, allBonds, allAngles)           
+
+
+    # Output all Info 
+    # 1 output all atom class ids
+    orgAllAtomClassFileName = os.path.join(sys.argv[2], "orgAllAtomClasses.txt")
+    try:
+        orgAllAtomClassFile = open(orgAllAtomClassFileName, "w")
+    except IOError :
+        print "%s can not be opened for reading "%orgAllAtomClassFiles
+        sys.exit(1)
+    for elemA in sorted(allCodAtomClasses["org"].iterkeys()):
+        for classA in sorted(allCodAtomClasses["org"][elemA].iterkeys()):
+            orgAllAtomClassFile.write("%12d    %s\n"%(allCodAtomClasses["org"][elemA][classA],classA))
+    orgAllAtomClassFile.close()
+
+
+    nonOrgAllAtomClassFileName = os.path.join(sys.argv[2], "nonOrgAllAtomClasses.txt")
+    try:
+        nonOrgAllAtomClassFile = open(nonOrgAllAtomClassFileName, "w")
+    except IOError :
+        print "%s can not be opened for reading "%nonOrgAllAtomClassFiles
+        sys.exit(1)
+    for elemA in sorted(allCodAtomClasses["nonOrg"].iterkeys()):
+        for classA in sorted(allCodAtomClasses["nonOrg"][elemA].iterkeys()):
+            nonOrgAllAtomClassFile.write("%12d    %s\n"%(allCodAtomClasses["nonOrg"][elemA][classA],classA))
+
+    # 2 output all bonds    
+    orgBondFileName = os.path.join(sys.argv[2], "allOrgBonds.txt")
+    try:
+        orgBondFile = open(orgBondFileName, "w")
+    except IOError :
+        print "%s can not be opened for reading "%orgBondFileName
+        sys.exit(1)
+    
+    for elem1 in sorted(allBonds["org"].iterkeys()):
+        for elem2 in sorted(allBonds["org"][elem1].iterkeys()):
+            for class1 in sorted(allBonds["org"][elem1][elem2].iterkeys()):
+                for class2 in sorted(allBonds["org"][elem1][elem2][class1].iterkeys()):
+                    for aTup in allBonds["org"][elem1][elem2][class1][class2]:
+                        orgBondFile.write("%s       %s     %s    %s      %s      %s\n"%(aTup[0], elem1, elem2, class1, class2, aTup[1])) 
+    orgBondFile.close()
+ 
+    nonOrgBondFileName = os.path.join(sys.argv[2], "allNonOrgBonds.txt")
+    try:
+        nonOrgBondFile = open(nonOrgBondFileName, "w")
+    except IOError :
+        print "%s can not be opened for reading "%nonOrgBondFileName
+        sys.exit(1)
+    nonOrgBondFile.close()
+
+    # 3 output all angles 
+    orgAngleFileName = os.path.join(sys.argv[2], "allOrgAngles.txt")
+    try:
+        orgAngleFile = open(orgAngleFileName, "w")
+    except IOError :
+        print "%s can not be opened for reading "%orgAngleFileName
+        sys.exit(1)
+
+    for elem_cen in sorted(allAngles["org"].iterkeys()):
+        for elem1 in sorted(allAngles["org"][elem_cen].iterkeys()):
+            for elem2 in sorted(allAngles["org"][elem_cen][elem1].iterkeys()):
+                for class_cen in sorted(allAngles["org"][elem_cen][elem1][elem2].iterkeys()):
+                    for class1 in sorted(allAngles["org"][elem_cen][elem1][elem2][class_cen].iterkeys()):
+                        for class2 in sorted(allAngles["org"][elem_cen][elem1][elem2][class_cen][class1].iterkeys()):
+                            for aTup in allAngles["org"][elem_cen][elem1][elem2][class_cen][class1][class2]:
+                                orgAngleFile.write("%s     %s     %s    %s     %s     %s    %s      %s\n" \
+                                      %(aTup[0], elem_cen, elem1, elem2, class_cen, class1, class2, aTup[1]))
+    
+    orgAngleFile.close()
+
+    nonOrgAngleFileName = os.path.join(sys.argv[2], "allNonOrgAngles.txt")
+    try:
+        nonOrgAngleFile = open(nonOrgAngleFileName, "w")
+    except IOError :
+        print "%s can not be opened for reading "%nonOrgAngleFileName
+        sys.exit(1)
+    nonOrgAngleFile.close()
+

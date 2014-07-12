@@ -165,11 +165,13 @@ namespace LIBMOL
         ~BondDict();
                 
         std::string bondOrderNumToStr();
+        bool        checkIfInSameRing(std::vector<AtomDict> & tAtoms);
+        void        checkIfInSameRing2(std::vector<AtomDict> & tAtoms);
         
         ID                      resName;
         SeriNumber              seriNum;
         
-        ID                      order;
+        std::string             order;
         REAL                    orderN;
         REAL                    value;
         REAL                    sigValue;
@@ -182,6 +184,7 @@ namespace LIBMOL
         bool                    hasCodValue;
         int                     numCodValues;
         int                     numCodValuesP;
+        bool                    isInSameRing;
         
         std::map<ID, int>       fullAtoms; // for atoms from SMILE, ID is chemType
         std::vector<ID>         atoms;

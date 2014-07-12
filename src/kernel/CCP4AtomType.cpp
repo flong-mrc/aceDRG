@@ -236,8 +236,8 @@ namespace LIBMOL
         // C atom
         if (tAtom.chemType.compare("C")==0)
         {
-            
-            // SP2 bonding 
+            std::cout << "atom id " << tAtom.id << " C atom " << std::endl;
+            std::cout << " H atom connection " << tAtom.connHAtoms.size() << std::endl;
             if (tAtom.bondingIdx==2)
             {
                 if (R5 && R6)
@@ -540,7 +540,9 @@ namespace LIBMOL
             tAtom.ccp4Type = tAtom.chemType;
         }
         
-        // std::cout << "Its ccp4 type " << tAtom.ccp4Type << std::endl; 
+        std::cout << " Set atom id " << tAtom.id 
+                  << " bond idx " << tAtom.bondingIdx << std::endl;
+        std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl; 
         
     }
     
