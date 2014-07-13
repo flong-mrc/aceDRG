@@ -98,7 +98,7 @@ class Acedrg:
 
         if inputOptionsU:    
             print "Line arguments for those keywords are missing "
-            for a_opt in t_inputOptionsU:
+            for a_opt in inputOptionsU:
                 print "Keyword %s ?"%a_opt
             sys.exit()
 
@@ -234,7 +234,7 @@ class Acedrg:
             libcheckBat.write("FILE_O  %s \n\n"%tOutRoot)
             libcheckBat.close()
 
-            self.cmdLine +=" < %s > %"%(libcheckBatName, tLogNme)
+            self.cmdLine +=" < %s > %s"%(libcheckBatName, tLogNme)
             print self.cmdLine
     
     def runLibcheck(self, tSmiName=None):
