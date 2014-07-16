@@ -80,10 +80,14 @@
 #include "TransCoord.h"
 #endif
 
+#ifndef MOLSDFFILE_H
+#include "MolSdfFile.h"
+#endif
+
 namespace LIBMOL
 {
     
-        class Atom;
+    class Atom;
     class AtomDict;
     
     class Bond;
@@ -109,6 +113,9 @@ namespace LIBMOL
     class CodClassify;
     
     class CCP4AtomType;
+    
+    class MolSdfFile;
+    
     
     extern int getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,
                                 std::vector<AtomDict>::iterator iA);
@@ -167,6 +174,12 @@ namespace LIBMOL
                                       std::vector<AtomDict>::iterator tIA);
     extern void  setOneHAtomCoordsSP(std::vector<AtomDict> & tAtoms,
                                      std::vector<AtomDict>::iterator tIA);
+    
+    // atom and bond stereo  
+    extern void checkAllStereo(FileName tMdlIn, FileName tPdbIn,
+                               FileName tPdbOut);
+    extern void checkStereoOneMol(std::vector<Molecule>::iterator tMol,
+                                  FileName tPdbOut);
     
     
 }

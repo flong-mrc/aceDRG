@@ -28,9 +28,23 @@ namespace LIBMOL
         {
             int tN = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
             // std::cout << "tN " << tN << std::endl;
+            
+            unsigned tHC =0;
+            for (std::vector<int>::iterator iNB=allAtoms[i].connAtoms.begin();
+                    iNB !=allAtoms[i].connAtoms.end(); iNB++)
+            {
+                if (allAtoms[*iNB].chemType =="H")
+                {
+                    tHC++;
+                }
+            }
+            unsigned tDiff = allAtoms[i].connAtoms.size()-tHC;
+            
+            
             if (allAtoms[i].id != "H" 
                 && (int)allAtoms[i].ringRep.size() ==0
-                && (int)allAtoms[i].connAtoms.size() > 1 
+                && (int)allAtoms[i].connAtoms.size() > 2 
+                && tDiff > 1
                 && tN > nMax)
             {
                 iMax = i;
@@ -38,15 +52,29 @@ namespace LIBMOL
             }
         }
         
+        std::cout << " Not found start atom under the first atom " << std::endl;
+        
         if (iMax==-1)
         {
+            
             nMax=0;
             // have to use a ring atom as the start atom
             for (int i=0; i < (int)allAtoms.size(); i++)
             {
+                unsigned tHC =0;
+                for (std::vector<int>::iterator iNB=allAtoms[i].connAtoms.begin();
+                       iNB !=allAtoms[i].connAtoms.end(); iNB++)
+                {
+                    if (allAtoms[*iNB].chemType =="H")
+                    {
+                        tHC++;
+                    }
+                }
+                unsigned tDiff = allAtoms[i].connAtoms.size()-tHC;
                 int tN = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
                 if (allAtoms[i].id != "H" 
-                    && (int)allAtoms[i].connAtoms.size() > 1 
+                    && (int)allAtoms[i].connAtoms.size() > 2
+                    && tDiff > 1
                     && tN > nMax)
                 {
                     iMax = i;
@@ -68,6 +96,7 @@ namespace LIBMOL
             allAtoms[iMax].tree["parent"].push_back(-1);
         }
         
+       
         return iMax;
        
     }
@@ -1036,7 +1065,8 @@ namespace LIBMOL
             if((int)startPack.size() < 2)
             {
                 // First, do not include H in the start-set of atoms.
-                if(tAtoms[*iAt].chemType != "H")
+                if(tAtoms[*iAt].chemType != "H"
+                   && tAtoms[*iAt].tree["children"].size() !=0)
                 {
                     startPack.push_back(*iAt);
                 }
@@ -1056,6 +1086,8 @@ namespace LIBMOL
                 }
             }
         }
+        
+        std::cout << "number of atoms in start pack " << startPack.size() << std::endl;
         
         std::cout << "atom in startPack " << std::endl;
         
@@ -1080,6 +1112,7 @@ namespace LIBMOL
         {
             *iC= 0.0;
         }
+        
         
         int nChs = (int)tAtoms[startAtom].tree["children"].size();
         std::cout << "The tree starts on atom " << tAtoms[startAtom].id 
@@ -1270,28 +1303,30 @@ namespace LIBMOL
         
         std::vector<int> Ats;
         Ats.push_back(tAtoms[startAtom].tree["children"][0]);
-        std::cout << "start atom " << tAtoms[startAtom].id 
-                  << " is in " << (int)tAtoms[startAtom].inChirals.size() << std::endl;
-        if ((int)tAtoms[startAtom].inChirals.size() !=0)
-        {
+        //std::cout << "start atom " << tAtoms[startAtom].id 
+        //          << " is in " << (int)tAtoms[startAtom].inChirals.size() 
+        //          << " chirals " << std::endl;
+        
+        //if ((int)tAtoms[startAtom].inChirals.size() !=0)
+        //{
             // the start atom is chiral center 
-            int iCh = tAtoms[startAtom].inChirals[0];
+        //    int iCh = tAtoms[startAtom].inChirals[0];
             
-            for (std::vector<int>::iterator iA=tChs[iCh].mutTable[Ats[0]].begin();
-                    iA !=tChs[iCh].mutTable[Ats[0]].end(); iA++)
-            {
-                Ats.push_back(*iA);
-            }
+        //    for (std::vector<int>::iterator iA=tChs[iCh].mutTable[Ats[0]].begin();
+        //            iA !=tChs[iCh].mutTable[Ats[0]].end(); iA++)
+        //    {
+        //        Ats.push_back(*iA);
+        //    }
             
-        }
-        else
-        {
+        //}
+        //else
+        //{
             // the start atom is not chiral center (connected to more than 2 H e.g.)
             for (int i=1; i< (int)tAtoms[startAtom].tree["children"].size(); i++)
             {
                 Ats.push_back(tAtoms[startAtom].tree["children"][i]);
             }
-        }
+        //}
         
         
         /*
@@ -1340,7 +1375,7 @@ namespace LIBMOL
                       << std::endl;
             exit(1);      
         }
-            
+       
         
         int iAng14 = getAngle(tAngs, startAtom, Ats[0], Ats[3]);
         REAL tAng14 = tAngs[iAng14].value-90.0;
@@ -1366,6 +1401,8 @@ namespace LIBMOL
         tAtoms[Ats[3]].coords[0] =   0.0;
         tAtoms[Ats[3]].coords[1] =   0.0;
         tAtoms[Ats[3]].coords[2] =  -tBonds[iBo4].value;
+        
+       
         
     }
     

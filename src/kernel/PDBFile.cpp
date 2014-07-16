@@ -1205,7 +1205,7 @@ namespace LIBMOL
                 //double r3 =  (double) rand()/RAND_MAX;
                 
                 outPDB.width(6);
-                outPDB <<std::left<< "ATOM";
+                outPDB <<std::left<< "HETATM";
                 outPDB.width(5);
                 outPDB <<std::right << iA->seriNum+1;
                 outPDB.width(1);

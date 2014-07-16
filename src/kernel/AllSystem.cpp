@@ -703,6 +703,11 @@ namespace LIBMOL
                     }
                     iAt->bondingIdx = 3; 
                 }
+                else if (t_len==2)
+                {
+                    iAt->bondingIdx = 2;
+                }
+                
             }
         }
         
@@ -1559,13 +1564,16 @@ namespace LIBMOL
              
         
         std::vector<int> tV2; 
-       
+        //std::cout << "root atom is " << allAtoms[tIdx1].id << std::endl;
         // Ring atom first 
         for(std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                 iA2 !=allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
-            if(AtomsInSameRing(allAtoms[i1], allAtoms[*iA2], allRingsV))
+            if(AtomsInSameRing(allAtoms[i1], allAtoms[*iA2], allRingsV)
+               && *iA2 != tIdx1 
+              &&  std::find(tV2.begin(), tV2.end(), *iA2)==tV2.end())
             {
+                // std::cout << "Atom " << allAtoms[*iA2].id << " for Tor " << allAtoms[tIdx2].id << std::endl;
                 tV2.push_back(*iA2);
                 break;
             }
@@ -1576,6 +1584,7 @@ namespace LIBMOL
         {
             if(*iA2 !=tIdx1 && std::find(tV2.begin(), tV2.end(), *iA2)==tV2.end())
             {
+                // std::cout << "Atom " << allAtoms[*iA2].id << " for Tor " << allAtoms[tIdx2].id << std::endl;
                 tV2.push_back(*iA2);
             }
         }   
@@ -3445,16 +3454,16 @@ namespace LIBMOL
                 // std::cout << "tPos.size() " << (int)tPos.size() << std::endl;
                 if((int)tPos.size() ==2)
                 {
-                    //std::cout << "Set torsion angles around the bond of atom "
-                    //          << allAtoms[tPos[0]].id << " and "
-                    //          << allAtoms[tPos[1]].id << std::endl;
+                    std::cout << "Set torsion angles around the bond of atom "
+                              << allAtoms[tPos[0]].id << " and "
+                              << allAtoms[tPos[1]].id << std::endl;
                     
                     setTorsionFromOneBond(tPos[0], tPos[1]);
                 }
             }
         }
         
-        /*
+        
         std::cout << "All torsions have been setup " << std::endl;
        
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
@@ -3468,7 +3477,7 @@ namespace LIBMOL
                 std::cout << "atom " << allAtoms[*iA].id << std::endl;
             }
         }
-        */
+      
     }
     
     void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs, 

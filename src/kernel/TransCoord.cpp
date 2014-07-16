@@ -742,11 +742,11 @@ namespace LIBMOL
                 int i_prev   = tAtoms[i_atom].tree["parent"][0];
                 int i1 = tAtoms[i_atom].tree["children"][i_conn];
                 int i2 = -1;
-                //std::cout << "new atom id " << tAtoms[i1].id << std::endl;
+                // std::cout << "new atom id " << tAtoms[i1].id << std::endl;
                 
                 if (tAtoms[i1].chemType=="H")
                 {
-                    //std::cout << "it is " << tAtoms[i1].id << std::endl;
+                    // std::cout << "it is " << tAtoms[i1].id << std::endl;
                     
                     // grow other atom first if exist
                     for (std::vector<int>::iterator iA=tAtoms[i_atom].connAtoms.begin();
@@ -770,7 +770,7 @@ namespace LIBMOL
                 {
                     i_next = i1;
                 }
-                //std::cout << "Final pick " << tAtoms[i_next].id << std::endl; 
+                // std::cout << "Final pick " << tAtoms[i_next].id << std::endl; 
                 std::vector<int> aSSet;
                 int i_pprev;
                 if (tAtoms[i_atom].id !=tAtoms[sAtom3].id)
@@ -865,7 +865,7 @@ namespace LIBMOL
                                 // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
                                 growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
                                 doneList.push_back(*iNodeA);
-                                // std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                                std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
                             }
                             iL++;
                         }
@@ -888,7 +888,7 @@ namespace LIBMOL
                                     growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    //std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
+                                    // std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
                                     iL++;
                                 }
                                 else if (tAtoms[i_atom].bondingIdx==2)
@@ -897,7 +897,7 @@ namespace LIBMOL
                                     growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    //std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
+                                    // std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
                                 }
                             }
                         }    
@@ -1097,7 +1097,7 @@ namespace LIBMOL
                      */
                     growOneAtom(aSSet3, tAtoms, tBonds, tAngles, tTorsions, i_next);
                     doneList.push_back(i_next);
-                    //std::cout <<  tAtoms[i_next].id << " done3 " << std::endl;
+                    std::cout <<  tAtoms[i_next].id << " done3 " << std::endl;
                     // grow other atoms linked to i_atom (like i_next)
                     /*
                     int iL=1;
@@ -2241,7 +2241,14 @@ namespace LIBMOL
         // Set new Z axis 
 
         CrossP(v1,v2,tmp_v);
- 
+        /*
+        std::cout << "v1[0] " << v1[0] << std::endl;
+        std::cout << "v2[0] " << v2[0] << std::endl;
+        std::cout << "v1[1] " << v1[1] << std::endl;
+        std::cout << "v2[1] " << v2[1] << std::endl;
+        std::cout << "v1[2] " << v1[2] << std::endl;
+        std::cout << "v2[2] " << v2[2] << std::endl;
+        */
         mod_tmp_v = DotP(tmp_v,tmp_v);
   
         mod_tmp_v = sqrt(mod_tmp_v);

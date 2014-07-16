@@ -106,7 +106,7 @@ namespace LIBMOL
     class Ring;
     class RinDict;
     
-    class molecule;
+    class Molecule;
     
     class CrystInfo;
     
@@ -156,6 +156,9 @@ namespace LIBMOL
         void addHAtoms(int tIdxMol, 
                        int tIdxAtm,
                        REAL tNumH);
+        
+        void reNameHAtoms(int tIdxMol);
+        
         /*
         REAL  getTotalBondOrder(int tIdxMol,
                                 std::vector<AtomDict>::iterator  tIA);

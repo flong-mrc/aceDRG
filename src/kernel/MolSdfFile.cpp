@@ -164,7 +164,9 @@ namespace LIBMOL
                                 aAtom.coords[1] = StrToReal(tBuf[1]);
                                 aAtom.coords[2] = StrToReal(tBuf[2]);
                                 aAtom.coordExist = true;
-                                aAtom.chemType = TrimSpaces(tBuf[3]);
+                                aAtom.chemType  = TrimSpaces(tBuf[3]);
+                                aAtom.formalCharge = strToCharge(tBuf[5]);
+                                aAtom.chiralIdx = StrToInt(tBuf[6]); 
                                 tIDs[aAtom.chemType].push_back(aAtom.seriNum);
                                 int tSize = (int)tIDs[aAtom.chemType].size();
                                 aAtom.id       = aAtom.chemType + IntToStr(tSize);
@@ -217,9 +219,12 @@ namespace LIBMOL
         }
       
         
+        
         for (unsigned i=0; i < allMols.size(); i++)
         {
+           
             addHAtomToMols(i);
+            
             setAtomsBondingAndChiralCenter(i);
             
             setChiral(i);
@@ -261,9 +266,11 @@ namespace LIBMOL
             {
                 std::cout << "atom " << iA->seriNum +1  << "\t" << iA->chemType 
                           << " id : " << iA->id << "\t"
-                        << "\t" << iA->coords[0] << "\t" 
-                        << iA->coords[1] << "\t"
-                        << iA->coords[2] << std::endl;
+                          << " charge " << iA->formalCharge << std::endl
+                          << "Coordinates : " 
+                          << iA->coords[0] << "\t" 
+                          << iA->coords[1] << "\t"
+                          << iA->coords[2] << std::endl;
                 if (iA->connAtoms.size() !=0)
                 {
                     std::cout << "It connects to the following atoms: " <<std::endl;
@@ -392,6 +399,8 @@ namespace LIBMOL
              */
         }
         
+        reNameHAtoms(tIdxMol);
+        
         // Now add newly generated H atoms to atoms in the molecule
         // and add associated bonds to the bond set in the molecule
         for (std::vector<AtomDict>::iterator iHA=allMols[tIdxMol].extraHAtoms.begin();
@@ -409,6 +418,8 @@ namespace LIBMOL
             aBo.fullAtoms[allMols[tIdxMol].atoms[iHA->connAtoms[0]].id] = allMols[tIdxMol].atoms[iHA->connAtoms[0]].seriNum;
             allMols[tIdxMol].bonds.push_back(aBo);
         }
+        
+        reNameHAtoms(tIdxMol);
     }
     
     void MolSdfFile::setHAtomCoordsMols(int tIdxMol)
@@ -568,6 +579,20 @@ namespace LIBMOL
                   << allMols[tIdxMol].atoms[tIdxAtm].id << std::endl;  
     }
     
+    void MolSdfFile::reNameHAtoms(int tIdxMol)
+    {
+        int aIdx =1;
+        for (std::vector<AtomDict>::iterator iHA=allMols[tIdxMol].atoms.begin();
+                iHA !=allMols[tIdxMol].atoms.end(); iHA++)
+        {
+            if (iHA->chemType.compare("H")==0)
+            {
+                iHA->id = "H" + IntToStr(aIdx);
+                aIdx+=1;
+            }
+        }
+    }
+    
     int MolSdfFile::getNumOxyConnect(int tIdxMol, std::vector<AtomDict>::iterator iA)
     {
         int nO=0;
@@ -637,7 +662,7 @@ namespace LIBMOL
                     {
                         iAt->chiralIdx  = 2;
                     } 
-                    iAt->chiralIdx  = 1;
+                    // iAt->chiralIdx  = 1;
                     iAt->bondingIdx = 3;  
                 }
                 //else if (t_len==3) // temp
@@ -662,7 +687,10 @@ namespace LIBMOL
                 // int t_len = (int)iAt->connAtoms.size();
                 if(t_len==4)
                 {
-                    iAt->chiralIdx  = 1;
+                    if (iAt->chiralIdx==0)
+                    {
+                        iAt->chiralIdx  = 1;
+                    }
                     iAt->bondingIdx = 3;
                 }
             }
@@ -724,6 +752,10 @@ namespace LIBMOL
                         iAt->chiralIdx  = 2;
                     }
                     iAt->bondingIdx = 3; 
+                }
+                else if (t_len==2)
+                {
+                    iAt->bondingIdx = 2;
                 }
             }
         }
@@ -1001,28 +1033,68 @@ namespace LIBMOL
                 aCh.atoms.push_back(iA->seriNum);
                
                 // aCh.seriNum = (int)allMols[tIdxMol].chirals.size();
-                int aNum = (int)allMols[tIdxMol].chirals.size() + 1;
-                aCh.id = "chi" + IntToStr(aNum);
-                aCh.sign = "both";
                 
+                //ChiToStr(iA->chiralIdx, aCh.sign);
+                aCh.sign = "both";
+                /*
+                std::cout << "Atom is " << iA->id << std::endl;
+                std::cout << "Its serial number " << iA->seriNum << std::endl;
+                std::cout << "number of bonds " << allMols[tIdxMol].bonds.size() 
+                          << std::endl;
+                 */
                 int i=0;
+                for (std::vector<BondDict>::iterator iB=allMols[tIdxMol].bonds.begin();
+                        iB !=allMols[tIdxMol].bonds.end(); iB++)
+                {
+                    if (i <3)
+                    {
+                        int idx0=iB->atomsIdx[0], idx1=iB->atomsIdx[1];
+                        // std::cout << "Bond atoms: " << allMols[tIdxMol].atoms[idx0].seriNum 
+                        //          << " and " << allMols[tIdxMol].atoms[idx1].seriNum  << std::endl;
+                        if (std::find(iB->atomsIdx.begin(), iB->atomsIdx.end(), iA->seriNum) !=iB->atomsIdx.end() )
+                        {
+                            // std::cout << "Atom " << iA->id << " is in this bond " << std::endl;   
+                            if (idx0 ==iA->seriNum && allMols[tIdxMol].atoms[idx1].chemType !="H")
+                            {
+                                aCh.atoms.push_back(idx1);
+                                allMols[tIdxMol].atoms[idx1].inChirals.push_back(tChIdx);
+                                // std::cout << idx1 << " is included 1 " << std::endl;
+                                i++;
+                            }
+                            else if (idx1 ==iA->seriNum && allMols[tIdxMol].atoms[idx0].chemType !="H")
+                            {
+                                aCh.atoms.push_back(idx0);
+                                // std::cout << idx0 << " is included 0 " << std::endl;
+                                i++;
+                            }
+                        }
+                    }
+                }
+                /*
                 for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
                         iNB !=iA->connAtoms.end(); iNB++)
                 {
-                    if (i < 3)
+                    if (i < 3 && allMols[tIdxMol].atoms[*iNB].chemType !="H")
                     {
                         aCh.atoms.push_back(*iNB);
                         allMols[tIdxMol].atoms[*iNB].inChirals.push_back(tChIdx);
                         i++;
                     }
                 }
+                 */
                
                 aCh.setMutTable(iA->chiralIdx);
                 
-                allMols[tIdxMol].chirals.push_back(aCh);
+                if (aCh.atoms.size() > 3)
+                {
+                    int aNum = (int)allMols[tIdxMol].chirals.size() + 1;
+                    aCh.id = "chi" + IntToStr(aNum);
+                    allMols[tIdxMol].chirals.push_back(aCh);
+                }
                 
             }
         }
+        
     }
     
    

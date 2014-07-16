@@ -118,8 +118,8 @@ int main(int argc, char** argv) {
             {   
                 aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                                                           AJob.IOEntries["monoRootName"]);
-                if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
-                {
+                //if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
+                //{
                     LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                      AJob.IOEntries["monoRootName"], 
                                      aTargetSystem.allAtoms,
@@ -134,10 +134,10 @@ int main(int argc, char** argv) {
                     LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
                                    AJob.IOEntries["monoRootName"], 
                                    aTargetSystem.allAtoms);
-                }
+                //}
                 // aTargetSystem.chiralExch();
-                else
-                {
+                
+                /*
                 if ( !aTargetSystem.containMetal()) 
                 {
                     // coordinate generator works only for a system of "organic" atoms. Tempo!
@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
                                                     AJob.IOEntries["userOutName"].c_str(),
                                                     AJob.IOEntries["monoRootName"]);           
                     aGlobMinSystem.Driver();
-            
+                    
                 
                     LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                      AJob.IOEntries["monoRootName"], 
@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
                               << "No atom coordinates will be generated at the momemt. " << std::endl
                               << "They will be available soon. " << std::endl;
                 }
-                }
+                */
             }
             else
             {
@@ -217,6 +217,7 @@ int main(int argc, char** argv) {
                         aTargetSystem.setupAllTargetValuesFromCOD(tOutName.c_str(), 
                                                    AJob.IOEntries["monoRootName"]);
                         
+                        /*
                         LIBMOL::outMMCif(tOutName.c_str(),
                                          AJob.IOEntries["monoRootName"], 
                                              aTargetSystem.allAtoms,
@@ -228,13 +229,13 @@ int main(int argc, char** argv) {
                                              aTargetSystem.allPlanes,
                                              aTargetSystem.allChirals);
             
-                            LIBMOL::outPDB(tOutName.c_str(),
-                                           AJob.IOEntries["monoRootName"], 
-                                           aTargetSystem.allAtoms);
-                        
+                        LIBMOL::outPDB(tOutName.c_str(),
+                                AJob.IOEntries["monoRootName"], 
+                                aTargetSystem.allAtoms);
+                        */
                         // aTargetSystem.chiralExch();
                         
-                        /*
+                        
                         if ( !aTargetSystem.containMetal()) 
                         {
                              
@@ -245,6 +246,7 @@ int main(int argc, char** argv) {
             
                             aGlobMinSystem.Driver();
             
+                            // aGlobMinSystem.PreIdealization();
                             
                             LIBMOL::outMMCif(tOutName.c_str(),
                                              AJob.IOEntries["monoRootName"], 
@@ -282,8 +284,7 @@ int main(int argc, char** argv) {
                                       << "Restraint cif is the only output. "
                                       << "No atom coordinates will be generated at the momemt. " << std::endl
                                       << "They will be available soon. " << std::endl;
-                        ]
-                         */
+                        }
                         
                     }
                     

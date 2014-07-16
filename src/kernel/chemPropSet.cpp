@@ -10,6 +10,7 @@
 
 namespace LIBMOL
 {
+
     
     extern int getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,
                                 std::vector<AtomDict>::iterator iA)
@@ -300,8 +301,10 @@ namespace LIBMOL
         
         REAL Order  = getTotalBondOrder(tMol, tIA);
         REAL Diff1  = Order -tIA->formalCharge;
+        std::cout << "For atom " << tIA->id << std::endl;
+        std::cout << "Total bond order is " << Order << std::endl;
+        std::cout << "formal charge is " << tIA->formalCharge << std::endl;
         
-        ;
         std::map<int, int> Vals;
         
         Vals[1] = tTab.elements[tIA->chemType]["val"];
@@ -322,9 +325,10 @@ namespace LIBMOL
         for (std::map<int, int>::iterator iM=Vals.begin();
                 iM !=Vals.end(); iM++)
         {
-            REAL Diff2  = (REAL)tTab.elements[tIA->chemType]["val"]
+            REAL Diff2  = (REAL)iM->second
                            -Diff1;
-            
+      
+            //std::cout <<" diff2 is " << Diff2 << std::endl;
             if (fabs(Diff2) <0.000001)
             {
                 return 0.0;
@@ -342,6 +346,7 @@ namespace LIBMOL
             
             
         }
+        
         std::cout << minD <<" H atom should be added to bind atom " 
                   << tIA->id << std::endl;
         
@@ -710,8 +715,19 @@ namespace LIBMOL
                     if (tAtoms[*iR2].chemType !="H" 
                         && tAtoms[*iR2].id !=tAtoms[aCen].id)
                     {
-                        root2=tAtoms[*iR2].seriNum;
-                        break;
+                        std::vector<REAL> v1, v2, v3;
+                        for (unsigned iX=0; iX < tAtoms[*iR2].coords.size();
+                                iX++)
+                        {
+                            v1.push_back(tAtoms[*iR1].coords[iX]-tAtoms[*iR2].coords[iX]);
+                            v2.push_back(tAtoms[aCen].coords[iX]-tAtoms[*iR1].coords[iX]);
+                        }
+                        crossP2V(v1, v2, v3);
+                        if (lengthV(v3) >0.00000001)
+                        {
+                            root2=tAtoms[*iR2].seriNum;
+                            break;
+                        }
                     }
                 }
             }
@@ -801,18 +817,27 @@ namespace LIBMOL
             else
             {
                 // only two atoms connect to tAtoms[aCen]
-                aTor  = 180*PI180;
+                aTor  = 120*PI180;
             }
             
             std::cout << "Tor is " << aTor*PID180 << std::endl;
             std::cout << "atom1 " << tAtoms[root2].id << " atom2 " 
                       << tAtoms[root1].id << " atom3 " << tAtoms[aCen].id
-                      << "H atom added " << tIA->id << std::endl;
+                      << " H atom added " << tIA->id << std::endl;
             aTransTool.growOneAtom(tAtoms[root2], tAtoms[root1], tAtoms[aCen], 
                                        tIA, d, alpha, aTor);
             std::cout << "check distance " << distanceV(tAtoms[aCen].coords,
                                                         tIA->coords) 
                                            << std::endl;
+            std::vector<REAL> v1, v2;
+            for (unsigned i=0; i < tIA->coords.size(); i++)
+            {
+                v1.push_back(tAtoms[aCen].coords[i]-tAtoms[root1].coords[i]);
+                v2.push_back(tIA->coords[i]-tAtoms[aCen].coords[i]);
+            }
+            
+            std::cout << "check angle: " << (PI-getAngle2V(v1, v2))*PID180
+                                         << std::endl;
             
             //for (unsigned i=0; i < 3; i++)
             //{
@@ -898,10 +923,19 @@ namespace LIBMOL
             std::cout << "Tor is " << aTor*PID180 << std::endl;
             std::cout << "atom1 " << tAtoms[root2].id << " atom2 " 
                       << tAtoms[root1].id << " atom3 " << tAtoms[aCen].id
-                      << "H atom added " << tIA->id << std::endl;
-            std::cout << "check distance " << distanceV(tAtoms[aCen].coords,
+                      << " H atom added " << tIA->id << std::endl;
+            std::cout << "check distance: " << distanceV(tAtoms[aCen].coords,
                                                         tIA->coords) 
                                            << std::endl;
+            std::vector<REAL> v1, v2;
+            for (unsigned i=0; i < tIA->coords.size(); i++)
+            {
+                v1.push_back(tAtoms[aCen].coords[i]-tAtoms[root1].coords[i]);
+                v2.push_back(tIA->coords[i]-tAtoms[aCen].coords[i]);
+            }
+            
+            std::cout << "check angle: " << (PI-getAngle2V(v1, v2))*PID180
+                                         << std::endl;
             tIA->coordExist = true;
         }
         else
@@ -967,5 +1001,23 @@ namespace LIBMOL
                       << tAtoms[aCen].id << " at the center " << std::endl;
             exit(1);
         }
+    }
+    
+    extern void checkAllStereo(FileName tMdlIn, FileName tPdbIn,
+                               FileName tPdbOut)
+    {
+        MolSdfFile aMolFile(tMdlIn,  std::ios::in);
+        
+        for (std::vector<Molecule>::iterator iMol=aMolFile.allMols.begin();
+                iMol !=aMolFile.allMols.end(); iMol++)
+        {
+            checkStereoOneMol(iMol, tPdbIn);
+        }
+    }
+    
+    extern void checkStereoOneMol(std::vector<Molecule>::iterator tMol,
+                                  FileName tPdbIn)
+    {
+        
     }
 }

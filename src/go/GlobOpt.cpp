@@ -306,9 +306,9 @@ namespace GO
         std::vector<std::string> parts;
         LIBMOL::StrTokenize(itsFileNameRoot, parts, '.');
         
-        std::string tFileName = parts[0] + "_tree";
-        std::cout << tFileName << std::endl;
-        LIBMOL::outPDB(tFileName.c_str(), itsMonoRoot, allAtoms);
+        //std::string tFileName = parts[0] + "_tree";
+        //std::cout << tFileName << std::endl;
+        //LIBMOL::outPDB(tFileName.c_str(), itsMonoRoot, allAtoms);
         /*
         for (std::vector<LIBMOL::AngleDict>::iterator iA=allAngles.begin();
                 iA !=allAngles.end(); iA++)
@@ -483,6 +483,7 @@ namespace GO
          }   
         
          // A set of initial coordinates is done
+         hasIniCoords = false;
          if (!hasIniCoords)
          {
              SetDefinedInitPositions();
@@ -518,18 +519,18 @@ namespace GO
         //lComp =101;
         //LocalMin();
         
-        std::cout << "Pre-stage " << std::endl;
-        lComp =100;
-        LocalMin();
+        // std::cout << "Pre-stage " << std::endl;
+        // lComp =100;
+        // LocalMin();
         
         
         //std::cout << "Pre-stage 2 \n";
         //lComp =100;
         //LocalMin();
-        AddToOptim();
-        LIBMOL::outPDB("Pre-Idealized.pdb", "XXX", allAtoms);
-        std::cout << "Pre-Idealizations finished" << std::endl;
-     
+        //AddToOptim();
+        // LIBMOL::outPDB("Pre-Idealized.pdb", "XXX", allAtoms);
+        //std::cout << "Pre-Idealizations finished" << std::endl;
+        // SelectBestOpt();
     }
     
     void FindGlobMin::ProIdealization()
@@ -1034,7 +1035,7 @@ namespace GO
             std::cout << "Set objective value " << iO->objValue << std::endl;
         }
         
-        SelectBestOpt();
+        // SelectBestOpt();
         
         std::time(&tEnd);
         std::cout << " Geometrical optimization finished at " << std::ctime(&tEnd);

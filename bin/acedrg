@@ -247,21 +247,42 @@ class Acedrg:
         self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot, self.libcheckLogName)
         os.system(self.cmdLine)
             
-    def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tLogName):
-      
+    def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tLogName, tStage=2):
+     
         self.cmdline = self.refmac 
-        self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
-        self.cmdline += "mode newe \n"
-        self.cmdline += "end       \n"
-	self.cmdline += "eof       \n\n"
-
+        if tStage==1:
+            self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName) 
+            self.cmdline += "end       \n"
+	    self.cmdline += "eof       \n\n"
+        elif tStage==2: 
+            self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
+            self.cmdline += "mode newe \n"
+            self.cmdline += "end       \n"
+	    self.cmdline += "eof       \n\n"
+        elif tStage==3: 
+            self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
+            self.cmdline += "ncyc 1    \n"
+            self.cmdline += "end       \n"
+	    self.cmdline += "eof       \n\n"
+        elif tStage==4: 
+            self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
+            self.cmdline += "make hout yes    \n"
+            self.cmdline += "ncyc 40    \n"
+            self.cmdline += "end       \n"
+	    self.cmdline += "eof       \n\n"
+        else: 
+            self.cmdline += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
+            self.cmdline += "mode newe \n"
+            self.cmdline += "end       \n"
+	    self.cmdline += "eof       \n\n"
         print self.cmdLine
 
-    def runRefmac(self, tPdbIn, tLibIn):
+    def runRefmac(self, tPdbIn, tLibIn, tStage=2):
       
-        self.refmacLogName  = self.outRoot + "_refmac.log"
-        self.refmacXYZOUTName = self.outRoot + "_refmac.pdb"
-        self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, self.refmacLogName)
+        print "Run Refmac at stgae ", tStage
+        self.refmacLogName    = self.outRoot + "_refmac_stage_"+ str(tStage) + ".log"
+        self.refmacXYZOUTName = self.outRoot + "_refmac_stage_"+ str(tStage) + ".pdb"
+        self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, self.refmacLogName, tStage)
         os.system(self.cmdline)
 
     def execute(self):
@@ -280,7 +301,13 @@ class Acedrg:
             # Stage 2: optimization
             if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
                 if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    stageNow = 1
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
+                    if os.path.isfile(self.refmacXYZOUTName):
+                        tPdb1 = self.refmacXYZOUTName
+                        stageNow = 2
+                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
+                        
     
         if self.workMode == 12:
             
@@ -301,7 +328,13 @@ class Acedrg:
             # Stage 3: optimization
             if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
                 if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    #self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    stageNow = 1
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
+                    if os.path.isfile(self.refmacXYZOUTName):
+                        tPdb1 = self.refmacXYZOUTName
+                        stageNow = 2
+                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
                 else:
                     print "%s or %s does not contain enough information "%(self.outRstPdbName, self.outRstCifName)
             else:
@@ -314,11 +347,25 @@ class Acedrg:
                 self.runLibmol(self.inMdlName)
                 print "Dictionary output %s"%self.outRstCifName
                 print "PDB output %s"%self.outRstPdbName
-              
+ 
             # Stage 2: optimization
             if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
                 if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    # self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    stageNow = 1
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
+                    if os.path.isfile(self.refmacXYZOUTName):
+                        tPdb1 = self.refmacXYZOUTName
+                        stageNow = 2
+                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
+                        if os.path.isfile(self.refmacXYZOUTName):
+                            tPdb1 = self.refmacXYZOUTName
+                            stageNow = 3
+                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
+                            if os.path.isfile(self.refmacXYZOUTName):
+                                tPdb1 = self.refmacXYZOUTName
+                                stageNow = 4
+                                self.runRefmac(tPdb1, self.outRstCifName, stageNow)
     
         if self.workMode == 14:
             
@@ -329,7 +376,13 @@ class Acedrg:
             # Stage 2: optimization
             if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
                 if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    #self.runRefmac(self.outRstPdbName, self.outRstCifName)
+                    stageNow = 1
+                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
+                    if os.path.isfile(self.refmacXYZOUTName):
+                        tPdb1 = self.refmacXYZOUTName
+                        stageNow = 2
+                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
 
         if self.workMode == 21:
             

@@ -1750,6 +1750,61 @@ namespace LIBMOL
         
     }
     
+    // Chiral center conversion (mol/sdf file)
+    extern void ChiToStr(int & tCIdx, std::string & tCStr)
+    {
+        if (tCIdx==2)
+        {
+            tCStr="negative";
+        }
+        else if (tCIdx==1)
+        {
+            tCStr="positive";
+        }
+        else
+        {
+            tCStr="both";
+        }
+    }
+    
+    // formal charge conversion (mol/sdf file)
+    extern REAL strToCharge(std::string & tStr)
+    {
+        REAL aCharge =0.0;
+        
+        if (tStr.compare("1")==0)
+        {
+            aCharge = 3.0;
+        }
+        else if (tStr.compare("2")==0)
+        {
+            aCharge = 2.0;
+        }
+        else if (tStr.compare("3")==0)
+        {
+            aCharge = 1.0;
+        }
+        else if (tStr.compare("4")==0)
+        {
+            // doublet radical ?
+            aCharge = 0.0;
+        }
+        else if (tStr.compare("5")==0)
+        {
+            aCharge = -1.0;
+        }
+        else if (tStr.compare("6")==0)
+        {
+            aCharge = -2.0;
+        }
+        else if (tStr.compare("7")==0)
+        {
+            aCharge = -3.0;
+        }
+        
+        return aCharge;
+    }
+    
     // Symmetry-related functions
     
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 

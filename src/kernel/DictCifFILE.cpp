@@ -3378,6 +3378,10 @@ namespace LIBMOL
                     }
                     iAt->bondingIdx = 3; 
                 }
+                else if (t_len==2)
+                {
+                    iAt->bondingIdx = 2;
+                }
             }
         }
         
@@ -7205,22 +7209,25 @@ namespace LIBMOL
                 for (std::vector<ChiralDict>::iterator iCh = tChs.begin();
                         iCh != tChs.end(); iCh++)
                 {
-                    inputChiralID.push_back(iCh->archID);
-                    outRestrF << sName << "    " 
-                              << iCh->id  << "    ";
-                    for (std::vector<int>::iterator iAt=iCh->atoms.begin();
-                            iAt != iCh->atoms.end(); iAt++)
-                    {
-                        outRestrF << tAtoms[*iAt].id << "    ";
-                    }
-                    outRestrF << iCh->sign << std::endl;
+                   
+                        inputChiralID.push_back(iCh->archID);
+                        outRestrF << sName << "    " 
+                                  << iCh->id  << "    ";
+                        for (std::vector<int>::iterator iAt=iCh->atoms.begin();
+                               iAt != iCh->atoms.end(); iAt++)
+                        {
+                            outRestrF << tAtoms[*iAt].id << "    ";
+                        }
+                        outRestrF << iCh->sign << std::endl;
+                   
                 }
                 // New chiral that are not in the input list 
+                /*
                 int idxC =(int)inputChiralID.size();
                 for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                           iA !=tAtoms.end(); iA++)
                 {
-                    
+                 
                     if (iA->chiralIdx == 1)
                     {
                         std::vector<ID>::iterator tFind;
@@ -7278,6 +7285,7 @@ namespace LIBMOL
                         }
                     }
                 }
+                */
             }
             
             

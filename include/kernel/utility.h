@@ -248,6 +248,8 @@ namespace LIBMOL
     extern REAL StrToOrder(std::string  & tStrOrder);
     extern void OrderToStr(REAL tOrder, std::string  & sOrder);
     extern void OrderStrToStr(std::string & tOrder, std::string  & sOrder);
+    extern void ChiToStr(int & tCIdx, std::string & tCStr);
+    extern REAL strToCharge(std::string & tStr);  
     
     // symmetry related operations 
     extern void StrToSymmOps(std::vector<std::string>           & tStrs, 
