@@ -160,6 +160,14 @@ namespace LIBMOL
                     std::cout << "Table generator mode :  " 
                               << IOEntries["tabGen"] << std::endl;
                     break;
+                case 'y':
+                    IOEntries["transCoords"] = optarg;
+                    StrLower(IOEntries["transCoords"]);
+                    break;                          
+                case 'z':
+                    IOEntries["transAngles"] = optarg;
+                    StrLower(IOEntries["transAngles"]);
+                    break;                    
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
                     //std::cout << "COD atom types are output to : " 
@@ -171,6 +179,7 @@ namespace LIBMOL
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
+                
                 case '?':
                     if (std::isprint(optopt))
                     {
@@ -309,6 +318,7 @@ namespace LIBMOL
     void CheckEnvAndGetMode::SetWorkMode()
     {
         
+        
         if ( IOEntries.find("inCifName")!=IOEntries.end())
         {
             if (!IOEntries["inCifName"].empty())
@@ -319,16 +329,33 @@ namespace LIBMOL
                 }
                 else if ( IOEntries.find("inPdbName")!=IOEntries.end())
                 {
-                    if (!IOEntries["inPdbName"].empty())
+                    if (IOEntries.find("transCoords") != IOEntries.end())
                     {
-                        // This mode read the input cif file and PDB file 
-                        // replace the angles in the cif with the ones calculated from PDB
-                        workMode = 2;
+                        if (!IOEntries["inPdbName"].empty() && IOEntries["transCoords"] =="y" )
+                        {
+                            // This mode read the input cif file and PDB file 
+                            // replace the angles in the cif with the ones calculated from PDB
+                            workMode = 21;
+                        }
+                        else
+                        {
+                            std::cout << "You need to enter a output PDB name "
+                                     << std::endl;
+                        }
                     }
-                    else
+                    if (IOEntries.find("transAngles") != IOEntries.end())
                     {
-                        std::cout << "You need to enter a output PDB name "
-                                << std::endl;
+                        if (!IOEntries["inPdbName"].empty() && IOEntries["transAngles"] =="y" )
+                        {
+                            // This mode read the input cif file and PDB file 
+                            // replace the angles in the cif with the ones calculated from PDB
+                            workMode = 22;
+                        }
+                        else
+                        {
+                            std::cout << "You need to enter a output PDB name "
+                                     << std::endl;
+                        }
                     }
                 }
                 else

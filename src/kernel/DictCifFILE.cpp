@@ -26,7 +26,7 @@ namespace LIBMOL
                            curBlockLine(ZeroInt),
                            hasCoords(false),
                            hasH(false),
-                           itsCurAtomSeriNum(ZeroInt),
+                           itsCurAtomSeriNum(ZeroInt),  
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
                            itsCurCryst(NullPoint)
@@ -1997,7 +1997,7 @@ namespace LIBMOL
             outFile.open(tFname, tOpenMode);
         }        
     }
-    
+    /*
     DictCifFile::DictCifFile(FileName                tFname):
                              curBlockLine(ZeroInt),
                              hasConnect(false),
@@ -2016,6 +2016,47 @@ namespace LIBMOL
                              itsCurChiral(NullPoint)
     {
         
+        
+    }
+    */
+    
+        DictCifFile::DictCifFile(FileName                tCifName,
+                                 FileName                tPdbName) :
+                             curBlockLine(ZeroInt),
+                             hasConnect(false),
+                             hasCoords(false),
+                             hasH(false),
+                             hasCCP4Type(false),
+                             itsCurAtomSeriNum(ZeroInt),
+                             itsCurAtom(NullPoint),
+                             itsCurBondSeriNum(ZeroInt),
+                             itsCurBond(NullPoint),
+                             itsCurAngleSeriNum(ZeroInt),
+                             itsCurAngle(NullPoint),
+                             itsCurTorsionSeriNum(ZeroInt),
+                             itsCurTorsion(NullPoint),
+                             itsCurChiralSeriNum(ZeroInt),
+                             itsCurChiral(NullPoint)
+    {   
+        std::ifstream aInCif(tCifName);
+        
+        if (aInCif.is_open())
+        {
+            itsCurAtom    = new AtomDict();
+            setupSystem3Secs(aInCif);  
+            aInCif.close();
+            
+            DictPDBFile aInPdb(tPdbName, std::ios::in);
+            transCoordsPdbToCif(aInPdb);
+            
+        }
+        else
+        {
+            std::cout << tCifName << " can not be open for reading. Check the file ! "
+                      << std::endl;
+            exit(1);
+        }
+            
         
     }
     
@@ -2385,6 +2426,73 @@ namespace LIBMOL
             }
              
             
+        }
+    }
+    
+    void DictCifFile::setupSystem3Secs(std::ifstream & tInCif)
+    {
+        bool tOK       = true;
+            
+        std::map<std::string, bool>    lBloc;
+            
+        lBloc["head"]     = false;
+        lBloc["atom"]     = false;
+        lBloc["others"]   = false;
+            
+        std::string tRecord="";
+            
+        while(!inFile.eof() && tOK)
+        {
+            std::getline(tInCif, tRecord);
+            tRecord = TrimSpaces(tRecord);
+                
+            std::vector<std::string> tBuf;
+            std::vector<std::string> tBuf_t;
+            if (tRecord.find('\"') !=std::string::npos)
+            {
+                // std::cout << tRecord << std::endl;
+                StrTokenize(tRecord, tBuf_t, '\"');
+                    
+                for (int i=0; i < (int)tBuf_t.size(); i++)
+                {
+                    if ((i+1)%2 !=0)
+                    {
+                        std::vector<std::string> tBuf_t2;
+                        StrTokenize(tBuf_t[i], tBuf_t2);
+                        for (int j=0; j< (int)tBuf_t2.size(); j++)
+                        {
+                            tBuf.push_back(tBuf_t2[j]);
+                        }
+                    }
+                    else
+                    {
+                        // entries within the reversed comma 
+                        tBuf.push_back(tBuf_t[i]);
+                    }
+                }
+            }
+            else
+            {
+                StrTokenize(tRecord, tBuf);
+            }
+            
+            if ((int)tBuf.size() !=0)
+            {
+                checkBloc(lBloc, tBuf);
+                // std::cout << tRecord << std::endl;
+                if(lBloc["head"])
+                {
+                    allUnchangedBlocks["head"].push_back(tRecord);
+                }
+                else if(lBloc["atom"])
+                {   
+                    getAtomInfo(tBuf);
+                }
+                else 
+                {
+                    allUnchangedBlocks["others"].push_back(tRecord);  
+                }
+            }
         }
     }
         
@@ -4598,7 +4706,7 @@ namespace LIBMOL
       
     void DictCifFile::getAngleInfo(std::vector<std::string> tF)
     {   
-        /*
+        
         if ((int)tF.size() ==1 && 
             tF[0].find("_chem_comp_angle.")!=std::string::npos)
         {
@@ -4646,41 +4754,40 @@ namespace LIBMOL
             }
             
         }
-        */
-        // remember the residue name is ignored so we have
-        // (int)tF.size() == (int)hasProps["angle"].size()+1
-        //if ((int)tF.size() == (int)hasProps["angle"].size()+1 
-        //        && (int)tF.size() >2 && tF[0].find("#") ==std::string::npos)
-        //{
-            // itsCurAngle = new AngleDict();
-            // itsCurAngle->seriNum = itsCurAngleSeriNum;
-            // itsCurAngleSeriNum++;
+        
+        //  remember the residue name is ignored so we have
+        if ((int)tF.size() == (int)hasProps["angle"].size()+1 
+                && (int)tF.size() >2 && tF[0].find("#") ==std::string::npos)
+        {
+            itsCurAngle = new AngleDict();
+            itsCurAngle->seriNum = itsCurAngleSeriNum;
+            itsCurAngleSeriNum++;
             
             
-            /*
-             * No need for that part, could rewrite them
-            if (hasProps["angle"].find("resName") != hasProps["angle"].end())
-            {
-                itsCurAngle->resName=tF[hasProps["angle"]["resName"]];
-            }
+            
+            //  No need for that part, could rewrite them
+            //if (hasProps["angle"].find("resName") != hasProps["angle"].end())
+            //{
+            //    itsCurAngle->resName=tF[hasProps["angle"]["resName"]];
+            //}
             
             
             if (hasProps["angle"].find("atom_id_1") != hasProps["angle"].end())
             {
                 cleanSymbol(tF[hasProps["angle"]["atom_id_1"]], "\"");
-                itsCurAngle->atoms.push_back(TrimSpaces(tF[hasProps["angle"]["atom_id_1"]]));
+                itsCurAngle->atoms.push_back(StrToInt(TrimSpaces(tF[hasProps["angle"]["atom_id_1"]])));
             }
             
             if (hasProps["angle"].find("atom_id_2") != hasProps["angle"].end())
             {
                 cleanSymbol(tF[hasProps["angle"]["atom_id_2"]], "\"");
-                itsCurAngle->atoms.push_back(TrimSpaces(tF[hasProps["angle"]["atom_id_2"]]));
+                itsCurAngle->atoms.push_back(StrToInt(TrimSpaces(tF[hasProps["angle"]["atom_id_2"]])));
             }
             
             if (hasProps["angle"].find("atom_id_3") != hasProps["angle"].end())
             {
                 cleanSymbol(tF[hasProps["angle"]["atom_id_3"]], "\"");
-                itsCurAngle->atoms.push_back(TrimSpaces(tF[hasProps["angle"]["atom_id_3"]]));
+                itsCurAngle->atoms.push_back(StrToInt(TrimSpaces(tF[hasProps["angle"]["atom_id_3"]])));
             }
             
             // temp keep CCP4 dictionary values first 
@@ -4693,14 +4800,14 @@ namespace LIBMOL
             {
                 itsCurAngle->sigValue = StrToReal(tF[hasProps["bond"]["value_esd"]]);
             }
-            */
-            //allAngles.push_back(*itsCurAngle);
-            //delete itsCurAngle;
-            //itsCurAngle = NULL;
-        //}   
+            
+            allAngles.push_back(*itsCurAngle);
+            delete itsCurAngle;
+            itsCurAngle = NULL;
+        }   
     }
     
-    // setAllAngles() may not needed in the future
+   // setAllAngles() may not needed in the future
     void DictCifFile::setAllAngles()
     {
         
@@ -6934,6 +7041,27 @@ namespace LIBMOL
         
     }
     
+    void DictCifFile::transCoordsPdbToCif(DictPDBFile       & tPdbObj)
+    {
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            if (tPdbObj.allHetAtmList.find(iA->id) !=tPdbObj.allHetAtmList.end())
+            {
+                if ((tPdbObj.allHetAtmList[iA->id].size() ==iA->coords.size())
+                     && iA->coords.size() !=0)
+                {
+                    for (unsigned i=0; i < iA->coords.size(); iA++)
+                    {
+                        iA->coords[i] = tPdbObj.allHetAtmList[iA->id][i];
+                    }
+                }
+            }
+            
+        }
+        
+    }
+    
     extern void outMMCif(FileName tFName, 
                          ID tMonoRootName,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
@@ -7213,10 +7341,15 @@ namespace LIBMOL
                         inputChiralID.push_back(iCh->archID);
                         outRestrF << sName << "    " 
                                   << iCh->id  << "    ";
+                        int numCh=0;
                         for (std::vector<int>::iterator iAt=iCh->atoms.begin();
                                iAt != iCh->atoms.end(); iAt++)
                         {
-                            outRestrF << tAtoms[*iAt].id << "    ";
+                            if (numCh < 4)
+                            {
+                                outRestrF << tAtoms[*iAt].id << "    ";
+                                numCh++;
+                            }
                         }
                         outRestrF << iCh->sign << std::endl;
                    
@@ -7322,5 +7455,80 @@ namespace LIBMOL
         }
     }
     
+    
+    extern void outMMCif3Secs(FileName tFName, 
+                              ID tMonoRootName,
+                              std::vector<LIBMOL::AtomDict>& tAtoms,
+                              std::map<std::string, std::vector<std::string> > & tUnChangedEntries)
+    {
+       
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            if (iA->id.find("\'") !=std::string::npos)
+            {
+                iA->id = "\"" + iA->id + "\"";
+            }
+        }
+        
+        std::ofstream outRestrF(tFName);
+        
+        if(outRestrF.is_open())
+        {
+            if (tUnChangedEntries.find("head") !=tUnChangedEntries.end())
+            {
+                for (std::vector<std::string>::iterator iStr=tUnChangedEntries["head"].begin();
+                        iStr != tUnChangedEntries["head"].end(); iStr++)
+                {
+                    outRestrF << *iStr;
+                }
+            }
+            
+            if (tAtoms.size() >0)
+            {
+                // atom info section
+                std::string sName =tMonoRootName.substr(0,3);
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_atom.comp_id" << std::endl
+                          << "_chem_comp_atom.atom_id" << std::endl
+                          << "_chem_comp_atom.type_symbol" << std::endl
+                          << "_chem_comp_atom.type_energy" << std::endl
+                          << "_chem_comp_atom.partial_charge" << std::endl
+                          << "_chem_comp_atom.x" << std::endl
+                          << "_chem_comp_atom.y" << std::endl
+                          << "_chem_comp_atom.z" << std::endl;
+                
+                for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
+                        iA != tAtoms.end(); iA++)
+                {
+                    //double r1 =  (double) rand()/RAND_MAX;
+                    //double r2 =  (double) rand()/RAND_MAX;
+                    //double r3 =  (double) rand()/RAND_MAX;
+                    StrUpper(iA->chemType);
+                    StrUpper(iA->ccp4Type);
+                    outRestrF << sName 
+                              << std::setw(12) << iA->id 
+                              << std::setw(6) << iA->chemType 
+                              << std::setw(6) << iA->ccp4Type 
+                              << std::setw(8) << iA->parCharge 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[0] 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[2] << std::endl;
+                }
+            }
+            
+            if (tUnChangedEntries.find("others") !=tUnChangedEntries.end())
+            {
+                for (std::vector<std::string>::iterator iStr=tUnChangedEntries["others"].begin();
+                        iStr != tUnChangedEntries["others"].end(); iStr++)
+                {
+                    outRestrF << *iStr;
+                }
+            }
+        }
+    }
     
 }

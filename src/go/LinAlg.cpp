@@ -1894,7 +1894,7 @@ namespace GO
             curIter++;
       
             
-        }while(!lCont && curIter < 200);
+        }while(!lCont && curIter < 100);
         
         
         

@@ -158,6 +158,26 @@ namespace LIBMOL
     extern REAL checkProtonateC(std::vector<AtomDict>::iterator tIA, 
                                 Molecule   & tMol,
                                 REAL tPka,           REAL tPh);
+    
+    extern void checkProtonatedCarBoxylicAcids(std::vector<AtomDict>::iterator tIA,
+                                               std::vector<AtomDict> & tAtoms,
+                                               std::vector<BondDict> & tBonds,
+                                               REAL tPH=7.0);
+    
+    extern void checkProtonatedSulfuricAcids(std::vector<AtomDict>::iterator tIA,
+                                           std::vector<AtomDict> & tAtoms,
+                                           std::vector<BondDict> & tBonds,
+                                           REAL tPH=7.0);
+    extern void checkProtonatedNAcids(std::vector<AtomDict>::iterator tIA,
+                                           std::vector<AtomDict> & tAtoms,
+                                           std::vector<BondDict> & tBonds,
+                                           REAL tPH=7.0);
+    extern void checkProtonatedPAcids(std::vector<AtomDict>::iterator tIA,
+                                           std::vector<AtomDict> & tAtoms,
+                                           std::vector<BondDict> & tBonds,
+                                           REAL tPH=7.0);
+    
+    // Bond order sections 
         
     extern REAL  getTotalBondOrder(Molecule   & tMol,
                                    std::vector<AtomDict>::iterator  tIA);

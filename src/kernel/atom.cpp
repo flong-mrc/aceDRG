@@ -1,4 +1,4 @@
-/* 
+ /* 
  * File:   atom.cpp
  * Author: flong
  *
@@ -268,6 +268,7 @@ namespace LIBMOL
             formalCharge(ZeroReal),
             radius(VDWCONST),
             ionRadius(VDWCONST),
+            inChiralIdx(ZeroInt),
             chiralIdx(ZeroInt),
             bondingIdx(ZeroInt),
             isMetal(false),
@@ -285,6 +286,7 @@ namespace LIBMOL
             hashingValue(ZeroInt),
             coordExist(false),
             isCChemTypeSet(false),
+            isInPreCell(false),
             sId(NullString),
             symmOp(NullString),
             treeBond(ZeroReal),
@@ -316,6 +318,7 @@ namespace LIBMOL
             formalCharge(tAtom.formalCharge),
             radius(tAtom.radius),
             ionRadius(tAtom.ionRadius),
+            inChiralIdx(tAtom.inChiralIdx),
             chiralIdx(tAtom.chiralIdx),
             bondingIdx(tAtom.bondingIdx),
             isMetal(tAtom.isMetal),
@@ -334,6 +337,7 @@ namespace LIBMOL
             coordExist(tAtom.coordExist),
             isCChemTypeSet(tAtom.isCChemTypeSet),
             isInPreCell(tAtom.isInPreCell),
+            chiralChecked(tAtom.chiralChecked),
             sId(tAtom.sId),
             symmOp(tAtom.symmOp),
             treeBond(tAtom.treeBond),
@@ -410,6 +414,11 @@ namespace LIBMOL
                 iRiRep != tAtom.ringRep.end(); iRiRep++)
         {
              ringRep.insert(std::pair<std::string,int>(iRiRep->first, iRiRep->second));
+        }
+        for (std::map<std::string,int>::const_iterator iRdRep=tAtom.ringRepBySeriNum.begin();
+                iRdRep != tAtom.ringRepBySeriNum.end(); iRdRep++)
+        {
+             ringRepBySeriNum.insert(std::pair<std::string,int>(iRdRep->first, iRdRep->second));
         }
         for (std::vector<ID>::const_iterator iCod=tAtom.codClassV.begin();
                 iCod !=tAtom.codClassV.end(); iCod++)

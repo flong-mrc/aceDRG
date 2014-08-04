@@ -49,6 +49,9 @@ class Acedrg:
         self.cmdLine          = ""
         self.workMode         = 0
 
+
+        self.molGen           = False
+
         inputOptionsP         = self.InputParser(t_argvs) 
         self.checkDependency()
         self.setWorkMode(inputOptionsP)
@@ -69,6 +72,10 @@ class Acedrg:
 
         self.inputParser.add_option("-c",  "--mmcif", dest="inMmCifName", metavar="FILE", 
                                     action="store", type="string", help="Input MMCIF File containing coordinates and bonds")
+
+        self.inputParser.add_option("-e",  "--molgen", dest="molGen",  
+                                    action="store_true",  default=False,  
+                                    help="The option when the user want to generate molecules and values of the associated bonds and angles in a cif file")
 
         self.inputParser.add_option("-i",  "--smi", dest="inSmiName", metavar="FILE", 
                                     action="store", type="string", 
@@ -165,7 +172,7 @@ class Acedrg:
         elif t_inputOptionsP.inSdfName: 
             self.inSdfName = t_inputOptionsP.inSdfName
             self.workMode    = 14
-        elif t_inputOptionsP.inStdCifName: 
+        elif t_inputOptionsP.molGen and t_inputOptionsP.inStdCifName: 
             self.inStdCifName = t_inputOptionsP.inStdCifName
             self.workMode     = 21
                         
@@ -214,7 +221,8 @@ class Acedrg:
             self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
 
             self.cmdLine += " -b %s  "%self.inStdCifName
-            self.cmdLine += " -m yes -r %s -o %s >  %s "%(self.monomRoot, self.outRstCifName, self.libmolLogNam)
+            self.cmdLine += " -m yes -r %s -o %s >  %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
+            print self.cmdLine
             os.system(self.cmdLine)
 
              
@@ -388,7 +396,7 @@ class Acedrg:
             
             # Stage 1: generate molecules and the associated bond and bond-angle values 
             # using a small molecule cif file
-
+            print "Generate molecules, bonds and angles from small molecule CIF file ", self.inStdCifName 
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol(self.inStdCifName)
             

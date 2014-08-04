@@ -175,6 +175,7 @@ namespace LIBMOL
         bool                    hasConnect;
         bool                    hasH;
         bool                    containMetal;
+  
         
         std::vector<Molecule>   allMols;
 

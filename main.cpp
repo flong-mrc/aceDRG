@@ -15,6 +15,10 @@
 #include "SmileTool.h"
 #endif
 
+#ifndef SMILETOOL_H
+#include "include/kernel/SmileTool.h"
+#endif
+
 #ifndef MOLSDFFILE_H
 #include "include/kernel/MolSdfFile.h"
 #endif
@@ -246,7 +250,7 @@ int main(int argc, char** argv) {
             
                             aGlobMinSystem.Driver();
             
-                            // aGlobMinSystem.PreIdealization();
+                            //aGlobMinSystem.PreIdealization();
                             
                             LIBMOL::outMMCif(tOutName.c_str(),
                                              AJob.IOEntries["monoRootName"], 
@@ -300,15 +304,22 @@ int main(int argc, char** argv) {
             }
         }
     }
-    else if (AJob.workMode == 2)
+    else if (AJob.workMode == 21 || AJob.workMode == 22 )
     {
         
-        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-        LIBMOL::CodClassify  aCodSystem(dataFromCif);
-        aCodSystem.getAnglesFromPDB(AJob.IOEntries["inPdbName"]);
-        // Temp for outRestraintCif2
-        aCodSystem.outRestraintCif2(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
-        aCodSystem.outPDB(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
+        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"].c_str(),
+                                        AJob.IOEntries["inPdbName"].c_str());
+        std::string tOutName(AJob.IOEntries["userOutName"]);
+        LIBMOL::outMMCif3Secs(tOutName.c_str(), AJob.IOEntries["monoRootName"],
+                      dataFromCif.allAtoms, dataFromCif.allUnchangedBlocks);
+                         
+        // dataFromCif
+        //LIBMOL::CodClassify  aCodSystem(dataFromCif);
+        //aCodSystem.getAnglesFromPDB(AJob.IOEntries["inPdbName"]);
+        //Temp for outRestraintCif2
+        //aCodSystem.outRestraintCif2(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
+        //aCodSystem.outPDB(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
+        
        
     }
     else if (AJob.workMode==31 || AJob.workMode==32 || AJob.workMode==33)

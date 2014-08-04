@@ -104,6 +104,7 @@ namespace LIBMOL
         ~ChiralDict();
         
         void setMutTable(int tChiralIdx);
+        void setMutTable2(int tChiralIdx);
         
         ID                  id; 
         ID                  archID;

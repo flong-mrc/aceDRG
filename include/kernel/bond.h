@@ -165,8 +165,10 @@ namespace LIBMOL
         ~BondDict();
                 
         std::string bondOrderNumToStr();
-        bool        checkIfInSameRing(std::vector<AtomDict> & tAtoms);
-        void        checkIfInSameRing2(std::vector<AtomDict> & tAtoms);
+        bool        checkIfInSameRing(std::vector<AtomDict> & tAtoms,
+                                      int tIdx1, int tIdx2);
+        
+        bool        checkIfInSameRing2(std::vector<AtomDict> & tAtoms);
         
         ID                      resName;
         SeriNumber              seriNum;

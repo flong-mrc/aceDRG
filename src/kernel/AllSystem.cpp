@@ -12,6 +12,7 @@ namespace LIBMOL
 {
     AllSystem::AllSystem():hasCoords(false),
                            hasCCP4Type(false),
+                           usingInChiral(true),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -24,6 +25,7 @@ namespace LIBMOL
  
     AllSystem::AllSystem(const AllSystem& tAllSys):hasCoords(tAllSys.hasCoords),
                                                    hasCCP4Type(tAllSys.hasCCP4Type),
+                                                   usingInChiral(tAllSys.usingInChiral),
                                                    itsContainMetal(tAllSys.itsContainMetal),
                                                    itsCurAngleSeriNum(ZeroInt),
                                                    itsCurAngle(NullPoint),
@@ -53,6 +55,7 @@ namespace LIBMOL
                          const std::map<ID, std::vector<RingDict> >& tAllRings)
                           :hasCoords(false),
                            hasCCP4Type(false),
+                           usingInChiral(true),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -82,6 +85,7 @@ namespace LIBMOL
     
     AllSystem::AllSystem(DictCifFile& tCifObj):hasCoords(tCifObj.hasCoords),
                                                hasCCP4Type(tCifObj.hasCCP4Type),
+                                               usingInChiral(true),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -100,6 +104,7 @@ namespace LIBMOL
     
     AllSystem::AllSystem(Molecule& tMol):hasCoords(tMol.hasCoords),
                                          hasCCP4Type(false),
+                                         usingInChiral(true),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -610,10 +615,10 @@ namespace LIBMOL
                 // int t_len = (int)iAt->connAtoms.size();
                 if(t_len==4)
                 {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    } 
+                    //if (iAt->chiralIdx ==0)
+                    //{
+                    //    iAt->chiralIdx  = 2;
+                    //} 
                     iAt->chiralIdx  = 1;
                     iAt->bondingIdx = 3;  
                 }

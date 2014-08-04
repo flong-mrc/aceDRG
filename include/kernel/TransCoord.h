@@ -111,7 +111,25 @@ namespace LIBMOL
                                      std::vector<PlaneDict>   & tPlas,
                                      std::vector<ChiralDict>  & tChs);
         
+        void generateCoordTorsToCart3(std::vector<AtomDict>& tAtoms,
+                                     std::vector<BondDict>    & tBonds,
+                                     std::vector<AngleDict>   & tAngles,
+                                     std::vector<TorsionDict> & tTorsions,
+                                     std::vector<RingDict>    & tRings,
+                                     std::vector<PlaneDict>   & tPlas,
+                                     std::vector<ChiralDict>  & tChs);
+        
+        
         void branchGrowthTorsToCart2(std::vector<AtomDict> & tAllAtoms,
+                                     int tAtom1, int tAtom2, int tAtom3,
+                                     std::vector<BondDict>    & tBonds,
+                                     std::vector<AngleDict>   & tAngles,
+                                     std::vector<TorsionDict> & tTorsions,
+                                     std::vector<RingDict>    & tRings,
+                                     std::vector<PlaneDict>   & tPlas,
+                                     std::vector<ChiralDict>  & tChs);
+        
+        void branchGrowthTorsToCart3(std::vector<AtomDict> & tAllAtoms,
                                      int tAtom1, int tAtom2, int tAtom3,
                                      std::vector<BondDict>    & tBonds,
                                      std::vector<AngleDict>   & tAngles,
@@ -159,12 +177,25 @@ namespace LIBMOL
                          std::vector<TorsionDict> & tTorsions,
                          int                        tIdx);
         
+        void growOneNodeWithCheck(std::vector<int>         & sSet,
+                         std::vector<AtomDict>    & tAtoms,
+                         std::vector<BondDict>    & tBonds,
+                         std::vector<AngleDict>   & tAngles,
+                         std::vector<TorsionDict> & tTorsions,
+                         int                        tIdx,
+                         std::vector<int>         & tDoneSet);
+        
+        REAL getNearestNBDist(std::vector<AtomDict>    & tAtoms,
+                         int tIdxP,               int tIdx, 
+                         std::vector<int>         & tDoneSet);
+        
         void growOneAtom(std::vector<int>         & sSet,
                          std::vector<AtomDict>    & tAtoms,
                          REAL                     tbondV,
                          REAL                     tAngV,
                          REAL                     tTorV,
                          int                      tIdx);
+        
         
         void growOneAtom(AtomDict &                        tAtom1,
                          AtomDict &                        tAtom2,

@@ -203,7 +203,8 @@ namespace LIBMOL
             hasMetal(false),
             hasCodValue(false),
             numCodValues(ZeroInt),
-            numCodValuesP(ZeroInt)
+            numCodValuesP(ZeroInt),
+            isInSameRing(false)
     {
     }
     
@@ -220,7 +221,8 @@ namespace LIBMOL
             hasMetal(tBond.hasMetal),
             hasCodValue(tBond.hasCodValue),
             numCodValues(tBond.numCodValues),
-            numCodValuesP(tBond.numCodValuesP)
+            numCodValuesP(tBond.numCodValuesP),
+            isInSameRing(tBond.isInSameRing)
     {
         for (std::vector<ID>::const_iterator tA = tBond.atoms.begin();
                 tA != tBond.atoms.end(); tA++)
@@ -230,8 +232,10 @@ namespace LIBMOL
         for (std::vector<int>::const_iterator iI=tBond.atomsIdx.begin();
                 iI !=tBond.atomsIdx.end(); iI++)
         {
+        
             atomsIdx.push_back(*iI);
-        }
+        } 
+        
         for (std::vector<ID>::const_iterator tA = tBond.atomsCodClasses.begin();
                 tA != tBond.atomsCodClasses.end(); tA++)
         {
@@ -274,6 +278,24 @@ namespace LIBMOL
         
     }
     
+    bool BondDict::checkIfInSameRing(std::vector<AtomDict>& tAtoms, 
+                                     int tIdx1, int tIdx2)
+    {
+        bool lInRing = false;
+        for (std::vector<int>::iterator iR=tAtoms[tIdx1].inRings.begin();
+                iR !=tAtoms[tIdx1].inRings.end(); iR++)
+        {
+            if (std::find(tAtoms[tIdx2].inRings.begin(), tAtoms[tIdx2].inRings.end(), *iR)
+                    !=tAtoms[tIdx2].inRings.end())
+            {
+                lInRing = true;
+                break;
+            }
+        }
+        
+        return lInRing;
+    }
+    
     MetBond::MetBond() : resName(NullString),
             seriNum(ZeroInt),
             order(ZeroShort),
@@ -301,7 +323,6 @@ namespace LIBMOL
             lAtomIdx(tBond.lAtomIdx)
     {
     }
-    
     
     extern int getBond(std::vector<BondDict> & tBonds,
                        int tAt1, int tAt2)

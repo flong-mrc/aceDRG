@@ -85,6 +85,9 @@
 #include "crystInfo.h"
 #endif
 
+#ifndef PDBFILE_H
+#include "PDBFile.h"
+#endif
 /*
 #ifndef  __MMDB_Manager__
 #include "mmdb_manager.h"
@@ -343,7 +346,6 @@ namespace LIBMOL
     
     
     
-    
     class DictCifFile : public File
     {
         
@@ -360,12 +362,17 @@ namespace LIBMOL
                     std::ios_base::openmode     tOpenMode);
         
         // The following constructor is based on mmdb lib 
-        DictCifFile(FileName                    tFname);
+        //DictCifFile(FileName                    tFname);
+        
+        // For transfering information from PDB to CIF
+        DictCifFile(FileName                    tCifName,
+                    FileName                    tPdbName);
         
         // destructor
         virtual ~DictCifFile();
         
         void setupSystem();
+        void setupSystem3Secs(std::ifstream & tInCif);
         
         void initCifKeys();
         
@@ -452,6 +459,9 @@ namespace LIBMOL
         void  outSystem();
         void  outAtomBloc();
         void  outBondBloc();
+        
+        
+        void transCoordsPdbToCif(DictPDBFile       & tPdbObj);
     
         
         /* The core member functions are that 
@@ -538,6 +548,10 @@ namespace LIBMOL
         std::ofstream              outFile;
         std::ifstream              inFile;
         
+        // For File transfer
+        std::map<std::string, std::vector<std::string> >   allUnchangedBlocks;
+        
+        
         bool                       hasConnect;
         bool                       hasCoords;
         bool                       hasH;
@@ -575,7 +589,11 @@ namespace LIBMOL
                          std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> > & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs);
-    
+
+    extern void outMMCif3Secs(FileName tFName, 
+                              ID tMonoRootName,
+                              std::vector<LIBMOL::AtomDict>& tAtoms,
+                              std::map<std::string, std::vector<std::string> > & tUnChangedEntries);
 }
 
 

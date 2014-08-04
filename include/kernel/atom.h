@@ -265,6 +265,7 @@ namespace LIBMOL // temp
         REAL     formalCharge;
         REAL     radius;
         REAL     ionRadius;
+        int      inChiralIdx;
         int      chiralIdx;
         int      bondingIdx;
         bool     isMetal;
@@ -291,7 +292,7 @@ namespace LIBMOL // temp
         
         bool     isCChemTypeSet;
         bool     isInPreCell;
-        
+        bool     chiralChecked;
         
         // symmetry-related 
         ID       sId;
@@ -332,6 +333,7 @@ namespace LIBMOL // temp
         std::vector<int>           inChirals;
         std::vector< std::string > nbRep;
         std::map<std::string, int> ringRep;
+        std::map<std::string, int> ringRepBySeriNum;
         std::map<std::string, std::vector<int> > tree;
         
         REAL                       treeBond;

@@ -366,7 +366,7 @@ namespace LIBMOL
     void CodClassify::codAtomClassify2(int dLev)
     {
         ringDetecting2();
-        
+       
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
@@ -383,18 +383,18 @@ namespace LIBMOL
                 }
             }
             
-            //if (iA->inRings.size() >0)
-            //{
-            //    std::cout << "From ring number view " << std::endl;
-            //    std::cout << "Atom " << iA->id << " is in  " 
-            //            << (int)iA->inRings.size() << " ring(s)" << std::endl;
+            if (iA->inRings.size() >0)
+            {
+                std::cout << "From ring number view " << std::endl;
+                std::cout << "Atom " << iA->id << " is in  " 
+                          << (int)iA->inRings.size() << " ring(s)" << std::endl;
                 
-            //    for (std::vector<int>::iterator iI=iA->inRings.begin();
-            //            iI !=iA->inRings.end(); iI++)
-            //    {
-            //        std::cout << "Ring: " << *iI << std::endl;
-            //    }
-            //}
+                for (std::vector<int>::iterator iI=iA->inRings.begin();
+                         iI !=iA->inRings.end(); iI++)
+                {
+                    std::cout << "Ring: " << *iI << std::endl;
+                }
+            }
             if (iA->ringRep.size() !=iA->inRings.size())
             {
                exit(1);
@@ -1002,6 +1002,7 @@ namespace LIBMOL
             }
         }
        
+       
     }
     
     
@@ -1380,15 +1381,18 @@ namespace LIBMOL
                         // FIND A RING !
                         atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
                         std::list<std::string> tAllIds;
+                        std::list<std::string> tAllSeris;
                         std::vector <AtomDict> ttAtoms;
                         for (std::map<int, ID>::iterator iSee = atomIDsInPath.begin();
                                 iSee != atomIDsInPath.end(); iSee++)
                         {
                             //if (iSee->first != iOriAto->seriNum)
                             //{
+                            tAllSeris.push_back( IntToStr(iSee->first));
                             tAllIds.push_back(iSee->second);
-                            int posIdx = atomPosition(iSee->second);
-                            ttAtoms.push_back(allAtoms[posIdx]);
+                            
+                            //int posIdx = atomPosition(iSee->second);
+                            ttAtoms.push_back(allAtoms[iSee->first]);
                             
                             // tRing.atoms.push_back(*tAt);
                             //std::cout << iSee->second << std::endl;   
@@ -1396,29 +1400,46 @@ namespace LIBMOL
                         }
                         
                         RingDict aRingDict(ttAtoms);                 
-                        
+                        tAllSeris.sort(compareNoCase);
                         tAllIds.sort(compareNoCase);
                         //std::string tRepStr(iOriAto->id);
                         std::string tRepStr;
+                        std::string tRepSeri;
                         for (std::list<std::string>::iterator iAI =tAllIds.begin();
                                     iAI != tAllIds.end(); iAI++)
                         {
                             tRepStr.append(*iAI);
                         }
+                        
+                        int nRS =0;
+                        for (std::list<std::string>::iterator iAS =tAllSeris.begin();
+                                    iAS != tAllSeris.end(); iAS++)
+                        {
+                            if (nRS==0)
+                            {
+                                tRepSeri.append(*iAS);
+                            }
+                            else
+                            {
+                                tRepSeri.append("_" + *iAS);
+                            }
+                        }
                             
                         iOriAto->ringRep[tRepStr] = (int)atomIDsInPath.size();
                         
-                        aRingDict.rep = tRepStr;
-                        std::map<ID, std::vector<RingDict> >::iterator iFindRing=allRings.find(tRepStr);
+                        aRingDict.rep  = tRepStr;
+                        aRingDict.sRep = tRepSeri;
+                        
+                        std::map<ID, std::vector<RingDict> >::iterator iFindRing=allRings.find(tRepSeri);
                         if (iFindRing == allRings.end())
                         {
                             for (std::map<int, ID>::iterator iSee = atomIDsInPath.begin();
                                 iSee != atomIDsInPath.end(); iSee++)
                             {
-                                int posIdx = atomPosition(iSee->second);
-                                allAtoms[posIdx].inRings.push_back((int)allRings.size());
+                                // int posIdx = atomPosition(iSee->second);
+                                allAtoms[iSee->first].inRings.push_back((int)allRings.size());
                             }
-                            allRings[tRepStr].push_back(aRingDict);
+                            allRings[tRepSeri].push_back(aRingDict);
                         }
                         
                         atomIDsInPath.erase(curAto.seriNum);  

@@ -11,6 +11,7 @@
 
 namespace LIBMOL
 {
+    
     TransCoords::TransCoords()
     {
     }
@@ -1320,6 +1321,850 @@ namespace LIBMOL
     }
     
     
+    void TransCoords::generateCoordTorsToCart3(std::vector<AtomDict>& tAtoms,
+                                               std::vector<BondDict>    & tBonds,
+                                               std::vector<AngleDict>   & tAngles,
+                                               std::vector<TorsionDict> & tTorsions,
+                                               std::vector<RingDict>    & tRings,
+                                               std::vector<PlaneDict>   & tPlas,
+                                               std::vector<ChiralDict>  & tChs)
+    {
+        
+        
+        LIBMOL::buildAtomTree tTool;
+            
+        tTool.buildTree(tAtoms, tBonds, tAngles, tTorsions, 
+                        tRings, tPlas, tChs);
+        
+        //for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+        //        iA !=tAtoms.end(); iA++)
+        //{
+        //    std::cout << "atom " << iA->id << " element " << iA->chemType 
+        //              << " seriNum " << iA->seriNum << std::endl;
+        //}
+        
+        //tTool.setTreeAtomValues(tAtoms, tBonds, tAngs, tTorsions, 
+        //                        tRings, tPlas, tChs);
+        
+        for (std::map<int, std::map<int, std::vector<int> > >::iterator iBr=tTool.branches.begin();
+                iBr !=tTool.branches.end(); iBr++)
+        {
+            for(std::map<int, std::vector<int> >::iterator iSB=iBr->second.begin();
+                    iSB !=iBr->second.end(); iSB++)
+            {
+                for (std::vector<int>::iterator iSSB=iSB->second.begin();
+                        iSSB != iSB->second.end(); iSSB++)
+                {
+                    // Build a branch of the tree beginning with 3 atoms   
+                    //std::cout << "Branch 1st atom " << tAtoms[iBr->first].id 
+                    //          << " 2nd " << tAtoms[iSB->first].id
+                    //          << " 3rd " << tAtoms[*iSSB].id << std::endl;
+                    
+                    if ((int)tAtoms[*iSSB].tree["children"].size() > 0)
+                    {
+                        if(std::find(doneList.begin(), doneList.end(), iBr->first)==doneList.end())
+                        {
+                            doneList.push_back(iBr->first);
+                        }
+                        if(std::find(doneList.begin(), doneList.end(), iSB->first)==doneList.end())
+                        {
+                            doneList.push_back(iSB->first);
+                        }
+                        if(std::find(doneList.begin(), doneList.end(), *iSSB)==doneList.end())
+                        {
+                            doneList.push_back(*iSSB);
+                        }
+                        branchGrowthTorsToCart3(tAtoms, iBr->first, iSB->first, *iSSB,
+                                                tBonds, tAngles, tTorsions, 
+                                                tRings, tPlas,   tChs);
+                    }
+                }
+            }
+        } 
+    }
+    
+    
+    void TransCoords::branchGrowthTorsToCart3(std::vector<AtomDict>& tAtoms,
+                                              int sAtom1, int sAtom2, int sAtom3,
+                                              std::vector<BondDict>    & tBonds,
+                                              std::vector<AngleDict>   & tAngles,
+                                              std::vector<TorsionDict> & tTorsions,
+                                              std::vector<RingDict>    & tRings,
+                                              std::vector<PlaneDict>   & tPlas,
+                                              std::vector<ChiralDict>  & tChs)
+    {
+        
+        
+        //std::cout << "Branch growth from " << tAtoms[sAtom1].id
+        //        << " and atom " << tAtoms[sAtom2].id 
+        //        << " and atom " << tAtoms[sAtom3].id << std::endl;
+        
+        const int NSTLIM2 = 3;
+        const int NSTLIM =  10000;
+        int dim = (int)tAtoms[0].coords.size();
+        
+        // Just for debug this time
+        if (dim !=3)
+        {
+            std::cout << "Coord dim does not equal to 3, check !" << std::endl;
+            exit(1);
+        }
+        
+        int i, j;
+       
+        int i_atom, i_next;
+        int i_conn, n_conn;
+        int n_stack;
+        int * iatom_stack  = new int [NSTLIM];
+        int * i_conn_stack = new int [NSTLIM];
+        
+
+        REAL *** aMatStack = new REAL ** [NSTLIM];
+        for ( i =0; i < NSTLIM; i++)
+        {
+            aMatStack[i] = new REAL *[NSTLIM2];
+            for(j =0; j < NSTLIM2; j++)
+            {
+                aMatStack[i][j] = new REAL [NSTLIM2];
+            }
+        }
+        
+        REAL xyz_stack[NSTLIM][dim];
+        
+        REAL ** rotate_tem;
+        rotate_tem = new REAL * [dim];
+        for (i =0; i < dim; i++)
+        {
+            rotate_tem[i] = new REAL [dim];
+            for (j = 0; j < dim; j++)
+            {
+                rotate_tem[i][j] =0.0;
+            }
+        }
+
+        REAL **A = new REAL * [dim];
+        for (i =0; i < dim; i++)
+        {
+            A[i] = new REAL [dim];
+            for (j = 0; j < dim; j++)
+            {
+                A[i][j] =0.0;
+            }
+        }
+        
+        // Pick up the starting atom according to the selected torsion angle
+        
+        
+        REAL *v1    = new REAL [dim];
+        REAL *v2    = new REAL [dim];
+        REAL *v3    = new REAL [dim];
+        REAL *tmp_v = new REAL [dim];
+        REAL mod_tmp_v = 0.0;
+  
+        REAL *X_new = new REAL [dim];
+        REAL *Y_new = new REAL [dim]; 
+        REAL *Z_new = new REAL [dim];
+        
+        for (i =0; i < dim; i++)
+        {
+            v1[i] = tAtoms[sAtom2].coords[i] - tAtoms[sAtom1].coords[i];
+            v2[i] = tAtoms[sAtom3].coords[i] - tAtoms[sAtom2].coords[i];
+        }
+        
+        // Set new Z axis 
+
+        CrossP(v1,v2,tmp_v);
+ 
+        mod_tmp_v = DotP(tmp_v,tmp_v);
+  
+        mod_tmp_v = sqrt(mod_tmp_v);
+
+        if(mod_tmp_v)
+        {
+            for ( i = 0; i < dim; i++)
+            {
+                Z_new [i] = 0.0;
+                Z_new [i] = tmp_v[i]/mod_tmp_v; 
+            }
+        }
+        else 
+        {
+            std::cout << " The cross product of vectors v1 and v2 is zero " << std::endl;
+            exit(1);
+        }
+
+        // Set New Y axis
+
+        CrossP(Z_new,v2, tmp_v);
+        mod_tmp_v = DotP(tmp_v,tmp_v);
+        mod_tmp_v = sqrt(mod_tmp_v);
+  
+        if(mod_tmp_v)
+        {
+            for ( i = 0; i < dim; i++)
+            {
+                Y_new [i] = 0.0;
+                Y_new [i] = tmp_v[i]/mod_tmp_v;
+            }
+        }
+        else 
+        {
+            std::cout << " The cross product of vectors Z_new and v2 is zero " << std::endl;
+            exit(1);
+        }
+  
+        // Set New X axis
+
+        mod_tmp_v = DotP(v2, v2);
+        mod_tmp_v = sqrt(mod_tmp_v);
+        if(mod_tmp_v)
+        {
+            for ( i = 0; i < dim; i++)
+            {
+                X_new [i] = 0.0;
+                X_new [i] = v2[i]/mod_tmp_v;
+            }
+        }
+        else 
+        {
+            std::cout << " The module of the vector v2 is zero " << std::endl;
+            exit(1);
+        }
+        
+        // Set the initial transformation matrix from old coordinate system
+        // to the new system
+
+        InitAMat2(X_new,Y_new,Z_new,A, dim);
+
+        // Start climbing the tree from the seleted atom
+  
+        i_atom   = sAtom3;
+        
+        //cout << "i_atom is " << i_atom+1 << endl; 
+        
+        //for(i =0; i < dim; i++)
+        //  {
+        //    atoms[i_atom].coords[i] =atoms[i_atom].coords[i];     
+        //  }
+
+        i_conn   = 0;
+        n_stack  = 0;
+  
+        n_conn = (int)tAtoms[i_atom].tree["children"].size();
+
+        // std::cout << " The first atom at the branch is atom " << tAtoms[i_atom].id << std::endl;
+        // std::cout << " There are " << n_conn << " atoms forwardly linked this atom" << std::endl;
+ 
+        std::vector<AtomDict> dAtms;
+        std::vector<int>   aStartSet;
+
+        std::map<std::string, std::vector<int> >::iterator iFind;
+        
+        while((n_conn > 0 && n_stack >= 0)|| (n_conn== 0 && n_stack > 0) )
+        {
+            if ( n_conn > 1 &&  n_stack >= 0 ) 
+            {
+                int i_prev   = tAtoms[i_atom].tree["parent"][0];
+                int i1 = tAtoms[i_atom].tree["children"][i_conn];
+                int i2 = -1; 
+                //std::cout << "gp atom id " << tAtoms[i_prev].id << std::endl;
+                //std::cout << "p atom id " << tAtoms[i_atom].id << std::endl;
+                //std::cout << "new atom id " << tAtoms[i1].id << std::endl;
+                
+                if (tAtoms[i1].chemType=="H")
+                {
+                    //std::cout << "it is " << tAtoms[i1].id << std::endl;
+                    //std::cout << "Done List " << std::endl;
+                    //for (std::vector<int>::iterator iD=doneList.begin();
+                    //        iD != doneList.end(); iD++)
+                    //{
+                    //    std::cout << "Atom " << tAtoms[*iD].id << std::endl; 
+                    //}
+                    // grow other atom first if exist
+                    for (std::vector<int>::iterator iA=tAtoms[i_atom].connAtoms.begin();
+                            iA !=tAtoms[i_atom].connAtoms.end(); iA++)
+                    {
+                        //std::cout << "first grow i2 =" << tAtoms[*iA].id << std::endl;
+                        if (std::find(doneList.begin(), doneList.end(), *iA)==doneList.end()
+                             && *iA != i1 && *iA !=i_prev && tAtoms[*iA].chemType !="H")
+                        {
+                            i2=*iA;
+                            //std::cout << "It is here i2 =" << tAtoms[i2].id << std::endl;
+                            break;
+                        }
+                    }
+                }
+                if (i2 != -1)
+                {
+                    i_next = i2;
+                }
+                else
+                {
+                    i_next = i1;
+                }
+                
+                
+                std::vector<int> aSSet;
+                int i_pprev;
+                if (tAtoms[i_atom].id !=tAtoms[sAtom3].id)
+                {
+                    
+                    i_pprev  = tAtoms[i_prev].tree["parent"][0];
+                }
+                else
+                {
+                    i_pprev  = sAtom1;
+                    
+                }
+                aSSet.push_back(i_pprev);
+                aSSet.push_back(i_prev);
+                aSSet.push_back(i_atom);
+                
+                
+                
+                
+	        // cin.get();
+	        //   if(tAllAtoms[i_next].occupancy < 0.001)  && tAllAtoms[i_next].type != "R")
+	   
+                if (std::find(doneList.begin(), doneList.end(), i_next) ==doneList.end())
+                {
+                     //std::cout << "Final pick " << tAtoms[i_next].id << std::endl;
+                     //std::cout << " The grand parent atom " << tAtoms[i_pprev].id << std::endl;
+                     //std::cout << " The parent atom " << tAtoms[i_prev].id << std::endl;
+                     //std::cout << " The current atom " << tAtoms[i_atom].id << std::endl;
+                     //std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
+                     REAL tBo;   //   = tAtoms[i_next].treeBond;
+                     REAL tTha;  //  = tAtoms[i_next].treeAngle; 
+                     REAL tPhi  = tAtoms[i_next].treeTorsion;
+                    // (aSSet, tAtoms, tBonds, tAngles, tTorsions, i_next, doneList); 
+                    
+                    //if (tAtoms[i_atom].id !=tAtoms[sAtom3].id)
+                    //{
+                    growOneAtom(aSSet, tAtoms, tBonds, tAngles, tTorsions, i_next);
+                    
+                    tPhi = tTorsions[getTorsion(tTorsions, aSSet[0], aSSet[1], aSSet[2], i_next)].value*PI180;
+                    //}
+                    //else
+                    //{
+                    //    PolToCart(tAtoms,i_atom, i_next, tBo, tTha, tPhi,  A);
+                    //}
+                    doneList.push_back(i_next);
+                    // std::cout <<  tAtoms[i_next].id << " done0 " << std::endl;
+                    // std::cout << " atom " << tAtoms[i_atom].id 
+                    //          << " chiral idx " <<tAtoms[i_atom].chiralIdx << std::endl;
+                    
+                    // grow other atoms linked to i_atom (like i_next)
+                    // int i_chir = tAtoms[i_atom].chiralIdx;
+                
+                    if (tAtoms[i_atom].inChiralIdx !=0 && (int)tChs[tAtoms[i_atom].inChirals[0]].mutTable.size() !=0)
+                    {
+                        int aCh = tAtoms[i_atom].inChirals[0];
+                        bool lS= false;
+                        std::vector<int> t1, rTable;
+                        for (std::vector<int>::iterator irA=tChs[aCh].mutTable[i_prev].begin();
+                               irA!=tChs[aCh].mutTable[i_prev].end(); irA++)
+                        {
+                            if (lS)
+                            {
+                                rTable.push_back(*irA);
+                            }
+                            else if (*irA==i_next)
+                            {
+                                lS=true;
+                            }
+                            else
+                            {
+                                t1.push_back(*irA);
+                            }
+                        }
+                        for (std::vector<int>::iterator irA2=t1.begin();
+                                irA2 !=t1.end(); irA2++)
+                        {
+                            rTable.push_back(*irA2);
+                        }
+                        
+                        int iL=1;
+                        
+                        for (std::vector<int>::iterator iNodeA=rTable.begin();
+                                iNodeA !=rTable.end(); iNodeA++)
+                        {
+                            // std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
+                            
+                            int bIdx    = getBond(tBonds, i_atom, *iNodeA);
+                            tBo         = tBonds[bIdx].valueST;
+                            int aIdx    = getAngle(tAngles, i_atom, i_prev, *iNodeA);
+                            tTha        = tAngles[aIdx].valueST;
+                            //std::cout << "iL= " << iL << std::endl
+                            //          << " tPhi" << tPhi << std::endl
+                            //          << " deltal " << 2.0*PI/3.0 << std::endl;
+                            REAL tPhiI  = tPhi +iL*2.0*PI/3.0;
+                            if (std::find(doneList.begin(), doneList.end(), *iNodeA) ==doneList.end())
+                            {
+                                // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
+                                growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
+                                doneList.push_back(*iNodeA);
+                                // std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                            }
+                            iL++;
+                        }
+                        
+                    }
+                    else
+                    {
+                        int iL=1;
+                        for (std::vector<int>::iterator iCA=tAtoms[i_atom].connAtoms.begin();
+                                iCA != tAtoms[i_atom].connAtoms.end(); iCA++)
+                        {
+                            if (*iCA !=i_next && *iCA !=i_prev 
+                                && std::find(doneList.begin(), doneList.end(), *iCA) ==doneList.end())
+                            {
+                                tBo         = tAtoms[*iCA].treeBond;
+                                tTha        = tAtoms[*iCA].treeAngle;
+                                if (tAtoms[i_atom].bondingIdx==3)
+                                {    
+                                    REAL tPhiI  = tPhi +iL*2.0*PI/3.0;
+                                    growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iCA);
+                                    // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
+                                    doneList.push_back(*iCA);
+                                    std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
+                                    iL++;
+                                }
+                                else if (tAtoms[i_atom].bondingIdx==2)
+                                {
+                                    REAL tPhiI  = tPhi + PI;   
+                                    growOneAtom(aSSet, tAtoms, tBo, tTha, tPhiI, *iCA);
+                                    // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
+                                    doneList.push_back(*iCA);
+                                    std::cout <<  tAtoms[*iCA].id << " done22 " << std::endl;
+                                }
+                            }
+                        }    
+                    }
+                    
+                   
+                    optSubSystem(doneList, tAtoms, tBonds, tAngles,
+                                tTorsions, tRings, tPlas, tChs, false);
+                    // std::cout << "The sub-system is optimized \n";
+                    
+                    // Ring growth
+                    
+                    if ((int)tAtoms[i_next].inRings.size() !=0 )
+                    {   
+                        
+                        int iTurn =0;
+                        for (std::vector<int>::iterator iRi=tAtoms[i_next].inRings.begin();
+                                iRi !=tAtoms[i_next].inRings.end(); iRi++)
+                        {
+                            if (! tRings[*iRi].isPlanar)
+                            {
+                                //std::cout << "Grow the ring contain " << tAtoms[i_next].id
+                                //          << std::endl;
+                                aStartSet.clear();
+                                if (i_atom == sAtom3)
+                                {
+                                    aStartSet.push_back(sAtom2);
+                                }
+                                else
+                                {
+                                    int iGP = tAtoms[i_atom].tree["parent"][0];
+                                    aStartSet.push_back(iGP);
+                                }
+                                aStartSet.push_back(i_atom);
+                                aStartSet.push_back(i_next);
+                                //std::cout << "S1 set " << tAtoms[aStartSet[0]].id << "\t"
+                                //          << tAtoms[aStartSet[1]].id << "\t" 
+                                //          << tAtoms[aStartSet[2]].id << std::endl;
+                                ringBuilder(aStartSet, tRings[*iRi], tAtoms, tBonds, 
+                                            tAngles, tTorsions, tRings, tPlas, tChs, iTurn, doneList);
+                 
+                                
+                                //optSubSystem(doneList, tAtoms, tBonds, tAngles,
+                                //              tTorsions, tRings, tPlas, tChs, false);
+                                // std::cout << "The sub-system is optimized \n";
+                                
+                                iTurn++;    
+                            }
+                            else
+                            {
+                                //std::cout << "Grow the planar ring contain " << tAtoms[i_next].id
+                                //          << std::endl;
+                                aStartSet.clear();
+                                if (i_atom == sAtom3)
+                                {
+                                    aStartSet.push_back(sAtom2);
+                                }
+                                else
+                                {
+                                    int iGP = tAtoms[i_atom].tree["parent"][0];
+                                    aStartSet.push_back(iGP);
+                                }
+                                aStartSet.push_back(i_atom);
+                                aStartSet.push_back(i_next);
+                                //std::cout << "S1 set " << tAtoms[aStartSet[0]].id << "\t"
+                                //          << tAtoms[aStartSet[1]].id << "\t" << tAtoms[aStartSet[2]].id << std::endl;
+                                ringBuilder(aStartSet, tRings[*iRi], tAtoms, tBonds, 
+                                            tAngles, tTorsions, tRings, tPlas, tChs, iTurn, doneList);
+                 
+                            }
+                        
+                        }
+                        
+                    
+                    }
+                    
+                    dAtms.clear();
+                    for (std::vector<int>::iterator iD=doneList.begin();
+                            iD != doneList.end(); iD++)
+                    {
+                        dAtms.push_back(tAtoms[*iD]);
+                    }
+                    /*
+                    int  a1    = (int)doneList.size();
+                    if ( a1 > 5 )
+                    {
+                        std::string tName = "atoms_" + IntToStr(a1) + ".pdb";
+                    
+                        LIBMOL::outPDB(tName.c_str(), "XXX", dAtms);
+                    }
+                     */
+                    /*
+                    else if (a1 > 50)
+                    {
+                        exit(1);
+                    }
+                    
+                     */
+                }
+                else
+                {
+                    std::cout << "Atom " << tAtoms[i1].id << "is in doneList " << std::endl;
+                }
+                
+                //std::cout << "0 i_conn " << i_conn << std::endl;
+                //std::cout << "n_conn "   << n_conn << std::endl;
+	                                     
+                if (i_conn < n_conn )
+                {
+                    if(n_stack > NSTLIM)
+                    {
+                        std::cout << " Error in member function generateCoordCartToTors " 
+                                  << std::endl << " Number in the stack is :  " 
+                                  << n_stack  << std::endl;
+                        exit(1);
+                    }                                 
+
+                    // Keep the junction point info in a stack
+                    
+                    i_conn               = i_conn  + 1;
+	            iatom_stack[n_stack] = i_atom;
+             
+                    i_conn_stack[n_stack] = i_conn;
+
+	            // cout << " The infor of the atom " <<  i_atom +1 
+	            //     << " has been stored in the stack " << n_stack +1 << endl;
+             
+                    NBD_MCOPY(A, aMatStack[n_stack], dim);
+                             
+                    for ( i =0; i < dim; i++)
+                    {
+                        xyz_stack[n_stack][i] = tAtoms[i_atom].coords[i];
+                    }
+	      
+                    n_stack   = n_stack + 1;
+
+		    // std::cout << " n_stack :   " << n_stack << std::endl;  
+                }
+                
+                CHANGE_AMAT(tAtoms,i_next, A);
+                // Set the next atom to be the current atom in new loop
+
+                i_atom     = i_next;
+                i_conn     = 0;
+                
+                // n_conn = (int)tAtoms[i_atom].connAtoms.size()-1;
+                
+                //n_conn     = (int)tAtoms[i_atom].tree["children"].size();
+                
+                iFind = tAtoms[i_atom].tree.find("children");
+                if (iFind !=tAtoms[i_atom].tree.end())
+                {
+                    n_conn = tAtoms[i_atom].tree["children"].size();
+                }
+                else
+                {
+                    n_conn = 0;
+                }
+               
+	        //std::cout << " new i_atom: " << tAtoms[i_atom].id << std::endl;
+	        //std::cout << " new n_conn: " << n_conn << std::endl;
+	  
+            }
+            else if (n_conn == 1)
+            { 
+                int i_prev = tAtoms[i_atom].tree["parent"][0];
+                
+                int i_pprev;
+               
+                if (tAtoms[i_atom].id !=tAtoms[sAtom3].id)
+                {
+                    
+                    i_pprev  = tAtoms[i_prev].tree["parent"][0];
+                }
+                else
+                {
+                    i_pprev  = sAtom1;
+                    
+                }
+                
+                //= tAtoms[i_prev].tree["parent"][0];
+                //std::cout << "3 grand parent atom is " << tAtoms[i_pprev].id << std::endl 
+                //          << "3 prev atom is " << tAtoms[i_prev].id << std::endl
+                //          << "3 current atom is " << tAtoms[i_atom].id << std::endl;
+                
+                i_next = tAtoms[i_atom].tree["children"][i_conn];
+                // std::cout << " The next atom is " << tAtoms[i_next].id << std::endl;
+                
+	        //  cout << " The next atom is " << i_next+1 << endl;
+                if (std::find(doneList.begin(), doneList.end(), i_next) ==doneList.end())
+                {
+                    
+                    //REAL tBo   = tAtoms[i_next].treeBond;
+                    //REAL tTha  = tAtoms[i_next].treeAngle; 
+                    //REAL tPhi  = tAtoms[i_next].treeTorsion;
+                    std::vector<int> aSSet3;
+                    aSSet3.push_back(i_pprev);
+                    aSSet3.push_back(i_prev);
+                    aSSet3.push_back(i_atom);
+                    /**
+                    PolToCart(tAtoms,i_atom, i_next, tBo, tTha, tPhi,  A);
+                     */
+                    growOneAtom(aSSet3, tAtoms, tBonds, tAngles, tTorsions, i_next);
+                    doneList.push_back(i_next);
+                    // std::cout <<  tAtoms[i_next].id << " done3 " << std::endl;
+                    // grow other atoms linked to i_atom (like i_next)
+                    /*
+                    int iL=1;
+                    for (std::vector<int>::iterator iCA=tAtoms[i_atom].connAtoms.begin();
+                            iCA != tAtoms[i_atom].connAtoms.end(); iCA++)
+                    {
+                        if (*iCA !=i_next && *iCA !=i_prev 
+                            && std::find(doneList.begin(), doneList.end(), *iCA) ==doneList.end())
+                        {
+                            tBo         = tAtoms[*iCA].treeBond;
+                            tTha        = tAtoms[*iCA].treeAngle;
+                            if (tAtoms[i_atom].bondingIdx==3)
+                            {    
+                                REAL tPhiI  = tPhi +iL*2.0*PI/3.0;   
+                                PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
+                                doneList.push_back(*iCA);
+                                // std::cout <<  tAtoms[*iCA].id << " done " << std::endl;
+                                iL++;
+                            }
+                            else if (tAtoms[i_atom].bondingIdx==2)
+                            {
+                                REAL tPhiI  = tPhi + PI;   
+                                PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
+                                doneList.push_back(*iCA);
+                                // std::cout <<  tAtoms[*iCA].id << " done " << std::endl;
+                            }  
+                        }
+                    }
+                    */
+                    
+                    //optSubSystem(doneList, tAtoms, tBonds, tAngles,
+                    //             tTorsions, tRings, tPlas, tChs, false);
+                    //std::cout << "tree Node end: The sub-system is optimized \n";
+                    //REAL tLeng  = tAtoms[i_next].treeBond;
+                    //REAL tAng   = PI-tAtoms[i_next].treeAngle; 
+                    //REAL tTor   = tAtoms[i_next].treeTorsion;   
+                    //PolToCart(tAtoms, i_atom, i_next, tLeng, tAng, tTor, A);
+                    //doneList.push_back(i_next);
+                    //std::cout <<  tAtoms[i_next].id << " done " << std::endl;
+                }
+	                                    //  strcpy(tAllAtoms[i_next].type, "R");
+                
+                
+                dAtms.clear();
+                for (std::vector<int>::iterator iD=doneList.begin();
+                            iD != doneList.end(); iD++)
+                {
+                    dAtms.push_back(tAtoms[*iD]);
+                }
+                  
+                /*
+                int  a1    = (int)doneList.size();
+               
+                if ( a1 > 5 )
+                {
+                    std::string tName = "atoms_" + IntToStr(a1) + ".pdb";
+                    
+                    LIBMOL::outPDB(tName.c_str(), "XXX", dAtms);
+                }
+                 */
+                    /*
+                    else if (a1 > 50)
+                    {
+                        exit(1);
+                    }
+                    
+                     */
+                
+                
+            
+                
+                CHANGE_AMAT(tAtoms, i_next, A);
+
+                
+                // Set the next atom to be the current atom in new loop
+
+                i_atom     = i_next;
+                i_conn     = 0;
+                
+                
+                iFind = tAtoms[i_atom].tree.find("children");
+                if (iFind !=tAtoms[i_atom].tree.end())
+                {
+                    n_conn = tAtoms[i_atom].tree["children"].size();
+                }
+                else
+                {
+                    n_conn = 0;
+                }
+                
+	        //std::cout << " new i_atom: " << tAtoms[i_atom].id << std::endl;
+	        //std::cout << " new n_conn: " << n_conn   << std::endl;
+            }
+            else if (n_conn == 0 && n_stack > 0)
+            {
+                do
+                {
+                    n_stack = n_stack-1;
+	            // std::cout << "The stack level is " << n_stack << std::endl;
+                    if(n_stack < 0)
+                    {
+                        break;
+                    }
+                    i_atom = iatom_stack[n_stack];
+
+	            // std::cout << " restart from i_atom " << tAtoms[i_atom].id << std::endl;
+         
+                    i_conn = i_conn_stack[n_stack];
+
+	            // std::cout << " restart1 from the " << i_conn+1 
+	            //           << " node that linked to the above atom " << std::endl;
+
+                    NBD_MCOPY(aMatStack[n_stack], A, dim);
+
+	            //for( i =0; i < dim; i++)
+	            //{
+                    //  xyz[i] = xyz_stack[n_stack][i];
+	            //}
+
+                    // n_conn = (int)tAtoms[i_atom].tree["children"].size();
+                    iFind = tAtoms[i_atom].tree.find("children");
+                    if (iFind !=tAtoms[i_atom].tree.end())
+                    {
+                        n_conn = tAtoms[i_atom].tree["children"].size();
+                    }
+                    else
+                    {
+                        n_conn = 0;
+                    }
+	            //    cout << "restart n_conn " << n_conn << endl;
+	            //    cout << " continue      " << endl;             
+	            //    cin.get();
+                
+                }while(i_conn >= n_conn && n_stack >= 0);
+                /*
+                std::cout << "out while  " << std::endl
+                          << "n_conn " << n_conn << std::endl
+                          << "i_conn " << i_conn << std::endl
+                          << "n_stack " <<n_stack << std::endl
+                          << "i_atom "  << tAtoms[i_atom].id << std::endl;
+                 */
+            }
+            
+            // std::cout << "here " << std::endl;
+        }
+        //std::cout << "New coordinates after angle-to-coordinates transfer are " << std::endl;
+
+        //for (int i =0; i < (int)tAtoms.size(); i++)
+        //{
+        //    std::cout << "The " <<i+1<<"th atom is at" << std::endl;
+        //    for (int j=0; j < dim; j++)
+        // 	{
+        //        std::cout << tAtoms[i].coords[j] << "\t";
+        //      }
+        //    std::cout << std::endl;
+        //  }
+  
+        // cout << " Continue ? " << endl;
+        // cin.get();
+
+        // Release memory and null point variables
+
+        delete [] v1;
+        v1 = NULL;
+
+        delete v2;
+        v2 = NULL;
+
+        delete [] v3;
+        v3 = NULL;
+  
+        delete [] tmp_v;
+        tmp_v = 0;
+  
+        delete [] X_new;
+        X_new = NULL;
+
+        delete [] Y_new;
+        Y_new = NULL;
+
+        delete [] Z_new;
+        Z_new = NULL;
+  
+        for ( i =0; i < dim; i++)
+        {
+            delete [] rotate_tem[i];
+            rotate_tem[i] =NULL;
+        }
+
+        delete [] rotate_tem;
+        rotate_tem = NULL;
+  
+        for (i =0; i < dim; i++)
+        {
+            delete [] A[i];
+            A[i] = 0;
+        }
+        delete [] A;
+        A = 0;
+
+        delete [] iatom_stack;
+        iatom_stack  = 0;
+
+        delete [] i_conn_stack;
+        i_conn_stack = 0;
+
+        for ( i =0; i < NSTLIM; i++)
+        {
+            for(j =0; j < NSTLIM2; j++)
+            {
+                delete []    aMatStack[i][j];
+                aMatStack[i][j] = 0;
+            }
+            delete [] aMatStack[i];
+            aMatStack[i] =0;
+        }
+        delete [] aMatStack;
+        aMatStack = 0; 
+       
+    }
+    
+    
+           
+    
     void TransCoords::PolToCart(std::vector<AtomDict> & tAtoms,
                                 int i_cur, int i_next, REAL** aMat)
     {
@@ -1888,17 +2733,26 @@ namespace LIBMOL
         if (p !=-1 and gp !=-1)
         {
             // using ring atoms as the start set
+            std::cout << "Use tree " << std::endl;
             curSet.push_back(gp);
             curSet.push_back(p);
             curSet.push_back(tCur);
         }
         else
         {
+            std::cout << "Use input " << std::endl;
             for(std::vector<int>::iterator iA=tSet.begin();
                     iA !=tSet.end(); iA++)
             {
                 curSet.push_back(*iA);
             }
+        }
+        
+        std::cout << "Current set: " << std::endl;
+        for (std::vector<int>::iterator iC=curSet.begin();
+                iC !=curSet.end(); iC++)
+        {
+            std::cout << *iC << std::endl;
         }
         
     }
@@ -2063,6 +2917,319 @@ namespace LIBMOL
     }
     
     
+    void TransCoords::growOneNodeWithCheck(std::vector<int>        & sSet,
+                         std::vector<AtomDict>    & tAtoms,
+                         std::vector<BondDict>    & tBonds,
+                         std::vector<AngleDict>   & tAngles,
+                         std::vector<TorsionDict> & tTorsions,
+                         int                        tIdx,
+                         std::vector<int>         & tDoneSet)
+    {
+                
+        int dim = (int)tAtoms[0].coords.size();
+
+        REAL **A = new REAL * [dim];
+        for (int i =0; i < dim; i++)
+        {
+            A[i] = new REAL [dim];
+            for (int j = 0; j < dim; j++)
+            {
+                A[i][j] =0.0;
+            }
+        }
+        
+        // Pick up the starting atom according to the selected torsion angle
+        
+        REAL *v1    = new REAL [dim];
+        REAL *v2    = new REAL [dim];
+        
+        REAL *tmp_v = new REAL [dim];
+        REAL mod_tmp_v = 0.0;
+  
+        REAL *X_new = new REAL [dim];
+        REAL *Y_new = new REAL [dim]; 
+        REAL *Z_new = new REAL [dim];
+        
+        for (int i =0; i < dim; i++)
+        {
+            v1[i] = tAtoms[sSet[1]].coords[i] - tAtoms[sSet[0]].coords[i];
+            v2[i] = tAtoms[sSet[2]].coords[i] - tAtoms[sSet[1]].coords[i];
+        }
+        
+        // Set new Z axis 
+
+        CrossP(v1,v2,tmp_v);
+ 
+        mod_tmp_v = DotP(tmp_v,tmp_v);
+  
+        mod_tmp_v = sqrt(mod_tmp_v);
+
+        if(mod_tmp_v)
+        {
+            for (int i = 0; i < dim; i++)
+            {
+                Z_new [i] = 0.0;
+                Z_new [i] = tmp_v[i]/mod_tmp_v; 
+            }
+        }
+        else 
+        {
+            std::cout << " The cross product of vectors v1 and v2 is zero " << std::endl;
+            exit(1);
+        }
+        
+
+        // Set New Y axis
+
+        CrossP(Z_new,v2, tmp_v);
+        mod_tmp_v = DotP(tmp_v,tmp_v);
+        mod_tmp_v = sqrt(mod_tmp_v);
+  
+        if(mod_tmp_v)
+        {
+            for ( int i = 0; i < dim; i++)
+            {
+                Y_new [i] = 0.0;
+                Y_new [i] = tmp_v[i]/mod_tmp_v;
+            }
+        }
+        else 
+        {
+            std::cout << " The cross product of vectors Z_new and v2 is zero " << std::endl;
+            exit(1);
+        }
+  
+
+        // Set New X axis
+
+        mod_tmp_v = DotP(v2, v2);
+        mod_tmp_v = sqrt(mod_tmp_v);
+        if(mod_tmp_v)
+        {
+            for (int i = 0; i < dim; i++)
+            {
+                X_new [i] = 0.0;
+                X_new [i] = v2[i]/mod_tmp_v;
+            }
+        }
+        else 
+        {
+            std::cout << " The module of the vector v2 is zero " << std::endl;
+            exit(1);
+        }
+        
+        // Set the initial transformation matrix from old coordinate system
+        // to the new system
+
+        InitAMat2(X_new,Y_new,Z_new,A, dim);
+        
+        
+        // Grow the first atom linked to the atom sSet[2] 
+        int  idxBond = getBond(tBonds, sSet[2], tIdx);
+        int  idxAng  = getAngle(tAngles, sSet[2], sSet[1], tIdx);
+        int  idxTor  = getTorsion(tTorsions, sSet[0], sSet[1], sSet[2], tIdx);
+        
+        
+        if (idxBond !=-1 && idxAng !=-1 && idxTor !=-1)
+        {
+            REAL aBond=tBonds[idxBond].value;
+            REAL aAng =tAngles[idxAng].valueST;
+            REAL aTor =tTorsions[idxTor].value*PI180;
+            PolToCart(tAtoms, sSet[2], tIdx, aBond, aAng, aTor, A);
+            
+            REAL curShortestDist = getNearestNBDist(tAtoms, sSet[2], tIdx, tDoneSet);
+            
+            std::vector <REAL> maxDCoords;
+            maxDCoords.push_back(tAtoms[tIdx].coords[0]);
+            maxDCoords.push_back(tAtoms[tIdx].coords[1]);
+            maxDCoords.push_back(tAtoms[tIdx].coords[2]);
+            REAL maxTor = aTor, minD=curShortestDist;
+            int maxIdx  = 0;
+            
+            if (curShortestDist > 0.0)
+            {
+                if (tAtoms[sSet[2]].bondingIdx==3)
+                {
+                    aTor = aTor + 2*PI/3.0;
+                    PolToCart(tAtoms, sSet[2], tIdx, aBond, aAng, aTor, A);
+                    curShortestDist = getNearestNBDist(tAtoms, sSet[2], tIdx, tDoneSet);
+                    if (curShortestDist > minD)
+                    {
+                        minD = curShortestDist;
+                        maxTor = aTor;
+                        maxIdx = 1;
+                        maxDCoords[0] = tAtoms[tIdx].coords[0];
+                        maxDCoords[1] = tAtoms[tIdx].coords[1];
+                        maxDCoords[2] = tAtoms[tIdx].coords[2];
+                    }
+                    aTor = aTor + 2*PI/3.0;
+                    if (aTor >=2*PI)
+                    {
+                        aTor =aTor - 2*PI;
+                    }
+                    PolToCart(tAtoms, sSet[2], tIdx, aBond, aAng, aTor, A);
+                    tDoneSet.push_back(tIdx);
+                    curShortestDist = getNearestNBDist(tAtoms, sSet[2], tIdx, tDoneSet);
+                    if (curShortestDist > minD)
+                    {
+                        maxTor = aTor;
+                        maxIdx = 2;
+                        maxDCoords[0] = tAtoms[tIdx].coords[0];
+                        maxDCoords[1] = tAtoms[tIdx].coords[1];
+                        maxDCoords[2] = tAtoms[tIdx].coords[2];
+                    }
+                    
+                    // Replace all three torsion angles
+                    // 1. Current atom
+                    tTorsions[idxTor].value = maxTor;
+                    tAtoms[tIdx].coords[0]= maxDCoords[0];
+                    tAtoms[tIdx].coords[1]= maxDCoords[1];
+                    tAtoms[tIdx].coords[2]= maxDCoords[2];
+                    // std::cout << "Atom " << tAtoms[tIdx].id << " grown " << std::endl;
+                    if (std::find(tDoneSet.begin(), tDoneSet.end(), tIdx) == tDoneSet.end())
+                    {
+                        tDoneSet.push_back(tIdx);
+                    }
+                    
+                    // 2. other two atoms 
+                    for (std::vector<int>::iterator iNB=tAtoms[sSet[2]].connAtoms.begin();
+                          iNB !=tAtoms[sSet[2]].connAtoms.end(); iNB++)
+                    {
+                        if (tAtoms[*iNB].id !=tAtoms[tIdx].id
+                            && tAtoms[*iNB].id !=tAtoms[sSet[1]].id)
+                        {
+                            int  idxNBTor  = getTorsion(tTorsions, sSet[0], sSet[1], sSet[2], *iNB);
+                            tTorsions[idxNBTor].value = tTorsions[idxNBTor].value +maxIdx*(2*PI)/3.0;
+                            if ( tTorsions[idxNBTor].value >=2*PI)
+                            {
+                                tTorsions[idxNBTor].value =tTorsions[idxNBTor].value - 2*PI;
+                            }
+                            PolToCart(tAtoms, sSet[2], *iNB, aBond, aAng, tTorsions[idxNBTor].value, A);
+                            // std::cout << "Atom " << tAtoms[*iNB].id << " grown " <<  std::endl;
+                            if (std::find(tDoneSet.begin(), tDoneSet.end(), *iNB) == tDoneSet.end())
+                            {
+                                tDoneSet.push_back(*iNB);
+                            }
+                        }
+                    }
+                }
+                else if (tAtoms[sSet[2]].bondingIdx==2)
+                {
+                    aTor = aTor + PI;
+                    if (aTor >=2*PI)
+                    {
+                        aTor =aTor - 2*PI;
+                    }
+                    PolToCart(tAtoms, sSet[2], tIdx, aBond, aAng, aTor, A);
+                    curShortestDist = getNearestNBDist(tAtoms, sSet[2], tIdx, tDoneSet);
+                    if (curShortestDist > minD)
+                    {
+                        minD = curShortestDist;
+                        maxTor = aTor;
+                        maxIdx = 1;
+                        maxDCoords[0] = tAtoms[tIdx].coords[0];
+                        maxDCoords[1] = tAtoms[tIdx].coords[1];
+                        maxDCoords[2] = tAtoms[tIdx].coords[2];
+                    }
+                    
+                    
+                    // Replace all three torsion angles
+                    // 1. Current atom
+                    tTorsions[idxTor].value = maxTor;
+                    tAtoms[tIdx].coords[0]= maxDCoords[0];
+                    tAtoms[tIdx].coords[1]= maxDCoords[1];
+                    tAtoms[tIdx].coords[2]= maxDCoords[2];
+                    if (std::find(tDoneSet.begin(), tDoneSet.end(), tIdx) == tDoneSet.end())
+                    {
+                        tDoneSet.push_back(tIdx);
+                    }
+                    //std::cout << "Atom " << tAtoms[tIdx].id << " grown " << std::endl;
+                    // 2. the other atoms 
+                    for (std::vector<int>::iterator iNB=tAtoms[sSet[2]].connAtoms.begin();
+                          iNB !=tAtoms[sSet[2]].connAtoms.end(); iNB++)
+                    {
+                        if (tAtoms[*iNB].id !=tAtoms[tIdx].id
+                            && tAtoms[*iNB].id !=tAtoms[sSet[1]].id)
+                        {
+                            int  idxNBTor  = getTorsion(tTorsions, sSet[0], sSet[1], sSet[2], *iNB);
+                            tTorsions[idxNBTor].value = tTorsions[idxNBTor].value +maxIdx*PI;
+                            if ( tTorsions[idxNBTor].value >=2*PI)
+                            {
+                                tTorsions[idxNBTor].value =tTorsions[idxNBTor].value - 2*PI;
+                            }
+                            PolToCart(tAtoms, sSet[2], *iNB, aBond, aAng, aTor, A);
+                            //std::cout << "Atom " << tAtoms[*iNB].id << " grown " << std::endl;
+                            if (std::find(tDoneSet.begin(), tDoneSet.end(), *iNB) == tDoneSet.end())
+                            {
+                                tDoneSet.push_back(*iNB);
+                            }
+                        }
+                    }
+                }
+                //
+            }
+        }
+        else
+        {
+            std::cout << "could not find either bond, or angle or torsion for atoms set "
+                    << tAtoms[sSet[0]].id << " " << tAtoms[sSet[1]].id 
+                    << tAtoms[sSet[2]].id << " " << tAtoms[tIdx].id << std::endl;
+            exit(1);
+        }
+        
+        // Release memory and null point variables
+
+        delete [] v1;
+        v1 = 0;
+
+        delete v2;
+        v2 = 0;
+  
+        delete [] tmp_v;
+        tmp_v = 0;
+  
+        delete [] X_new;
+        X_new = 0;
+
+        delete [] Y_new;
+        Y_new = 0;
+
+        delete [] Z_new;
+        Z_new = 0;
+        
+        for (int i =0; i < dim; i++)
+        {
+            delete [] A[i];
+            A[i] = 0;
+        }
+        delete [] A;
+        A = 0;
+        
+    }
+    
+    REAL TransCoords::getNearestNBDist(std::vector<AtomDict>& tAtoms, 
+                                  int tIdxP, int tIdx,
+                                  std::vector<int>         & tDoneSet)
+    {
+        REAL aMinDist =10000.0;
+     
+        for (std::vector<int>::iterator iNBA=tDoneSet.begin();
+                iNBA !=tDoneSet.end(); iNBA++)
+        {
+            if (tAtoms[*iNBA].id != tAtoms[tIdxP].id
+                && tAtoms[*iNBA].id != tAtoms[tIdx].id)
+            {
+                REAL tDist = distanceV(tAtoms[tIdx].coords, tAtoms[*iNBA].coords);
+                if (tDist < aMinDist)
+                {
+                    aMinDist = tDist;
+                }
+            }
+            
+        }
+        return aMinDist;
+    }
+    
     void TransCoords::growOneAtom(std::vector<int>           & sSet,
                                   std::vector<AtomDict>   & tAtoms,
                                   REAL                      tBondV, 
@@ -2201,6 +3368,9 @@ namespace LIBMOL
         A = NULL;
   
     }
+    
+    
+    
     
     void TransCoords::growOneAtom(AtomDict& tAtom1, AtomDict& tAtom2, 
                                   AtomDict& tAtom3, 
@@ -2356,6 +3526,11 @@ namespace LIBMOL
                                       int tIdx, std::vector<int>& tDoneSet)
     {
         //std::cout << "growOneRingNode " << std::endl;
+        //std::cout << "start set: " << std::endl;
+        //for (unsigned i=0; i < sSet.size(); i++)
+        //{
+        //    std::cout << "Atom " << sSet[i] << "  " << tAtoms[sSet[i]].id << std::endl;
+        //}
         int dim = (int)tAtoms[0].coords.size();
 
         REAL **A = new REAL * [dim];
@@ -2463,6 +3638,7 @@ namespace LIBMOL
         
         if (idxBond !=-1 && idxAng !=-1 && idxTor !=-1)
         {
+            
             REAL aBond=tBonds[idxBond].value;
             REAL aAng =tAngles[idxAng].valueST;
             REAL aTor;
@@ -2525,15 +3701,19 @@ namespace LIBMOL
                 }
                
             }
-            
-            
+            //std::cout << "Here atom " <<  tAtoms[sSet[2]].bondingIdx
+            //          << " has chiral idx " << tAtoms[sSet[2]].chiralIdx << std::endl;
+     
             // build the atoms that are not on the ring but bonding with 
             // the atom sSet[2] (tIdx is also bonding with sSet[2] 
             
             // grow other atoms linked to i_atom (like i_next)
             
-                    if (tAtoms[sSet[2]].chiralIdx !=0)
-                    {
+                    
+                    if (tAtoms[sSet[2]].inChiralIdx !=0)
+                    { 
+                        
+                        //std::cout << "Here 2 " << std::endl;
                         int aCh = tAtoms[sSet[2]].inChirals[0];
                         bool lS= false;
                         std::vector<int> t1, rTable;
@@ -2560,7 +3740,8 @@ namespace LIBMOL
                         }
                         
                         //std::cout << "Chiral center " << tAtoms[sSet[2]].id << std::endl;
-                        //std::cout << "chiral description  " << tChs[aCh].signST << std::endl;
+                        //std::cout << "Tree path from atom " << tAtoms[sSet[1]].id << std::endl;
+                        //std::cout << "chiral description  " << tChs[aCh].sign << std::endl;
                         //std::cout << "Atom arrangement " << std::endl;
                         //std::cout << "from atom " << tAtoms[sSet[1]].id  << " clockwise " << std::endl;
                         //std::cout << "atom " << tAtoms[tIdx].id << std::endl;
@@ -2578,7 +3759,7 @@ namespace LIBMOL
                             //std::cout << "iNodeA " << tAtoms[*iNodeA].id << std::endl;
                             
                             int bIdx    = getBond(tBonds, sSet[2], *iNodeA);
-                            REAL tBo         = tBonds[bIdx].value;
+                            REAL tBo    = tBonds[bIdx].value;
                             int aIdx    = getAngle(tAngles, sSet[2], sSet[1], *iNodeA);
                             REAL tTha        = tAngles[aIdx].valueST;
                             //std::cout << "iL= " << iL << std::endl
@@ -2590,7 +3771,7 @@ namespace LIBMOL
                                 // PolToCart(tAtoms,i_atom, *iNodeA, tBo, tTha, tPhiI,  A);
                                 growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iNodeA);
                                 doneList.push_back(*iNodeA);
-                                //std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
+                                // std::cout <<  tAtoms[*iNodeA].id << " done1 " << std::endl;
                             }
                             iL++;
                         }
@@ -2600,6 +3781,7 @@ namespace LIBMOL
                     }
                     else
                     {
+                        // std::cout << "Here 3 " << std::endl;
                         int iL=1;
                         for (std::vector<int>::iterator iCA=tAtoms[sSet[2]].connAtoms.begin();
                                 iCA != tAtoms[sSet[2]].connAtoms.end(); iCA++)
@@ -2615,7 +3797,7 @@ namespace LIBMOL
                                     growOneAtom(sSet, tAtoms, tBo, tTha, tPhiI, *iCA);
                                     // PolToCart(tAtoms,i_atom, *iCA, tBo, tTha, tPhiI,  A);
                                     doneList.push_back(*iCA);
-                                    //std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
+                                    // std::cout <<  tAtoms[*iCA].id << " done21 " << std::endl;
                                     iL++;
                                 }
                                 else if (tAtoms[sSet[2]].bondingIdx==2)
@@ -2974,7 +4156,7 @@ namespace LIBMOL
                             }
                             iL++;
                         }
-                        // optSubSystem(doneList, tAtoms, tBonds, tAngles,
+                        //optSubSystem(doneList, tAtoms, tBonds, tAngles,
                         //             tTorsions, tRings, tPlas, tChs);
                         //std::cout << "The sub-system is optimized \n";
                     }
@@ -3184,6 +4366,7 @@ namespace LIBMOL
         int tRingAtmSeq =1;
         while (iL < iSize-1)
         {
+            //std::cout << "turn " << tD << std::endl;
             //std::cout << "ring atom grow  " << iNext << "  " << tAtoms[iNext].id << std::endl;
             std::vector<int> curSSet;
             setCurStartSet(sSet, curSSet, iNext, tD, tRing, doneSet);
@@ -3194,6 +4377,7 @@ namespace LIBMOL
             {
                 tInR=true;
             }
+            
             //std::cout << "sSet[0] " << tAtoms[sSet[0]].id << std::endl;
             //std::cout << "tInR "  << tInR << std::endl;
             
@@ -3203,21 +4387,41 @@ namespace LIBMOL
             if (!tTurn)
             {
                 //std::cout << "Grow node 1 " << std::endl;
+                //std::cout << "Current start set " << std::endl;
+                //for (std::vector<int>::iterator iCA=curSSet.begin(); 
+                //        iCA != curSSet.end(); iCA++)
+                //{
+                //    std::cout << "Atom " << *iCA << " " << tAtoms[*iCA].id 
+                //              << std::endl; 
+                //}
+                
+                //std::cout << "Atom " << tAtoms[iNext].id << std::endl;
                 growOneRingNode(curSSet, tAtoms, tBonds, tAngles, tTorsions, tChs, tInR, tRingAtmSeq, iNext, doneSet);
+                
             }
             else
             {
                 //std::cout << "Grow node 2 " << std::endl;
+                //std::cout << "Atom " << tAtoms[iNext].id << std::endl;
                 growOneRingNode2(curSSet, tAtoms, tBonds, tAngles, tTorsions, tChs, tInR, tRingAtmSeq, iNext, doneSet);
             }
           
+            std::vector<int> tSet;
+            tSet.push_back(sSet[1]);
+            tSet.push_back(sSet[2]);
+            tSet.push_back(iNext);
+            sSet.clear();
+            for (unsigned i=0; i < tSet.size(); i++)
+            {
+                sSet.push_back(tSet[i]);
+            }
             
             //}
-            // tRingAtmSeq = -tRingAtmSeq;    
-            sSet.erase(sSet.begin());
-            sSet.push_back(iNext);
+            // tRingAtmSeq = -tRingAtmSeq;  
             iNext = tRing.atomsLink[iNext][tD];
-            //std::cout << "ring atom next " << tAtoms[iNext].id << std::endl;
+            //sSet.erase(sSet.begin());
+            
+            // std::cout << "ring atom next " << tAtoms[iNext].id << std::endl;
             iL++;
         }
         

@@ -299,7 +299,7 @@ namespace GO
         // tTransTool.generateCoordTorsToCart(allAtoms,allBonds, allAngles, allTorsions, 
         // allRings, allPlanes, allChirals);
        
-        tTransTool.generateCoordTorsToCart2(allAtoms,allBonds, allAngles, allTorsions, 
+        tTransTool.generateCoordTorsToCart3(allAtoms,allBonds, allAngles, allTorsions, 
                                             allRingsV, allPlanes, allChirals);
         
         // std::cout << "Done a set of coordinates based on the tree structure " << std::endl;
@@ -309,6 +309,8 @@ namespace GO
         //std::string tFileName = parts[0] + "_tree";
         //std::cout << tFileName << std::endl;
         //LIBMOL::outPDB(tFileName.c_str(), itsMonoRoot, allAtoms);
+       
+        
         /*
         for (std::vector<LIBMOL::AngleDict>::iterator iA=allAngles.begin();
                 iA !=allAngles.end(); iA++)
@@ -663,7 +665,7 @@ namespace GO
         lComp =100;
         std::cout << "Global min stage starts " << std::endl;
         // numOptimSets = (int)allAtoms.size();
-        // numOptimSets = 200;
+        numOptimSets = 10;
         std::cout << "number of local min to be found " 
                   << numOptimSets << std::endl;
         

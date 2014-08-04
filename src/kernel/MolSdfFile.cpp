@@ -56,6 +56,7 @@ namespace LIBMOL
               hasCoords(false),
               hasConnect(false),
               hasH(false),
+              containMetal(false),
               itsCurMol(NullPoint)
     {
         
@@ -166,6 +167,7 @@ namespace LIBMOL
                                 aAtom.coordExist = true;
                                 aAtom.chemType  = TrimSpaces(tBuf[3]);
                                 aAtom.formalCharge = strToCharge(tBuf[5]);
+                                aAtom.inChiralIdx = StrToInt(tBuf[6]); 
                                 aAtom.chiralIdx = StrToInt(tBuf[6]); 
                                 tIDs[aAtom.chemType].push_back(aAtom.seriNum);
                                 int tSize = (int)tIDs[aAtom.chemType].size();
@@ -277,13 +279,36 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
                              iNB !=iA->connAtoms.end(); iNB++)
                     {
-                        std::cout << "Atom " << *iNB+1 << std::endl;
+                        std::cout << "Atom " << iM->atoms[*iNB].id << std::endl;
                     }
                 }
                 if (iA->connHAtoms.size() !=0)
                 {
                     std::cout << "It bonds to " << iA->connHAtoms.size()  
                               << "H atoms " << std::endl;
+                }
+                std::cout << "Its is in " << iA->inChirals.size() << " chirals " << std::endl;
+                if (iA->inChirals.size())
+                {
+                    
+                    for (std::vector<int>::iterator iCh=iA->inChirals.begin();
+                            iCh!=iA->inChirals.end(); iCh++)
+                    {
+                        std::cout << "For chiral center " << *iCh << std::endl;
+                        std::cout << "Its mutational table is " << std::endl;
+                        for (std::map<int, std::vector<int> >::iterator iMu=iM->chirals[*iCh].mutTable.begin(); 
+                             iMu !=iM->chirals[*iCh].mutTable.end(); iMu++)
+                        {
+                            std::cout << "start from atom " << iM->atoms[iMu->first].id 
+                                      << " and " << iA->id << " mutable is " << std::endl;
+                            for (std::vector<int>::iterator iMu2=iMu->second.begin();
+                                   iMu2 != iMu->second.end(); iMu2++)
+                            {
+                                std::cout << iM->atoms[*iMu2].id << "\t";
+                            }
+                            std::cout << std::endl;
+                        }
+                    }
                 }
             }
             std::cout << "There are " << (int)iM->bonds.size() 
@@ -313,7 +338,7 @@ namespace LIBMOL
                 }
             }
         }
-       
+        
     }
     
     void MolSdfFile::createCurMol()
@@ -362,44 +387,7 @@ namespace LIBMOL
                     addHAtoms(tIdxMol, iA->seriNum, addH);
                 }
             }
-            
-            /*
-            if (aPTab.elements.find(iA->chemType) !=aPTab.elements.end())
-            {
-                if (tVal !=aPTab.elements[iA->chemType]["val"] 
-                     && std::find(aPTab.extraValences[iA->chemType].begin(),
-                                  aPTab.extraValences[iA->chemType].end(), tVal)
-                                  ==aPTab.extraValences[iA->chemType].end())
-                {
-                    if (tVal < aPTab.elements[iA->chemType]["val"])
-                    {
-                        REAL diffV= aPTab.elements[iA->chemType]["val"]-tVal;
-                        addHAtoms(tIdxMol, iA->seriNum, diffV);
-                    }
-                    else if (tVal > aPTab.elements[iA->chemType]["val"])
-                    {
-                        std::cout << "Atom " << iA->seriNum+1 << ", " 
-                                  << iA->chemType << std::endl;
-                        std::cout << "Its valence by bonding order " << tVal 
-                                  << ", its valence in Periodic table " 
-                                  << aPTab.elements[iA->chemType]["val"] << std::endl;
-                        std::cout << "Warning: the number of bonds binding atom " 
-                                  << iA->seriNum+1 << " is larger than its valence "
-                                  << std::endl;
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "Element type " << iA->chemType 
-                          << " can not be found in the Periodic Table"
-                          << std::endl;
-                exit(1);
-            }
-             */
         }
-        
-        reNameHAtoms(tIdxMol);
         
         // Now add newly generated H atoms to atoms in the molecule
         // and add associated bonds to the bond set in the molecule
@@ -555,6 +543,7 @@ namespace LIBMOL
         {
             AtomDict aH;
             aH.chemType = "H";
+            
             std::string tS;
             getDigitSec(allMols[tIdxMol].atoms[tIdxAtm].id, tS);
             if (allMols[tIdxMol].atoms[tIdxAtm].chemType=="C")
@@ -565,13 +554,16 @@ namespace LIBMOL
             {
                 aH.id  = aH.chemType + allMols[tIdxMol].atoms[tIdxAtm].id;
             }
+            
+            
             aH.seriNum =  (int)allMols[tIdxMol].atoms.size()
-                         +(int)allMols[tIdxMol].extraHAtoms.size();
+                          +(int)allMols[tIdxMol].extraHAtoms.size();
             aH.connAtoms.push_back(allMols[tIdxMol].atoms[tIdxAtm].seriNum);
             allMols[tIdxMol].atoms[tIdxAtm].connAtoms.push_back(aH.seriNum);
             allMols[tIdxMol].atoms[tIdxAtm].connHAtoms.push_back(aH.seriNum);
-            
+            // allMols[tIdxMol].atoms.push_back(aH);
             allMols[tIdxMol].extraHAtoms.push_back(aH);
+            
         }
         // allMols[tIdxMol].hasCoords = false;
         
@@ -1019,55 +1011,77 @@ namespace LIBMOL
     
     void MolSdfFile::setChiral(int tIdxMol)
     {
+        
     
         for (std::vector<AtomDict>::iterator iA=allMols[tIdxMol].atoms.begin();
                 iA !=allMols[tIdxMol].atoms.end(); iA++)
         {
             if (iA->chiralIdx !=0)
             {
-                
                 int tChIdx = (int)allMols[tIdxMol].chirals.size();
-                iA->inChirals.push_back(tChIdx);
+                // iA->inChirals.push_back(tChIdx);
                 ChiralDict aCh;
                 
                 aCh.atoms.push_back(iA->seriNum);
                
                 // aCh.seriNum = (int)allMols[tIdxMol].chirals.size();
                 
-                //ChiToStr(iA->chiralIdx, aCh.sign);
-                aCh.sign = "both";
-                /*
-                std::cout << "Atom is " << iA->id << std::endl;
-                std::cout << "Its serial number " << iA->seriNum << std::endl;
-                std::cout << "number of bonds " << allMols[tIdxMol].bonds.size() 
-                          << std::endl;
-                 */
-                int i=0;
+                
+                
+                //std::cout << "Atom is " << iA->id << std::endl;
+                //std::cout << "Its serial number " << iA->seriNum << std::endl;
+                //std::cout << "number of bonds " << allMols[tIdxMol].bonds.size() 
+                //          << std::endl;
+                 
+                // int i=0;
+                std::vector<int> hIdx;
                 for (std::vector<BondDict>::iterator iB=allMols[tIdxMol].bonds.begin();
                         iB !=allMols[tIdxMol].bonds.end(); iB++)
                 {
-                    if (i <3)
-                    {
+                    //if (i <3)
+                    //{
                         int idx0=iB->atomsIdx[0], idx1=iB->atomsIdx[1];
                         // std::cout << "Bond atoms: " << allMols[tIdxMol].atoms[idx0].seriNum 
                         //          << " and " << allMols[tIdxMol].atoms[idx1].seriNum  << std::endl;
                         if (std::find(iB->atomsIdx.begin(), iB->atomsIdx.end(), iA->seriNum) !=iB->atomsIdx.end() )
                         {
-                            // std::cout << "Atom " << iA->id << " is in this bond " << std::endl;   
-                            if (idx0 ==iA->seriNum && allMols[tIdxMol].atoms[idx1].chemType !="H")
+                            //std::cout << "Atom " << iA->id << " is in this bond " << std::endl;   
+                            if (idx0 ==iA->seriNum)
                             {
-                                aCh.atoms.push_back(idx1);
-                                allMols[tIdxMol].atoms[idx1].inChirals.push_back(tChIdx);
-                                // std::cout << idx1 << " is included 1 " << std::endl;
-                                i++;
+                                if(allMols[tIdxMol].atoms[idx1].chemType !="H")
+                                {
+                                    aCh.atoms.push_back(idx1);
+                                    // allMols[tIdxMol].atoms[idx1].inChirals.push_back(tChIdx);
+                                    //std::cout << allMols[tIdxMol].atoms[idx1].id << " is included 1 " << std::endl;
+                                    //i++;
+                                }
+                                else
+                                {
+                                    hIdx.push_back(idx1);
+                                }
                             }
-                            else if (idx1 ==iA->seriNum && allMols[tIdxMol].atoms[idx0].chemType !="H")
+                            else if (idx1 ==iA->seriNum)
                             {
-                                aCh.atoms.push_back(idx0);
-                                // std::cout << idx0 << " is included 0 " << std::endl;
-                                i++;
+                                if(allMols[tIdxMol].atoms[idx0].chemType !="H")
+                                {
+                                    aCh.atoms.push_back(idx0);
+                                    //std::cout << allMols[tIdxMol].atoms[idx0].id << " is included 0 " << std::endl;
+                                    //i++;
+                                }
+                                else
+                                {
+                                    hIdx.push_back(idx1);
+                                }
                             }
                         }
+                    //}
+                }
+                if (hIdx.size() > 0)
+                {
+                    for (std::vector<int>::iterator iH=hIdx.begin();
+                            iH !=hIdx.end(); iH++)
+                    {
+                        aCh.atoms.push_back(*iH);
                     }
                 }
                 /*
@@ -1082,14 +1096,23 @@ namespace LIBMOL
                     }
                 }
                  */
-               
-                aCh.setMutTable(iA->chiralIdx);
+                
+                //std::cout << "Number of atoms in the chiral center " << aCh.atoms.size() << std::endl;
                 
                 if (aCh.atoms.size() > 3)
                 {
+                    // ChiToStr(iA->inChiralIdx, aCh.sign);
+                    aCh.sign = "both";
+                    aCh.setMutTable2(iA->inChiralIdx);
                     int aNum = (int)allMols[tIdxMol].chirals.size() + 1;
                     aCh.id = "chi" + IntToStr(aNum);
+                    
+                    iA->inChirals.push_back(tChIdx);
+                    
                     allMols[tIdxMol].chirals.push_back(aCh);
+                    //std::cout << "Atom " << iA->id << " is the chiral center " 
+                    //          << iA->inChirals[0]
+                    //          << std::endl;
                 }
                 
             }
