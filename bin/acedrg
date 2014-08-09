@@ -138,11 +138,11 @@ class Acedrg:
             else:
                 self.libcheck = tLibcheck
 
-            tLibmol = os.path.join(os.environ['CBIN'], "libmol")
+            tLibmol = os.path.join(os.environ['CCP4'], "libexec", "libmol")
             if glob.glob(tLibmol):
                 self.libmol = tLibmol
 
-            tAcedrgTables = os.path.join(os.environ['CCP4'], "share/Acedrg/tables")
+            tAcedrgTables = os.path.join(os.environ['CCP4'], "share/acedrg/tables")
             if glob.glob(tAcedrgTables):
                 self.acedrgTables = tAcedrgTables
         else :

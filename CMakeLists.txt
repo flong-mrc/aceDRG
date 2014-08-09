@@ -67,8 +67,9 @@ set(SRC
     src/kernel/chemPropSet.cpp
 )
 
-add_executable(acedrg ${SRC})
-target_link_libraries(acedrg ${SQLITE3_LIBRARY})
+add_executable(libmol ${SRC})
+target_link_libraries(libmol ${SQLITE3_LIBRARY})
 
-install(TARGETS acedrg DESTINATION bin)
+install(TARGETS libmol DESTINATION libexec)
+install(PROGRAMS bin/acedrg DESTINATION bin)
 install(DIRECTORY tables DESTINATION share/acedrg/)
