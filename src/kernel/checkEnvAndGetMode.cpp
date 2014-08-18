@@ -96,7 +96,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:m:o:p:r:s:A:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:m:n:o:p:r:s:t:y:z:A:O:")) != -1)
         {
             switch (c)
             {
@@ -334,8 +334,10 @@ namespace LIBMOL
                         if (!IOEntries["inPdbName"].empty() && IOEntries["transCoords"] =="y" )
                         {
                             // This mode read the input cif file and PDB file 
-                            // replace the angles in the cif with the ones calculated from PDB
+                            // replace the coordinates in the cif with the corresponding ones in the PDB
+                            // which have been refined 
                             workMode = 21;
+                            std::cout << "Coords transforming mode " << std::endl;
                         }
                         else
                         {
@@ -479,6 +481,11 @@ namespace LIBMOL
                     << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
                     << "The output  dictionary file(cif) : " << IOEntries["userOutName"]
                     << std::endl;
+        }
+        else if (workMode==21)
+        {
+            std::cout << "The current job is coordinate transform in the dictionary file " 
+                      << std::endl;
         }
         else if (workMode==31 || workMode==32)
         {

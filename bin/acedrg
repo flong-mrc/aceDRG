@@ -103,10 +103,9 @@ class Acedrg:
                                     action="store", type="string", 
                                     help="Input File of SDF format containing coordinates and bonds")
 
-
         self.inputParser.add_option("-y", "--repcrd",
-                  action="store_false", dest="repCrd", default=False,
-                  help="Use this keyword if you want to replace the atomic coordinates in the PDB with the coordinates in mmCif")
+                  action="store_true", dest="repCrd", default=False,
+                  help="Use this keyword if you want to replace the atomic coordinates in the input mmCif with those in the input PDB")
 
         (inputOptionsP, inputOptionsU) = self.inputParser.parse_args(t_argvs)
 
@@ -166,8 +165,8 @@ class Acedrg:
                 sys.exit()
                                 
     def setWorkMode(self, t_inputOptionsP = None):
-       
-        if t_inputOptionsP.inMmCifName: 
+ 
+        if t_inputOptionsP.inMmCifName and not t_inputOptionsP.repCrd : 
             self.inMmCifName = t_inputOptionsP.inMmCifName
             self.workMode    = 11            
         elif t_inputOptionsP.inSmiName: 
@@ -182,7 +181,7 @@ class Acedrg:
         elif t_inputOptionsP.molGen and t_inputOptionsP.inStdCifName: 
             self.inStdCifName = t_inputOptionsP.inStdCifName
             self.workMode     = 21
-        elif t_inputOptionsP.repCrd and t_inputOptionsP.inpdbName and t_inputOptionsP.inMmCifName: 
+        elif t_inputOptionsP.repCrd and t_inputOptionsP.inPdbName and t_inputOptionsP.inMmCifName: 
             self.inMmCifName = t_inputOptionsP.inMmCifName
             self.inPdbName = t_inputOptionsP.inPdbName
             self.workMode     = 41
@@ -239,9 +238,8 @@ class Acedrg:
         if self.workMode == 41 :
 
             self.libmolLogName  = self.outRoot + ".log"
-            self.outRstPdbName  = self.outRoot + ".pdb"
             self.cmdLine += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
-            self.cmdLine += " -y yes -o %s >  %s "%(self.monomRoot, self.outRstPdbName, self.libmolLogName)
+            self.cmdLine += " -y y -o %s >>  %s "%(self.outRstCifName, self.libmolLogName)
             print self.cmdLine
             os.system(self.cmdLine)
 
@@ -313,6 +311,85 @@ class Acedrg:
         self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, self.refmacLogName, tStage)
         os.system(self.cmdLine)
 
+    def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName):
+
+        cifCont = {}
+        cifCont['head']   = []
+        cifCont['atoms']  = []
+        cifCont['others'] = []
+        pdbAtoms = {}
+        try:
+            tPdbIn = open(tPdbInName, "r")
+        except IOError:
+            print "%s can not be opened for reading"%tPdbInName
+            sys.exit()
+        else:
+            try: 
+                tCifIn = open(tCifInName, "r")
+            except IOError:
+                print "%s can not be opened for reading"%tCifInName
+                sys.exit()
+            else:
+                allPdbLines  = tPdbIn.readlines()
+                tPdbIn.close()
+                for aLine in allPdbLines:
+                    aLine = aLine.strip()
+                    if aLine.find("ATOM") !=-1 or aLine.find("HETATM") !=-1 :
+                        tName = aLine[12:16].strip()
+                        tX    = aLine[30:38].strip()
+                        tY    = aLine[38:46].strip()
+                        tZ    = aLine[46:54].strip()
+                        pdbAtoms[tName] = []
+                        pdbAtoms[tName].append(tX)
+                        pdbAtoms[tName].append(tY)
+                        pdbAtoms[tName].append(tZ)
+
+                allCifLines = tCifIn.readlines()
+                tCifIn.close()
+                lStart = True
+                lAtom  = False
+                lOther = False
+
+                for aLine in allCifLines:
+                    if aLine.find("_chem_comp_atom.z") != -1:
+                        cifCont['head'].append(aLine)
+                        lStart = False
+                        lAtom  = True
+                    elif lAtom and aLine.find("loop") != -1:
+                        lAtom  = False
+                        lOther = True
+                        cifCont['others'].append(aLine)
+                    elif lStart:  
+                        cifCont['head'].append(aLine)
+                    elif lAtom:
+                        strGrp = aLine.split()
+                        tName  = strGrp[1].strip()
+                        if pdbAtoms.has_key(tName):
+                            bLine = "%s%s%s%s%s%s%s%s\n"%(strGrp[0].ljust(8), tName.ljust(8), strGrp[2].ljust(8), \
+                                                        strGrp[3].ljust(8), strGrp[4].ljust(8), \
+                                                        pdbAtoms[tName][0].ljust(12), pdbAtoms[tName][1].ljust(12), \
+                                                        pdbAtoms[tName][2].ljust(12)) 
+                            cifCont['atoms'].append(bLine)
+                        else: 
+                            print "Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName) 
+                            sys.exit()
+                    elif lOther:
+                        cifCont['others'].append(aLine)
+  
+                try:
+                    tOutCif = open(tCifOutName, "w")
+                except IOError:
+                    print "%s can not be opened for reading"%tCifOutName
+                    sys.exit()
+                else:
+                    for aL in cifCont['head']:
+                        tOutCif.write(aL)
+                    for aL in cifCont['atoms']:
+                        tOutCif.write(aL)
+                    for aL in cifCont['others']:
+                        tOutCif.write(aL)
+                    tOutCif.close()
+                        
     def execute(self):
        
         print "Current workMode ", self.workMode
@@ -347,7 +424,14 @@ class Acedrg:
                                      finPdb = self.outRoot + ".pdb"
                                      finRst = self.outRoot + ".cif"
                                      os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                     os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                                     #os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                                     if os.path.isfile(finPdb):
+                                         self.inPdbName        = finPdb 
+                                         self.inMmCifName      = self.outRstCifName
+                                         self.outRstCifName    = finRst
+                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+                                     else:
+                                         print "Failed to produce %s "%finPdb
                                 else:
                                      print "Failed to produce the final coordinates" 
                         
@@ -390,7 +474,14 @@ class Acedrg:
                                      finPdb = self.outRoot + ".pdb"
                                      finRst = self.outRoot + ".cif"
                                      os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                     os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                                     #os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                                     if os.path.isfile(finPdb):
+                                         self.inPdbName        = finPdb 
+                                         self.inMmCifName      = self.outRstCifName
+                                         self.outRstCifName    = finRst
+                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+                                     else:
+                                         print "Failed to produce %s "%finPdb
                                 else:
                                      print "Failed to produce the final coordinates" 
                 else:
@@ -405,6 +496,9 @@ class Acedrg:
                 self.runLibmol(self.inMdlName)
                 print "Dictionary output %s"%self.outRstCifName
                 print "PDB output %s"%self.outRstPdbName
+            else:
+                print "can not find %s to read "%self.inMdlName
+                sys.exit() 
  
             # Stage 2: optimization
             if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
@@ -429,6 +523,13 @@ class Acedrg:
                                      finRst = self.outRoot + ".cif"
                                      os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
                                      os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                                     if os.path.isfile(finPdb):
+                                         self.inPdbName        = finPdb 
+                                         self.inMmCifName      = self.outRstCifName
+                                         self.outRstCifName    = finRst
+                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+                                     else:
+                                         print "Failed to produce %s "%finPdb
                                 else:
                                      print "Failed to produce the final coordinates" 
     
@@ -437,6 +538,9 @@ class Acedrg:
             # Stage 1: dictionary generation using  a sdf file
             if os.path.isfile(self.inSdfName):
                 self.runLibmol(self.inSdfName)
+            else:
+                print "%s does not exist"%self.inSdfName
+                sys.exit()
             
             # Stage 2: optimization
             if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
@@ -459,6 +563,13 @@ class Acedrg:
                                 if os.path.isfile(self.refmacXYZOUTName):
                                      finPdb = self.outRoot + ".pdb"
                                      os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
+                                     if os.path.isfile(finPdb):
+                                         self.inPdbName        = finPdb 
+                                         self.inMmCifName      = self.outRstCifName
+                                         self.outRstCifName    = finRst
+                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+                                     else:
+                                         print "Failed to produce %s "%finPdb
                                 else:
                                      print "Failed to produce the final coordinates" 
 

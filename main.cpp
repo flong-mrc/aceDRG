@@ -307,8 +307,11 @@ int main(int argc, char** argv) {
     else if (AJob.workMode == 21 || AJob.workMode == 22 )
     {
         
+        std::cout <<" 1 " << std::endl;
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"].c_str(),
                                         AJob.IOEntries["inPdbName"].c_str());
+        std::cout << " 2 " << std::endl;
+        exit(1);
         std::string tOutName(AJob.IOEntries["userOutName"]);
         LIBMOL::outMMCif3Secs(tOutName.c_str(), AJob.IOEntries["monoRootName"],
                       dataFromCif.allAtoms, dataFromCif.allUnchangedBlocks);

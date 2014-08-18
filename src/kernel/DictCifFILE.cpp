@@ -2042,9 +2042,12 @@ namespace LIBMOL
         
         if (aInCif.is_open())
         {
+            std::cout << "Here " << std::endl;
+            exit(1);
             itsCurAtom    = new AtomDict();
             setupSystem3Secs(aInCif);  
             aInCif.close();
+            exit(1);
             
             DictPDBFile aInPdb(tPdbName, std::ios::in);
             transCoordsPdbToCif(aInPdb);
@@ -2425,7 +2428,6 @@ namespace LIBMOL
                 //std::cout << "its order : " << iBo->order << std::endl;
             }
              
-            
         }
     }
     
