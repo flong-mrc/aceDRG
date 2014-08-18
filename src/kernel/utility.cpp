@@ -1590,9 +1590,21 @@ namespace LIBMOL
                        "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
                        "Zn", "zn", "Cd", "cd", "Hg", "hg",   
                        "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
-                       "Sn", "sn", "Pb", "pb", "Bi", "bi"};
+                       "Sn", "sn", "Pb", "pb", "Bi", "bi", "Pu", "pu", "Nd", "nd", "Ce", "ce",
+                       "La", "la","Pr", "pr", "Pm", "pm", "Sm", "sm", "Eu", "eu", "Gd", "gd", 
+                       "Tb", "tb", "Dy", "dy", "Ho", "ho", "Er", "er", "Tm", "tm", "Yb", "yb"
+                       "Lu", "lu", "Ac", "ac", "Th", "th", "Pa", "pa", "U", "u", "Np", "np",
+                       "Am", "am", "Cm", "cm", "Bk", "bk", "Cf", "cf", "Es", "es", "Fm", "fm",
+                       "Md", "md", "No", "no", "Lr", "lr"};
         
-        tMeTab.assign(metals, metals+120);
+        tMeTab.assign(metals, metals+181);
+        /*
+        for (std::vector<ID>::iterator iM=tMeTab.begin();
+                iM !=tMeTab.end(); iM++)
+        {
+            std::cout << "Metal " << *iM << std::endl;
+        }
+         */
     }
     
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID)

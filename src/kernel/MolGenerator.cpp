@@ -757,6 +757,7 @@ namespace LIBMOL
         REAL covalent_sensitivity;
         REAL covalent_sensitivity1 =0.15;
         REAL covalent_sensitivity2 =0.22;
+        REAL covalent_sensitivity3 =0.20;
         
         NeighbListDict  tNBListOfSystem;
         
@@ -801,31 +802,38 @@ namespace LIBMOL
             //if (allAtoms[i].sId=="555")
             //{
                 //j++;
-                // std::cout << "Look for bonds to atom " << allAtoms[i].id 
-                //          << "(serial number  " << allAtoms[i].seriNum
-                //          << ") " << std::endl;
-                // std::cout << "Its has " << allAtoms[i].neighbAtoms.size() 
-                //           << " neighbor atoms. " <<std::endl;
+                std::cout << "Look for bonds to atom " << allAtoms[i].id 
+                          << "(serial number  " << allAtoms[i].seriNum
+                          << ") " << std::endl;
+                std::cout << "Its has " << allAtoms[i].neighbAtoms.size() 
+                          << " neighbor atoms. " <<std::endl;
                 for (std::vector<int>::iterator iNB=allAtoms[i].neighbAtoms.begin();
                         iNB !=allAtoms[i].neighbAtoms.end(); iNB++)
                 {
                     // REAL rD = distanceV(refAtoms[i].coords, refAtoms[(*iNB)].coords);
-                    //std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
-                    //          << refAtoms[(*iNB)].sId << std::endl;
+                    std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
+                              << refAtoms[(*iNB)].sId << std::endl;
                     REAL rD = getBondLenFromFracCoords(allAtoms[i].fracCoords, allAtoms[(*iNB)].fracCoords,
                                                        tCryst->itsCell->a, tCryst->itsCell->b, 
                                                        tCryst->itsCell->c, tCryst->itsCell->alpha,
                                                        tCryst->itsCell->beta, tCryst->itsCell->gamma);
                     
                     std::vector<REAL> bondRange;
-                    if ((!allAtoms[i].isMetal) && (!allAtoms[*iNB].isMetal))
+                    if (allAtoms[i].chemType=="H" || allAtoms[*iNB].chemType=="H")
+                    {
+                        covalent_sensitivity = covalent_sensitivity3;
+                    }
+                    else if ((!allAtoms[i].isMetal) && (!allAtoms[*iNB].isMetal))
                     {
                         covalent_sensitivity = covalent_sensitivity1;
                     }
+                    
                     else
                     {
                         covalent_sensitivity = covalent_sensitivity2;
                     }
+                    
+                    std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
 
                     getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                                          covalent_sensitivity, tPTab, 
@@ -833,10 +841,10 @@ namespace LIBMOL
                     
                     
                     
-                        //std::cout << "Range between " << bondRange[0]
-                        //              << " and " << bondRange[1] << std::endl;
-                        //std::cout << "Distance between " << allAtoms[i].id << " and "
-                        //         << allAtoms[*iNB].id << " is " << rD << std::endl;
+                        std::cout << "Range between " << bondRange[0]
+                                      << " and " << bondRange[1] << std::endl;
+                        std::cout << "Distance between " << allAtoms[i].id << " and "
+                                  << allAtoms[*iNB].id << " is " << rD << std::endl;
                    
                    
                     
@@ -860,12 +868,12 @@ namespace LIBMOL
                             }
                             
                             // if (allAtoms[i].id=="C22" && allAtoms[i].isInPreCell)
-                            /*
+                            
                             std::cout << "a bond between " << allAtoms[i].id << " and "
                              << allAtoms[*iNB].id << " is added to the bond_list_cell " 
                              << std::endl << "Its bond length is " << rD 
                              << std::endl;
-                            */
+                            
                         }
                     }
                 }
@@ -1749,8 +1757,8 @@ namespace LIBMOL
                     }
                 }
             
-                std::cout << "The number of atoms in this molecule is " 
-                          << aMol.atoms.size() << std::endl;
+                std::cout << "The number of atoms in molecule " << aMol.seriNum 
+                          << " is " << aMol.atoms.size() << std::endl;
                        //   << "They are : " << std::endl;
                /*
                for (std::vector<AtomDict>::iterator iAt=aMol.atoms.begin();
@@ -1808,13 +1816,15 @@ namespace LIBMOL
                    //getAtomTypeOneMol(aMol);
                    getUniqAngleMols(aMol, tCryst);
                    allMolecules.push_back(aMol);
-                   std::cout << "Molecule " << iMol->first << " is included "
+                   std::cout << "Molecule " << aMol.seriNum << " is included "
                              << std::endl << "It contains " << aMol.atoms.size() 
                              << " atoms" << std::endl; 
                }
                else
                {
                    std::cout << aMolErrInfo << std::endl;
+                   std::cout << "Molecule " << aMol.seriNum 
+                             << " is rejected " << std::endl;
                }
             //}
         }
@@ -1830,8 +1840,8 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin(); 
                         iAt !=tMol.atoms.end(); iAt++)
         {
-            //std::cout << "Atom " << iAt->id << " occupancy "
-            //            << iAt->ocp << std::endl;
+           //std::cout << "Atom " << iAt->id << " occupancy "
+           //           << iAt->ocp << std::endl;
             
             if (iAt->ocp < 0.99)
             {
@@ -2456,11 +2466,13 @@ namespace LIBMOL
     
     void MolGenerator::getAtomTypeOneMol(Molecule& tMol)
     {
-        std::cout << "Number of atoms in this molecule is " 
-                  << tMol.atoms.size() << std::endl;
+        //std::cout << "Number of atoms in this molecule is " 
+        //          << tMol.atoms.size() << std::endl;
+        
         CodClassify aCodSys(tMol.atoms);
+        
         aCodSys.codAtomClassify2(2);
-     
+        
         tMol.atoms.clear();         
         for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();
                 iAt!=aCodSys.allAtoms.end(); iAt++)

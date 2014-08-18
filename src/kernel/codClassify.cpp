@@ -367,9 +367,11 @@ namespace LIBMOL
     {
         ringDetecting2();
        
+        /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
+           
             if ((int)iA->ringRep.size() >0)
             {
                 std::cout << "From ring rep view " << std::endl;
@@ -395,12 +397,14 @@ namespace LIBMOL
                     std::cout << "Ring: " << *iI << std::endl;
                 }
             }
+           
             if (iA->ringRep.size() !=iA->inRings.size())
             {
                exit(1);
             }
         }
-        
+       
+        */
         
         // std::cout <<std::endl << "Output Atom COD classes now " << std::endl << std::endl;
         
@@ -1722,7 +1726,7 @@ namespace LIBMOL
         {
             tAtom.codClass = "";
             tAtom.codClass.append(tAtom.chemType);
-            outRingSec(tAtom);
+            outRingSec2(tAtom);
             
             std::string tStr;
             std::list<std::string> tStrList, tStrList1;
@@ -1972,6 +1976,67 @@ namespace LIBMOL
             }
         }
     }
+    
+    void CodClassify::outRingSec2(AtomDict &tAtom)
+    {
+        int numRings = (int)tAtom.ringRepBySeriNum.size();
+       
+        if (numRings)
+        {
+            
+            std::map<int, int> sizeMap;
+            
+            
+            for (std::map<std::string, int>::iterator iMR=tAtom.ringRepBySeriNum.begin();
+                    iMR != tAtom.ringRepBySeriNum.end(); iMR++)
+            {
+                if (sizeMap.find(iMR->second) ==sizeMap.end())
+                {
+                    sizeMap[iMR->second] =1;
+                }
+                else
+                {
+                    sizeMap[iMR->second]++;
+                }   
+            }
+            
+            tAtom.codClass.append("[");
+            int i =0;
+            int j = (int)sizeMap.size();
+            for (std::map<int, int>::iterator iSMa=sizeMap.begin();
+                    iSMa != sizeMap.end(); iSMa++)
+            {
+                std::string tSize = IntToStr(iSMa->first);
+                std::string tNum  = IntToStr(iSMa->second);
+                
+                if(iSMa->second >= 3)
+                {
+                    tAtom.codClass.append(tNum + "x" + tSize);
+                }
+                else if (iSMa->second==2)
+                {
+                    tAtom.codClass.append( tSize + "," + tSize);
+                }   
+                else if (iSMa->second==1)
+                {
+                    tAtom.codClass.append(tSize);
+                }
+                       
+                
+                if(i != j-1)
+                {
+                    tAtom.codClass.append(",");
+                }
+                else
+                {
+                    tAtom.codClass.append("]");
+                }
+                    
+                i++;
+            }
+        }
+    }
+    
     
     std::string CodClassify::outRingSecStr(AtomDict &tAtom)
     {

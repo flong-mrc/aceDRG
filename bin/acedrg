@@ -103,9 +103,6 @@ class Acedrg:
                                     action="store", type="string", 
                                     help="Input File of SDF format containing coordinates and bonds")
 
-        self.inputParser.add_option("-t", "--mol",
-                  action="store_false", dest="buildMol", default=False,
-                  help="Use this keyword if you want to generate molecules and a set of bonds and angles from a small molecule cif file ")
 
         self.inputParser.add_option("-y", "--repcrd",
                   action="store_false", dest="repCrd", default=False,
@@ -472,6 +469,8 @@ class Acedrg:
             print "Generate molecules, bonds and angles from small molecule CIF file ", self.inStdCifName 
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol(self.inStdCifName)
+            else:
+                print "Can not find the input file ", self.inStdCifName 
             
 
 def main():

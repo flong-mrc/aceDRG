@@ -82,8 +82,6 @@ namespace LIBMOL
         elements["O"]["val"]       = 2;
         elemProps["O"]["vdw"]      = 1.52;
         elemProps["O"]["cova"]     = 0.68;
-        elemProps["O"]["vdw"]      = 1.52;
-        elemProps["O"]["cova"]     = 0.68;
         elemProps["O"]["ionM-"]    = 1.26;
         
         elements["P"]["row"]       = 3;
@@ -955,7 +953,305 @@ namespace LIBMOL
         elemProps["Po"]["ionM+"]    = 1.08;
         //elemProps["Po6+"]["cova"]    = 0.81;
         
-        // some elements have multiple valences
+        // Rare earth metals
+        
+        elements["La"]["row"]       = 6;
+        elements["La"]["group"]     = 3;
+        elements["La"]["matType"]   = 9;
+        elements["La"]["atomNum"]   = 57;
+        elements["La"]["val"]       = 3;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["La"]["vdw"]      = 1.87;  //atom radius
+        elemProps["La"]["cova"]     = 2.07;
+        elemProps["La"]["ionM+"]    = 1.08;     
+        
+        
+        elements["Ce"]["row"]       = 6;
+        elements["Ce"]["group"]     = 3;
+        elements["Ce"]["matType"]   = 9;
+        elements["Ce"]["atomNum"]   = 58;
+        elements["Ce"]["val"]       = 4;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["Ce"]["vdw"]      = 1.82;  //atom radius
+        elemProps["Ce"]["cova"]     = 2.04;
+        elemProps["Ce"]["ionM+"]    = 1.08;
+        
+        
+        elements["Pr"]["row"]       = 6;
+        elements["Pr"]["group"]     = 3;
+        elements["Pr"]["matType"]   = 9;
+        elements["Pr"]["atomNum"]   = 59;
+        elements["Pr"]["val"]       = 4;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["Pr"]["vdw"]      = 1.82;  //atom radius
+        elemProps["Pr"]["cova"]     = 2.03;
+        elemProps["Pr"]["ionM+"]    = 1.08;
+        
+        
+        elements["Nd"]["row"]       = 6;
+        elements["Nd"]["group"]     = 3;
+        elements["Nd"]["matType"]   = 9;
+        elements["Nd"]["atomNum"]   = 60;
+        elements["Nd"]["val"]       = 3;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["Nd"]["vdw"]      = 1.81;  //atom radius
+        elemProps["Nd"]["cova"]     = 2.01;
+        elemProps["Nd"]["ionM+"]    = 1.08;
+        
+        
+        elements["Pm"]["row"]       = 6;
+        elements["Pm"]["group"]     = 3;
+        elements["Pm"]["matType"]   = 9;
+        elements["Pm"]["atomNum"]   = 61;
+        elements["Pm"]["val"]       = 2;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["Pm"]["vdw"]      = 1.59;
+        elemProps["Pm"]["cova"]     = 1.87;
+        elemProps["Pm"]["ionM+"]    = 1.08;
+        
+        
+        elements["Sm"]["row"]       = 6;
+        elements["Sm"]["group"]     = 3;
+        elements["Sm"]["matType"]   = 9;
+        elements["Sm"]["atomNum"]   = 62;
+        elements["Sm"]["val"]       = 3;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["Sm"]["vdw"]      = 1.59;
+        elemProps["Sm"]["cova"]     = 1.87;
+        elemProps["Sm"]["ionM+"]    = 1.08;
+        
+        elements["Eu"]["row"]       = 6;
+        elements["Eu"]["group"]     = 3;
+        elements["Eu"]["matType"]   = 9;
+        elements["Eu"]["atomNum"]   = 63;
+        elements["Eu"]["val"]       = 6;
+        //elements["Po"]["vdw"]       = 1.85;
+        //elements["Po"]["cova"]      = 1.60;
+        elemProps["Eu"]["vdw"]      = 1.59;
+        elemProps["Eu"]["cova"]     = 1.87;
+        elemProps["Eu"]["ionM+"]    = 1.08;
+        
+        elements["Gd"]["row"]       = 6;
+        elements["Gd"]["group"]     = 3;
+        elements["Gd"]["matType"]   = 9;
+        elements["Gd"]["atomNum"]   = 64;
+        elements["Gd"]["val"]       = 3;
+        elemProps["Gd"]["vdw"]      = 1.80;
+        elemProps["Gd"]["cova"]     = 1.96;
+        elemProps["Gd"]["ionM+"]    = 1.08;
+        
+        elements["Tb"]["row"]       = 6;
+        elements["Tb"]["group"]     = 3;
+        elements["Tb"]["matType"]   = 9;
+        elements["Tb"]["atomNum"]   = 65;
+        elements["Tb"]["val"]       = 4;
+        elemProps["Tb"]["vdw"]      = 1.77;
+        elemProps["Tb"]["cova"]     = 1.94;
+        elemProps["Tb"]["ionM+"]    = 1.08;
+        
+        elements["Dy"]["row"]       = 6;
+        elements["Dy"]["group"]     = 3;
+        elements["Dy"]["matType"]   = 9;
+        elements["Dy"]["atomNum"]   = 66;
+        elements["Dy"]["val"]       = 3;
+        elemProps["Dy"]["vdw"]      = 1.78;
+        elemProps["Dy"]["cova"]     = 1.94;
+        elemProps["Dy"]["ionM+"]    = 1.08;
+        
+        elements["Ho"]["row"]       = 6;
+        elements["Ho"]["group"]     = 3;
+        elements["Ho"]["matType"]   = 9;
+        elements["Ho"]["atomNum"]   = 67;
+        elements["Ho"]["val"]       = 3;
+        elemProps["Ho"]["vdw"]      = 1.76;
+        elemProps["Ho"]["cova"]     = 1.92;
+        elemProps["Ho"]["ionM+"]    = 1.08;
+       
+        elements["Er"]["row"]       = 6;
+        elements["Er"]["group"]     = 3;
+        elements["Er"]["matType"]   = 9;
+        elements["Er"]["atomNum"]   = 68;
+        elements["Er"]["val"]       = 3;
+        elemProps["Er"]["vdw"]      = 1.76;
+        elemProps["Er"]["cova"]     = 1.89;
+        elemProps["Er"]["ionM+"]    = 1.08;
+        
+        elements["Tm"]["row"]       = 6;
+        elements["Tm"]["group"]     = 3;
+        elements["Tm"]["matType"]   = 9;
+        elements["Tm"]["atomNum"]   = 69;
+        elements["Tm"]["val"]       = 3;
+        elemProps["Tm"]["vdw"]      = 1.76;
+        elemProps["Tm"]["cova"]     = 1.90;
+        elemProps["Tm"]["ionM+"]    = 1.08;
+        
+        elements["Yb"]["row"]       = 6;
+        elements["Yb"]["group"]     = 3;
+        elements["Yb"]["matType"]   = 9;
+        elements["Yb"]["atomNum"]   = 70;
+        elements["Yb"]["val"]       = 1;
+        elemProps["Yb"]["vdw"]      = 1.76;
+        elemProps["Yb"]["cova"]     = 1.87;
+        elemProps["Yb"]["ionM+"]    = 1.08;
+        
+        elements["Lu"]["row"]       = 6;
+        elements["Lu"]["group"]     = 3;
+        elements["Lu"]["matType"]   = 9;
+        elements["Lu"]["atomNum"]   = 71;
+        elements["Lu"]["val"]       = 1;
+        elemProps["Lu"]["vdw"]      = 1.74;
+        elemProps["Lu"]["cova"]     = 1.87;
+        elemProps["Lu"]["ionM+"]    = 1.08;
+        
+        elements["Ac"]["row"]       = 7;
+        elements["Ac"]["group"]     = 3;
+        elements["Ac"]["matType"]   = 9;
+        elements["Ac"]["atomNum"]   = 89;
+        elements["Ac"]["val"]       = 3;
+        elemProps["Ac"]["vdw"]      = 1.76;
+        elemProps["Ac"]["cova"]     = 2.15;
+        elemProps["Ac"]["ionM+"]    = 1.08;
+        
+        elements["Th"]["row"]       = 7;
+        elements["Th"]["group"]     = 3;
+        elements["Th"]["matType"]   = 9;
+        elements["Th"]["atomNum"]   = 90;
+        elements["Th"]["val"]       = 4;
+        elemProps["Th"]["vdw"]      = 1.80;
+        elemProps["Th"]["cova"]     = 2.06;
+        elemProps["Th"]["ionM+"]    = 1.08;
+        
+        elements["Pa"]["row"]       = 7;
+        elements["Pa"]["group"]     = 3;
+        elements["Pa"]["matType"]   = 9;
+        elements["Pa"]["atomNum"]   = 91;
+        elements["Pa"]["val"]       = 4;
+        elemProps["Pa"]["vdw"]      = 1.63;
+        elemProps["Pa"]["cova"]     = 2.00;
+        elemProps["Pa"]["ionM+"]    = 1.08;
+        
+        elements["U"]["row"]       = 7;
+        elements["U"]["group"]     = 3;
+        elements["U"]["matType"]   = 9;
+        elements["U"]["atomNum"]   = 92;
+        elements["U"]["val"]       = 6;
+        elemProps["U"]["vdw"]      = 1.86;
+        elemProps["U"]["cova"]     = 1.96;
+        elemProps["U"]["ionM+"]    = 1.08;
+        
+        elements["Np"]["row"]       = 7;
+        elements["Np"]["group"]     = 3;
+        elements["Np"]["matType"]   = 9;
+        elements["Np"]["atomNum"]   = 93;
+        elements["Np"]["val"]       = 4;
+        elemProps["Np"]["vdw"]      = 1.55;
+        elemProps["Np"]["cova"]     = 1.90;
+        elemProps["Np"]["ionM+"]    = 1.08;
+        
+        elements["Pu"]["row"]       = 7;
+        elements["Pu"]["group"]     = 3;
+        elements["Pu"]["matType"]   = 9;
+        elements["Pu"]["atomNum"]   = 94;
+        elements["Pu"]["val"]       = 6;
+        elemProps["Pu"]["vdw"]      = 1.59;
+        elemProps["Pu"]["cova"]     = 1.87;
+        elemProps["Pu"]["ionM+"]    = 1.08;
+        
+        elements["Am"]["row"]       = 7;
+        elements["Am"]["group"]     = 3;
+        elements["Am"]["matType"]   = 9;
+        elements["Am"]["atomNum"]   = 95;
+        elements["Am"]["val"]       = 6;
+        elemProps["Am"]["vdw"]      = 1.73;
+        elemProps["Am"]["cova"]     = 1.80;
+        elemProps["Am"]["ionM+"]    = 1.08;
+        
+        elements["Cm"]["row"]       = 7;
+        elements["Cm"]["group"]     = 3;
+        elements["Cm"]["matType"]   = 9;
+        elements["Cm"]["atomNum"]   = 96;
+        elements["Cm"]["val"]       = 4;
+        elemProps["Cm"]["vdw"]      = 1.74;
+        elemProps["Cm"]["cova"]     = 1.69;
+        elemProps["Cm"]["ionM+"]    = 1.08;
+        
+        
+        elements["Bk"]["row"]       = 7;
+        elements["Bk"]["group"]     = 3;
+        elements["Bk"]["matType"]   = 9;
+        elements["Bk"]["atomNum"]   = 97;
+        elements["Bk"]["val"]       = 4;
+        elemProps["Bk"]["vdw"]      = 1.70;
+        elemProps["Bk"]["cova"]     = 1.80;
+        elemProps["Bk"]["ionM+"]    = 1.08;
+        
+        // The following are  rare-earth synthetic elements
+        // where atom, vdw and covalent radii are not available
+        // Put those props here just as position holders 
+        
+        elements["Cf"]["row"]       = 7;
+        elements["Cf"]["group"]     = 3;
+        elements["Cf"]["matType"]   = 9;
+        elements["Cf"]["atomNum"]   = 98;
+        elements["Cf"]["val"]       = 4;
+        elemProps["Cf"]["vdw"]      = 1.73;       // not sure
+        elemProps["Cf"]["cova"]     = 1.80;       // not sure
+        elemProps["Cf"]["ionM+"]    = 1.08;
+        
+        
+        elements["Es"]["row"]       = 7;
+        elements["Es"]["group"]     = 3;
+        elements["Es"]["matType"]   = 9;
+        elements["Es"]["atomNum"]   = 99;
+        elements["Es"]["val"]       = 3;
+        elemProps["Es"]["vdw"]      = 1.73;       // not sure
+        elemProps["Es"]["cova"]     = 1.80;       // not sure
+        elemProps["Es"]["ionM+"]    = 1.08;
+        
+        
+        elements["Fm"]["row"]       = 7;
+        elements["Fm"]["group"]     = 3;
+        elements["Fm"]["matType"]   = 9;
+        elements["Fm"]["atomNum"]   = 100;
+        elements["Fm"]["val"]       = 3;
+        elemProps["Fm"]["vdw"]      = 1.73;       // not sure
+        elemProps["Fm"]["cova"]     = 1.80;       // not sure
+        elemProps["Fm"]["ionM+"]    = 1.08;
+        
+        elements["Md"]["row"]       = 7;
+        elements["Md"]["group"]     = 3;
+        elements["Md"]["matType"]   = 9;
+        elements["Md"]["atomNum"]   = 101;
+        elements["Md"]["val"]       = 3;
+        elemProps["Md"]["vdw"]      = 1.73;       // not sure
+        elemProps["Md"]["cova"]     = 1.80;       // not sure
+        elemProps["Md"]["ionM+"]    = 1.08;
+        
+        elements["No"]["row"]       = 7;
+        elements["No"]["group"]     = 3;
+        elements["No"]["matType"]   = 9;
+        elements["No"]["atomNum"]   = 102;
+        elements["No"]["val"]       = 3;
+        elemProps["No"]["vdw"]      = 1.73;       // not sure
+        elemProps["No"]["cova"]     = 1.80;       // not sure
+        elemProps["No"]["ionM+"]    = 1.08;
+        
+        elements["Lr"]["row"]       = 7;
+        elements["Lr"]["group"]     = 3;
+        elements["Lr"]["matType"]   = 9;
+        elements["Lr"]["atomNum"]   = 103;
+        elements["Lr"]["val"]       = 3;
+        elemProps["Lr"]["vdw"]      = 1.73;       // not sure
+        elemProps["Lr"]["cova"]     = 1.80;       // not sure
+        elemProps["Lr"]["ionM+"]    = 1.08;
+        
+        //some elements have multiple valences
         
         extraValences["P"].push_back(3);
         

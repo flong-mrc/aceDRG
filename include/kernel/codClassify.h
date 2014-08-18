@@ -263,6 +263,7 @@ namespace LIBMOL
         void setAtomCodClassName(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void setAtomCodClassName2(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void outRingSec(AtomDict & tAtom);
+        void outRingSec2(AtomDict & tAtom);
         std::string outRingSecStr(AtomDict &tAtom);
         
         
