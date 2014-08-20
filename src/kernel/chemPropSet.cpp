@@ -10,6 +10,31 @@
 
 namespace LIBMOL
 {
+    
+    extern bool assignElementType(PeriodicTable & tP, std::string tStr, 
+                                  std::vector<AtomDict>::iterator tAtom)
+    {
+        bool tFind = false;
+        if (tP.elements.find(tStr) !=tP.elements.end())
+        {
+            tAtom->chemType = tStr;
+            tFind = true;
+        }
+        else
+        {
+            if (tStr.size() > 1)
+            {
+                std::string tSubStr = tStr.substr(0, tStr.size()-1);
+                if(tP.elements.find(tSubStr) != tP.elements.end())
+                {
+                    tAtom->chemType = tSubStr;
+                    tFind = true;
+                }
+            }
+        }
+        
+        return tFind;
+    }
 
     
     extern int getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,

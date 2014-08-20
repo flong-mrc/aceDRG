@@ -84,6 +84,10 @@
 #include "MolSdfFile.h"
 #endif
 
+#ifndef PERIODICTABLE_H
+#include "periodicTable.h"
+#endif
+
 namespace LIBMOL
 {
     
@@ -116,6 +120,11 @@ namespace LIBMOL
     
     class MolSdfFile;
     
+    class PeriodicTable;
+    
+    
+    extern bool assignElementType(PeriodicTable & tP, std::string tStr,  
+                                  std::vector<AtomDict>::iterator tAtom);
     
     extern int getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,
                                 std::vector<AtomDict>::iterator iA);

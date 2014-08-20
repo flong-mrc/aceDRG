@@ -39,7 +39,7 @@ class Acedrg:
         self.outRstPdb        = ""
         self.monomRoot        = ""
 
-        self.acedrgTable      = ""
+        self.acedrgTables      = ""
         self.libmol           = ""
         self.libmolLogName    = ""
         self.libcheck         = ""
@@ -55,8 +55,8 @@ class Acedrg:
         self.repCrds          = False
 
         inputOptionsP         = self.InputParser(t_argvs) 
-        self.checkDependency()
         self.setWorkMode(inputOptionsP)
+        self.checkDependency()
        
         self.execute()  
 
@@ -103,6 +103,10 @@ class Acedrg:
                                     action="store", type="string", 
                                     help="Input File of SDF format containing coordinates and bonds")
 
+        self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input path that stores all bond and angle tables (if no input, default CCP4 location will be used)")
+
         self.inputParser.add_option("-y", "--repcrd",
                   action="store_true", dest="repCrd", default=False,
                   help="Use this keyword if you want to replace the atomic coordinates in the input mmCif with those in the input PDB")
@@ -145,7 +149,7 @@ class Acedrg:
             print "You need to install CCP4 suite"
             sys.exit()
 
-        if not self.libmol or not self.acedrgTables:
+        if not self.libmol :
             if os.environ.has_key("LIBMOL_ROOT"):
                 tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "bin/libmol")
                 if glob.glob(tLibmol):
@@ -153,7 +157,13 @@ class Acedrg:
                 else:
                     print "libmol could not be found at %s"%tLibmol
                     sys.exit()
+            else:
+                print "You need to define the path where the acedrg tables are or install the latest version of CCP4 with acedrg  "
+                sys.exit()
+                                
 
+        if not self.acedrgTables:
+            if os.environ.has_key("LIBMOL_ROOT"):
                 tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "tables")
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
@@ -161,11 +171,32 @@ class Acedrg:
                     print "Tables required could not be found at %s"%tAcedrgTables
                     sys.exit()
             else:
-                print "You need to define 'LIBMOL_ROOT"
+                print "You need to define the path where the acedrg tables are or install the latest version of CCP4 with acedrg  "
                 sys.exit()
                                 
     def setWorkMode(self, t_inputOptionsP = None):
  
+        if not t_inputOptionsP.acedrgTables: 
+            if os.environ.has_key("CCP4"):
+                tAcedrgTables = os.path.join(os.environ['CCP4'], "share/acedrg/tables")
+                if glob.glob(tAcedrgTables):
+                    self.acedrgTables = tAcedrgTables
+            else:
+                print "You need to install CCP4 suite"
+                sys.exit()
+        else:
+            if os.path.isdir(t_inputOptionsP.acedrgTables):
+                self.acedrgTables = t_inputOptionsP.acedrgTables
+ 
+        if not self.acedrgTables or not glob.glob(self.acedrgTables):
+            if os.environ.has_key("LIBMOL_ROOT"):
+                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "tables")
+                if os.path.isdir(tAcedrgTables):
+                    self.acedrgTables = tAcedrgTables
+                else:
+                    print "Bond and angle tables required could not be found "
+                    sys.exit()
+                     
         if t_inputOptionsP.inMmCifName and not t_inputOptionsP.repCrd : 
             self.inMmCifName = t_inputOptionsP.inMmCifName
             self.workMode    = 11            

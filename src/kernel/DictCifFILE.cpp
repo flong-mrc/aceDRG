@@ -469,8 +469,22 @@ namespace LIBMOL
                 
                 // Now select what we need from the input cif file.
                 selectPropsToMaps(rowProps, colProps);
-                
                 checkAtomElementID();
+                
+                // check if the assigned atom element types are right ones
+                PeriodicTable aPTab;
+                for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                     iA !=allAtoms.end(); iA++)
+                {
+                    if (!assignElementType(aPTab, iA->chemType, iA))
+                    {
+                        std::cout << "Warn: atom " << iA->id << " has element type "
+                                  << iA->chemType << " which is not in the Periodic Table"
+                                  << std::endl;
+                    }
+                }
+                
+                
                 
                 setAtomsMetalType();
                 
@@ -529,7 +543,7 @@ namespace LIBMOL
                 std::cout << "Not find " << std::endl;
             }
              */
-            if (iAt->chemType.empty() || ((iAt->chemType.size() < 3) &&
+            if (iAt->chemType.empty() || ((iAt->chemType.size() < 4) &&
                 aPTab.elements.find(iAt->chemType) == aPTab.elements.end()))
                      
             {
@@ -734,6 +748,7 @@ namespace LIBMOL
     void GenCifFile::selectPropsToMaps(std::map<std::string,std::string> & tRowProps, 
                                        std::map<int,std::map<ID,std::vector<std::string> > > & tColProps)
     {   
+        
         getCifCrystInfo(tRowProps, tColProps);
       
         bool lSymOps=false, lAtms=false;

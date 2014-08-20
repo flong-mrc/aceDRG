@@ -71,7 +71,7 @@ namespace LIBMOL
         PeriodicTable aPTable;
         
         
-        if (initAtoms.size() !=0)
+        if (initAtoms.size() > 1)
         {
             for (std::vector<CrystInfo>::iterator iCryst=allCryst.begin();
                     iCryst !=allCryst.end(); iCryst++)
@@ -802,17 +802,17 @@ namespace LIBMOL
             //if (allAtoms[i].sId=="555")
             //{
                 //j++;
-                std::cout << "Look for bonds to atom " << allAtoms[i].id 
-                          << "(serial number  " << allAtoms[i].seriNum
-                          << ") " << std::endl;
-                std::cout << "Its has " << allAtoms[i].neighbAtoms.size() 
-                          << " neighbor atoms. " <<std::endl;
+                //std::cout << "Look for bonds to atom " << allAtoms[i].id 
+                //          << "(serial number  " << allAtoms[i].seriNum
+                //          << ") " << std::endl;
+                //std::cout << "Its has " << allAtoms[i].neighbAtoms.size() 
+                //          << " neighbor atoms. " <<std::endl;
                 for (std::vector<int>::iterator iNB=allAtoms[i].neighbAtoms.begin();
                         iNB !=allAtoms[i].neighbAtoms.end(); iNB++)
                 {
                     // REAL rD = distanceV(refAtoms[i].coords, refAtoms[(*iNB)].coords);
-                    std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
-                              << refAtoms[(*iNB)].sId << std::endl;
+                    //std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
+                    //          << refAtoms[(*iNB)].sId << std::endl;
                     REAL rD = getBondLenFromFracCoords(allAtoms[i].fracCoords, allAtoms[(*iNB)].fracCoords,
                                                        tCryst->itsCell->a, tCryst->itsCell->b, 
                                                        tCryst->itsCell->c, tCryst->itsCell->alpha,
@@ -833,7 +833,7 @@ namespace LIBMOL
                         covalent_sensitivity = covalent_sensitivity2;
                     }
                     
-                    std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
+                    //std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
 
                     getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                                          covalent_sensitivity, tPTab, 
@@ -841,10 +841,10 @@ namespace LIBMOL
                     
                     
                     
-                        std::cout << "Range between " << bondRange[0]
-                                      << " and " << bondRange[1] << std::endl;
-                        std::cout << "Distance between " << allAtoms[i].id << " and "
-                                  << allAtoms[*iNB].id << " is " << rD << std::endl;
+                        //std::cout << "Range between " << bondRange[0]
+                        //              << " and " << bondRange[1] << std::endl;
+                        //std::cout << "Distance between " << allAtoms[i].id << " and "
+                        //          << allAtoms[*iNB].id << " is " << rD << std::endl;
                    
                    
                     
@@ -869,10 +869,10 @@ namespace LIBMOL
                             
                             // if (allAtoms[i].id=="C22" && allAtoms[i].isInPreCell)
                             
-                            std::cout << "a bond between " << allAtoms[i].id << " and "
-                             << allAtoms[*iNB].id << " is added to the bond_list_cell " 
-                             << std::endl << "Its bond length is " << rD 
-                             << std::endl;
+                            //std::cout << "a bond between " << allAtoms[i].id << " and "
+                            // << allAtoms[*iNB].id << " is added to the bond_list_cell " 
+                            // << std::endl << "Its bond length is " << rD 
+                            // << std::endl;
                             
                         }
                     }
@@ -1014,7 +1014,8 @@ namespace LIBMOL
                     aBond.atomsIdx.push_back(*iCo);
                     aBond.value = rD;
                     aBond.isInSameRing = aBond.checkIfInSameRing(tMol.atoms, iAt->seriNum, *iCo);
-                    tMol.allBonds.push_back(aBond);            
+                    tMol.allBonds.push_back(aBond);
+                    /*
                     std::cout << "a bond between " << iAt->id << " and "
                               << tMol.atoms[(*iCo)].id << " is added to the bond_list_cell " 
                               << std::endl << "Its bond length is " << aBond.value 
@@ -1027,6 +1028,7 @@ namespace LIBMOL
                     {
                         std::cout << "Two atoms in the bond are not in the same ring " << std::endl;
                     }
+                     */
                 }
             }
         }
@@ -1188,11 +1190,11 @@ namespace LIBMOL
             }
             tRange[1] =  tRad + tExtraD;
             
-            std::cout <<  "comp1 " << comp1 << std::endl;
-            std::cout <<  "comp2 " << comp2 << std::endl;
-            std::cout << "tRad " << tRad << std::endl;
-            std::cout << "tSen " << tSens << std::endl;
-            std::cout << "tExtraD " << std::endl;
+            //std::cout <<  "comp1 " << comp1 << std::endl;
+            //std::cout <<  "comp2 " << comp2 << std::endl;
+            //std::cout << "tRad " << tRad << std::endl;
+            //std::cout << "tSen " << tSens << std::endl;
+            //std::cout << "tExtraD " << std::endl;
            
         }
         else 
