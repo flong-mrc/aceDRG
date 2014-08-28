@@ -27,7 +27,7 @@ namespace LIBMOL
             std::cerr << "You need to setup CCP4 suite first " << std::endl;
             exit(1);
         }
-        
+        /*
         char * pLibMon = std::getenv("LIBMOL_ROOT");
         if (pLibMon !=NULL)
         {
@@ -44,7 +44,7 @@ namespace LIBMOL
             std::cerr << "You need to setup env variable $LIBMOL_ROOT first " << std::endl;
             exit(1);
         }
-         
+        */
     }
     
     CheckEnvAndGetMode::CheckEnvAndGetMode(int numArg, char** ArgVars) :workMode(0)
@@ -65,6 +65,7 @@ namespace LIBMOL
             exit(1);
         }
        
+        /*
         char * pLibMon = std::getenv("LIBMOL_ROOT");
         if (pLibMon !=NULL)
         {
@@ -79,6 +80,7 @@ namespace LIBMOL
             std::cerr << "You need to setup env variable $LIBMOL_ROOT first " << std::endl;
             exit(1);
         }
+        */
         
         // do not need the following declarations, put here in case......
         //extern char *optarg;
@@ -96,7 +98,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:m:n:o:p:r:s:t:y:z:A:O:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:m:n:o:p:r:s:t:y:z:A:D:O:")) != -1)
         {
             switch (c)
             {
@@ -170,6 +172,11 @@ namespace LIBMOL
                     break;                    
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
+                    //std::cout << "COD atom types are output to : " 
+                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    break;
+                case 'D':
+                    IOEntries["libMolTabDir"] = optarg;
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;

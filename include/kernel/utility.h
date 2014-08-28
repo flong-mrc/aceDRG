@@ -238,7 +238,8 @@ namespace LIBMOL
     
     // some math functions such as Random number generator
     extern REAL GetRand();
-    extern void initPrimeTab(std::vector<int> & tPrimeTab);
+    extern void initPrimeTab(std::vector<int> & tPrimeTab,
+                             std::string tLibmolTabDir);
     
     // Chemical properties related functions 
     extern void initOrgTable(std::vector<std::string> & tOrgTab);
@@ -282,6 +283,8 @@ namespace LIBMOL
     // Function dealt with environment variables and scripts
     // executing external program using command line arguments
     extern void cmdExecute(std::string & tCom);
+    
+    extern std::string getLibmolDir();
 
 }
 

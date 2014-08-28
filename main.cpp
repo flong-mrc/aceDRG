@@ -71,15 +71,14 @@ int main(int argc, char** argv) {
     
     LIBMOL::CheckEnvAndGetMode AJob(argc, argv);
     
-    // std::cout << "The work mode is " << AJob.workMode << std::endl;
+    std::cout << "The work mode is " << AJob.workMode << std::endl;
     
-    /*
-    for (std::map<ID,ID>::iterator iKW=checkMode.IOEntries.begin();
-            iKW !=checkMode.IOEntries.end(); iKW++)
+    
+    for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
+            iKW !=AJob.IOEntries.end(); iKW++)
     {   
         std::cout << iKW->first << "\t" << iKW->second << std::endl;
     }
-    */
     
     if (AJob.workMode == 11 
        || AJob.workMode ==12
@@ -115,13 +114,15 @@ int main(int argc, char** argv) {
             }
             
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
+                                           
             
-            LIBMOL::AllSystem   aTargetSystem(dataFromCif); 
+            LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
                 aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
-                                                          AJob.IOEntries["monoRootName"]);
+                                                          AJob.IOEntries["monoRootName"], 
+                                                          AJob.IOEntries["libMolTabDir"]);
                 //if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
                 //{
                     LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
@@ -208,7 +209,7 @@ int main(int argc, char** argv) {
                         iMol !=dataFromSdf.allMols.end(); iMol++)
                 {
                     
-                    LIBMOL::AllSystem   aTargetSystem(*iMol);
+                    LIBMOL::AllSystem   aTargetSystem(*iMol, AJob.IOEntries["libMolTabDir"]);
                     
                     if ( (int)aTargetSystem.allAtoms.size() > 0)
                     {
@@ -218,8 +219,10 @@ int main(int argc, char** argv) {
                             tOutName.append("_");
                             tOutName.append(LIBMOL::IntToStr(i));
                         }
+                        
                         aTargetSystem.setupAllTargetValuesFromCOD(tOutName.c_str(), 
-                                                   AJob.IOEntries["monoRootName"]);
+                                                   AJob.IOEntries["monoRootName"],
+                                                   AJob.IOEntries["libMolTabDir"]);
                         
                         /*
                         LIBMOL::outMMCif(tOutName.c_str(),

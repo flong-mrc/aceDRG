@@ -23,7 +23,7 @@ AS=as
 # Macros
 CND_PLATFORM=GNU-MacOSX
 CND_CONF=Debug
-CND_DISTDIR=bin
+CND_DISTDIR=libexec
 CND_BUILDDIR=build
 
 # Include 

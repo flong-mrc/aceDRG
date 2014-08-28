@@ -3674,7 +3674,7 @@ namespace LIBMOL
     
     void DictCifFile::setAtomsMetalType()
     {
-        setDefaultCoordGeos();
+        // setDefaultCoordGeos();
         
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                      "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",

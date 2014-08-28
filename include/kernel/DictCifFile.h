@@ -362,6 +362,8 @@ namespace LIBMOL
         DictCifFile(Name                    tFname, 
                     std::ios_base::openmode tOpenMode);
         
+       
+        
         DictCifFile(FileName                    tFname,
                     std::ios_base::openmode     tOpenMode);
         

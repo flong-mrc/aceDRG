@@ -192,7 +192,8 @@ namespace LIBMOL
                     const std::vector<TorsionDict>              & tTorsions,
                     const std::vector<ChiralDict>               & tChirals,
                     const std::vector<PlaneDict>                & tPlans,
-                    const std::map<ID, std::vector<RingDict> >  & tRings);
+                    const std::map<ID, std::vector<RingDict> >  & tRings, 
+                    std::string                                   tLibmolTabDir);
         
         // Constructor by a DictCifFile object
         CodClassify(const DictCifFile & tCifObj);
@@ -471,7 +472,10 @@ namespace LIBMOL
         
         
         int                                      wSize;
+        std::string                              libmolTabDir;
+        
         PeriodicTable            *               pPeriodictable;
+        
         
         std::vector<AtomDict>                    allAtoms;
         std::vector<int>                         allHAtomIdx;

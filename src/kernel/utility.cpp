@@ -1538,13 +1538,15 @@ namespace LIBMOL
     }
     
     // For hashing code of COD atom types
-    extern void initPrimeTab(std::vector<int> & tPrimeTab)
+    extern void initPrimeTab(std::vector<int> & tPrimeTab,
+                             std::string tLibmolTabDir)
     {
         // should use a env variable related path
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string primName = clibMonDir + "primes.table";
-        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string primName = clibMonDir + "/tables/primes.table";
+        //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string primName = tLibmolTabDir + "/primes.table";
+        
         std::ifstream primFile;
         primFile.open(primName.c_str(), std::ios::in);
         
@@ -1559,6 +1561,11 @@ namespace LIBMOL
             }
             
             primFile.close();
+        }
+        else
+        {
+            std::cout << "can not open " << primName << " for hashing table "
+                      << std::endl;
         }
     }
     
@@ -2156,6 +2163,10 @@ namespace LIBMOL
 
     }
     
+    extern std::string getLibmolDir()
+    {
+        
+    }
     
         
 }

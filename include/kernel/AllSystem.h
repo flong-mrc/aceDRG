@@ -144,19 +144,20 @@ namespace LIBMOL
                   const std::vector<TorsionDict>           & tAllTorsions,
                   const std::vector<ChiralDict>            & tAllChirals,
                   const std::vector<PlaneDict>               & tAllPlanes,
-                  const std::map<ID, std::vector<RingDict> > & tAllRings);
+                  const std::map<ID, std::vector<RingDict> > & tAllRings, 
+                  std::string tLibmolTabDir);
         
         // Input from files contains mainly atom id and chemical types,
         // bonds and connections, and perhaps chirals of atoms (e.g, mol/sdf file).
         // Angle and torsion angles formed from atoms will be re-found here,
         // so as planarity
         
-        AllSystem(DictCifFile & tCifObj);
-        AllSystem(Molecule & tMol);
+        AllSystem(DictCifFile & tCifObj, std::string tLibmolTabDir);
+        AllSystem(Molecule & tMol, std::string tLibmolTabDir);
         // AllSystem(MolSdfFile & tSdfObj);
         
         // get the system after COD classification and search.
-        AllSystem(const CodClassify  & tProCodSys);
+        AllSystem(const CodClassify  & tProCodSys, std::string tLibmolTabDir);
         
         //Destructor
         ~AllSystem();
@@ -276,7 +277,7 @@ namespace LIBMOL
         void setDefaultCoordGeos();
         
         // COD applications 
-        void setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName);
+        void setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName, ID tLibmolTabDir);
         // Other applications 
         
         //void SetupCoords();
@@ -294,6 +295,8 @@ namespace LIBMOL
         bool                                     hasCoords;
         bool                                     hasCCP4Type;
         bool                                     usingInChiral;
+        std::string                              libmolTabDir;
+        
         std::vector<AtomDict>                    allAtoms;
         std::vector<int>                         allHAtomIdx;      //repeated ones
         std::vector<int>                         allHydroAtoms;

@@ -52,10 +52,12 @@ namespace LIBMOL
                          const std::vector<TorsionDict>& tAllTorsions, 
                          const std::vector<ChiralDict>& tAllChirals, 
                          const std::vector<PlaneDict>& tAllPlanes, 
-                         const std::map<ID, std::vector<RingDict> >& tAllRings)
+                         const std::map<ID, std::vector<RingDict> >& tAllRings,
+                         std::string tLibmolTab)
                           :hasCoords(false),
                            hasCCP4Type(false),
                            usingInChiral(true),
+                           libmolTabDir(""),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -64,6 +66,7 @@ namespace LIBMOL
                            itsCurChiralSeriNum(ZeroInt),
                            itsCurChiral(NullPoint)
     {
+        libmolTabDir  = tLibmolTab;
         
         AddAtoms(tAllAtoms);
         for (std::vector<int>::const_iterator iH = tAllHAtomIdx.begin();
@@ -83,9 +86,11 @@ namespace LIBMOL
     }
     
     
-    AllSystem::AllSystem(DictCifFile& tCifObj):hasCoords(tCifObj.hasCoords),
+    AllSystem::AllSystem(DictCifFile& tCifObj, std::string tLibmolTab):
+                                               hasCoords(tCifObj.hasCoords),
                                                hasCCP4Type(tCifObj.hasCCP4Type),
                                                usingInChiral(true),
+                                               libmolTabDir(""),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -94,6 +99,7 @@ namespace LIBMOL
                                                itsCurChiralSeriNum(ZeroInt),
                                                itsCurChiral(NullPoint)
     {
+        libmolTabDir  = tLibmolTab;
         AddAtoms(tCifObj.allAtoms);
         AddBonds(tCifObj.allBonds);
         // AddTorsions(tCifObj.allTorsions);
@@ -102,7 +108,8 @@ namespace LIBMOL
         
     }
     
-    AllSystem::AllSystem(Molecule& tMol):hasCoords(tMol.hasCoords),
+    AllSystem::AllSystem(Molecule& tMol, std::string tLibmolTab):
+                                         hasCoords(tMol.hasCoords),
                                          hasCCP4Type(false),
                                          usingInChiral(true),
                                                itsContainMetal(false),
@@ -113,13 +120,14 @@ namespace LIBMOL
                                                itsCurChiralSeriNum(ZeroInt),
                                                itsCurChiral(NullPoint)
     {
+        libmolTabDir  = tLibmolTab;
         AddAtoms(tMol.atoms);
         AddBonds(tMol.bonds);
         AddChirals(tMol.chirals);
         setSysProps();
     }
     
-    AllSystem::AllSystem(const CodClassify& tProCodSys)
+    AllSystem::AllSystem(const CodClassify& tProCodSys, std::string tLibmolTab)
                           :itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
                            itsCurTorsionSeriNum(ZeroInt),
@@ -127,6 +135,7 @@ namespace LIBMOL
                            itsCurChiralSeriNum(ZeroInt),
                            itsCurChiral(NullPoint)
     {
+        libmolTabDir  = tLibmolTab;
         AddAtoms(tProCodSys.allAtoms);
         AddBonds(tProCodSys.allBonds);
         AddAngles(tProCodSys.allAngles);
@@ -1032,8 +1041,8 @@ namespace LIBMOL
         
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
-        std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        std::string metDefCoordGeoFileName = clibMonDir + "/tables/allMetalDefCoordGeos.table";
+        // std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
+        std::string metDefCoordGeoFileName = libmolTabDir + "/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
         
         if(metDefCoordGeoFile.is_open())
@@ -1055,6 +1064,11 @@ namespace LIBMOL
                 }
             }
             metDefCoordGeoFile.close();
+        }
+        else
+        {
+            std::cout << "Bug: Can not find " << metDefCoordGeoFileName 
+                      << " to read !" << std::endl;
         }
         
     }   
@@ -4333,10 +4347,13 @@ namespace LIBMOL
         
     
     
-    void AllSystem::setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName)
+    void AllSystem::setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName, 
+                                                ID tLibmolDir)
     {
        CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles, 
-                               allTorsions, allChirals, allPlanes, allRings);
+                               allTorsions, allChirals, allPlanes, allRings,
+                               tLibmolDir);
+      
       
        
        aCodSystem.setupAllTargetValues();

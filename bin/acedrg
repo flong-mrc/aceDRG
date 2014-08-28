@@ -54,10 +54,12 @@ class Acedrg:
         self.molGen           = False
         self.repCrds          = False
 
+        self.acedrg = os.path.abspath(sys.argv[0])
+        self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
+        #print self.acedrgDir
         inputOptionsP         = self.InputParser(t_argvs) 
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
-       
         self.execute()  
 
     def InputParser(self, t_argvs):
@@ -151,31 +153,50 @@ class Acedrg:
 
         if not self.libmol :
             if os.environ.has_key("LIBMOL_ROOT"):
-                tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "bin/libmol")
+                tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "libexec/libmol")
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
                 else:
                     print "libmol could not be found at %s"%tLibmol
                     sys.exit()
+
+        if not self.libmol and self.acedrgDir:
+            tLibmol = os.path.join(self.acedrgDir, "libexec/libmol")
+            if glob.glob(tLibmol):
+                self.libmol = tLibmol
             else:
-                print "You need to define the path where the acedrg tables are or install the latest version of CCP4 with acedrg  "
+                print "libmol could not be found at %s"%tLibmol
                 sys.exit()
+        else:
+            print "can not find libmol at libexec/"
+            sys.exit()
                                 
 
         if not self.acedrgTables:
             if os.environ.has_key("LIBMOL_ROOT"):
-                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "tables")
+                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share/acedrg/tables")
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
                 else:
                     print "Tables required could not be found at %s"%tAcedrgTables
                     sys.exit()
-            else:
-                print "You need to define the path where the acedrg tables are or install the latest version of CCP4 with acedrg  "
-                sys.exit()
                                 
+        if not self.acedrgTables: 
+            tAcedrgTables = os.path.join(self.acedrgDir, "share/acedrg/tables")
+            print tAcedrgTables
+            if os.path.isdir(tAcedrgTables):
+                self.acedrgTables = tAcedrgTables
+            else:
+                print "Bond and angle tables required could not be found "
+                sys.exit()
+                     
     def setWorkMode(self, t_inputOptionsP = None):
- 
+
+        # Sequnence for check the locations of acedrg tables 
+        # (1) Check if the user provides the location
+        # (2) If not, check CCP4 suite default location.
+        # (3) If not, check if the environment variable LIBMOL_ROOT is defined in the user's machine.
+        # (4) If none of them, program exits.   
         if not t_inputOptionsP.acedrgTables: 
             if os.environ.has_key("CCP4"):
                 tAcedrgTables = os.path.join(os.environ['CCP4'], "share/acedrg/tables")
@@ -190,13 +211,21 @@ class Acedrg:
  
         if not self.acedrgTables or not glob.glob(self.acedrgTables):
             if os.environ.has_key("LIBMOL_ROOT"):
-                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "tables")
+                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share/acedrg/tables")
+                print tAcedrgTables
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
-                else:
-                    print "Bond and angle tables required could not be found "
-                    sys.exit()
-                     
+
+        if not self.acedrgTables :
+            
+            tAcedrgTables = os.path.join(self.acedrgDir, "share/acedrg/tables")
+            print tAcedrgTables
+            if os.path.isdir(tAcedrgTables):
+                self.acedrgTables = tAcedrgTables
+            else:
+                print "Bond and angle tables required could not be found "
+                sys.exit()
+
         if t_inputOptionsP.inMmCifName and not t_inputOptionsP.repCrd : 
             self.inMmCifName = t_inputOptionsP.inMmCifName
             self.workMode    = 11            
@@ -227,9 +256,11 @@ class Acedrg:
         else:
             self.outRoot   = "AcedrgOut"
 
+
     def runLibmol(self, tIn=None):
  
         self.cmdLine = self.libmol
+        # print self.cmdLine
         if self.workMode == 11 or self.workMode == 12:
             if tIn:
                 self.inMmCifName    = tIn
@@ -238,8 +269,9 @@ class Acedrg:
             self.outRstCifName  = self.outRoot + "_cod.rst"   
             self.outRstPdbName  = self.outRoot + "_cod.pdb"
 
-            self.cmdLine +=" -c %s  "%self.inMmCifName
+            self.cmdLine +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
             self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
+            print self.cmdLine
             os.system(self.cmdLine)
         if self.workMode == 13 or self.workMode == 14:
             if tIn:
@@ -248,8 +280,9 @@ class Acedrg:
             self.outRstCifName  = self.outRoot + "_cod.rst"
             self.outRstPdbName  = self.outRoot + "_cod.pdb"
 
-            self.cmdLine += " -s %s  "%self.inMmCifName
+            self.cmdLine += " -s %s  -D %s "%(self.inMmCifName, self.acedrgTables)
             self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
+            print self.cmdLine
             os.system(self.cmdLine)
 
         if self.workMode == 21 :
