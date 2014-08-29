@@ -171,6 +171,7 @@ class Acedrg:
             else:
                 print "Can not find where the acedrg is installed"
                 sys.exit()
+
         
         if not self.libmol: 
             print "can not find libmol at libexec/"
