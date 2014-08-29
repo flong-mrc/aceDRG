@@ -56,7 +56,7 @@ class Acedrg:
 
         self.acedrg = os.path.abspath(sys.argv[0])
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
-        #print self.acedrgDir
+        print self.acedrgDir
         inputOptionsP         = self.InputParser(t_argvs) 
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
@@ -160,14 +160,20 @@ class Acedrg:
                     print "libmol could not be found at %s"%tLibmol
                     sys.exit()
 
-        if not self.libmol and self.acedrgDir:
-            tLibmol = os.path.join(self.acedrgDir, "libexec/libmol")
-            if glob.glob(tLibmol):
-                self.libmol = tLibmol
+        if not self.libmol: 
+            if glob.glob(self.acedrgDir):
+               tLibmol = os.path.join(self.acedrgDir, "libexec/libmol")
+               if glob.glob(tLibmol):
+                   self.libmol = tLibmol
+               else:
+                   print "libmol could not be found at %s"%tLibmol
+                   sys.exit()
             else:
-                print "libmol could not be found at %s"%tLibmol
+                print "Can not find where the acedrg is installed"
                 sys.exit()
-        else:
+
+        
+        if not self.libmol: 
             print "can not find libmol at libexec/"
             sys.exit()
                                 
