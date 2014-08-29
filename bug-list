@@ -1,0 +1,20 @@
+
+#1 Thu Aug 28 17:08:48 BST 2014
+
+  I setup ccp4, I did not setup LIBMOL_ROOT
+  Crashes on 
+   $ acedrg -s DB00167.mol -o thing
+
+#0  0x000000000068e97b in LIBMOL::CodClassify::hashingAtoms() ()
+Missing separate debuginfos, use: debuginfo-install glibc-2.12-1.107.el6_4.4.x86_64 libgcc-4.4.7-3.el6.x86_64 libstdc++-4.4.7-3.el6.x86_64 sqlite-3.6.20-1.el6.x86_64
+(gdb) where
+#0  0x000000000068e97b in LIBMOL::CodClassify::hashingAtoms() ()
+#1  0x00000000006834c0 in LIBMOL::CodClassify::codAtomClassify(int) ()
+#2  0x0000000000683408 in LIBMOL::CodClassify::setupSystem() ()
+#3  0x00000000006827d2 in LIBMOL::CodClassify::CodClassify(std::vector<LIBMOL::AtomDict, std::allocator<LIBMOL::AtomDict> > const&, std::vector<int, std::allocator<int> > const&, std::vector<LIBMOL::BondDict, std::allocator<LIBMOL::BondDict> > const&, std::vector<LIBMOL::AngleDict, std::allocator<LIBMOL::AngleDict> > const&, std::vector<LIBMOL::TorsionDict, std::allocator<LIBMOL::TorsionDict> > const&, std::vector<LIBMOL::ChiralDict, std::allocator<LIBMOL::ChiralDict> > const&, std::vector<LIBMOL::PlaneDict, std::allocator<LIBMOL::PlaneDict> > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::vector<LIBMOL::RingDict, std::allocator<LIBMOL::RingDict> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::vector<LIBMOL::RingDict, std::allocator<LIBMOL::RingDict> > > > > const&) ()
+#4  0x0000000000820c56 in LIBMOL::AllSystem::setupAllTargetValuesFromCOD(std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >) ()
+#5  0x0000000000648c93 in main ()
+(gdb) 
+
+ 
+
