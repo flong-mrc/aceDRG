@@ -262,6 +262,23 @@ class Acedrg:
         else:
             self.outRoot   = "AcedrgOut"
 
+    def printJobs(self):
+
+        print "===========================================================" 
+        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+            print "| Your job is  generate the dictionary (cif) and coord(pdb) files |"
+            print "| for your ligand and/or monomer                                  |"
+            if self.workMode==11:
+                print "Input file %s"%os.path.basename(self.inMmCifName)
+            if self.workMode==12:
+                print "Input file %s"%os.path.basename(self.inSmiName)
+            if self.workMode==13:
+                print "Input file %s"%os.path.basename(self.inMdlName)
+            if self.workMode==14:
+                print "Input file %s"%os.path.basename(self.inSdfName)
+            print "Output dictionary file %s"%os.path.basename(self.outRoot + ".cif")
+            print "Output coordinate file %s"%os.path.basename(self.outRoot + ".pdb")
+        print "===========================================================" 
 
     def runLibmol(self, tIn=None):
  
@@ -462,8 +479,7 @@ class Acedrg:
                         
     def execute(self):
        
-        print "Current workMode ", self.workMode
-        
+        self.printJobs()
         if self.workMode == 11:
 
             # Stage 1: dictionary generation using a mmcif file 
