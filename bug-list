@@ -17,4 +17,21 @@ Missing separate debuginfos, use: debuginfo-install glibc-2.12-1.107.el6_4.4.x86
 (gdb) 
 
  
+-----
 
+#2 Fri Aug 29 17:26:05 BST 2014
+
+  Ugly warnings.
+
+$ acedrg -c 141.cif -r 141
+/home/paule/acedrg/share/acedrg/tables
+Current workMode  11
+/home/paule/acedrg/libexec/libmol -c 141.cif -D /home/paule/acedrg/share/acedrg/tables  -r 141 -o AcedrgOut_cod.rst >& AcedrgOut.log 
+Run Refmac at stgae  1
+sh: line 3: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+Run Refmac at stgae  2
+sh: line 4: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+Run Refmac at stgae  3
+sh: line 4: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+Run Refmac at stgae  4
+sh: line 5: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
