@@ -39,7 +39,7 @@ sh: line 5: warning: here-document at line 0 delimited by end-of-file (wanted `e
 -----
 #3 Fri Aug 29 21:25:56 BST 2014
 
-I am using Ubuntu at home, acedrg fails immediately like this:
+I am using Ubuntu at home 10.04LTS, acedrg fails immediately like this:
 
 $ acedrg -c monomers/3/38P.cif -r 38P
 /home/paule/acedrg
@@ -47,5 +47,12 @@ $ acedrg -c monomers/3/38P.cif -r 38P
 Current workMode  11
 /home/paule/acedrg/libexec/libmol -c monomers/3/38P.cif -D /home/paule/acedrg/share/acedrg/tables  -r 38P -o AcedrgOut_cod.rst >& AcedrgOut.log 
 sh: Syntax error: Bad fd number
+
+
+-----
+#4 Fri Aug 29 21:49:39 BST 2014
+
+When using the -o option the restraints mmCIF file should have the extension .cif not .rst.
+Why is _cod.rst added?
 
 
