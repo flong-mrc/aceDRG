@@ -56,7 +56,7 @@ class Acedrg:
 
         self.acedrg = os.path.abspath(sys.argv[0])
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
-        print self.acedrgDir
+        #print self.acedrgDir
         inputOptionsP         = self.InputParser(t_argvs) 
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
@@ -264,24 +264,28 @@ class Acedrg:
 
     def printJobs(self):
 
-        print "===========================================================" 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+            print "===================================================================" 
             print "| Your job is  generate the dictionary (cif) and coord(pdb) files |"
             print "| for your ligand and/or monomer                                  |"
+            print "===================================================================" 
             if self.workMode==11:
-                print "Input file %s"%os.path.basename(self.inMmCifName)
+                print "Input file: %s"%os.path.basename(self.inMmCifName)
             if self.workMode==12:
-                print "Input file %s"%os.path.basename(self.inSmiName)
+                print "Input file: %s"%os.path.basename(self.inSmiName)
             if self.workMode==13:
-                print "Input file %s"%os.path.basename(self.inMdlName)
+                print "Input file: %s"%os.path.basename(self.inMdlName)
             if self.workMode==14:
-                print "Input file %s"%os.path.basename(self.inSdfName)
-            print "Output dictionary file %s"%os.path.basename(self.outRoot + ".cif")
-            print "Output coordinate file %s"%os.path.basename(self.outRoot + ".pdb")
-        print "===========================================================" 
+                print "Input file: %s"%os.path.basename(self.inSdfName)
+            print "Output dictionary file: %s"%os.path.basename(self.outRoot + ".cif")
+            print "Output coordinate file: %s"%os.path.basename(self.outRoot + ".pdb")
 
     def runLibmol(self, tIn=None):
  
+        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+            print "===================================================================" 
+            print "| Generate the dictionary file using the internal database        |"
+            print "===================================================================" 
         self.cmdLine = self.libmol
         # print self.cmdLine
         if self.workMode == 11 or self.workMode == 12:
@@ -294,7 +298,7 @@ class Acedrg:
 
             self.cmdLine +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
             self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
-            print self.cmdLine
+            # print self.cmdLine
             os.system(self.cmdLine)
         if self.workMode == 13 or self.workMode == 14:
             if tIn:
@@ -305,7 +309,7 @@ class Acedrg:
 
             self.cmdLine += " -s %s  -D %s "%(self.inMmCifName, self.acedrgTables)
             self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
-            print self.cmdLine
+            #print self.cmdLine
             os.system(self.cmdLine)
 
         if self.workMode == 21 :
@@ -319,7 +323,7 @@ class Acedrg:
 
             self.cmdLine += " -b %s  "%self.inStdCifName
             self.cmdLine += " -m yes -r %s -o %s >  %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
-            print self.cmdLine
+            #print self.cmdLine
             os.system(self.cmdLine)
 
         if self.workMode == 41 :
@@ -327,7 +331,7 @@ class Acedrg:
             self.libmolLogName  = self.outRoot + ".log"
             self.cmdLine += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
             self.cmdLine += " -y y -o %s >>  %s "%(self.outRstCifName, self.libmolLogName)
-            print self.cmdLine
+            #print self.cmdLine
             os.system(self.cmdLine)
 
              
@@ -366,38 +370,87 @@ class Acedrg:
         if tStage==1:
             self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName) 
             self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n\n"
+	    self.cmdLine += "eof       \n"
         elif tStage==2: 
             self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
             self.cmdLine += "mode newe \n"
             self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n\n"
+	    self.cmdLine += "eof       \n"
         elif tStage==3: 
             self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
             self.cmdLine += "ncyc 1    \n"
             self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n\n"
+	    self.cmdLine += "eof       \n"
         elif tStage==4: 
             self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
             self.cmdLine += "make hout yes    \n"
             self.cmdLine += "ncyc 40    \n"
             self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n\n"
+	    self.cmdLine += "eof       \n"
         else: 
             self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
             self.cmdLine += "mode newe \n"
             self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n\n"
+	    self.cmdLine += "eof       \n"
         #print self.cmdLine
 
     def runRefmac(self, tPdbIn, tLibIn, tStage=2):
       
-        print "Run Refmac at stgae ", tStage
+        print "| Stage  %d        |"%tStage
         self.refmacLogName    = self.outRoot + "_refmac_stage_"+ str(tStage) + ".log"
         self.refmacXYZOUTName = self.outRoot + "_refmac_stage_"+ str(tStage) + ".pdb"
         self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, self.refmacLogName, tStage)
         os.system(self.cmdLine)
 
+    
+    def runGeoOpt(self):
+
+        # Geometrical optimization
+        if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
+            if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
+                print "===================================================================" 
+                print "| Geometrical Optimization                                        |"
+                print "===================================================================" 
+                stageNow = 1
+                self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
+                if os.path.isfile(self.refmacXYZOUTName):
+                    tPdb1 = self.refmacXYZOUTName
+                    stageNow = 2
+                    self.runRefmac(tPdb1, self.outRstCifName, stageNow)
+                    if os.path.isfile(self.refmacXYZOUTName):
+                        tPdb1 = self.refmacXYZOUTName
+                        stageNow = 3
+                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
+                        if os.path.isfile(self.refmacXYZOUTName):
+                            tPdb1 = self.refmacXYZOUTName
+                            stageNow = 4
+                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
+                            if os.path.isfile(self.refmacXYZOUTName):
+                                finPdb = self.outRoot + ".pdb"
+                                finRst = self.outRoot + ".cif"
+                                os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
+                                #os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                                if os.path.isfile(finPdb):
+                                    self.inPdbName        = finPdb 
+                                    self.inMmCifName      = self.outRstCifName
+                                    self.outRstCifName    = finRst
+                                    self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+                                    print "===================================================================" 
+                                else:
+                                    print "Failed to produce %s after final geometrical optimization"%finPdb
+                            else:
+                                print "Failed to produce the final coordinates at stage 4 optimization" 
+                        else:
+                            print "Failed to produce the  coordinates at stage 3 optimization" 
+                    else:
+                        print "Failed to produce the coordinates at stage 2 optimization" 
+                else:
+                    print "Failed to produce the coordinates at stage 1 optimization" 
+            else:
+                print "No dictionary file produced ! " 
+        else:
+            print "No dictionary file produced ! " 
+                        
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName):
 
         cifCont = {}
@@ -490,37 +543,7 @@ class Acedrg:
                 sys.exit()
 
             # Stage 2: optimization
-            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
-                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    stageNow = 1
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
-                    if os.path.isfile(self.refmacXYZOUTName):
-                        tPdb1 = self.refmacXYZOUTName
-                        stageNow = 2
-                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                        if os.path.isfile(self.refmacXYZOUTName):
-                            tPdb1 = self.refmacXYZOUTName
-                            stageNow = 3
-                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                            if os.path.isfile(self.refmacXYZOUTName):
-                                tPdb1 = self.refmacXYZOUTName
-                                stageNow = 4
-                                self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                                if os.path.isfile(self.refmacXYZOUTName):
-                                     finPdb = self.outRoot + ".pdb"
-                                     finRst = self.outRoot + ".cif"
-                                     os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                     #os.system("cp %s   %s "%(self.outRstCifName, finRst))
-                                     if os.path.isfile(finPdb):
-                                         self.inPdbName        = finPdb 
-                                         self.inMmCifName      = self.outRstCifName
-                                         self.outRstCifName    = finRst
-                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                     else:
-                                         print "Failed to produce %s "%finPdb
-                                else:
-                                     print "Failed to produce the final coordinates" 
-                        
+            self.runGeoOpt()            
     
         if self.workMode == 12:
             
@@ -539,85 +562,19 @@ class Acedrg:
                 sys.exit()
 
             # Stage 3: optimization
-            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
-                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    #self.runRefmac(self.outRstPdbName, self.outRstCifName)
-                    stageNow = 1
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
-                    if os.path.isfile(self.refmacXYZOUTName):
-                        tPdb1 = self.refmacXYZOUTName
-                        stageNow = 2
-                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                        if os.path.isfile(self.refmacXYZOUTName):
-                            tPdb1 = self.refmacXYZOUTName
-                            stageNow = 3
-                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                            if os.path.isfile(self.refmacXYZOUTName):
-                                tPdb1 = self.refmacXYZOUTName
-                                stageNow = 4
-                                self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                                if os.path.isfile(self.refmacXYZOUTName):
-                                     finPdb = self.outRoot + ".pdb"
-                                     finRst = self.outRoot + ".cif"
-                                     os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                     #os.system("cp %s   %s "%(self.outRstCifName, finRst))
-                                     if os.path.isfile(finPdb):
-                                         self.inPdbName        = finPdb 
-                                         self.inMmCifName      = self.outRstCifName
-                                         self.outRstCifName    = finRst
-                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                     else:
-                                         print "Failed to produce %s "%finPdb
-                                else:
-                                     print "Failed to produce the final coordinates" 
-                else:
-                    print "%s or %s does not contain enough information "%(self.outRstPdbName, self.outRstCifName)
-            else:
-                print "%s and/or %s do not exist "%(self.outRstPdbName, self.outRstCifName)
+            self.runGeoOpt()            
 
         if self.workMode == 13:
             
             # Stage 1: dictionary generation using  a mdl file
             if os.path.isfile(self.inMdlName):
                 self.runLibmol(self.inMdlName)
-                print "Dictionary output %s"%self.outRstCifName
-                print "PDB output %s"%self.outRstPdbName
             else:
                 print "can not find %s to read "%self.inMdlName
                 sys.exit() 
  
             # Stage 2: optimization
-            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
-                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    # self.runRefmac(self.outRstPdbName, self.outRstCifName)
-                    stageNow = 1
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
-                    if os.path.isfile(self.refmacXYZOUTName):
-                        tPdb1 = self.refmacXYZOUTName
-                        stageNow = 2
-                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                        if os.path.isfile(self.refmacXYZOUTName):
-                            tPdb1 = self.refmacXYZOUTName
-                            stageNow = 3
-                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                            if os.path.isfile(self.refmacXYZOUTName):
-                                tPdb1 = self.refmacXYZOUTName
-                                stageNow = 4
-                                self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                                if os.path.isfile(self.refmacXYZOUTName):
-                                     finPdb = self.outRoot + ".pdb"
-                                     finRst = self.outRoot + ".cif"
-                                     os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                     os.system("cp %s   %s "%(self.outRstCifName, finRst))
-                                     if os.path.isfile(finPdb):
-                                         self.inPdbName        = finPdb 
-                                         self.inMmCifName      = self.outRstCifName
-                                         self.outRstCifName    = finRst
-                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                     else:
-                                         print "Failed to produce %s "%finPdb
-                                else:
-                                     print "Failed to produce the final coordinates" 
+            self.runGeoOpt()            
     
         if self.workMode == 14:
             
@@ -629,35 +586,7 @@ class Acedrg:
                 sys.exit()
             
             # Stage 2: optimization
-            if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
-                if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
-                    #self.runRefmac(self.outRstPdbName, self.outRstCifName)
-                    stageNow = 1
-                    self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
-                    if os.path.isfile(self.refmacXYZOUTName):
-                        tPdb1 = self.refmacXYZOUTName
-                        stageNow = 2
-                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                        if os.path.isfile(self.refmacXYZOUTName):
-                            tPdb1 = self.refmacXYZOUTName
-                            stageNow = 3
-                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                            if os.path.isfile(self.refmacXYZOUTName):
-                                tPdb1 = self.refmacXYZOUTName
-                                stageNow = 4
-                                self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                                if os.path.isfile(self.refmacXYZOUTName):
-                                     finPdb = self.outRoot + ".pdb"
-                                     os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                     if os.path.isfile(finPdb):
-                                         self.inPdbName        = finPdb 
-                                         self.inMmCifName      = self.outRstCifName
-                                         self.outRstCifName    = finRst
-                                         self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                     else:
-                                         print "Failed to produce %s "%finPdb
-                                else:
-                                     print "Failed to produce the final coordinates" 
+            self.runGeoOpt()            
 
         if self.workMode == 21:
             
