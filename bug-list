@@ -16,6 +16,7 @@ Missing separate debuginfos, use: debuginfo-install glibc-2.12-1.107.el6_4.4.x86
 #5  0x0000000000648c93 in main ()
 (gdb) 
 
+Severity:: Important
  
 -----
 #2 Fri Aug 29 17:26:05 BST 2014
@@ -35,6 +36,7 @@ sh: line 4: warning: here-document at line 0 delimited by end-of-file (wanted `e
 Run Refmac at stgae  4
 sh: line 5: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
 
+Severity:: Trivial
 
 -----
 #3 Fri Aug 29 21:25:56 BST 2014
@@ -48,11 +50,6 @@ Current workMode  11
 /home/paule/acedrg/libexec/libmol -c monomers/3/38P.cif -D /home/paule/acedrg/share/acedrg/tables  -r 38P -o AcedrgOut_cod.rst >& AcedrgOut.log 
 sh: Syntax error: Bad fd number
 
+Severity:: Important
 
 -----
-#4 Fri Aug 29 21:49:39 BST 2014
-
-When using the -o option the restraints mmCIF file should have the extension .cif not .rst.
-Why is _cod.rst added?
-
-
