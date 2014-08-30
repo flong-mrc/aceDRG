@@ -16,8 +16,16 @@ Missing separate debuginfos, use: debuginfo-install glibc-2.12-1.107.el6_4.4.x86
 #5  0x0000000000648c93 in main ()
 (gdb) 
 
+<<<<<<< TREE
+%%%%%%%%%%%%%%%%%%%%%%%%%
+Reply:
+
+#1 Fixed on Aug 28 
+
+=======
 Severity:: Important
  
+>>>>>>> MERGE-SOURCE
 -----
 #2 Fri Aug 29 17:26:05 BST 2014
 
@@ -36,7 +44,14 @@ sh: line 4: warning: here-document at line 0 delimited by end-of-file (wanted `e
 Run Refmac at stgae  4
 sh: line 5: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
 
+<<<<<<< TREE
+%%%%%%%%%%%%%%%%%%%%%%%%%
+Reply:
+
+#2 fixed fixed on Aug. 29
+=======
 Severity:: Trivial
+>>>>>>> MERGE-SOURCE
 
 -----
 #3 Fri Aug 29 21:25:56 BST 2014
@@ -53,3 +68,14 @@ sh: Syntax error: Bad fd number
 Severity:: Important
 
 -----
+<<<<<<< TREE
+#4 Fri Aug 29 21:49:39 BST 2014
+
+When using the -o option the restraints mmCIF file should have the extension .cif not .rst.
+Why is _cod.rst added?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#4 The final output restraints mmCIF file is *.cif. *_cod.rst is intmediate file. The state is like that from quite a few earilier versions (version 50 after ?. The current is 60). 
+=======
+>>>>>>> MERGE-SOURCE
