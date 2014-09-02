@@ -1,0 +1,81 @@
+
+#1 Thu Aug 28 17:08:48 BST 2014
+
+  I setup ccp4, I did not setup LIBMOL_ROOT
+  Crashes on 
+   $ acedrg -s DB00167.mol -o thing
+
+#0  0x000000000068e97b in LIBMOL::CodClassify::hashingAtoms() ()
+Missing separate debuginfos, use: debuginfo-install glibc-2.12-1.107.el6_4.4.x86_64 libgcc-4.4.7-3.el6.x86_64 libstdc++-4.4.7-3.el6.x86_64 sqlite-3.6.20-1.el6.x86_64
+(gdb) where
+#0  0x000000000068e97b in LIBMOL::CodClassify::hashingAtoms() ()
+#1  0x00000000006834c0 in LIBMOL::CodClassify::codAtomClassify(int) ()
+#2  0x0000000000683408 in LIBMOL::CodClassify::setupSystem() ()
+#3  0x00000000006827d2 in LIBMOL::CodClassify::CodClassify(std::vector<LIBMOL::AtomDict, std::allocator<LIBMOL::AtomDict> > const&, std::vector<int, std::allocator<int> > const&, std::vector<LIBMOL::BondDict, std::allocator<LIBMOL::BondDict> > const&, std::vector<LIBMOL::AngleDict, std::allocator<LIBMOL::AngleDict> > const&, std::vector<LIBMOL::TorsionDict, std::allocator<LIBMOL::TorsionDict> > const&, std::vector<LIBMOL::ChiralDict, std::allocator<LIBMOL::ChiralDict> > const&, std::vector<LIBMOL::PlaneDict, std::allocator<LIBMOL::PlaneDict> > const&, std::map<std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::vector<LIBMOL::RingDict, std::allocator<LIBMOL::RingDict> >, std::less<std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::basic_string<char, std::char_traits<char>, std::allocator<char> > const, std::vector<LIBMOL::RingDict, std::allocator<LIBMOL::RingDict> > > > > const&) ()
+#4  0x0000000000820c56 in LIBMOL::AllSystem::setupAllTargetValuesFromCOD(std::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::basic_string<char, std::char_traits<char>, std::allocator<char> >) ()
+#5  0x0000000000648c93 in main ()
+(gdb) 
+
+<<<<<<< TREE
+%%%%%%%%%%%%%%%%%%%%%%%%%
+Reply:
+
+#1 Fixed on Aug 28 
+
+=======
+Severity:: Important
+ 
+>>>>>>> MERGE-SOURCE
+-----
+#2 Fri Aug 29 17:26:05 BST 2014
+
+  Ugly warnings.
+
+$ acedrg -c 141.cif -r 141
+/home/paule/acedrg/share/acedrg/tables
+Current workMode  11
+/home/paule/acedrg/libexec/libmol -c 141.cif -D /home/paule/acedrg/share/acedrg/tables  -r 141 -o AcedrgOut_cod.rst >& AcedrgOut.log 
+Run Refmac at stgae  1
+sh: line 3: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+Run Refmac at stgae  2
+sh: line 4: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+Run Refmac at stgae  3
+sh: line 4: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+Run Refmac at stgae  4
+sh: line 5: warning: here-document at line 0 delimited by end-of-file (wanted `eof')
+
+<<<<<<< TREE
+%%%%%%%%%%%%%%%%%%%%%%%%%
+Reply:
+
+#2 fixed fixed on Aug. 29
+=======
+Severity:: Trivial
+>>>>>>> MERGE-SOURCE
+
+-----
+#3 Fri Aug 29 21:25:56 BST 2014
+
+I am using Ubuntu at home 10.04LTS, acedrg fails immediately like this:
+
+$ acedrg -c monomers/3/38P.cif -r 38P
+/home/paule/acedrg
+/home/paule/acedrg/share/acedrg/tables
+Current workMode  11
+/home/paule/acedrg/libexec/libmol -c monomers/3/38P.cif -D /home/paule/acedrg/share/acedrg/tables  -r 38P -o AcedrgOut_cod.rst >& AcedrgOut.log 
+sh: Syntax error: Bad fd number
+
+Severity:: Important
+
+-----
+<<<<<<< TREE
+#4 Fri Aug 29 21:49:39 BST 2014
+
+When using the -o option the restraints mmCIF file should have the extension .cif not .rst.
+Why is _cod.rst added?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#4 The final output restraints mmCIF file is *.cif. *_cod.rst is intmediate file. The state is like that from quite a few earilier versions (version 50 after ?. The current is 60). 
+=======
+>>>>>>> MERGE-SOURCE
