@@ -1376,4 +1376,35 @@ namespace LIBMOL
         
     }
     
+    
+    void extern setAromPlanes(std::vector<AtomDict> & tAtoms,
+                              std::vector<RingDict> & tRings, 
+                              std::vector<PlaneDict> & tPlans)
+    {
+        // 1. 
+        std::vector<std::vector<int> > sP21Rs;
+        for (std::vector<RingDict>::iterator iRi=tRings.begin();
+                iRi !=tRings.end(); iRi++)
+        {
+            if (iRi->isPlanar)
+            {
+                std::vector<int> tAtms;
+                for (std::vector<AtomDict>::iterator iAt=iRi->atoms.begin();
+                        iAt !=iRi->atoms.end(); iAt++)
+                {
+                    tAtms.push_back(iAt->seriNum);
+                }
+                sP21Rs.push_back(tAtms);
+            }
+        }
+        
+        std::cout << "Number of rings containing sp2 and sp bonding atoms only is: "
+                  << sP21Rs.size() << std::endl;
+        
+        // 2.
+        
+        
+        
+    }
+    
 }

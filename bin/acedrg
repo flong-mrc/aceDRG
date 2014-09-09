@@ -16,12 +16,154 @@ import glob,shutil
 import re,string
 from optparse import OptionParser 
 import time
+import math
+import select, fcntl
+import signal
 
 if not os.environ.has_key("CCP4") :
     print "Please activate ccp4.setup"
     sys.exit() 
 
-class Acedrg:
+
+#################################################   
+
+class CExeCode :
+    """ A generic abstract base class that is to be inheritted by other classes that warp 
+        a executable code. Basically this class defines two main methods that characterize the
+        procedures a job by an executable code, i.e.  forming a command line object and then
+        run the code according to the command line object"""
+
+    def __init__( self ):
+
+        # set pathes
+ 
+        self.exitCode = 0
+
+        # test 
+        self._setCmdLineAndFile()
+
+    def _setCmdLineAndFile(self ):         # will be overrided by individual derived classes
+        self._cmdline = 'ls '
+        self.batch_name = None
+        self._log_name = None
+            
+    def subExecute(self, mode = 0, err_str ="" ):
+
+        if self._log_name :
+            self.logMode(mode, err_str)
+        else :
+            self.interactiveMode()
+
+    def logMode(self, mode = 0, err_str=""):
+        """ execute self._cmdline and output to a log file (self._log_name)  
+        in a nonblocking way"""
+
+        logfile = open(self._log_name, 'w')
+        logfile.write("\n============ PROCESS INFORMATION =============\n")
+
+        # spawn a sub-process for a job and connect to its input/output(and error)
+        # streams using pipes
+
+        try : 
+            import subprocess
+            subProcess = subprocess.Popen(self._cmdline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+            subProcess.stdin.close()
+            outfile_sub  = subProcess.stdout
+            outfd_sub    = outfile_sub.fileno()
+        except ImportError:
+            print "module 'subprocess' has not be found, you use a version of PYTHON below 2.4"
+            print "BALBES import module 'popen2' instead, the calculations will not be affected"
+            import popen2
+            subProcess = popen2.Popen4(self._cmdline)
+            subProcess.tochild.close()
+            outfile_sub  = subProcess.fromchild
+            outfd_sub    = outfile_sub.fileno()
+    
+        self._pid  = subProcess.pid
+        pid_c      = self._pid  + 1
+        p_name = os.path.basename(self._cmdline.strip().split()[0])
+        t__log_name = os.path.basename(self._log_name)
+        
+       
+        log_size = 0 
+        log_max  = 100000000
+        outfile_eof = 0
+        if not mode:
+            self._nonBlockingFile(outfd_sub)
+            while not outfile_eof :
+                ready_to_read, ready_to_write, in_error = \
+                     select.select([outfd_sub],[],[],60.0)
+                if outfd_sub in ready_to_read:
+                    out_quantum = outfile_sub.read()
+                    out_quantum_bt = len(out_quantum)
+                    log_size = log_size + out_quantum_bt
+                    if log_size > log_max:
+                        logfile.write("\nTHE SIZE OF LOG FILE, %s, EXCEEDED THE LIMIT AND PROCESS STOPPED\n"%t__log_name)
+                        logfile.write("The process running %s is killed\n"%p_name)
+                        logfile.close()
+                        os.kill(self._pid, signal.SIGKILL)
+                        os.kill(pid_c, signal.SIGKILL)
+                        print "The process running %s is killed " %p_name
+                        time.sleep(1.0)
+                        # be safe stop all process
+                        sys.exit(1)
+                    else :
+                        if out_quantum == '':
+                            outfile_eof = 1
+                        logfile.write(out_quantum)
+                        logfile.flush()
+        else :
+            self._nonBlockingFile(outfd_sub)
+            while not outfile_eof :
+                ready_to_read, ready_to_write, in_error = \
+                     select.select([outfd_sub],[],[],10)
+                if outfd_sub in ready_to_read:
+                    out_quantum = outfile_sub.read()
+                    if out_quantum == '':
+                        outfile_eof = 1
+                    logfile.write(out_quantum)
+                    logfile.flush()
+                    # allProcInfo.append(out_quantum)
+
+        self.exitCode = subProcess.wait()
+      
+        # if mode:
+        #    for item in allProcInfo:
+        #        logfile.write(item)
+
+        logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
+        logfile.close()
+
+        outfile_sub.close()
+
+        if self.exitCode:   
+            print "#-----------------------------------------------------------#"
+            print "The process stoped because of a runtime error in code '%s'!"%p_name
+            if err_str:
+                print "%s"%err_str
+            else:
+                print "See the associated log file '%s'."%t__log_name
+            print "#-----------------------------------------------------------#"
+            if not err_str:
+                # if normal runtime errors, stop the program(using log. no err_str)  
+                sys.exit(1)
+                
+        return True
+
+    def _nonBlockingFile(self,fd):
+        f_flag = fcntl.fcntl(fd, fcntl.F_GETFL,0)
+        fcntl.fcntl(fd, fcntl.F_SETFL, f_flag | os.O_NONBLOCK)
+
+    def interactiveMode(self):
+        """ execute self._cmdline  just like what is done in a shell """
+        
+        os.system(self._cmdline)
+
+
+# end
+
+
+class Acedrg(CExeCode ):
 
     def __init__( self, t_argvs):
 
@@ -85,9 +227,9 @@ class Acedrg:
                                     action="store", type="string", 
                                     help="Input  File containing a SMILE string")
 
-        self.inputParser.add_option("-m",  "--mdl", dest="inMdlName", metavar="FILE", 
+        self.inputParser.add_option("-m",  "--mol", dest="inMdlName", metavar="FILE", 
                                     action="store", type="string", 
-                                    help="Input File of MDL format containing coordinates and bonds")
+                                    help="Input File of MOL format containing coordinates and bonds")
 
         self.inputParser.add_option("-o",  "--out", dest="outRoot", 
                                     action="store", type="string", 
@@ -286,37 +428,41 @@ class Acedrg:
             print "===================================================================" 
             print "| Generate the dictionary file using the internal database        |"
             print "===================================================================" 
-        self.cmdLine = self.libmol
-        # print self.cmdLine
+        self._cmdline = self.libmol
+        # print self._cmdline
         if self.workMode == 11 or self.workMode == 12:
             if tIn:
                 self.inMmCifName    = tIn
             
-            self.libmolLogName  = self.outRoot + ".log"
+            #self.libmolLogName  = self.outRoot + ".log"
+            self._log_name      = self.outRoot + "_cod.log"
             self.outRstCifName  = self.outRoot + "_cod.rst"   
             self.outRstPdbName  = self.outRoot + "_cod.pdb"
 
-            self.cmdLine +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
-            self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
-            # print self.cmdLine
-            os.system(self.cmdLine)
+            self._cmdline +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
+            self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
+            #print self._cmdline
+            #os.system(self._cmdline)
+            self.subExecute()
         if self.workMode == 13 or self.workMode == 14:
             if tIn:
                 self.inMmCifName = tIn
-            self.libmolLogName  = self.outRoot + ".log"
+            #self.libmolLogName  = self.outRoot + ".log"
+            self._log_name      = self.outRoot + "_cod.log"
             self.outRstCifName  = self.outRoot + "_cod.rst"
             self.outRstPdbName  = self.outRoot + "_cod.pdb"
 
-            self.cmdLine += " -s %s  -D %s "%(self.inMmCifName, self.acedrgTables)
-            self.cmdLine += " -r %s -o %s >& %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
-            #print self.cmdLine
-            os.system(self.cmdLine)
+            self._cmdline += " -s %s  -D %s "%(self.inMmCifName, self.acedrgTables)
+            self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
+            #print self._cmdline
+            #os.system(self._cmdline)
+            self.subExecute()
 
         if self.workMode == 21 :
             if tIn:
                 self.inStdCifName = tIn
 
-            self.libmolLogName  = self.outRoot + ".log"
+            self.libmolLogName  = self.outRoot + "_cod.log"
             self.outRstCifName  = self.outRoot + ".rst"
 	    self.outMolsName    = self.monomRoot + "_all_mols.txt"
             self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
@@ -364,44 +510,44 @@ class Acedrg:
         self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot, self.libcheckLogName)
         os.system(self.cmdLine)
             
-    def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tLogName, tStage=2):
+    def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
      
-        self.cmdLine = self.refmac 
+        self._cmdline = self.refmac 
         if tStage==1:
-            self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName) 
-            self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n"
+            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
+            self._cmdline += "end       \n"
+	    self._cmdline += "eof       \n"
         elif tStage==2: 
-            self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
-            self.cmdLine += "mode newe \n"
-            self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n"
+            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
+            self._cmdline += "mode newe \n"
+            self._cmdline += "end       \n"
+	    self._cmdline += "eof       \n"
         elif tStage==3: 
-            self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
-            self.cmdLine += "ncyc 1    \n"
-            self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n"
+            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
+            self._cmdline += "ncyc 1    \n"
+            self._cmdline += "end       \n"
+	    self._cmdline += "eof       \n"
         elif tStage==4: 
-            self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
-            self.cmdLine += "make hout yes    \n"
-            self.cmdLine += "ncyc 40    \n"
-            self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n"
+            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
+            self._cmdline += "make hout yes    \n"
+            self._cmdline += "ncyc 40    \n"
+            self._cmdline += "end       \n"
+	    self._cmdline += "eof       \n"
         else: 
-            self.cmdLine += "  xyzin %s libin %s xyzout %s <<eof > %s  \n"%(tPdbIn, tLibIn, tPdbOut, tLogName)  
-            self.cmdLine += "mode newe \n"
-            self.cmdLine += "end       \n"
-	    self.cmdLine += "eof       \n"
-        #print self.cmdLine
+            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
+            self._cmdline += "mode newe \n"
+            self._cmdline += "end       \n"
+	    self._cmdline += "eof       \n"
+        #print self._cmdline
 
     def runRefmac(self, tPdbIn, tLibIn, tStage=2):
       
         print "| Stage  %d        |"%tStage
         self.refmacLogName    = self.outRoot + "_refmac_stage_"+ str(tStage) + ".log"
+        self._log_name    = self.outRoot + "_refmac_stage_"+ str(tStage) + ".log"
         self.refmacXYZOUTName = self.outRoot + "_refmac_stage_"+ str(tStage) + ".pdb"
-        self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, self.refmacLogName, tStage)
-        os.system(self.cmdLine)
-
+        self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
+        self.subExecute()
     
     def runGeoOpt(self):
 

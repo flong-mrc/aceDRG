@@ -211,6 +211,13 @@ namespace LIBMOL
                                   FileName tPdbOut);
     
     
+    // Check aromatic stability of extended ring systems.
+    // using it to decide planes in the systems(molecules or monomers)
+    extern void setAromPlanes(std::vector<AtomDict> & tAtoms,
+                              std::vector<RingDict> & tRings,
+                              std::vector<PlaneDict> & tPlans);
+    
+    
 }
 
 #endif	/* CHEMPROPSET_H */
