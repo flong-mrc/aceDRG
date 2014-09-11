@@ -170,6 +170,8 @@ class Acedrg(CExeCode ):
         self.errMessage       = []
         self.errLevel         = 0
 
+        self.scrDir           = ""
+
         self.inStdCifName     = ""
         self.inMmCifName      = ""
         self.inSmiName        = ""
@@ -189,7 +191,6 @@ class Acedrg(CExeCode ):
         self.refmac           = ""
         self.refmacLogName    = ""
 
-        self.cmdLine          = ""
         self.workMode         = 0
 
 
@@ -404,6 +405,10 @@ class Acedrg(CExeCode ):
         else:
             self.outRoot   = "AcedrgOut"
 
+        self.scrDir = self.outRoot + "_TMP"
+        if not os.path.isdir(self.scrDir):
+            os.mkdir(self.scrDir)
+
     def printJobs(self):
 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
@@ -424,21 +429,18 @@ class Acedrg(CExeCode ):
 
     def runLibmol(self, tIn=None):
  
+        self._cmdline = self.libmol
+        self._log_name       = os.path.join(self.scrDir, self.outRoot + "_cod.log")
+        #print self._cmdline
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
             print "===================================================================" 
             print "| Generate the dictionary file using the internal database        |"
             print "===================================================================" 
-        self._cmdline = self.libmol
-        # print self._cmdline
+            self.outRstCifName   = os.path.join(self.scrDir, self.outRoot + "_cod.rst")   
+            self.outRstPdbName   = os.path.join(self.scrDir, self.outRoot + "_cod.pdb")
         if self.workMode == 11 or self.workMode == 12:
             if tIn:
                 self.inMmCifName    = tIn
-            
-            #self.libmolLogName  = self.outRoot + ".log"
-            self._log_name      = self.outRoot + "_cod.log"
-            self.outRstCifName  = self.outRoot + "_cod.rst"   
-            self.outRstPdbName  = self.outRoot + "_cod.pdb"
-
             self._cmdline +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
             #print self._cmdline
@@ -447,11 +449,6 @@ class Acedrg(CExeCode ):
         if self.workMode == 13 or self.workMode == 14:
             if tIn:
                 self.inMmCifName = tIn
-            #self.libmolLogName  = self.outRoot + ".log"
-            self._log_name      = self.outRoot + "_cod.log"
-            self.outRstCifName  = self.outRoot + "_cod.rst"
-            self.outRstPdbName  = self.outRoot + "_cod.pdb"
-
             self._cmdline += " -s %s  -D %s "%(self.inMmCifName, self.acedrgTables)
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
             #print self._cmdline
@@ -461,31 +458,28 @@ class Acedrg(CExeCode ):
         if self.workMode == 21 :
             if tIn:
                 self.inStdCifName = tIn
-
-            self.libmolLogName  = self.outRoot + "_cod.log"
             self.outRstCifName  = self.outRoot + ".rst"
 	    self.outMolsName    = self.monomRoot + "_all_mols.txt"
             self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
 
-            self.cmdLine += " -b %s  "%self.inStdCifName
-            self.cmdLine += " -m yes -r %s -o %s >  %s "%(self.monomRoot, self.outRstCifName, self.libmolLogName)
-            #print self.cmdLine
-            os.system(self.cmdLine)
+            self._cmdline += " -b %s  "%self.inStdCifName
+            self._cmdline += " -m yes -r %s -o %s "%(self.monomRoot, self.outRstCifName)
+            #print self.cmdline
+            self.subExecute()
 
         if self.workMode == 41 :
 
-            self.libmolLogName  = self.outRoot + ".log"
-            self.cmdLine += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
-            self.cmdLine += " -y y -o %s >>  %s "%(self.outRstCifName, self.libmolLogName)
-            #print self.cmdLine
-            os.system(self.cmdLine)
+            self._cmdline += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
+            self._cmdline += " -y y -o %s "%(self.outRstCifName)
+            #print self._cmdline
+            self.subExecute()
 
              
-    def setLibcheckBat(self, tSmiName, tOutRoot, tLogNme):
+    def setLibcheckBat(self, tSmiName, tOutRoot):
 
-        self.cmdLine = self.libcheck 
+        self._cmdline = self.libcheck 
 
-        libcheckBatName = self.outRoot + "_libcheck.bat"
+        libcheckBatName = os.path.join(self.scrDir, self.outRoot + "_libcheck.bat")
         try:
             libcheckBat = open(libcheckBatName,"w")
         except IOError:
@@ -497,19 +491,19 @@ class Acedrg(CExeCode ):
             libcheckBat.write("FILE_O  %s \n\n"%tOutRoot)
             libcheckBat.close()
 
-            self.cmdLine +=" < %s > %s"%(libcheckBatName, tLogNme)
-            #print self.cmdLine
+            self._cmdline +=" < %s "%(libcheckBatName)
+            #print self.cmdline
     
     def runLibcheck(self, tSmiName=None):
 
         if tSmiName:
             self.inSmiName = tSmiName
-        self.libcheckLogName  = self.outRoot + "_libcheck.log"
-        self.libcheckOutRoot  = self.outRoot + "_libcheck"
+        self._log_name        = os.path.join(self.scrDir, self.outRoot + "_libcheck.log")
+        self.libcheckOutRoot  = os.path.join(self.scrDir, self.outRoot + "_libcheck")
         self.libcheckLibName  = self.libcheckOutRoot +".lib"
-        self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot, self.libcheckLogName)
-        os.system(self.cmdLine)
-            
+        self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot) 
+        self.subExecute()
+    
     def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
      
         self._cmdline = self.refmac 
@@ -543,9 +537,8 @@ class Acedrg(CExeCode ):
     def runRefmac(self, tPdbIn, tLibIn, tStage=2):
       
         print "| Stage  %d        |"%tStage
-        self.refmacLogName    = self.outRoot + "_refmac_stage_"+ str(tStage) + ".log"
-        self._log_name    = self.outRoot + "_refmac_stage_"+ str(tStage) + ".log"
-        self.refmacXYZOUTName = self.outRoot + "_refmac_stage_"+ str(tStage) + ".pdb"
+        self._log_name    = os.path.join(self.scrDir, self.outRoot + "_refmac_stage_"+ str(tStage) + ".log")
+        self.refmacXYZOUTName = os.path.join(self.scrDir, self.outRoot + "_refmac_stage_"+ str(tStage) + ".pdb")
         self.setRefmacCom(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
         self.subExecute()
     

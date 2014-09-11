@@ -7248,9 +7248,8 @@ namespace LIBMOL
                             outRestrF << sName << std::setw(12)
                                       << tAtoms[iA->atoms[1]].id << std::setw(12)
                                       << tAtoms[iA->atoms[0]].id << std::setw(12)
-                                      << tAtoms[iA->atoms[2]].id ;
-                            outRestrF << std::setw(6) << std::setprecision(3) <<  *iCA << "    "
-                                      << std::setw(6) << std::setprecision(2) << iA->sigValue << std::endl;
+                                      << tAtoms[iA->atoms[2]].id << std::setw(12) << std::setprecision(3) <<  *iCA << "    "
+                                      << std::setw(8) << std::setprecision(2) << iA->sigValue << std::endl;
                         }
                     }
                     else
@@ -7259,7 +7258,7 @@ namespace LIBMOL
                                   << std::setw(12) << tAtoms[iA->atoms[1]].id
                                   << std::setw(12) << tAtoms[iA->atoms[0]].id 
                                   << std::setw(12) << tAtoms[iA->atoms[2]].id;
-                        outRestrF << std::setw(10) << std::setprecision(3) <<  iA->value
+                        outRestrF << std::setw(12) << std::setprecision(3) <<  iA->value
                                   << std::setw(8) << std::setprecision(2) << iA->sigValue 
                                   << std::endl;
                     }
