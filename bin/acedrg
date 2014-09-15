@@ -654,7 +654,15 @@ class Acedrg(CExeCode ):
                         cifCont['head'].append(aLine)
                     elif lAtom:
                         strGrp = aLine.split()
-                        tName  = strGrp[1].strip()
+                        tName  = ""
+                        tID  = strGrp[1].strip()
+                        if tID.find("\"") !=-1:
+                            for aC in tID:
+                                if aC !="\"":
+                                    tName +=aC
+                        else:
+                            tName = tID
+                            
                         if pdbAtoms.has_key(tName):
                             bLine = "%s%s%s%s%s%s%s%s\n"%(strGrp[0].ljust(8), tName.ljust(8), strGrp[2].ljust(8), \
                                                         strGrp[3].ljust(8), strGrp[4].ljust(8), \

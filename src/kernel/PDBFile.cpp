@@ -1200,6 +1200,14 @@ namespace LIBMOL
             for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                     iA !=tAtoms.end(); iA++)
             {
+                
+                std::string tID(iA->id);
+                if (tID.find("\"") !=tID.npos)
+                {
+                    char tQ='\"';
+                    cleanChar(tID, tQ);
+                }
+                
                 //double r1 =  (double) rand()/RAND_MAX;
                 //double r2 =  (double) rand()/RAND_MAX;
                 //double r3 =  (double) rand()/RAND_MAX;
@@ -1210,18 +1218,18 @@ namespace LIBMOL
                 outPDB <<std::right << iA->seriNum+1;
                 outPDB.width(1);
                 outPDB << " ";
-                if ((int)iA->id.size() ==4)
+                
+                if ((int)tID.size() <=4)
                 {
                     outPDB.width(4);
-                    outPDB << std::left << iA->id;
+                    outPDB << std::left << tID;
                 }
                 else
                 {
-                    outPDB.width(1);
-                    outPDB << " ";
-                    outPDB.width(3);
-                    outPDB << std::left << iA->id;
+                    outPDB.width(4);
+                    outPDB << std::left << tID.substr(0,4);
                 }
+                
                 outPDB.width(1); // altLoc
                 outPDB << " ";
                 outPDB.width(3); // resName
