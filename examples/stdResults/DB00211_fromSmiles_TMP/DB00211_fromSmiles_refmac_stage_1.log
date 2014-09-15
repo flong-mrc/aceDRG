@@ -1,0 +1,403 @@
+
+============ PROCESS INFORMATION =============
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+<html> <!-- CCP4 HTML LOGFILE -->
+<hr>
+<!--SUMMARY_END--></FONT></B>
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+<pre>
+ 
+ ###############################################################
+ ###############################################################
+ ###############################################################
+ ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
+ ###############################################################
+ User: flong  Run date: 12/ 9/2014 Run time: 13:57:13 
+
+
+ Please reference: Collaborative Computational Project, Number 4. 1994.
+ "The CCP4 Suite: Programs for Protein Crystallography". Acta Cryst. D50, 760-763.
+ as well as any specific reference in the program write-up.
+
+<!--SUMMARY_END--></FONT></B>
+ $TEXT:Reference1: $$ Main reference $$ 
+   "REFMAC5 for the refinement of macromolecular crystal structures:"
+   G.N.Murshudov, P.Skubak, A.A.Lebedev, N.S.Pannu, R.A.Steiner, R.A.Nicholls, M.D.Winn, F.Long and A.A.Vagin,(2011) 
+   Acta Crystallogr. D67, 355-367
+
+ $$
+ $SUMMARY :Reference1:  $$ Refmac: $$
+ :TEXT:Reference1: $$
+
+ $TEXT:Reference2: $$ Secondary reference $$ 
+   "Refinement of Macromolecular Structures by the  Maximum-Likelihood Method:"
+   G.N. Murshudov, A.A.Vagin and E.J.Dodson,(1997)
+   Acta Crystallogr. D53, 240-255
+   EU  Validation contract: BIO2CT-92-0524
+
+ $$
+ $SUMMARY :Reference2:  $$ Refmac: $$
+ :TEXT:Reference2: $$
+
+  Data line--- END
+===> Warning: Reflections file has not been defined
+===> Warning: Switching to the idealisation mode
+
+    ****                     Input and Default parameters#                      ****
+
+
+Input coordinate file.  Logical name - XYZIN actual file name  - DB00211_fromSmiles_TMP/DB00211_fromSmiles_cod.pdb
+Output coordinate file. Logical name - XYZOUT actual file name - DB00211_fromSmiles_TMP/DB00211_fromSmiles_refmac_stage_1.pdb
+
+  Refinement type                        : Idealisation
+
+    ****                           Makecif parameters                           ****
+
+Dictionary files for restraints : /Applications/ccp4-6.4.0/lib/data/monomers/mon*cif
+Parameters for new entry and VDW: /Applications/ccp4-6.4.0/lib/data/monomers/ener_lib.cif
+User supplied dictionary entries: DB00211_fromSmiles_TMP/DB00211_fromSmiles_cod.rst
+    Apart from amino acids and DNA/RNA all monomers will be checked to see if atom names and connectivity is correct
+    Hydrogens will be restored in their riding positions
+    Links between monomers will be checked. Only those links present in the coordinate file will be used
+    Standard sugar links will be analysed and used
+    For new ligands "ideal restraint" values will be taken from the energetic libary ener_lib.cif
+    Symmetry related links will be analysed and used
+    Cis peptides will be found and used automatically
+
+
+  Method of minimisation                 : Sparse Matrix
+
+  Damping factors:     1.0000  1.0000
+
+
+    ****                    Geometry restraints and weights                     ****
+
+
+                                              Sigma:
+ Bonding distances
+          Weight =  1.00
+
+ Bond angles
+          Weight =  1.00
+
+ Planar groups (all and main chain)
+          WEIGHT= 1.00 1.00
+
+ Chiral centers
+          Weight= 1.00
+
+ NON-BONDED CONTACTS
+          Overall weight                          =  1.00
+          Sigma for simple VDW                    =  0.20
+          Sigma for VDW trhough torsion angle     =  0.20
+          Sigma for HBOND                         =  0.20
+          Sigma for metal-ion                     =  0.20
+          Sigma for DUMMY and other atom          =  0.30
+          Distance for donor-accepetor = vdw1+vdw2+(-0.30)
+          Distance for acceptor - H    = vdw1+     ( 0.10)
+          VDW distance through torsion = vdw1+vdw2+(-0.30)
+          Distance for DUMMY-others    = vdw1+vdw2+(-0.70)
+
+ TORSION ANGLES
+          Weight= 1.00
+
+ RESTRAINTS AGAINST EXCESSIVE SHIFTS
+     Positional parameters                   0.00A
+     Thermal parameters                      0.00A
+     Occupancy parameters                    0.00
+
+ RADIUS OF CONFIDENCE
+     Positional parameters 0.00A
+     Thermal parameters    0.00A**2
+     Occupancy parameters  0.00
+
+Monitoring style is "MEDIUM". Complete information will be printed out in the
+first and last cycle. In all other cycles minimum information will be printed out
+Sigma cutoffs for printing out outliers
+If deviation of restraint parameter > alpha*sigma then information will be printed out
+Distance outliers      10.000
+Angle outliers         10.000
+Torsion outliers       10.000
+Chiral volume outliers 10.000
+Plane outliers         10.000
+Non-bonding outliers   10.000
+---------------------------------------------------------------
+
+ Input file :DB00211_fromSmiles_TMP/DB00211_fromSmiles_cod.pdb
+  ------------------------------
+  ---  LIBRARY OF MONOMERS   ---
+ _lib_name         mon_lib
+ _lib_version      5.41
+ _lib_update       11/02/13
+  ------------------------------
+  ------------------------------
+  ---  LIBRARY OF MONOMERS   ---
+ _lib_name         ?
+ _lib_version      ?
+ _lib_update       ?
+  ------------------------------
+  NUMBER OF MONOMERS IN THE LIBRARY          : 11472
+                with complete description    : 11472
+  NUMBER OF MODIFICATIONS                    :    59
+  NUMBER OF LINKS                            :    70
+  I am reading libraries. Please wait.
+      - energy parameters
+      - monomer"s description (links & mod )
+
+FORMATTED      OLD     file opened on unit  45
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
+<!--SUMMARY_END--></FONT></B>
+
+
+ Spacegroup information obtained from library file: 
+ Logical Name: SYMINFO   Filename: /Applications/ccp4-6.4.0/lib/data/syminfo.lib
+
+  WARNING: "SCALE" card is absent in input PDB file
+  Number of atoms    :      36
+  Number of residues :       1
+  Number of chains   :       1
+  I am reading library. Please wait.
+                mon_lib.cif
+  --------------------------------
+  --- title of input coord file ---
+ 
+  PDB_code:XXXX
+  PDB_name: MONOMER tests                UNL Date:
+  PDB_date:   UNL
+  --------------------------------
+  Number of chains                  :       1
+  Total number of monomers          :       1
+  Number of atoms                   :      36
+  Number of missing atoms           :       0
+  Number of rebuilt atoms           :       0
+  Number of unknown atoms           :       0
+  Number of deleted atoms           :       0
+ pdb_in_format P
+
+
+ loop_
+     _atom_type_symbol
+     _atom_type_scat_Cromer_Mann_a1
+     _atom_type_scat_Cromer_Mann_b1
+     _atom_type_scat_Cromer_Mann_a2
+     _atom_type_scat_Cromer_Mann_b2
+     _atom_type_scat_Cromer_Mann_a3
+     _atom_type_scat_Cromer_Mann_b3
+     _atom_type_scat_Cromer_Mann_a4
+     _atom_type_scat_Cromer_Mann_b4
+     _atom_type_scat_Cromer_Mann_c
+
+
+  O      3.0485  13.2771   2.2868   5.7011   1.5463   0.3239   0.8670  32.9089   0.2508
+  C      2.3100  20.8439   1.0200  10.2075   1.5886   0.5687   0.8650  51.6512   0.2156
+  H      0.4930  10.5109   0.3229  26.1257   0.1402   3.1424   0.0408  57.7997   0.0030
+  N     12.2126   0.0057   3.1322   9.8933   2.0125  28.9975   1.1663   0.5826 -11.5290
+
+
+ Number of distances         :           0
+ Number of angles            :           0
+ Number of torsions          :           0
+ Number of planes            :           0
+ Number of chirals           :           0
+ Number of intervals         :           0
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                        Standard  External       All
+                Bonds:        36         0        36
+               Angles:        60         0        60
+              Chirals:         1         0         1
+               Planes:         3         0         3
+             Torsions:        76         0        76
+            Intervals:         0         0         0
+--------------------------------------------------------------------------------
+ 
+ 
+  Number of harmonic restraints       =            0
+  Number of atoms in special position =            0
+ -----------------------------------------------------
+ 
+
+
+     CGMAT cycle number =      1
+
+    ****                         Bond distance outliers                         ****
+
+Bond distance deviations from the ideal >10.000Sigma will be monitored
+
+A      1 UNL C3  . - A      1 UNL C8  . mod.= 1.588 id.= 1.398 dev= -0.190 sig.= 0.015
+A      1 UNL C11 . - A      1 UNL C1  . mod.= 1.578 id.= 1.384 dev= -0.194 sig.= 0.015
+
+    ****                Large deviation of atoms from planarity                 ****
+
+Deviations from the planarity >10.000Sigma will be monitored
+Atom: A      1 UNL C1    deviation=  -0.32 sigma.=   0.02
+Atom: A      1 UNL C11   deviation=  -0.21 sigma.=   0.02
+Atom: A      1 UNL C3    deviation=   0.32 sigma.=   0.02
+Atom: A      1 UNL C4    deviation=   0.53 sigma.=   0.02
+Atom: A      1 UNL C8    deviation=  -0.53 sigma.=   0.02
+Atom: A      1 UNL H16   deviation=   0.27 sigma.=   0.02
+Atom: A      1 UNL H17   deviation=  -0.24 sigma.=   0.02
+
+    ****                              VDW outliers                              ****
+
+VDW deviations from the ideal >10.000Sigma or dist <  1.000 will be monitored
+
+A      1 UNL H8  . - A      1 UNL H   . mod.= 0.927 id.= 2.400 dev= -1.47 sig.= 0.20 sym.=  1  0  0  0 type =  1
+A      1 UNL H6  . - A      1 UNL O   . mod.= 0.808 id.= 2.720 dev= -1.91 sig.= 0.20 sym.=  1  0  0  0 type =  1
+A      1 UNL C4  . - A      1 UNL C11 . mod.= 0.942 id.= 3.400 dev= -2.46 sig.= 0.20 sym.=  1  0  0  0 type =  1
+A      1 UNL H4  . - A      1 UNL C11 . mod.= 0.967 id.= 2.900 dev= -1.93 sig.= 0.20 sym.=  1  0  0  0 type =  1
+A      1 UNL H4  . - A      1 UNL H17 . mod.= 0.712 id.= 2.400 dev= -1.69 sig.= 0.20 sym.=  1  0  0  0 type =  1
+
+ function value    8426.292    
+
+-------------------------------------------------------------------------------
+             Restraint type              N restraints   Rms Delta   Av(Sigma)
+Bond distances: refined atoms                    18     0.091     0.014
+Bond distances: others                           18     0.115     0.019
+Bond angles  : refined atoms                     23    22.212     1.660
+Bond angles  : others                            37     9.304     1.474
+Chiral centres: refined atoms                     1     0.657     0.200
+Planar groups: refined atoms                     16     0.229     0.020
+Planar groups: others                             4     0.184     0.020
+VDW repulsions: refined_atoms                    18     1.075     0.200
+VDW repulsions.others                            50     0.864     0.200
+VDW; torsion: refined_atoms                       8     0.941     0.200
+VDW; torsion.others                               4     0.175     0.200
+HBOND: refined_atoms                              1     0.886     0.200
+-------------------------------------------------------------------------------
+ Trying gamma equal   0.0000000E+00
+ Not converging with gamma equal   0.0000000E+00
+ Trying gamma equal   5.2499998E-02
+ Gamma decreased to   4.1999999E-02
+
+
+ fvalues   0.0000000E+00   8426.292       3745.181       8426.292    
+
+
+     CGMAT cycle number =      2
+
+ function value    3746.433    
+
+-------------------------------------------------------------------------------
+             Restraint type              N restraints   Rms Delta   Av(Sigma)
+Bond distances: refined atoms                    18     0.124     0.014
+Bond distances: others                           18     0.052     0.019
+-------------------------------------------------------------------------------
+ Trying gamma equal   4.1999999E-02
+ Gamma decreased to   3.2454543E-02
+
+
+ fvalues   0.0000000E+00   3746.433       2911.477       3746.433    
+
+
+     CGMAT cycle number =      3
+
+ function value    2911.477    
+
+-------------------------------------------------------------------------------
+             Restraint type              N restraints   Rms Delta   Av(Sigma)
+Bond distances: refined atoms                    18     0.096     0.014
+Bond distances: others                           18     0.034     0.019
+-------------------------------------------------------------------------------
+ Trying gamma equal   3.2454543E-02
+ Gamma decreased to   2.3776857E-02
+
+
+ fvalues   0.0000000E+00   2911.477       2713.469       2911.477    
+
+
+     CGMAT cycle number =      4
+
+ function value    2713.469    
+
+-------------------------------------------------------------------------------
+             Restraint type              N restraints   Rms Delta   Av(Sigma)
+Bond distances: refined atoms                    18     0.086     0.014
+Bond distances: others                           18     0.067     0.019
+-------------------------------------------------------------------------------
+ Trying gamma equal   2.3776857E-02
+ Gamma decreased to   1.5888054E-02
+
+
+ fvalues   0.0000000E+00   2713.469       2491.587       2713.469    
+
+
+     CGMAT cycle number =      5
+
+    ****                         Bond distance outliers                         ****
+
+Bond distance deviations from the ideal >10.000Sigma will be monitored
+
+A      1 UNL C3  . - A      1 UNL C2  . mod.= 1.228 id.= 1.390 dev=  0.162 sig.= 0.015
+
+    ****                Large deviation of atoms from planarity                 ****
+
+Deviations from the planarity >10.000Sigma will be monitored
+Atom: A      1 UNL C2    deviation=  -0.22 sigma.=   0.02
+Atom: A      1 UNL C3    deviation=   0.30 sigma.=   0.02
+Atom: A      1 UNL C4    deviation=   0.34 sigma.=   0.02
+
+    ****                              VDW outliers                              ****
+
+VDW deviations from the ideal >10.000Sigma or dist <  1.000 will be monitored
+
+A      1 UNL C4  . - A      1 UNL C11 . mod.= 0.668 id.= 3.400 dev= -2.73 sig.= 0.20 sym.=  1  0  0  0 type =  1
+A      1 UNL H4  . - A      1 UNL C11 . mod.= 0.590 id.= 2.900 dev= -2.31 sig.= 0.20 sym.=  1  0  0  0 type =  1
+
+ function value    2491.587    
+
+-------------------------------------------------------------------------------
+             Restraint type              N restraints   Rms Delta   Av(Sigma)
+Bond distances: refined atoms                    18     0.079     0.014
+Bond distances: others                           18     0.026     0.019
+Bond angles  : refined atoms                     23    12.701     1.660
+Bond angles  : others                            37     1.520     1.474
+Chiral centres: refined atoms                     1     0.377     0.200
+Planar groups: refined atoms                     16     0.141     0.020
+Planar groups: others                             4     0.031     0.020
+VDW repulsions: refined_atoms                    17     1.185     0.200
+VDW repulsions.others                            40     0.828     0.200
+VDW; torsion: refined_atoms                       9     0.913     0.200
+VDW; torsion.others                               5     0.253     0.200
+HBOND: refined_atoms                              1     0.765     0.200
+-------------------------------------------------------------------------------
+ Trying gamma equal   1.5888054E-02
+ Gamma decreased to   8.7164138E-03
+
+
+ fvalues   0.0000000E+00   2491.587       2573.405       2491.587    
+
+ fvalues   0.0000000E+00   2491.587       2452.867       2491.587    
+  Time in seconds: CPU =         0.02
+             Elapsed =           0.00
+
+    ****           Things for loggraph, R factor and others vs cycle            ****
+
+
+$TABLE: Rfactor analysis, stats vs cycle  :
+$GRAPHS:<Rfactor> vs cycle :N:1,2,3:
+:FOM vs cycle :N:1,4:
+:-LL vs cycle :N:1,5:
+:-LLfree vs cycle :N:1,6:
+:Geometry vs cycle:N:1,7,8,9,10,11:
+$$
+    Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
+$$
+       0   0.0      0.0      0.0             0.       0.0   0.0911  6.453  22.212 18.178   0.657
+       1   0.0      0.0      0.0             0.       0.0   0.1243  8.161  15.296 11.196   0.667
+       2   0.0      0.0      0.0             0.       0.0   0.0957  6.183  13.756 10.343   0.520
+       3   0.0      0.0      0.0             0.       0.0   0.0856  5.399  12.974  9.826   0.450
+       4   0.0      0.0      0.0             0.       0.0   0.0791  4.948  12.701  9.652   0.377
+ $$
+ $TEXT:Result: $$ Final results $$
+ $$
+ Harvest: NO PNAME_KEYWRD given - no deposit file created
+<B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
+ Refmac_5.8.0073:  End of Refmac_5.8.0073  
+Times: User:       1.9s System:    0.0s Elapsed:     0:01  
+</pre>
+</html>
+<!--SUMMARY_END--></FONT></B>
+=========END OF PROCESS INFORMATION
+ ==========
