@@ -426,7 +426,7 @@ class Acedrg(CExeCode ):
 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
             print "===================================================================" 
-            print "| Your job is  generate the dictionary (cif) and coord(pdb) files |"
+            print "| Your job is  generating the dictionary (cif) and coord(pdb) files |"
             print "| for your ligand and/or monomer                                  |"
             print "===================================================================" 
             if self.workMode==11:
