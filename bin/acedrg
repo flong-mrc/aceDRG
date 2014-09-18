@@ -186,6 +186,9 @@ class Acedrg(CExeCode ):
 
     def __init__( self, t_argvs):
 
+        if len(sys.argv)==1:
+            print "Look for help: %s -h "%(os.path.basename(sys.argv[0]))
+
         self.errMessage       = []
         self.errLevel         = 0
 

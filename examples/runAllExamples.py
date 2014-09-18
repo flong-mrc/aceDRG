@@ -3,7 +3,7 @@ import os, os.path, sys, glob, string
 if len(sys.argv) > 1:
     print "Usuage: python runAllExamples.py"
     sys.exit()
-"""
+
 print "========================================================="
 print "|  run all examples with input SMILES files at ./inSmil |"
 print "========================================================="
@@ -49,7 +49,7 @@ for aF in glob.glob("./inMmcif/*.cif"):
         cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
         print cmdL
         os.system(cmdL)
-"""
+
 print "========================================================="
 print "|  run all examples with input small molecule Cif files |"
 print "|  at ./inStdcif to generate molecules and derive       |"
@@ -62,4 +62,13 @@ for aF in glob.glob("./inStdcif/*.cif"):
         print cmdL
         os.system(cmdL)
 
+print "========================================================="
+print "|  run all small molecule Cif files at ./inStdcif and   |"
+print "|  and generate a table containing unique bond lengths  |"
+print "|  and angles, and atom types in those cif files        |"
+print "========================================================="
+if os.path.isdir("inStdcif"):
+    cmdL = "acedrg -e -d %s " %"inStdcif" 
+    print cmdL
+    os.system(cmdL)
 
