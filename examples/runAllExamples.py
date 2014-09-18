@@ -3,7 +3,7 @@ import os, os.path, sys, glob, string
 if len(sys.argv) > 1:
     print "Usuage: python runAllExamples.py"
     sys.exit()
-
+"""
 print "========================================================="
 print "|  run all examples with input SMILES files at ./inSmil |"
 print "========================================================="
@@ -35,7 +35,6 @@ for aF in glob.glob("./inMol/*.mol"):
         os.system(cmdL)
 
 
-
 print "========================================================="
 print "|  run all examples with input mmCif files at ./inMmcif |"
 print "========================================================="
@@ -48,6 +47,18 @@ for aF in glob.glob("./inMmcif/*.cif"):
 
     if len(aFRoot) !=0:
         cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
+        print cmdL
+        os.system(cmdL)
+"""
+print "========================================================="
+print "|  run all examples with input small molecule Cif files |"
+print "|  at ./inStdcif to generate molecules and derive       |"
+print "|  unique bond lengths and angles, and atom types       |"
+print "========================================================="
+for aF in glob.glob("./inStdcif/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) !=0:
+        cmdL = "acedrg -e -b %s  -r  %s -o  %s"%(aF, aFRoot, aFRoot) 
         print cmdL
         os.system(cmdL)
 

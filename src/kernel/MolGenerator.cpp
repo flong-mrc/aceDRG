@@ -58,6 +58,7 @@ namespace LIBMOL
     }
     
     
+    
     MolGenerator::~MolGenerator()
     {
     }
@@ -2534,11 +2535,11 @@ namespace LIBMOL
             {
                 std::vector<sortMap3> tVec;
                 struct sortMap3 tMap;
-                tMap.key = iMol->atoms[iBo->atomsIdx[0]].codClass;
-                tMap.val = iMol->atoms[iBo->atomsIdx[0]].chemType;
+                tMap.key  = iMol->atoms[iBo->atomsIdx[0]].codClass;
+                tMap.val  = iMol->atoms[iBo->atomsIdx[0]].id;
                 tVec.push_back(tMap);
                 tMap.key = iMol->atoms[iBo->atomsIdx[1]].codClass;
-                tMap.val = iMol->atoms[iBo->atomsIdx[1]].chemType;
+                tMap.val = iMol->atoms[iBo->atomsIdx[1]].id;
                 tVec.push_back(tMap);
                 std::sort(tVec.begin(), tVec.end(), desSortMapKey3);
                 std::string tKey = tVec[0].key + "_" + tVec[1].key;
@@ -2585,10 +2586,10 @@ namespace LIBMOL
                 std::vector<sortMap3> tVec;
                 struct sortMap3 tMap;
                 tMap.key = iMol->atoms[iAn->atoms[1]].codClass;
-                tMap.val = iMol->atoms[iAn->atoms[1]].chemType;
+                tMap.val = iMol->atoms[iAn->atoms[1]].id;
                 tVec.push_back(tMap);
                 tMap.key = iMol->atoms[iAn->atoms[2]].codClass;
-                tMap.val = iMol->atoms[iAn->atoms[2]].chemType;
+                tMap.val = iMol->atoms[iAn->atoms[2]].id;
                 tVec.push_back(tMap);
                 std::sort(tVec.begin(), tVec.end(), desSortMapKey3);
                 std::string tKey = iMol->atoms[iAn->atoms[0]].codClass 
@@ -2596,7 +2597,7 @@ namespace LIBMOL
                 if(aAM.find(tKey)==aAM.end())
                 {
                     iAn->atomChemTypes.clear();
-                    iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].chemType);
+                    iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].id);
                     iAn->atomsCodClasses.clear();
                     iAn->atomsCodClasses.push_back(iMol->atoms[iAn->atoms[0]].codClass);
                     for (std::vector<sortMap3>::iterator iAt=tVec.begin();
@@ -2611,7 +2612,7 @@ namespace LIBMOL
                 else if (!inVectABS(aAM[tKey], iAn->value, 0.0001))
                 {
                     iAn->atomChemTypes.clear();
-                    iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].chemType);
+                    iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].id);
                     iAn->atomsCodClasses.clear();
                     iAn->atomsCodClasses.push_back(iMol->atoms[iAn->atoms[0]].codClass);
                     for (std::vector<sortMap3>::iterator iAt=tVec.begin();
@@ -2669,8 +2670,8 @@ namespace LIBMOL
                       << "_chem_comp_bond.bond_serial_number"  << std::endl
                       << "_chem_comp_bond.atom1_serial_number" << std::endl
                       << "_chem_comp_bond.atom2_serial_number" << std::endl
-                      << "_chem_comp_bond.atom1_element_symbol" << std::endl
-                      << "_chem_comp_bond.atom2_element_symbol" << std::endl
+                      << "_chem_comp_bond.atom1_id" << std::endl
+                      << "_chem_comp_bond.atom2_id" << std::endl
                       << "_chem_comp_bond.value_dist" << std::endl
                       << "_chem_comp_bond.is_in_same_ring" << std::endl;
                 int nBo = 1;
@@ -2712,9 +2713,9 @@ namespace LIBMOL
                           << "_chem_comp_angle.atom1_serial_number" << std::endl
                           << "_chem_comp_angle.atom2_serial_number" << std::endl
                           << "_chem_comp_angle.atom3_serial_number" << std::endl
-                          << "_chem_comp_angle.atom1_element_symbol" << std::endl
-                          << "_chem_comp_angle.atom2_element_symbol" << std::endl
-                          << "_chem_comp_angle.atom3_element_symbol" << std::endl
+                          << "_chem_comp_angle.atom1_id" << std::endl
+                          << "_chem_comp_angle.atom2_id" << std::endl
+                          << "_chem_comp_angle.atom3_id" << std::endl
                           << "_chem_comp_angle.value_angle"          << std::endl;
                 int nAn = 1;
                 for (std::vector<AngleDict>::iterator iAn=tMol.angles.begin();
@@ -2747,7 +2748,7 @@ namespace LIBMOL
         {
             if (bonds.size() >0)
             {
-                aBAndAF << "Atom1_COD_type        Atom2_COD_type          Atom1_chem_type     Atom2_chem_type     Bond_length       BondInRing"
+                aBAndAF << "Atom1_COD_type        Atom2_COD_type        Atom1_id       Atom2_ID   Bond_length       BondInRing"
                         << std::endl;
                 for (std::vector<BondDict>::iterator iBo=bonds.begin();
                         iBo !=bonds.end(); iBo++)
@@ -2779,7 +2780,7 @@ namespace LIBMOL
             if (angles.size() !=0)
             {
                 aBAndAF << "Center_Atom_COD_type        Atom1_COD_type          Atom2_COD_type     " 
-                        << "Center_Atom_chem_type      Atom1_chem_type     Atom2_chem_type     Angle_length"
+                        << "Center_Atom_id      Atom1_id     Atom2_id     Angle_length"
                         << std::endl;
                 for (std::vector<AngleDict>::iterator iAn=angles.begin();
                         iAn !=angles.end(); iAn++)
@@ -2807,6 +2808,10 @@ namespace LIBMOL
         std::vector<std::string> nameComps;
         StrTokenize(aFName, nameComps, '.');
         Name rootFName;
+        //std::cout << aFName << std::endl;
+        //std::cout << "nameComps size " <<nameComps.size() << std::endl;
+    
+        
         for (unsigned jF=0; jF < nameComps.size()-1; jF++)
         {
             rootFName.append(nameComps[jF]);
