@@ -20,10 +20,6 @@ import math
 import select, fcntl
 import signal
 
-if not os.environ.has_key("CCP4") :
-    print "Please activate ccp4.setup"
-    sys.exit() 
-
 def listComp(a_list, b_list):
 
     if a_list[1] > b_list[1]:
@@ -205,6 +201,7 @@ class Acedrg(CExeCode ):
         self.inSDFName        = ""
         self.outRstCifName    = ""
         self.outRstPdb        = ""
+        self.outAtmTypeName   = ""
         self.monomRoot        = ""
 
         self.acedrgTables     = ""
@@ -216,7 +213,6 @@ class Acedrg(CExeCode ):
         self.refmacLogName    = ""
 
         self.workMode         = 0
-
 
         self.molGen           = False
         self.repCrds          = False
@@ -265,6 +261,10 @@ class Acedrg(CExeCode ):
                                     action="store", type="string", 
                                     help="Input File of MOL format containing coordinates and bonds")
 
+        self.inputParser.add_option("-n",  "--typeOut", dest="typeOut",  
+                                    action="store_true",  default=False,  
+                                    help="The option when the user want to output two kinds of atom types (CCP4 and Acedrg) only")
+
         self.inputParser.add_option("-o",  "--out", dest="outRoot", 
                                     action="store", type="string", 
                                     help="A name root that users want their output files called(without extension)")
@@ -288,6 +288,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-y", "--repcrd",
                   action="store_true", dest="repCrd", default=False,
                   help="Use this keyword if you want to replace the atomic coordinates in the input mmCif with those in the input PDB")
+
+        self.inputParser.add_option("-z",  "--noGeoOpt", dest="noGeoOpt",  
+                                    action="store_true",  default=False,
+                                    help="The option for not doing geometry optimization on coordinates")
 
         (inputOptionsP, inputOptionsU) = self.inputParser.parse_args(t_argvs)
 
@@ -325,6 +329,7 @@ class Acedrg(CExeCode ):
                 self.acedrgTables = tAcedrgTables
         else :
             print "You need to install CCP4 suite"
+            print "or activate ccp4.setup"
             sys.exit()
 
         if not self.libmol :
@@ -408,28 +413,61 @@ class Acedrg(CExeCode ):
                 print "Bond and angle tables required could not be found "
                 sys.exit()
 
-        if t_inputOptionsP.inMmCifName and not t_inputOptionsP.repCrd : 
-            self.inMmCifName = t_inputOptionsP.inMmCifName
-            self.workMode    = 11            
-        elif t_inputOptionsP.inSmiName: 
-            self.inSmiName = t_inputOptionsP.inSmiName
-            self.workMode    = 12            
-        elif t_inputOptionsP.inMdlName: 
-            self.inMdlName = t_inputOptionsP.inMdlName
-            self.workMode    = 13
-        elif t_inputOptionsP.inSdfName: 
-            self.inSdfName = t_inputOptionsP.inSdfName
-            self.workMode    = 14
-        elif t_inputOptionsP.molGen and t_inputOptionsP.inStdCifName: 
-            self.inStdCifName = t_inputOptionsP.inStdCifName
-            self.workMode     = 21
-        elif t_inputOptionsP.molGen and t_inputOptionsP.inStdCifDir: 
-            self.inStdCifDir = t_inputOptionsP.inStdCifDir
-            self.workMode     = 22
-        elif t_inputOptionsP.repCrd and t_inputOptionsP.inPdbName and t_inputOptionsP.inMmCifName: 
-            self.inMmCifName = t_inputOptionsP.inMmCifName
-            self.inPdbName = t_inputOptionsP.inPdbName
-            self.workMode     = 41
+        if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut: 
+            if not t_inputOptionsP.noGeoOpt:
+                if t_inputOptionsP.inMmCifName:
+                    self.inMmCifName = t_inputOptionsP.inMmCifName
+                    self.workMode    = 11            
+                elif t_inputOptionsP.inSmiName: 
+                    self.inSmiName = t_inputOptionsP.inSmiName
+                    self.workMode    = 12            
+                elif t_inputOptionsP.inMdlName: 
+                    self.inMdlName = t_inputOptionsP.inMdlName
+                    self.workMode    = 13
+                elif t_inputOptionsP.inSdfName: 
+                    self.inSdfName = t_inputOptionsP.inSdfName
+                    self.workMode    = 14
+            else:
+                if t_inputOptionsP.inMmCifName:
+                    self.inMmCifName = t_inputOptionsP.inMmCifName
+                    self.workMode    = 111            
+                elif t_inputOptionsP.inSmiName: 
+                    self.inSmiName = t_inputOptionsP.inSmiName
+                    self.workMode    = 121            
+                elif t_inputOptionsP.inMdlName: 
+                    self.inMdlName = t_inputOptionsP.inMdlName
+                    self.workMode    = 131
+                elif t_inputOptionsP.inSdfName: 
+                    self.inSdfName = t_inputOptionsP.inSdfName
+                    self.workMode    = 141
+        elif t_inputOptionsP.molGen:
+            if t_inputOptionsP.inStdCifName: 
+                self.inStdCifName = t_inputOptionsP.inStdCifName
+                self.workMode     = 21
+            elif t_inputOptionsP.inStdCifDir: 
+                self.inStdCifDir = t_inputOptionsP.inStdCifDir
+                self.workMode     = 22
+        elif t_inputOptionsP.typeOut:
+            if t_inputOptionsP.inMmCifName:
+                self.inMmCifName = t_inputOptionsP.inMmCifName
+                self.workMode    = 31
+            elif t_inputOptionsP.inSmiName:
+                self.inSmiName = t_inputOptionsP.inSmiName
+                self.workMode    = 32
+            elif t_inputOptionsP.inMdlName:
+                self.inMdlName = t_inputOptionsP.inMdlName
+                self.workMode    = 33
+            elif t_inputOptionsP.inSdfName:
+                self.inSdfName = t_inputOptionsP.inSdfName
+                self.workMode    = 34
+            if t_inputOptionsP.inStdCifName:
+                self.inStdCifName = t_inputOptionsP.inStdCifName
+                self.workMode     = 35
+        elif t_inputOptionsP.repCrd :
+            if t_inputOptionsP.inPdbName and t_inputOptionsP.inMmCifName: 
+                self.inMmCifName = t_inputOptionsP.inMmCifName
+                self.inPdbName = t_inputOptionsP.inPdbName
+                self.workMode     = 41
                         
         if t_inputOptionsP.monomRoot:
             self.monomRoot   = t_inputOptionsP.monomRoot
@@ -458,21 +496,23 @@ class Acedrg(CExeCode ):
 
     def printJobs(self):
 
-        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or \
+           self.workMode == 111 or self.workMode==121 or self.workMode ==131 or self.workMode==141:
             print "=====================================================================" 
             print "| Your job is  generating the dictionary (cif) and coord(pdb) files |"
             print "| for your ligand and/or monomer                                    |"
             print "=====================================================================" 
-            if self.workMode==11:
+            if self.workMode==11 or self.workMode==111:
                 print "Input file: %s"%os.path.basename(self.inMmCifName)
-            if self.workMode==12:
+            if self.workMode==12 or self.workMode==121:
                 print "Input file: %s"%os.path.basename(self.inSmiName)
-            if self.workMode==13:
+            if self.workMode==13 or self.workMode==131:
                 print "Input file: %s"%os.path.basename(self.inMdlName)
-            if self.workMode==14:
+            if self.workMode==14 or self.workMode==141:
                 print "Input file: %s"%os.path.basename(self.inSdfName)
             print "Output dictionary file: %s"%self.outRoot + ".cif"
-            print "Output coordinate file: %s"%self.outRoot + ".pdb"
+            if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+                print "Output coordinate file: %s"%self.outRoot + ".pdb"
 
         if self.workMode == 21 or self.workMode==22:
             print "=====================================================================" 
@@ -492,13 +532,14 @@ class Acedrg(CExeCode ):
  
         self._cmdline = self.libmol
         self._log_name       = os.path.join(self.scrDir, self.baseRoot + "_cod.log")
-        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 \
+           or self.workMode == 111 or self.workMode == 121 or self.workMode == 131 or self.workMode==141 :
             print "===================================================================" 
             print "| Generate the dictionary file using the internal database        |"
             print "===================================================================" 
             self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")   
             self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_cod.pdb")
-        if self.workMode == 11 or self.workMode == 12:
+        if self.workMode == 11 or self.workMode == 12 or self.workMode == 111 or self.workMode == 121:
             if tIn:
                 self.inMmCifName    = tIn
             self._cmdline +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
@@ -506,7 +547,7 @@ class Acedrg(CExeCode ):
             #print self._cmdline
             #os.system(self._cmdline)
             self.subExecute()
-        if self.workMode == 13 or self.workMode == 14:
+        if self.workMode == 13 or self.workMode == 14 or self.workMode == 131 or self.workMode == 141:
             if tIn:
                 self.inMmCifName = tIn
             self._cmdline += " -s %s  -D %s "%(self.inMmCifName, self.acedrgTables)
@@ -550,6 +591,21 @@ class Acedrg(CExeCode ):
                 if len(tAllBondInMols) !=0:
                     self.getBondsAndAngles(bTable, tAllBondInMols)
 
+        if self.workMode == 31 or self.workMode == 32 or self.workMode == 33 or self.workMode == 34 or self.workMode == 35 : 
+            print "===================================================================" 
+            print "| Generate atom types of Acedrg style and CCP4 style              |"
+            print "===================================================================" 
+            if self.workMode == 31 or self.workMode == 32:
+                if tIn:
+                    self.inMmCifName    = tIn
+                self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
+                self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, self.inMmCifName, self.outAtmTypeName)
+                print self._cmdline
+                self.subExecute()
+                
+ 
+
+             
         if self.workMode == 41 :
 
             self._cmdline += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
@@ -826,7 +882,7 @@ class Acedrg(CExeCode ):
                             tName = tID
                             
                         if pdbAtoms.has_key(tName):
-                            bLine = "%s%s%s%s%s%s%s%s\n"%(strGrp[0].ljust(8), tName.ljust(8), strGrp[2].ljust(8), \
+                            bLine = "%s%s%s%s%s%s%s%s\n"%(strGrp[0].ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
                                                         strGrp[3].ljust(8), strGrp[4].ljust(8), \
                                                         pdbAtoms[tName][0].ljust(12), pdbAtoms[tName][1].ljust(12), \
                                                         pdbAtoms[tName][2].ljust(12)) 
@@ -852,9 +908,12 @@ class Acedrg(CExeCode ):
                     tOutCif.close()
                         
     def execute(self):
-       
+        
+        print "work mode : ", self.workMode
+
         self.printJobs()
-        if self.workMode == 11:
+
+        if self.workMode == 11 or self.workMode == 111:
 
             # Stage 1: dictionary generation using a mmcif file 
             if os.path.isfile(self.inMmCifName):
@@ -863,10 +922,10 @@ class Acedrg(CExeCode ):
                 print "%s does not exist"%self.inMmCifName
                 sys.exit()
 
-            # Stage 2: optimization
-            self.runGeoOpt()            
-    
-        if self.workMode == 12:
+            if self.workMode == 11 :
+                # Stage 2: optimization
+                self.runGeoOpt()    
+        if self.workMode == 12 or self.workMode == 121:
             
             # Stage 1: Transfer the SMILE input into a mmcif file
             if os.path.isfile(self.inSmiName):
@@ -882,10 +941,11 @@ class Acedrg(CExeCode ):
                 print "%s does not exist"%self.inMmCifName
                 sys.exit()
 
-            # Stage 3: optimization
-            self.runGeoOpt()            
+            if self.workMode == 12:
+                # Stage 3: optimization
+                self.runGeoOpt()            
 
-        if self.workMode == 13:
+        if self.workMode == 13 or self.workMode == 131 :
             
             # Stage 1: dictionary generation using  a mdl file
             if os.path.isfile(self.inMdlName):
@@ -893,11 +953,12 @@ class Acedrg(CExeCode ):
             else:
                 print "can not find %s to read "%self.inMdlName
                 sys.exit() 
- 
-            # Stage 2: optimization
-            self.runGeoOpt()            
+            
+            if self.workMode == 13 : 
+                # Stage 2: optimization
+                self.runGeoOpt()            
     
-        if self.workMode == 14:
+        if self.workMode == 14 or self.workMode == 141 :
             
             # Stage 1: dictionary generation using  a sdf file
             if os.path.isfile(self.inSdfName):
@@ -905,9 +966,10 @@ class Acedrg(CExeCode ):
             else:
                 print "%s does not exist"%self.inSdfName
                 sys.exit()
-            
-            # Stage 2: optimization
-            self.runGeoOpt()            
+           
+            if self.workMode == 14: 
+                # Stage 2: optimization
+                self.runGeoOpt()            
 
         if self.workMode == 21:
             
@@ -929,6 +991,47 @@ class Acedrg(CExeCode ):
             else:
                 print "Can not find the input directory ", self.inStdCifDir
                 
+        if self.workMode == 31:
+            print "work mode ", self.workMode
+            if os.path.isfile(self.inMmCifName):
+                self.runLibmol()    
+        
+        if self.workMode == 32:
+            print "work mode ", self.workMode
+            if os.path.isfile(self.inSmiName):
+                self.runLibcheck(self.inSmiName)
+            else:
+                print "%s does not exist"%self.inSmiName
+                sys.exit()
+
+            if os.path.isfile(self.libcheckLibName):
+                self.runLibmol(self.libcheckLibName)
+            else:
+                print "%s does not exist"%self.inMmCifName
+                sys.exit()
+            
+        if self.workMode == 33:
+            print "work mode ", self.workMode
+            if os.path.isfile(self.inMdlName):
+                self.runLibmol()    
+        
+
+        if self.workMode == 34:
+            print "work mode ", self.workMode
+            if os.path.isfile(self.inSdfName):
+                self.runLibmol()    
+
+        if self.workMode == 35:
+            print "work mode ", self.workMode
+            if os.path.isfile(self.inStdCifName):
+                self.runLibmol()    
+
+        if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
+            if os.path.isfile(self.outRstCifName):
+                tCif = self.outRoot + ".cif"
+                os.system("cp %s %s"%(self.outRstCifName, tCif)) 
+            else:
+                print "acedrg failed to generate a dictionary file"       
 
 def main():
     acedrgObj = Acedrg(sys.argv[1:])

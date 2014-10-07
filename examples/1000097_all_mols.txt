@@ -1,0 +1,358 @@
+data_mol_1
+
+loop_
+_chem_comp_atom.serial_number
+_chem_comp_atom.atom_id 
+_chem_comp_atom.element_symbol
+_chem_comp_atom.cod_type
+     1       Cd1   Cd    Cd(FCd)6
+     2        F1    F    F(CdF5)2
+     3        F2    F    F(CdF5)2
+     4       Cd1   Cd    Cd(FCd)6
+     5       Cd1   Cd    Cd(FCd)6
+     6       Cd1   Cd    Cd(FCd)6
+     7        F1    F    F(CdF5)2
+     8        F1    F    F(CdF5)2
+     9        F1    F    F(CdF5)2
+    10        F1    F    F(CdF5)2
+    11        F1    F    F(CdF5)2
+    12        F1    F    F(CdF5)2
+    13        F1    F    F(CdF5)2
+    14        F2    F    F(CdF5)2
+    15        F2    F    F(CdF5)2
+    16        F2    F    F(CdF5)2
+    17       Cd1   Cd    Cd(FCd)6
+    18       Cd1   Cd    Cd(FCd)6
+    19       Cd1   Cd    Cd(FCd)6
+    20       Cd1   Cd    Cd(FCd)6
+    21       Cd1   Cd    Cd(FCd)6
+    22       Cd1   Cd    Cd(FCd)6
+    23       Cd1   Cd    Cd(FCd)6
+    24        F1    F    F(CdF5)
+    25        F1    F    F(CdF5)
+    26        F1    F    F(CdF5)
+    27        F1    F    F(CdF5)
+    28        F1    F    F(CdF5)
+    29        F1    F    F(CdF5)
+    30        F1    F    F(CdF5)2
+    31        F1    F    F(CdF5)
+    32        F1    F    F(CdF5)2
+    33        F1    F    F(CdF5)2
+    34        F1    F    F(CdF5)
+    35        F1    F    F(CdF5)2
+    36        F1    F    F(CdF5)2
+    37        F1    F    F(CdF5)
+    38        F1    F    F(CdF5)2
+    39        F1    F    F(CdF5)2
+    40        F1    F    F(CdF5)
+    41        F2    F    F(CdF5)
+    42        F2    F    F(CdF5)
+    43        F2    F    F(CdF5)2
+    44        F2    F    F(CdF5)2
+    45        F2    F    F(CdF5)2
+    46        F2    F    F(CdF5)2
+    47        F2    F    F(CdF5)
+    48        F2    F    F(CdF5)
+    49        F2    F    F(CdF5)2
+    50        F2    F    F(CdF5)2
+    51        F2    F    F(CdF5)2
+    52       Cd1   Cd    Cd(FCd)5(F)
+    53       Cd1   Cd    Cd(FCd)5(F)
+    54       Cd1   Cd    Cd(FCd)6
+    55       Cd1   Cd    Cd(FCd)5(F)
+    56       Cd1   Cd    Cd(FCd)5(F)
+    57       Cd1   Cd    Cd(FCd)5(F)
+    58       Cd1   Cd    Cd(FCd)5(F)
+    59       Cd1   Cd    Cd(FCd)6
+    60       Cd1   Cd    Cd(FCd)6
+    61       Cd1   Cd    Cd(FCd)5(F)
+    62       Cd1   Cd    Cd(FCd)5(F)
+    63       Cd1   Cd    Cd(FCd)2(F)4
+    64       Cd1   Cd    Cd(FCd)3(F)3
+    65       Cd1   Cd    Cd(FCd)2(F)4
+    66       Cd1   Cd    Cd(FCd)3(F)3
+    67       Cd1   Cd    Cd(FCd)4(F)2
+    68       Cd1   Cd    Cd(FCd)3(F)3
+    69       Cd1   Cd    Cd(FCd)2(F)4
+    70       Cd1   Cd    Cd(FCd)3(F)3
+    71       Cd1   Cd    Cd(FCd)2(F)4
+    72       Cd1   Cd    Cd(FCd)3(F)3
+    73       Cd1   Cd    Cd(FCd)5(F)
+    74       Cd1   Cd    Cd(FCd)3(F)3
+    75       Cd1   Cd    Cd(FCd)4(F)2
+    76       Cd1   Cd    Cd(FCd)4(F)2
+    77       Cd1   Cd    Cd(FCd)3(F)3
+    78       Cd1   Cd    Cd(FCd)5(F)
+    79       Cd1   Cd    Cd(FCd)3(F)3
+    80       Cd1   Cd    Cd(FCd)2(F)4
+    81       Cd1   Cd    Cd(FCd)3(F)3
+    82       Cd1   Cd    Cd(FCd)2(F)4
+    83       Cd1   Cd    Cd(FCd)3(F)3
+    84       Cd1   Cd    Cd(FCd)4(F)2
+    85       Cd1   Cd    Cd(FCd)3(F)3
+    86       Cd1   Cd    Cd(FCd)2(F)4
+    87       Cd1   Cd    Cd(FCd)3(F)3
+    88       Cd1   Cd    Cd(FCd)2(F)4
+    89       Cd1   Cd    Cd(FCd)3(F)3
+    90       Cd1   Cd    Cd(FCd)4(F)2
+    91       Cd1   Cd    Cd(FCd)3(F)3
+    92       Cd1   Cd    Cd(FCd)3(F)3
+    93       Cd1   Cd    Cd(FCd)4(F)2
+    94       Cd1   Cd    Cd(FCd)3(F)3
+    95       Cd1   Cd    Cd(FCd)4(F)2
+    96       Cd1   Cd    Cd(FCd)4(F)2
+    97       Cd1   Cd    Cd(FCd)4(F)2
+    98       Cd1   Cd    Cd(FCd)6
+    99       Cd1   Cd    Cd(FCd)4(F)2
+   100       Cd1   Cd    Cd(FCd)3(F)3
+   101       Cd1   Cd    Cd(FCd)4(F)2
+   102       Cd1   Cd    Cd(FCd)3(F)3
+   103       Cd1   Cd    Cd(FCd)3(F)3
+   104       Cd1   Cd    Cd(FCd)4(F)2
+   105       Cd1   Cd    Cd(FCd)3(F)3
+   106        F1    F    F(CdF5)
+   107        F1    F    F(CdF5)2
+   108        F1    F    F(CdF5)2
+   109        F1    F    F(CdF5)
+   110        F1    F    F(CdF5)2
+   111        F1    F    F(CdF5)2
+   112        F1    F    F(CdF5)
+   113        F1    F    F(CdF5)2
+   114        F1    F    F(CdF5)2
+   115        F1    F    F(CdF5)
+   116        F1    F    F(CdF5)2
+   117        F1    F    F(CdF5)
+   118        F1    F    F(CdF5)
+   119        F1    F    F(CdF5)
+   120        F1    F    F(CdF5)
+   121        F1    F    F(CdF5)
+   122        F1    F    F(CdF5)
+   123        F1    F    F(CdF5)
+   124        F1    F    F(CdF5)2
+   125        F1    F    F(CdF5)2
+   126        F1    F    F(CdF5)
+   127        F1    F    F(CdF5)2
+   128        F1    F    F(CdF5)2
+   129        F1    F    F(CdF5)
+   130        F1    F    F(CdF5)2
+   131        F1    F    F(CdF5)2
+   132        F1    F    F(CdF5)
+   133        F1    F    F(CdF5)2
+   134        F1    F    F(CdF5)2
+   135        F1    F    F(CdF5)
+   136        F1    F    F(CdF5)2
+   137        F1    F    F(CdF5)
+   138        F1    F    F(CdF5)2
+   139        F1    F    F(CdF5)2
+   140        F1    F    F(CdF5)
+   141        F1    F    F(CdF5)
+   142        F1    F    F(CdF5)
+   143        F1    F    F(CdF5)
+   144        F1    F    F(CdF5)
+   145        F1    F    F(CdF5)
+   146        F1    F    F(CdF5)
+   147        F1    F    F(CdF5)
+   148        F1    F    F(CdF5)
+   149        F1    F    F(CdF5)2
+   150        F1    F    F(CdF5)2
+   151        F1    F    F(CdF5)
+   152        F1    F    F(CdF5)2
+   153        F1    F    F(CdF5)2
+   154        F1    F    F(CdF5)
+   155        F1    F    F(CdF5)2
+   156        F1    F    F(CdF5)2
+   157        F1    F    F(CdF5)
+   158        F1    F    F(CdF5)2
+   159        F1    F    F(CdF5)2
+   160        F1    F    F(CdF5)
+   161        F1    F    F(CdF5)2
+   162        F1    F    F(CdF5)
+   163        F1    F    F(CdF5)2
+   164        F1    F    F(CdF5)2
+   165        F1    F    F(CdF5)
+   166        F1    F    F(CdF5)
+   167        F1    F    F(CdF5)
+   168        F1    F    F(CdF5)
+   169        F1    F    F(CdF5)
+   170        F1    F    F(CdF5)
+   171        F1    F    F(CdF5)
+   172        F1    F    F(CdF5)
+   173        F1    F    F(CdF5)
+   174        F1    F    F(CdF5)
+   175        F1    F    F(CdF5)2
+   176        F1    F    F(CdF5)2
+   177        F1    F    F(CdF5)
+   178        F1    F    F(CdF5)2
+   179        F1    F    F(CdF5)2
+   180        F1    F    F(CdF5)
+   181        F1    F    F(CdF5)2
+   182        F1    F    F(CdF5)
+   183        F1    F    F(CdF5)2
+   184        F1    F    F(CdF5)2
+   185        F1    F    F(CdF5)
+   186        F1    F    F(CdF5)
+   187        F1    F    F(CdF5)
+   188        F1    F    F(CdF5)
+   189        F1    F    F(CdF5)
+   190        F1    F    F(CdF5)
+   191        F1    F    F(CdF5)
+   192        F1    F    F(CdF5)
+   193        F1    F    F(CdF5)
+   194        F1    F    F(CdF5)
+   195        F1    F    F(CdF5)
+   196        F1    F    F(CdF5)
+   197        F1    F    F(CdF5)
+   198        F1    F    F(CdF5)
+   199        F1    F    F(CdF5)2
+   200        F1    F    F(CdF5)2
+   201        F1    F    F(CdF5)
+   202        F1    F    F(CdF5)2
+   203        F1    F    F(CdF5)
+   204        F1    F    F(CdF5)2
+   205        F1    F    F(CdF5)2
+   206        F1    F    F(CdF5)
+   207        F1    F    F(CdF5)2
+   208        F1    F    F(CdF5)2
+   209        F1    F    F(CdF5)
+   210        F1    F    F(CdF5)
+   211        F1    F    F(CdF5)
+   212        F1    F    F(CdF5)
+   213        F1    F    F(CdF5)
+   214        F1    F    F(CdF5)
+   215        F1    F    F(CdF5)
+   216        F1    F    F(CdF5)
+   217        F1    F    F(CdF5)
+   218        F1    F    F(CdF5)
+   219        F1    F    F(CdF5)2
+   220        F1    F    F(CdF5)2
+   221        F1    F    F(CdF5)
+   222        F1    F    F(CdF5)2
+   223        F1    F    F(CdF5)
+   224        F1    F    F(CdF5)2
+   225        F1    F    F(CdF5)2
+   226        F1    F    F(CdF5)
+   227        F1    F    F(CdF5)2
+   228        F1    F    F(CdF5)2
+   229        F1    F    F(CdF5)
+   230        F1    F    F(CdF5)2
+   231        F1    F    F(CdF5)2
+   232        F1    F    F(CdF5)
+   233        F1    F    F(CdF5)2
+   234        F1    F    F(CdF5)2
+   235        F1    F    F(CdF5)
+   236        F1    F    F(CdF5)
+   237        F1    F    F(CdF5)
+   238        F1    F    F(CdF5)
+   239        F1    F    F(CdF5)
+   240        F1    F    F(CdF5)
+   241        F1    F    F(CdF5)
+   242        F1    F    F(CdF5)
+   243        F1    F    F(CdF5)
+   244        F1    F    F(CdF5)2
+   245        F1    F    F(CdF5)2
+   246        F1    F    F(CdF5)
+   247        F1    F    F(CdF5)2
+   248        F1    F    F(CdF5)
+   249        F1    F    F(CdF5)2
+   250        F1    F    F(CdF5)2
+   251        F1    F    F(CdF5)
+   252        F1    F    F(CdF5)2
+   253        F1    F    F(CdF5)2
+   254        F1    F    F(CdF5)
+   255        F1    F    F(CdF5)2
+   256        F1    F    F(CdF5)2
+   257        F1    F    F(CdF5)
+   258        F1    F    F(CdF5)2
+   259        F1    F    F(CdF5)2
+   260        F1    F    F(CdF5)
+   261        F2    F    F(CdF5)2
+   262        F2    F    F(CdF5)2
+   263        F2    F    F(CdF5)2
+   264        F2    F    F(CdF5)
+   265        F2    F    F(CdF5)
+   266        F2    F    F(CdF5)2
+   267        F2    F    F(CdF5)2
+   268        F2    F    F(CdF5)2
+   269        F2    F    F(CdF5)2
+   270        F2    F    F(CdF5)
+   271        F2    F    F(CdF5)
+   272        F2    F    F(CdF5)
+   273        F2    F    F(CdF5)
+   274        F2    F    F(CdF5)
+   275        F2    F    F(CdF5)2
+   276        F2    F    F(CdF5)2
+   277        F2    F    F(CdF5)2
+   278        F2    F    F(CdF5)2
+   279        F2    F    F(CdF5)2
+   280        F2    F    F(CdF5)2
+   281        F2    F    F(CdF5)
+   282        F2    F    F(CdF5)
+   283        F2    F    F(CdF5)
+   284        F2    F    F(CdF5)2
+   285        F2    F    F(CdF5)2
+   286        F2    F    F(CdF5)2
+   287        F2    F    F(CdF5)2
+   288        F2    F    F(CdF5)2
+   289        F2    F    F(CdF5)
+   290        F2    F    F(CdF5)
+   291        F2    F    F(CdF5)
+   292        F2    F    F(CdF5)2
+   293        F2    F    F(CdF5)2
+   294        F2    F    F(CdF5)2
+   295        F2    F    F(CdF5)2
+   296        F2    F    F(CdF5)2
+   297        F2    F    F(CdF5)2
+   298        F2    F    F(CdF5)2
+   299        F2    F    F(CdF5)2
+   300        F2    F    F(CdF5)2
+   301        F2    F    F(CdF5)2
+   302        F2    F    F(CdF5)2
+   303        F2    F    F(CdF5)2
+   304        F2    F    F(CdF5)
+   305        F2    F    F(CdF5)
+   306        F2    F    F(CdF5)
+   307        F2    F    F(CdF5)2
+   308        F2    F    F(CdF5)2
+   309        F2    F    F(CdF5)2
+   310        F2    F    F(CdF5)2
+   311        F2    F    F(CdF5)2
+   312        F2    F    F(CdF5)
+   313        F2    F    F(CdF5)
+   314        F2    F    F(CdF5)
+   315        F2    F    F(CdF5)2
+   316        F2    F    F(CdF5)2
+   317        F2    F    F(CdF5)2
+   318        F2    F    F(CdF5)2
+   319        F2    F    F(CdF5)2
+   320        F2    F    F(CdF5)2
+   321        F2    F    F(CdF5)
+   322        F2    F    F(CdF5)
+   323        F2    F    F(CdF5)
+
+loop_
+_chem_comp_bond.bond_serial_number
+_chem_comp_bond.atom1_serial_number
+_chem_comp_bond.atom2_serial_number
+_chem_comp_bond.atom1_id
+_chem_comp_bond.atom2_id
+_chem_comp_bond.value_dist
+_chem_comp_bond.is_in_same_ring
+     1     1   261  Cd   F   2.23395     N
+     2     1   175  Cd   F   2.21242     N
+     3     1   107  Cd   F   2.21116     N
+loop_
+_chem_comp_angle.angle_serial_number
+_chem_comp_angle.atom1_serial_number
+_chem_comp_angle.atom2_serial_number
+_chem_comp_angle.atom3_serial_number
+_chem_comp_angle.atom1_id
+_chem_comp_angle.atom2_id
+_chem_comp_angle.atom3_id
+_chem_comp_angle.value_angle
+     1     1   261    43  Cd   F   F       180
+     2     1   261   175  Cd   F   F   91.2984
+     3     1   261   107  Cd   F   F   90.3786
+     4     1   261    30  Cd   F   F   89.6214
+     5     1   261   199  Cd   F   F   88.7016
+     6     1   175   107  Cd   F   F   90.3009
+     7     1   175    30  Cd   F   F   89.6991

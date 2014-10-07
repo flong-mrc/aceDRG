@@ -687,6 +687,25 @@ namespace LIBMOL
         }
         
         return tOrd;
+        
+    }
+    
+    extern REAL getBondOrderOneAtom(std::vector<BondDict> tBonds,
+                                    std::vector<AtomDict> tAtoms,
+                                    int tIdx)
+    {
+        
+        REAL tOrd = -1.0;
+        
+        for (std::vector<int>::iterator iNB=tAtoms[tIdx].connAtoms.begin();
+                iNB !=tAtoms[tIdx].connAtoms.end(); iNB++)
+        {
+            
+        }
+            
+        
+        return tOrd;
+        
     }
     
     // Automated assignment of bond orders to a set of bonds

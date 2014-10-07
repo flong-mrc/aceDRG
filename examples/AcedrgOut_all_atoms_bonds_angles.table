@@ -1,0 +1,568 @@
+All unique atom types: 
+C        C(CCC)(CCH)(H)     
+C        C(CCC)(H)3     
+C        C(CCCH)(CCH)(H)     
+C        C(CCCH)(H)3     
+C        C(CCCH)2(OC)(H)     
+C        C(CCH)(CNO)(H)     
+C        C(CCH)(NCH)(H)2     
+C        C(CCH)(NCH)(O)     
+C        C(CCHH)(CCH)(OH)(H)     
+C        C(CCHH)(CHHP)(H)2     
+C        C(CCHH)(CNO)(NCC)(H)     
+C        C(CCHH)(CNO)(NCH)(H)     
+C        C(CCHH)(H)3     
+C        C(CCHH)2(H)2     
+C        C(CCHH)2(O)     
+C        C(CCHN)(CH3)(H)2     
+C        C(CCHN)(CH3)(OC)(H)     
+C        C(CCHN)(NCH)(O)     
+C        C(CCHN)(OC)(O)     
+C        C(CCHO)(CCC)(H)     
+C        C(CCHO)(CCO)(H)2     
+C        C(CCHO)(CH3)(CCH)(H)     
+C        C(CCHO)(CH3)2(H)     
+C        C(CCHO)(CNO)(NCH)(H)     
+C        C(CCHO)(H)3     
+C        C(CH3)(CCH)2     
+C        C(CH3)(OC)(H)2     
+C        C(CH3)(OC)(O)     
+C        C(CH3)2(H)2     
+C        C(CHHN)(CCH)(H)     
+C        C(CHHO)(H)3     
+C        C(COO)(H)3     
+C        C(C[5]CHN)(NCC)(O)     
+C        C(C[5]CHN)(OC)(O)     
+C        C(C[5]CN)(N[5]CC)(O)     
+C        C(C[5]NO)(CCO)(H)2     
+C        C(C[6]CC)(CCHN)(H)2     
+C        C(C[6]CC)(COO)(NCH)(H)     
+C        C(C[6]CC)(NHH)(O)     
+C        C(C[6]CCO)(H)3     
+C        C(C[6]CHN)(NCH)(O)     
+C        C(C[6]CN)(NCH)(O)     
+C        C(NCC)(H)3     
+C        C(NCCH)(H)3     
+C        C(NCH)(H)3     
+C        C(N[5]CC)(CCHN)(O)     
+C        C(N[6]CC)(CCHN)(O)     
+C        C(PCuCC)(CCHH)(H)2     
+C        C[5](C[5]CHH)(C[5]CHN)(H)2     
+C        C[5](C[5]CHH)(C[5]HHN)(H)2     
+C        C[5](C[5]CHH)(N[5]CC)(CNO)(H)     
+C        C[5](C[5]CHH)(N[5]CC)(COO)(H)     
+C        C[5](C[5]CHH)(N[5]CC)(H)2     
+C        C[5](C[5]CN)(O[5]C)(H)     
+C        C[5](C[5]HO)(N[5]C)(CNO)     
+C        C[5](N[5]C)(O[5]C)(CCHH)     
+C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CH)     
+C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CHH)(H)     
+C        C[6,6](C[6,6]CC)(C[6]CO)2     
+C        C[6,6](C[6,6]CCH)(C[6]CO)2     
+C        C[6,6](C[6,6]CCH)(C[6]CO)2(OH)     
+C        C[6,6](C[6,6]CCO)(C[6]CHH)(C[6]CHN)(H)     
+C        C[6](C[6,6]CC)(C[6]CH)(H)     
+C        C[6](C[6,6]CC)(C[6]CH)(OH)     
+C        C[6](C[6,6]CC)2(O)     
+C        C[6](C[6,6]CCH)(C[6,6]CC)(CH3)(OH)     
+C        C[6](C[6,6]CCH)(C[6]CO)(NCCH)(H)     
+C        C[6](C[6,6]CCH)2(H)2     
+C        C[6](C[6,6]CCO)(C[6,6]CC)(OH)     
+C        C[6](C[6,6]CCO)(C[6]CC)(O)     
+C        C[6](C[6]CC)(C[6]CH)(H)     
+C        C[6](C[6]CH)(C[6]CN)(H)     
+C        C[6](C[6]CH)(C[6]CN)(OH)     
+C        C[6](C[6]CH)(C[6]CO)(H)     
+C        C[6](C[6]CH)(C[6]CP)(H)     
+C        C[6](C[6]CH)(C[6]HN)(H)     
+C        C[6](C[6]CH)(N[6]C)(H)     
+C        C[6](C[6]CH)2(CCHH)     
+C        C[6](C[6]CH)2(CCHN)     
+C        C[6](C[6]CH)2(H)     
+C        C[6](C[6]CH)2(NCH)     
+C        C[6](C[6]CH)2(PCuCC)     
+C        C[6](C[6]CHH)(N[6]CC)(CNO)(H)     
+C        C[6](C[6]CHH)(N[6]CC)(H)2     
+C        C[6](C[6]CHH)2(O)     
+C        C[6](C[6]CHN)(C[6]CC)(O)     
+C        C[6](C[6]CHN)(C[6]CO)(H)2     
+C        C[6](C[6]CO)(N[6]C)(CNO)     
+C        C[6](C[6]CO)2(CNO)     
+C        C[6](C[6]HHN)(C[6]CO)(H)2     
+Cd        Cd(FCd)6     
+Cu        Cu(PC3)2(ICu)2     
+F        F(CdF5)2     
+H        H(CC3)     
+H        H(CCC)     
+H        H(CCCH)     
+H        H(CCCN)     
+H        H(CCCO)     
+H        H(CCHH)     
+H        H(CCHN)     
+H        H(CCHO)     
+H        H(CCHP)     
+H        H(CHHN)     
+H        H(C[5]CCH)     
+H        H(C[5]CCN)     
+H        H(C[5]CHN)     
+H        H(C[5]CO)     
+H        H(C[6,6]C3)     
+H        H(C[6]CC)     
+H        H(C[6]CCH)     
+H        H(C[6]CCN)     
+H        H(C[6]CHN)     
+H        H(C[6]CN)     
+H        H(NC3)     
+H        H(NCC)     
+H        H(NCH)     
+H        H(OC)     
+I        I(CuIPP)2     
+N        N(CCCH)(CCO)(H)     
+N        N(CCCH)(CH3)(CCO)     
+N        N(CCHH)(CCO)(H)     
+N        N(CCO)(H)2     
+N        N(C[6]CC)(CH3)(H)     
+N        N(C[6]CCH)(CH3)2(H)     
+N        N[5](C[5]CC)(C[5]CO)     
+N        N[5](C[5]CCH)(C[5]CHH)(CCO)     
+N        N[6](C[6]CC)(C[6]CH)     
+N        N[6](C[6]CCH)(C[6]CHH)(CCO)     
+O        O(CCC)     
+O        O(CCCH)(CCO)     
+O        O(CCCH)(H)     
+O        O(CCHH)(CCO)     
+O        O(CCN)     
+O        O(CCO)     
+O        O(C[6,6]C3)(H)     
+O        O(C[6]C3)(H)     
+O        O(C[6]CC)     
+O        O(C[6]CC)(H)     
+O        O[5](C[5]CH)(C[5]CN)     
+P        P(C[6]CC)2(CuIIP)(CCHH)     
+All bond lengths: 
+C       C        C(CCC)(CCH)(H)      C(CH3)(CCH)2      C118      C119    N     1.49491    1000001
+C       C        C(CCC)(CCH)(H)      C(CH3)(CCH)2      C160      C161    N     1.44763    1000001
+C       C        C(CCCH)(CCH)(H)      C(CCH)(CNO)(H)      C111      C112    N     1.31845    1000001
+C       C        C(CCCH)(CCH)(H)      C(CCH)(CNO)(H)      C153      C154    N     1.31054    1000001
+C       C        C(CCH)(CNO)(H)      C(CCH)(NCH)(O)      C112      C113    N     1.47602    1000001
+C       C        C(CCH)(CNO)(H)      C(CCH)(NCH)(O)      C154      C155    N     1.48692    1000001
+C       C        C(CCH)(NCH)(H)2      C(CHHN)(CCH)(H)      C116      C117    N     1.49806    1000001
+C       C        C(CCH)(NCH)(H)2      C(CHHN)(CCH)(H)      C158      C159    N     1.50968    1000001
+C       C        C(CCHH)(CCH)(OH)(H)      C(CCHO)(CCC)(H)      C121      C120    N     1.49824    1000001
+C       C        C(CCHH)(CCH)(OH)(H)      C(CCHO)(CCC)(H)      C164      C163    N     1.50004    1000001
+C       C        C(CCHH)(CCH)(OH)(H)      C(CCHO)(CCO)(H)2      C121      C123    N     1.52575    1000001
+C       C        C(CCHH)(CCH)(OH)(H)      C(CCHO)(CCO)(H)2      C164      C166    N     1.50677    1000001
+C       C        C(CCHH)(CHHP)(H)2      C(CCHH)2(H)2      C2      C3    N     1.54565    1000004
+C       C        C(CCHH)(CHHP)(H)2      C(CCHH)2(H)2      C4      C3    N     1.53206    1000004
+C       C        C(CCHH)(CNO)(NCC)(H)      C(C[6]CC)(CCHN)(H)2      C26      C48    N     1.55667    1000001
+C       C        C(CCHH)(CNO)(NCC)(H)      C(N[6]CC)(CCHN)(O)      C26      C27    N     1.50524    1000001
+C       C        C(CCHH)(CNO)(NCH)(H)      C(CCHN)(CH3)(H)2      C17      C60    N     1.53897    1000001
+C       C        C(CCHH)(CNO)(NCH)(H)      C(N[5]CC)(CCHN)(O)      C17      C18    N     1.53884    1000001
+C       C        C(CCHH)(H)3      C(CH3)2(H)2      C205      C206    N     1.29755    1000001
+C       C        C(CCHH)(H)3      C(CH3)2(H)2      C207      C206    N     1.58238    1000001
+C       C        C(CCHN)(CH3)(H)2      C(CCHH)(H)3      C60      C61    N     1.54084    1000001
+C       C        C(CCHN)(CH3)(OC)(H)      C(CCHO)(H)3      C2      C62    N     1.51935    1000001
+C       C        C(CCHO)(CCC)(H)      C(CH3)(CCH)2      C120      C119    N     1.30700    1000001
+C       C        C(CCHO)(CCC)(H)      C(CH3)(CCH)2      C163      C161    N     1.36613    1000001
+C       C        C(CCHO)(CCO)(H)2      C(CCHH)2(O)      C123      C124    N     1.43472    1000001
+C       C        C(CCHO)(CCO)(H)2      C(CCHH)2(O)      C166      C167    N     1.52087    1000001
+C       C        C(CCHO)(CH3)(CCH)(H)      C(CCCH)(CCH)(H)      C110      C111    N     1.53933    1000001
+C       C        C(CCHO)(CH3)(CCH)(H)      C(CCCH)(CCH)(H)      C152      C153    N     1.49668    1000001
+C       C        C(CCHO)(CH3)(CCH)(H)      C(CCCH)(H)3      C110      C133    N     1.49396    1000001
+C       C        C(CCHO)(CH3)(CCH)(H)      C(CCCH)(H)3      C152      C184    N     1.55557    1000001
+C       C        C(CCHO)(CH3)(CCH)(H)      C(CCCH)2(OC)(H)      C110      C109    N     1.53459    1000001
+C       C        C(CCHO)(CH3)(CCH)(H)      C(CCCH)2(OC)(H)      C152      C151    N     1.52592    1000001
+C       C        C(CCHO)(CH3)2(H)      C(CCCH)(H)3      C134      C136    N     1.27032    1000001
+C       C        C(CCHO)(CH3)2(H)      C(CCCH)(H)3      C134      C135    N     1.48569    1000001
+C       C        C(CCHO)(CH3)2(H)      C(CCCH)(H)3      C185      C186    N     1.50783    1000001
+C       C        C(CCHO)(CH3)2(H)      C(CCCH)(H)3      C185      C187    N     1.48711    1000001
+C       C        C(CCHO)(CH3)2(H)      C(CCCH)2(OC)(H)      C134      C109    N     1.52865    1000001
+C       C        C(CCHO)(CH3)2(H)      C(CCCH)2(OC)(H)      C185      C151    N     1.51837    1000001
+C       C        C(CCHO)(CNO)(NCH)(H)      C(CCHN)(CH3)(OC)(H)      C3      C2    N     1.51139    1000001
+C       C        C(CCHO)(CNO)(NCH)(H)      C(CCHN)(NCH)(O)      C3      C14    N     1.54239    1000001
+C       C        C(CH3)(CCH)2      C(CCC)(H)3      C119      C132    N     1.51066    1000001
+C       C        C(CH3)(CCH)2      C(CCC)(H)3      C161      C162    N     1.48098    1000001
+C       C        C(CH3)(OC)(H)2      C(CHHO)(H)3      C201      C200    N     1.42853    1000001
+C       C        C(CH3)(OC)(O)      C(COO)(H)3      C202      C203    N     1.56388    1000001
+C       C        C(CHHN)(CCH)(H)      C(CCC)(CCH)(H)      C117      C118    N     1.33923    1000001
+C       C        C(CHHN)(CCH)(H)      C(CCC)(CCH)(H)      C159      C160    N     1.30563    1000001
+C       C        C(C[5]NO)(CCO)(H)2      C(CCHH)2(O)      C126      C124    N     1.52323    1000001
+C       C        C(C[5]NO)(CCO)(H)2      C(CCHH)2(O)      C169      C167    N     1.48285    1000001
+C       C        C(C[6]CC)(CCHN)(H)2      C[6](C[6]CH)2(CCHH)      C48      C49    N     1.51910    1000001
+C       C        C(C[6]CC)(COO)(NCH)(H)      C(CCHN)(OC)(O)      C38      C39    N     1.52642    1000001
+C       C        C(C[6]CC)(COO)(NCH)(H)      C[6](C[6]CH)2(CCHN)      C38      C41    N     1.54208    1000001
+C       C        C(PCuCC)(CCHH)(H)2      C(CCHH)(CHHP)(H)2      C1      C2    N     1.52411    1000004
+C       C        C(PCuCC)(CCHH)(H)2      C(CCHH)(CHHP)(H)2      C5      C4    N     1.51191    1000004
+C       C        C[5](C[5]CHH)(C[5]CHN)(H)2      C[5](C[5]CHH)(C[5]HHN)(H)2      C105      C104    Y     1.42750    1000001
+C       C        C[5](C[5]CHH)(C[5]CHN)(H)2      C[5](C[5]CHH)(C[5]HHN)(H)2      C181      C182    Y     1.45971    1000001
+C       C        C[5](C[5]CHH)(C[5]CHN)(H)2      C[5](C[5]CHH)(C[5]HHN)(H)2      C57      C58    Y     1.51163    1000001
+C       C        C[5](C[5]CHH)(C[5]HHN)(H)2      C[5](C[5]CHH)(N[5]CC)(H)2      C104      C103    Y     1.46908    1000001
+C       C        C[5](C[5]CHH)(C[5]HHN)(H)2      C[5](C[5]CHH)(N[5]CC)(H)2      C182      C183    Y     1.43510    1000001
+C       C        C[5](C[5]CHH)(C[5]HHN)(H)2      C[5](C[5]CHH)(N[5]CC)(H)2      C58      C59    Y     1.48500    1000001
+C       C        C[5](C[5]CHH)(N[5]CC)(CNO)(H)      C(C[5]CHN)(NCC)(O)      C21      C22    N     1.54076    1000001
+C       C        C[5](C[5]CHH)(N[5]CC)(CNO)(H)      C[5](C[5]CHH)(C[5]CHN)(H)2      C21      C57    Y     1.52585    1000001
+C       C        C[5](C[5]CHH)(N[5]CC)(COO)(H)      C(C[5]CHN)(OC)(O)      C106      C107    N     1.51841    1000001
+C       C        C[5](C[5]CHH)(N[5]CC)(COO)(H)      C(C[5]CHN)(OC)(O)      C178      C179    N     1.50301    1000001
+C       C        C[5](C[5]CHH)(N[5]CC)(COO)(H)      C[5](C[5]CHH)(C[5]CHN)(H)2      C106      C105    Y     1.52063    1000001
+C       C        C[5](C[5]CHH)(N[5]CC)(COO)(H)      C[5](C[5]CHH)(C[5]CHN)(H)2      C178      C181    Y     1.51233    1000001
+C       C        C[5](C[5]HO)(N[5]C)(CNO)      C(C[5]CN)(N[5]CC)(O)      C130      C101    N     1.45841    1000001
+C       C        C[5](C[5]HO)(N[5]C)(CNO)      C(C[5]CN)(N[5]CC)(O)      C173      C175    N     1.47951    1000001
+C       C        C[5](C[5]HO)(N[5]C)(CNO)      C[5](C[5]CN)(O[5]C)(H)      C130      C129    Y     1.35811    1000001
+C       C        C[5](C[5]HO)(N[5]C)(CNO)      C[5](C[5]CN)(O[5]C)(H)      C173      C172    Y     1.33034    1000001
+C       C        C[5](N[5]C)(O[5]C)(CCHH)      C(C[5]NO)(CCO)(H)2      C127      C126    N     1.43887    1000001
+C       C        C[5](N[5]C)(O[5]C)(CCHH)      C(C[5]NO)(CCO)(H)2      C170      C169    N     1.49067    1000001
+C       C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CH)      C[6,6](C[6,6]CC)(C[6]CO)2      C5      C18    Y     1.42222    1000006
+C       C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CH)      C[6](C[6,6]CC)(C[6]CH)(H)      C5      C4    Y     1.37486    1000006
+C       C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CHH)(H)      C[6,6](C[6,6]CCH)(C[6]CO)2      C7      C16    Y     1.51228    1000006
+C       C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CHH)(H)      C[6](C[6,6]CCH)(C[6,6]CC)(CH3)(OH)      C7      C6    Y     1.53992    1000006
+C       C        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CHH)(H)      C[6](C[6,6]CCH)2(H)2      C7      C8    Y     1.52616    1000006
+C       C        C[6,6](C[6,6]CC)(C[6]CO)2      C[6](C[6,6]CC)2(O)      C18      C17    Y     1.45091    1000006
+C       C        C[6,6](C[6,6]CCH)(C[6]CO)2      C[6](C[6,6]CC)2(O)      C16      C17    Y     1.44482    1000006
+C       C        C[6,6](C[6,6]CCH)(C[6]CO)2(OH)      C[6](C[6,6]CCO)(C[6,6]CC)(OH)      C14      C15    Y     1.50765    1000006
+C       C        C[6,6](C[6,6]CCH)(C[6]CO)2(OH)      C[6](C[6,6]CCO)(C[6]CC)(O)      C14      C13    Y     1.55150    1000006
+C       C        C[6,6](C[6,6]CCO)(C[6]CHH)(C[6]CHN)(H)      C[6,6](C[6,6]CCH)(C[6]CO)2(OH)      C9      C14    Y     1.52163    1000006
+C       C        C[6,6](C[6,6]CCO)(C[6]CHH)(C[6]CHN)(H)      C[6](C[6,6]CCH)(C[6]CO)(NCCH)(H)      C9      C10    Y     1.53771    1000006
+C       C        C[6,6](C[6,6]CCO)(C[6]CHH)(C[6]CHN)(H)      C[6](C[6,6]CCH)2(H)2      C9      C8    Y     1.53361    1000006
+C       C        C[6](C[6,6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(H)      C4      C3    Y     1.39950    1000006
+C       C        C[6](C[6,6]CC)(C[6]CH)(OH)      C[6,6](C[6,6]CC)(C[6]CO)2      C1      C18    Y     1.40541    1000006
+C       C        C[6](C[6,6]CC)(C[6]CH)(OH)      C[6](C[6]CH)(C[6]CO)(H)      C1      C2    Y     1.38562    1000006
+C       C        C[6](C[6,6]CCH)(C[6,6]CC)(CH3)(OH)      C(C[6]CCO)(H)3      C6      C20    N     1.51583    1000006
+C       C        C[6](C[6,6]CCH)(C[6,6]CC)(CH3)(OH)      C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CH)      C6      C5    Y     1.53414    1000006
+C       C        C[6](C[6,6]CCH)(C[6]CO)(NCCH)(H)      C[6](C[6]CHN)(C[6]CC)(O)      C10      C11    Y     1.52170    1000006
+C       C        C[6](C[6,6]CCO)(C[6,6]CC)(OH)      C[6,6](C[6,6]CCH)(C[6]CO)2      C15      C16    Y     1.35408    1000006
+C       C        C[6](C[6,6]CCO)(C[6]CC)(O)      C[6](C[6]CO)2(CNO)      C13      C12    Y     1.42691    1000006
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)(C[6]CN)(H)      C50      C51    Y     1.37855    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)(C[6]CN)(H)      C56      C55    Y     1.37283    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(CCHH)      C50      C49    Y     1.37453    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(CCHH)      C56      C49    Y     1.38823    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(CCHN)      C46      C41    Y     1.38435    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(CCHN)      C42      C41    Y     1.32850    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(H)      C42      C43    Y     1.37328    1000001
+C       C        C[6](C[6]CC)(C[6]CH)(H)      C[6](C[6]CH)2(H)      C46      C45    Y     1.41580    1000001
+C       C        C[6](C[6]CH)(C[6]CN)(H)      C[6](C[6]CH)2(NCH)      C51      C52    Y     1.37839    1000001
+C       C        C[6](C[6]CH)(C[6]CN)(H)      C[6](C[6]CH)2(NCH)      C55      C52    Y     1.40295    1000001
+C       C        C[6](C[6]CH)(C[6]CN)(OH)      C[6](C[6]CH)(C[6]CO)(H)      C12      C11    Y     1.39858    1000001
+C       C        C[6](C[6]CH)(C[6]CN)(OH)      C[6](C[6]CO)(N[6]C)(CNO)      C12      C7    Y     1.37275    1000001
+C       C        C[6](C[6]CH)(C[6]CO)(H)      C[6](C[6]CH)(C[6]HN)(H)      C11      C10    Y     1.36778    1000001
+C       C        C[6](C[6]CH)(C[6]CO)(H)      C[6](C[6]CH)2(H)      C2      C3    Y     1.35674    1000006
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C222      C223    Y     1.39983    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C226      C225    Y     1.37911    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C112      C113    Y     1.39791    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C116      C115    Y     1.38144    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C216      C215    Y     1.38641    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C122      C123    Y     1.39337    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C126      C125    Y     1.38724    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(H)      C212      C213    Y     1.39173    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C116      C111    Y     1.38342    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C112      C111    Y     1.38987    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C122      C121    Y     1.40028    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C126      C121    Y     1.39879    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C216      C211    Y     1.40718    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C212      C211    Y     1.40042    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C222      C221    Y     1.37828    1000004
+C       C        C[6](C[6]CH)(C[6]CP)(H)      C[6](C[6]CH)2(PCuCC)      C226      C221    Y     1.40230    1000004
+C       C        C[6](C[6]CH)(C[6]HN)(H)      C[6](C[6]CH)(N[6]C)(H)      C10      C9    Y     1.33481    1000001
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C44      C43    Y     1.36655    1000001
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C45      C44    Y     1.32093    1000001
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C123      C124    Y     1.37288    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C125      C124    Y     1.39464    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C224      C223    Y     1.34828    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C225      C224    Y     1.38250    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C114      C113    Y     1.36585    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C115      C114    Y     1.36251    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C215      C214    Y     1.39333    1000004
+C       C        C[6](C[6]CH)2(H)      C[6](C[6]CH)2(H)      C213      C214    Y     1.38326    1000004
+C       C        C[6](C[6]CHH)(N[6]CC)(CNO)(H)      C(C[6]CHN)(NCH)(O)      C35      C36    N     1.54090    1000001
+C       C        C[6](C[6]CHH)(N[6]CC)(CNO)(H)      C[6](C[6]CHN)(C[6]CO)(H)2      C35      C34    Y     1.51438    1000001
+C       C        C[6](C[6]CHH)(N[6]CC)(H)2      C[6](C[6]HHN)(C[6]CO)(H)2      C30      C31    Y     1.50807    1000001
+C       C        C[6](C[6]CHN)(C[6]CC)(O)      C[6](C[6]CO)2(CNO)      C11      C12    Y     1.40326    1000006
+C       C        C[6](C[6]CHN)(C[6]CO)(H)2      C[6](C[6]CHH)2(O)      C34      C32    Y     1.49589    1000001
+C       C        C[6](C[6]CO)(N[6]C)(CNO)      C(C[6]CN)(NCH)(O)      C7      C5    N     1.48572    1000001
+C       C        C[6](C[6]CO)2(CNO)      C(C[6]CC)(NHH)(O)      C12      C19    N     1.43531    1000006
+C       C        C[6](C[6]HHN)(C[6]CO)(H)2      C[6](C[6]CHH)2(O)      C31      C32    Y     1.51257    1000001
+C       H        C(CCC)(CCH)(H)      H(CCC)      C118      H118    N     1.04233    1000001
+C       H        C(CCC)(CCH)(H)      H(CCC)      C160      H160    N     1.01524    1000001
+C       H        C(CCC)(H)3      H(CCHH)      C132      H1321    N     0.97062    1000001
+C       H        C(CCC)(H)3      H(CCHH)      C132      H1322    N     1.06866    1000001
+C       H        C(CCC)(H)3      H(CCHH)      C132      H1323    N     0.99523    1000001
+C       H        C(CCC)(H)3      H(CCHH)      C162      H1621    N     1.01418    1000001
+C       H        C(CCC)(H)3      H(CCHH)      C162      H1622    N     1.02029    1000001
+C       H        C(CCC)(H)3      H(CCHH)      C162      H1623    N     1.01194    1000001
+C       H        C(CCCH)(CCH)(H)      H(CCC)      C111      H111    N     1.01551    1000001
+C       H        C(CCCH)(CCH)(H)      H(CCC)      C153      H153    N     1.01317    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C133      H1331    N     0.97452    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C133      H1333    N     1.05664    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C133      H1332    N     1.01323    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C135      H1351    N     1.00290    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C135      H1353    N     1.05322    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C135      H1352    N     0.97676    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C136      H1362    N     0.93420    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C136      H1363    N     1.01450    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C136      H1361    N     1.01345    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C186      H1861    N     0.98961    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C186      H1862    N     0.99677    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C186      H1863    N     1.03270    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C184      H1841    N     0.95175    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C184      H1842    N     1.04236    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C184      H1843    N     0.98877    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C187      H1872    N     0.96232    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C187      H1873    N     1.04273    1000001
+C       H        C(CCCH)(H)3      H(CCHH)      C187      H1871    N     0.99728    1000001
+C       H        C(CCCH)2(OC)(H)      H(CCCO)      C109      H109    N     1.02017    1000001
+C       H        C(CCCH)2(OC)(H)      H(CCCO)      C151      H151    N     1.02953    1000001
+C       H        C(CCH)(CNO)(H)      H(CCC)      C112      H112    N     1.01120    1000001
+C       H        C(CCH)(CNO)(H)      H(CCC)      C154      H154    N     1.04611    1000001
+C       H        C(CCH)(NCH)(H)2      H(CCHN)      C116      H1162    N     0.99467    1000001
+C       H        C(CCH)(NCH)(H)2      H(CCHN)      C116      H1161    N     1.02874    1000001
+C       H        C(CCH)(NCH)(H)2      H(CCHN)      C158      H1582    N     0.97458    1000001
+C       H        C(CCH)(NCH)(H)2      H(CCHN)      C158      H1581    N     1.04440    1000001
+C       H        C(CCHH)(CCH)(OH)(H)      H(CCCO)      C121      H121    N     1.04900    1000001
+C       H        C(CCHH)(CCH)(OH)(H)      H(CCCO)      C164      H164    N     1.00505    1000001
+C       H        C(CCHH)(CHHP)(H)2      H(CCCH)      C2      H2A    N     0.97000    1000004
+C       H        C(CCHH)(CHHP)(H)2      H(CCCH)      C2      H2B    N     0.96994    1000004
+C       H        C(CCHH)(CHHP)(H)2      H(CCCH)      C4      H4A    N     0.97085    1000004
+C       H        C(CCHH)(CHHP)(H)2      H(CCCH)      C4      H4B    N     0.97049    1000004
+C       H        C(CCHH)(CNO)(NCC)(H)      H(CCCN)      C26      H26    N     1.00180    1000001
+C       H        C(CCHH)(CNO)(NCH)(H)      H(CCCN)      C17      H17    N     1.00759    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C61      H611    N     0.99411    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C61      H612    N     1.00790    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C61      H613    N     0.99127    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C207      H2073    N     1.11131    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C207      H2071    N     1.00187    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C207      H2072    N     0.93959    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C205      H2053    N     0.99511    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C205      H2051    N     1.13357    1000001
+C       H        C(CCHH)(H)3      H(CCHH)      C205      H2052    N     1.05195    1000001
+C       H        C(CCHH)2(H)2      H(CCCH)      C3      H3B    N     0.96975    1000004
+C       H        C(CCHH)2(H)2      H(CCCH)      C3      H3A    N     0.97072    1000004
+C       H        C(CCHN)(CH3)(H)2      H(CCCH)      C60      H602    N     1.00475    1000001
+C       H        C(CCHN)(CH3)(H)2      H(CCCH)      C60      H601    N     1.02895    1000001
+C       H        C(CCHN)(CH3)(OC)(H)      H(CCCO)      C2      H2    N     1.00651    1000001
+C       H        C(CCHO)(CCC)(H)      H(CCC)      C120      H120    N     1.03072    1000001
+C       H        C(CCHO)(CCC)(H)      H(CCC)      C163      H163    N     0.99840    1000001
+C       H        C(CCHO)(CCO)(H)2      H(CCCH)      C123      H1231    N     1.01447    1000001
+C       H        C(CCHO)(CCO)(H)2      H(CCCH)      C123      H1232    N     1.03594    1000001
+C       H        C(CCHO)(CCO)(H)2      H(CCCH)      C166      H1661    N     1.02650    1000001
+C       H        C(CCHO)(CCO)(H)2      H(CCCH)      C166      H1662    N     1.01387    1000001
+C       H        C(CCHO)(CH3)(CCH)(H)      H(CC3)      C110      H110    N     1.03295    1000001
+C       H        C(CCHO)(CH3)(CCH)(H)      H(CC3)      C152      H152    N     1.02596    1000001
+C       H        C(CCHO)(CH3)2(H)      H(CC3)      C134      H1341    N     1.10909    1000001
+C       H        C(CCHO)(CH3)2(H)      H(CC3)      C185      H185    N     1.00129    1000001
+C       H        C(CCHO)(CNO)(NCH)(H)      H(CCCN)      C3      H3    N     1.01179    1000001
+C       H        C(CCHO)(H)3      H(CCHH)      C62      H622    N     0.98672    1000001
+C       H        C(CCHO)(H)3      H(CCHH)      C62      H623    N     1.02234    1000001
+C       H        C(CCHO)(H)3      H(CCHH)      C62      H621    N     1.01577    1000001
+C       H        C(CH3)(OC)(H)2      H(CCHO)      C201      H2011    N     1.00379    1000001
+C       H        C(CH3)(OC)(H)2      H(CCHO)      C201      H2012    N     1.12628    1000001
+C       H        C(CH3)2(H)2      H(CCCH)      C206      H2061    N     1.13177    1000001
+C       H        C(CH3)2(H)2      H(CCCH)      C206      H2062    N     0.97520    1000001
+C       H        C(CHHN)(CCH)(H)      H(CCC)      C117      H117    N     0.98256    1000001
+C       H        C(CHHN)(CCH)(H)      H(CCC)      C159      H159    N     1.00850    1000001
+C       H        C(CHHO)(H)3      H(CCHH)      C200      H2001    N     0.92940    1000001
+C       H        C(CHHO)(H)3      H(CCHH)      C200      H2003    N     1.09264    1000001
+C       H        C(CHHO)(H)3      H(CCHH)      C200      H2002    N     1.01412    1000001
+C       H        C(COO)(H)3      H(CCHH)      C203      H2031    N     1.02128    1000001
+C       H        C(COO)(H)3      H(CCHH)      C203      H2032    N     0.89467    1000001
+C       H        C(COO)(H)3      H(CCHH)      C203      H2033    N     1.04760    1000001
+C       H        C(C[5]NO)(CCO)(H)2      H(CCCH)      C126      H1261    N     1.00919    1000001
+C       H        C(C[5]NO)(CCO)(H)2      H(CCCH)      C126      H1262    N     1.04159    1000001
+C       H        C(C[5]NO)(CCO)(H)2      H(CCCH)      C169      H1691    N     1.02761    1000001
+C       H        C(C[5]NO)(CCO)(H)2      H(CCCH)      C169      H1692    N     1.02140    1000001
+C       H        C(C[6]CC)(CCHN)(H)2      H(CCCH)      C48      H481    N     1.02062    1000001
+C       H        C(C[6]CC)(CCHN)(H)2      H(CCCH)      C48      H482    N     0.99724    1000001
+C       H        C(C[6]CC)(COO)(NCH)(H)      H(CCCN)      C38      H38    N     0.99916    1000001
+C       H        C(C[6]CCO)(H)3      H(CCHH)      C20      H20A    N     1.00168    1000006
+C       H        C(C[6]CCO)(H)3      H(CCHH)      C20      H20B    N     0.93050    1000006
+C       H        C(C[6]CCO)(H)3      H(CCHH)      C20      H20C    N     0.94687    1000006
+C       H        C(NCC)(H)3      H(CHHN)      C25      H251    N     0.96838    1000001
+C       H        C(NCC)(H)3      H(CHHN)      C25      H253    N     1.03645    1000001
+C       H        C(NCC)(H)3      H(CHHN)      C25      H252    N     0.98715    1000001
+C       H        C(NCCH)(H)3      H(CHHN)      C21      H21B    N     0.93974    1000006
+C       H        C(NCCH)(H)3      H(CHHN)      C21      H21C    N     0.92798    1000006
+C       H        C(NCCH)(H)3      H(CHHN)      C21      H21A    N     0.90351    1000006
+C       H        C(NCCH)(H)3      H(CHHN)      C22      H22A    N     0.99710    1000006
+C       H        C(NCCH)(H)3      H(CHHN)      C22      H22C    N     0.95015    1000006
+C       H        C(NCCH)(H)3      H(CHHN)      C22      H22B    N     0.87500    1000006
+C       H        C(NCH)(H)3      H(CHHN)      C54      H541    N     1.00910    1000001
+C       H        C(NCH)(H)3      H(CHHN)      C54      H542    N     1.02364    1000001
+C       H        C(NCH)(H)3      H(CHHN)      C54      H543    N     1.00106    1000001
+C       H        C(PCuCC)(CCHH)(H)2      H(CCHP)      C1      H1B    N     0.96931    1000004
+C       H        C(PCuCC)(CCHH)(H)2      H(CCHP)      C1      H1A    N     0.97029    1000004
+C       H        C(PCuCC)(CCHH)(H)2      H(CCHP)      C5      H5A    N     0.97014    1000004
+C       H        C(PCuCC)(CCHH)(H)2      H(CCHP)      C5      H5B    N     0.96934    1000004
+C       H        C[5](C[5]CHH)(C[5]CHN)(H)2      H(C[5]CCH)      C105      H1051    N     1.03213    1000001
+C       H        C[5](C[5]CHH)(C[5]CHN)(H)2      H(C[5]CCH)      C105      H1052    N     1.02123    1000001
+C       H        C[5](C[5]CHH)(C[5]CHN)(H)2      H(C[5]CCH)      C181      H1811    N     1.02502    1000001
+C       H        C[5](C[5]CHH)(C[5]CHN)(H)2      H(C[5]CCH)      C181      H1812    N     1.00812    1000001
+C       H        C[5](C[5]CHH)(C[5]CHN)(H)2      H(C[5]CCH)      C57      H571    N     1.01566    1000001
+C       H        C[5](C[5]CHH)(C[5]CHN)(H)2      H(C[5]CCH)      C57      H572    N     1.01205    1000001
+C       H        C[5](C[5]CHH)(C[5]HHN)(H)2      H(C[5]CCH)      C104      H1042    N     1.02206    1000001
+C       H        C[5](C[5]CHH)(C[5]HHN)(H)2      H(C[5]CCH)      C104      H1041    N     1.02704    1000001
+C       H        C[5](C[5]CHH)(C[5]HHN)(H)2      H(C[5]CCH)      C182      H1822    N     0.99973    1000001
+C       H        C[5](C[5]CHH)(C[5]HHN)(H)2      H(C[5]CCH)      C182      H1821    N     1.04791    1000001
+C       H        C[5](C[5]CHH)(C[5]HHN)(H)2      H(C[5]CCH)      C58      H581    N     1.00129    1000001
+C       H        C[5](C[5]CHH)(C[5]HHN)(H)2      H(C[5]CCH)      C58      H582    N     0.97263    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(CNO)(H)      H(C[5]CCN)      C21      H21    N     1.01931    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(COO)(H)      H(C[5]CCN)      C106      H106    N     1.04603    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(COO)(H)      H(C[5]CCN)      C178      H178    N     1.00353    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(H)2      H(C[5]CHN)      C103      H1031    N     1.03286    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(H)2      H(C[5]CHN)      C103      H1032    N     0.98906    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(H)2      H(C[5]CHN)      C183      H1832    N     0.95847    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(H)2      H(C[5]CHN)      C183      H1831    N     1.06940    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(H)2      H(C[5]CHN)      C59      H591    N     1.00112    1000001
+C       H        C[5](C[5]CHH)(N[5]CC)(H)2      H(C[5]CHN)      C59      H592    N     1.03088    1000001
+C       H        C[5](C[5]CN)(O[5]C)(H)      H(C[5]CO)      C129      H1291    N     0.99865    1000001
+C       H        C[5](C[5]CN)(O[5]C)(H)      H(C[5]CO)      C172      H172    N     1.01603    1000001
+C       H        C[6,6](C[6,6]CC)(C[6]CCO)(C[6]CHH)(H)      H(C[6,6]C3)      C7      H7    N     0.97377    1000006
+C       H        C[6,6](C[6,6]CCO)(C[6]CHH)(C[6]CHN)(H)      H(C[6,6]C3)      C9      H9    N     0.99398    1000006
+C       H        C[6](C[6,6]CC)(C[6]CH)(H)      H(C[6]CC)      C4      H4    N     0.98787    1000006
+C       H        C[6](C[6,6]CCH)(C[6]CO)(NCCH)(H)      H(C[6]CCN)      C10      H10A    N     0.91595    1000006
+C       H        C[6](C[6,6]CCH)2(H)2      H(C[6]CCH)      C8      H8A    N     0.94710    1000006
+C       H        C[6](C[6,6]CCH)2(H)2      H(C[6]CCH)      C8      H8B    N     0.96795    1000006
+C       H        C[6](C[6]CC)(C[6]CH)(H)      H(C[6]CC)      C42      H42    N     1.03713    1000001
+C       H        C[6](C[6]CC)(C[6]CH)(H)      H(C[6]CC)      C46      H46    N     1.04826    1000001
+C       H        C[6](C[6]CC)(C[6]CH)(H)      H(C[6]CC)      C50      H50    N     0.99337    1000001
+C       H        C[6](C[6]CC)(C[6]CH)(H)      H(C[6]CC)      C56      H56    N     1.02273    1000001
+C       H        C[6](C[6]CH)(C[6]CN)(H)      H(C[6]CC)      C51      H51    N     1.03749    1000001
+C       H        C[6](C[6]CH)(C[6]CN)(H)      H(C[6]CC)      C55      H55    N     1.03211    1000001
+C       H        C[6](C[6]CH)(C[6]CO)(H)      H(C[6]CC)      C11      H11    N     1.00340    1000001
+C       H        C[6](C[6]CH)(C[6]CO)(H)      H(C[6]CC)      C2      H2    N     0.99337    1000006
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C112      H112    N     0.93049    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C116      H116    N     0.93091    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C122      H122    N     0.93085    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C126      H126    N     0.93043    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C212      H212    N     0.93019    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C216      H216    N     0.92972    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C222      H222    N     0.92955    1000004
+C       H        C[6](C[6]CH)(C[6]CP)(H)      H(C[6]CC)      C226      H226    N     0.93067    1000004
+C       H        C[6](C[6]CH)(C[6]HN)(H)      H(C[6]CC)      C10      H10    N     0.98079    1000001
+C       H        C[6](C[6]CH)(N[6]C)(H)      H(C[6]CN)      C9      H9    N     1.00276    1000001
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C43      H43    N     1.05944    1000001
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C44      H44    N     1.08776    1000001
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C45      H45    N     1.03993    1000001
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C123      H123    N     0.93054    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C124      H124    N     0.92998    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C223      H223    N     0.93030    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C224      H224    N     0.93068    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C225      H225    N     0.92997    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C113      H113    N     0.92969    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C114      H114    N     0.93063    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C115      H115    N     0.92955    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C214      H214    N     0.93051    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C215      H215    N     0.93047    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C125      H125    N     0.93061    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C213      H213    N     0.92987    1000004
+C       H        C[6](C[6]CH)2(H)      H(C[6]CC)      C3      H3    N     0.84875    1000006
+C       H        C[6](C[6]CHH)(N[6]CC)(CNO)(H)      H(C[6]CCN)      C35      H35    N     1.02355    1000001
+C       H        C[6](C[6]CHH)(N[6]CC)(H)2      H(C[6]CHN)      C30      H302    N     0.99491    1000001
+C       H        C[6](C[6]CHH)(N[6]CC)(H)2      H(C[6]CHN)      C30      H301    N     1.01433    1000001
+C       H        C[6](C[6]CHN)(C[6]CO)(H)2      H(C[6]CCH)      C34      H341    N     1.03201    1000001
+C       H        C[6](C[6]CHN)(C[6]CO)(H)2      H(C[6]CCH)      C34      H342    N     1.02404    1000001
+C       H        C[6](C[6]HHN)(C[6]CO)(H)2      H(C[6]CCH)      C31      H311    N     1.01771    1000001
+C       H        C[6](C[6]HHN)(C[6]CO)(H)2      H(C[6]CCH)      C31      H312    N     1.00455    1000001
+C       N        C(CCH)(NCH)(H)2      N(CCHH)(CCO)(H)      C116      N115    N     1.45048    1000001
+C       N        C(CCH)(NCH)(H)2      N(CCHH)(CCO)(H)      C158      N157    N     1.47629    1000001
+C       N        C(CCH)(NCH)(O)      N(CCHH)(CCO)(H)      C113      N115    N     1.30779    1000001
+C       N        C(CCH)(NCH)(O)      N(CCHH)(CCO)(H)      C155      N157    N     1.34494    1000001
+C       N        C(CCHH)(CNO)(NCC)(H)      N(CCCH)(CH3)(CCO)      C26      N24    N     1.49664    1000001
+C       N        C(CCHH)(CNO)(NCH)(H)      N(CCCH)(CCO)(H)      C17      N16    N     1.46243    1000001
+C       N        C(CCHN)(NCH)(O)      N(CCCH)(CCO)(H)      C14      N16    N     1.32681    1000001
+C       N        C(CCHO)(CNO)(NCH)(H)      N(CCCH)(CCO)(H)      C3      N4    N     1.47191    1000001
+C       N        C(C[5]CHN)(NCC)(O)      N(CCCH)(CH3)(CCO)      C22      N24    N     1.32152    1000001
+C       N        C(C[5]CN)(N[5]CC)(O)      N[5](C[5]CCH)(C[5]CHH)(CCO)      C101      N102    N     1.33855    1000001
+C       N        C(C[5]CN)(N[5]CC)(O)      N[5](C[5]CCH)(C[5]CHH)(CCO)      C175      N177    N     1.31840    1000001
+C       N        C(C[6]CC)(COO)(NCH)(H)      N(CCCH)(CCO)(H)      C38      N37    N     1.44031    1000001
+C       N        C(C[6]CC)(NHH)(O)      N(CCO)(H)2      C19      N19    N     1.30059    1000006
+C       N        C(C[6]CHN)(NCH)(O)      N(CCCH)(CCO)(H)      C36      N37    N     1.32908    1000001
+C       N        C(C[6]CN)(NCH)(O)      N(CCCH)(CCO)(H)      C5      N4    N     1.33253    1000001
+C       N        C(NCC)(H)3      N(CCCH)(CH3)(CCO)      C25      N24    N     1.45810    1000001
+C       N        C(NCCH)(H)3      N(C[6]CCH)(CH3)2(H)      C21      N10    N     1.49047    1000006
+C       N        C(NCCH)(H)3      N(C[6]CCH)(CH3)2(H)      C22      N10    N     1.49104    1000006
+C       N        C(NCH)(H)3      N(C[6]CC)(CH3)(H)      C54      N53    N     1.41811    1000001
+C       N        C(N[5]CC)(CCHN)(O)      N[5](C[5]CCH)(C[5]CHH)(CCO)      C18      N20    N     1.33843    1000001
+C       N        C(N[6]CC)(CCHN)(O)      N[6](C[6]CCH)(C[6]CHH)(CCO)      C27      N29    N     1.37664    1000001
+C       N        C[5](C[5]CHH)(N[5]CC)(CNO)(H)      N[5](C[5]CCH)(C[5]CHH)(CCO)      C21      N20    Y     1.44125    1000001
+C       N        C[5](C[5]CHH)(N[5]CC)(COO)(H)      N[5](C[5]CCH)(C[5]CHH)(CCO)      C106      N102    Y     1.46006    1000001
+C       N        C[5](C[5]CHH)(N[5]CC)(COO)(H)      N[5](C[5]CCH)(C[5]CHH)(CCO)      C178      N177    Y     1.46524    1000001
+C       N        C[5](C[5]CHH)(N[5]CC)(H)2      N[5](C[5]CCH)(C[5]CHH)(CCO)      C103      N102    Y     1.44618    1000001
+C       N        C[5](C[5]CHH)(N[5]CC)(H)2      N[5](C[5]CCH)(C[5]CHH)(CCO)      C183      N177    Y     1.46170    1000001
+C       N        C[5](C[5]CHH)(N[5]CC)(H)2      N[5](C[5]CCH)(C[5]CHH)(CCO)      C59      N20    Y     1.46785    1000001
+C       N        C[5](C[5]HO)(N[5]C)(CNO)      N[5](C[5]CC)(C[5]CO)      C130      N131    Y     1.37756    1000001
+C       N        C[5](C[5]HO)(N[5]C)(CNO)      N[5](C[5]CC)(C[5]CO)      C173      N174    Y     1.41715    1000001
+C       N        C[5](N[5]C)(O[5]C)(CCHH)      N[5](C[5]CC)(C[5]CO)      C127      N131    Y     1.31552    1000001
+C       N        C[5](N[5]C)(O[5]C)(CCHH)      N[5](C[5]CC)(C[5]CO)      C170      N174    Y     1.27612    1000001
+C       N        C[6](C[6,6]CCH)(C[6]CO)(NCCH)(H)      N(C[6]CCH)(CH3)2(H)      C10      N10    N     1.49382    1000006
+C       N        C[6](C[6]CH)(N[6]C)(H)      N[6](C[6]CC)(C[6]CH)      C9      N8    Y     1.35574    1000001
+C       N        C[6](C[6]CH)2(NCH)      N(C[6]CC)(CH3)(H)      C52      N53    N     1.38981    1000001
+C       N        C[6](C[6]CHH)(N[6]CC)(CNO)(H)      N[6](C[6]CCH)(C[6]CHH)(CCO)      C35      N29    Y     1.45393    1000001
+C       N        C[6](C[6]CHH)(N[6]CC)(H)2      N[6](C[6]CCH)(C[6]CHH)(CCO)      C30      N29    Y     1.46640    1000001
+C       N        C[6](C[6]CO)(N[6]C)(CNO)      N[6](C[6]CC)(C[6]CH)      C7      N8    Y     1.32078    1000001
+C       O        C(CCCH)2(OC)(H)      O(CCCH)(CCO)      C109      O108    N     1.40527    1000001
+C       O        C(CCCH)2(OC)(H)      O(CCCH)(CCO)      C151      O150    N     1.47367    1000001
+C       O        C(CCH)(NCH)(O)      O(CCN)      C113      O114    N     1.25390    1000001
+C       O        C(CCH)(NCH)(O)      O(CCN)      C155      O156    N     1.21884    1000001
+C       O        C(CCHH)(CCH)(OH)(H)      O(CCCH)(H)      C121      O122    N     1.40231    1000001
+C       O        C(CCHH)(CCH)(OH)(H)      O(CCCH)(H)      C164      O165    N     1.41884    1000001
+C       O        C(CCHH)2(O)      O(CCC)      C124      O125    N     1.20523    1000001
+C       O        C(CCHH)2(O)      O(CCC)      C167      O168    N     1.20339    1000001
+C       O        C(CCHN)(CH3)(OC)(H)      O(CCCH)(CCO)      C2      O1    N     1.46411    1000001
+C       O        C(CCHN)(NCH)(O)      O(CCN)      C14      O15    N     1.20666    1000001
+C       O        C(CCHN)(OC)(O)      O(CCCH)(CCO)      C39      O1    N     1.30092    1000001
+C       O        C(CCHN)(OC)(O)      O(CCO)      C39      O40    N     1.19971    1000001
+C       O        C(CH3)(OC)(H)2      O(CCHH)(CCO)      C201      O200    N     1.56081    1000001
+C       O        C(CH3)(OC)(O)      O(CCHH)(CCO)      C202      O200    N     1.46051    1000001
+C       O        C(CH3)(OC)(O)      O(CCO)      C202      O201    N     0.97961    1000001
+C       O        C(C[5]CHN)(NCC)(O)      O(CCN)      C22      O23    N     1.25568    1000001
+C       O        C(C[5]CHN)(OC)(O)      O(CCCH)(CCO)      C107      O108    N     1.29815    1000001
+C       O        C(C[5]CHN)(OC)(O)      O(CCCH)(CCO)      C179      O150    N     1.36521    1000001
+C       O        C(C[5]CHN)(OC)(O)      O(CCO)      C107      O136    N     1.23532    1000001
+C       O        C(C[5]CHN)(OC)(O)      O(CCO)      C179      O180    N     1.19404    1000001
+C       O        C(C[5]CN)(N[5]CC)(O)      O(CCN)      C101      O100    N     1.22713    1000001
+C       O        C(C[5]CN)(N[5]CC)(O)      O(CCN)      C175      O176    N     1.23789    1000001
+C       O        C(C[6]CC)(NHH)(O)      O(CCN)      C19      O19    N     1.31344    1000006
+C       O        C(C[6]CHN)(NCH)(O)      O(CCN)      C36      O47    N     1.21557    1000001
+C       O        C(C[6]CN)(NCH)(O)      O(CCN)      C5      O6    N     1.23408    1000001
+C       O        C(N[5]CC)(CCHN)(O)      O(CCN)      C18      O19    N     1.22307    1000001
+C       O        C(N[6]CC)(CCHN)(O)      O(CCN)      C27      O28    N     1.21117    1000001
+C       O        C[5](C[5]CN)(O[5]C)(H)      O[5](C[5]CH)(C[5]CN)      C129      O128    Y     1.35198    1000001
+C       O        C[5](C[5]CN)(O[5]C)(H)      O[5](C[5]CH)(C[5]CN)      C172      O171    Y     1.35867    1000001
+C       O        C[5](N[5]C)(O[5]C)(CCHH)      O[5](C[5]CH)(C[5]CN)      C127      O128    Y     1.33497    1000001
+C       O        C[5](N[5]C)(O[5]C)(CCHH)      O[5](C[5]CH)(C[5]CN)      C170      O171    Y     1.37335    1000001
+C       O        C[6,6](C[6,6]CCH)(C[6]CO)2(OH)      O(C[6,6]C3)(H)      C14      O14    N     1.42239    1000006
+C       O        C[6](C[6,6]CC)(C[6]CH)(OH)      O(C[6]CC)(H)      C1      O1    N     1.35176    1000006
+C       O        C[6](C[6,6]CC)2(O)      O(C[6]CC)      C17      O17    N     1.27649    1000006
+C       O        C[6](C[6,6]CCH)(C[6,6]CC)(CH3)(OH)      O(C[6]C3)(H)      C6      O6    N     1.43191    1000006
+C       O        C[6](C[6,6]CCO)(C[6,6]CC)(OH)      O(C[6]CC)(H)      C15      O15    N     1.32981    1000006
+C       O        C[6](C[6,6]CCO)(C[6]CC)(O)      O(C[6]CC)      C13      O13    N     1.23351    1000006
+C       O        C[6](C[6]CH)(C[6]CN)(OH)      O(C[6]CC)(H)      C12      O13    N     1.33811    1000001
+C       O        C[6](C[6]CHH)2(O)      O(C[6]CC)      C32      O33    N     1.24699    1000001
+C       O        C[6](C[6]CHN)(C[6]CC)(O)      O(C[6]CC)      C11      O11    N     1.25931    1000006
+C       P        C(PCuCC)(CCHH)(H)2      P(C[6]CC)2(CuIIP)(CCHH)      C1      P1    N     1.83741    1000004
+C       P        C(PCuCC)(CCHH)(H)2      P(C[6]CC)2(CuIIP)(CCHH)      C5      P2    N     1.84905    1000004
+C       P        C[6](C[6]CH)2(PCuCC)      P(C[6]CC)2(CuIIP)(CCHH)      C111      P1    N     1.81852    1000004
+C       P        C[6](C[6]CH)2(PCuCC)      P(C[6]CC)2(CuIIP)(CCHH)      C121      P1    N     1.84606    1000004
+C       P        C[6](C[6]CH)2(PCuCC)      P(C[6]CC)2(CuIIP)(CCHH)      C221      P2    N     1.83417    1000004
+C       P        C[6](C[6]CH)2(PCuCC)      P(C[6]CC)2(CuIIP)(CCHH)      C211      P2    N     1.82583    1000004
+Cd       F        Cd(FCd)6      F(CdF5)2      Cd1      F2    N     2.23395    1000097
+Cd       F        Cd(FCd)6      F(CdF5)2      Cd1      F1    N     2.21242    1000097
+Cd       F        Cd(FCd)6      F(CdF5)2      Cd1      F1    N     2.21116    1000097
+Cu       I        Cu(PC3)2(ICu)2      I(CuIPP)2      Cu      I    N     2.75770    1000004
+Cu       I        Cu(PC3)2(ICu)2      I(CuIPP)2      Cu      I    N     2.74355    1000004
+Cu       P        Cu(PC3)2(ICu)2      P(C[6]CC)2(CuIIP)(CCHH)      Cu      P1    N     2.25504    1000004
+Cu       P        Cu(PC3)2(ICu)2      P(C[6]CC)2(CuIIP)(CCHH)      Cu      P2    N     2.25202    1000004
+H       N        H(NC3)      N(C[6]CCH)(CH3)2(H)      H10      N10    N     0.86481    1000006
+H       N        H(NCC)      N(CCCH)(CCO)(H)      H3004      N4    N     1.02510    1000001
+H       N        H(NCC)      N(CCCH)(CCO)(H)      H3016      N16    N     1.02122    1000001
+H       N        H(NCC)      N(CCCH)(CCO)(H)      H3037      N37    N     1.02432    1000001
+H       N        H(NCC)      N(CCHH)(CCO)(H)      H3115      N115    N     1.02430    1000001
+H       N        H(NCC)      N(CCHH)(CCO)(H)      H3157      N157    N     1.03043    1000001
+H       N        H(NCC)      N(C[6]CC)(CH3)(H)      H3053      N53    N     1.02142    1000001
+H       N        H(NCH)      N(CCO)(H)2      H19A      N19    N     0.91699    1000006
+H       N        H(NCH)      N(CCO)(H)2      H19B      N19    N     0.87219    1000006
+H       O        H(OC)      O(CCCH)(H)      H3122      O122    N     0.98658    1000001
+H       O        H(OC)      O(CCCH)(H)      H3165      O165    N     0.97915    1000001
+H       O        H(OC)      O(C[6,6]C3)(H)      H14      O14    N     0.70535    1000006
+H       O        H(OC)      O(C[6]C3)(H)      H6      O6    N     0.93329    1000006
+H       O        H(OC)      O(C[6]CC)(H)      H3013      O13    N     0.99831    1000001
+H       O        H(OC)      O(C[6]CC)(H)      H1      O1    N     0.92215    1000006
+H       O        H(OC)      O(C[6]CC)(H)      H15      O15    N     0.93835    1000006

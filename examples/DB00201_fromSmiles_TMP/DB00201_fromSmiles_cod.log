@@ -1,0 +1,2475 @@
+
+============ PROCESS INFORMATION =============
+||=====================Job description====================================||
+You will get an output cif file for a list of dictionary restraints
+based on the input cif file
+Your input cif file : DB00201_fromSmiles_TMP/DB00201_fromSmiles_libcheck.lib
+Your monomer name : UNL
+The output dictionary file(cif) : DB00201_fromSmiles_TMP/DB00201_fromSmiles_cod.rst
+||========================================================================||
+The work mode is 11
+NBDepth	1
+inCifName	DB00201_fromSmiles_TMP/DB00201_fromSmiles_libcheck.lib
+libMolTabDir	/Applications/ccp4-6.4.0/share/acedrg/tables
+monoRootName	UNL
+userOutName	DB00201_fromSmiles_TMP/DB00201_fromSmiles_cod.rst
+
+Atom 0 : 
+Its ID : O1
+Its Chemical Type : O
+Its CCP4 chemical type O
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C6
+The coords for the atom are : 
+0
+0
+0
+
+Atom 1 : 
+Its ID : C6
+Its Chemical Type : C
+Its CCP4 chemical type CR6
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+N2
+O1
+N3
+The coords for the atom are : 
+0.795
+0.453
+1.037
+
+Atom 2 : 
+Its ID : N3
+Its Chemical Type : N
+Its CCP4 chemical type NR6
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+C6
+C2
+C7
+The coords for the atom are : 
+0.412
+-0.409
+2.119
+
+Atom 3 : 
+Its ID : C7
+Its Chemical Type : C
+Its CCP4 chemical type CH3
+Its bonding index : 3
+Its residue Name: SMILE
+Its connected atoms are : 
+N3
+H7
+H8
+H9
+The coords for the atom are : 
+1.66
+-0.942
+2.808
+
+Atom 4 : 
+Its ID : H9
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C7
+The coords for the atom are : 
+2.254
+-1.492
+2.118
+
+Atom 5 : 
+Its ID : H8
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C7
+The coords for the atom are : 
+2.239
+-0.137
+3.192
+
+Atom 6 : 
+Its ID : H7
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C7
+The coords for the atom are : 
+1.389
+-1.583
+3.613
+
+Atom 7 : 
+Its ID : C2
+Its Chemical Type : C
+Its CCP4 chemical type CR56
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+N1
+C3
+N3
+The coords for the atom are : 
+-0.961
+-0.412
+1.834
+
+Atom 8 : 
+Its ID : N1
+Its Chemical Type : N
+Its CCP4 chemical type NRD5
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+C1
+C2
+The coords for the atom are : 
+-1.596
+-1.469
+1.427
+
+Atom 9 : 
+Its ID : C1
+Its Chemical Type : C
+Its CCP4 chemical type CR15
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+N
+N1
+H3
+The coords for the atom are : 
+-2.327
+-1.396
+0.283
+
+Atom 10 : 
+Its ID : H3
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C1
+The coords for the atom are : 
+-2.832
+-2.235
+-0.178
+
+Atom 11 : 
+Its ID : N2
+Its Chemical Type : N
+Its CCP4 chemical type NR6
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+C4
+C5
+C6
+The coords for the atom are : 
+0.445
+1.89
+1.011
+
+Atom 12 : 
+Its ID : C5
+Its Chemical Type : C
+Its CCP4 chemical type CH3
+Its bonding index : 3
+Its residue Name: SMILE
+Its connected atoms are : 
+N2
+H4
+H5
+H6
+The coords for the atom are : 
+1.784
+2.508
+1.064
+
+Atom 13 : 
+Its ID : H6
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C5
+The coords for the atom are : 
+2.278
+2.21
+1.953
+
+Atom 14 : 
+Its ID : H5
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C5
+The coords for the atom are : 
+2.353
+2.197
+0.226
+
+Atom 15 : 
+Its ID : H4
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C5
+The coords for the atom are : 
+1.689
+3.564
+1.052
+
+Atom 16 : 
+Its ID : C4
+Its Chemical Type : C
+Its CCP4 chemical type CR6
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+C3
+O
+N2
+The coords for the atom are : 
+-0.915
+2.045
+0.493
+
+Atom 17 : 
+Its ID : O
+Its Chemical Type : O
+Its CCP4 chemical type O
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C4
+The coords for the atom are : 
+-0.973
+2.811
+-0.484
+
+Atom 18 : 
+Its ID : C3
+Its Chemical Type : C
+Its CCP4 chemical type CR56
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+C2
+N
+C4
+The coords for the atom are : 
+-1.437
+0.498
+0.67
+
+Atom 19 : 
+Its ID : N
+Its Chemical Type : N
+Its CCP4 chemical type NR5
+Its bonding index : 2
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+C1
+C3
+The coords for the atom are : 
+-2.338
+-0.217
+-0.168
+
+Atom 20 : 
+Its ID : C
+Its Chemical Type : C
+Its CCP4 chemical type CH3
+Its bonding index : 3
+Its residue Name: SMILE
+Its connected atoms are : 
+N
+H
+H1
+H2
+The coords for the atom are : 
+-3.461
+0.45
+-0.832
+
+Atom 21 : 
+Its ID : H2
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+The coords for the atom are : 
+-4.095
+0.875
+-0.101
+
+Atom 22 : 
+Its ID : H1
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+The coords for the atom are : 
+-3.089
+1.209
+-1.467
+
+Atom 23 : 
+Its ID : H
+Its Chemical Type : H
+Its CCP4 chemical type H
+Its bonding index : 0
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+The coords for the atom are : 
+-4
+-0.259
+-1.402
+For Bond : 0
+It is in Residue: SMILE
+Its component atom1 C
+Its component atom2 N
+For Bond : 1
+It is in Residue: SMILE
+Its component atom1 N
+Its component atom2 C1
+For Bond : 2
+It is in Residue: SMILE
+Its component atom1 C1
+Its component atom2 N1
+For Bond : 3
+It is in Residue: SMILE
+Its component atom1 N1
+Its component atom2 C2
+For Bond : 4
+It is in Residue: SMILE
+Its component atom1 C2
+Its component atom2 C3
+For Bond : 5
+It is in Residue: SMILE
+Its component atom1 N
+Its component atom2 C3
+For Bond : 6
+It is in Residue: SMILE
+Its component atom1 C3
+Its component atom2 C4
+For Bond : 7
+It is in Residue: SMILE
+Its component atom1 O
+Its component atom2 C4
+For Bond : 8
+It is in Residue: SMILE
+Its component atom1 C4
+Its component atom2 N2
+For Bond : 9
+It is in Residue: SMILE
+Its component atom1 C5
+Its component atom2 N2
+For Bond : 10
+It is in Residue: SMILE
+Its component atom1 N2
+Its component atom2 C6
+For Bond : 11
+It is in Residue: SMILE
+Its component atom1 C6
+Its component atom2 O1
+For Bond : 12
+It is in Residue: SMILE
+Its component atom1 N3
+Its component atom2 C6
+For Bond : 13
+It is in Residue: SMILE
+Its component atom1 C2
+Its component atom2 N3
+For Bond : 14
+It is in Residue: SMILE
+Its component atom1 C7
+Its component atom2 N3
+For Bond : 15
+It is in Residue: SMILE
+Its component atom1 H
+Its component atom2 C
+For Bond : 16
+It is in Residue: SMILE
+Its component atom1 H1
+Its component atom2 C
+For Bond : 17
+It is in Residue: SMILE
+Its component atom1 H2
+Its component atom2 C
+For Bond : 18
+It is in Residue: SMILE
+Its component atom1 H3
+Its component atom2 C1
+For Bond : 19
+It is in Residue: SMILE
+Its component atom1 H4
+Its component atom2 C5
+For Bond : 20
+It is in Residue: SMILE
+Its component atom1 H5
+Its component atom2 C5
+For Bond : 21
+It is in Residue: SMILE
+Its component atom1 H6
+Its component atom2 C5
+For Bond : 22
+It is in Residue: SMILE
+Its component atom1 H7
+Its component atom2 C7
+For Bond : 23
+It is in Residue: SMILE
+Its component atom1 H8
+Its component atom2 C7
+For Bond : 24
+It is in Residue: SMILE
+Its component atom1 H9
+Its component atom2 C7
+Atom ID: O1
+Atom chemType: O
+Atom chemType of COD classes: O
+Atom ID: C6
+Atom chemType: C
+Atom chemType of COD classes: c
+Atom ID: N3
+Atom chemType: N
+Atom chemType of COD classes: n
+Atom ID: C7
+Atom chemType: C
+Atom chemType of COD classes: C
+Atom ID: H9
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: H8
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: H7
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: C2
+Atom chemType: C
+Atom chemType of COD classes: c
+Atom ID: N1
+Atom chemType: N
+Atom chemType of COD classes: n
+Atom ID: C1
+Atom chemType: C
+Atom chemType of COD classes: c
+Atom ID: H3
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: N2
+Atom chemType: N
+Atom chemType of COD classes: n
+Atom ID: C5
+Atom chemType: C
+Atom chemType of COD classes: C
+Atom ID: H6
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: H5
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: H4
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: C4
+Atom chemType: C
+Atom chemType of COD classes: c
+Atom ID: O
+Atom chemType: O
+Atom chemType of COD classes: O
+Atom ID: C3
+Atom chemType: C
+Atom chemType of COD classes: c
+Atom ID: N
+Atom chemType: N
+Atom chemType of COD classes: n
+Atom ID: C
+Atom chemType: C
+Atom chemType of COD classes: C
+Atom ID: H2
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: H1
+Atom chemType: H
+Atom chemType of COD classes: H
+Atom ID: H
+Atom chemType: H
+Atom chemType of COD classes: H
+Set torsion angles around the bond of atom C and N
+Set torsion angles around the bond of atom C5 and N2
+Set torsion angles around the bond of atom C6 and N3
+Set torsion angles around the bond of atom C7 and N3
+All torsions have been setup 
+Torsion angle 0
+Its atoms are : 
+atom C3
+atom C2
+atom N1
+atom C1
+Torsion angle 1
+Its atoms are : 
+atom N3
+atom C2
+atom N1
+atom C1
+Torsion angle 2
+Its atoms are : 
+atom N
+atom C1
+atom N1
+atom C2
+Torsion angle 3
+Its atoms are : 
+atom H3
+atom C1
+atom N1
+atom C2
+Torsion angle 4
+Its atoms are : 
+atom N1
+atom C1
+atom N
+atom C3
+Torsion angle 5
+Its atoms are : 
+atom N1
+atom C1
+atom N
+atom C
+Torsion angle 6
+Its atoms are : 
+atom H3
+atom C1
+atom N
+atom C3
+Torsion angle 7
+Its atoms are : 
+atom H3
+atom C1
+atom N
+atom C
+Torsion angle 8
+Its atoms are : 
+atom C2
+atom C3
+atom N
+atom C1
+Torsion angle 9
+Its atoms are : 
+atom C2
+atom C3
+atom N
+atom C
+Torsion angle 10
+Its atoms are : 
+atom C4
+atom C3
+atom N
+atom C1
+Torsion angle 11
+Its atoms are : 
+atom C4
+atom C3
+atom N
+atom C
+Torsion angle 12
+Its atoms are : 
+atom N3
+atom C6
+atom N2
+atom C4
+Torsion angle 13
+Its atoms are : 
+atom N3
+atom C6
+atom N2
+atom C5
+Torsion angle 14
+Its atoms are : 
+atom O1
+atom C6
+atom N2
+atom C4
+Torsion angle 15
+Its atoms are : 
+atom O1
+atom C6
+atom N2
+atom C5
+Torsion angle 16
+Its atoms are : 
+atom C3
+atom C4
+atom N2
+atom C6
+Torsion angle 17
+Its atoms are : 
+atom C3
+atom C4
+atom N2
+atom C5
+Torsion angle 18
+Its atoms are : 
+atom O
+atom C4
+atom N2
+atom C6
+Torsion angle 19
+Its atoms are : 
+atom O
+atom C4
+atom N2
+atom C5
+Torsion angle 20
+Its atoms are : 
+atom C2
+atom C3
+atom C4
+atom N2
+Torsion angle 21
+Its atoms are : 
+atom C2
+atom C3
+atom C4
+atom O
+Torsion angle 22
+Its atoms are : 
+atom N
+atom C3
+atom C4
+atom N2
+Torsion angle 23
+Its atoms are : 
+atom N
+atom C3
+atom C4
+atom O
+Torsion angle 24
+Its atoms are : 
+atom N1
+atom C2
+atom C3
+atom N
+Torsion angle 25
+Its atoms are : 
+atom N1
+atom C2
+atom C3
+atom C4
+Torsion angle 26
+Its atoms are : 
+atom N3
+atom C2
+atom C3
+atom N
+Torsion angle 27
+Its atoms are : 
+atom N3
+atom C2
+atom C3
+atom C4
+Torsion angle 28
+Its atoms are : 
+atom C3
+atom C2
+atom N3
+atom C6
+Torsion angle 29
+Its atoms are : 
+atom C3
+atom C2
+atom N3
+atom C7
+Torsion angle 30
+Its atoms are : 
+atom N1
+atom C2
+atom N3
+atom C6
+Torsion angle 31
+Its atoms are : 
+atom N1
+atom C2
+atom N3
+atom C7
+Torsion angle 32
+Its atoms are : 
+atom C1
+atom N
+atom C
+atom H
+Torsion angle 33
+Its atoms are : 
+atom C1
+atom N
+atom C
+atom H1
+Torsion angle 34
+Its atoms are : 
+atom C1
+atom N
+atom C
+atom H2
+Torsion angle 35
+Its atoms are : 
+atom C3
+atom N
+atom C
+atom H
+Torsion angle 36
+Its atoms are : 
+atom C3
+atom N
+atom C
+atom H1
+Torsion angle 37
+Its atoms are : 
+atom C3
+atom N
+atom C
+atom H2
+Torsion angle 38
+Its atoms are : 
+atom C4
+atom N2
+atom C5
+atom H4
+Torsion angle 39
+Its atoms are : 
+atom C4
+atom N2
+atom C5
+atom H5
+Torsion angle 40
+Its atoms are : 
+atom C4
+atom N2
+atom C5
+atom H6
+Torsion angle 41
+Its atoms are : 
+atom C6
+atom N2
+atom C5
+atom H4
+Torsion angle 42
+Its atoms are : 
+atom C6
+atom N2
+atom C5
+atom H5
+Torsion angle 43
+Its atoms are : 
+atom C6
+atom N2
+atom C5
+atom H6
+Torsion angle 44
+Its atoms are : 
+atom N2
+atom C6
+atom N3
+atom C2
+Torsion angle 45
+Its atoms are : 
+atom N2
+atom C6
+atom N3
+atom C7
+Torsion angle 46
+Its atoms are : 
+atom O1
+atom C6
+atom N3
+atom C2
+Torsion angle 47
+Its atoms are : 
+atom O1
+atom C6
+atom N3
+atom C7
+Torsion angle 48
+Its atoms are : 
+atom C6
+atom N3
+atom C7
+atom H7
+Torsion angle 49
+Its atoms are : 
+atom C6
+atom N3
+atom C7
+atom H8
+Torsion angle 50
+Its atoms are : 
+atom C6
+atom N3
+atom C7
+atom H9
+Torsion angle 51
+Its atoms are : 
+atom C2
+atom N3
+atom C7
+atom H7
+Torsion angle 52
+Its atoms are : 
+atom C2
+atom N3
+atom C7
+atom H8
+Torsion angle 53
+Its atoms are : 
+atom C2
+atom N3
+atom C7
+atom H9
+
+Atom 0 : 
+Its ID : O1
+Its Chemical Type : O
+Its bonding index : 0
+Its CCP4 atom type : O
+Its residue Name: SMILE
+Its connected atoms are : 
+C6
+
+Atom 1 : 
+Its ID : C6
+Its Chemical Type : C
+Its bonding index : 2
+Its CCP4 atom type : CR6
+Its residue Name: SMILE
+Its connected atoms are : 
+N2
+O1
+N3
+
+Atom 2 : 
+Its ID : N3
+Its Chemical Type : N
+Its bonding index : 2
+Its CCP4 atom type : NR6
+Its residue Name: SMILE
+Its connected atoms are : 
+C6
+C2
+C7
+
+Atom 3 : 
+Its ID : C7
+Its Chemical Type : C
+Its bonding index : 3
+Its CCP4 atom type : CH3
+Its residue Name: SMILE
+Its connected atoms are : 
+N3
+H7
+H8
+H9
+
+Atom 4 : 
+Its ID : H9
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C7
+
+Atom 5 : 
+Its ID : H8
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C7
+
+Atom 6 : 
+Its ID : H7
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C7
+
+Atom 7 : 
+Its ID : C2
+Its Chemical Type : C
+Its bonding index : 2
+Its CCP4 atom type : CR56
+Its residue Name: SMILE
+Its connected atoms are : 
+N1
+C3
+N3
+
+Atom 8 : 
+Its ID : N1
+Its Chemical Type : N
+Its bonding index : 2
+Its CCP4 atom type : NRD5
+Its residue Name: SMILE
+Its connected atoms are : 
+C1
+C2
+
+Atom 9 : 
+Its ID : C1
+Its Chemical Type : C
+Its bonding index : 2
+Its CCP4 atom type : CR15
+Its residue Name: SMILE
+Its connected atoms are : 
+N
+N1
+H3
+
+Atom 10 : 
+Its ID : H3
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C1
+
+Atom 11 : 
+Its ID : N2
+Its Chemical Type : N
+Its bonding index : 2
+Its CCP4 atom type : NR6
+Its residue Name: SMILE
+Its connected atoms are : 
+C4
+C5
+C6
+
+Atom 12 : 
+Its ID : C5
+Its Chemical Type : C
+Its bonding index : 3
+Its CCP4 atom type : CH3
+Its residue Name: SMILE
+Its connected atoms are : 
+N2
+H4
+H5
+H6
+
+Atom 13 : 
+Its ID : H6
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C5
+
+Atom 14 : 
+Its ID : H5
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C5
+
+Atom 15 : 
+Its ID : H4
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C5
+
+Atom 16 : 
+Its ID : C4
+Its Chemical Type : C
+Its bonding index : 2
+Its CCP4 atom type : CR6
+Its residue Name: SMILE
+Its connected atoms are : 
+C3
+O
+N2
+
+Atom 17 : 
+Its ID : O
+Its Chemical Type : O
+Its bonding index : 0
+Its CCP4 atom type : O
+Its residue Name: SMILE
+Its connected atoms are : 
+C4
+
+Atom 18 : 
+Its ID : C3
+Its Chemical Type : C
+Its bonding index : 2
+Its CCP4 atom type : CR56
+Its residue Name: SMILE
+Its connected atoms are : 
+C2
+N
+C4
+
+Atom 19 : 
+Its ID : N
+Its Chemical Type : N
+Its bonding index : 2
+Its CCP4 atom type : NR5
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+C1
+C3
+
+Atom 20 : 
+Its ID : C
+Its Chemical Type : C
+Its bonding index : 3
+Its CCP4 atom type : CH3
+Its residue Name: SMILE
+Its connected atoms are : 
+N
+H
+H1
+H2
+
+Atom 21 : 
+Its ID : H2
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+
+Atom 22 : 
+Its ID : H1
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+
+Atom 23 : 
+Its ID : H
+Its Chemical Type : H
+Its bonding index : 0
+Its CCP4 atom type : H
+Its residue Name: SMILE
+Its connected atoms are : 
+C
+
+For atom O1
+class is O(C[6]NN)
+
+For atom C6
+class is C[6](N[6]CC)2(O)
+
+For atom N3
+class is N[6](C[5,6]CN)(C[6]NO)(CH3)
+
+For atom C7
+class is C(N[6]CC)(H)3
+
+For atom H9
+class is H(CHHN)
+
+For atom H8
+class is H(CHHN)
+
+For atom H7
+class is H(CHHN)
+
+For atom C2
+class is C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+
+For atom N1
+class is N[5](C[5,6]CN)(C[5]HN)
+
+For atom C1
+class is C[5](N[5]CC)(N[5]C)(H)
+
+For atom H3
+class is H(C[5]NN)
+
+For atom N2
+class is N[6](C[6]CO)(C[6]NO)(CH3)
+
+For atom C5
+class is C(N[6]CC)(H)3
+
+For atom H6
+class is H(CHHN)
+
+For atom H5
+class is H(CHHN)
+
+For atom H4
+class is H(CHHN)
+
+For atom C4
+class is C[6](C[5,6]CN)(N[6]CC)(O)
+
+For atom O
+class is O(C[6]CN)
+
+For atom C3
+class is C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+
+For atom N
+class is N[5](C[5,6]CC)(C[5]HN)(CH3)
+
+For atom C
+class is C(N[5]CC)(H)3
+
+For atom H2
+class is H(CHHN)
+
+For atom H1
+class is H(CHHN)
+
+For atom H
+class is H(CHHN)
+libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
+Clustering COD org bonds started at Tue Oct  7 11:26:23 2014
+Finish clustering COD org bonds 
+finished at Tue Oct  7 11:26:25 2014
+it takes 2 seconds to finish group COD bonds 
+Group COD bonds involving metal elements 
+Bond between C and N
+ search a org-related bond c 
+for target bond of atoms C and N
+chemType : C COD classes : C(N[5]CC)(H)3
+chemType : N COD classes : N[5](C[5,6]CC)(C[5]HN)(CH3)
+ha1 673 ha2 767
+ a1NB2 3:1:1:1: a2NB2 3:3:4:
+ a1NB N[5]-3:H-1:H-1:H-1: a2NB C[5,6]-3:C[5]-3:C-4:
+ a1C C(N[5]CC)(H)3 a2C N[5](C[5,6]CC)(C[5]HN)(CH3)
+atom 1 CH3  atom 2 NR5
+Found all hashing codes
+find 3:1:1:1:
+ find 3:3:4:
+ find N[5]-3:H-1:H-1:H-1:
+ find C[5,6]-3:C[5]-3:C-4:
+ find C(N[5]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 1.46
+Bond between N and C1
+ search a org-related bond c 
+for target bond of atoms N and C1
+chemType : C COD classes : C[5](N[5]CC)(N[5]C)(H)
+chemType : N COD classes : N[5](C[5,6]CC)(C[5]HN)(CH3)
+ha1 563 ha2 767
+ a1NB2 3:2:1: a2NB2 3:3:4:
+ a1NB N[5]-3:N[5]-2:H-1: a2NB C[5,6]-3:C[5]-3:C-4:
+ a1C C[5](N[5]CC)(N[5]C)(H) a2C N[5](C[5,6]CC)(C[5]HN)(CH3)
+atom 1 CR15  atom 2 NR5
+Found all hashing codes
+find 3:2:1:
+ find 3:3:4:
+ find N[5]-3:N[5]-2:H-1:
+ find C[5,6]-3:C[5]-3:C-4:
+ find C[5](N[5]CC)(N[5]C)(H)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.34
+Bond between C1 and N1
+ search a org-related bond c 
+for target bond of atoms C1 and N1
+chemType : C COD classes : C[5](N[5]CC)(N[5]C)(H)
+chemType : N COD classes : N[5](C[5,6]CN)(C[5]HN)
+ha1 563 ha2 653
+ a1NB2 3:2:1: a2NB2 3:3:
+ a1NB N[5]-3:N[5]-2:H-1: a2NB C[5,6]-3:C[5]-3:
+ a1C C[5](N[5]CC)(N[5]C)(H) a2C N[5](C[5,6]CN)(C[5]HN)
+atom 1 CR15  atom 2 NRD5
+Found all hashing codes
+find 3:2:1:
+ find 3:3:
+ find N[5]-3:N[5]-2:H-1:
+ find C[5,6]-3:C[5]-3:
+ find C[5](N[5]CC)(N[5]C)(H)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.34
+Bond between N1 and C2
+ search a org-related bond c 
+for target bond of atoms N1 and C2
+chemType : C COD classes : C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+chemType : N COD classes : N[5](C[5,6]CN)(C[5]HN)
+ha1 563 ha2 653
+ a1NB2 3:3:2: a2NB2 3:3:
+ a1NB C[5,6]-3:N[6]-3:N[5]-2: a2NB C[5,6]-3:C[5]-3:
+ a1C C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) a2C N[5](C[5,6]CN)(C[5]HN)
+atom 1 CR56  atom 2 NRD5
+Found all hashing codes
+find 3:3:2:
+ find 3:3:
+ find C[5,6]-3:N[6]-3:N[5]-2:
+ find C[5,6]-3:C[5]-3:
+ find C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.35
+Bond between C2 and C3
+ search a org-related bond c 
+for target bond of atoms C2 and C3
+chemType : C COD classes : C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+chemType : C COD classes : C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+ha1 563 ha2 563
+ a1NB2 3:3:2: a2NB2 3:3:3:
+ a1NB C[5,6]-3:N[6]-3:N[5]-2: a2NB C[5,6]-3:C[6]-3:N[5]-3:
+ a1C C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) a2C C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+atom 1 CR56  atom 2 CR56
+Found all hashing codes
+find 3:3:2:
+ find 3:3:3:
+ find C[5,6]-3:N[6]-3:N[5]-2:
+ find C[5,6]-3:C[6]-3:N[5]-3:
+ find C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.37
+Bond between N and C3
+ search a org-related bond c 
+for target bond of atoms N and C3
+chemType : C COD classes : C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+chemType : N COD classes : N[5](C[5,6]CC)(C[5]HN)(CH3)
+ha1 563 ha2 767
+ a1NB2 3:3:3: a2NB2 3:3:4:
+ a1NB C[5,6]-3:C[6]-3:N[5]-3: a2NB C[5,6]-3:C[5]-3:C-4:
+ a1C C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) a2C N[5](C[5,6]CC)(C[5]HN)(CH3)
+atom 1 CR56  atom 2 NR5
+Found all hashing codes
+find 3:3:3:
+ find 3:3:4:
+ find C[5,6]-3:C[6]-3:N[5]-3:
+ find C[5,6]-3:C[5]-3:C-4:
+ find C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.38
+Bond between C3 and C4
+ search a org-related bond c 
+for target bond of atoms C3 and C4
+chemType : C COD classes : C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+chemType : C COD classes : C[6](C[5,6]CN)(N[6]CC)(O)
+ha1 29 ha2 563
+ a1NB2 3:3:1: a2NB2 3:3:3:
+ a1NB C[5,6]-3:N[6]-3:O-1: a2NB C[5,6]-3:C[6]-3:N[5]-3:
+ a1C C[6](C[5,6]CN)(N[6]CC)(O) a2C C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+atom 1 CR56  atom 2 CR6
+Found all hashing codes
+find 3:3:1:
+ find 3:3:3:
+ find C[5,6]-3:N[6]-3:O-1:
+ find C[5,6]-3:C[6]-3:N[5]-3:
+ find C[6](C[5,6]CN)(N[6]CC)(O)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.42
+Bond between O and C4
+ search a org-related bond c 
+for target bond of atoms O and C4
+chemType : C COD classes : C[6](C[5,6]CN)(N[6]CC)(O)
+chemType : O COD classes : O(C[6]CN)
+ha1 29 ha2 157
+ a1NB2 3:3:1: a2NB2 3:
+ a1NB C[5,6]-3:N[6]-3:O-1: a2NB C[6]-3:
+ a1C C[6](C[5,6]CN)(N[6]CC)(O) a2C O(C[6]CN)
+atom 1 CR6  atom 2 O
+Found all hashing codes
+find 3:3:1:
+ find 3:
+ find C[5,6]-3:N[6]-3:O-1:
+ find C[6]-3:
+ find C[6](C[5,6]CN)(N[6]CC)(O)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.22
+Bond between C4 and N2
+ search a org-related bond c 
+for target bond of atoms C4 and N2
+chemType : C COD classes : C[6](C[5,6]CN)(N[6]CC)(O)
+chemType : N COD classes : N[6](C[6]CO)(C[6]NO)(CH3)
+ha1 29 ha2 983
+ a1NB2 3:3:1: a2NB2 3:3:4:
+ a1NB C[5,6]-3:N[6]-3:O-1: a2NB C[6]-3:C[6]-3:C-4:
+ a1C C[6](C[5,6]CN)(N[6]CC)(O) a2C N[6](C[6]CO)(C[6]NO)(CH3)
+atom 1 CR6  atom 2 NR6
+Found all hashing codes
+find 3:3:1:
+ find 3:3:4:
+ find C[5,6]-3:N[6]-3:O-1:
+ find C[6]-3:C[6]-3:C-4:
+ find C[6](C[5,6]CN)(N[6]CC)(O)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.4
+Bond between C5 and N2
+ search a org-related bond c 
+for target bond of atoms C5 and N2
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : N COD classes : N[6](C[6]CO)(C[6]NO)(CH3)
+ha1 673 ha2 983
+ a1NB2 3:1:1:1: a2NB2 3:3:4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C[6]-3:C[6]-3:C-4:
+ a1C C(N[6]CC)(H)3 a2C N[6](C[6]CO)(C[6]NO)(CH3)
+atom 1 CH3  atom 2 NR6
+Found all hashing codes
+find 3:1:1:1:
+ find 3:3:4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C[6]-3:C[6]-3:C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 1.47
+Bond between N2 and C6
+ search a org-related bond c 
+for target bond of atoms N2 and C6
+chemType : C COD classes : C[6](N[6]CC)2(O)
+chemType : N COD classes : N[6](C[6]CO)(C[6]NO)(CH3)
+ha1 29 ha2 983
+ a1NB2 3:3:1: a2NB2 3:3:4:
+ a1NB N[6]-3:N[6]-3:O-1: a2NB C[6]-3:C[6]-3:C-4:
+ a1C C[6](N[6]CC)2(O) a2C N[6](C[6]CO)(C[6]NO)(CH3)
+atom 1 CR6  atom 2 NR6
+Found all hashing codes
+find 3:3:1:
+ find 3:3:4:
+ find N[6]-3:N[6]-3:O-1:
+ find C[6]-3:C[6]-3:C-4:
+ find C[6](N[6]CC)2(O)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.39
+Bond between C6 and O1
+ search a org-related bond c 
+for target bond of atoms C6 and O1
+chemType : C COD classes : C[6](N[6]CC)2(O)
+chemType : O COD classes : O(C[6]NN)
+ha1 29 ha2 157
+ a1NB2 3:3:1: a2NB2 3:
+ a1NB N[6]-3:N[6]-3:O-1: a2NB C[6]-3:
+ a1C C[6](N[6]CC)2(O) a2C O(C[6]NN)
+atom 1 CR6  atom 2 O
+Found all hashing codes
+find 3:3:1:
+ find 3:
+ find N[6]-3:N[6]-3:O-1:
+ find C[6]-3:
+ find C[6](N[6]CC)2(O)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.22
+Bond between N3 and C6
+ search a org-related bond c 
+for target bond of atoms N3 and C6
+chemType : C COD classes : C[6](N[6]CC)2(O)
+chemType : N COD classes : N[6](C[5,6]CN)(C[6]NO)(CH3)
+ha1 29 ha2 983
+ a1NB2 3:3:1: a2NB2 3:3:4:
+ a1NB N[6]-3:N[6]-3:O-1: a2NB C[5,6]-3:C[6]-3:C-4:
+ a1C C[6](N[6]CC)2(O) a2C N[6](C[5,6]CN)(C[6]NO)(CH3)
+atom 1 CR6  atom 2 NR6
+Found all hashing codes
+find 3:3:1:
+ find 3:3:4:
+ find N[6]-3:N[6]-3:O-1:
+ find C[5,6]-3:C[6]-3:C-4:
+ find C[6](N[6]CC)2(O)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.38
+Bond between C2 and N3
+ search a org-related bond c 
+for target bond of atoms C2 and N3
+chemType : C COD classes : C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+chemType : N COD classes : N[6](C[5,6]CN)(C[6]NO)(CH3)
+ha1 563 ha2 983
+ a1NB2 3:3:2: a2NB2 3:3:4:
+ a1NB C[5,6]-3:N[6]-3:N[5]-2: a2NB C[5,6]-3:C[6]-3:C-4:
+ a1C C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) a2C N[6](C[5,6]CN)(C[6]NO)(CH3)
+atom 1 CR56  atom 2 NR6
+Found all hashing codes
+find 3:3:2:
+ find 3:3:4:
+ find C[5,6]-3:N[6]-3:N[5]-2:
+ find C[5,6]-3:C[6]-3:C-4:
+ find C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+Found exact matches of atom cod-classes 
+The final target bond value is 1.38
+Bond between C7 and N3
+ search a org-related bond c 
+for target bond of atoms C7 and N3
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : N COD classes : N[6](C[5,6]CN)(C[6]NO)(CH3)
+ha1 673 ha2 983
+ a1NB2 3:1:1:1: a2NB2 3:3:4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C[5,6]-3:C[6]-3:C-4:
+ a1C C(N[6]CC)(H)3 a2C N[6](C[5,6]CN)(C[6]NO)(CH3)
+atom 1 CH3  atom 2 NR6
+Found all hashing codes
+find 3:1:1:1:
+ find 3:3:4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C[5,6]-3:C[6]-3:C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 1.46
+Bond between H and C
+ search a org-related bond c 
+for target bond of atoms H and C
+chemType : C COD classes : C(N[5]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[5]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[5]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[5]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[5]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H1 and C
+ search a org-related bond c 
+for target bond of atoms H1 and C
+chemType : C COD classes : C(N[5]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[5]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[5]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[5]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[5]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H2 and C
+ search a org-related bond c 
+for target bond of atoms H2 and C
+chemType : C COD classes : C(N[5]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[5]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[5]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[5]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[5]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H3 and C1
+ search a org-related bond c 
+for target bond of atoms H3 and C1
+chemType : C COD classes : C[5](N[5]CC)(N[5]C)(H)
+chemType : H COD classes : H(C[5]NN)
+ha1 563 ha2 887
+ a1NB2 3:2:1: a2NB2 3:
+ a1NB N[5]-3:N[5]-2:H-1: a2NB C[5]-3:
+ a1C C[5](N[5]CC)(N[5]C)(H) a2C H(C[5]NN)
+atom 1 CR15  atom 2 H
+Found all hashing codes
+find 3:2:1:
+ find 3:
+ find N[5]-3:N[5]-2:H-1:
+ find C[5]-3:
+ find C[5](N[5]CC)(N[5]C)(H)
+Found exact matches of atom cod-classes 
+The final target bond value is 0.943
+Bond between H4 and C5
+ search a org-related bond c 
+for target bond of atoms H4 and C5
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[6]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H5 and C5
+ search a org-related bond c 
+for target bond of atoms H5 and C5
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[6]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H6 and C5
+ search a org-related bond c 
+for target bond of atoms H6 and C5
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[6]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H7 and C7
+ search a org-related bond c 
+for target bond of atoms H7 and C7
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[6]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H8 and C7
+ search a org-related bond c 
+for target bond of atoms H8 and C7
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[6]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Bond between H9 and C7
+ search a org-related bond c 
+for target bond of atoms H9 and C7
+chemType : C COD classes : C(N[6]CC)(H)3
+chemType : H COD classes : H(CHHN)
+ha1 673 ha2 887
+ a1NB2 3:1:1:1: a2NB2 4:
+ a1NB N[6]-3:H-1:H-1:H-1: a2NB C-4:
+ a1C C(N[6]CC)(H)3 a2C H(CHHN)
+atom 1 CH3  atom 2 H
+Found all hashing codes
+find 3:1:1:1:
+ find 4:
+ find N[6]-3:H-1:H-1:H-1:
+ find C-4:
+ find C(N[6]CC)(H)3
+Found exact matches of atom cod-classes 
+The final target bond value is 0.969
+Number of Bonds to be found 25
+Number of Bonds found 25
+Finish setDefaultCoordGeos() 
+Clustering all COD angles started at Tue Oct  7 11:26:26 2014
+Clustering COD org angles finished at Tue Oct  7 11:26:30 2014
+it takes 4 seconds to finish group COD angles 
+Finish groupCodOrgAngles() 
+Finish groupCodMetAngles() 
+Finish groupCodAnglesWithNonCenteredMetal() 
+Angle between C6(center) and N2 and O1
+Atom1 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom2 O1 Its Cod class O(C[6]NN) and Hashing 157
+ Its codNBSymb C[6]-3: its codNB2Symb 3:
+Atom3 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:1:
+Found 3:
+Found 3:3:4:
+Found N[6]-3:N[6]-3:O-1:
+Found C[6]-3:
+Found C[6]-3:C[6]-3:C-4:
+Found C[6](N[6]CC)2(O)
+Found O(C[6]NN)
+COD finds the exact value 121
+the sigma value 0.806
+Target angle value : 121
+Angle between C6(center) and N2 and N3
+Atom1 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom2 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:1:
+Found 3:3:4:
+Found 3:3:4:
+Found N[6]-3:N[6]-3:O-1:
+Found C[6]-3:C[6]-3:C-4:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C[6](N[6]CC)2(O)
+Found N[6](C[6]CO)(C[6]NO)(CH3)
+COD finds the exact value 117
+the sigma value 0.646
+Target angle value : 117
+Angle between C6(center) and O1 and N3
+Atom1 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom2 O1 Its Cod class O(C[6]NN) and Hashing 157
+ Its codNBSymb C[6]-3: its codNB2Symb 3:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:1:
+Found 3:
+Found 3:3:4:
+Found N[6]-3:N[6]-3:O-1:
+Found C[6]-3:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C[6](N[6]CC)2(O)
+Found O(C[6]NN)
+COD finds the exact value 122
+the sigma value 0.788
+Target angle value : 122
+Angle between N3(center) and C6 and C2
+Atom1 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Found 3:3:4:
+Found 3:3:1:
+Found 3:3:2:
+Found C[5,6]-3:C[6]-3:C-4:
+Found N[6]-3:N[6]-3:O-1:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found N[6](C[5,6]CN)(C[6]NO)(CH3)
+Found C[6](N[6]CC)2(O)
+COD finds the exact value 120
+the sigma value 0.595
+Target angle value : 120
+Angle between N3(center) and C6 and C7
+Atom1 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Found 3:3:4:
+Found 3:3:1:
+Found 3:1:1:1:
+Found C[5,6]-3:C[6]-3:C-4:
+Found N[6]-3:N[6]-3:O-1:
+Found N[6]-3:H-1:H-1:H-1:
+Found N[6](C[5,6]CN)(C[6]NO)(CH3)
+Found C[6](N[6]CC)2(O)
+COD finds the exact value 119
+the sigma value 1.2
+Target angle value : 119
+Angle between N3(center) and C2 and C7
+Atom1 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Atom3 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Found 3:3:4:
+Found 3:3:2:
+Found 3:1:1:1:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found N[6]-3:H-1:H-1:H-1:
+Found N[6](C[5,6]CN)(C[6]NO)(CH3)
+Found C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+COD finds the exact value 121
+the sigma value 0.73
+Target angle value : 121
+Angle between C7(center) and N3 and H7
+Atom1 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H7 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:1:1:1:
+Found 4:
+Found 3:3:4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.35
+Target angle value : 109
+Angle between C7(center) and N3 and H8
+Atom1 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H8 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:1:1:1:
+Found 4:
+Found 3:3:4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.35
+Target angle value : 109
+Angle between C7(center) and N3 and H9
+Atom1 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H9 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:1:1:1:
+Found 4:
+Found 3:3:4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.35
+Target angle value : 109
+Angle between C7(center) and H7 and H8
+Atom1 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H7 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H8 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 2.07
+Target angle value : 109
+Angle between C7(center) and H7 and H9
+Atom1 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H7 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H9 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 2.07
+Target angle value : 109
+Angle between C7(center) and H8 and H9
+Atom1 C7 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H8 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H9 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 2.07
+Target angle value : 109
+Angle between C2(center) and N1 and C3
+Atom1 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Atom2 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom3 N1 Its Cod class N[5](C[5,6]CN)(C[5]HN) and Hashing 653
+ Its codNBSymb C[5,6]-3:C[5]-3: its codNB2Symb 3:3:
+Found 3:3:2:
+Found 3:3:3:
+Found 3:3:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[5,6]-3:C[5]-3:
+Found C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+COD finds the exact value 112
+the sigma value 0.879
+Target angle value : 112
+Angle between C2(center) and N1 and N3
+Atom1 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Atom2 N1 Its Cod class N[5](C[5,6]CN)(C[5]HN) and Hashing 653
+ Its codNBSymb C[5,6]-3:C[5]-3: its codNB2Symb 3:3:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:2:
+Found 3:3:
+Found 3:3:4:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found C[5,6]-3:C[5]-3:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+Found N[5](C[5,6]CN)(C[5]HN)
+COD finds the exact value 126
+the sigma value 0.732
+Target angle value : 126
+Angle between C2(center) and C3 and N3
+Atom1 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Atom2 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom3 N3 Its Cod class N[6](C[5,6]CN)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[5,6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:2:
+Found 3:3:3:
+Found 3:3:4:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[5,6]-3:C[6]-3:C-4:
+Found C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+COD finds the exact value 122
+the sigma value 0.764
+Target angle value : 122
+Angle between N1(center) and C1 and C2
+Atom1 N1 Its Cod class N[5](C[5,6]CN)(C[5]HN) and Hashing 653
+ Its codNBSymb C[5,6]-3:C[5]-3: its codNB2Symb 3:3:
+Atom2 C1 Its Cod class C[5](N[5]CC)(N[5]C)(H) and Hashing 563
+ Its codNBSymb N[5]-3:N[5]-2:H-1: its codNB2Symb 3:2:1:
+Atom3 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Found 3:3:
+Found 3:2:1:
+Found 3:3:2:
+Found C[5,6]-3:C[5]-3:
+Found N[5]-3:N[5]-2:H-1:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found N[5](C[5,6]CN)(C[5]HN)
+Found C[5](N[5]CC)(N[5]C)(H)
+COD finds the exact value 103
+the sigma value 0.936
+Target angle value : 103
+Angle between C1(center) and N and N1
+Atom1 C1 Its Cod class C[5](N[5]CC)(N[5]C)(H) and Hashing 563
+ Its codNBSymb N[5]-3:N[5]-2:H-1: its codNB2Symb 3:2:1:
+Atom2 N1 Its Cod class N[5](C[5,6]CN)(C[5]HN) and Hashing 653
+ Its codNBSymb C[5,6]-3:C[5]-3: its codNB2Symb 3:3:
+Atom3 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:2:1:
+Found 3:3:
+Found 3:3:4:
+Found N[5]-3:N[5]-2:H-1:
+Found C[5,6]-3:C[5]-3:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C[5](N[5]CC)(N[5]C)(H)
+Found N[5](C[5,6]CN)(C[5]HN)
+COD finds the exact value 113
+the sigma value 0.891
+Target angle value : 113
+Angle between C1(center) and N and H3
+Atom1 C1 Its Cod class C[5](N[5]CC)(N[5]C)(H) and Hashing 563
+ Its codNBSymb N[5]-3:N[5]-2:H-1: its codNB2Symb 3:2:1:
+Atom2 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom3 H3 Its Cod class H(C[5]NN) and Hashing 887
+ Its codNBSymb C[5]-3: its codNB2Symb 3:
+Found 3:2:1:
+Found 3:3:4:
+Found 3:
+Found N[5]-3:N[5]-2:H-1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C[5]-3:
+Found C[5](N[5]CC)(N[5]C)(H)
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+COD finds the exact value 123
+the sigma value 1.13
+Target angle value : 123
+Angle between C1(center) and N1 and H3
+Atom1 C1 Its Cod class C[5](N[5]CC)(N[5]C)(H) and Hashing 563
+ Its codNBSymb N[5]-3:N[5]-2:H-1: its codNB2Symb 3:2:1:
+Atom2 N1 Its Cod class N[5](C[5,6]CN)(C[5]HN) and Hashing 653
+ Its codNBSymb C[5,6]-3:C[5]-3: its codNB2Symb 3:3:
+Atom3 H3 Its Cod class H(C[5]NN) and Hashing 887
+ Its codNBSymb C[5]-3: its codNB2Symb 3:
+Found 3:2:1:
+Found 3:3:
+Found 3:
+Found N[5]-3:N[5]-2:H-1:
+Found C[5,6]-3:C[5]-3:
+Found C[5]-3:
+Found C[5](N[5]CC)(N[5]C)(H)
+Found N[5](C[5,6]CN)(C[5]HN)
+COD finds the exact value 124
+the sigma value 1.23
+Target angle value : 124
+Angle between N2(center) and C4 and C5
+Atom1 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Found 3:3:4:
+Found 3:3:1:
+Found 3:1:1:1:
+Found C[6]-3:C[6]-3:C-4:
+Found C[5,6]-3:N[6]-3:O-1:
+Found N[6]-3:H-1:H-1:H-1:
+Found N[6](C[6]CO)(C[6]NO)(CH3)
+Found C[6](C[5,6]CN)(N[6]CC)(O)
+COD finds the exact value 117
+the sigma value 1.11
+Target angle value : 117
+Angle between N2(center) and C4 and C6
+Atom1 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Found 3:3:4:
+Found 3:3:1:
+Found 3:3:1:
+Found C[6]-3:C[6]-3:C-4:
+Found N[6]-3:N[6]-3:O-1:
+Found C[5,6]-3:N[6]-3:O-1:
+Found N[6](C[6]CO)(C[6]NO)(CH3)
+Found C[6](N[6]CC)2(O)
+COD finds the exact value 126
+the sigma value 0.896
+Target angle value : 126
+Angle between N2(center) and C5 and C6
+Atom1 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C6 Its Cod class C[6](N[6]CC)2(O) and Hashing 29
+ Its codNBSymb N[6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Found 3:3:4:
+Found 3:3:1:
+Found 3:1:1:1:
+Found C[6]-3:C[6]-3:C-4:
+Found N[6]-3:N[6]-3:O-1:
+Found N[6]-3:H-1:H-1:H-1:
+Found N[6](C[6]CO)(C[6]NO)(CH3)
+Found C[6](N[6]CC)2(O)
+COD finds the exact value 117
+the sigma value 0.806
+Target angle value : 117
+Angle between C5(center) and N2 and H4
+Atom1 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H4 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:1:1:1:
+Found 4:
+Found 3:3:4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C[6]-3:C[6]-3:C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.25
+Target angle value : 109
+Angle between C5(center) and N2 and H5
+Atom1 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H5 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:1:1:1:
+Found 4:
+Found 3:3:4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C[6]-3:C[6]-3:C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.25
+Target angle value : 109
+Angle between C5(center) and N2 and H6
+Atom1 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H6 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:1:1:1:
+Found 4:
+Found 3:3:4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C[6]-3:C[6]-3:C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.25
+Target angle value : 109
+Angle between C5(center) and H4 and H5
+Atom1 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H4 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H5 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 2.07
+Target angle value : 109
+Angle between C5(center) and H4 and H6
+Atom1 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H4 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H6 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 2.07
+Target angle value : 109
+Angle between C5(center) and H5 and H6
+Atom1 C5 Its Cod class C(N[6]CC)(H)3 and Hashing 673
+ Its codNBSymb N[6]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H5 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H6 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[6]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[6]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 2.07
+Target angle value : 109
+Angle between C4(center) and C3 and O
+Atom1 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom2 O Its Cod class O(C[6]CN) and Hashing 157
+ Its codNBSymb C[6]-3: its codNB2Symb 3:
+Atom3 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Found 3:3:1:
+Found 3:
+Found 3:3:3:
+Found C[5,6]-3:N[6]-3:O-1:
+Found C[6]-3:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[6](C[5,6]CN)(N[6]CC)(O)
+Found O(C[6]CN)
+COD finds the exact value 127
+the sigma value 1.16
+Target angle value : 127
+Angle between C4(center) and C3 and N2
+Atom1 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom2 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom3 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:1:
+Found 3:3:3:
+Found 3:3:4:
+Found C[5,6]-3:N[6]-3:O-1:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[6]-3:C[6]-3:C-4:
+Found C[6](C[5,6]CN)(N[6]CC)(O)
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+COD finds the exact value 112
+the sigma value 1.5
+Target angle value : 112
+Angle between C4(center) and O and N2
+Atom1 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom2 O Its Cod class O(C[6]CN) and Hashing 157
+ Its codNBSymb C[6]-3: its codNB2Symb 3:
+Atom3 N2 Its Cod class N[6](C[6]CO)(C[6]NO)(CH3) and Hashing 983
+ Its codNBSymb C[6]-3:C[6]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:1:
+Found 3:
+Found 3:3:4:
+Found C[5,6]-3:N[6]-3:O-1:
+Found C[6]-3:
+Found C[6]-3:C[6]-3:C-4:
+Found C[6](C[5,6]CN)(N[6]CC)(O)
+Found O(C[6]CN)
+COD finds the exact value 121
+the sigma value 1.02
+Target angle value : 121
+Angle between C3(center) and C2 and N
+Atom1 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom2 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Atom3 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:3:
+Found 3:3:2:
+Found 3:3:4:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+Found C[5,6](C[5,6]CN)(N[6]CC)(N[5]C)
+COD finds the exact value 106
+the sigma value 0.903
+Target angle value : 106
+Angle between C3(center) and C2 and C4
+Atom1 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom2 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 C2 Its Cod class C[5,6](C[5,6]CN)(N[6]CC)(N[5]C) and Hashing 563
+ Its codNBSymb C[5,6]-3:N[6]-3:N[5]-2: its codNB2Symb 3:3:2:
+Found 3:3:3:
+Found 3:3:1:
+Found 3:3:2:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[5,6]-3:N[6]-3:O-1:
+Found C[5,6]-3:N[6]-3:N[5]-2:
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+Found C[6](C[5,6]CN)(N[6]CC)(O)
+COD finds the exact value 123
+the sigma value 1.13
+Target angle value : 123
+Angle between C3(center) and N and C4
+Atom1 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom2 C4 Its Cod class C[6](C[5,6]CN)(N[6]CC)(O) and Hashing 29
+ Its codNBSymb C[5,6]-3:N[6]-3:O-1: its codNB2Symb 3:3:1:
+Atom3 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Found 3:3:3:
+Found 3:3:1:
+Found 3:3:4:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found C[5,6]-3:N[6]-3:O-1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+Found C[6](C[5,6]CN)(N[6]CC)(O)
+COD finds the exact value 131
+the sigma value 0.884
+Target angle value : 131
+Angle between N(center) and C and C1
+Atom1 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C1 Its Cod class C[5](N[5]CC)(N[5]C)(H) and Hashing 563
+ Its codNBSymb N[5]-3:N[5]-2:H-1: its codNB2Symb 3:2:1:
+Atom3 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Found 3:3:4:
+Found 3:2:1:
+Found 3:1:1:1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found N[5]-3:N[5]-2:H-1:
+Found N[5]-3:H-1:H-1:H-1:
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+Found C[5](N[5]CC)(N[5]C)(H)
+COD finds the exact value 127
+the sigma value 0.898
+Target angle value : 127
+Angle between N(center) and C and C3
+Atom1 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Atom3 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Found 3:3:4:
+Found 3:3:3:
+Found 3:1:1:1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found N[5]-3:H-1:H-1:H-1:
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+Found C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC)
+COD finds the exact value 127
+the sigma value 1.1
+Target angle value : 127
+Angle between N(center) and C1 and C3
+Atom1 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom2 C1 Its Cod class C[5](N[5]CC)(N[5]C)(H) and Hashing 563
+ Its codNBSymb N[5]-3:N[5]-2:H-1: its codNB2Symb 3:2:1:
+Atom3 C3 Its Cod class C[5,6](C[5,6]NN)(C[6]NO)(N[5]CC) and Hashing 563
+ Its codNBSymb C[5,6]-3:C[6]-3:N[5]-3: its codNB2Symb 3:3:3:
+Found 3:3:4:
+Found 3:2:1:
+Found 3:3:3:
+Found C[5,6]-3:C[5]-3:C-4:
+Found N[5]-3:N[5]-2:H-1:
+Found C[5,6]-3:C[6]-3:N[5]-3:
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+Found C[5](N[5]CC)(N[5]C)(H)
+COD finds the exact value 106
+the sigma value 0.929
+Target angle value : 106
+Angle between C(center) and N and H
+Atom1 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom3 H Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 3:3:4:
+Found 4:
+Found N[5]-3:H-1:H-1:H-1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C-4:
+Found C(N[5]CC)(H)3
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+COD finds the exact value 110
+the sigma value 1.29
+Target angle value : 110
+Angle between C(center) and N and H1
+Atom1 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom3 H1 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 3:3:4:
+Found 4:
+Found N[5]-3:H-1:H-1:H-1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C-4:
+Found C(N[5]CC)(H)3
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+COD finds the exact value 110
+the sigma value 1.29
+Target angle value : 110
+Angle between C(center) and N and H2
+Atom1 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 N Its Cod class N[5](C[5,6]CC)(C[5]HN)(CH3) and Hashing 767
+ Its codNBSymb C[5,6]-3:C[5]-3:C-4: its codNB2Symb 3:3:4:
+Atom3 H2 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 3:3:4:
+Found 4:
+Found N[5]-3:H-1:H-1:H-1:
+Found C[5,6]-3:C[5]-3:C-4:
+Found C-4:
+Found C(N[5]CC)(H)3
+Found N[5](C[5,6]CC)(C[5]HN)(CH3)
+COD finds the exact value 110
+the sigma value 1.29
+Target angle value : 110
+Angle between C(center) and H and H1
+Atom1 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H1 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[5]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[5]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.67
+Target angle value : 109
+Angle between C(center) and H and H2
+Atom1 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H2 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[5]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[5]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.67
+Target angle value : 109
+Angle between C(center) and H1 and H2
+Atom1 C Its Cod class C(N[5]CC)(H)3 and Hashing 673
+ Its codNBSymb N[5]-3:H-1:H-1:H-1: its codNB2Symb 3:1:1:1:
+Atom2 H1 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Atom3 H2 Its Cod class H(CHHN) and Hashing 887
+ Its codNBSymb C-4: its codNB2Symb 4:
+Found 3:1:1:1:
+Found 4:
+Found 4:
+Found N[5]-3:H-1:H-1:H-1:
+Found C-4:
+Found C-4:
+Found C(N[5]CC)(H)3
+Found H(CHHN)
+COD finds the exact value 109
+the sigma value 1.67
+Target angle value : 109
+There are 2 rings 
+These are: 
+Ring C1C2C3N1N.
+Ring size:  5
+Atom C2
+Atom N1
+Atom C1
+Atom C3
+Atom N
+Ring C2C3C4C6N2N3.
+Ring size:  6
+Atom C6
+Atom N3
+Atom C2
+Atom N2
+Atom C4
+Atom C3
+Finish searching angles 
+O1
+O1
+C6
+C6
+N3
+N3
+C7
+C7
+H9
+H9
+H8
+H8
+H7
+H7
+C2
+C2
+N1
+N1
+C1
+C1
+H3
+H3
+N2
+N2
+C5
+C5
+H6
+H6
+H5
+H5
+H4
+H4
+C4
+C4
+O
+O
+C3
+C3
+N
+N
+C
+C
+H2
+H2
+H1
+H1
+H
+H
+=========END OF PROCESS INFORMATION
+ ==========

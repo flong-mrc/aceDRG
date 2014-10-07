@@ -20,7 +20,6 @@
 #include "atomAssembly.h"
 #endif
 
-
 #ifndef BOND_H
 #include "bond.h"
 #endif
@@ -33,6 +32,14 @@
 #include "angle.h"
 #endif
 
+#ifndef PLANE_H
+#include "plane.h"
+#endif
+
+//#ifndef CHEMPROPSET_H
+//#include "chemPropSet.h"
+//#endif
+
 namespace LIBMOL
 {
     class Atom;
@@ -41,7 +48,10 @@ namespace LIBMOL
     class Bond;
     class BondDict;
     class Angle;
+    class AngleDict;
     class Torsion;
+    class TorsionDict;
+    class PlaneDict;
     
 
     class Ring 
@@ -84,6 +94,7 @@ namespace LIBMOL
         ~RingDict(); 
         
         void setAtmsLink(std::vector<AtomDict> tAllAtoms);
+        void setPlaneProp();
         
         bool                                     isPlanar;
         std::string                              rep;
@@ -100,9 +111,37 @@ namespace LIBMOL
     extern void buildOneRing(std::vector<AtomDict> & tAtoms, 
                              std::vector<AtomDict>   sSet,
                              std::vector<AtomDict> & doneSet);
+    
     extern void ringAtmsLink(RingDict & tRing, 
                              int        tIdx,
                              std::vector<int> & tAtmsLink);
+    
+    extern void mergePlaneRings(std::vector<RingDict> & tAllRings,
+                                std::vector<std::vector<int> > & tRingAtms);
+    
+    extern void mergePlaneRings(std::vector<RingDict>          & tAllRings,
+                                std::vector<std::vector<int> > & tRingAtms,
+                                std::vector<AtomDict>          & tAtoms,
+                                std::vector<BondDict>          & tBonds);
+    
+    extern void findAllRingsConnectedOneRing(int tCurIdx, std::vector<RingDict> & tRings,
+                                             std::vector<int>   & DoneList, 
+                                             std::vector<int>   & curLinkedRing);
+    
+    extern REAL getPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms, 
+                                std::vector<BondDict>  & tBonds);
+    
+    extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms,
+                              std::vector<BondDict> & tBonds);
+    
+    extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
+                                    std::vector<PlaneDict> & tPlanes,
+                                    std::vector<AtomDict>  & tAtoms,
+                                    std::vector<BondDict>  & tBonds);
+    
+    
+    
     
 }     // end of namespace LIBMOL
 

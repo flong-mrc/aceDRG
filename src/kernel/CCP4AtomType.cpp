@@ -139,8 +139,10 @@ namespace LIBMOL
                         << "Atom ID: " << tAtom.id 
                         << " its material type (should be smaller than 10) : "
                         << nType << std::endl;
-                exit(1);
+                exit(1);        
         }
+        
+        StrUpper(tAtom.ccp4Type);
     }
     
     void CCP4AtomType::setHydroAtomCCP4Type(AtomDict& tAtom)
@@ -236,8 +238,8 @@ namespace LIBMOL
         // C atom
         if (tAtom.chemType.compare("C")==0)
         {
-            std::cout << "atom id " << tAtom.id << " C atom " << std::endl;
-            std::cout << " H atom connection " << tAtom.connHAtoms.size() << std::endl;
+            //std::cout << "atom id " << tAtom.id << " C atom " << std::endl;
+            //std::cout << " H atom connection " << tAtom.connHAtoms.size() << std::endl;
             if (tAtom.bondingIdx==2)
             {
                 if (R5 && R6)
@@ -324,19 +326,18 @@ namespace LIBMOL
             {
                 std::map<ID, REAL>::iterator iFC;
                 iFC = chargedGrp.find(tAtom.resName);
-                 
-                if ((int)tAtom.connHAtoms.size() ==0)
+                
+                if (tAtom.connAtoms.size() == 3 && R5)
                 {
-                    tAtom.ccp4Type = "N";
+                    tAtom.ccp4Type = "NR5";
                 }
-                else if ((int)tAtom.connHAtoms.size() == 1)
+                else if (tAtom.connAtoms.size() == 3 && R6)
                 {
-            
-                    if (iFC !=chargedGrp.end())
-                    {
-                        tAtom.ccp4Type ="NC1";
-                    }
-                    else if (R5)
+                    tAtom.ccp4Type = "NR6";
+                }
+                else if (tAtom.connHAtoms.size() == 1)
+                {
+                    if (R5)
                     {
                         tAtom.ccp4Type = "NR15";
                     }
@@ -344,12 +345,16 @@ namespace LIBMOL
                     {
                         tAtom.ccp4Type = "NR16";
                     }
+                    else if (iFC !=chargedGrp.end())
+                    {
+                        tAtom.ccp4Type ="NC1";
+                    }
                     else
                     {
                         tAtom.ccp4Type ="NH1";
                     }
                 }
-                else if ((int)tAtom.connHAtoms.size() == 2)
+                else if (tAtom.connHAtoms.size() == 2)
                 {
                     if (iFC !=chargedGrp.end())
                     {
@@ -360,29 +365,34 @@ namespace LIBMOL
                         tAtom.ccp4Type ="NH2";
                     }
                 }
-                else if ((int)tAtom.connAtoms.size() == 3)
+                else if (tAtom.connHAtoms.size() ==0)
                 {
-                    if (R5)
+                    if (tAtom.connAtoms.size() == 2 && R6)
                     {
-                        tAtom.ccp4Type = "NR5";
+                        tAtom.ccp4Type = "NRD6";
                     }
-                    else if (R6)
+                    else if (tAtom.connAtoms.size() == 2 && R5)
                     {
-                        tAtom.ccp4Type = "NR6";
+                        tAtom.ccp4Type = "NRD5";
+                    }
+                    else
+                    {
+                        tAtom.ccp4Type = "N";
                     }
                 }
+                
             }
             else if (tAtom.bondingIdx ==3)  // SP3
             {
-                if ((int)tAtom.connHAtoms.size()==1)
+                if (tAtom.connHAtoms.size()==1)
                 {
                     tAtom.ccp4Type="NT1";
                 }
-                else if((int)tAtom.connHAtoms.size()==2)
+                else if(tAtom.connHAtoms.size()==2)
                 {
                     tAtom.ccp4Type = "NT2";
                 }
-                else if((int)tAtom.connHAtoms.size()==3)
+                else if(tAtom.connHAtoms.size()==3)
                 {
                     tAtom.ccp4Type = "NT3";
                 }
@@ -410,32 +420,32 @@ namespace LIBMOL
         }
         else if (tAtom.chemType.compare("O")==0)
         {
-            // PI bonding
+            bool lP=false, lS=false, lB=false;
+            for (std::vector<int>::iterator iNB=tAtom.connAtoms.begin();
+                             iNB!=tAtom.connAtoms.end(); iNB++)
+            {
+                if (allAtoms[*iNB].chemType.compare("P")==0)
+                {
+                    lP=true;
+                }
+                if (allAtoms[*iNB].chemType.compare("S")==0)
+                {
+                    lS=true;
+                }
+                if (allAtoms[*iNB].chemType.compare("B")==0)
+                {
+                    lB=true;
+                }
+            }
             
             // SP2 bonding
             if (tAtom.bondingIdx==2)
             {
                 // SP2 bonding
+                std::cout << "O atom " << " charge " << tAtom.parCharge << std::endl
+                          << "connections " << tAtom.connAtoms.size() << std::endl;
                 if (tAtom.parCharge)
-                {
-                    bool lP=false, lS=false, lB=false;
-                    for (std::vector<int>::iterator iNB=tAtom.connAtoms.begin();
-                             iNB!=tAtom.connAtoms.end(); iNB++)
-                    {
-                        if (allAtoms[*iNB].chemType.compare("P")==0)
-                        {
-                            lP=true;
-                        }
-                        if (allAtoms[*iNB].chemType.compare("S")==0)
-                        {
-                            lS=true;
-                        }
-                        if (allAtoms[*iNB].chemType.compare("B")==0)
-                        {
-                            lB=true;
-                        }
-                    }
-                        
+                { 
                     if(lP)
                     {
                         tAtom.ccp4Type = "OP";
@@ -453,7 +463,7 @@ namespace LIBMOL
                         tAtom.ccp4Type = "OC";
                     }
                 }
-                else if ((int)tAtom.connAtoms.size() ==2)
+                else if (tAtom.connAtoms.size() ==2)
                 {
                     if ((int)tAtom.connHAtoms.size()==1)
                     {
@@ -487,23 +497,68 @@ namespace LIBMOL
                     // O in alcohol groups
                     tAtom.ccp4Type = "OH1";
                 }
-                else if ((int)tAtom.connHAtoms.size()==2)
+                else if (tAtom.connHAtoms.size()==2)
                 {
                     // oxygen of water
                     tAtom.ccp4Type = "OH2";
                 }
                 // oxygen of water in MO6 ?
-                else if ((int)tAtom.connAtoms.size() ==2)
+                else if (tAtom.connAtoms.size() ==2)
                 {
                     if(tAtom.parCharge)
                     {
                         tAtom.ccp4Type = "OC2";
+                    }
+                    else if (tAtom.connHAtoms.size()==1)
+                    {
+                        // O in alcohol groups
+                        tAtom.ccp4Type = "OH1";
                     }
                     else
                     {
                         tAtom.ccp4Type = "O2";
                     }
                 }  
+            }
+            else if ((int)tAtom.connAtoms.size() ==1)
+            {
+                /*
+                bool lP=false, lS=false, lB=false;
+                for (std::vector<int>::iterator iNB=tAtom.connAtoms.begin();
+                             iNB!=tAtom.connAtoms.end(); iNB++)
+                {
+                    if (allAtoms[*iNB].chemType.compare("P")==0)
+                    {
+                        lP=true;
+                    }
+                    if (allAtoms[*iNB].chemType.compare("S")==0)
+                    {
+                            lS=true;
+                    }
+                    if (allAtoms[*iNB].chemType.compare("B")==0)
+                    {
+                        lB=true;
+                    }
+                    
+                }
+                        
+                if(lP)
+                {
+                    tAtom.ccp4Type = "OP";
+                }
+                else if(lS)
+                {
+                    tAtom.ccp4Type = "OS";
+                }
+                else if(lB)
+                {
+                    tAtom.ccp4Type = "OB";
+                }
+                else
+                {
+                    tAtom.ccp4Type = "OC";
+                }
+                 */
             }
             else
             {
@@ -512,38 +567,70 @@ namespace LIBMOL
         }
         else if (tAtom.chemType.compare("S")==0)
         {
-            if((int)tAtom.connHAtoms.size()==0)
+            if (tAtom.connAtoms.size() ==3)
             {
-                tAtom.ccp4Type = "S";
+                if(tAtom.connHAtoms.size()==0)
+                {
+                    tAtom.ccp4Type = "S3";
+                }
+                else if (tAtom.connHAtoms.size()==1)
+                {
+                    tAtom.ccp4Type = "SH1";
+                }
             }
-            else if((int)tAtom.connHAtoms.size()==1)
+            else if (tAtom.connAtoms.size() ==2)
             {
-                tAtom.ccp4Type = "SH1";
-            }
-            else if ((int)tAtom.connAtoms.size() ==3)
-            {
-                tAtom.ccp4Type = "S3";
-            }
-            else if ((int)tAtom.connAtoms.size() ==2)
-            {
-                tAtom.ccp4Type = "S2";
+                if(tAtom.connHAtoms.size()==0)
+                {
+                    tAtom.ccp4Type = "S2";
+                }
+                else
+                {
+                    tAtom.ccp4Type = "SH1";
+                }
+                
+                // should not have the case that 2 connections, both of them H atoms
             }
             else if ((int)tAtom.connAtoms.size() ==1)
             {
                 // One double bond
                 tAtom.ccp4Type = "S1";
             }
+            else if(tAtom.connHAtoms.size()==0)
+            {
+                tAtom.ccp4Type = "S";
+            }
+            else if(tAtom.connHAtoms.size()==1)
+            {
+                tAtom.ccp4Type = "SH1";
+            }
+            else
+            {
+                tAtom.ccp4Type = "S";
+            }
+            // 2 H connections or above ?
         }
         else
         {
             // elements have no special treatment at the moment 
-            tAtom.ccp4Type = tAtom.chemType;
+            tAtom.ccp4Type = tAtom.chemType;   
+            StrUpper(tAtom.ccp4Type);
         }
         
-        std::cout << " Set atom id " << tAtom.id 
-                  << " bond idx " << tAtom.bondingIdx << std::endl;
-        std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl; 
         
+        std::cout << "Atom Name " << tAtom.id << " bonding index " 
+                      << tAtom.bondingIdx << std::endl;
+        std::cout << "Its element type " << tAtom.chemType << std::endl;
+        
+        if (!tAtom.codClass.empty())
+        {
+            std::cout << " Cod type" << tAtom.codClass << std::endl; 
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
+        std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
     }
     
     void CCP4AtomType::SetAlkaliMetalsAtomCCP4Type(AtomDict& tAtom)

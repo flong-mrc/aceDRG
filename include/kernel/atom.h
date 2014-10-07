@@ -289,6 +289,7 @@ namespace LIBMOL // temp
        
         int      hashingValue;
         bool     coordExist;
+        bool     hasFreePi;
         
         bool     isCChemTypeSet;
         bool     isInPreCell;

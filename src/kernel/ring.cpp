@@ -7,6 +7,7 @@
  */
 
 #include "ring.h"
+#include "molecule.h"
 
 namespace LIBMOL
 {
@@ -193,6 +194,28 @@ namespace LIBMOL
         }while(i < tRSize);
         */
     }
+    
+    void RingDict::setPlaneProp()
+    {
+        bool lSP2=true;
+        
+        for (std::vector<AtomDict>::iterator iA=atoms.begin();
+                iA !=atoms.end(); iA++)
+        {
+            if (iA->bondingIdx !=2)
+            {
+                lSP2 =false;
+                break;
+            }
+        }
+        
+        if (lSP2)
+        {
+            isPlanar = lSP2;
+        }
+    }
+    
+    
     extern bool AtomsInSameRing(AtomDict & tAt1, AtomDict tAt2, 
                 std::vector<RingDict> & tRings)
     {
@@ -231,6 +254,341 @@ namespace LIBMOL
                              std::vector<AtomDict> & doneSet)
     {
         
+        
+        
+    }
+    
+    extern void mergePlaneRings(std::vector<RingDict> & tAllRings,
+                                std::vector<std::vector<int> > & tRingAtoms)
+    {
+        
+        std::cout << "Number of rings " << tAllRings.size() << std::endl;
+      
+        
+        // Connected planar rings
+        std::vector<int> DoneList;
+        std::vector<std::vector<int> > mergedRings;       // The inside vector represents a set of merged rings 
+        
+        for (unsigned i=0; i < tAllRings.size(); i++)
+        {
+            if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
+            {
+                // std::cout << "Planar ring " << i << std::endl;
+                
+                DoneList.push_back(i);
+                std::vector<int> curLinkedRing;
+                curLinkedRing.push_back(i);
+                findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing); 
+                if (curLinkedRing.size() > 1)
+                {
+                    mergedRings.push_back(curLinkedRing);
+                }
+            }
+            
+        }
+        
+        // 
+        for (std::vector<std::vector<int> >::iterator iMr =mergedRings.begin();
+                iMr !=mergedRings.end(); iMr++)
+        {
+            std::vector<int> atmIdxs;
+            for (std::vector<int>::iterator iR=iMr->begin();
+                    iR !=iMr->end(); iR++)
+            {
+                
+                for (std::vector<AtomDict>::iterator iAt=tAllRings[*iR].atoms.begin();
+                        iAt !=tAllRings[*iR].atoms.end(); iAt++)
+                {
+                    if(std::find(atmIdxs.begin(), atmIdxs.end(), iAt->seriNum)
+                            ==atmIdxs.end())
+                    {
+                        atmIdxs.push_back(iAt->seriNum);
+                    }
+                }
+            }
+            
+            tRingAtoms.push_back(atmIdxs);
+        }
+        
+        //
+        
+        
+        /*
+        
+        if (mergedRings.size() !=0)
+        {
+            std::cout << "Merged planar rings : " << std::endl;
+            for (std::vector<std::vector<int> >::iterator iMr=mergedRings.begin();
+                    iMr != mergedRings.end(); iMr++)
+            {
+                std::cout << "A merged system contains " << iMr->size() 
+                          << " rings. They are:  " << std::endl;
+                for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                {
+                    std::cout << "The Ring with atoms " << std::endl;
+                    for (std::vector<AtomDict>::iterator iA=tAllRings[*iR].atoms.begin();
+                            iA != tAllRings[*iR].atoms.end(); iA++)
+                    {
+                        std::cout << iA->id << std::endl;
+                    }
+                }
+            }
+            
+        }
+        
+        */
+        
+        
+    }
+    
+    extern void mergePlaneRings(std::vector<RingDict>          & tAllRings,
+                                std::vector<std::vector<int> > & tRingAtoms,
+                                std::vector<AtomDict >         & tAtoms, 
+                                std::vector<BondDict>          & tBonds)
+    {
+        
+        std::cout << "Number of rings " << tAllRings.size() << std::endl;
+      
+        
+        // Connected planar rings
+        std::vector<int> DoneList;
+        std::vector<std::vector<int> > mergedRings;       // The inside vector represents a set of merged rings 
+        
+        for (unsigned i=0; i < tAllRings.size(); i++)
+        {
+            if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
+            {
+                
+                std::cout << "Planar ring " << i << std::endl;
+                
+                DoneList.push_back(i);
+                std::vector<int> curLinkedRing;
+                curLinkedRing.push_back(i);
+                findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing); 
+                if (curLinkedRing.size() > 1)
+                {
+                    mergedRings.push_back(curLinkedRing);
+                }
+            }
+            
+        }
+        
+        
+        
+        if (mergedRings.size() !=0)
+        {
+            std::cout << "Merged planar rings : " << std::endl;
+            for (std::vector<std::vector<int> >::iterator iMr=mergedRings.begin();
+                    iMr != mergedRings.end(); iMr++)
+            {
+                std::cout << "A merged system contains " << iMr->size() 
+                          << " rings. They are:  " << std::endl;
+                for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                {
+                    std::cout << "The Ring with atoms " << std::endl;
+                    for (std::vector<AtomDict>::iterator iA=tAllRings[*iR].atoms.begin();
+                            iA != tAllRings[*iR].atoms.end(); iA++)
+                    {
+                        std::cout << iA->id << std::endl;
+                    }
+                }
+            }
+            
+        }
+        
+        
+        // 
+        for (std::vector<std::vector<int> >::iterator iMr =mergedRings.begin();
+                iMr !=mergedRings.end(); iMr++)
+        {
+            std::vector<int> atmIdxs;
+            for (std::vector<int>::iterator iR=iMr->begin();
+                    iR !=iMr->end(); iR++)
+            {
+                std::cout << "A merged system contains " << iMr->size() 
+                          << " rings.  " << std::endl;
+                for (std::vector<AtomDict>::iterator iAt=tAllRings[*iR].atoms.begin();
+                        iAt !=tAllRings[*iR].atoms.end(); iAt++)
+                {
+                    
+                    if(std::find(atmIdxs.begin(), atmIdxs.end(), iAt->seriNum)
+                            ==atmIdxs.end())
+                    {
+                        atmIdxs.push_back(iAt->seriNum);
+                    }
+                }
+            }
+            
+            std::cout<< "It contains " << atmIdxs.size() << " atoms " << std::endl;
+                   
+            if(checkAromaSys(atmIdxs, tAtoms, tBonds))
+            {
+                tRingAtoms.push_back(atmIdxs);
+            }
+        }
+        
+        //
+        
+        
+        
+        
+        std::cout << "Number of merged atom rings " 
+                  << tRingAtoms.size() << std::endl;
+        
+        if (tRingAtoms.size() >0)
+        {
+            for (std::vector<std::vector<int> >::iterator iR=tRingAtoms.begin();
+                   iR !=tRingAtoms.end(); iR++)
+            {
+                std::cout << "Atoms in a merged ring : " << std::endl;
+                for (std::vector<int>::iterator iAt=iR->begin();
+                        iAt !=iR->end(); iAt++)
+                {
+                    std::cout << tAtoms[*iAt].id << std::endl;
+                }
+            }
+        }
+        
+        exit(0);
+        
+        
+        
+    }
+    // A recursive function that get a set of planar rings sharing edges 
+    // with each other.
+    
+    extern void findAllRingsConnectedOneRing(int tCurIdx, 
+                                             std::vector<RingDict> & tRings,
+                                             std::vector<int>   & tDoneList, 
+                                             std::vector<int>   & tCurLinkedRing)
+    
+    {
+        
+        std::vector<int> tSeri;
+        for (std::vector<AtomDict>::iterator iA=tRings[tCurIdx].atoms.begin();
+                iA != tRings[tCurIdx].atoms.end(); iA++)
+        {
+            tSeri.push_back(iA->seriNum);
+        }
+        
+        for (unsigned tNext=tCurIdx+1; tNext < tRings.size(); tNext++)
+        {
+            if (std::find(tDoneList.begin(), tDoneList.end(), tNext) == tDoneList.end()
+                    && tRings[tNext].isPlanar)
+            {
+                int aA=0;
+            
+                for (std::vector<AtomDict>::iterator iNA=tRings[tNext].atoms.begin();
+                        iNA != tRings[tNext].atoms.end(); iNA++)
+                {
+                    if (std::find(tSeri.begin(), tSeri.end(), iNA->seriNum) 
+                          !=tSeri.end())
+                    {
+                        aA++;
+                    }
+                }
+                
+                if (aA > 1)
+                {
+                    tCurLinkedRing.push_back(tNext);
+                    tDoneList.push_back(tNext);
+                    findAllRingsConnectedOneRing(tNext, tRings, tDoneList, tCurLinkedRing);
+                }
+            }
+        }
+        
+    }
+    
+    
+    extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms,
+                              std::vector<BondDict> & tBonds)
+    {
+        bool lAr=false;
+        REAL numPiAll=0.0;
+        
+        for (std::vector<int>::iterator iAt=tSubAtoms.begin();
+                iAt !=tSubAtoms.end(); iAt++)
+        {
+            REAL numOneAtm = getPiForOneAtom(*iAt, tAtoms, tBonds);
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " add " << numOneAtm << " atoms" << std::endl;
+            if (numOneAtm > 0.0)
+            {
+                numPiAll +=numOneAtm;
+            }
+        }       
+        
+        if (numPiAll > 0.0 && fabs(fmod(numPiAll, 4.0)-2.0) < 0.001)
+        {
+            lAr = true;
+        }
+        
+        return lAr;
+    }
+    
+    extern REAL getPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms, 
+                                std::vector<BondDict>  & tBonds)
+    {
+        REAL aN=-1.0;
+        
+        if (tAtoms[tIdx].bondingIdx ==2)
+        {
+            if (tAtoms[tIdx].chemType.compare("C") ==0)
+            {
+                if (tAtoms[tIdx].connAtoms.size() ==3)
+                {
+                    bool aD=true;
+                    for (unsigned i=0; i < tAtoms[tIdx].connAtoms.size();
+                            i++)
+                    {
+                        int iB=getBond(tBonds, tIdx, tAtoms[tIdx].connAtoms[i]);
+                        std::cout<< "Bond " << iB << std::endl;
+                        if (iB >=0 && iB < (int)tBonds.size())
+                        {
+                            std::cout << tBonds[iB].order << std::endl;
+                            std::cout << StrToOrder(tBonds[iB].order) << std::endl;
+                            if (StrToOrder(tBonds[iB].order)==2.0
+                                || StrToOrder(tBonds[iB].order)==3.0)
+                            {
+                                aD =false;
+                                break;
+                            }
+                        }
+                    }
+                    if (aD)
+                    {
+                        aN=1.0;
+                    }
+                }
+            }
+            else if (tAtoms[tIdx].chemType.compare("N") ==0)
+            {
+                if (tAtoms[tIdx].connAtoms.size()==2 
+                    || tAtoms[tIdx].connAtoms.size()==3)
+                {
+                    aN=1.0;
+                }
+            }
+            else if(tAtoms[tIdx].chemType.compare("O") !=0)
+            {
+                aN =1.0;
+            }
+        }
+        
+        return aN;
+    }
+        
+    extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
+                                    std::vector<PlaneDict> & tPlanes,
+                                    std::vector<AtomDict>  & tAtoms,
+                                    std::vector<BondDict>  & tBonds)
+    {
+        std::vector<std::vector<int> >  allPlAtoms;
+        
+        mergePlaneRings(tAllRings, allPlAtoms, tAtoms, tBonds);
         
         
     }

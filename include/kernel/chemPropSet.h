@@ -192,6 +192,9 @@ namespace LIBMOL
                                    std::vector<AtomDict>::iterator  tIA);
     extern REAL  getBondOrder(Molecule   & tMol,
                               int tIdx1, int tIdx2);
+    extern REAL  getBondOrderOneAtom(std::vector<BondDict> tBonds,
+                                     std::vector<AtomDict> tAtoms,
+                                     int tIdx1, int tIdx2);
     extern void setAllBondOrders(std::vector<AtomDict> & tAtoms,
                                  std::vector<BondDict> & tBonds);
     
@@ -213,6 +216,9 @@ namespace LIBMOL
     
     // Check aromatic stability of extended ring systems.
     // using it to decide planes in the systems(molecules or monomers)
+    
+    
+    
     extern void setAromPlanes(std::vector<AtomDict> & tAtoms,
                               std::vector<RingDict> & tRings,
                               std::vector<PlaneDict> & tPlans);

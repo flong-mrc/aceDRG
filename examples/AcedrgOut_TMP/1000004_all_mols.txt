@@ -1,0 +1,567 @@
+data_mol_1
+
+loop_
+_chem_comp_atom.serial_number
+_chem_comp_atom.atom_id 
+_chem_comp_atom.element_symbol
+_chem_comp_atom.cod_type
+     1      H123    H    H(C[6]CC)
+     2      C124    C    C[6](C[6]CH)2(H)
+     3      H124    H    H(C[6]CC)
+     4      C223    C    C[6](C[6]CH)2(H)
+     5      H223    H    H(C[6]CC)
+     6      C224    C    C[6](C[6]CH)2(H)
+     7      H224    H    H(C[6]CC)
+     8      C225    C    C[6](C[6]CH)2(H)
+     9      H225    H    H(C[6]CC)
+    10        Cu   Cu    Cu(PC3)2(ICu)2
+    11         I    I    I(CuIPP)(CuIP)
+    12        P1    P    P(C[6]CC)2(CuIIP)(CCHH)
+    13        P2    P    P(C[6]CC)2(CuIIP)(CCHH)
+    14        C1    C    C(PCuCC)(CCHH)(H)2
+    15       H1A    H    H(CCHP)
+    16       H1B    H    H(CCHP)
+    17        C2    C    C(CHHP)(CH)(H)2
+    18       H2A    H    H(CCCH)
+    19       H2B    H    H(CCCH)
+    20        C3    C    C(CCHH)2(H)2
+    21       H3A    H    H(CCCH)
+    22       H3B    H    H(CCCH)
+    23        C4    C    C(CCHH)(CHHP)(H)2
+    24       H4A    H    H(CCCH)
+    25       H4B    H    H(CCCH)
+    26        C5    C    C(PCuCC)(CCHH)(H)2
+    27       H5A    H    H(CCHP)
+    28       H5B    H    H(CCHP)
+    29      C111    C    C[6](C[6]CH)2(PCuCC)
+    30      C112    C    C[6](C[6]CH)(C[6]CP)(H)
+    31      H112    H    H(C[6]CC)
+    32      C113    C    C[6](C[6]CH)2(H)
+    33      H113    H    H(C[6]CC)
+    34      C114    C    C[6](C[6]CH)2(H)
+    35      H114    H    H(C[6]CC)
+    36      C115    C    C[6](C[6]CH)2(H)
+    37      H115    H    H(C[6]CC)
+    38      C116    C    C[6](C[6]CH)(C[6]CP)(H)
+    39      H116    H    H(C[6]CC)
+    40      C121    C    C[6](C[6]CH)2(PCuCC)
+    41      C122    C    C[6](C[6]CH)(C[6]CP)(H)
+    42      H122    H    H(C[6]CC)
+    43      C123    C    C[6](C[6]CH)2(H)
+    44      C125    C    C[6](C[6]CH)2(H)
+    45      H125    H    H(C[6]CC)
+    46      C126    C    C[6](C[6]CH)(C[6]CP)(H)
+    47      H126    H    H(C[6]CC)
+    48      C211    C    C[6](C[6]CH)2(PCuCC)
+    49      C212    C    C[6](C[6]CH)(C[6]CP)(H)
+    50      H212    H    H(C[6]CC)
+    51      C213    C    C[6](C[6]CH)2(H)
+    52      H213    H    H(C[6]CC)
+    53      C214    C    C[6](C[6]CH)2(H)
+    54      H214    H    H(C[6]CC)
+    55      C215    C    C[6](C[6]CH)2(H)
+    56      H215    H    H(C[6]CC)
+    57      C216    C    C[6](C[6]CH)(C[6]CP)(H)
+    58      H216    H    H(C[6]CC)
+    59      C221    C    C[6](C[6]CH)2(PCuCC)
+    60      C222    C    C[6](C[6]CH)(C[6]CP)(H)
+    61      H222    H    H(C[6]CC)
+    62      C226    C    C[6](C[6]CH)(C[6]CP)(H)
+    63      H226    H    H(C[6]CC)
+    64        Cu   Cu    Cu(PCC)(ICu)2
+    65         I    I    I(CuIPP)(CuIP)
+    66        P1    P    P(C[6]CC)(CCHH)(CuII)
+    67        C1    C    C(CCHH)(PCuC)(H)2
+    68       H1A    H    H(CCHP)
+    69       H1B    H    H(CCHP)
+    70        C2    C    C(CCHH)(CHHP)(H)2
+    71       H2A    H    H(CCCH)
+    72       H2B    H    H(CCCH)
+    73        C3    C    C(CCHH)(H)
+    74       H3B    H    H(CC)
+    75      C111    C    C[6](C[6]CH)2(PCuC)
+    76      C112    C    C[6](C[6]CH)(C[6]CP)(H)
+    77      H112    H    H(C[6]CC)
+    78      C113    C    C[6](C[6]CH)2(H)
+    79      H113    H    H(C[6]CC)
+    80      C114    C    C[6](C[6]CH)2(H)
+    81      H114    H    H(C[6]CC)
+    82      C115    C    C[6](C[6]CH)2(H)
+    83      H115    H    H(C[6]CC)
+    84      C116    C    C[6](C[6]CH)(C[6]CP)(H)
+    85      H116    H    H(C[6]CC)
+
+loop_
+_chem_comp_bond.bond_serial_number
+_chem_comp_bond.atom1_serial_number
+_chem_comp_bond.atom2_serial_number
+_chem_comp_bond.atom1_id
+_chem_comp_bond.atom2_id
+_chem_comp_bond.value_dist
+_chem_comp_bond.is_in_same_ring
+     1     1    43   H   C  0.930538     N
+     2     2     3   C   H  0.929984     N
+     3     2    43   C   C   1.37288     Y
+     4     2    44   C   C   1.39464     Y
+     5     4     5   C   H    0.9303     N
+     6     4     6   C   C   1.34828     Y
+     7     4    60   C   C   1.39983     Y
+     8     6     7   C   H   0.93068     N
+     9     6     8   C   C    1.3825     Y
+    10     8     9   C   H  0.929971     N
+    11     8    62   C   C   1.37911     Y
+loop_
+_chem_comp_angle.angle_serial_number
+_chem_comp_angle.atom1_serial_number
+_chem_comp_angle.atom2_serial_number
+_chem_comp_angle.atom3_serial_number
+_chem_comp_angle.atom1_id
+_chem_comp_angle.atom2_id
+_chem_comp_angle.atom3_id
+_chem_comp_angle.value_angle
+     1     2    43     3   C   C   H   120.059
+     2     2    44     3   C   C   H   120.157
+     3     2    43    44   C   C   C   119.784
+     4     4     6     5   C   C   H   119.887
+     5     4    60     5   C   C   H   119.798
+     6     4     6    60   C   C   C   120.314
+     7     6     4     7   C   C   H   120.507
+     8     6     4     8   C   C   C   119.019
+     9     6     8     7   C   C   H   120.474
+    10     8     6     9   C   C   H   118.996
+    11     8     6    62   C   C   C   122.061
+    12     8    62     9   C   C   H   118.942
+data_mol_2
+
+loop_
+_chem_comp_atom.serial_number
+_chem_comp_atom.atom_id 
+_chem_comp_atom.element_symbol
+_chem_comp_atom.cod_type
+     1      C113    C    C[6](C[6]CH)2(H)
+     2      H113    H    H(C[6]CC)
+     3      C114    C    C[6](C[6]CH)2(H)
+     4      H114    H    H(C[6]CC)
+     5      C115    C    C[6](C[6]CH)2(H)
+     6      H115    H    H(C[6]CC)
+     7      C214    C    C[6](C[6]CH)2(H)
+     8      H214    H    H(C[6]CC)
+     9      C215    C    C[6](C[6]CH)2(H)
+    10      H215    H    H(C[6]CC)
+    11        Cu   Cu    Cu(PC3)2(ICu)2
+    12         I    I    I(CuIPP)(CuIP)
+    13        P1    P    P(C[6]CC)2(CuIIP)(CCHH)
+    14        P2    P    P(C[6]CC)2(CuIIP)(CCHH)
+    15        C1    C    C(PCuCC)(CCHH)(H)2
+    16       H1A    H    H(CCHP)
+    17       H1B    H    H(CCHP)
+    18        C2    C    C(CCHH)(CHHP)(H)2
+    19       H2A    H    H(CCCH)
+    20       H2B    H    H(CCCH)
+    21        C3    C    C(CCHH)(H)2
+    22       H3A    H    H(CCH)
+    23       H3B    H    H(CCH)
+    24        C4    C    C(CHHP)(CHH)(H)2
+    25       H4A    H    H(CCCH)
+    26       H4B    H    H(CCCH)
+    27        C5    C    C(PCuCC)(CCHH)(H)2
+    28       H5A    H    H(CCHP)
+    29       H5B    H    H(CCHP)
+    30      C111    C    C[6](C[6]CH)2(PCuCC)
+    31      C112    C    C[6](C[6]CH)(C[6]CP)(H)
+    32      H112    H    H(C[6]CC)
+    33      C116    C    C[6](C[6]CH)(C[6]CP)(H)
+    34      H116    H    H(C[6]CC)
+    35      C121    C    C[6](C[6]CH)2(PCuCC)
+    36      C122    C    C[6](C[6]CH)(C[6]CP)(H)
+    37      H122    H    H(C[6]CC)
+    38      C123    C    C[6](C[6]CH)2(H)
+    39      H123    H    H(C[6]CC)
+    40      C124    C    C[6](C[6]CH)2(H)
+    41      H124    H    H(C[6]CC)
+    42      C125    C    C[6](C[6]CH)2(H)
+    43      H125    H    H(C[6]CC)
+    44      C126    C    C[6](C[6]CH)(C[6]CP)(H)
+    45      H126    H    H(C[6]CC)
+    46      C211    C    C[6](C[6]CH)2(PCuCC)
+    47      C212    C    C[6](C[6]CH)(C[6]CP)(H)
+    48      H212    H    H(C[6]CC)
+    49      C213    C    C[6](C[6]CH)2(H)
+    50      H213    H    H(C[6]CC)
+    51      C216    C    C[6](C[6]CH)(C[6]CP)(H)
+    52      H216    H    H(C[6]CC)
+    53      C221    C    C[6](C[6]CH)2(PCuCC)
+    54      C222    C    C[6](C[6]CH)(C[6]CP)(H)
+    55      H222    H    H(C[6]CC)
+    56      C223    C    C[6](C[6]CH)2(H)
+    57      H223    H    H(C[6]CC)
+    58      C224    C    C[6](C[6]CH)2(H)
+    59      H224    H    H(C[6]CC)
+    60      C225    C    C[6](C[6]CH)2(H)
+    61      H225    H    H(C[6]CC)
+    62      C226    C    C[6](C[6]CH)(C[6]CP)(H)
+    63      H226    H    H(C[6]CC)
+    64        Cu   Cu    Cu(PCC)(ICu)2
+    65         I    I    I(CuIPP)(CuIP)
+    66        P2    P    P(CCHH)(CuII)(CC)
+    67        C3    C    C(CCHH)2(H)2
+    68       H3A    H    H(CCCH)
+    69       H3B    H    H(CCCH)
+    70        C4    C    C(CCHH)(CHHP)(H)2
+    71       H4A    H    H(CCCH)
+    72       H4B    H    H(CCCH)
+    73        C5    C    C(CCHH)(PCuC)(H)2
+    74       H5A    H    H(CCHP)
+    75       H5B    H    H(CCHP)
+    76      C221    C    C(PCuC)(CCH)
+    77      C222    C    C(CCH)(CP)(H)
+    78      H222    H    H(CCC)
+    79      C223    C    C(CCH)2(H)
+    80      H223    H    H(CCC)
+    81      C224    C    C(CCH)(C)(H)
+    82      H224    H    H(CCC)
+    83      C225    C    C(CCH)
+
+loop_
+_chem_comp_bond.bond_serial_number
+_chem_comp_bond.atom1_serial_number
+_chem_comp_bond.atom2_serial_number
+_chem_comp_bond.atom1_id
+_chem_comp_bond.atom2_id
+_chem_comp_bond.value_dist
+_chem_comp_bond.is_in_same_ring
+     1     1     3   C   C   1.36585     Y
+     2     1    31   C   C   1.39791     Y
+     3     1     2   C   H  0.929688     N
+     4     3     4   C   H  0.930625     N
+     5     3     5   C   C   1.36251     Y
+     6     5     6   C   H   0.92955     N
+     7     5    33   C   C   1.38144     Y
+     8     7     9   C   C   1.39333     Y
+     9     7     8   C   H  0.930511     N
+    10     7    49   C   C   1.38326     Y
+    11     9    10   C   H  0.930468     N
+    12     9    51   C   C   1.38641     Y
+loop_
+_chem_comp_angle.angle_serial_number
+_chem_comp_angle.atom1_serial_number
+_chem_comp_angle.atom2_serial_number
+_chem_comp_angle.atom3_serial_number
+_chem_comp_angle.atom1_id
+_chem_comp_angle.atom2_id
+_chem_comp_angle.atom3_id
+_chem_comp_angle.value_angle
+     1     1     3    31   C   C   C   118.735
+     2     1     3     2   C   C   H   120.676
+     3     1    31     2   C   C   H    120.59
+     4     3     1     4   C   C   H   119.353
+     5     3     1     5   C   C   C     121.3
+     6     3     5     4   C   C   H   119.347
+     7     5     3     6   C   C   H   119.785
+     8     5     3    33   C   C   C   120.341
+     9     5    33     6   C   C   H   119.874
+    10     7     9     8   C   C   H   119.325
+    11     7     9    49   C   C   C   121.379
+    12     7    49     8   C   C   H   119.296
+    13     9     7    10   C   C   H   120.938
+    14     9     7    51   C   C   C   118.234
+    15     9    51    10   C   C   H   120.828
+data_mol_3
+
+loop_
+_chem_comp_atom.serial_number
+_chem_comp_atom.atom_id 
+_chem_comp_atom.element_symbol
+_chem_comp_atom.cod_type
+     1        Cu   Cu    Cu(PC3)2(ICu)2
+     2         I    I    I(CuIPP)2
+     3        P1    P    P(C[6]CC)2(CuIIP)(CCHH)
+     4        P2    P    P(C[6]CC)2(CuIIP)(CCHH)
+     5        C1    C    C(PCuCC)(CCHH)(H)2
+     6       H1A    H    H(CCHP)
+     7       H1B    H    H(CCHP)
+     8        C2    C    C(CCHH)(CHHP)(H)2
+     9       H2A    H    H(CCCH)
+    10       H2B    H    H(CCCH)
+    11        C3    C    C(CCHH)2(H)2
+    12       H3A    H    H(CCCH)
+    13       H3B    H    H(CCCH)
+    14        C4    C    C(CCHH)(CHHP)(H)2
+    15       H4A    H    H(CCCH)
+    16       H4B    H    H(CCCH)
+    17        C5    C    C(PCuCC)(CCHH)(H)2
+    18       H5A    H    H(CCHP)
+    19       H5B    H    H(CCHP)
+    20      C111    C    C[6](C[6]CH)2(PCuCC)
+    21      C112    C    C[6](C[6]CH)(C[6]CP)(H)
+    22      H112    H    H(C[6]CC)
+    23      C116    C    C[6](C[6]CH)(C[6]CP)(H)
+    24      H116    H    H(C[6]CC)
+    25      C121    C    C[6](C[6]CH)2(PCuCC)
+    26      C122    C    C[6](C[6]CH)(C[6]CP)(H)
+    27      H122    H    H(C[6]CC)
+    28      C123    C    C[6](C[6]CH)2(H)
+    29      C125    C    C[6](C[6]CH)2(H)
+    30      H125    H    H(C[6]CC)
+    31      C126    C    C[6](C[6]CH)(C[6]CP)(H)
+    32      H126    H    H(C[6]CC)
+    33      C211    C    C[6](C[6]CH)2(PCuCC)
+    34      C212    C    C[6](C[6]CH)(C[6]CP)(H)
+    35      H212    H    H(C[6]CC)
+    36      C213    C    C[6](C[6]CH)2(H)
+    37      H213    H    H(C[6]CC)
+    38      C216    C    C[6](C[6]CH)(C[6]CP)(H)
+    39      H216    H    H(C[6]CC)
+    40      C221    C    C[6](C[6]CH)2(PCuCC)
+    41      C222    C    C[6](C[6]CH)(C[6]CP)(H)
+    42      H222    H    H(C[6]CC)
+    43      C226    C    C[6](C[6]CH)(C[6]CP)(H)
+    44      H226    H    H(C[6]CC)
+    45        Cu   Cu    Cu(PC3)2(ICu)2
+    46         I    I    I(CuIPP)2
+    47        P1    P    P(C[6]CC)2(CuIIP)(CCHH)
+    48        P2    P    P(C[6]CC)2(CuIIP)(CCHH)
+    49        C1    C    C(PCuCC)(CCHH)(H)2
+    50       H1A    H    H(CCHP)
+    51       H1B    H    H(CCHP)
+    52        C2    C    C(CCHH)(CHHP)(H)2
+    53       H2A    H    H(CCCH)
+    54       H2B    H    H(CCCH)
+    55        C3    C    C(CCHH)2(H)2
+    56       H3A    H    H(CCCH)
+    57       H3B    H    H(CCCH)
+    58        C4    C    C(CCHH)(CHHP)(H)2
+    59       H4A    H    H(CCCH)
+    60       H4B    H    H(CCCH)
+    61        C5    C    C(PCuCC)(CCHH)(H)2
+    62       H5A    H    H(CCHP)
+    63       H5B    H    H(CCHP)
+    64      C111    C    C[6](C[6]CH)2(PCuCC)
+    65      C112    C    C[6](C[6]CH)(C[6]CP)(H)
+    66      H112    H    H(C[6]CC)
+    67      C116    C    C[6](C[6]CH)(C[6]CP)(H)
+    68      H116    H    H(C[6]CC)
+    69      C121    C    C[6](C[6]CH)2(PCuCC)
+    70      C122    C    C[6](C[6]CH)(C[6]CP)(H)
+    71      H122    H    H(C[6]CC)
+    72      C123    C    C[6](C[6]CH)2(H)
+    73      C125    C    C[6](C[6]CH)2(H)
+    74      H125    H    H(C[6]CC)
+    75      C126    C    C[6](C[6]CH)(C[6]CP)(H)
+    76      H126    H    H(C[6]CC)
+    77      C211    C    C[6](C[6]CH)2(PCuCC)
+    78      C212    C    C[6](C[6]CH)(C[6]CP)(H)
+    79      H212    H    H(C[6]CC)
+    80      C213    C    C[6](C[6]CH)2(H)
+    81      H213    H    H(C[6]CC)
+    82      C216    C    C[6](C[6]CH)(C[6]CP)(H)
+    83      H216    H    H(C[6]CC)
+    84      C221    C    C[6](C[6]CH)2(PCuCC)
+    85      C222    C    C[6](C[6]CH)(C[6]CP)(H)
+    86      H222    H    H(C[6]CC)
+    87      C226    C    C[6](C[6]CH)(C[6]CP)(H)
+    88      H226    H    H(C[6]CC)
+    89      C113    C    C[6](C[6]CH)2(H)
+    90      H113    H    H(C[6]CC)
+    91      C114    C    C[6](C[6]CH)2(H)
+    92      H114    H    H(C[6]CC)
+    93      C115    C    C[6](C[6]CH)2(H)
+    94      H115    H    H(C[6]CC)
+    95      H123    H    H(C[6]CC)
+    96      C124    C    C[6](C[6]CH)2(H)
+    97      H124    H    H(C[6]CC)
+    98      C214    C    C[6](C[6]CH)2(H)
+    99      H214    H    H(C[6]CC)
+   100      C215    C    C[6](C[6]CH)2(H)
+   101      H215    H    H(C[6]CC)
+   102      C223    C    C[6](C[6]CH)2(H)
+   103      H223    H    H(C[6]CC)
+   104      C224    C    C[6](C[6]CH)2(H)
+   105      H224    H    H(C[6]CC)
+   106      C225    C    C[6](C[6]CH)2(H)
+   107      H225    H    H(C[6]CC)
+   108      C113    C    C[6](C[6]CH)2(H)
+   109      H113    H    H(C[6]CC)
+   110      C114    C    C[6](C[6]CH)2(H)
+   111      H114    H    H(C[6]CC)
+   112      C115    C    C[6](C[6]CH)2(H)
+   113      H115    H    H(C[6]CC)
+   114      H123    H    H(C[6]CC)
+   115      C124    C    C[6](C[6]CH)2(H)
+   116      H124    H    H(C[6]CC)
+   117      C214    C    C[6](C[6]CH)2(H)
+   118      H214    H    H(C[6]CC)
+   119      C215    C    C[6](C[6]CH)2(H)
+   120      H215    H    H(C[6]CC)
+   121      C223    C    C[6](C[6]CH)2(H)
+   122      H223    H    H(C[6]CC)
+   123      C224    C    C[6](C[6]CH)2(H)
+   124      H224    H    H(C[6]CC)
+   125      C225    C    C[6](C[6]CH)2(H)
+   126      H225    H    H(C[6]CC)
+
+loop_
+_chem_comp_bond.bond_serial_number
+_chem_comp_bond.atom1_serial_number
+_chem_comp_bond.atom2_serial_number
+_chem_comp_bond.atom1_id
+_chem_comp_bond.atom2_id
+_chem_comp_bond.value_dist
+_chem_comp_bond.is_in_same_ring
+     1     1     3  Cu   P   2.25504     N
+     2     1     4  Cu   P   2.25202     N
+     3     1    46  Cu   I    2.7577     N
+     4     1     2  Cu   I   2.74355     N
+     5     3     5   P   C   1.83741     N
+     6     3    20   P   C   1.81852     N
+     7     3    25   P   C   1.84606     N
+     8     4    40   P   C   1.83417     N
+     9     4    33   P   C   1.82583     N
+    10     4    17   P   C   1.84905     N
+    11     5     7   C   H  0.969306     N
+    12     5     8   C   C   1.52411     N
+    13     5     6   C   H  0.970287     N
+    14     8     9   C   H  0.970003     N
+    15     8    10   C   H  0.969943     N
+    16     8    55   C   C   1.54565     N
+    17    11    13   C   H  0.969746     N
+    18    11    14   C   C   1.53206     N
+    19    11    12   C   H  0.970725     N
+    20    14    15   C   H  0.970847     N
+    21    14    16   C   H  0.970488     N
+    22    14    17   C   C   1.51191     N
+    23    17    18   C   H  0.970136     N
+    24    17    19   C   H  0.969337     N
+    25    20    23   C   C   1.38342     Y
+    26    20    21   C   C   1.38987     Y
+    27    21    89   C   C   1.39791     Y
+    28    21    22   C   H  0.930485     N
+    29    23    93   C   C   1.38144     Y
+    30    23    24   C   H  0.930914     N
+    31    25    26   C   C   1.40028     Y
+    32    25    31   C   C   1.39879     Y
+    33    26    27   C   H   0.93085     N
+    34    26    28   C   C   1.39337     Y
+    35    28    95   C   H  0.930538     N
+    36    28    96   C   C   1.37288     Y
+    37    29    30   C   H  0.930611     N
+    38    29    31   C   C   1.38724     Y
+    39    29    96   C   C   1.39464     Y
+    40    31    32   C   H  0.930426     N
+    41    33    38   C   C   1.40718     Y
+    42    33    34   C   C   1.40042     Y
+    43    34    35   C   H  0.930187     N
+    44    34    36   C   C   1.39173     Y
+    45    36    98   C   C   1.38326     Y
+    46    36    37   C   H  0.929866     N
+    47    38    39   C   H  0.929719     N
+    48    38   100   C   C   1.38641     Y
+    49    40    41   C   C   1.37828     Y
+    50    40    43   C   C    1.4023     Y
+    51    41    42   C   H  0.929547     N
+    52    41   102   C   C   1.39983     Y
+    53    43    44   C   H  0.930671     N
+    54    43   106   C   C   1.37911     Y
+loop_
+_chem_comp_angle.angle_serial_number
+_chem_comp_angle.atom1_serial_number
+_chem_comp_angle.atom2_serial_number
+_chem_comp_angle.atom3_serial_number
+_chem_comp_angle.atom1_id
+_chem_comp_angle.atom2_id
+_chem_comp_angle.atom3_id
+_chem_comp_angle.value_angle
+     1     1     3     4  Cu   P   P   119.807
+     2     1     3    46  Cu   P   I   103.268
+     3     1     3     2  Cu   P   I    116.69
+     4     1     4    46  Cu   P   I   115.104
+     5     1     4     2  Cu   P   I   104.404
+     6     1    46     2  Cu   I   I   95.2164
+     7     2     1    45   I  Cu  Cu   84.7836
+     8     3     1     5   P  Cu   C   113.886
+     9     3     1    20   P  Cu   C   119.557
+    10     3     1    25   P  Cu   C   112.001
+    11     3     5    20   P   C   C   104.415
+    12     3     5    25   P   C   C   102.386
+    13     3    20    25   P   C   C   102.668
+    14     4     1    40   P  Cu   C   118.265
+    15     4     1    33   P  Cu   C   112.785
+    16     4     1    17   P  Cu   C   113.315
+    17     4    40    33   P   C   C   103.328
+    18     4    17    40   P   C   C   104.546
+    19     4    17    33   P   C   C   102.989
+    20     5     3     7   C   P   H   109.123
+    21     5     3     8   C   P   C   112.439
+    22     5     3     6   C   P   H   109.165
+    23     5     8     7   C   C   H   109.089
+    24     5     7     6   C   H   H   107.876
+    25     5     8     6   C   C   H   109.044
+    26     8     5     9   C   C   H   108.571
+    27     8     5    10   C   C   H   108.541
+    28     8     5    55   C   C   C   114.849
+    29     8     9    10   C   H   H   107.534
+    30     8    55     9   C   C   H   108.541
+    31     8    55    10   C   C   H   108.573
+    32    11    14    13   C   C   H   108.542
+    33    11    13    12   C   H   H   107.517
+    34    11    52    13   C   C   H   108.457
+    35    11    14    12   C   C   H   108.529
+    36    11    14    52   C   C   C    115.08
+    37    11    52    12   C   C   H   108.471
+    38    14    11    15   C   C   H   108.379
+    39    14    11    16   C   C   H   108.394
+    40    14    11    17   C   C   C   115.488
+    41    14    15    16   C   H   H   107.438
+    42    14    17    15   C   C   H   108.439
+    43    14    17    16   C   C   H   108.429
+    44    17     4    14   C   P   C   110.101
+    45    17     4    18   C   P   H   109.605
+    46    17     4    19   C   P   H   109.598
+    47    17    14    18   C   C   H   109.671
+    48    17    14    19   C   C   H   109.681
+    49    17    18    19   C   H   H   108.155
+    50    20     3    23   C   P   C   121.009
+    51    20     3    21   C   P   C   120.139
+    52    20    23    21   C   C   C   118.831
+    53    21    20    89   C   C   C   120.676
+    54    21    20    22   C   C   H   119.636
+    55    21    89    22   C   C   H   119.688
+    56    23    20    93   C   C   C   120.099
+    57    23    20    24   C   C   H   119.886
+    58    23    93    24   C   C   H   120.015
+    59    25     3    26   C   P   C   123.821
+    60    25     3    31   C   P   C   118.455
+    61    25    26    31   C   C   C   117.423
+    62    26    25    27   C   C   H   119.015
+    63    26    25    28   C   C   C   121.919
+    64    26    28    27   C   C   H   119.066
+    65    28    26    95   C   C   H   120.248
+    66    28    26    96   C   C   C   119.548
+    67    28    96    95   C   C   H   120.204
+    68    29    31    30   C   C   H   119.708
+    69    29    96    30   C   C   H    119.72
+    70    29    31    96   C   C   C   120.572
+    71    31    25    29   C   C   C   120.718
+    72    31    25    32   C   C   H   119.632
+    73    31    29    32   C   C   H   119.649
+    74    33     4    38   C   P   C   122.133
+    75    33     4    34   C   P   C   119.231
+    76    33    38    34   C   C   C   118.142
+    77    34    33    35   C   C   H    119.79
+    78    34    33    36   C   C   C    120.44
+    79    34    36    35   C   C   H   119.771
+    80    36    34    98   C   C   C   119.851
+    81    36    34    37   C   C   H   120.093
+    82    36    98    37   C   C   H   120.056
+    83    38    33    39   C   C   H   119.042
+    84    38    33   100   C   C   C     121.9
+    85    38   100    39   C   C   H   119.057
+    86    40     4    41   C   P   C   120.182
+    87    40     4    43   C   P   C   121.466
+    88    40    41    43   C   C   C   118.274
+    89    41    40    42   C   C   H   119.297
+    90    41    40   102   C   C   C   121.234
+    91    41   102    42   C   C   H   119.469
+    92    43    40    44   C   C   H   120.455
+    93    43    40   106   C   C   C   119.079
+    94    43   106    44   C   C   H   120.466

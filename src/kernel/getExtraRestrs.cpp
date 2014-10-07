@@ -2234,9 +2234,9 @@ namespace LIBMOL
         if(outputFile.is_open())
         {
             std::string ID1;
-            int from1, to1;
+            int from1=-1, to1=-1;
             std::string ID2;
-            int from2, to2;
+            int from2=-1, to2=-1;
             int iCout       = 0;
             bool lStart     = true;
             

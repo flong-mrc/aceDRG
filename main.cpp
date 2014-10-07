@@ -55,6 +55,14 @@
 #include "MolGenerator.h"
 #endif
 
+#ifndef ALLSYSTEM_H
+#include "AllSystem.h"
+#endif
+
+#ifndef CCP4ATOMTYPE_H
+#include "CCP4AtomType.h"
+#endif
+
 #ifndef LINALG_H
 #include "include/go/LinAlg.h"
 #endif
@@ -357,14 +365,29 @@ int main(int argc, char** argv) {
     }
     else if (AJob.workMode == 41)
     {
+       
+        
         LIBMOL::DictCifFile aTargetSystem(AJob.IOEntries["inCifName"], std::ios::in);
         
         if ( (int)aTargetSystem.allAtoms.size() > 0)
         {     
             // CodClassify  aCodSystem(aTargetSystem.allAtoms);
-            LIBMOL::CodClassify  aCodSystem(aTargetSystem);
+            LIBMOL::CodClassify  aCodSystem(aTargetSystem, AJob.IOEntries["libMolTabDir"]);
             aCodSystem.codAtomClassify(2);
-            aCodSystem.outAtomTypes(AJob.IOEntries["monoRootName"]);
+            outCodAndCcp4AtomTypes(AJob.IOEntries["userOutName"].c_str(),
+                                   aCodSystem.allAtoms);
+            
+            LIBMOL::CCP4AtomType  aCPP4TypeTool(aCodSystem.allAtoms, aCodSystem.allRings);
+            aCPP4TypeTool.setAllAtomsCCP4Type();
+            for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
+            {
+                if (aCPP4TypeTool.allAtoms[i].ccp4Type.compare(aCodSystem.allAtoms[i].ccp4Type) !=0)
+                {
+                    std::cout << aCodSystem.allAtoms[i].id << "    " 
+                              << aCPP4TypeTool.allAtoms[i].ccp4Type
+                              << "     " << aCodSystem.allAtoms[i].ccp4Type << std::endl;
+                }
+            }
         }
     }
     else if (AJob.workMode == 42)

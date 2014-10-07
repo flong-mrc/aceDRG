@@ -196,7 +196,8 @@ namespace LIBMOL
                     std::string                                   tLibmolTabDir);
         
         // Constructor by a DictCifFile object
-        CodClassify(const DictCifFile & tCifObj);
+        CodClassify(const DictCifFile & tCifObj, 
+                    std::string   tLibmolTabDir);
         
         // Constructor by a Mol/Sdf molecules
         CodClassify(const std::vector<Molecule> & tMols);

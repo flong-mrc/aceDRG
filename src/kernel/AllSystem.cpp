@@ -174,6 +174,7 @@ namespace LIBMOL
         allChirals.clear();
         allPlanes.clear();
         allRings.clear();
+        allRingsV.clear();
         
         AddAtoms(tCodSys.allAtoms);
         AddBonds(tCodSys.allBonds);
@@ -182,6 +183,55 @@ namespace LIBMOL
         AddChirals(tCodSys.allChirals);
         AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
+        
+        for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
+                    iMR != allRings.end(); iMR++)
+        {
+            for (std::vector<RingDict>::iterator iR=iMR->second.begin();
+                        iR != iMR->second.end(); iR++)
+            {
+                
+                iR->setAtmsLink(allAtoms);
+                allRingsV.push_back(*iR);
+            }
+        }
+        
+    }
+    
+    void AllSystem::resetSystem2(CodClassify& tCodSys)
+    {
+        
+        allAtoms.clear();
+        allBonds.clear();
+        allAngles.clear();
+        allTorsions.clear();
+        allChirals.clear();
+        allPlanes.clear();
+        allRings.clear();
+        allRingsV.clear();
+        
+        AddAtoms(tCodSys.allAtoms);
+        AddBonds(tCodSys.allBonds);
+        AddAngles(tCodSys.allAngles);
+        AddTorsions(tCodSys.allTorsions);
+        AddChirals(tCodSys.allChirals);
+        // AddPlanes(tCodSys.allPlanes);
+        AddRings(tCodSys.allRings);
+        
+        for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
+                    iMR != allRings.end(); iMR++)
+        {
+            for (std::vector<RingDict>::iterator iR=iMR->second.begin();
+                        iR != iMR->second.end(); iR++)
+            {
+                
+                iR->setAtmsLink(allAtoms);
+                allRingsV.push_back(*iR);
+            }
+        }
+        
+        checkAndSetupPlanes(allRingsV, allPlanes, allAtoms, allBonds);
+        
     }
     
     void AllSystem::AddAtom(const AtomDict & tAtom)
@@ -4372,7 +4422,7 @@ namespace LIBMOL
                 aCodSystem.allChirals);
        */
        resetSystem(aCodSystem);
-    
+       //resetSystem2(aCodSystem)
        /*
        for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
@@ -4567,5 +4617,45 @@ namespace LIBMOL
     {   
     }
      */
+    
+    void extern outCodAndCcp4AtomTypes(FileName                 tFName,
+                                       std::vector<AtomDict>  & tAtoms)
+    {
+        std::ofstream ouAtmTypes(tFName);
+        if(ouAtmTypes.is_open())
+        {
+            if (tAtoms.size() > 0)
+            {
+                
+                ouAtmTypes.width(15);
+                ouAtmTypes << std::left << "AtomName: ";
+                ouAtmTypes.width(40);
+                ouAtmTypes << std::left << "Acedrg atom types: ";
+                ouAtmTypes.width(40);
+                ouAtmTypes << std::left << "CCP4 atom types: " << std::endl;
+                
+                for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                        iA !=tAtoms.end(); iA++)
+                {
+                    ouAtmTypes.width(15);
+                    ouAtmTypes << std::left << iA->id; 
+                    unsigned len = iA->codClass.size();
+                    if (len <=40)
+                    {
+                        ouAtmTypes.width(40);
+                    }
+                    else
+                    {
+                        ouAtmTypes.width(iA->codClass.size() + 5);
+                    }
+                    ouAtmTypes << std::left << iA->codClass;
+                    ouAtmTypes.width(40);
+                    ouAtmTypes << std::left << iA->ccp4Type << std::endl;
+                }
+            }
+                       
+            ouAtmTypes.close();
+        }
+    }
 
 }

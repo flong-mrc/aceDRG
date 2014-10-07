@@ -92,6 +92,14 @@
 #include "utility.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
+#ifndef CCP4ATOMTYPE_H
+#include "CCP4AtomType.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
@@ -181,6 +189,7 @@ namespace LIBMOL
         void AddRing(const RingDict                              & tRing);
         
         void resetSystem(CodClassify & tCodSys);
+        void resetSystem2(CodClassify & tCodSys);
         
         // Further setup angles, torsions, planes and chirals
         bool isOrgSys();
@@ -344,6 +353,9 @@ namespace LIBMOL
                    AllSystem                & tSubSys);
     
     void extern optSubsys(AllSystem  & tSubSys);
+    
+    void extern outCodAndCcp4AtomTypes(FileName                 tFName,
+                                       std::vector<AtomDict>  & tAtoms);
        
 
 }

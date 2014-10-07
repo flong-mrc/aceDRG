@@ -67,10 +67,11 @@ namespace LIBMOL
         }
     }
  
-    CodClassify::CodClassify(const DictCifFile & tCifObj):wSize(1000),
-                                                          libmolTabDir("")
+    CodClassify::CodClassify(const DictCifFile & tCifObj,
+                             std::string   tLibmolTabDir):wSize(1000)
+                                                         
     {
-        
+        libmolTabDir = tLibmolTabDir;
         pPeriodictable = new PeriodicTable();
         
         for (std::vector<AtomDict>::const_iterator iA=tCifObj.allAtoms.begin();
@@ -314,6 +315,55 @@ namespace LIBMOL
         setAtomsBondingAndChiralCenter();
         
         getCCP4BondAndAngles();
+        
+        // std::vector<RingDict>          tmpRings;
+        // std::vector<std::vector<int> > tmpAtoms;
+        
+        if (allRings.size() !=0)
+        {
+            for (std::map<ID, std::vector<RingDict> >::iterator iMr=allRings.begin();
+                    iMr !=allRings.end(); iMr++)
+            {
+                for(std::vector<RingDict>::iterator iR=iMr->second.begin();
+                        iR !=iMr->second.end(); iR++)
+                {
+                    // tmpRings.push_back(*iR);
+                    
+                    iR->setPlaneProp();
+                    
+                    /*
+                    std::string PL("No");
+                    if (iR->isPlanar)
+                    {
+                        PL = "Yes";
+                    }
+                    
+                    std::cout << "Is ring, " << iMr->first << ", a planar ring? "
+                              <<  PL << std::endl;
+                    */
+                }
+            }
+        }
+        
+        /*
+        mergePlaneRings(tmpRings, tmpAtoms);
+        
+        std::cout << "Number of merged atom rings " 
+                  << tmpAtoms.size() << std::endl;
+        
+        for (std::vector<std::vector<int> >::iterator iR=tmpAtoms.begin();
+                iR !=tmpAtoms.end(); iR++)
+        {
+            std::cout << "Atoms in a merged ring : " << std::endl;
+            for (std::vector<int>::iterator iAt=iR->begin();
+                    iAt !=iR->end(); iAt++)
+            {
+                std::cout << allAtoms[*iAt].id << std::endl;
+            }
+        }
+         
+        exit(0);
+        */
         
         // detectPlaneGroups();
         

@@ -1672,13 +1672,13 @@ namespace LIBMOL
             //tOrder = 4.0;
             tOrder = 1.5;
         }
+        else if (a4.find("DELO") !=std::string::npos)
+        {
+            tOrder = 1.5;
+        }
         else if (a4.find("BOTH") !=std::string::npos)
         {
             tOrder = 5.0;
-        }
-        else if (a4.find("DELO") !=std::string::npos)
-        {
-            tOrder = 9.0;
         }
         else if (a4.find("META") !=std::string::npos)
         {
@@ -2165,7 +2165,7 @@ namespace LIBMOL
     
     extern std::string getLibmolDir()
     {
-        
+        return NullString; 
     }
     
         

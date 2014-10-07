@@ -1,0 +1,286 @@
+global_
+_lib_name         ?
+_lib_version      ?
+_lib_update       ?
+# ------------------------------------------------
+#
+# ---   LIST OF MONOMERS ---
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+SMILE    SMI '.                                   ' .                  36  18 .
+# ------------------------------------------------------
+# ------------------------------------------------------
+#
+# --- DESCRIPTION OF MONOMERS ---
+#
+data_comp_SMILE
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+ SMILE         O2     O    O         0.000      0.000    0.000    0.000
+ SMILE         C6     C    C         0.000      1.218   -0.341   -0.270
+ SMILE         C7     C    CH2       0.000      1.379   -1.809   -0.265
+ SMILE         H9     H    H         0.000      1.725   -2.149   -1.243
+ SMILE         H10    H    H         0.000      0.425   -2.286   -0.032
+ SMILE         N1     N    NT2       0.000      2.454   -2.196    0.846
+ SMILE         H12    H    H         0.000      2.814   -1.345    1.330
+ SMILE         H11    H    H         0.000      2.597   -3.229    0.883
+ SMILE         N      N    NH1       0.000      2.113    0.684   -0.091
+ SMILE         H8     H    H         0.000      1.593    1.519    0.139
+ SMILE         C5     C    CH2       0.000      3.592    1.036   -0.108
+ SMILE         H6     H    H         0.000      3.826    1.677    0.744
+ SMILE         H7     H    H         0.000      3.833    1.563   -1.034
+ SMILE         C4     C    CH1       0.000      4.415   -0.249   -0.022
+ SMILE         H4     H    H         0.000      3.928   -0.800    0.794
+ SMILE         O1     O    OH1       0.000      3.936   -0.873   -1.144
+ SMILE         H5     H    H         0.000      4.372   -1.726   -1.232
+ SMILE         C3     C    CR6       0.000      5.890   -0.006    0.537
+ SMILE         C2     C    CR16      0.000      5.727    1.196    1.484
+ SMILE         H3     H    H         0.000      6.215    2.044    1.948
+ SMILE         C8     C    CR6       0.000      6.771   -1.264    0.940
+ SMILE         O3     O    O2        0.000      7.895   -0.605    0.699
+ SMILE         C9     C    CH3       0.000      9.220   -1.043    0.932
+ SMILE         H15    H    H         0.000      9.345   -1.246    1.963
+ SMILE         H14    H    H         0.000      9.401   -1.923    0.372
+ SMILE         H13    H    H         0.000      9.897   -0.287    0.634
+ SMILE         C10    C    CR16      0.000      5.948   -1.727    0.072
+ SMILE         H16    H    H         0.000      6.015   -2.474   -0.709
+ SMILE         C11    C    CR16      0.000      4.866   -0.836    0.561
+ SMILE         H17    H    H         0.000      3.919   -1.260    0.251
+ SMILE         C1     C    CR6       0.000      4.566    0.493    1.358
+ SMILE         O      O    O2        0.000      3.355    1.224    1.219
+ SMILE         C      C    CH3       0.000      2.316    2.211    1.089
+ SMILE         H2     H    H         0.000      2.319    2.845    1.938
+ SMILE         H1     H    H         0.000      2.482    2.790    0.218
+ SMILE         H      H    H         0.000      1.375    1.729    1.015
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ SMILE    O2     n/a    C6     START
+ SMILE    C6     O2     N      .
+ SMILE    C7     C6     N1     .
+ SMILE    H9     C7     .      .
+ SMILE    H10    C7     .      .
+ SMILE    N1     C7     H11    .
+ SMILE    H12    N1     .      .
+ SMILE    H11    N1     .      .
+ SMILE    N      C6     C5     .
+ SMILE    H8     N      .      .
+ SMILE    C5     N      C4     .
+ SMILE    H6     C5     .      .
+ SMILE    H7     C5     .      .
+ SMILE    C4     C5     C3     .
+ SMILE    H4     C4     .      .
+ SMILE    O1     C4     H5     .
+ SMILE    H5     O1     .      .
+ SMILE    C3     C4     C8     .
+ SMILE    C2     C3     H3     .
+ SMILE    H3     C2     .      .
+ SMILE    C8     C3     C10    .
+ SMILE    O3     C8     C9     .
+ SMILE    C9     O3     H13    .
+ SMILE    H15    C9     .      .
+ SMILE    H14    C9     .      .
+ SMILE    H13    C9     .      .
+ SMILE    C10    C8     C11    .
+ SMILE    H16    C10    .      .
+ SMILE    C11    C10    C1     .
+ SMILE    H17    C11    .      .
+ SMILE    C1     C11    O      .
+ SMILE    O      C1     C      .
+ SMILE    C      O      H      .
+ SMILE    H2     C      .      .
+ SMILE    H1     C      .      .
+ SMILE    H      C      .      END
+ SMILE    C1     C2     .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ SMILE    C      O         single      1.426    0.020
+ SMILE    O      C1        single      1.370    0.020
+ SMILE    C1     C2        double      1.390    0.020
+ SMILE    C2     C3        single      1.390    0.020
+ SMILE    C3     C4        single      1.480    0.020
+ SMILE    O1     C4        single      1.432    0.020
+ SMILE    C4     C5        single      1.524    0.020
+ SMILE    C5     N         single      1.450    0.020
+ SMILE    N      C6        single      1.330    0.020
+ SMILE    C6     O2        double      1.220    0.020
+ SMILE    C7     C6        single      1.510    0.020
+ SMILE    N1     C7        single      1.472    0.020
+ SMILE    C8     C3        double      1.487    0.020
+ SMILE    O3     C8        single      1.370    0.020
+ SMILE    C9     O3        single      1.426    0.020
+ SMILE    C10    C8        single      1.390    0.020
+ SMILE    C11    C10       double      1.390    0.020
+ SMILE    C1     C11       single      1.390    0.020
+ SMILE    H      C         single      1.059    0.020
+ SMILE    H1     C         single      1.059    0.020
+ SMILE    H2     C         single      1.059    0.020
+ SMILE    H3     C2        single      1.083    0.020
+ SMILE    H4     C4        single      1.099    0.020
+ SMILE    H5     O1        single      0.967    0.020
+ SMILE    H6     C5        single      1.092    0.020
+ SMILE    H7     C5        single      1.092    0.020
+ SMILE    H8     N         single      1.010    0.020
+ SMILE    H9     C7        single      1.092    0.020
+ SMILE    H10    C7        single      1.092    0.020
+ SMILE    H11    N1        single      1.033    0.020
+ SMILE    H12    N1        single      1.033    0.020
+ SMILE    H13    C9        single      1.059    0.020
+ SMILE    H14    C9        single      1.059    0.020
+ SMILE    H15    C9        single      1.059    0.020
+ SMILE    H16    C10       single      1.083    0.020
+ SMILE    H17    C11       single      1.083    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ SMILE    O2     C6     C7      120.500    3.000
+ SMILE    O2     C6     N       123.000    3.000
+ SMILE    C7     C6     N       116.500    3.000
+ SMILE    C6     C7     H9      109.470    3.000
+ SMILE    C6     C7     H10     109.470    3.000
+ SMILE    C6     C7     N1      109.500    3.000
+ SMILE    H9     C7     H10     107.900    3.000
+ SMILE    H9     C7     N1      109.500    3.000
+ SMILE    H10    C7     N1      109.500    3.000
+ SMILE    C7     N1     H12     109.500    3.000
+ SMILE    C7     N1     H11     109.500    3.000
+ SMILE    H12    N1     H11     109.500    3.000
+ SMILE    C6     N      H8      120.000    3.000
+ SMILE    C6     N      C5      121.500    3.000
+ SMILE    H8     N      C5      118.500    3.000
+ SMILE    N      C5     H6      109.470    3.000
+ SMILE    N      C5     H7      109.470    3.000
+ SMILE    N      C5     C4      110.000    3.000
+ SMILE    H6     C5     H7      107.900    3.000
+ SMILE    H6     C5     C4      109.470    3.000
+ SMILE    H7     C5     C4      109.470    3.000
+ SMILE    C5     C4     H4      108.340    3.000
+ SMILE    C5     C4     O1      109.470    3.000
+ SMILE    C5     C4     C3      109.470    3.000
+ SMILE    H4     C4     O1      109.470    3.000
+ SMILE    H4     C4     C3      109.470    3.000
+ SMILE    O1     C4     C3      109.470    3.000
+ SMILE    C4     O1     H5      109.470    3.000
+ SMILE    C4     C3     C2      120.000    3.000
+ SMILE    C4     C3     C8      120.000    3.000
+ SMILE    C2     C3     C8      120.000    3.000
+ SMILE    C3     C2     H3      120.000    3.000
+ SMILE    C3     C2     C1      120.000    3.000
+ SMILE    H3     C2     C1      120.000    3.000
+ SMILE    C3     C8     O3      120.000    3.000
+ SMILE    C3     C8     C10     120.000    3.000
+ SMILE    O3     C8     C10     120.000    3.000
+ SMILE    C8     O3     C9      120.000    3.000
+ SMILE    O3     C9     H15     109.470    3.000
+ SMILE    O3     C9     H14     109.470    3.000
+ SMILE    O3     C9     H13     109.470    3.000
+ SMILE    H15    C9     H14     109.470    3.000
+ SMILE    H15    C9     H13     109.470    3.000
+ SMILE    H14    C9     H13     109.470    3.000
+ SMILE    C8     C10    H16     120.000    3.000
+ SMILE    C8     C10    C11     120.000    3.000
+ SMILE    H16    C10    C11     120.000    3.000
+ SMILE    C10    C11    H17     120.000    3.000
+ SMILE    C10    C11    C1      120.000    3.000
+ SMILE    H17    C11    C1      120.000    3.000
+ SMILE    C11    C1     O       120.000    3.000
+ SMILE    C11    C1     C2      120.000    3.000
+ SMILE    O      C1     C2      120.000    3.000
+ SMILE    C1     O      C       120.000    3.000
+ SMILE    O      C      H2      109.470    3.000
+ SMILE    O      C      H1      109.470    3.000
+ SMILE    O      C      H       109.470    3.000
+ SMILE    H2     C      H1      109.470    3.000
+ SMILE    H2     C      H       109.470    3.000
+ SMILE    H1     C      H       109.470    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ SMILE    var_1            O2     C6     C7     N1               180.000           20.000   3
+ SMILE    var_2            C6     C7     N1     H11              180.000           20.000   3
+ SMILE    var_3            O2     C6     N      C5               180.000           20.000   2
+ SMILE    var_4            C6     N      C5     C4                 0.000           20.000   3
+ SMILE    var_5            N      C5     C4     C3               180.000           20.000   3
+ SMILE    var_6            C5     C4     O1     H5               180.000           20.000   3
+ SMILE    var_7            C5     C4     C3     C8               180.000           20.000   3
+ SMILE    CONST_1          C4     C3     C2     C1                 0.000            0.000   0
+ SMILE    CONST_2          C4     C3     C8     C10                0.000            0.000   0
+ SMILE    var_8            C3     C8     O3     C9               180.000           20.000   3
+ SMILE    var_9            C8     O3     C9     H13              180.000           20.000   3
+ SMILE    CONST_3          C3     C8     C10    C11                0.000            0.000   0
+ SMILE    CONST_4          C8     C10    C11    C1                 0.000            0.000   0
+ SMILE    CONST_5          C10    C11    C1     O                  0.000            0.000   0
+ SMILE    CONST_6          C11    C1     C2     C3                 0.000            0.000   0
+ SMILE    var_10           C11    C1     O      C                180.000           20.000   3
+ SMILE    var_11           C1     O      C      H                180.000           20.000   3
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ SMILE    chir_01          C4     C3     O1     C5        both
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ SMILE    plan-1            C1        0.020
+ SMILE    plan-1            O         0.020
+ SMILE    plan-1            C2        0.020
+ SMILE    plan-1            C11       0.020
+ SMILE    plan-1            C3        0.020
+ SMILE    plan-1            C8        0.020
+ SMILE    plan-1            C10       0.020
+ SMILE    plan-1            H3        0.020
+ SMILE    plan-1            C4        0.020
+ SMILE    plan-1            O3        0.020
+ SMILE    plan-1            H16       0.020
+ SMILE    plan-1            H17       0.020
+ SMILE    plan-2            N         0.020
+ SMILE    plan-2            C5        0.020
+ SMILE    plan-2            C6        0.020
+ SMILE    plan-2            H8        0.020
+ SMILE    plan-3            C6        0.020
+ SMILE    plan-3            N         0.020
+ SMILE    plan-3            O2        0.020
+ SMILE    plan-3            C7        0.020
+ SMILE    plan-3            H8        0.020
+# ------------------------------------------------------

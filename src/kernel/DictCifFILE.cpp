@@ -7094,10 +7094,12 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
         {
+            std::cout << iA->id << std::endl;
             if (iA->id.find("\'") !=std::string::npos)
             {
                 iA->id = "\"" + iA->id + "\"";
             }
+            std::cout << iA->id << std::endl;
         }
         
         std::ofstream outRestrF(tFName);
@@ -7197,6 +7199,7 @@ namespace LIBMOL
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
                 {
+                    StrLower(iB->order);
                     outRestrF << sName 
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)   << tAtoms[iB->atomsIdx[1]].id  
@@ -7522,8 +7525,20 @@ namespace LIBMOL
                     //double r3 =  (double) rand()/RAND_MAX;
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
+                    
+                    std::string tId;
+                    if (iA->id.find("\'") !=std::string::npos)
+                    {
+                      tId = "\"" + iA->id + "\"";
+                    }
+                    else
+                    {
+                        tId = iA->id;
+                    }
+           
+                    std::cout << "here " << tId << std::endl;
                     outRestrF << sName 
-                              << std::setw(12) << iA->id 
+                              << std::setw(12) << tId 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
                               << std::setw(8) << iA->parCharge 

@@ -1,0 +1,1089 @@
+
+============ PROCESS INFORMATION =============
+||=====================Job description====================================||
+Your job is to deduce values of bond and bond-angle and build molecules from your input cif file 
+Your input cif file : ./inStdcif/1000004.cif
+Your monomer name : 1000004
+The output dictionary file(cif) : 1000004.cif
+||========================================================================||
+The work mode is 31
+NBDepth	1
+inCifNameB	./inStdcif/1000004.cif
+molGen	yes
+monoRootName	1000004
+userOutName	1000004.cif
+WorkMode: Molecule generation
+Input cif ./inStdcif/1000004.cif
+Inside the crystal information container generated, there are, 
+1. Space Group related : 
+Space group names : 
+xHM <--> P -1  
+2. Cell parameters : 
+Cell length a 9.899
+Cell length b 11.729
+Cell length c 12.259
+Cell angle alpha 103.442
+Cell angle beta 96.291
+Cell angle gamma 95.56
+Cell volume 1364.9
+Crystal lattice ?
+symm opt pos 0
+Symmetry operators for the lattice: 
+For operator  '-x, -y, -z', its matrix is: 
+-1    0    0    0    
+0    -1    0    0    
+0    0    -1    0    
+0    0    0    1    
+For operator  'x, y, z', its matrix is: 
+1    0    0    0    
+0    1    0    0    
+0    0    1    0    
+0    0    0    1    
+There are 63 atoms in the system. They are 
+Atom Cu
+ serial Number 0
+Its type symbol Cu
+Is it metal  Yes 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.45979
+y:   0.36869
+z:   0.3783
+Its coordinates  
+x:   3.6243
+y:   3.1714
+z:   4.46834
+Atom I
+ serial Number 1
+Its type symbol I
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.59748
+y:   0.401507
+z:   0.59219
+Its coordinates  
+x:   4.66268
+y:   2.91412
+z:   6.99473
+Atom P1
+ serial Number 2
+Its type symbol P
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.25033
+y:   0.26261
+z:   0.34169
+Its coordinates  
+x:   1.72059
+y:   2.04265
+z:   4.03592
+Atom P2
+ serial Number 3
+Its type symbol P
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.61789
+y:   0.31869
+z:   0.26291
+Its coordinates  
+x:   5.40116
+y:   2.93318
+z:   3.1054
+Atom C1
+ serial Number 4
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1306
+y:   0.3224
+z:   0.4381
+Its coordinates  
+x:   0.337926
+y:   2.45198
+z:   5.17468
+Atom H1A
+ serial Number 5
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1436
+y:   0.408
+z:   0.4537
+Its coordinates  
+x:   0.348381
+y:   3.40455
+z:   5.35894
+Atom H1B
+ serial Number 6
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0375
+y:   0.295
+z:   0.4014
+Its coordinates  
+x:   -0.503234
+y:   2.24199
+z:   4.74119
+Atom C2
+ serial Number 7
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1502
+y:   0.2857
+z:   0.5496
+Its coordinates  
+x:   0.423872
+y:   1.68972
+z:   6.49167
+Atom H2A
+ serial Number 8
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.2461
+y:   0.2773
+z:   0.5673
+Its coordinates  
+x:   1.35896
+y:   1.53867
+z:   6.70074
+Atom H2B
+ serial Number 9
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0979
+y:   0.2088
+z:   0.5396
+Its coordinates  
+x:   0.00697685
+y:   0.821944
+z:   6.37356
+Atom C3
+ serial Number 10
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.8932
+y:   0.6277
+z:   0.3485
+Its coordinates  
+x:   7.66032
+y:   6.28426
+z:   4.11635
+Atom H3A
+ serial Number 11
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.9249
+y:   0.6726
+z:   0.2969
+Its coordinates  
+x:   7.99241
+y:   6.9629
+z:   3.50687
+Atom H3B
+ serial Number 12
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.97
+y:   0.5917
+z:   0.3758
+Its coordinates  
+x:   8.4248
+y:   5.78226
+z:   4.43881
+Atom C4
+ serial Number 13
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7807
+y:   0.5293
+z:   0.2824
+Its coordinates  
+x:   6.7473
+y:   5.33345
+z:   3.33561
+Atom H4A
+ serial Number 14
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6924
+y:   0.5552
+z:   0.2957
+Its coordinates  
+x:   5.82592
+y:   5.59599
+z:   3.4927
+Atom H4B
+ serial Number 15
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7865
+y:   0.5185
+z:   0.2022
+Its coordinates  
+x:   6.92472
+y:   5.44749
+z:   2.38831
+Atom C5
+ serial Number 16
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7856
+y:   0.4111
+z:   0.3112
+Its coordinates  
+x:   6.89144
+y:   3.86738
+z:   3.67578
+Atom H5A
+ serial Number 17
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.8083
+y:   0.423
+z:   0.3924
+Its coordinates  
+x:   6.99355
+y:   3.76319
+z:   4.63488
+Atom H5B
+ serial Number 18
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.8561
+y:   0.3711
+z:   0.2749
+Its coordinates  
+x:   7.68354
+y:   3.50911
+z:   3.24702
+Atom C111
+ serial Number 19
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.2344
+y:   0.1059
+z:   0.3378
+Its coordinates  
+x:   1.74621
+y:   0.224892
+z:   3.98997
+Atom C112
+ serial Number 20
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.3504
+y:   0.0526
+z:   0.3598
+Its coordinates  
+x:   2.92551
+y:   -0.46319
+z:   4.24983
+Atom H112
+ serial Number 21
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.4363
+y:   0.0973
+z:   0.3755
+Its coordinates  
+x:   3.70395
+y:   0.0116246
+z:   4.43527
+Atom C113
+ serial Number 22
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.3393
+y:   -0.0674
+z:   0.3587
+Its coordinates  
+x:   2.95348
+y:   -1.86075
+z:   4.23683
+Atom H113
+ serial Number 23
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.417
+y:   -0.103
+z:   0.3732
+Its coordinates  
+x:   3.74361
+y:   -2.31976
+z:   4.4081
+Atom C114
+ serial Number 24
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.2122
+y:   -0.1313
+z:   0.3358
+Its coordinates  
+x:   1.79869
+y:   -2.53815
+z:   3.96635
+Atom H114
+ serial Number 25
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.2039
+y:   -0.2115
+z:   0.3338
+Its coordinates  
+x:   1.81035
+y:   -3.4684
+z:   3.94272
+Atom C115
+ serial Number 26
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0973
+y:   -0.0799
+z:   0.316
+Its coordinates  
+x:   0.629482
+y:   -1.87883
+z:   3.73248
+Atom H115
+ serial Number 27
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0117
+y:   -0.1247
+z:   0.3025
+Its coordinates  
+x:   -0.148827
+y:   -2.3614
+z:   3.57302
+Atom C116
+ serial Number 28
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1074
+y:   0.0384
+z:   0.316
+Its coordinates  
+x:   0.595026
+y:   -0.497822
+z:   3.73248
+Atom H116
+ serial Number 29
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0287
+y:   0.0728
+z:   0.3012
+Its coordinates  
+x:   -0.203236
+y:   -0.0519315
+z:   3.55766
+Atom C121
+ serial Number 30
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1605
+y:   0.2642
+z:   0.202
+Its coordinates  
+x:   1.0172
+y:   2.47944
+z:   2.38595
+Atom C122
+ serial Number 31
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1443
+y:   0.1686
+z:   0.1068
+Its coordinates  
+x:   1.09336
+y:   1.64845
+z:   1.26148
+Atom H122
+ serial Number 32
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1749
+y:   0.0979
+z:   0.1144
+Its coordinates  
+x:   1.46641
+y:   0.800356
+z:   1.35125
+Atom C123
+ serial Number 33
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0836
+y:   0.1762
+z:   0.0011
+Its coordinates  
+x:   0.625845
+y:   2.05363
+z:   0.0129928
+Atom H123
+ serial Number 34
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0713
+y:   0.1106
+z:   -0.0603
+Its coordinates  
+x:   0.661115
+y:   1.47166
+z:   -0.712241
+Atom C124
+ serial Number 35
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0422
+y:   0.2812
+z:   -0.0119
+Its coordinates  
+x:   0.114168
+y:   3.31831
+z:   -0.140558
+Atom H124
+ serial Number 36
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0032
+y:   0.2874
+z:   -0.0825
+Its coordinates  
+x:   -0.184101
+y:   3.60206
+z:   -0.97446
+Atom C125
+ serial Number 37
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0587
+y:   0.3784
+z:   0.0811
+Its coordinates  
+x:   0.0421143
+y:   4.17456
+z:   0.957923
+Atom H125
+ serial Number 38
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.0301
+y:   0.4494
+z:   0.0723
+Its coordinates  
+x:   -0.30986
+y:   5.02975
+z:   0.853981
+Atom C126
+ serial Number 39
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1175
+y:   0.3702
+z:   0.1866
+Its coordinates  
+x:   0.491774
+y:   3.76297
+z:   2.20405
+Atom H126
+ serial Number 40
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.1284
+y:   0.4359
+z:   0.2478
+Its coordinates  
+x:   0.4428
+y:   4.34671
+z:   2.92692
+Atom C211
+ serial Number 41
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6606
+y:   0.1694
+z:   0.2559
+Its coordinates  
+x:   6.00302
+y:   1.21139
+z:   3.0226
+Atom C212
+ serial Number 42
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.728
+y:   0.1443
+z:   0.3525
+Its coordinates  
+x:   6.56897
+y:   0.629156
+z:   4.1636
+Atom H212
+ serial Number 43
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7583
+y:   0.2051
+z:   0.4168
+Its coordinates  
+x:   6.71344
+y:   1.14641
+z:   4.92309
+Atom C213
+ serial Number 44
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7501
+y:   0.029
+z:   0.3529
+Its coordinates  
+x:   6.91823
+y:   -0.718033
+z:   4.16833
+Atom H213
+ serial Number 45
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7948
+y:   0.0128
+z:   0.4173
+Its coordinates  
+x:   7.29261
+y:   -1.09996
+z:   4.92899
+Atom C214
+ serial Number 46
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7053
+y:   -0.0615
+z:   0.2573
+Its coordinates  
+x:   6.70602
+y:   -1.48829
+z:   3.03913
+Atom H214
+ serial Number 47
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7214
+y:   -0.1382
+z:   0.258
+Its coordinates  
+x:   6.95161
+y:   -2.38577
+z:   3.0474
+Atom C215
+ serial Number 48
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6366
+y:   -0.0402
+z:   0.16
+Its coordinates  
+x:   6.13246
+y:   -0.948324
+z:   1.88986
+Atom H215
+ serial Number 49
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6073
+y:   -0.1014
+z:   0.0958
+Its coordinates  
+x:   5.9982
+y:   -1.47055
+z:   1.13155
+Atom C216
+ serial Number 50
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6131
+y:   0.0747
+z:   0.1613
+Its coordinates  
+x:   5.76751
+y:   0.389106
+z:   1.90522
+Atom H216
+ serial Number 51
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.5644
+y:   0.0896
+z:   0.0979
+Its coordinates  
+x:   5.35366
+y:   0.752864
+z:   1.15636
+Atom C221
+ serial Number 52
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.5787
+y:   0.3204
+z:   0.1136
+Its coordinates  
+x:   5.21185
+y:   3.40018
+z:   1.3418
+Atom C222
+ serial Number 53
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.4558
+y:   0.3528
+z:   0.0746
+Its coordinates  
+x:   4.01083
+y:   3.89517
+z:   0.881148
+Atom H222
+ serial Number 54
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.3917
+y:   0.3706
+z:   0.124
+Its coordinates  
+x:   3.28972
+y:   3.95506
+z:   1.46464
+Atom C223
+ serial Number 55
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.4258
+y:   0.3593
+z:   -0.0379
+Its coordinates  
+x:   3.8576
+y:   4.30787
+z:   -0.447661
+Atom H223
+ serial Number 56
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.3415
+y:   0.3799
+z:   -0.0628
+Its coordinates  
+x:   3.03315
+y:   4.62291
+z:   -0.741771
+Atom C224
+ serial Number 57
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.5184
+y:   0.3357
+z:   -0.1103
+Its coordinates  
+x:   4.89832
+y:   4.24914
+z:   -1.30282
+Atom H224
+ serial Number 58
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.499
+y:   0.3405
+z:   -0.185
+Its coordinates  
+x:   4.80117
+y:   4.52882
+z:   -2.18515
+Atom C225
+ serial Number 59
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6427
+y:   0.3044
+z:   -0.0719
+Its coordinates  
+x:   6.11275
+y:   3.76878
+z:   -0.849256
+Atom H225
+ serial Number 60
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.707
+y:   0.2891
+z:   -0.1216
+Its coordinates  
+x:   6.83341
+y:   3.73897
+z:   -1.43629
+Atom C226
+ serial Number 61
+Its type symbol C
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.6743
+y:   0.295
+z:   0.0378
+Its coordinates  
+x:   6.28888
+y:   3.3306
+z:   0.44648
+Atom H226
+ serial Number 62
+Its type symbol H
+Is it metal  No 
+Its form charge 0
+Its occupancy 1
+Its coordinates (fractional) 
+x:   0.7579
+y:   0.2721
+z:   0.0612
+Its coordinates  
+x:   7.11103
+y:   2.99321
+z:   0.722872
+Number of crystals 1
+Number of atoms read from the input file 63
+number of atoms in a center unit cell 126
+fraCell 0.7
+Number of atoms in allAtoms 1724
+number of atoms in the center unit cell is 126
+Atom Cu (0) bonds to 4 atoms
+Atom I (1) bonds to 2 atoms
+Atom P1 (2) bonds to 4 atoms
+Atom P2 (3) bonds to 4 atoms
+Atom C1 (4) bonds to 4 atoms
+Atom H1A (5) bonds to 1 atoms
+Atom H1B (6) bonds to 1 atoms
+Atom C2 (7) bonds to 4 atoms
+Atom H2A (8) bonds to 1 atoms
+Atom H2B (9) bonds to 1 atoms
+Atom C3 (10) bonds to 4 atoms
+Atom H3A (11) bonds to 1 atoms
+Atom H3B (12) bonds to 1 atoms
+Atom C4 (13) bonds to 4 atoms
+Atom H4A (14) bonds to 1 atoms
+Atom H4B (15) bonds to 1 atoms
+Atom C5 (16) bonds to 4 atoms
+Atom H5A (17) bonds to 1 atoms
+Atom H5B (18) bonds to 1 atoms
+Atom C111 (19) bonds to 3 atoms
+Atom C112 (20) bonds to 3 atoms
+Atom H112 (21) bonds to 1 atoms
+Atom C113 (22) bonds to 3 atoms
+Atom H113 (23) bonds to 1 atoms
+Atom C114 (24) bonds to 3 atoms
+Atom H114 (25) bonds to 1 atoms
+Atom C115 (26) bonds to 3 atoms
+Atom H115 (27) bonds to 1 atoms
+Atom C116 (28) bonds to 3 atoms
+Atom H116 (29) bonds to 1 atoms
+Atom C121 (30) bonds to 3 atoms
+Atom C122 (31) bonds to 3 atoms
+Atom H122 (32) bonds to 1 atoms
+Atom C123 (33) bonds to 3 atoms
+Atom H123 (34) bonds to 1 atoms
+Atom C124 (35) bonds to 3 atoms
+Atom H124 (36) bonds to 1 atoms
+Atom C125 (37) bonds to 3 atoms
+Atom H125 (38) bonds to 1 atoms
+Atom C126 (39) bonds to 3 atoms
+Atom H126 (40) bonds to 1 atoms
+Atom C211 (41) bonds to 3 atoms
+Atom C212 (42) bonds to 3 atoms
+Atom H212 (43) bonds to 1 atoms
+Atom C213 (44) bonds to 3 atoms
+Atom H213 (45) bonds to 1 atoms
+Atom C214 (46) bonds to 3 atoms
+Atom H214 (47) bonds to 1 atoms
+Atom C215 (48) bonds to 3 atoms
+Atom H215 (49) bonds to 1 atoms
+Atom C216 (50) bonds to 3 atoms
+Atom H216 (51) bonds to 1 atoms
+Atom C221 (52) bonds to 3 atoms
+Atom C222 (53) bonds to 3 atoms
+Atom H222 (54) bonds to 1 atoms
+Atom C223 (55) bonds to 3 atoms
+Atom H223 (56) bonds to 1 atoms
+Atom C224 (57) bonds to 3 atoms
+Atom H224 (58) bonds to 1 atoms
+Atom C225 (59) bonds to 3 atoms
+Atom H225 (60) bonds to 1 atoms
+Atom C226 (61) bonds to 3 atoms
+Atom H226 (62) bonds to 1 atoms
+Number of molecules after EQ classification is 83
+Number of molecules containing atoms in ASU is 3
+Number of molecules after linked equiv class: 3
+The number of atoms in molecule 0 is 85
+Number of atoms in this molecule is 85
+Atom H123 has COD class id H(C[6]CC)
+Atom C124 has COD class id C[6](C[6]CH)2(H)
+Atom H124 has COD class id H(C[6]CC)
+Atom C223 has COD class id C[6](C[6]CH)2(H)
+Atom H223 has COD class id H(C[6]CC)
+Atom C224 has COD class id C[6](C[6]CH)2(H)
+Atom H224 has COD class id H(C[6]CC)
+Atom C225 has COD class id C[6](C[6]CH)2(H)
+Atom H225 has COD class id H(C[6]CC)
+Molecule 0 is included 
+It contains 85 atoms
+The number of atoms in molecule 1 is 83
+Number of atoms in this molecule is 83
+Atom C113 has COD class id C[6](C[6]CH)2(H)
+Atom H113 has COD class id H(C[6]CC)
+Atom C114 has COD class id C[6](C[6]CH)2(H)
+Atom H114 has COD class id H(C[6]CC)
+Atom C115 has COD class id C[6](C[6]CH)2(H)
+Atom H115 has COD class id H(C[6]CC)
+Atom C214 has COD class id C[6](C[6]CH)2(H)
+Atom H214 has COD class id H(C[6]CC)
+Atom C215 has COD class id C[6](C[6]CH)2(H)
+Atom H215 has COD class id H(C[6]CC)
+Molecule 1 is included 
+It contains 83 atoms
+The number of atoms in molecule 2 is 126
+Number of atoms in this molecule is 126
+Atom Cu has COD class id Cu(PC3)2(ICu)2
+Atom I has COD class id I(CuIPP)2
+Atom P1 has COD class id P(C[6]CC)2(CuIIP)(CCHH)
+Atom P2 has COD class id P(C[6]CC)2(CuIIP)(CCHH)
+Atom C1 has COD class id C(PCuCC)(CCHH)(H)2
+Atom H1A has COD class id H(CCHP)
+Atom H1B has COD class id H(CCHP)
+Atom C2 has COD class id C(CCHH)(CHHP)(H)2
+Atom H2A has COD class id H(CCCH)
+Atom H2B has COD class id H(CCCH)
+Atom C3 has COD class id C(CCHH)2(H)2
+Atom H3A has COD class id H(CCCH)
+Atom H3B has COD class id H(CCCH)
+Atom C4 has COD class id C(CCHH)(CHHP)(H)2
+Atom H4A has COD class id H(CCCH)
+Atom H4B has COD class id H(CCCH)
+Atom C5 has COD class id C(PCuCC)(CCHH)(H)2
+Atom H5A has COD class id H(CCHP)
+Atom H5B has COD class id H(CCHP)
+Atom C111 has COD class id C[6](C[6]CH)2(PCuCC)
+Atom C112 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H112 has COD class id H(C[6]CC)
+Atom C116 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H116 has COD class id H(C[6]CC)
+Atom C121 has COD class id C[6](C[6]CH)2(PCuCC)
+Atom C122 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H122 has COD class id H(C[6]CC)
+Atom C123 has COD class id C[6](C[6]CH)2(H)
+Atom C125 has COD class id C[6](C[6]CH)2(H)
+Atom H125 has COD class id H(C[6]CC)
+Atom C126 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H126 has COD class id H(C[6]CC)
+Atom C211 has COD class id C[6](C[6]CH)2(PCuCC)
+Atom C212 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H212 has COD class id H(C[6]CC)
+Atom C213 has COD class id C[6](C[6]CH)2(H)
+Atom H213 has COD class id H(C[6]CC)
+Atom C216 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H216 has COD class id H(C[6]CC)
+Atom C221 has COD class id C[6](C[6]CH)2(PCuCC)
+Atom C222 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H222 has COD class id H(C[6]CC)
+Atom C226 has COD class id C[6](C[6]CH)(C[6]CP)(H)
+Atom H226 has COD class id H(C[6]CC)
+Molecule 2 is included 
+It contains 126 atoms
+Number of molecules in allMolecules after validation 3
+Total Number of unique bonds are 68
+Total number of unique angles are 118
+1000004_unique_bond_and_angles.txt
+
+
+
+
+
+
+
+
+
+
+
+
+=========END OF PROCESS INFORMATION
+ ==========

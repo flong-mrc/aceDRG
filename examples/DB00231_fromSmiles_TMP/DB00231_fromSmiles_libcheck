@@ -1,0 +1,89 @@
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.desc_level
+SMILE    . .   34 M
+data_comp_SMILE
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.partial_charge
+ SMILE         C    C         0.000
+ SMILE         N    N         0.000
+ SMILE         C1   C         0.000
+ SMILE         C2   C         0.000
+ SMILE         C3   C         0.000
+ SMILE         C4   C         0.000
+ SMILE         CL   CL        0.000
+ SMILE         C5   C         0.000
+ SMILE         C6   C         0.000
+ SMILE         C7   C         0.000
+ SMILE         N1   N         0.000
+ SMILE         C8   C         0.000
+ SMILE         O    O         0.000
+ SMILE         C9   C         0.000
+ SMILE         O1   O         0.000
+ SMILE         C10  C         0.000
+ SMILE         C11  C         0.000
+ SMILE         C12  C         0.000
+ SMILE         C13  C         0.000
+ SMILE         C14  C         0.000
+ SMILE         C15  C         0.000
+ SMILE         H    H         0.000
+ SMILE         H1   H         0.000
+ SMILE         H2   H         0.000
+ SMILE         H3   H         0.000
+ SMILE         H4   H         0.000
+ SMILE         H5   H         0.000
+ SMILE         H6   H         0.000
+ SMILE         H7   H         0.000
+ SMILE         H8   H         0.000
+ SMILE         H9   H         0.000
+ SMILE         H10  H         0.000
+ SMILE         H11  H         0.000
+ SMILE         H12  H         0.000
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+ SMILE    C    N       single
+ SMILE    N    C1      single
+ SMILE    C1   C2      double
+ SMILE    C2   C3      single
+ SMILE    C3   C4      double
+ SMILE    C4   CL      single
+ SMILE    C4   C5      single
+ SMILE    C5   C6      double
+ SMILE    C6   C1      single
+ SMILE    C2   C7      single
+ SMILE    C7   N1      double
+ SMILE    N1   C8      single
+ SMILE    C8   O       single
+ SMILE    C8   C9      single
+ SMILE    C9   N       single
+ SMILE    C9   O1      double
+ SMILE    C7   C10     single
+ SMILE    C10  C11     double
+ SMILE    C11  C12     single
+ SMILE    C12  C13     double
+ SMILE    C13  C14     single
+ SMILE    C14  C15     double
+ SMILE    C15  C10     single
+ SMILE    C    H       single
+ SMILE    C    H1      single
+ SMILE    C    H2      single
+ SMILE    C3   H3      single
+ SMILE    C5   H4      single
+ SMILE    C6   H5      single
+ SMILE    C8   H6      single
+ SMILE    O    H7      single
+ SMILE    C11  H8      single
+ SMILE    C12  H9      single
+ SMILE    C13  H10     single
+ SMILE    C14  H11     single
+ SMILE    C15  H12     single

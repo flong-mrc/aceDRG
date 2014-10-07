@@ -112,7 +112,7 @@ namespace LIBMOL
     };
     
     
-        class AtomTypeTool
+    class AtomTypeTool
     {
     public:
         
