@@ -909,7 +909,7 @@ class Acedrg(CExeCode ):
                         
     def execute(self):
         
-        print "work mode : ", self.workMode
+        # print "work mode : ", self.workMode
 
         self.printJobs()
 

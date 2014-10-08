@@ -456,6 +456,9 @@ namespace LIBMOL
         
         
     }
+    
+    
+    
     // A recursive function that get a set of planar rings sharing edges 
     // with each other.
     

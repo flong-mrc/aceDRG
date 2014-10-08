@@ -7456,14 +7456,24 @@ namespace LIBMOL
                 {
                     if (iP->atoms.size() > 3)
                     {
+                        
                         std::string idxPStr = IntToStr(idxP);
                         idxPStr = "plan-" + idxPStr;
                         for(std::map<ID, int>::iterator iAt=iP->atoms.begin();
                                 iAt != iP->atoms.end(); iAt++)
                         {
+                            std::string tID;
+                            if (iAt->first.find("\'") !=std::string::npos)
+                            {
+                                tID = "\"" + iAt->first + "\"";
+                            }
+                            else
+                            {
+                                tID = iAt->first;
+                            }
                             outRestrF << sName
                                       << std::setw(10) << idxPStr
-                                      << std::setw(12)  << iAt->first 
+                                      << std::setw(12)  << tID
                                       << std::setw(8)  << "0.020" << std::endl;
                         }
                         idxP++;

@@ -230,7 +230,9 @@ namespace LIBMOL
             }
         }
         
-        checkAndSetupPlanes(allRingsV, allPlanes, allAtoms, allBonds);
+        setAllRingPlanes(allRingsV, allAtoms, allPlanes);
+        
+        // checkAndSetupPlanes(allRingsV, allPlanes, allAtoms, allBonds);
         
     }
     
@@ -4421,8 +4423,8 @@ namespace LIBMOL
                 aCodSystem.allPlanes,
                 aCodSystem.allChirals);
        */
-       resetSystem(aCodSystem);
-       //resetSystem2(aCodSystem)
+       //resetSystem(aCodSystem);
+       resetSystem2(aCodSystem);
        /*
        for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
