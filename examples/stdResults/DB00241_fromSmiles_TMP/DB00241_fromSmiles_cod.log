@@ -1609,9 +1609,9 @@ class is C[6](C[6]C3)(N[6]CH)(O)
 For atom O
 class is O(C[6]CN)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 13:58:06 2014
+Clustering COD org bonds started at Thu Oct  9 20:26:52 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 13:58:07 2014
+finished at Thu Oct  9 20:26:53 2014
 it takes 1 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between C and C1
@@ -2191,8 +2191,8 @@ The final target bond value is 0.877
 Number of Bonds to be found 32
 Number of Bonds found 32
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 13:58:09 2014
-Clustering COD org angles finished at Fri Sep 12 13:58:12 2014
+Clustering all COD angles started at Thu Oct  9 20:26:54 2014
+Clustering COD org angles finished at Thu Oct  9 20:26:57 2014
 it takes 3 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
@@ -3195,5 +3195,69 @@ Atom C9
 Atom N
 Atom C8
 Finish searching angles 
+O2
+O2
+C10
+C10
+C4
+C4
+C5
+C5
+H9
+H9
+H10
+H10
+C6
+C6
+H11
+H11
+C7
+C7
+H13
+H13
+H12
+H12
+C3
+C3
+H7
+H7
+H8
+H8
+C1
+C1
+H3
+H3
+C2
+C2
+H6
+H6
+H5
+H5
+H4
+H4
+C
+C
+H2
+H2
+H1
+H1
+H
+H
+N1
+N1
+H15
+H15
+C9
+C9
+O1
+O1
+N
+N
+H14
+H14
+C8
+C8
+O
+O
 =========END OF PROCESS INFORMATION
  ==========

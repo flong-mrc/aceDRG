@@ -1167,9 +1167,9 @@ class is H(CHHN)
 For atom H
 class is H(CHHN)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 13:56:43 2014
+Clustering COD org bonds started at Thu Oct  9 20:25:29 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 13:56:45 2014
+finished at Thu Oct  9 20:25:31 2014
 it takes 2 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between C and N
@@ -1625,8 +1625,8 @@ The final target bond value is 0.969
 Number of Bonds to be found 25
 Number of Bonds found 25
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 13:56:46 2014
-Clustering COD org angles finished at Fri Sep 12 13:56:50 2014
+Clustering all COD angles started at Thu Oct  9 20:25:33 2014
+Clustering COD org angles finished at Thu Oct  9 20:25:37 2014
 it takes 4 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
@@ -2423,5 +2423,73 @@ Atom N2
 Atom C4
 Atom C3
 Finish searching angles 
+There are 2 planes 
+One Plane. It has 7 They are : 
+Atom C
+Atom C1
+Atom C2
+Atom C3
+Atom H3
+Atom N
+Atom N1
+One Plane. It has 10 They are : 
+Atom C2
+Atom C3
+Atom C4
+Atom C5
+Atom C6
+Atom C7
+Atom N2
+Atom N3
+Atom O
+Atom O1
+O1
+O1
+C6
+C6
+N3
+N3
+C7
+C7
+H9
+H9
+H8
+H8
+H7
+H7
+C2
+C2
+N1
+N1
+C1
+C1
+H3
+H3
+N2
+N2
+C5
+C5
+H6
+H6
+H5
+H5
+H4
+H4
+C4
+C4
+O
+O
+C3
+C3
+N
+N
+C
+C
+H2
+H2
+H1
+H1
+H
+H
 =========END OF PROCESS INFORMATION
  ==========

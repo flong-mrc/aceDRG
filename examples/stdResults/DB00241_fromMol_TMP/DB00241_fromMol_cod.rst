@@ -32,38 +32,38 @@ _chem_comp_atom.partial_charge
 _chem_comp_atom.x
 _chem_comp_atom.y
 _chem_comp_atom.z
-UNL          O1     O     O       0       0.430      -3.214      -2.210
-UNL          O2     O     O   0.000       1.264      -2.839       2.032
-UNL          O3     O     O   0.000      -1.500      -6.196       0.706
-UNL          N1     N  NR16   0.000      -0.977      -4.460      -0.827
-UNL          N2     N  NR16   0.000      -0.001      -4.589       1.375
-UNL          C1     C    CT   0.000      -0.111      -2.661       0.168
-UNL          C2     C   CH2   0.000      -0.601      -1.208       0.505
-UNL          C3     C   CH1   0.000       0.142       0.096       0.095
-UNL          C4     C   CH2   0.000      -1.495      -3.127       0.376
-UNL          C5     C   CR6   0.000      -0.169      -3.374      -1.141
-UNL          C6     C   CR6   0.000       0.544      -3.350       1.231
-UNL          C7     C   CH3   0.000      -0.597       1.397       0.540
-UNL          C8     C   CH3   0.000       1.546       0.111       0.599
-UNL          C9     C    C1   0.000      -1.560      -4.669       0.131
-UNL         C10     C   CR6   0.000      -0.844      -5.179       0.440
-UNL         C11     C    C2   0.000      -1.865      -5.519       1.006
-UNL          H1     H     H   0.000      -1.598      -4.703      -1.334
-UNL          H2     H     H   0.000       0.197      -5.025       2.072
-UNL          H3     H     H   0.000      -0.639      -1.113       1.548
-UNL          H4     H     H   0.000      -1.546      -1.132       0.247
-UNL          H5     H     H   0.000       0.094       0.138      -0.876
-UNL          H6     H     H   0.000      -1.771      -2.967       1.266
-UNL          H7     H     H   0.000      -2.100      -2.695      -0.238
-UNL          H8     H     H   0.000      -0.626       1.438       1.572
-UNL          H9     H     H   0.000      -1.564       1.350       0.226
-UNL         H10     H     H   0.000      -0.228       2.174       0.282
-UNL         H11     H     H   0.000       1.593       0.127       1.521
-UNL         H12     H     H   0.000       2.004      -0.709       0.224
-UNL         H13     H     H   0.000       2.078       0.829       0.233
-UNL         H14     H     H   0.000      -1.333      -4.963      -0.712
-UNL         H15     H     H   0.000      -1.925      -6.461       0.802
-UNL         H16     H     H   0.000      -2.130      -5.184       1.960
+UNL          O1     O     O       0       0.285      -3.112      -2.097
+UNL          O2     O     O   0.000       1.253      -2.803       2.032
+UNL          O3     O     O   0.000      -1.454      -6.095       0.763
+UNL          N1     N   NR6   0.000      -1.095      -4.359      -0.737
+UNL          N2     N   NR6   0.000      -0.008      -4.544       1.445
+UNL          C1     C    CT   0.000      -0.097      -2.550       0.180
+UNL          C2     C   CH2   0.000      -0.539      -1.102       0.569
+UNL          C3     C   CH1   0.000       0.176       0.130       0.135
+UNL          C4     C   CH2   0.000      -1.421      -3.123       0.629
+UNL          C5     C   CR6   0.000      -0.417      -3.172      -1.084
+UNL          C6     C   CR6   0.000       0.705      -3.349       1.152
+UNL          C7     C   CH3   0.000      -0.578       1.415       0.530
+UNL          C8     C   CH3   0.000       1.592       0.143       0.588
+UNL          C9     C    C1   0.000      -1.393      -4.617       0.505
+UNL         C10     C   CR6   0.000      -0.949      -4.990       0.557
+UNL         C11     C    C2   0.000      -1.591      -5.447       1.469
+UNL          H1     H     H   0.000      -1.810      -4.582      -1.109
+UNL          H2     H     H   0.000       0.185      -4.975       2.174
+UNL          H3     H     H   0.000      -0.567      -1.053       1.601
+UNL          H4     H     H   0.000      -1.502      -1.019       0.231
+UNL          H5     H     H   0.000       0.145       0.183      -0.846
+UNL          H6     H     H   0.000      -1.572      -2.859       1.542
+UNL          H7     H     H   0.000      -2.134      -2.756       0.051
+UNL          H8     H     H   0.000      -0.598       1.508       1.551
+UNL          H9     H     H   0.000      -1.500       1.337       0.226
+UNL         H10     H     H   0.000      -0.185       2.180       0.193
+UNL         H11     H     H   0.000       1.651       0.177       1.558
+UNL         H12     H     H   0.000       2.050      -0.616       0.262
+UNL         H13     H     H   0.000       2.017       0.880       0.270
+UNL         H14     H     H   0.000      -1.295      -4.940      -0.408
+UNL         H15     H     H   0.000      -1.636      -6.401       1.286
+UNL         H16     H     H   0.000      -1.737      -5.073       2.384
 loop_
 _chem_comp_bond.comp_id
 _chem_comp_bond.atom_id_1
@@ -270,36 +270,3 @@ _chem_comp_chir.atom_id_3
 _chem_comp_chir.volume_sign
 UNL    chi1    C1    C2    C4    C5    both
 UNL    chi2    C3    C2    C7    C8    both
-loop_
-_chem_comp_plane_atom.comp_id
-_chem_comp_plane_atom.plane_id
-_chem_comp_plane_atom.atom_id
-_chem_comp_plane_atom.dist_esd
-UNL    plan-1         C10   0.020
-UNL    plan-1          C5   0.020
-UNL    plan-1          H1   0.020
-UNL    plan-1          N1   0.020
-UNL    plan-2         C10   0.020
-UNL    plan-2          C6   0.020
-UNL    plan-2          H2   0.020
-UNL    plan-2          N2   0.020
-UNL    plan-3          C1   0.020
-UNL    plan-3          C5   0.020
-UNL    plan-3          N1   0.020
-UNL    plan-3          O1   0.020
-UNL    plan-4          C1   0.020
-UNL    plan-4          C6   0.020
-UNL    plan-4          N2   0.020
-UNL    plan-4          O2   0.020
-UNL    plan-5         C11   0.020
-UNL    plan-5          C4   0.020
-UNL    plan-5          C9   0.020
-UNL    plan-5         H14   0.020
-UNL    plan-6         C10   0.020
-UNL    plan-6          N1   0.020
-UNL    plan-6          N2   0.020
-UNL    plan-6          O3   0.020
-UNL    plan-7         C11   0.020
-UNL    plan-7          C9   0.020
-UNL    plan-7         H15   0.020
-UNL    plan-7         H16   0.020

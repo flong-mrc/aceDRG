@@ -59,26 +59,26 @@ _chem_comp_bond.atom_id_2
 _chem_comp_bond.type
 _chem_comp_bond.value_dist
 _chem_comp_bond.value_dist_esd
-UNL          C5          O5      SINGLE     1.421   0.012
-UNL          O5         HO5      SINGLE     0.850   0.020
-UNL          C5          H5      SINGLE     0.979   0.020
-UNL          C5         H5A      SINGLE     0.979   0.020
-UNL          C4          C5      SINGLE     1.511   0.011
-UNL          C4          H4      SINGLE     0.985   0.020
-UNL          C3          C4      SINGLE     1.525   0.014
-UNL          C3          O3      SINGLE     1.418   0.010
-UNL          C3          H3      SINGLE     0.986   0.020
-UNL          O3         HO3      SINGLE     0.847   0.020
-UNL          C2          C3      SINGLE     1.528   0.010
-UNL          C2          H2      SINGLE     1.020   0.020
-UNL          C2          O2      SINGLE     1.415   0.010
-UNL          O2         HO2      SINGLE     0.847   0.020
-UNL          C1          C2      SINGLE     1.523   0.011
-UNL          C1          O4      SINGLE     1.417   0.013
-UNL          O1          C1      SINGLE     1.394   0.010
-UNL          O4          C4      SINGLE     1.442   0.010
-UNL          C1          H1      SINGLE     0.995   0.020
-UNL          O1         H10      SINGLE     0.850   0.020
+UNL          C5          O5      single     1.421   0.012
+UNL          O5         HO5      single     0.850   0.020
+UNL          C5          H5      single     0.979   0.020
+UNL          C5         H5A      single     0.979   0.020
+UNL          C4          C5      single     1.511   0.011
+UNL          C4          H4      single     0.985   0.020
+UNL          C3          C4      single     1.525   0.014
+UNL          C3          O3      single     1.418   0.010
+UNL          C3          H3      single     0.986   0.020
+UNL          O3         HO3      single     0.847   0.020
+UNL          C2          C3      single     1.528   0.010
+UNL          C2          H2      single     1.020   0.020
+UNL          C2          O2      single     1.415   0.010
+UNL          O2         HO2      single     0.847   0.020
+UNL          C1          C2      single     1.523   0.011
+UNL          C1          O4      single     1.417   0.013
+UNL          O1          C1      single     1.394   0.010
+UNL          O4          C4      single     1.442   0.010
+UNL          C1          H1      single     0.995   0.020
+UNL          O1         H10      single     0.850   0.020
 loop_
 _chem_comp_angle.comp_id
 _chem_comp_angle.atom_id_1

@@ -1702,10 +1702,10 @@ class is C[6](C[6]CC)(C[6]CH)(H)
 For atom H8
 class is H(C[6]CC)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 13:57:44 2014
+Clustering COD org bonds started at Thu Oct  9 20:26:31 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 13:57:47 2014
-it takes 3 seconds to finish group COD bonds 
+finished at Thu Oct  9 20:26:33 2014
+it takes 2 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between C and N
  search a org-related bond c 
@@ -2340,9 +2340,9 @@ The final target bond value is 0.955
 Number of Bonds to be found 36
 Number of Bonds found 36
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 13:57:48 2014
-Clustering COD org angles finished at Fri Sep 12 13:57:54 2014
-it takes 6 seconds to finish group COD angles 
+Clustering all COD angles started at Thu Oct  9 20:26:35 2014
+Clustering COD org angles finished at Thu Oct  9 20:26:40 2014
+it takes 5 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
 Finish groupCodAnglesWithNonCenteredMetal() 
@@ -3331,5 +3331,100 @@ Atom C5
 Atom C6
 Atom C1
 Finish searching angles 
+There are 2 planes 
+One Plane. It has 12 They are : 
+Atom C10
+Atom C11
+Atom C12
+Atom C13
+Atom C14
+Atom C15
+Atom C7
+Atom H10
+Atom H11
+Atom H12
+Atom H8
+Atom H9
+One Plane. It has 12 They are : 
+Atom C1
+Atom C2
+Atom C3
+Atom C4
+Atom C5
+Atom C6
+Atom C7
+Atom CL
+Atom H3
+Atom H4
+Atom H5
+Atom N
+O1
+O1
+C9
+C9
+N
+N
+C
+C
+H2
+H2
+H1
+H1
+H
+H
+C8
+C8
+H6
+H6
+O
+O
+H7
+H7
+N1
+N1
+C7
+C7
+C2
+C2
+C3
+C3
+H3
+H3
+C4
+C4
+CL
+CL
+C5
+C5
+H4
+H4
+C6
+C6
+H5
+H5
+C1
+C1
+C10
+C10
+C15
+C15
+H12
+H12
+C14
+C14
+H11
+H11
+C13
+C13
+H10
+H10
+C12
+C12
+H9
+H9
+C11
+C11
+H8
+H8
 =========END OF PROCESS INFORMATION
  ==========

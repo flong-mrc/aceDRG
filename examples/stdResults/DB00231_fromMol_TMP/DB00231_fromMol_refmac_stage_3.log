@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 14:00:06 
+ User: flong  Run date:  9/10/2014 Run time: 20:28:48 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -208,7 +208,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        35         0        35
                Angles:        58         0        58
               Chirals:         1         0         1
-               Planes:         5         0         5
+               Planes:         2         0         2
              Torsions:        81         0        81
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -222,21 +222,20 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    16.30888    
+ function value    16.63969    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    23     0.003     0.015
-Bond distances: others                           12     0.001     0.020
-Bond angles  : refined atoms                     33     0.656     1.629
-Bond angles  : others                            25     0.103     0.978
-Chiral centres: refined atoms                     1     0.028     0.200
-Planar groups: refined atoms                     28     0.001     0.020
+Bond distances: refined atoms                    23     0.002     0.015
+Bond distances: others                           12     0.000     0.020
+Bond angles  : refined atoms                     33     0.561     1.629
+Bond angles  : others                            25     0.105     0.978
+Chiral centres: refined atoms                     1     0.025     0.200
+Planar groups: refined atoms                     16     0.000     0.020
 Planar groups: others                             8     0.000     0.020
-VDW repulsions: refined_atoms                     1     0.052     0.200
-VDW repulsions.others                             1     0.365     0.200
-VDW; torsion: refined_atoms                      17     0.246     0.200
-VDW; torsion.others                               3     0.087     0.200
+VDW repulsions.others                             1     0.368     0.200
+VDW; torsion: refined_atoms                      15     0.265     0.200
+VDW; torsion.others                               3     0.117     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   0.0000000E+00
  Not converging with gamma equal   0.0000000E+00
@@ -244,7 +243,7 @@ VDW; torsion.others                               3     0.087     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   16.30888       16.26570       16.30888    
+ fvalues   0.0000000E+00   16.63969       16.59762       16.63969    
   Time in seconds: CPU =         0.00
              Elapsed =           0.00
 
@@ -260,7 +259,7 @@ $GRAPHS:<Rfactor> vs cycle :N:1,2,3:
 $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
-       0   0.0      0.0      0.0             0.       0.0   0.0026  0.166   0.656  0.247   0.028
+       0   0.0      0.0      0.0             0.       0.0   0.0023  0.149   0.561  0.233   0.025
  $$
  $TEXT:Result: $$ Final results $$
  $$

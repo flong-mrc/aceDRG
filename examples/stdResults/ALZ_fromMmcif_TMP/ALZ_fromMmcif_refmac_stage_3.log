@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 14:00:57 
+ User: flong  Run date:  9/10/2014 Run time: 20:29:34 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -207,7 +207,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        51         0        51
                Angles:        91         0        91
               Chirals:         1         0         1
-               Planes:         6         0         6
+               Planes:         1         0         1
              Torsions:       131         0       131
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -221,21 +221,21 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    9.607262    
+ function value    9.201426    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    25     0.003     0.017
-Bond distances: others                           26     0.000     0.019
-Bond angles  : refined atoms                     31     0.234     1.630
-Bond angles  : others                            60     0.079     1.160
-Chiral centres: refined atoms                     1     0.003     0.200
-Planar groups: refined atoms                     25     0.001     0.020
-Planar groups: others                             7     0.000     0.020
-VDW repulsions: refined_atoms                     2     0.080     0.200
-VDW repulsions.others                             4     0.124     0.200
-VDW; torsion: refined_atoms                       9     0.254     0.200
-VDW; torsion.others                               8     0.079     0.200
+Bond distances: refined atoms                    25     0.002     0.017
+Bond distances: others                           26     0.001     0.019
+Bond angles  : refined atoms                     31     0.243     1.630
+Bond angles  : others                            60     0.070     1.160
+Chiral centres: refined atoms                     1     0.000     0.200
+Planar groups: refined atoms                      7     0.000     0.020
+Planar groups: others                             5     0.000     0.020
+VDW repulsions: refined_atoms                     1     0.036     0.200
+VDW repulsions.others                             4     0.131     0.200
+VDW; torsion: refined_atoms                       9     0.252     0.200
+VDW; torsion.others                               9     0.069     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   0.0000000E+00
  Not converging with gamma equal   0.0000000E+00
@@ -243,8 +243,8 @@ VDW; torsion.others                               8     0.079     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   9.607262       9.539474       9.607262    
-  Time in seconds: CPU =         0.02
+ fvalues   0.0000000E+00   9.201426       9.121098       9.201426    
+  Time in seconds: CPU =         0.01
              Elapsed =           0.00
 
     ****           Things for loggraph, R factor and others vs cycle            ****
@@ -259,7 +259,7 @@ $GRAPHS:<Rfactor> vs cycle :N:1,2,3:
 $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
-       0   0.0      0.0      0.0             0.       0.0   0.0027  0.149   0.234  0.137   0.003
+       0   0.0      0.0      0.0             0.       0.0   0.0022  0.131   0.243  0.132   0.000
  $$
  $TEXT:Result: $$ Final results $$
  $$

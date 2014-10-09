@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 13:56:51 
+ User: flong  Run date:  9/10/2014 Run time: 20:25:38 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -207,7 +207,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        25         0        25
                Angles:        43         0        43
               Chirals:         0         0         0
-               Planes:         1         0         1
+               Planes:         2         0         2
              Torsions:        54         0        54
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -232,17 +232,16 @@ A      1 UNL C4  . - A      1 UNL C3  . mod.= 1.642 id.= 1.422 dev= -0.220 sig.=
     ****                Large deviation of atoms from planarity                 ****
 
 Deviations from the planarity >10.000Sigma will be monitored
-Atom: A      1 UNL C2    deviation=  -0.74 sigma.=   0.02
-Atom: A      1 UNL C3    deviation=  -0.36 sigma.=   0.02
-Atom: A      1 UNL C4    deviation=  -0.48 sigma.=   0.02
-Atom: A      1 UNL C5    deviation=   0.27 sigma.=   0.02
-Atom: A      1 UNL C6    deviation=   0.49 sigma.=   0.02
-Atom: A      1 UNL H3    deviation=   0.53 sigma.=   0.02
-Atom: A      1 UNL N1    deviation=  -0.38 sigma.=   0.02
-Atom: A      1 UNL N3    deviation=  -0.28 sigma.=   0.02
-Atom: A      1 UNL O1    deviation=   1.06 sigma.=   0.02
+Atom: A      1 UNL C     deviation=  -0.26 sigma.=   0.02
+Atom: A      1 UNL C3    deviation=   0.21 sigma.=   0.02
+Atom: A      1 UNL C2    deviation=  -0.50 sigma.=   0.02
+Atom: A      1 UNL C4    deviation=  -0.42 sigma.=   0.02
+Atom: A      1 UNL C6    deviation=   0.45 sigma.=   0.02
+Atom: A      1 UNL N2    deviation=  -0.27 sigma.=   0.02
+Atom: A      1 UNL N3    deviation=  -0.22 sigma.=   0.02
+Atom: A      1 UNL O1    deviation=   1.20 sigma.=   0.02
 
- function value    7965.026    
+ function value    7316.913    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
@@ -250,8 +249,8 @@ Bond distances: refined atoms                    15     0.097     0.013
 Bond distances: others                           10     0.097     0.020
 Bond angles  : refined atoms                     23    14.273     0.927
 Bond angles  : others                            20     0.585     1.573
-Planar groups: refined atoms                     14     0.435     0.020
-Planar groups: others                             1     0.530     0.020
+Planar groups: refined atoms                     16     0.388     0.020
+Planar groups: others                             1     0.091     0.020
 VDW repulsions: refined_atoms                     5     0.855     0.200
 VDW; torsion: refined_atoms                       4     0.748     0.200
 VDW; torsion.others                               2     0.165     0.200
@@ -262,55 +261,55 @@ VDW; torsion.others                               2     0.165     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   7965.026       3859.106       7965.026    
+ fvalues   0.0000000E+00   7316.913       3782.231       7316.913    
 
 
      CGMAT cycle number =      2
 
- function value    3859.106    
+ function value    3782.231    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    15     0.103     0.013
-Bond distances: others                           10     0.040     0.020
+Bond distances: refined atoms                    15     0.108     0.013
+Bond distances: others                           10     0.031     0.020
 -------------------------------------------------------------------------------
  Trying gamma equal   4.1999999E-02
  Gamma decreased to   3.2454543E-02
 
 
- fvalues   0.0000000E+00   3859.106       3486.345       3859.106    
+ fvalues   0.0000000E+00   3782.231       3395.064       3782.231    
 
 
      CGMAT cycle number =      3
 
- function value    3486.345    
+ function value    3395.064    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    15     0.083     0.013
+Bond distances: refined atoms                    15     0.085     0.013
 Bond distances: others                           10     0.004     0.020
 -------------------------------------------------------------------------------
  Trying gamma equal   3.2454543E-02
  Gamma decreased to   2.3776857E-02
 
 
- fvalues   0.0000000E+00   3486.345       3397.369       3486.345    
+ fvalues   0.0000000E+00   3395.064       3301.488       3395.064    
 
 
      CGMAT cycle number =      4
 
- function value    3397.369    
+ function value    3301.488    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    15     0.083     0.013
-Bond distances: others                           10     0.001     0.020
+Bond distances: refined atoms                    15     0.087     0.013
+Bond distances: others                           10     0.002     0.020
 -------------------------------------------------------------------------------
  Trying gamma equal   2.3776857E-02
  Gamma decreased to   1.5888054E-02
 
 
- fvalues   0.0000000E+00   3397.369       3327.869       3397.369    
+ fvalues   0.0000000E+00   3301.488       3199.702       3301.488    
 
 
      CGMAT cycle number =      5
@@ -319,41 +318,38 @@ Bond distances: others                           10     0.001     0.020
 
 Bond distance deviations from the ideal >10.000Sigma will be monitored
 
-A      1 UNL O1  . - A      1 UNL C6  . mod.= 1.075 id.= 1.218 dev=  0.143 sig.= 0.012
-A      1 UNL C6  . - A      1 UNL N3  . mod.= 1.231 id.= 1.376 dev=  0.145 sig.= 0.011
-A      1 UNL C6  . - A      1 UNL N2  . mod.= 1.191 id.= 1.390 dev=  0.199 sig.= 0.013
+A      1 UNL O1  . - A      1 UNL C6  . mod.= 1.033 id.= 1.218 dev=  0.185 sig.= 0.012
+A      1 UNL C6  . - A      1 UNL N3  . mod.= 1.247 id.= 1.376 dev=  0.129 sig.= 0.011
+A      1 UNL C6  . - A      1 UNL N2  . mod.= 1.189 id.= 1.390 dev=  0.201 sig.= 0.013
 
     ****                Large deviation of atoms from planarity                 ****
 
 Deviations from the planarity >10.000Sigma will be monitored
-Atom: A      1 UNL C2    deviation=  -0.29 sigma.=   0.02
-Atom: A      1 UNL C4    deviation=  -0.22 sigma.=   0.02
-Atom: A      1 UNL C6    deviation=   0.25 sigma.=   0.02
-Atom: A      1 UNL N2    deviation=  -0.33 sigma.=   0.02
-Atom: A      1 UNL N3    deviation=  -0.28 sigma.=   0.02
-Atom: A      1 UNL O1    deviation=   0.90 sigma.=   0.02
+Atom: A      1 UNL N2    deviation=  -0.38 sigma.=   0.02
+Atom: A      1 UNL N3    deviation=  -0.29 sigma.=   0.02
+Atom: A      1 UNL O1    deviation=   0.95 sigma.=   0.02
 
- function value    3327.869    
+ function value    3199.702    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    15     0.080     0.013
+Bond distances: refined atoms                    15     0.083     0.013
 Bond distances: others                           10     0.001     0.020
-Bond angles  : refined atoms                     23     8.839     0.927
-Bond angles  : others                            20     0.094     1.573
-Planar groups: refined atoms                     14     0.293     0.020
-Planar groups: others                             1     0.010     0.020
-VDW repulsions: refined_atoms                     4     0.789     0.200
-VDW repulsions.others                             2     0.090     0.200
-VDW; torsion: refined_atoms                       9     0.651     0.200
-VDW; torsion.others                               6     0.080     0.200
+Bond angles  : refined atoms                     23     8.261     0.927
+Bond angles  : others                            20     0.196     1.573
+Planar groups: refined atoms                     16     0.278     0.020
+Planar groups: others                             1     0.001     0.020
+VDW repulsions: refined_atoms                     4     0.690     0.200
+VDW repulsions.others                             3     0.160     0.200
+VDW; torsion: refined_atoms                       9     0.609     0.200
+VDW; torsion.others                               6     0.100     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   1.5888054E-02
  Gamma decreased to   8.7164138E-03
 
 
- fvalues   0.0000000E+00   3327.869       3217.826       3327.869    
-  Time in seconds: CPU =         0.01
+ fvalues   0.0000000E+00   3199.702       2956.066       3199.702    
+  Time in seconds: CPU =         0.02
              Elapsed =           0.00
 
     ****           Things for loggraph, R factor and others vs cycle            ****
@@ -369,17 +365,17 @@ $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
        0   0.0      0.0      0.0             0.       0.0   0.0967  8.269  14.273 17.673   0.0
-       1   0.0      0.0      0.0             0.       0.0   0.1033  8.202  10.173 12.912   0.0
-       2   0.0      0.0      0.0             0.       0.0   0.0831  6.742   9.457 11.957   0.0
-       3   0.0      0.0      0.0             0.       0.0   0.0825  6.784   9.358 11.775   0.0
-       4   0.0      0.0      0.0             0.       0.0   0.0799  6.585   8.839 11.110   0.0
+       1   0.0      0.0      0.0             0.       0.0   0.1080  8.797  10.039 12.742   0.0
+       2   0.0      0.0      0.0             0.       0.0   0.0854  6.876   9.189 11.641   0.0
+       3   0.0      0.0      0.0             0.       0.0   0.0865  7.053   8.963 11.267   0.0
+       4   0.0      0.0      0.0             0.       0.0   0.0834  6.823   8.261 10.359   0.0
  $$
  $TEXT:Result: $$ Final results $$
  $$
  Harvest: NO PNAME_KEYWRD given - no deposit file created
 <B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
  Refmac_5.8.0073:  End of Refmac_5.8.0073  
-Times: User:       1.9s System:    0.0s Elapsed:     0:02  
+Times: User:       2.0s System:    0.0s Elapsed:     0:02  
 </pre>
 </html>
 <!--SUMMARY_END--></FONT></B>

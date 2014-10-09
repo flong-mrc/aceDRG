@@ -73,42 +73,42 @@ _chem_comp_bond.atom_id_2
 _chem_comp_bond.type
 _chem_comp_bond.value_dist
 _chem_comp_bond.value_dist_esd
-UNL           N           C      SINGLE     1.470   0.011
-UNL           N          C1      SINGLE     1.441   0.011
-UNL          C2          C1      DOUBLE     1.404   0.015
-UNL          C2          C3      SINGLE     1.401   0.011
-UNL          C3          C4      DOUBLE     1.377   0.011
-UNL          C4          CL      SINGLE     1.740   0.014
-UNL          C4          C5      SINGLE     1.375   0.015
-UNL          C5          C6      DOUBLE     1.381   0.011
-UNL          C6          C1      SINGLE     1.397   0.014
-UNL          C7          C2      SINGLE     1.490   0.016
-UNL          N1          C7      DOUBLE     1.286   0.010
-UNL          C8          N1      SINGLE     1.463   0.010
-UNL          C8           O      SINGLE     1.428   0.020
-UNL          C9          C8      SINGLE     1.504   0.020
-UNL          C9           N      SINGLE     1.353   0.018
-UNL          O1          C9      DOUBLE     1.227   0.015
-UNL          C7         C10      SINGLE     1.494   0.010
-UNL         C10         C11      DOUBLE     1.389   0.011
-UNL         C12         C11      SINGLE     1.383   0.020
-UNL         C13         C12      DOUBLE     1.373   0.020
-UNL         C14         C13      SINGLE     1.373   0.020
-UNL         C15         C14      DOUBLE     1.383   0.020
-UNL         C10         C15      SINGLE     1.389   0.011
-UNL           C           H      SINGLE     0.971   0.020
-UNL           C          H1      SINGLE     0.971   0.020
-UNL           C          H2      SINGLE     0.971   0.020
-UNL          C3          H3      SINGLE     0.939   0.016
-UNL          C5          H4      SINGLE     0.941   0.020
-UNL          C6          H5      SINGLE     0.951   0.020
-UNL          C8          H6      SINGLE     0.982   0.020
-UNL           O          H7      SINGLE     0.851   0.020
-UNL         C11          H8      SINGLE     0.955   0.020
-UNL         C12          H9      SINGLE     0.958   0.020
-UNL         C13         H10      SINGLE     0.958   0.020
-UNL         C14         H11      SINGLE     0.958   0.020
-UNL         C15         H12      SINGLE     0.955   0.020
+UNL           N           C      single     1.470   0.011
+UNL           N          C1      single     1.441   0.011
+UNL          C2          C1      double     1.404   0.015
+UNL          C2          C3      single     1.401   0.011
+UNL          C3          C4      double     1.377   0.011
+UNL          C4          CL      single     1.740   0.014
+UNL          C4          C5      single     1.375   0.015
+UNL          C5          C6      double     1.381   0.011
+UNL          C6          C1      single     1.397   0.014
+UNL          C7          C2      single     1.490   0.016
+UNL          N1          C7      double     1.286   0.010
+UNL          C8          N1      single     1.463   0.010
+UNL          C8           O      single     1.428   0.020
+UNL          C9          C8      single     1.504   0.020
+UNL          C9           N      single     1.353   0.018
+UNL          O1          C9      double     1.227   0.015
+UNL          C7         C10      single     1.494   0.010
+UNL         C10         C11      double     1.389   0.011
+UNL         C12         C11      single     1.383   0.020
+UNL         C13         C12      double     1.373   0.020
+UNL         C14         C13      single     1.373   0.020
+UNL         C15         C14      double     1.383   0.020
+UNL         C10         C15      single     1.389   0.011
+UNL           C           H      single     0.971   0.020
+UNL           C          H1      single     0.971   0.020
+UNL           C          H2      single     0.971   0.020
+UNL          C3          H3      single     0.939   0.016
+UNL          C5          H4      single     0.941   0.020
+UNL          C6          H5      single     0.951   0.020
+UNL          C8          H6      single     0.982   0.020
+UNL           O          H7      single     0.851   0.020
+UNL         C11          H8      single     0.955   0.020
+UNL         C12          H9      single     0.958   0.020
+UNL         C13         H10      single     0.958   0.020
+UNL         C14         H11      single     0.958   0.020
+UNL         C15         H12      single     0.955   0.020
 loop_
 _chem_comp_angle.comp_id
 _chem_comp_angle.atom_id_1
@@ -283,39 +283,27 @@ _chem_comp_plane_atom.comp_id
 _chem_comp_plane_atom.plane_id
 _chem_comp_plane_atom.atom_id
 _chem_comp_plane_atom.dist_esd
-UNL    plan-1          C8   0.020
-UNL    plan-1          C9   0.020
-UNL    plan-1           N   0.020
-UNL    plan-1          O1   0.020
-UNL    plan-2           C   0.020
+UNL    plan-1         C10   0.020
+UNL    plan-1         C11   0.020
+UNL    plan-1         C12   0.020
+UNL    plan-1         C13   0.020
+UNL    plan-1         C14   0.020
+UNL    plan-1         C15   0.020
+UNL    plan-1          C7   0.020
+UNL    plan-1         H10   0.020
+UNL    plan-1         H11   0.020
+UNL    plan-1         H12   0.020
+UNL    plan-1          H8   0.020
+UNL    plan-1          H9   0.020
 UNL    plan-2          C1   0.020
-UNL    plan-2          C9   0.020
+UNL    plan-2          C2   0.020
+UNL    plan-2          C3   0.020
+UNL    plan-2          C4   0.020
+UNL    plan-2          C5   0.020
+UNL    plan-2          C6   0.020
+UNL    plan-2          C7   0.020
+UNL    plan-2          CL   0.020
+UNL    plan-2          H3   0.020
+UNL    plan-2          H4   0.020
+UNL    plan-2          H5   0.020
 UNL    plan-2           N   0.020
-UNL    plan-3         C10   0.020
-UNL    plan-3          C2   0.020
-UNL    plan-3          C7   0.020
-UNL    plan-3          N1   0.020
-UNL    plan-4          C1   0.020
-UNL    plan-4          C2   0.020
-UNL    plan-4          C3   0.020
-UNL    plan-4          C4   0.020
-UNL    plan-4          C5   0.020
-UNL    plan-4          C6   0.020
-UNL    plan-4          C7   0.020
-UNL    plan-4          CL   0.020
-UNL    plan-4          H3   0.020
-UNL    plan-4          H4   0.020
-UNL    plan-4          H5   0.020
-UNL    plan-4           N   0.020
-UNL    plan-5         C10   0.020
-UNL    plan-5         C11   0.020
-UNL    plan-5         C12   0.020
-UNL    plan-5         C13   0.020
-UNL    plan-5         C14   0.020
-UNL    plan-5         C15   0.020
-UNL    plan-5          C7   0.020
-UNL    plan-5         H10   0.020
-UNL    plan-5         H11   0.020
-UNL    plan-5         H12   0.020
-UNL    plan-5          H8   0.020
-UNL    plan-5          H9   0.020

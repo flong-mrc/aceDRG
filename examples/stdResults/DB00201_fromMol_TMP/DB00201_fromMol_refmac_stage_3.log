@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 13:58:40 
+ User: flong  Run date:  9/10/2014 Run time: 20:27:25 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -207,7 +207,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        25         0        25
                Angles:        43         0        43
               Chirals:         0         0         0
-               Planes:         1         0         1
+               Planes:         2         0         2
              Torsions:        58         0        58
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -221,19 +221,19 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    13.07706    
+ function value    13.08768    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    15     0.002     0.013
-Bond distances: others                           10     0.000     0.020
-Bond angles  : refined atoms                     23     0.090     0.927
-Bond angles  : others                            20     0.121     1.573
-Planar groups: refined atoms                     14     0.000     0.020
+Bond distances: others                           10     0.001     0.020
+Bond angles  : refined atoms                     23     0.104     0.927
+Bond angles  : others                            20     0.131     1.573
+Planar groups: refined atoms                     16     0.000     0.020
 Planar groups: others                             1     0.000     0.020
-VDW repulsions: refined_atoms                     1     0.058     0.200
+VDW repulsions: refined_atoms                     1     0.057     0.200
 VDW repulsions.others                             4     0.312     0.200
-VDW; torsion: refined_atoms                       7     0.283     0.200
+VDW; torsion: refined_atoms                       7     0.282     0.200
 VDW; torsion.others                               3     0.140     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   0.0000000E+00
@@ -242,8 +242,8 @@ VDW; torsion.others                               3     0.140     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   13.07706       13.05885       13.07706    
-  Time in seconds: CPU =         0.00
+ fvalues   0.0000000E+00   13.08768       13.05882       13.08768    
+  Time in seconds: CPU =         0.01
              Elapsed =           0.00
 
     ****           Things for loggraph, R factor and others vs cycle            ****
@@ -258,14 +258,14 @@ $GRAPHS:<Rfactor> vs cycle :N:1,2,3:
 $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
-       0   0.0      0.0      0.0             0.       0.0   0.0022  0.185   0.090  0.095   0.0
+       0   0.0      0.0      0.0             0.       0.0   0.0022  0.181   0.104  0.110   0.0
  $$
  $TEXT:Result: $$ Final results $$
  $$
  Harvest: NO PNAME_KEYWRD given - no deposit file created
 <B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
  Refmac_5.8.0073:  End of Refmac_5.8.0073  
-Times: User:       1.8s System:    0.0s Elapsed:     0:02  
+Times: User:       1.9s System:    0.0s Elapsed:     0:02  
 </pre>
 </html>
 <!--SUMMARY_END--></FONT></B>

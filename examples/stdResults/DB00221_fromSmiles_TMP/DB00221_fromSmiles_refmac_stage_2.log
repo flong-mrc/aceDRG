@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 13:57:36 
+ User: flong  Run date:  9/10/2014 Run time: 20:26:23 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -5038,7 +5038,7 @@ VDW; torsion.others                               7     0.101     0.200
  chir_max =  7.6622963E-02
  rms =  0.2144863    
  angle =  0.4635191    
-  Time in seconds: CPU =         1.22
+  Time in seconds: CPU =         1.19
              Elapsed =           0.00
 
     ****           Things for loggraph, R factor and others vs cycle            ****

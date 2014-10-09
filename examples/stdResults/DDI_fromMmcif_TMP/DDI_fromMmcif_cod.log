@@ -3962,9 +3962,9 @@ class is C[6](C[6,6]CC)(C[6]CH)(H)
 For atom H20
 class is H(C[6]CC)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 14:01:43 2014
+Clustering COD org bonds started at Thu Oct  9 20:30:20 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 14:01:46 2014
+finished at Thu Oct  9 20:30:23 2014
 it takes 3 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between N and C27
@@ -5301,8 +5301,8 @@ The final target bond value is 1.21
 Number of Bonds to be found 76
 Number of Bonds found 76
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 14:01:47 2014
-Clustering COD org angles finished at Fri Sep 12 14:01:57 2014
+Clustering all COD angles started at Thu Oct  9 20:30:24 2014
+Clustering COD org angles finished at Thu Oct  9 20:30:34 2014
 it takes 10 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
@@ -7586,5 +7586,177 @@ Atom C29
 Atom C28
 Atom C27
 Finish searching angles 
+There are 3 planes 
+One Plane. It has 10 They are : 
+Atom C1
+Atom C10
+Atom C2
+Atom C3
+Atom C4
+Atom C5
+Atom H1
+Atom H2
+Atom H3
+Atom H4
+One Plane. It has 8 They are : 
+Atom C14
+Atom C15
+Atom C16
+Atom C21
+Atom C22
+Atom C23
+Atom H15
+Atom H22
+One Plane. It has 10 They are : 
+Atom C16
+Atom C17
+Atom C18
+Atom C19
+Atom C20
+Atom C21
+Atom H17
+Atom H18
+Atom H19
+Atom H20
+O1
+O1
+C8
+C8
+C7
+C7
+H7A
+H7A
+H7B
+H7B
+C6
+C6
+H6A
+H6A
+H6B
+H6B
+C5
+C5
+C4
+C4
+H4
+H4
+C3
+C3
+H3
+H3
+C2
+C2
+H2
+H2
+C1
+C1
+H1
+H1
+C10
+C10
+C9
+C9
+C25
+C25
+H25
+H25
+O3
+O3
+C26
+C26
+H26
+H26
+O7
+O7
+C30
+C30
+H30
+H30
+C31
+C31
+H31A
+H31A
+H31B
+H31B
+O6
+O6
+HO6
+HO6
+C29
+C29
+H29
+H29
+O5
+O5
+HO5
+HO5
+C28
+C28
+H28
+H28
+O4
+O4
+HO4
+HO4
+C27
+C27
+H27
+H27
+N
+N
+HN2
+HN2
+HN1
+HN1
+C11
+C11
+H11
+H11
+C23
+C23
+C14
+C14
+C13
+C13
+O2
+O2
+C12
+C12
+H12
+H12
+C24
+C24
+H24B
+H24B
+H24A
+H24A
+C15
+C15
+H15
+H15
+C16
+C16
+C21
+C21
+C22
+C22
+H22
+H22
+C17
+C17
+H17
+H17
+C18
+C18
+H18
+H18
+C19
+C19
+H19
+H19
+C20
+C20
+H20
+H20
 =========END OF PROCESS INFORMATION
  ==========

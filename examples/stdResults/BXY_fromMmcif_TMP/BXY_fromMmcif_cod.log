@@ -1025,10 +1025,10 @@ class is O(CCHH)(H)
 For atom HO5
 class is H(OC)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 14:01:01 2014
+Clustering COD org bonds started at Thu Oct  9 20:29:38 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 14:01:03 2014
-it takes 2 seconds to finish group COD bonds 
+finished at Thu Oct  9 20:29:39 2014
+it takes 1 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between O5 and C5
  search a org-related bond c 
@@ -1389,9 +1389,9 @@ The final target bond value is 0.85
 Number of Bonds to be found 20
 Number of Bonds found 20
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 14:01:04 2014
-Clustering COD org angles finished at Fri Sep 12 14:01:06 2014
-it takes 2 seconds to finish group COD angles 
+Clustering all COD angles started at Thu Oct  9 20:29:40 2014
+Clustering COD org angles finished at Thu Oct  9 20:29:43 2014
+it takes 3 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
 Finish groupCodAnglesWithNonCenteredMetal() 
@@ -1991,5 +1991,45 @@ Atom C3
 Atom O4
 Atom C4
 Finish searching angles 
+O1
+O1
+H10
+H10
+C1
+C1
+H1
+H1
+C2
+C2
+H2
+H2
+O2
+O2
+HO2
+HO2
+C3
+C3
+H3
+H3
+O3
+O3
+HO3
+HO3
+O4
+O4
+C4
+C4
+H4
+H4
+C5
+C5
+H5
+H5
+H5A
+H5A
+O5
+O5
+HO5
+HO5
 =========END OF PROCESS INFORMATION
  ==========

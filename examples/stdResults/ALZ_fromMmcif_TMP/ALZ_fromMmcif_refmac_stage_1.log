@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 14:00:52 
+ User: flong  Run date:  9/10/2014 Run time: 20:29:29 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -207,7 +207,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        51         0        51
                Angles:        91         0        91
               Chirals:         1         0         1
-               Planes:         6         0         6
+               Planes:         1         0         1
              Torsions:       131         0       131
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    903.1157    
+ function value    903.1151    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
@@ -230,8 +230,8 @@ Bond distances: others                           26     0.118     0.019
 Bond angles  : refined atoms                     31     3.485     1.630
 Bond angles  : others                            60     2.625     1.160
 Chiral centres: refined atoms                     1     0.024     0.200
-Planar groups: refined atoms                     25     0.001     0.020
-Planar groups: others                             7     0.004     0.020
+Planar groups: refined atoms                      7     0.002     0.020
+Planar groups: others                             5     0.005     0.020
 VDW repulsions: refined_atoms                     2     0.213     0.200
 VDW repulsions.others                             5     0.049     0.200
 VDW; torsion: refined_atoms                       9     0.257     0.200
@@ -243,44 +243,44 @@ VDW; torsion.others                               2     0.207     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   903.1157       49.75649       903.1157    
+ fvalues   0.0000000E+00   903.1151       51.96695       903.1151    
 
 
      CGMAT cycle number =      2
 
- function value    49.75649    
+ function value    51.96695    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    25     0.013     0.017
-Bond distances: others                           26     0.007     0.019
+Bond distances: refined atoms                    25     0.014     0.017
+Bond distances: others                           26     0.008     0.019
 -------------------------------------------------------------------------------
  Trying gamma equal   4.1999999E-02
  Gamma decreased to   3.2454543E-02
 
 
- fvalues   0.0000000E+00   49.75649       30.20343       49.75649    
+ fvalues   0.0000000E+00   51.96695       30.04031       51.96695    
 
 
      CGMAT cycle number =      3
 
- function value    30.20343    
+ function value    30.04031    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    25     0.008     0.017
+Bond distances: refined atoms                    25     0.007     0.017
 Bond distances: others                           26     0.015     0.019
 -------------------------------------------------------------------------------
  Trying gamma equal   3.2454543E-02
  Gamma decreased to   2.3776857E-02
 
 
- fvalues   0.0000000E+00   30.20343       16.40900       30.20343    
+ fvalues   0.0000000E+00   30.04031       16.30127       30.04031    
 
 
      CGMAT cycle number =      4
 
- function value    16.40900    
+ function value    16.30127    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
@@ -288,40 +288,36 @@ Bond distances: refined atoms                    25     0.005     0.017
 Bond distances: others                           26     0.001     0.019
 -------------------------------------------------------------------------------
  Trying gamma equal   2.3776857E-02
- Not converging with gamma equal   2.3776857E-02
- Trying gamma equal   6.5193079E-02
- Gamma decreased to   5.6909837E-02
+ Gamma decreased to   1.5888054E-02
 
 
- fvalues   0.0000000E+00   16.40900       15.41063       16.40900    
+ fvalues   0.0000000E+00   16.30127       14.27003       16.30127    
 
 
      CGMAT cycle number =      5
 
- function value    15.41063    
+ function value    14.27003    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    25     0.005     0.017
+Bond distances: refined atoms                    25     0.004     0.017
 Bond distances: others                           26     0.000     0.019
-Bond angles  : refined atoms                     31     0.962     1.630
-Bond angles  : others                            60     0.324     1.160
-Chiral centres: refined atoms                     1     0.014     0.200
-Planar groups: refined atoms                     25     0.002     0.020
-Planar groups: others                             7     0.000     0.020
-VDW repulsions: refined_atoms                     2     0.162     0.200
-VDW repulsions.others                             7     0.100     0.200
+Bond angles  : refined atoms                     31     0.990     1.630
+Bond angles  : others                            60     0.141     1.160
+Chiral centres: refined atoms                     1     0.018     0.200
+Planar groups: refined atoms                      7     0.003     0.020
+Planar groups: others                             5     0.000     0.020
+VDW repulsions: refined_atoms                     2     0.146     0.200
+VDW repulsions.others                             6     0.111     0.200
 VDW; torsion: refined_atoms                       9     0.263     0.200
-VDW; torsion.others                               8     0.093     0.200
+VDW; torsion.others                               8     0.094     0.200
 -------------------------------------------------------------------------------
- Trying gamma equal   5.6909837E-02
- Not converging with gamma equal   5.6909837E-02
- Trying gamma equal   9.6443504E-02
- Gamma decreased to   8.8536769E-02
+ Trying gamma equal   1.5888054E-02
+ Gamma decreased to   8.7164138E-03
 
 
- fvalues   0.0000000E+00   15.41063       14.92895       15.41063    
-  Time in seconds: CPU =         0.02
+ fvalues   0.0000000E+00   14.27003       12.80136       14.27003    
+  Time in seconds: CPU =         0.03
              Elapsed =           0.00
 
     ****           Things for loggraph, R factor and others vs cycle            ****
@@ -337,10 +333,10 @@ $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
        0   0.0      0.0      0.0             0.       0.0   0.0169  1.203   3.485  4.412   0.024
-       1   0.0      0.0      0.0             0.       0.0   0.0131  0.869   1.381  0.674   0.095
-       2   0.0      0.0      0.0             0.       0.0   0.0077  0.485   1.170  0.539   0.044
-       3   0.0      0.0      0.0             0.       0.0   0.0055  0.334   1.024  0.467   0.021
-       4   0.0      0.0      0.0             0.       0.0   0.0048  0.288   0.962  0.441   0.014
+       1   0.0      0.0      0.0             0.       0.0   0.0136  0.913   1.388  0.658   0.085
+       2   0.0      0.0      0.0             0.       0.0   0.0074  0.470   1.254  0.562   0.039
+       3   0.0      0.0      0.0             0.       0.0   0.0051  0.314   1.131  0.493   0.024
+       4   0.0      0.0      0.0             0.       0.0   0.0041  0.252   0.990  0.427   0.018
  $$
  $TEXT:Result: $$ Final results $$
  $$

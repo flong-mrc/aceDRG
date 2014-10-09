@@ -68,7 +68,7 @@ print "|  and generate a table containing unique bond lengths  |"
 print "|  and angles, and atom types in those cif files        |"
 print "========================================================="
 if os.path.isdir("inStdcif"):
-    cmdL = "acedrg -e -d %s " %"inStdcif" 
+    cmdL = "acedrg -e -d %s -o %s " %("inStdcif", "Summary_inStdcif") 
     print cmdL
     os.system(cmdL)
 

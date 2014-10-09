@@ -370,7 +370,7 @@ class Acedrg(CExeCode ):
                                 
         if not self.acedrgTables: 
             tAcedrgTables = os.path.join(self.acedrgDir, "share/acedrg/tables")
-            print tAcedrgTables
+            # print tAcedrgTables
             if os.path.isdir(tAcedrgTables):
                 self.acedrgTables = tAcedrgTables
             else:
@@ -576,12 +576,13 @@ class Acedrg(CExeCode ):
                 for aCif in glob.glob(self.inStdCifDir+"/*.cif"):
                     tMonomRoot = os.path.basename(aCif).split(".")[0]
                     print "Generate molecules, bonds and angles from ", aCif
+                    self._cmdline = self.libmol
                     self.outMolsName            = os.path.join(self.scrDir,tMonomRoot + "_all_mols.txt")
                     self.outBondsAndAnglesName  = os.path.join(self.scrDir, tMonomRoot + "_unique_bond_and_angles.txt")
                     self._log_name = os.path.join(self.scrDir,tMonomRoot + "_cod.log")
                     self._cmdline += " -b %s  "%aCif
                     self._cmdline += " -m yes -r %s -o %s.cif "%(tMonomRoot, self.scrDir+"/"+tMonomRoot)
-                    print self._cmdline
+                    #print self._cmdline
                     self.subExecute()
                     if os.path.isfile(self.outBondsAndAnglesName):
                         tAllBondInMols.append(self.outBondsAndAnglesName)
@@ -646,10 +647,13 @@ class Acedrg(CExeCode ):
                          if not self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]].has_key(tSets[1][0]): # id 2
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]] = {}
                          if not self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]].has_key(strGrp[5]):
-                             self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]] = []
-                         aTup = [tSets[0][2], tSets[1][2], strGrp[4], aFileIdx]              # bond length and the file index
-                         self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]].append(aTup) 
+                             self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]] = {}
+                             self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]]["observations"] = []
+                             self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]]["stats"]        = {}
 
+                         aTup = [tSets[0][2], tSets[1][2], float(strGrp[4]), aFileIdx]              # atom1_id, atom2_id, bond length and the file index
+                         self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]]["observations"].append(aTup) 
+                
 
                          # Get sorted atom types
                          if not self.allBondsAndAngles["atomClasses"].has_key(tSets[0][1]):            # atom 1 element type
@@ -665,6 +669,32 @@ class Acedrg(CExeCode ):
                               self.allBondsAndAngles["atomClasses"][tSets[1][1]][tSets[1][0]] = 1
                          else:
                               self.allBondsAndAngles["atomClasses"][tSets[1][1]][tSets[1][0]] +=1
+                    elif lAn and len(strGrp)==7:
+                         # get sorted bond-angles
+                         cenElem = self.getElemFromAtomClass(strGrp[0])
+                         aElem   = self.getElemFromAtomClass(strGrp[1])
+                         bElem   = self.getElemFromAtomClass(strGrp[2])
+                         aSet  = [strGrp[0], cenElem, strGrp[3]]                  
+                         bSet  = [strGrp[1], aElem, strGrp[4]]   
+                         cSet  = [strGrp[2], bElem, strGrp[5]]   
+                         tSets = [bSet, cSet]
+                         tSets.sort(listComp)
+                         if not self.allBondsAndAngles["angles"].has_key(aSet[1]):         # center atom element  
+                             self.allBondsAndAngles["angles"][aSet[1]] = {}
+                         if not self.allBondsAndAngles["angles"][aSet[1]].has_key(tSets[0][1]): # atom1 element 
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]] = {}
+                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]].has_key(tSets[1][1]) : # atom2 elment 
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]] = {}
+                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]].has_key(aSet[0]): # center atom class
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]] = {}
+                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]].has_key(tSets[0][0]): #  atom1 class
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]] = {}
+                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]].has_key(tSets[1][0]): #  atom1 class
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]] = {}
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]]["observations"] = []
+                             self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]]["stats"]        = {}
+                         aTup = [aSet[2], tSets[0][2], tSets[1][2], float(strGrp[6]), aFileIdx]              # cen_atom_id, atom1_id, atom2_id, bond length and the file index
+                         self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]]["observations"].append(aTup)
                     elif aL.find("Bond_length") != -1:
                         lBo = True
                     elif aL.find("Angle_") !=-1:
@@ -689,9 +719,48 @@ class Acedrg(CExeCode ):
                         for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].iterkeys()):
                             for bCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl].iterkeys()):
                                 for rP in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl].iterkeys()):
-                                    for aSet in self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]:
+                                    self.getStatsForOneBondClass(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"], \
+                                                            self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"])                                  
+                                    for aSet in self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"]:
                                         f2.write("%s       %s        %s      %s      %s      %s    %s     %7.5f    %s\n" \
-                                            %(aElem, bElem, aCl, bCl, aSet[0],  aSet[1], rP, float(aSet[2]), aSet[3]))   
+                                            %(aElem, bElem, aCl, bCl, aSet[0],  aSet[1], rP, aSet[2], aSet[3]))   
+
+                f2.write("\nAll bond lengths stats: \n")  
+                for aElem in sorted(self.allBondsAndAngles["bonds"].iterkeys()):
+                    for bElem in sorted(self.allBondsAndAngles["bonds"][aElem].iterkeys()):
+                        for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].iterkeys()):
+                            for bCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl].iterkeys()):
+                                for rP in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl].iterkeys()):
+                                    ave = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["mean"]
+                                    sig = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["sig"]
+                                    num = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["nObs"]
+                                    f2.write("%s      %s    %7.5f      %7.5f      %d\n" %(aCl, bCl, ave, sig, num)) 
+  
+            if len(self.allBondsAndAngles["angles"]):
+                f2.write("\n\nAll bond angles: \n")
+                for cenElem in sorted(self.allBondsAndAngles["angles"].iterkeys()):
+                    for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].iterkeys()):
+                        for bElem in sorted(self.allBondsAndAngles["angles"][cenElem][aElem].iterkeys()):
+                            for cenC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem].iterkeys()):
+                                for aC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC].iterkeys()):
+                                    for bC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC].iterkeys()):
+                                        self.getStatsForOneAngleClass(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["observations"], \
+                                                                      self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"])
+                                        for aSet in self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["observations"]:
+                                            f2.write("%s      %s       %s        %s      %s      %s      %s        %s      %s     %7.5f    %s\n" \
+                                                      %(cenElem, aElem, bElem, cenC, aC, bC, aSet[0],  aSet[1], aSet[2], aSet[3], aSet[4]))   
+                f2.write("\nAll bond angle stats : \n")
+                for cenElem in sorted(self.allBondsAndAngles["angles"].iterkeys()):
+                    for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].iterkeys()):
+                        for bElem in sorted(self.allBondsAndAngles["angles"][cenElem][aElem].iterkeys()):
+                            for cenC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem].iterkeys()):
+                                for aC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC].iterkeys()):
+                                    for bC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC].iterkeys()):
+                                        ave  = self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"]["mean"]
+                                        sig  = self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"]["sig"]
+                                        nObs = self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"]["nObs"]
+                                        f2.write("%s      %s      %s   %7.5f    %7.5f   %d\n" \
+                                                  %(cenC, aC, bC, ave, sig, nObs))   
             f2.close()
    
     def getElemFromAtomClass(self, tAtm):
@@ -705,6 +774,84 @@ class Acedrg(CExeCode ):
                 else :
                     tElem = tStrs[0].split("[")[0]
         return tElem         
+
+
+    def getStatsForOneBondClass(self, tBondObjList, tBondStatsDict):
+
+        
+        numObjs = len(tBondObjList)
+
+        if numObjs:
+     
+            tBondStatsDict["nObs"] = numObjs
+            tBondStatsDict["max"]  = 0.0
+            tBondStatsDict["min"]  = 100.0
+
+            sum = 0.0
+            for aTup in tBondObjList:
+                if len(aTup)==4:
+                    sum = sum + aTup[2]
+                    if aTup[2] > tBondStatsDict["max"]:
+                        tBondStatsDict["max"] = aTup[2]
+                    if aTup[2] < tBondStatsDict["min"]:
+                        tBondStatsDict["min"] = aTup[2]
+                else: 
+                    print "Bug. error in ", aTup
+                    sys.exit(1)
+
+            tBondStatsDict["mean"] = sum/numObjs
+
+            sum_diff_sq = 0.0
+
+            for aTup in tBondObjList:
+                sum_diff_sq +=((aTup[2]- tBondStatsDict["mean"])*(aTup[2]- tBondStatsDict["mean"]))
+
+            if numObjs > 1:
+                tBondStatsDict["sig"] = sum_diff_sq/(numObjs-1)
+            else:
+                tBondStatsDict["sig"] = 0.0  
+            
+            
+    def getStatsForOneAngleClass(self, tAngleObjList, tAngleStatsDict):
+        
+        numObjs = len(tAngleObjList)
+
+        if numObjs:
+     
+            tAngleStatsDict["nObs"] = numObjs
+            tAngleStatsDict["max"]  = 0.0
+            tAngleStatsDict["min"]  = 360.0
+
+            sum = 0.0
+            for aTup in tAngleObjList:
+                if len(aTup)==5:
+                    if (aTup[3] > 180.0):
+                        aTup[3] = 360.0-aTup[3]
+                    elif (aTup[3] < 0.0):
+                        aTup[3] = math.fabs(aTup[3])
+
+                    sum = sum + aTup[3]
+                    if aTup[3] > tAngleStatsDict["max"]:
+                        tAngleStatsDict["max"] = aTup[3]
+                    if aTup[3] < tAngleStatsDict["min"]:
+                        tAngleStatsDict["min"] = aTup[3]
+                else: 
+                    print "Bug. error in ", aTup
+                    sys.exit(1)
+
+            tAngleStatsDict["mean"] = sum/numObjs
+
+            sum_diff_sq = 0.0
+
+            for aTup in tAngleObjList:
+                sum_diff_sq +=((aTup[3]- tAngleStatsDict["mean"])*(aTup[3]- tAngleStatsDict["mean"]))
+
+            if numObjs > 1:
+                tAngleStatsDict["sig"] = sum_diff_sq/(numObjs-1)
+            else:
+                tAngleStatsDict["sig"] = 0.0  
+            
+            
     def setLibcheckBat(self, tSmiName, tOutRoot):
 
         self._cmdline = self.libcheck 
@@ -1032,6 +1179,10 @@ class Acedrg(CExeCode ):
                 os.system("cp %s %s"%(self.outRstCifName, tCif)) 
             else:
                 print "acedrg failed to generate a dictionary file"       
+
+
+# Other supplement functions
+
 
 def main():
     acedrgObj = Acedrg(sys.argv[1:])

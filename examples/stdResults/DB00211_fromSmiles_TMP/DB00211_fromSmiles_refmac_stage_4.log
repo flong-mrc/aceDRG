@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 13:57:20 
+ User: flong  Run date:  9/10/2014 Run time: 20:26:08 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -209,7 +209,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        35         0        35
                Angles:        59         0        59
               Chirals:         1         0         1
-               Planes:         3         0         3
+               Planes:         1         0         1
              Torsions:        73         0        73
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -223,21 +223,20 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    53.16621    
+ function value    52.25667    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.002     0.019
-Bond angles  : refined atoms                     23     0.778     1.660
-Bond angles  : others                            36     4.213     1.443
-Chiral centres: refined atoms                     1     0.027     0.200
-Planar groups: refined atoms                     16     0.000     0.020
-Planar groups: others                             4     0.001     0.020
-VDW repulsions: refined_atoms                     2     0.056     0.200
-VDW repulsions.others                            10     0.208     0.200
-VDW; torsion: refined_atoms                       9     0.231     0.200
-VDW; torsion.others                               9     0.058     0.200
+Bond angles  : refined atoms                     23     0.576     1.660
+Bond angles  : others                            36     4.205     1.443
+Chiral centres: refined atoms                     1     0.022     0.200
+Planar groups: refined atoms                      9     0.003     0.020
+Planar groups: others                             3     0.004     0.020
+VDW repulsions.others                             6     0.292     0.200
+VDW; torsion: refined_atoms                       6     0.275     0.200
+VDW; torsion.others                              10     0.065     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   0.0000000E+00
  Not converging with gamma equal   0.0000000E+00
@@ -245,659 +244,648 @@ VDW; torsion.others                               9     0.058     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   53.16621       25.93502       53.16621    
+ fvalues   0.0000000E+00   52.25667       36.06284       52.25667    
 
 
      CGMAT cycle number =      2
 
- function value    25.93502    
+ function value    36.06284    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
-Bond distances: others                           17     0.012     0.019
+Bond distances: others                           17     0.029     0.019
 -------------------------------------------------------------------------------
  Trying gamma equal   4.1999999E-02
  Gamma decreased to   3.2454543E-02
 
 
- fvalues   0.0000000E+00   25.93502       29.92376       25.93502    
-
- fvalues   0.0000000E+00   25.93502       18.96415       25.93502    
+ fvalues   0.0000000E+00   36.06284       14.04168       36.06284    
 
 
      CGMAT cycle number =      3
 
- function value    18.96415    
+ function value    14.04168    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
-Bond distances: others                           17     0.011     0.019
+Bond distances: others                           17     0.003     0.019
 -------------------------------------------------------------------------------
  Trying gamma equal   3.2454543E-02
  Gamma decreased to   2.3776857E-02
 
 
- fvalues   0.0000000E+00   18.96415       15.12620       18.96415    
+ fvalues   0.0000000E+00   14.04168       13.75998       14.04168    
 
 
      CGMAT cycle number =      4
 
- function value    15.12620    
+ function value    13.75998    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
-Bond distances: others                           17     0.005     0.019
+Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
  Trying gamma equal   2.3776857E-02
- Gamma decreased to   1.5888054E-02
+ Not converging with gamma equal   2.3776857E-02
+ Trying gamma equal   6.5193079E-02
+ Not converging with gamma equal   6.5193079E-02
+ Trying gamma equal   0.1086801    
+ Not converging with gamma equal   0.1086801    
+ Trying gamma equal   0.1543415    
+ Not converging with gamma equal   0.1543415    
+ Trying gamma equal   0.2022859    
+ Gamma decreased to   0.1926970    
 
 
- fvalues   0.0000000E+00   15.12620       14.43269       15.12620    
+ fvalues   0.0000000E+00   13.75998       13.74286       13.75998    
 
 
      CGMAT cycle number =      5
 
- function value    14.43269    
+ function value    13.74286    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   1.5888054E-02
- Gamma decreased to   8.7164138E-03
+ Trying gamma equal   0.1926970    
+ Gamma decreased to   0.1839799    
 
 
- fvalues   0.0000000E+00   14.43269       14.38315       14.43269    
+ fvalues   0.0000000E+00   13.74286       13.72561       13.74286    
 
 
      CGMAT cycle number =      6
 
- function value    14.38315    
+ function value    13.72561    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   8.7164138E-03
- Gamma decreased to   2.1967408E-03
+ Trying gamma equal   0.1839799    
+ Gamma decreased to   0.1760552    
 
 
- fvalues   0.0000000E+00   14.38315       14.36926       14.38315    
+ fvalues   0.0000000E+00   13.72561       13.70800       13.72561    
 
 
      CGMAT cycle number =      7
 
- function value    14.36926    
+ function value    13.70800    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   2.1967408E-03
- Not converging with gamma equal   2.1967408E-03
- Trying gamma equal   3.3313360E-02
- Gamma decreased to   2.7090035E-02
+ Trying gamma equal   0.1760552    
+ Gamma decreased to   0.1688509    
 
 
- fvalues   0.0000000E+00   14.36926       14.36589       14.36926    
+ fvalues   0.0000000E+00   13.70800       13.68992       13.70800    
 
 
      CGMAT cycle number =      8
 
- function value    14.36589    
+ function value    13.68992    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   2.7090035E-02
- Not converging with gamma equal   2.7090035E-02
- Trying gamma equal   5.6792259E-02
- Not converging with gamma equal   5.6792259E-02
- Trying gamma equal   8.7979592E-02
- Gamma decreased to   8.1742123E-02
+ Trying gamma equal   0.1688509    
+ Gamma decreased to   0.1623015    
 
 
- fvalues   0.0000000E+00   14.36589       14.36464       14.36589    
+ fvalues   0.0000000E+00   13.68992       13.67139       13.68992    
 
 
      CGMAT cycle number =      9
 
- function value    14.36464    
+ function value    13.67139    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   8.1742123E-02
- Gamma decreased to   7.6071702E-02
+ Trying gamma equal   0.1623015    
+ Gamma decreased to   0.1563476    
 
 
- fvalues   0.0000000E+00   14.36464       14.36330       14.36464    
+ fvalues   0.0000000E+00   13.67139       13.65242       13.67139    
 
 
      CGMAT cycle number =     10
 
- function value    14.36330    
+ function value    13.65242    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   7.6071702E-02
- Gamma decreased to   7.0916772E-02
+ Trying gamma equal   0.1563476    
+ Gamma decreased to   0.1509349    
 
 
- fvalues   0.0000000E+00   14.36330       14.36194       14.36330    
+ fvalues   0.0000000E+00   13.65242       13.63300       13.65242    
 
 
      CGMAT cycle number =     11
 
- function value    14.36194    
+ function value    13.63300    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   7.0916772E-02
- Gamma decreased to   6.6230468E-02
+ Trying gamma equal   0.1509349    
+ Gamma decreased to   0.1460143    
 
 
- fvalues   0.0000000E+00   14.36194       14.36053       14.36194    
+ fvalues   0.0000000E+00   13.63300       13.61321       13.63300    
 
 
      CGMAT cycle number =     12
 
- function value    14.36053    
+ function value    13.61321    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   6.6230468E-02
- Gamma decreased to   6.1970197E-02
+ Trying gamma equal   0.1460143    
+ Gamma decreased to   0.1415410    
 
 
- fvalues   0.0000000E+00   14.36053       14.35908       14.36053    
+ fvalues   0.0000000E+00   13.61321       13.59301       13.61321    
 
 
      CGMAT cycle number =     13
 
- function value    14.35908    
+ function value    13.59301    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   6.1970197E-02
- Gamma decreased to   5.8097221E-02
+ Trying gamma equal   0.1415410    
+ Gamma decreased to   0.1374744    
 
 
- fvalues   0.0000000E+00   14.35908       14.35760       14.35908    
+ fvalues   0.0000000E+00   13.59301       13.57246       13.59301    
 
 
      CGMAT cycle number =     14
 
- function value    14.35760    
+ function value    13.57246    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.8097221E-02
- Gamma decreased to   5.4576334E-02
+ Trying gamma equal   0.1374744    
+ Gamma decreased to   0.1337775    
 
 
- fvalues   0.0000000E+00   14.35760       14.35608       14.35760    
+ fvalues   0.0000000E+00   13.57246       13.55155       13.57246    
 
 
      CGMAT cycle number =     15
 
- function value    14.35608    
+ function value    13.55155    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.4576334E-02
- Gamma decreased to   5.1375527E-02
+ Trying gamma equal   0.1337775    
+ Gamma decreased to   0.1304166    
 
 
- fvalues   0.0000000E+00   14.35608       14.35452       14.35608    
+ fvalues   0.0000000E+00   13.55155       13.53033       13.55155    
 
 
      CGMAT cycle number =     16
 
- function value    14.35452    
+ function value    13.53033    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.1375527E-02
- Gamma decreased to   4.8465703E-02
+ Trying gamma equal   0.1304166    
+ Gamma decreased to   0.1273613    
 
 
- fvalues   0.0000000E+00   14.35452       14.35293       14.35452    
+ fvalues   0.0000000E+00   13.53033       13.50883       13.53033    
 
 
      CGMAT cycle number =     17
 
- function value    14.35293    
+ function value    13.50883    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.8465703E-02
- Gamma decreased to   4.5820408E-02
+ Trying gamma equal   0.1273613    
+ Gamma decreased to   0.1245837    
 
 
- fvalues   0.0000000E+00   14.35293       14.35129       14.35293    
+ fvalues   0.0000000E+00   13.50883       13.48704       13.50883    
 
 
      CGMAT cycle number =     18
 
- function value    14.35129    
+ function value    13.48704    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.5820408E-02
- Not converging with gamma equal   4.5820408E-02
- Trying gamma equal   5.8445673E-02
- Gamma decreased to   5.5920620E-02
+ Trying gamma equal   0.1245837    
+ Gamma decreased to   0.1220587    
 
 
- fvalues   0.0000000E+00   14.35129       14.34999       14.35129    
+ fvalues   0.0000000E+00   13.48704       13.46502       13.48704    
 
 
      CGMAT cycle number =     19
 
- function value    14.34999    
+ function value    13.46502    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.5920620E-02
- Gamma decreased to   5.3625118E-02
+ Trying gamma equal   0.1220587    
+ Gamma decreased to   0.1197632    
 
 
- fvalues   0.0000000E+00   14.34999       14.34866       14.34999    
+ fvalues   0.0000000E+00   13.46502       13.44276       13.46502    
 
 
      CGMAT cycle number =     20
 
- function value    14.34866    
+ function value    13.44276    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.3625118E-02
- Gamma decreased to   5.1538296E-02
+ Trying gamma equal   0.1197632    
+ Gamma decreased to   0.1176763    
 
 
- fvalues   0.0000000E+00   14.34866       14.34731       14.34866    
+ fvalues   0.0000000E+00   13.44276       13.42032       13.44276    
 
 
      CGMAT cycle number =     21
 
- function value    14.34731    
+ function value    13.42032    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.1538296E-02
- Gamma decreased to   4.9641185E-02
+ Trying gamma equal   0.1176763    
+ Gamma decreased to   0.1157792    
 
 
- fvalues   0.0000000E+00   14.34731       14.34597       14.34731    
+ fvalues   0.0000000E+00   13.42032       13.39769       13.42032    
 
 
      CGMAT cycle number =     22
 
- function value    14.34597    
+ function value    13.39769    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.9641185E-02
- Gamma decreased to   4.7916539E-02
+ Trying gamma equal   0.1157792    
+ Gamma decreased to   0.1140546    
 
 
- fvalues   0.0000000E+00   14.34597       14.34460       14.34597    
+ fvalues   0.0000000E+00   13.39769       13.37491       13.39769    
 
 
      CGMAT cycle number =     23
 
- function value    14.34460    
+ function value    13.37491    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.7916539E-02
- Gamma decreased to   4.6348680E-02
+ Trying gamma equal   0.1140546    
+ Gamma decreased to   0.1124867    
 
 
- fvalues   0.0000000E+00   14.34460       14.34321       14.34460    
+ fvalues   0.0000000E+00   13.37491       13.35198       13.37491    
 
 
      CGMAT cycle number =     24
 
- function value    14.34321    
+ function value    13.35198    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.6348680E-02
- Gamma decreased to   4.4923354E-02
+ Trying gamma equal   0.1124867    
+ Gamma decreased to   0.1110614    
 
 
- fvalues   0.0000000E+00   14.34321       14.34187       14.34321    
+ fvalues   0.0000000E+00   13.35198       13.32893       13.35198    
 
 
      CGMAT cycle number =     25
 
- function value    14.34187    
+ function value    13.32893    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.4923354E-02
- Gamma decreased to   4.3627601E-02
+ Trying gamma equal   0.1110614    
+ Gamma decreased to   0.1097656    
 
 
- fvalues   0.0000000E+00   14.34187       14.34048       14.34187    
+ fvalues   0.0000000E+00   13.32893       13.30578       13.32893    
 
 
      CGMAT cycle number =     26
 
- function value    14.34048    
+ function value    13.30578    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.3627601E-02
- Gamma decreased to   4.2449646E-02
+ Trying gamma equal   0.1097656    
+ Gamma decreased to   0.1085877    
 
 
- fvalues   0.0000000E+00   14.34048       14.33912       14.34048    
+ fvalues   0.0000000E+00   13.30578       13.28253       13.30578    
 
 
      CGMAT cycle number =     27
 
- function value    14.33912    
+ function value    13.28253    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.2449646E-02
- Gamma decreased to   4.1378777E-02
+ Trying gamma equal   0.1085877    
+ Gamma decreased to   0.1075168    
 
 
- fvalues   0.0000000E+00   14.33912       14.33772       14.33912    
+ fvalues   0.0000000E+00   13.28253       13.25921       13.28253    
 
 
      CGMAT cycle number =     28
 
- function value    14.33772    
+ function value    13.25921    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.1378777E-02
- Not converging with gamma equal   4.1378777E-02
- Trying gamma equal   4.6489742E-02
- Gamma decreased to   4.5467548E-02
+ Trying gamma equal   0.1075168    
+ Gamma decreased to   0.1065433    
 
 
- fvalues   0.0000000E+00   14.33772       14.33650       14.33772    
+ fvalues   0.0000000E+00   13.25921       13.23585       13.25921    
 
 
      CGMAT cycle number =     29
 
- function value    14.33650    
+ function value    13.23585    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.5467548E-02
- Not converging with gamma equal   4.5467548E-02
- Trying gamma equal   5.0346196E-02
- Gamma decreased to   4.9370468E-02
+ Trying gamma equal   0.1065433    
+ Gamma decreased to   0.1056583    
 
 
- fvalues   0.0000000E+00   14.33650       14.33538       14.33650    
+ fvalues   0.0000000E+00   13.23585       13.21241       13.23585    
 
 
      CGMAT cycle number =     30
 
- function value    14.33538    
+ function value    13.21241    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   4.9370468E-02
- Not converging with gamma equal   4.9370468E-02
- Trying gamma equal   5.4027360E-02
- Not converging with gamma equal   5.4027360E-02
- Trying gamma equal   5.8917094E-02
- Gamma decreased to   5.7939146E-02
+ Trying gamma equal   0.1056583    
+ Gamma decreased to   0.1048537    
 
 
- fvalues   0.0000000E+00   14.33538       14.33442       14.33538    
+ fvalues   0.0000000E+00   13.21241       13.18895       13.21241    
 
 
      CGMAT cycle number =     31
 
- function value    14.33442    
+ function value    13.18895    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.7939146E-02
- Gamma decreased to   5.7050101E-02
+ Trying gamma equal   0.1048537    
+ Gamma decreased to   0.1041223    
 
 
- fvalues   0.0000000E+00   14.33442       14.33348       14.33442    
+ fvalues   0.0000000E+00   13.18895       13.16547       13.18895    
 
 
      CGMAT cycle number =     32
 
- function value    14.33348    
+ function value    13.16547    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.7050101E-02
- Gamma decreased to   5.6241881E-02
+ Trying gamma equal   0.1041223    
+ Gamma decreased to   0.1034574    
 
 
- fvalues   0.0000000E+00   14.33348       14.33250       14.33348    
+ fvalues   0.0000000E+00   13.16547       13.14198       13.16547    
 
 
      CGMAT cycle number =     33
 
- function value    14.33250    
+ function value    13.14198    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.6241881E-02
- Gamma decreased to   5.5507135E-02
+ Trying gamma equal   0.1034574    
+ Gamma decreased to   0.1028529    
 
 
- fvalues   0.0000000E+00   14.33250       14.33154       14.33250    
+ fvalues   0.0000000E+00   13.14198       13.11851       13.14198    
 
 
      CGMAT cycle number =     34
 
- function value    14.33154    
+ function value    13.11851    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.5507135E-02
- Gamma decreased to   5.4839183E-02
+ Trying gamma equal   0.1028529    
+ Gamma decreased to   0.1023034    
 
 
- fvalues   0.0000000E+00   14.33154       14.33060       14.33154    
+ fvalues   0.0000000E+00   13.11851       13.09501       13.11851    
 
 
      CGMAT cycle number =     35
 
- function value    14.33060    
+ function value    13.09501    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.4839183E-02
- Gamma decreased to   5.4231953E-02
+ Trying gamma equal   0.1023034    
+ Gamma decreased to   0.1018038    
 
 
- fvalues   0.0000000E+00   14.33060       14.32963       14.33060    
+ fvalues   0.0000000E+00   13.09501       13.07154       13.09501    
 
 
      CGMAT cycle number =     36
 
- function value    14.32963    
+ function value    13.07154    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.4231953E-02
- Gamma decreased to   5.3679928E-02
+ Trying gamma equal   0.1018038    
+ Gamma decreased to   0.1013497    
 
 
- fvalues   0.0000000E+00   14.32963       14.32870       14.32963    
+ fvalues   0.0000000E+00   13.07154       13.04814       13.07154    
 
 
      CGMAT cycle number =     37
 
- function value    14.32870    
+ function value    13.04814    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.3679928E-02
- Gamma decreased to   5.3178087E-02
+ Trying gamma equal   0.1013497    
+ Gamma decreased to   0.1009368    
 
 
- fvalues   0.0000000E+00   14.32870       14.32773       14.32870    
+ fvalues   0.0000000E+00   13.04814       13.02477       13.04814    
 
 
      CGMAT cycle number =     38
 
- function value    14.32773    
+ function value    13.02477    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.3178087E-02
- Gamma decreased to   5.2721869E-02
+ Trying gamma equal   0.1009368    
+ Gamma decreased to   0.1005615    
 
 
- fvalues   0.0000000E+00   14.32773       14.32681       14.32773    
+ fvalues   0.0000000E+00   13.02477       13.00145       13.02477    
 
 
      CGMAT cycle number =     39
 
- function value    14.32681    
+ function value    13.00145    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
 -------------------------------------------------------------------------------
- Trying gamma equal   5.2721869E-02
- Gamma decreased to   5.2307125E-02
+ Trying gamma equal   0.1005615    
+ Gamma decreased to   0.1002202    
 
 
- fvalues   0.0000000E+00   14.32681       14.32586       14.32681    
+ fvalues   0.0000000E+00   13.00145       12.97815       13.00145    
 
 
      CGMAT cycle number =     40
 
- function value    14.32586    
+ function value    12.97815    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    18     0.003     0.014
 Bond distances: others                           17     0.001     0.019
-Bond angles  : refined atoms                     23     0.773     1.660
-Bond angles  : others                            36     0.171     1.443
-Chiral centres: refined atoms                     1     0.029     0.200
-Planar groups: refined atoms                     16     0.000     0.020
-Planar groups: others                             4     0.000     0.020
-VDW repulsions: refined_atoms                     2     0.054     0.200
-VDW repulsions.others                            10     0.203     0.200
-VDW; torsion: refined_atoms                       8     0.245     0.200
-VDW; torsion.others                               8     0.039     0.200
+Bond angles  : refined atoms                     23     0.520     1.660
+Bond angles  : others                            36     0.172     1.443
+Chiral centres: refined atoms                     1     0.018     0.200
+Planar groups: refined atoms                      9     0.003     0.020
+Planar groups: others                             3     0.001     0.020
+VDW repulsions.others                             6     0.270     0.200
+VDW; torsion: refined_atoms                       7     0.254     0.200
+VDW; torsion.others                              10     0.049     0.200
 -------------------------------------------------------------------------------
- Trying gamma equal   5.2307125E-02
- Gamma decreased to   5.1930085E-02
+ Trying gamma equal   0.1002202    
+ Gamma decreased to   9.9910058E-02
 
 
- fvalues   0.0000000E+00   14.32586       14.32491       14.32586    
-  Time in seconds: CPU =         0.12
+ fvalues   0.0000000E+00   12.97815       12.95495       12.97815    
+  Time in seconds: CPU =         0.13
              Elapsed =           0.00
 
     ****           Things for loggraph, R factor and others vs cycle            ****
@@ -912,53 +900,53 @@ $GRAPHS:<Rfactor> vs cycle :N:1,2,3:
 $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
-       0   0.0      0.0      0.0             0.       0.0   0.0029  0.213   0.778  0.446   0.027
-       1   0.0      0.0      0.0             0.       0.0   0.0028  0.199   0.774  0.444   0.031
-       2   0.0      0.0      0.0             0.       0.0   0.0028  0.199   0.775  0.444   0.030
-       3   0.0      0.0      0.0             0.       0.0   0.0028  0.203   0.776  0.444   0.029
-       4   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.778  0.444   0.029
-       5   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.778  0.444   0.028
-       6   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.777  0.443   0.028
-       7   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-       8   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-       9   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      10   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      11   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      12   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      13   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      14   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      15   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      16   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.776  0.443   0.028
-      17   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      18   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      19   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      20   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      21   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      22   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      23   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      24   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      25   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.775  0.443   0.028
-      26   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.028
-      27   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      28   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      29   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      30   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      31   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      32   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      33   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.443   0.029
-      34   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.774  0.442   0.029
-      35   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.773  0.442   0.029
-      36   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.773  0.442   0.029
-      37   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.773  0.442   0.029
-      38   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.773  0.442   0.029
-      39   0.0      0.0      0.0             0.       0.0   0.0028  0.205   0.773  0.442   0.029
+       0   0.0      0.0      0.0             0.       0.0   0.0028  0.206   0.576  0.316   0.022
+       1   0.0      0.0      0.0             0.       0.0   0.0028  0.193   0.584  0.318   0.024
+       2   0.0      0.0      0.0             0.       0.0   0.0029  0.203   0.550  0.306   0.022
+       3   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.558  0.307   0.021
+       4   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.559  0.306   0.021
+       5   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.559  0.306   0.021
+       6   0.0      0.0      0.0             0.       0.0   0.0028  0.203   0.558  0.305   0.020
+       7   0.0      0.0      0.0             0.       0.0   0.0028  0.203   0.558  0.305   0.020
+       8   0.0      0.0      0.0             0.       0.0   0.0028  0.203   0.557  0.304   0.020
+       9   0.0      0.0      0.0             0.       0.0   0.0028  0.203   0.556  0.303   0.020
+      10   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.555  0.303   0.020
+      11   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.554  0.302   0.020
+      12   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.553  0.301   0.020
+      13   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.552  0.300   0.020
+      14   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.551  0.300   0.020
+      15   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.550  0.299   0.020
+      16   0.0      0.0      0.0             0.       0.0   0.0028  0.202   0.548  0.298   0.020
+      17   0.0      0.0      0.0             0.       0.0   0.0028  0.201   0.547  0.297   0.020
+      18   0.0      0.0      0.0             0.       0.0   0.0028  0.201   0.546  0.297   0.020
+      19   0.0      0.0      0.0             0.       0.0   0.0028  0.201   0.545  0.296   0.019
+      20   0.0      0.0      0.0             0.       0.0   0.0028  0.201   0.544  0.295   0.019
+      21   0.0      0.0      0.0             0.       0.0   0.0028  0.200   0.542  0.294   0.019
+      22   0.0      0.0      0.0             0.       0.0   0.0028  0.200   0.541  0.294   0.019
+      23   0.0      0.0      0.0             0.       0.0   0.0028  0.200   0.540  0.293   0.019
+      24   0.0      0.0      0.0             0.       0.0   0.0028  0.200   0.539  0.292   0.019
+      25   0.0      0.0      0.0             0.       0.0   0.0028  0.200   0.538  0.291   0.019
+      26   0.0      0.0      0.0             0.       0.0   0.0028  0.199   0.536  0.290   0.019
+      27   0.0      0.0      0.0             0.       0.0   0.0028  0.199   0.535  0.290   0.019
+      28   0.0      0.0      0.0             0.       0.0   0.0028  0.199   0.534  0.289   0.019
+      29   0.0      0.0      0.0             0.       0.0   0.0028  0.199   0.533  0.288   0.019
+      30   0.0      0.0      0.0             0.       0.0   0.0028  0.198   0.531  0.287   0.019
+      31   0.0      0.0      0.0             0.       0.0   0.0028  0.198   0.530  0.287   0.019
+      32   0.0      0.0      0.0             0.       0.0   0.0028  0.198   0.529  0.286   0.019
+      33   0.0      0.0      0.0             0.       0.0   0.0028  0.198   0.528  0.285   0.019
+      34   0.0      0.0      0.0             0.       0.0   0.0028  0.198   0.526  0.284   0.019
+      35   0.0      0.0      0.0             0.       0.0   0.0028  0.197   0.525  0.284   0.019
+      36   0.0      0.0      0.0             0.       0.0   0.0028  0.197   0.524  0.283   0.018
+      37   0.0      0.0      0.0             0.       0.0   0.0028  0.197   0.523  0.282   0.018
+      38   0.0      0.0      0.0             0.       0.0   0.0027  0.197   0.521  0.281   0.018
+      39   0.0      0.0      0.0             0.       0.0   0.0027  0.196   0.520  0.281   0.018
  $$
  $TEXT:Result: $$ Final results $$
  $$
  Harvest: NO PNAME_KEYWRD given - no deposit file created
 <B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
  Refmac_5.8.0073:  End of Refmac_5.8.0073  
-Times: User:       1.9s System:    0.1s Elapsed:     0:02  
+Times: User:       2.0s System:    0.1s Elapsed:     0:02  
 </pre>
 </html>
 <!--SUMMARY_END--></FONT></B>

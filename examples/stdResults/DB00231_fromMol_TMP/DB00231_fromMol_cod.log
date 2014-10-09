@@ -634,79 +634,89 @@ Atom chemType of COD classes: H
 Atom ID: H13
 Atom chemType: H
 Atom chemType of COD classes: H
- Set atom id O1 bond idx 2
+O atom  charge 0
+connections 2
+Atom Name O1 bonding index 2
+Its element type O
+
  Its ccp4 type OH1
- Set atom id O2 bond idx 0
+Atom Name O2 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id N1 bond idx 2
+Atom Name N1 bonding index 2
+Its element type N
+
  Its ccp4 type N
- Set atom id N2 bond idx 2
+Atom Name N2 bonding index 2
+Its element type N
+
  Its ccp4 type N
-atom id C1 C atom 
- H atom connection 0
- Set atom id C1 bond idx 2
+Atom Name C1 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C2 C atom 
- H atom connection 0
- Set atom id C2 bond idx 2
+Atom Name C2 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C3 C atom 
- H atom connection 0
- Set atom id C3 bond idx 2
+Atom Name C3 bonding index 2
+Its element type C
+
  Its ccp4 type C
-atom id C4 C atom 
- H atom connection 1
- Set atom id C4 bond idx 3
+Atom Name C4 bonding index 3
+Its element type C
+
  Its ccp4 type CH1
-atom id C5 C atom 
- H atom connection 0
- Set atom id C5 bond idx 2
+Atom Name C5 bonding index 2
+Its element type C
+
  Its ccp4 type C
-atom id C6 C atom 
- H atom connection 0
- Set atom id C6 bond idx 2
+Atom Name C6 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C7 C atom 
- H atom connection 1
- Set atom id C7 bond idx 2
+Atom Name C7 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C8 C atom 
- H atom connection 1
- Set atom id C8 bond idx 2
+Atom Name C8 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C9 C atom 
- H atom connection 3
- Set atom id C9 bond idx 3
+Atom Name C9 bonding index 3
+Its element type C
+
  Its ccp4 type CH3
-atom id C10 C atom 
- H atom connection 0
- Set atom id C10 bond idx 2
+Atom Name C10 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C11 C atom 
- H atom connection 1
- Set atom id C11 bond idx 2
+Atom Name C11 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C12 C atom 
- H atom connection 1
- Set atom id C12 bond idx 2
+Atom Name C12 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C13 C atom 
- H atom connection 1
- Set atom id C13 bond idx 2
+Atom Name C13 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C14 C atom 
- H atom connection 1
- Set atom id C14 bond idx 2
+Atom Name C14 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C15 C atom 
- H atom connection 1
- Set atom id C15 bond idx 2
+Atom Name C15 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C16 C atom 
- H atom connection 1
- Set atom id C16 bond idx 2
+Atom Name C16 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-Atom Cl1 Its sp idx 0 CCP4 atom type is Cl
+Atom Cl1 Its sp idx 0 CCP4 atom type is CL
 Atom O1 Its sp idx 2 CCP4 atom type is OH1
 Atom O2 Its sp idx 0 CCP4 atom type is O
 Atom N1 Its sp idx 2 CCP4 atom type is N
@@ -1256,79 +1266,89 @@ atom H10
 atom C13
 atom C6
 atom C3
- Set atom id O1 bond idx 2
+O atom  charge 0
+connections 2
+Atom Name O1 bonding index 2
+Its element type O
+
  Its ccp4 type OH1
- Set atom id O2 bond idx 0
+Atom Name O2 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id N1 bond idx 2
+Atom Name N1 bonding index 2
+Its element type N
+
  Its ccp4 type N
- Set atom id N2 bond idx 2
+Atom Name N2 bonding index 2
+Its element type N
+
  Its ccp4 type N
-atom id C1 C atom 
- H atom connection 0
- Set atom id C1 bond idx 2
+Atom Name C1 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C2 C atom 
- H atom connection 0
- Set atom id C2 bond idx 2
+Atom Name C2 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C3 C atom 
- H atom connection 0
- Set atom id C3 bond idx 2
+Atom Name C3 bonding index 2
+Its element type C
+
  Its ccp4 type C
-atom id C4 C atom 
- H atom connection 1
- Set atom id C4 bond idx 3
+Atom Name C4 bonding index 3
+Its element type C
+
  Its ccp4 type CH1
-atom id C5 C atom 
- H atom connection 0
- Set atom id C5 bond idx 2
+Atom Name C5 bonding index 2
+Its element type C
+
  Its ccp4 type C
-atom id C6 C atom 
- H atom connection 0
- Set atom id C6 bond idx 2
+Atom Name C6 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C7 C atom 
- H atom connection 1
- Set atom id C7 bond idx 2
+Atom Name C7 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C8 C atom 
- H atom connection 1
- Set atom id C8 bond idx 2
+Atom Name C8 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C9 C atom 
- H atom connection 3
- Set atom id C9 bond idx 3
+Atom Name C9 bonding index 3
+Its element type C
+
  Its ccp4 type CH3
-atom id C10 C atom 
- H atom connection 0
- Set atom id C10 bond idx 2
+Atom Name C10 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C11 C atom 
- H atom connection 1
- Set atom id C11 bond idx 2
+Atom Name C11 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C12 C atom 
- H atom connection 1
- Set atom id C12 bond idx 2
+Atom Name C12 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C13 C atom 
- H atom connection 1
- Set atom id C13 bond idx 2
+Atom Name C13 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C14 C atom 
- H atom connection 1
- Set atom id C14 bond idx 2
+Atom Name C14 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C15 C atom 
- H atom connection 1
- Set atom id C15 bond idx 2
+Atom Name C15 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-atom id C16 C atom 
- H atom connection 1
- Set atom id C16 bond idx 2
+Atom Name C16 bonding index 2
+Its element type C
+
  Its ccp4 type CR16
-Atom Cl1 Its sp idx 0 CCP4 atom type is Cl
+Atom Cl1 Its sp idx 0 CCP4 atom type is CL
 Atom O1 Its sp idx 2 CCP4 atom type is OH1
 Atom O2 Its sp idx 0 CCP4 atom type is O
 Atom N1 Its sp idx 2 CCP4 atom type is N
@@ -1367,7 +1387,7 @@ Atom 0 :
 Its ID : Cl1
 Its Chemical Type : Cl
 Its bonding index : 0
-Its CCP4 atom type : Cl
+Its CCP4 atom type : CL
 Its residue Name: 
 Its connected atoms are : 
 C10
@@ -1809,9 +1829,9 @@ class is H(C[6]CC)
 For atom H13
 class is H(C[6]CC)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 13:59:39 2014
+Clustering COD org bonds started at Thu Oct  9 20:28:23 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 13:59:41 2014
+finished at Thu Oct  9 20:28:25 2014
 it takes 2 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between Cl1 and C10
@@ -1823,7 +1843,7 @@ ha1 29 ha2 517
  a1NB2 3:3:1: a2NB2 3:
  a1NB C[6]-3:C[6]-3:Cl-1: a2NB C[6]-3:
  a1C C[6](C[6]CH)2(Cl) a2C Cl(C[6]CC)
-atom 1 CR6  atom 2 Cl
+atom 1 CR6  atom 2 CL
 Found all hashing codes
 find 3:3:1:
  find 3:
@@ -2447,9 +2467,9 @@ The final target bond value is 0.958
 Number of Bonds to be found 36
 Number of Bonds found 36
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 13:59:42 2014
-Clustering COD org angles finished at Fri Sep 12 13:59:48 2014
-it takes 6 seconds to finish group COD angles 
+Clustering all COD angles started at Thu Oct  9 20:28:27 2014
+Clustering COD org angles finished at Thu Oct  9 20:28:32 2014
+it takes 5 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
 Finish groupCodAnglesWithNonCenteredMetal() 
@@ -3438,8 +3458,35 @@ Atom C14
 Atom C15
 Atom C16
 Finish searching angles 
+There are 2 planes 
+One Plane. It has 12 They are : 
+Atom C1
+Atom C10
+Atom C11
+Atom C2
+Atom C3
+Atom C7
+Atom C8
+Atom Cl1
+Atom H3
+Atom H4
+Atom H8
+Atom N1
+One Plane. It has 12 They are : 
+Atom C12
+Atom C13
+Atom C14
+Atom C15
+Atom C16
+Atom C3
+Atom C6
+Atom H10
+Atom H11
+Atom H12
+Atom H13
+Atom H9
 The system for global optimization is initiated
-Geometrical optimization started at Fri Sep 12 13:59:49 2014
+Geometrical optimization started at Thu Oct  9 20:28:34 2014
  Not found start atom under the first atom 
 Atom N1 is the starting atom 
 Atom N1 has a child C1
@@ -3725,37 +3772,105 @@ We have 0 optimal sets
 number of local min found 1
 We have 1 optimal sets 
 The 3the OptimSet is stored 
-Its curObjValue 119
+Its curObjValue 84.7
 number of local min found 3
 We have 3 optimal sets 
 The 5the OptimSet is stored 
-Its curObjValue 113
+Its curObjValue 79.8
 number of local min found 5
 We have 5 optimal sets 
 The 7the OptimSet is stored 
-Its curObjValue 104
+Its curObjValue 71.3
 number of local min found 7
 We have 7 optimal sets 
 The 9the OptimSet is stored 
-Its curObjValue 81.3
+Its curObjValue 66.5
 number of local min found 9
 We have 9 optimal sets 
 The 11the OptimSet is stored 
-Its curObjValue 80.1
+Its curObjValue 66
 number of local min found 11
 The following are optimized sets 
-Set objective value 80.1
-Set objective value 80.1
-Set objective value 81.3
-Set objective value 81.3
-Set objective value 104
-Set objective value 104
-Set objective value 113
-Set objective value 113
-Set objective value 119
-Set objective value 119
-Set objective value 136
- Geometrical optimization finished at Fri Sep 12 14:00:01 2014
-it takes 12 seconds
+Set objective value 66
+Set objective value 66
+Set objective value 66.5
+Set objective value 66.5
+Set objective value 71.3
+Set objective value 71.3
+Set objective value 79.8
+Set objective value 79.8
+Set objective value 84.7
+Set objective value 84.7
+Set objective value 96.9
+ Geometrical optimization finished at Thu Oct  9 20:28:43 2014
+it takes 9 seconds
+Cl1
+Cl1
+O1
+O1
+O2
+O2
+N1
+N1
+N2
+N2
+C1
+C1
+C2
+C2
+C3
+C3
+C4
+C4
+C5
+C5
+C6
+C6
+C7
+C7
+C8
+C8
+C9
+C9
+C10
+C10
+C11
+C11
+C12
+C12
+C13
+C13
+C14
+C14
+C15
+C15
+C16
+C16
+H1
+H1
+H2
+H2
+H3
+H3
+H4
+H4
+H5
+H5
+H6
+H6
+H7
+H7
+H8
+H8
+H9
+H9
+H10
+H10
+H11
+H11
+H12
+H12
+H13
+H13
 =========END OF PROCESS INFORMATION
  ==========

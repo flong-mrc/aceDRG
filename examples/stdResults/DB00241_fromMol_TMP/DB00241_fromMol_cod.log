@@ -577,65 +577,75 @@ Atom chemType of COD classes: H
 Atom ID: H16
 Atom chemType: H
 Atom chemType of COD classes: H
- Set atom id O1 bond idx 0
+Atom Name O1 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id O2 bond idx 0
+Atom Name O2 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id O3 bond idx 0
+Atom Name O3 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id N1 bond idx 2
- Its ccp4 type NR16
- Set atom id N2 bond idx 2
- Its ccp4 type NR16
-atom id C1 C atom 
- H atom connection 0
- Set atom id C1 bond idx 3
+Atom Name N1 bonding index 2
+Its element type N
+
+ Its ccp4 type NR6
+Atom Name N2 bonding index 2
+Its element type N
+
+ Its ccp4 type NR6
+Atom Name C1 bonding index 3
+Its element type C
+
  Its ccp4 type CT
-atom id C2 C atom 
- H atom connection 2
- Set atom id C2 bond idx 3
+Atom Name C2 bonding index 3
+Its element type C
+
  Its ccp4 type CH2
-atom id C3 C atom 
- H atom connection 1
- Set atom id C3 bond idx 3
+Atom Name C3 bonding index 3
+Its element type C
+
  Its ccp4 type CH1
-atom id C4 C atom 
- H atom connection 2
- Set atom id C4 bond idx 3
+Atom Name C4 bonding index 3
+Its element type C
+
  Its ccp4 type CH2
-atom id C5 C atom 
- H atom connection 0
- Set atom id C5 bond idx 2
+Atom Name C5 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C6 C atom 
- H atom connection 0
- Set atom id C6 bond idx 2
+Atom Name C6 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C7 C atom 
- H atom connection 3
- Set atom id C7 bond idx 3
+Atom Name C7 bonding index 3
+Its element type C
+
  Its ccp4 type CH3
-atom id C8 C atom 
- H atom connection 3
- Set atom id C8 bond idx 3
+Atom Name C8 bonding index 3
+Its element type C
+
  Its ccp4 type CH3
-atom id C9 C atom 
- H atom connection 1
- Set atom id C9 bond idx 2
+Atom Name C9 bonding index 2
+Its element type C
+
  Its ccp4 type C1
-atom id C10 C atom 
- H atom connection 0
- Set atom id C10 bond idx 2
+Atom Name C10 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C11 C atom 
- H atom connection 2
- Set atom id C11 bond idx 2
+Atom Name C11 bonding index 2
+Its element type C
+
  Its ccp4 type C2
 Atom O1 Its sp idx 0 CCP4 atom type is O
 Atom O2 Its sp idx 0 CCP4 atom type is O
 Atom O3 Its sp idx 0 CCP4 atom type is O
-Atom N1 Its sp idx 2 CCP4 atom type is NR16
-Atom N2 Its sp idx 2 CCP4 atom type is NR16
+Atom N1 Its sp idx 2 CCP4 atom type is NR6
+Atom N2 Its sp idx 2 CCP4 atom type is NR6
 Atom C1 Its sp idx 3 CCP4 atom type is CT
 Atom C2 Its sp idx 3 CCP4 atom type is CH2
 Atom C3 Its sp idx 3 CCP4 atom type is CH1
@@ -1170,65 +1180,75 @@ atom H16
 atom C11
 atom C9
 atom H14
- Set atom id O1 bond idx 0
+Atom Name O1 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id O2 bond idx 0
+Atom Name O2 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id O3 bond idx 0
+Atom Name O3 bonding index 0
+Its element type O
+
  Its ccp4 type O
- Set atom id N1 bond idx 2
- Its ccp4 type NR16
- Set atom id N2 bond idx 2
- Its ccp4 type NR16
-atom id C1 C atom 
- H atom connection 0
- Set atom id C1 bond idx 3
+Atom Name N1 bonding index 2
+Its element type N
+
+ Its ccp4 type NR6
+Atom Name N2 bonding index 2
+Its element type N
+
+ Its ccp4 type NR6
+Atom Name C1 bonding index 3
+Its element type C
+
  Its ccp4 type CT
-atom id C2 C atom 
- H atom connection 2
- Set atom id C2 bond idx 3
+Atom Name C2 bonding index 3
+Its element type C
+
  Its ccp4 type CH2
-atom id C3 C atom 
- H atom connection 1
- Set atom id C3 bond idx 3
+Atom Name C3 bonding index 3
+Its element type C
+
  Its ccp4 type CH1
-atom id C4 C atom 
- H atom connection 2
- Set atom id C4 bond idx 3
+Atom Name C4 bonding index 3
+Its element type C
+
  Its ccp4 type CH2
-atom id C5 C atom 
- H atom connection 0
- Set atom id C5 bond idx 2
+Atom Name C5 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C6 C atom 
- H atom connection 0
- Set atom id C6 bond idx 2
+Atom Name C6 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C7 C atom 
- H atom connection 3
- Set atom id C7 bond idx 3
+Atom Name C7 bonding index 3
+Its element type C
+
  Its ccp4 type CH3
-atom id C8 C atom 
- H atom connection 3
- Set atom id C8 bond idx 3
+Atom Name C8 bonding index 3
+Its element type C
+
  Its ccp4 type CH3
-atom id C9 C atom 
- H atom connection 1
- Set atom id C9 bond idx 2
+Atom Name C9 bonding index 2
+Its element type C
+
  Its ccp4 type C1
-atom id C10 C atom 
- H atom connection 0
- Set atom id C10 bond idx 2
+Atom Name C10 bonding index 2
+Its element type C
+
  Its ccp4 type CR6
-atom id C11 C atom 
- H atom connection 2
- Set atom id C11 bond idx 2
+Atom Name C11 bonding index 2
+Its element type C
+
  Its ccp4 type C2
 Atom O1 Its sp idx 0 CCP4 atom type is O
 Atom O2 Its sp idx 0 CCP4 atom type is O
 Atom O3 Its sp idx 0 CCP4 atom type is O
-Atom N1 Its sp idx 2 CCP4 atom type is NR16
-Atom N2 Its sp idx 2 CCP4 atom type is NR16
+Atom N1 Its sp idx 2 CCP4 atom type is NR6
+Atom N2 Its sp idx 2 CCP4 atom type is NR6
 Atom C1 Its sp idx 3 CCP4 atom type is CT
 Atom C2 Its sp idx 3 CCP4 atom type is CH2
 Atom C3 Its sp idx 3 CCP4 atom type is CH1
@@ -1288,7 +1308,7 @@ Atom 3 :
 Its ID : N1
 Its Chemical Type : N
 Its bonding index : 2
-Its CCP4 atom type : NR16
+Its CCP4 atom type : NR6
 Its residue Name: 
 Its connected atoms are : 
 C5
@@ -1299,7 +1319,7 @@ Atom 4 :
 Its ID : N2
 Its Chemical Type : N
 Its bonding index : 2
-Its CCP4 atom type : NR16
+Its CCP4 atom type : NR6
 Its residue Name: 
 Its connected atoms are : 
 C6
@@ -1673,10 +1693,10 @@ class is H(CCH)
 For atom H16
 class is H(CCH)
 libmol table should be /Applications/ccp4-6.4.0/share/acedrg/tables
-Clustering COD org bonds started at Fri Sep 12 14:00:10 2014
+Clustering COD org bonds started at Thu Oct  9 20:28:53 2014
 Finish clustering COD org bonds 
-finished at Fri Sep 12 14:00:12 2014
-it takes 2 seconds to finish group COD bonds 
+finished at Thu Oct  9 20:28:54 2014
+it takes 1 seconds to finish group COD bonds 
 Group COD bonds involving metal elements 
 Bond between O1 and C5
  search a org-related bond c 
@@ -1741,7 +1761,7 @@ ha1 29 ha2 983
  a1NB2 4:3:1: a2NB2 3:3:1:
  a1NB C[6]-4:N[6]-3:O-1: a2NB C[6]-3:C[6]-3:H-1:
  a1C C[6](C[6]C3)(N[6]CH)(O) a2C N[6](C[6]CO)(C[6]NO)(H)
-atom 1 CR6  atom 2 NR16
+atom 1 CR6  atom 2 NR6
 Found all hashing codes
 find 4:3:1:
  find 3:3:1:
@@ -1759,7 +1779,7 @@ ha1 29 ha2 983
  a1NB2 3:3:1: a2NB2 3:3:1:
  a1NB N[6]-3:N[6]-3:O-1: a2NB C[6]-3:C[6]-3:H-1:
  a1C C[6](N[6]CH)2(O) a2C N[6](C[6]CO)(C[6]NO)(H)
-atom 1 CR6  atom 2 NR16
+atom 1 CR6  atom 2 NR6
 Found all hashing codes
 find 3:3:1:
  find 3:3:1:
@@ -1777,7 +1797,7 @@ ha1 29 ha2 983
  a1NB2 4:3:1: a2NB2 3:3:1:
  a1NB C[6]-4:N[6]-3:O-1: a2NB C[6]-3:C[6]-3:H-1:
  a1C C[6](C[6]C3)(N[6]CH)(O) a2C N[6](C[6]CO)(C[6]NO)(H)
-atom 1 CR6  atom 2 NR16
+atom 1 CR6  atom 2 NR6
 Found all hashing codes
 find 4:3:1:
  find 3:3:1:
@@ -1795,7 +1815,7 @@ ha1 29 ha2 983
  a1NB2 3:3:1: a2NB2 3:3:1:
  a1NB N[6]-3:N[6]-3:O-1: a2NB C[6]-3:C[6]-3:H-1:
  a1C C[6](N[6]CH)2(O) a2C N[6](C[6]CO)(C[6]NO)(H)
-atom 1 CR6  atom 2 NR16
+atom 1 CR6  atom 2 NR6
 Found all hashing codes
 find 3:3:1:
  find 3:3:1:
@@ -1975,7 +1995,7 @@ ha1 887 ha2 983
  a1NB2 3: a2NB2 3:3:1:
  a1NB N[6]-3: a2NB C[6]-3:C[6]-3:H-1:
  a1C H(N[6]CC) a2C N[6](C[6]CO)(C[6]NO)(H)
-atom 1 H  atom 2 NR16
+atom 1 H  atom 2 NR6
 Found all hashing codes
 find 3:
  find 3:3:1:
@@ -1993,7 +2013,7 @@ ha1 887 ha2 983
  a1NB2 3: a2NB2 3:3:1:
  a1NB N[6]-3: a2NB C[6]-3:C[6]-3:H-1:
  a1C H(N[6]CC) a2C N[6](C[6]CO)(C[6]NO)(H)
-atom 1 H  atom 2 NR16
+atom 1 H  atom 2 NR6
 Found all hashing codes
 find 3:
  find 3:3:1:
@@ -2255,8 +2275,8 @@ The final target bond value is 0.949
 Number of Bonds to be found 32
 Number of Bonds found 32
 Finish setDefaultCoordGeos() 
-Clustering all COD angles started at Fri Sep 12 14:00:13 2014
-Clustering COD org angles finished at Fri Sep 12 14:00:16 2014
+Clustering all COD angles started at Thu Oct  9 20:28:55 2014
+Clustering COD org angles finished at Thu Oct  9 20:28:58 2014
 it takes 3 seconds to finish group COD angles 
 Finish groupCodOrgAngles() 
 Finish groupCodMetAngles() 
@@ -3260,7 +3280,7 @@ Atom C6
 Atom C10
 Finish searching angles 
 The system for global optimization is initiated
-Geometrical optimization started at Fri Sep 12 14:00:18 2014
+Geometrical optimization started at Thu Oct  9 20:29:00 2014
  Not found start atom under the first atom 
 Atom C3 is the starting atom 
 Atom C3 has a child C8
@@ -3514,34 +3534,98 @@ We have 0 optimal sets
 number of local min found 1
 We have 1 optimal sets 
 The 3the OptimSet is stored 
-Its curObjValue 21.4
+Its curObjValue 22.6
 number of local min found 3
 We have 3 optimal sets 
-number of local min found 4
-We have 4 optimal sets 
+The 5the OptimSet is stored 
+Its curObjValue 21.6
 number of local min found 5
 We have 5 optimal sets 
 number of local min found 6
 We have 6 optimal sets 
-number of local min found 7
-We have 7 optimal sets 
+The 8the OptimSet is stored 
+Its curObjValue 20.8
 number of local min found 8
 We have 8 optimal sets 
-number of local min found 9
-We have 9 optimal sets 
+The 10the OptimSet is stored 
+Its curObjValue 20.5
 number of local min found 10
 The following are optimized sets 
-Set objective value 21.4
-Set objective value 21.4
-Set objective value 22.3
-Set objective value 26.1
-Set objective value 21.7
-Set objective value 56.2
-Set objective value 22.1
-Set objective value 21.5
-Set objective value 22.8
-Set objective value 24.4
- Geometrical optimization finished at Fri Sep 12 14:00:29 2014
-it takes 11 seconds
+Set objective value 20.5
+Set objective value 20.5
+Set objective value 20.8
+Set objective value 20.8
+Set objective value 21.6
+Set objective value 21.6
+Set objective value 22.6
+Set objective value 22.6
+Set objective value 24.8
+Set objective value 29
+ Geometrical optimization finished at Thu Oct  9 20:29:07 2014
+it takes 7 seconds
+O1
+O1
+O2
+O2
+O3
+O3
+N1
+N1
+N2
+N2
+C1
+C1
+C2
+C2
+C3
+C3
+C4
+C4
+C5
+C5
+C6
+C6
+C7
+C7
+C8
+C8
+C9
+C9
+C10
+C10
+C11
+C11
+H1
+H1
+H2
+H2
+H3
+H3
+H4
+H4
+H5
+H5
+H6
+H6
+H7
+H7
+H8
+H8
+H9
+H9
+H10
+H10
+H11
+H11
+H12
+H12
+H13
+H13
+H14
+H14
+H15
+H15
+H16
+H16
 =========END OF PROCESS INFORMATION
  ==========

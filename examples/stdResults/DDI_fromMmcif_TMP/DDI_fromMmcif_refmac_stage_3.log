@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 14:02:05 
+ User: flong  Run date:  9/10/2014 Run time: 20:30:41 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -207,7 +207,7 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
                 Bonds:        73         0        73
                Angles:       137         0       137
               Chirals:         9         0         9
-               Planes:         4         0         4
+               Planes:         3         0         3
              Torsions:       242         0       242
             Intervals:         0         0         0
 --------------------------------------------------------------------------------
@@ -221,21 +221,21 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    61.96604    
+ function value    54.12642    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
-Bond distances: refined atoms                    45     0.007     0.016
+Bond distances: refined atoms                    45     0.006     0.016
 Bond distances: others                           28     0.001     0.019
-Bond angles  : refined atoms                     70     1.623     1.849
-Bond angles  : others                            67     0.811     1.370
-Chiral centres: refined atoms                     9     0.076     0.200
-Planar groups: refined atoms                     28     0.003     0.020
-Planar groups: others                            10     0.001     0.020
-VDW repulsions: refined_atoms                     6     0.328     0.200
-VDW repulsions.others                            15     0.213     0.200
-VDW; torsion: refined_atoms                      25     0.260     0.200
-VDW; torsion.others                              10     0.116     0.200
+Bond angles  : refined atoms                     70     1.436     1.849
+Bond angles  : others                            67     0.761     1.370
+Chiral centres: refined atoms                     9     0.077     0.200
+Planar groups: refined atoms                     18     0.004     0.020
+Planar groups: others                            10     0.000     0.020
+VDW repulsions: refined_atoms                     6     0.294     0.200
+VDW repulsions.others                            14     0.205     0.200
+VDW; torsion: refined_atoms                      24     0.264     0.200
+VDW; torsion.others                               8     0.124     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   0.0000000E+00
  Not converging with gamma equal   0.0000000E+00
@@ -243,7 +243,7 @@ VDW; torsion.others                              10     0.116     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   61.96604       61.85402       61.96604    
+ fvalues   0.0000000E+00   54.12642       53.99623       54.12642    
   Time in seconds: CPU =         0.01
              Elapsed =           0.00
 
@@ -259,14 +259,14 @@ $GRAPHS:<Rfactor> vs cycle :N:1,2,3:
 $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
-       0   0.0      0.0      0.0             0.       0.0   0.0070  0.414   1.623  0.624   0.076
+       0   0.0      0.0      0.0             0.       0.0   0.0059  0.342   1.436  0.542   0.077
  $$
  $TEXT:Result: $$ Final results $$
  $$
  Harvest: NO PNAME_KEYWRD given - no deposit file created
 <B><FONT COLOR="#FF0000"><!--SUMMARY_BEGIN-->
  Refmac_5.8.0073:  End of Refmac_5.8.0073  
-Times: User:       1.9s System:    0.0s Elapsed:     0:01  
+Times: User:       2.0s System:    0.0s Elapsed:     0:02  
 </pre>
 </html>
 <!--SUMMARY_END--></FONT></B>

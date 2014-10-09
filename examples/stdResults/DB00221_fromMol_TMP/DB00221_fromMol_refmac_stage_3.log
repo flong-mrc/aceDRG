@@ -12,7 +12,7 @@
  ###############################################################
  ### CCP4 6.4: Refmac_5.8.0073     version 5.8.0073 : 25/05/14##
  ###############################################################
- User: flong  Run date: 12/ 9/2014 Run time: 13:59:34 
+ User: flong  Run date:  9/10/2014 Run time: 20:28:19 
 
 
  Please reference: Collaborative Computational Project, Number 4. 1994.
@@ -221,22 +221,22 @@ Logical name: ATOMSF, Filename: /Applications/ccp4-6.4.0/lib/data/atomsf.lib
 
      CGMAT cycle number =      1
 
- function value    12.48247    
+ function value    12.64013    
 
 -------------------------------------------------------------------------------
              Restraint type              N restraints   Rms Delta   Av(Sigma)
 Bond distances: refined atoms                    17     0.003     0.013
 Bond distances: others                           19     0.000     0.019
-Bond angles  : refined atoms                     23     0.496     1.733
-Bond angles  : others                            41     0.234     1.195
-Chiral centres: refined atoms                     3     0.053     0.200
+Bond angles  : refined atoms                     23     0.525     1.733
+Bond angles  : others                            41     0.233     1.195
+Chiral centres: refined atoms                     3     0.054     0.200
 Chiral centers: others                            1     0.038     0.200
 Planar groups: refined atoms                      9     0.001     0.020
 Planar groups: others                             3     0.000     0.020
-VDW repulsions: refined_atoms                     1     0.278     0.200
-VDW repulsions.others                            11     0.135     0.200
-VDW; torsion: refined_atoms                       6     0.282     0.200
-VDW; torsion.others                              12     0.096     0.200
+VDW repulsions: refined_atoms                     1     0.279     0.200
+VDW repulsions.others                            11     0.133     0.200
+VDW; torsion: refined_atoms                       6     0.284     0.200
+VDW; torsion.others                              12     0.098     0.200
 -------------------------------------------------------------------------------
  Trying gamma equal   0.0000000E+00
  Not converging with gamma equal   0.0000000E+00
@@ -244,7 +244,7 @@ VDW; torsion.others                              12     0.096     0.200
  Gamma decreased to   4.1999999E-02
 
 
- fvalues   0.0000000E+00   12.48247       12.40764       12.48247    
+ fvalues   0.0000000E+00   12.64013       12.56748       12.64013    
   Time in seconds: CPU =         0.00
              Elapsed =           0.00
 
@@ -260,7 +260,7 @@ $GRAPHS:<Rfactor> vs cycle :N:1,2,3:
 $$
     Ncyc    Rfact    Rfree     FOM      -LL     -LLfree  rmsBOND  zBOND rmsANGL  zANGL rmsCHIRAL $$
 $$
-       0   0.0      0.0      0.0             0.       0.0   0.0026  0.191   0.496  0.254   0.053
+       0   0.0      0.0      0.0             0.       0.0   0.0025  0.186   0.525  0.262   0.054
  $$
  $TEXT:Result: $$ Final results $$
  $$
