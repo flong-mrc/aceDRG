@@ -6504,7 +6504,7 @@ namespace LIBMOL
     }
     
     void DictCifFile::setAllTorsionsInOneRing(std::vector<int> & tBs, 
-                                              RingDict & tR)
+                                              RingDict         & tR)
     {
         
         std::vector<int> tAs, tLinkA, tBos;
@@ -7202,9 +7202,9 @@ namespace LIBMOL
                     StrLower(iB->order);
                     outRestrF << sName 
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
-                              << std::setw(12)   << tAtoms[iB->atomsIdx[1]].id  
+                              << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
                               << std::setw(12)  << iB->order 
-                              << std::setw(10) << std::setprecision(3)
+                              << std::setw(10)  << std::setprecision(3)
                               << iB->value 
                               << std::setw(8) << std::setprecision(3)
                               << iB->sigValue << std::endl;
@@ -7309,7 +7309,7 @@ namespace LIBMOL
                     //          << iT->atoms[3] << std::endl;
                 
                     outRestrF << sName 
-                              << std::setw(16) << iT->id
+                              << std::setw(22) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id 
                               << std::setw(12)  << tAtoms[iT->atoms[1]].id 
                               << std::setw(12)  << tAtoms[iT->atoms[2]].id 

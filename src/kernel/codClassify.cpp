@@ -9724,7 +9724,12 @@ namespace LIBMOL
             // std::cout << "look at torsion " << iT->seriNum << std::endl;
             if(checkATorsAtomsInPla(iT->atoms))
             {
-                iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
+                if (iT->id.size() >=16 )
+                {
+                    iT->id = "const_" + IntToStr(idxPTors);
+                }
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
                 idxPTors +=1;
             }
             else
