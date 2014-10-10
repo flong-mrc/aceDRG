@@ -167,11 +167,7 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
                             iNB !=iAt->connAtoms.end(); iNB++)
                     {
-                        if (std::find(atmIdxAll.begin(), atmIdxAll.end(), *iNB)
-                                ==atmIdxAll.end())
-                        {
-                            aPL.atoms[tAtoms[*iNB].id]=tAtoms[*iNB].seriNum;
-                        }
+                        aPL.atoms[tAtoms[*iNB].id]=tAtoms[*iNB].seriNum;
                     }
                 }
                 
