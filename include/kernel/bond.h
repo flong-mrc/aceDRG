@@ -187,6 +187,7 @@ namespace LIBMOL
         int                     numCodValues;
         int                     numCodValuesP;
         bool                    isInSameRing;
+        bool                    isAromatic;
         
         std::map<ID, int>       fullAtoms; // for atoms from SMILE, ID is chemType
         std::vector<ID>         atoms;

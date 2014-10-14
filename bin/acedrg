@@ -604,9 +604,6 @@ class Acedrg(CExeCode ):
                 print self._cmdline
                 self.subExecute()
                 
- 
-
-             
         if self.workMode == 41 :
 
             self._cmdline += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)

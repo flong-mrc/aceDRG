@@ -1396,8 +1396,8 @@ namespace LIBMOL
     }
     
     
-    void extern setAromPlanes(std::vector<AtomDict> & tAtoms,
-                              std::vector<RingDict> & tRings, 
+    void extern setAromPlanes(std::vector<AtomDict>  & tAtoms,
+                              std::vector<RingDict>  & tRings, 
                               std::vector<PlaneDict> & tPlans)
     {
         // 1. 

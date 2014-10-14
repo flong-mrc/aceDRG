@@ -67,6 +67,9 @@
 #include "include/go/LinAlg.h"
 #endif
 
+#ifndef RING_H
+#include "ring.h"
+#endif
 
 //using namespace GO;
 //using namespace FF;
@@ -374,7 +377,8 @@ int main(int argc, char** argv) {
             // CodClassify  aCodSystem(aTargetSystem.allAtoms);
             LIBMOL::CodClassify  aCodSystem(aTargetSystem, AJob.IOEntries["libMolTabDir"]);
             aCodSystem.codAtomClassify(2);
-            outCodAndCcp4AtomTypes(AJob.IOEntries["userOutName"].c_str(),
+            
+            LIBMOL::outCodAndCcp4AtomTypes(AJob.IOEntries["userOutName"].c_str(),
                                    aCodSystem.allAtoms);
             
             LIBMOL::CCP4AtomType  aCPP4TypeTool(aCodSystem.allAtoms, aCodSystem.allRings);
@@ -388,6 +392,25 @@ int main(int argc, char** argv) {
                               << "     " << aCodSystem.allAtoms[i].ccp4Type << std::endl;
                 }
             }
+            
+            if (aCodSystem.allRings.size() != 0)
+            {
+                std::vector<LIBMOL::RingDict> aRingSys;
+                for (std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> >::iterator iMR=
+                        aCodSystem.allRings.begin(); iMR !=aCodSystem.allRings.end(); iMR++)
+                {
+                    for (std::vector<LIBMOL::RingDict>::iterator iR=iMR->second.begin();
+                            iR !=iMR->second.end(); iR++)
+                    {
+                        aRingSys.push_back(*iR);
+                    }
+                }
+                
+                // LIBMOL::TestAromaticity(aRingSys, aCodSystem.allAtoms);
+                LIBMOL::checkAndSetupPlanes(aRingSys, aCodSystem.allPlanes, aCodSystem.allAtoms);
+                
+            }
+            
         }
     }
     else if (AJob.workMode == 42)

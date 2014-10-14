@@ -289,7 +289,7 @@ namespace LIBMOL // temp
        
         int      hashingValue;
         bool     coordExist;
-        bool     hasFreePi;
+        int      numPi;
         
         bool     isCChemTypeSet;
         bool     isInPreCell;
@@ -348,6 +348,9 @@ namespace LIBMOL // temp
                                             // element 3: one more neighbor layers
                                             //        than key 2
     };
+    
+    
+    
     
  
 }

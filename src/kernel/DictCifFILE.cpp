@@ -7094,13 +7094,15 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
         {
-            std::cout << iA->id << std::endl;
+            // std::cout << iA->id << std::endl;
             if (iA->id.find("\'") !=std::string::npos)
             {
                 iA->id = "\"" + iA->id + "\"";
             }
-            std::cout << iA->id << std::endl;
+            // std::cout << iA->id << std::endl;
         }
+        
+        // std::cout << "Print Pos " << std::endl;
         
         std::ofstream outRestrF(tFName);
         
@@ -7192,6 +7194,7 @@ namespace LIBMOL
                           << "_chem_comp_bond.atom_id_1" << std::endl
                           << "_chem_comp_bond.atom_id_2" << std::endl
                           << "_chem_comp_bond.type" << std::endl
+                          << "_chem_comp_bond.aromatic"  << std::endl
                           << "_chem_comp_bond.value_dist"<< std::endl
                           << "_chem_comp_bond.value_dist_esd" << std::endl;
                           // << "_chem_comp_bond.exact_cod_dist" << std::endl;
@@ -7200,10 +7203,20 @@ namespace LIBMOL
                           iB !=tBonds.end(); iB++)
                 {
                     StrLower(iB->order);
+                    std::string tAr;
+                    if (iB->isAromatic)
+                    {
+                        tAr = "y";
+                    }
+                    else
+                    {
+                        tAr = "n";
+                    }
                     outRestrF << sName 
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
                               << std::setw(12)  << iB->order 
+                              << std::setw(8)   << tAr
                               << std::setw(10)  << std::setprecision(3)
                               << iB->value 
                               << std::setw(8) << std::setprecision(3)
@@ -7546,7 +7559,7 @@ namespace LIBMOL
                         tId = iA->id;
                     }
            
-                    std::cout << "here " << tId << std::endl;
+                    // std::cout << "here " << tId << std::endl;
                     outRestrF << sName 
                               << std::setw(12) << tId 
                               << std::setw(6) << iA->chemType 

@@ -186,7 +186,12 @@ namespace LIBMOL
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
-                
+                case 'T':
+                    IOEntries["TestMode"] = optarg;
+                    StrLower(IOEntries["TestMode"]);
+                    //std::cout << "COD atom types are output to : " 
+                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    break;
                 case '?':
                     if (std::isprint(optopt))
                     {
@@ -437,6 +442,10 @@ namespace LIBMOL
                     workMode =42;
                 }
             }
+        }
+        else if (IOEntries.find("TestMode") !=IOEntries.end())
+        {
+            workMode = 900;
         }
         else
         {

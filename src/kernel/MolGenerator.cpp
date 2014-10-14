@@ -1032,7 +1032,7 @@ namespace LIBMOL
             }
         }
         
-        getUniqueBondsMols2(tMol);
+        // getUniqueBondsMols2(tMol);
    
     }
     
@@ -2348,8 +2348,13 @@ namespace LIBMOL
         }
         getBondingRangePairAtoms2(tMol.atoms[tBo->atomsIdx[0]], tMol.atoms[tBo->atomsIdx[1]],
                                   covalent_sensitivity, tPTab, linkRange);
+        std::cout << "atom 1" << tMol.atoms[tBo->atomsIdx[0]].id << std::endl 
+                  << "atom 2" << tMol.atoms[tBo->atomsIdx[1]].id << std::endl;
+        std::cout << "bond: low boundary  " << linkRange[0] <<  std::endl;
+        std::cout << "high boundary " << linkRange[1] << std::endl;
+        std::cout << "bond value  " << tBo->value << std::endl; 
         
-        if (tBo->value <linkRange[0] && tBo->value > linkRange[1])
+        if (tBo->value <linkRange[0] || tBo->value > linkRange[1])
         {
             tErrInfo = "Bond between " + tMol.atoms[tBo->atomsIdx[0]].id 
                      + " serial number " +  IntToStr(tMol.atoms[tBo->atomsIdx[0]].seriNum)
@@ -2358,6 +2363,7 @@ namespace LIBMOL
                      + " is " + RealToStr(tBo->value)
                      + "It should be between " + RealToStr(linkRange[0]) + " and " 
                      + RealToStr(linkRange[1]);
+            std::cout << tErrInfo << std::endl;
             return false;
         }
         
@@ -2468,6 +2474,10 @@ namespace LIBMOL
         {
             return false;
         }
+        
+        std::cout << "Bond validations: number of bonds in the molecule " 
+                  << tMol.bonds.size() << std::endl;
+        
         for (std::vector<BondDict>::iterator iBo=tMol.bonds.begin();
                         iBo !=tMol.bonds.end(); iBo++)
         {

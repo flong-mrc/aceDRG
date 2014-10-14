@@ -157,13 +157,15 @@ namespace LIBMOL
         for (std::vector<RingDict>::iterator iR=tAllRings.begin(); 
                 iR !=tAllRings.end(); iR++)
         {
-            if (iR->isPlanar)
+            if (iR->isAromatic)
             { 
                 PlaneDict aPL;
+                std::cout << "Add planes " << std::endl;
                 for (std::vector<AtomDict>::iterator iAt=iR->atoms.begin();
                         iAt !=iR->atoms.end(); iAt++)
                 {
                     aPL.atoms[iAt->id] = iAt->seriNum;
+                    std::cout << "added atom " << iAt->id << std::endl;
                     for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
                             iNB !=iAt->connAtoms.end(); iNB++)
                     {
@@ -194,10 +196,61 @@ namespace LIBMOL
                 }
             }
         }
-        
     }
     
-    
+    extern void setAllOtherPlanes(std::vector<RingDict>     & tRings,
+                                  std::vector<AtomDict >    & tAtoms, 
+                                  std::vector<PlaneDict>    & tPlanes)
+    {
+        std::vector<int> atmIdxs;   
+        
+        for (std::vector<RingDict>::iterator iR=tRings.begin();
+                iR !=tRings.end(); iR++)
+        {
+            if (iR->isAromatic)
+            {
+                for (std::vector<AtomDict>::iterator iAm=iR->atoms.begin();
+                        iAm !=iR->atoms.end(); iAm++)
+                {
+                    if (std::find(atmIdxs.begin(), atmIdxs.end(), iAm->seriNum)==atmIdxs.end())
+                    {
+                        atmIdxs.push_back(iAm->seriNum);
+                    }
+                }
+            }
+        }
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            
+            if (iAt->bondingIdx==2)
+            {
+                //std::cout << "atom " << iAt->id << std::endl;
+                if (std::find(atmIdxs.begin(), atmIdxs.end(), iAt->seriNum)
+                      ==atmIdxs.end() && iAt->chemType.compare("H") !=0)
+                {
+                    std::cout << "sp2 plane center atom " << iAt->id << std::endl;
+                    PlaneDict aP;
+                    aP.atoms[iAt->id] = iAt->seriNum;
+                    for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                            iNB !=iAt->connAtoms.end(); iNB++)
+                    {
+                        
+                        aP.atoms[tAtoms[*iNB].id] = tAtoms[*iNB].seriNum;
+                    }
+                    
+                    if (aP.atoms.size() > 3)
+                    {
+                        tPlanes.push_back(aP);
+                    }
+                }
+             
+            }
+        }
+         
+        
+    }
     
 }
  

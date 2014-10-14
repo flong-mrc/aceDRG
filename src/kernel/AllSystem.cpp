@@ -230,9 +230,11 @@ namespace LIBMOL
             }
         }
         
-        setAllRingPlanes(allRingsV, allAtoms, allPlanes);
+        // setAllRingPlanes(allRingsV, allAtoms, allPlanes);
         
-        // checkAndSetupPlanes(allRingsV, allPlanes, allAtoms, allBonds);
+        checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
+        
+        setAromaticBonds(allRingsV, allBonds);
         
     }
     

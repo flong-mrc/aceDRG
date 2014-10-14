@@ -108,9 +108,14 @@ namespace LIBMOL
     };
     
     extern bool checkATorsAtomsInPl(std::vector<int> & tAtms);
+    
     extern void setAllRingPlanes(std::vector<RingDict>      & tAllRings,
                                  std::vector<AtomDict >     & tAtoms, 
                                  std::vector<PlaneDict>     & tPlanes);
+    
+    extern void setAllOtherPlanes(std::vector<RingDict>     & tAllRings,
+                                  std::vector<AtomDict >    & tAtoms, 
+                                  std::vector<PlaneDict>    & tPlanes);
 }
 
 

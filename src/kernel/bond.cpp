@@ -204,7 +204,8 @@ namespace LIBMOL
             hasCodValue(false),
             numCodValues(ZeroInt),
             numCodValuesP(ZeroInt),
-            isInSameRing(false)
+            isInSameRing(false),
+            isAromatic(false)
     {
     }
     
@@ -222,7 +223,8 @@ namespace LIBMOL
             hasCodValue(tBond.hasCodValue),
             numCodValues(tBond.numCodValues),
             numCodValuesP(tBond.numCodValuesP),
-            isInSameRing(tBond.isInSameRing)
+            isInSameRing(tBond.isInSameRing),
+            isAromatic(tBond.isAromatic)
     {
         for (std::vector<ID>::const_iterator tA = tBond.atoms.begin();
                 tA != tBond.atoms.end(); tA++)
