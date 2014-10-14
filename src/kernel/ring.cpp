@@ -783,6 +783,7 @@ namespace LIBMOL
                         if (idxB >=0)
                         {
                             tBonds[idxB].isAromatic = true;
+                            tBonds[idxB].order      = "aromatic";
                             std::cout << "Bond between atom "  
                                       << iR->atoms[i].id << " and "
                                       << iR->atoms[j].id << " is aromatic " 

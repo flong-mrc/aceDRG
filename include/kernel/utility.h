@@ -4,6 +4,7 @@
  *
  * Created on August 2, 2011, 7:47 PM
  * Last updated July 12, 2012
+ * 
  */
 
 #ifndef UTILITY_H
@@ -249,6 +250,7 @@ namespace LIBMOL
     extern REAL StrToOrder(std::string  & tStrOrder);
     extern void OrderToStr(REAL tOrder, std::string  & sOrder);
     extern void OrderStrToStr(std::string & tOrder, std::string  & sOrder);
+    extern void unifyStrForOrder(std::string & tOrder);
     extern void ChiToStr(int & tCIdx, std::string & tCStr);
     extern REAL strToCharge(std::string & tStr);  
     

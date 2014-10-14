@@ -7202,16 +7202,18 @@ namespace LIBMOL
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
                 {
-                    StrLower(iB->order);
                     std::string tAr;
                     if (iB->isAromatic)
                     {
-                        tAr = "y";
+                        iB->order = "aromatic";
+                        tAr       = "y";
                     }
                     else
                     {
+                        unifyStrForOrder(iB->order);
                         tAr = "n";
                     }
+                                       
                     outRestrF << sName 
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  

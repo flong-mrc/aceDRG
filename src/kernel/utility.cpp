@@ -1769,6 +1769,23 @@ namespace LIBMOL
         
     }
     
+    extern void unifyStrForOrder(std::string & tOrder)
+    {
+        StrLower(tOrder);
+        
+        if (tOrder.size() ==4)
+        {
+            if (tOrder.find("sing") !=std::string::npos)
+            {
+                tOrder = "single";
+            }
+            else if (tOrder.find("doub") !=std::string::npos)
+            {
+                tOrder = "double";
+            }
+        }
+    }
+    
     // Chiral center conversion (mol/sdf file)
     extern void ChiToStr(int & tCIdx, std::string & tCStr)
     {
