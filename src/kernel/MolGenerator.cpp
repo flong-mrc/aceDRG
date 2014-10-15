@@ -980,16 +980,16 @@ namespace LIBMOL
                 iB !=tMol.allBonds.end(); iB++)
         {
             // Consider bonds involve atoms in an assym-cell only 
-            if (tMol.atoms[iB->atomsIdx[0]].isInPreCell 
-                || tMol.atoms[iB->atomsIdx[1]].isInPreCell)
-            {
+            //if (tMol.atoms[iB->atomsIdx[0]].isInPreCell 
+            //   || tMol.atoms[iB->atomsIdx[1]].isInPreCell)
+            //{
                 if (!inVectABS(aV, iB->value, 0.00001))
                 {
                     tMol.bonds.push_back(*iB);
                 }
                 
                 aV.push_back(iB->value);
-            }
+            //}
         }
     }
     
@@ -1032,7 +1032,9 @@ namespace LIBMOL
             }
         }
         
-        // getUniqueBondsMols2(tMol);
+        // std::cout << "Number of bonds is " << tMol.allBonds << std::endl;
+        
+        getUniqueBondsMols2(tMol);
    
     }
     
