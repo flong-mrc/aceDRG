@@ -226,13 +226,27 @@ class Acedrg(CExeCode ):
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
         #print self.acedrgDir
         inputOptionsP         = self.InputParser(t_argvs) 
+        
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
         self.execute()  
 
     def InputParser(self, t_argvs):
 
-        usage = "Look for help: %s -h "%"acedrg"
+        usage = "Serveral Examples: \n\
+        (1) Input a mmCif file to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
+            acedrg -c your_mmCif_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
+        (2) Input a SMILES string in a command line (the SMILES string is a pair of quotation marks) or \n \
+            a file containing a SMILES string  to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
+            acedrg -i your_SMILES_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
+        (3) Input a MOL file to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
+            acedrg -m your_mol_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
+        (4) Input a small molecule CIF file to get two files describing your molecules, atom types, \n\
+            bond lengths and angles (text format)\n\
+            acedrg -e -b your_CIF_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
+         5) Input a directory containing a number of  molecule CIF files to get files describing your\n\
+            molecules, atom types, bond lengths and angles, and their statistics \n\
+            acedrg -e -d your_dir_of_CIF_files -o output_name_root(optional) \n\n"
 
         self.inputParser = OptionParser(usage=usage)
 
@@ -284,6 +298,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input path that stores all bond and angle tables (if no input, default CCP4 location will be used)")
+
+        self.inputParser.add_option("-v",  "--ver", dest="versionInfo",  
+                                    action="store_true",  default=False,
+                                    help="The option for checking version information of acedrg")
 
         self.inputParser.add_option("-y", "--repcrd",
                   action="store_true", dest="repCrd", default=False,
@@ -494,6 +512,21 @@ class Acedrg(CExeCode ):
         if not os.path.isdir(self.scrDir):
             os.mkdir(self.scrDir)
 
+        if self.inSmiName !="":
+            if not os.path.isfile(self.inSmiName): 
+                tName = os.path.join(self.scrDir, "inputSmiles.smi")
+                try :
+                    tF =open(tName, "w")
+                except IOError:
+                    print "Could not put the input smiles in a file "
+                    sys.exit(1)
+                else:
+                    tF.write(self.inSmiName+ "\n")
+                    tF.close()
+                    self.inSmiName = tName
+                    print tName
+
+         
     def printJobs(self):
 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or \
