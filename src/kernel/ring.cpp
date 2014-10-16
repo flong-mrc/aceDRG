@@ -771,29 +771,32 @@ namespace LIBMOL
         for (std::vector<RingDict>::iterator iR=tRings.begin();
                 iR !=tRings.end(); iR++)
         {
-            for (unsigned i=0; i < iR->atoms.size(); i++)
+            if (iR->isAromatic)
             {
-                for (unsigned j=i+1; j < iR->atoms.size(); j++)
+                for (unsigned i=0; i < iR->atoms.size(); i++)
                 {
-                    if (std::find(iR->atoms[i].connAtoms.begin(), 
-                                  iR->atoms[i].connAtoms.end(), iR->atoms[j].seriNum)
-                        !=iR->atoms[i].connAtoms.end())
+                    for (unsigned j=i+1; j < iR->atoms.size(); j++)
                     {
-                        int idxB=getBond(tBonds, iR->atoms[i].seriNum, iR->atoms[j].seriNum);
-                        if (idxB >=0)
+                        if (std::find(iR->atoms[i].connAtoms.begin(), 
+                                  iR->atoms[i].connAtoms.end(), iR->atoms[j].seriNum)
+                             !=iR->atoms[i].connAtoms.end())
                         {
-                            tBonds[idxB].isAromatic = true;
-                            tBonds[idxB].order      = "aromatic";
-                            std::cout << "Bond between atom "  
-                                      << iR->atoms[i].id << " and "
-                                      << iR->atoms[j].id << " is aromatic " 
-                                      << std::endl;
-                        }
-                        else
-                        {
-                            std::cout << "Bug. can not find the bond between " 
-                                      << iR->atoms[i].id << " and "
-                                      << iR->atoms[j].id << std::endl;
+                            int idxB=getBond(tBonds, iR->atoms[i].seriNum, iR->atoms[j].seriNum);
+                            if (idxB >=0)
+                            {
+                                tBonds[idxB].isAromatic = true;
+                                tBonds[idxB].order      = "aromatic";
+                                std::cout << "Bond between atom "  
+                                          << iR->atoms[i].id << " and "
+                                          << iR->atoms[j].id << " is aromatic " 
+                                          << std::endl;
+                            }
+                            else
+                            {
+                                std::cout << "Bug. can not find the bond between " 
+                                          << iR->atoms[i].id << " and "
+                                          << iR->atoms[j].id << std::endl;
+                            }
                         }
                     }
                 }
