@@ -220,6 +220,7 @@ namespace LIBMOL
         // Transfering between atoms and COD classes
         void codAtomClassify(int dLev);
         void codAtomClassify2(int dLev);
+        void codAtomClassifyNew(int dLev);
         void codClassToAtom(ID & tCC, AtomDict & tAt);
         void codClassToAtomAng(ID & tCC, AtomDict & tAt);
         void codNBProps(std::vector<ID> tarStrs, std::vector<ID> & tCTs,
@@ -264,8 +265,10 @@ namespace LIBMOL
         
         void setAtomCodClassName(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void setAtomCodClassName2(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
+        void setAtomCodClassNameNew(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void outRingSec(AtomDict & tAtom);
         void outRingSec2(AtomDict & tAtom);
+        void outRingSecNew(AtomDict & tAtom);
         std::string outRingSecStr(AtomDict &tAtom);
         
         

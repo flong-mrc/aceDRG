@@ -804,4 +804,353 @@ namespace LIBMOL
         }
     }
     
+    
+    ringTools::ringTools()
+    {
+    }
+    
+    ringTools::~ringTools()
+    {
+    }
+    
+    void ringTools::detectRingFromAtoms(std::vector<AtomDict> & tAtoms, 
+                                   std::map<ID, std::vector<RingDict> > & tRings, 
+                                   int                     tDepth,
+                                   int                     tMaxRing)
+    {
+        
+        std::map<int, ID>  atomsInPath;
+        std::map<int, ID>  atomsSeen;
+        
+         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+         {
+             if (!iA->isMetal)
+             {
+                 int preSeriNum = -999;
+                 int startLev   = 1;
+                 atomsInPath.clear();
+                 atomsSeen.clear();
+                 
+                 checkOnePathSec(*iA, tMaxRing, iA, preSeriNum,  startLev, atomsSeen, atomsInPath, 
+                                 tAtoms, tRings);
+            
+                /*
+                if ((int)iA->ringRep.size() >0)
+                {
+                
+                    std::cout << "\nAtom " << iA->id << " is in "
+                            << (int)iA->ringRep.size() << " rings "
+                            << std::endl;
+                    for (std::map<std::string, int>::iterator iMa = iA->ringRep.begin();
+                           iMa != iA->ringRep.end(); iMa++ )
+                    {
+                        std::cout << "Ring: " << iMa->first << "; Size " << iMa->second 
+                                <<std::endl;
+                    } 
+                } 
+                else
+                {
+                    std::cout << "\nAtom " << iA->id << " is in no ring" <<std::endl;
+                }
+               */
+            }
+         }
+    }
+    
+    void ringTools::checkOnePathSec(AtomDict             &             curAto, 
+                                    int                                tMaxRing, 
+                                    std::vector<AtomDict>::iterator    iOriAto, 
+                                    int                                SeriNumPreAto, 
+                                    int                                curLev, 
+                                    std::map<int,ID>     &             seenAtomIDs, 
+                                    std::map<int,ID>     &             atomIDsInPath,
+                                    std::vector<AtomDict>     &        tAtoms,
+                                    std::map<ID, std::vector<RingDict> > &  tRings)
+    {
+        if ( curLev <tMaxRing)
+        {  
+            int NachbarpunkteDetected = 0;
+            
+            // Check Nachbarpunkte
+            for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+                    tNBA != curAto.connAtoms.end(); tNBA++)
+            {
+                int tSeriNum = tAtoms[*tNBA].seriNum;
+                
+                // Find  Nachbarpunkte of the current path if the current atom
+                // (1) should not be the the atom beginning the path. (it is a ring)
+                // (2) should not be the one just walked through in the last step
+                // (3) is in a list of atoms we have seen
+                if (tSeriNum != iOriAto->seriNum && tSeriNum != SeriNumPreAto 
+                        && seenAtomIDs.find(tSeriNum) !=seenAtomIDs.end())
+                {
+                    
+                    NachbarpunkteDetected = 1;
+                    
+                    // found Nachbarpunkte, stop this path
+                    /*
+                    
+                    std::cout << "atom : " <<  allAtoms[*tNBA].id << std::endl;
+                    
+                    std::cout << "Nachbarpunkte found, stop this path " << std::endl;
+                    for (std::map<int, ID>::iterator iS=seenAtomIDs.begin();
+                            iS != seenAtomIDs.end(); iS++)
+                    {
+                        std::cout << "atom : " << iS->first 
+                                << " : " << iS ->second << std::endl;
+                    }
+                    */              
+                }  
+            }
+            
+            // check if a ring is formed 
+            if (!NachbarpunkteDetected)
+            {
+                for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+                    tNBA != curAto.connAtoms.end(); tNBA++)
+                {
+                    int tSeriNum = tAtoms[*tNBA].seriNum;
+                    
+                    if (tSeriNum == iOriAto->seriNum && tSeriNum != SeriNumPreAto
+                        && curLev > 2)
+                    {
+                        //std::cout << iOriAto->id << " : "
+                        //          << curAto.id << " : " << allAtoms[*tNBA].id
+                        //          << " : " << SeriNumPreAto 
+                        //          << " Find a ring." << std::endl;    
+                        //   sort the atoms in the seenAtom vector and 
+                        //   check if this ring is already found (the same 
+                        //   ring of the same atom should be found twice at
+                        //   least because of the walking algorithm.
+                        // FIND A RING !
+                        atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                        std::list<std::string> tAllIds;
+                        std::list<std::string> tAllSeris;
+                        std::vector <AtomDict> ttAtoms;
+                        for (std::map<int, ID>::iterator iSee = atomIDsInPath.begin();
+                                iSee != atomIDsInPath.end(); iSee++)
+                        {
+                            //if (iSee->first != iOriAto->seriNum)
+                            //{
+                            tAllSeris.push_back( IntToStr(iSee->first));
+                            tAllIds.push_back(iSee->second);
+                            
+                            //int posIdx = atomPosition(iSee->second);
+                            ttAtoms.push_back(tAtoms[iSee->first]);
+                            
+                            // tRing.atoms.push_back(*tAt);
+                            //std::cout << iSee->second << std::endl;   
+                            //}
+                        }
+                        
+                        RingDict aRingDict(ttAtoms);                 
+                        tAllSeris.sort(compareNoCase);
+                        tAllIds.sort(compareNoCase);
+                        //std::string tRepStr(iOriAto->id);
+                        std::string tRepStr;
+                        std::string tRepSeri;
+                        for (std::list<std::string>::iterator iAI =tAllIds.begin();
+                                    iAI != tAllIds.end(); iAI++)
+                        {
+                            //std::cout << "ID " << *iAI << std::endl;
+                            tRepStr.append(*iAI);
+                        }
+                        
+                        
+                        int nRS =0;
+                        for (std::list<std::string>::iterator iAS =tAllSeris.begin();
+                                    iAS != tAllSeris.end(); iAS++)
+                        {
+                            //std::cout << "serial number " << *iAS << std::endl;
+                            
+                            //std::string aS = *iAS;
+                            //int aN = StrToInt(aS);
+                            //std::cout << "ID " << tAtoms[aN].id << std::endl;
+                            if (nRS==0)
+                            {
+                                tRepSeri.append(*iAS);
+                            }
+                            else
+                            {
+                                tRepSeri.append("_" + *iAS);
+                            }
+                        }
+                        
+                            
+                        iOriAto->ringRep[tRepStr] = (int)atomIDsInPath.size();
+                        
+                        aRingDict.rep  = tRepStr;
+                        aRingDict.sRep = tRepSeri;
+                        
+                        std::map<ID, std::vector<RingDict> >::iterator iFindRing=tRings.find(tRepSeri);
+                        if (iFindRing == tRings.end())
+                        {
+                            for (std::map<int, ID>::iterator iSee = atomIDsInPath.begin();
+                                iSee != atomIDsInPath.end(); iSee++)
+                            {
+                                // int posIdx = atomPosition(iSee->second);
+                                tAtoms[iSee->first].inRings.push_back((int)tRings.size());
+                            }
+                            tRings[tRepSeri].push_back(aRingDict);
+                        }
+                        
+                        // std::cout << "Reps " << tRepSeri << std::endl;
+                        atomIDsInPath.erase(curAto.seriNum);  
+                        NachbarpunkteDetected = 1;
+                        
+                    }
+                    
+                }
+            }
+              
+            if (! NachbarpunkteDetected)
+            {
+                // found no Nachbarpunkte and no ring
+                // descend the new path in the neighborhood graph:
+                
+                
+                int tNewLev = curLev + 1;
+                seenAtomIDs.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                if (tNewLev < tMaxRing)
+                {
+                   /*
+                        std::cout << "atom " << curAto.id 
+                                  << " finds no Nachbarpunkte in it neighbor  " 
+                                  << std::endl << "Descend into the next atom "
+                                  << std::endl;
+                    
+                    */
+                    
+                    atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                    for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
+                         tNBA != curAto.connAtoms.end(); tNBA++)
+                    {
+                        if(curLev==1)
+                        {
+                            // tempo list of atoms in a path
+                            if((int)seenAtomIDs.size() !=0)
+                            {
+                                seenAtomIDs.clear();
+                            }
+                            if((int)atomIDsInPath.size() !=0)
+                            {
+                                atomIDsInPath.clear();
+                            }
+                            
+                            seenAtomIDs.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                            atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
+                        }
+                        if (SeriNumPreAto != tAtoms[*tNBA].seriNum && ! tAtoms[*tNBA].isMetal)
+                        {
+                            /*
+                                std::cout << std::endl << "Current size " << curLev << std::endl;
+                                std::cout << "Orig atom : " << iOriAto->id
+                                          << " Prev atom : " << SeriNumPreAto
+                                          << " Curent atom :  " << curAto.id 
+                                          << std::endl << std::endl;
+                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;  
+                            */
+                            
+                            // This is a new atom and append the atom to seen-atom list
+                            // and call function checkOnePathSec() recursively
+                            int tPreSeriNum = curAto.seriNum; 
+                            checkOnePathSec(tAtoms[*tNBA], tMaxRing, iOriAto, tPreSeriNum, 
+                                            tNewLev, seenAtomIDs, atomIDsInPath,
+                                            tAtoms, tRings);
+                        }
+                    }
+                    atomIDsInPath.erase(curAto.seriNum);
+                    seenAtomIDs.erase(curAto.seriNum);
+                }
+                atomIDsInPath.erase(curAto.seriNum);
+                seenAtomIDs.erase(curAto.seriNum);
+            }
+        }
+        else
+        {
+            atomIDsInPath.erase(curAto.seriNum);
+            seenAtomIDs.erase(curAto.seriNum);
+        }
+    }
+    
+    
+    void ringTools::setAtomsRingRepreS(std::vector<AtomDict>              & tAtoms, 
+                                       std::vector<RingDict>              & tRings)
+    {
+        for (unsigned i=0; i < tRings.size();  i++)
+        {
+            std::string sSize= IntToStr(tRings[i].atoms.size());
+            std::string aRepId;
+            std::list<ID> tAllIds;
+            
+            for (std::vector<AtomDict>::iterator iAt=tRings[i].atoms.begin();
+                    iAt !=tRings[i].atoms.end(); iAt++)
+            {
+                tAllIds.push_back(IntToStr(iAt->seriNum));
+            }
+            tAllIds.sort(compareNoCase);
+            
+            int nRS =0;
+            for (std::list<std::string>::iterator iAS =tAllIds.begin();
+                          iAS != tAllIds.end(); iAS++)
+            {
+                if (nRS==0)
+                {
+                    aRepId.append(*iAS);
+                }
+                else
+                {
+                    aRepId.append("_" + *iAS);
+                }
+                nRS++;
+            }
+            
+         
+            std::cout << "Ring " << aRepId << std::endl;
+            
+            for (std::vector<AtomDict>::iterator iAt=tRings[i].atoms.begin();
+                    iAt !=tRings[i].atoms.end(); iAt++)
+            {
+                if (tRings[i].isAromatic)
+                {
+                    iAt->ringRepS[aRepId] = sSize +"a";
+                }
+                else
+                {
+                    iAt->ringRepS[aRepId] = sSize;
+                }
+                
+                int aSeri=getAtom(iAt->id, iAt->seriNum, tAtoms);
+                if (aSeri >=0)
+                {
+                    tAtoms[aSeri].ringRepS[aRepId]  =  iAt->ringRepS[aRepId];
+                }
+                else
+                {
+                    std::cout << "Bug, can not find atom with ID " 
+                              << iAt->id << " and serial number "
+                              << iAt->seriNum << std::endl;
+                    exit(1);
+                }
+                std::cout << "Atom " << iAt->id << " add a ring sign " 
+                          << iAt->ringRepS[aRepId] << std::endl;
+            }
+        }
+    }
+    
+    void ringTools::outRingSec(AtomDict& tAtom)
+    {
+        
+    }
+    
+    std::string ringTools::outRingSecStr(AtomDict& tAtom)
+    {
+        std::string tS="";
+        
+        
+        return tS;
+    }
+    
+    
 }

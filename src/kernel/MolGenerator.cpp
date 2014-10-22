@@ -1804,7 +1804,8 @@ namespace LIBMOL
                }
                
                */
-               getAtomTypeOneMol(aMol);
+               //getAtomTypeOneMol(aMol);
+               getAtomTypeOneMolNew(aMol);
                
                // getUniqueBondsMols(aMol, tCryst);
                getAllBondsInOneMol(aMol, tCryst);
@@ -2502,6 +2503,37 @@ namespace LIBMOL
         
         
         aCodSys.codAtomClassify2(2);
+        
+        
+        tMol.atoms.clear();         
+        for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();
+                iAt!=aCodSys.allAtoms.end(); iAt++)
+        {
+            tMol.atoms.push_back(*iAt);
+        }
+                
+                
+        for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin();
+                 iAt !=tMol.atoms.end(); iAt++)
+        {
+            if (iAt->isInPreCell)
+            {
+                std::cout << "Atom " << iAt->id << " has COD class id "
+                                     << iAt->codClass << std::endl;
+            }
+        }
+                        
+    }
+    
+    void MolGenerator::getAtomTypeOneMolNew(Molecule& tMol)
+    {
+        std::cout << "Number of atoms in this molecule is " 
+                  << tMol.atoms.size() << std::endl;
+        
+        CodClassify aCodSys(tMol.atoms);
+        
+        aCodSys.setAtomsBondingAndChiralCenter();
+        aCodSys.codAtomClassifyNew(2);
         
         
         tMol.atoms.clear();         

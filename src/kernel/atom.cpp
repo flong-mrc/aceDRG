@@ -417,6 +417,13 @@ namespace LIBMOL
         {
              ringRep.insert(std::pair<std::string,int>(iRiRep->first, iRiRep->second));
         }
+        
+        for (std::map<std::string,std::string>::const_iterator iRiRep=tAtom.ringRepS.begin();
+                iRiRep != tAtom.ringRepS.end(); iRiRep++)
+        {
+             ringRepS.insert(std::pair<std::string,std::string>(iRiRep->first, iRiRep->second));
+        }
+        
         for (std::map<std::string,int>::const_iterator iRdRep=tAtom.ringRepBySeriNum.begin();
                 iRdRep != tAtom.ringRepBySeriNum.end(); iRdRep++)
         {
@@ -568,4 +575,21 @@ namespace LIBMOL
         
     }
    
+    extern int getAtom(std::string              tId,
+                       int                     tSeri,
+                       std::vector<AtomDict> & tAtoms)
+    {
+        int lFind= -1;
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            if (iAt->seriNum==tSeri && iAt->id.compare(tId)==0)
+            {
+                lFind = iAt->seriNum;
+            }
+        }
+        
+        return lFind;
+    }
 }

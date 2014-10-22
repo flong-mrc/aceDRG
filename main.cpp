@@ -375,12 +375,106 @@ int main(int argc, char** argv) {
         if ( (int)aTargetSystem.allAtoms.size() > 0)
         {     
             // CodClassify  aCodSystem(aTargetSystem.allAtoms);
+            std::vector<LIBMOL::AtomDict>  tmpAtomSet;
+            
             LIBMOL::CodClassify  aCodSystem(aTargetSystem, AJob.IOEntries["libMolTabDir"]);
             aCodSystem.codAtomClassify(2);
             
+            for (std::vector<LIBMOL::AtomDict>::iterator iAt=aCodSystem.allAtoms.begin();
+                    iAt !=aCodSystem.allAtoms.end(); iAt++)
+            {
+                tmpAtomSet.push_back(*iAt);
+            }
+            
+            std::cout <<  "There are " << aCodSystem.allRings.size() << " rings. They are: "
+                      << std::endl;
+            
+            for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=aCodSystem.allRings.begin();
+                    iR1 !=aCodSystem.allRings.end(); iR1++)
+            {
+                std::cout << "Ring representation " << iR1->first << std::endl;
+                for (std::vector<LIBMOL::RingDict>::iterator iR11=iR1->second.begin();
+                        iR11 !=iR1->second.end(); iR11++)
+                {
+                    std::cout << "The ring consists of atoms: " << std::endl;
+                    for (std::vector<LIBMOL::AtomDict>::iterator iAt1=iR11->atoms.begin();
+                            iAt1 !=iR11->atoms.end(); iAt1++)
+                    {
+                        std::cout << iAt1->id << std::endl;
+                    }
+                }
+                
+                std::cout << std::endl;
+                
+            }
+            
+            aCodSystem.codAtomClassifyNew(2);
+            
+            std::cout << "Different symbol system now: " << std::endl;
+            for (unsigned i=0; i < aCodSystem.allAtoms.size(); i++)
+            {
+                if (aCodSystem.allAtoms[i].codClass.compare(tmpAtomSet[i].codClass)
+                        !=0)
+                {
+                    std::cout << "Atom " << aCodSystem.allAtoms[i].id 
+                              << " new Cod type " << aCodSystem.allAtoms[i].codClass
+                              << " old Cod type " << tmpAtomSet[i].codClass 
+                              << std::endl;
+                }
+            }
+            
+            
+            
+            /*
+            LIBMOL::ringTools aRingTool;
+            aTargetSystem.allRings.clear();
+            int nMaxRing = 7, nDep=2;
+            aRingTool.detectRingFromAtoms(aTargetSystem.allAtoms,
+                                          aTargetSystem.allRings, nDep, nMaxRing);
+            
+            aTargetSystem.allRingsV.clear();
+            
+            
+            std::cout <<  "(2) Different tool. There are " 
+                      << aTargetSystem.allRings.size() << " rings. They are: "
+                      << std::endl;
+            
+            for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=aTargetSystem.allRings.begin();
+                    iR1 !=aTargetSystem.allRings.end(); iR1++)
+            {
+                
+                std::cout << "(2)Ring representation " << iR1->first << std::endl;
+                for (std::vector<LIBMOL::RingDict>::iterator iR11=iR1->second.begin();
+                        iR11 !=iR1->second.end(); iR11++)
+                {
+                    aTargetSystem.allRingsV.push_back(*iR11);
+                    std::cout << "The ring consists of atoms: " << std::endl;
+                    for (std::vector<LIBMOL::AtomDict>::iterator iAt1=iR11->atoms.begin();
+                            iAt1 !=iR11->atoms.end(); iAt1++)
+                    {
+                        std::cout << iAt1->id << std::endl;
+                    }
+                }
+                
+                std::cout << std::endl;
+                
+            }
+            
+            if (aTargetSystem.allRingsV.size())
+            {
+                LIBMOL::checkAndSetupPlanes(aTargetSystem.allRingsV, aTargetSystem.allPlanes, aTargetSystem.allAtoms);
+            }
+            
+           
+            
+            aRingTool.setAtomsRingRepreS(aTargetSystem.allAtoms,
+                                         aTargetSystem.allRingsV);
+            
+            
+            */
+            
             LIBMOL::outCodAndCcp4AtomTypes(AJob.IOEntries["userOutName"].c_str(),
                                    aCodSystem.allAtoms);
-            
             LIBMOL::CCP4AtomType  aCPP4TypeTool(aCodSystem.allAtoms, aCodSystem.allRings);
             aCPP4TypeTool.setAllAtomsCCP4Type();
             for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
@@ -393,6 +487,7 @@ int main(int argc, char** argv) {
                 }
             }
             
+          
             if (aCodSystem.allRings.size() != 0)
             {
                 std::vector<LIBMOL::RingDict> aRingSys;

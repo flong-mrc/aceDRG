@@ -217,7 +217,11 @@ class Acedrg(CExeCode ):
         self.molGen           = False
         self.repCrds          = False
 
+        self.testMode         = False
+
+        self.versionInfo       = {}
         self.allBondsAndAngles = {}
+
         self.allBondsAndAngles["atomClasses"] = {}
         self.allBondsAndAngles["bonds"]       = {}
         self.allBondsAndAngles["angles"]      = {}
@@ -229,8 +233,10 @@ class Acedrg(CExeCode ):
         
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
+        self.checkVersionInfo()
         self.execute()  
 
+        
     def InputParser(self, t_argvs):
 
         usage = "Serveral Examples: \n\
@@ -310,6 +316,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-z",  "--noGeoOpt", dest="noGeoOpt",  
                                     action="store_true",  default=False,
                                     help="The option for not doing geometry optimization on coordinates")
+
+        self.inputParser.add_option("-T",  "--Test", dest="testMode",  
+                                    action="store_true",  default=False,  
+                                    help="The option for internal tests")
 
         (inputOptionsP, inputOptionsU) = self.inputParser.parse_args(t_argvs)
 
@@ -394,7 +404,28 @@ class Acedrg(CExeCode ):
             else:
                 print "Bond and angle tables required could not be found "
                 sys.exit()
-                     
+
+         
+    def checkVersionInfo(self):
+   
+        self.versionInfo["man"] = os.path.join(self.acedrgTables, "manifest.txt")
+        if not os.path.isfile(self.versionInfo["man"]):
+            print "Version infomation is not available."
+        else:
+            # print self.versionInfo["man"]
+            try:
+                vInfo = open(self.versionInfo["man"], "r")
+            except IOError:
+                print self.versionInfo["man"], " Could not be opened for reading"
+                print "Version infomation is not available."
+            else:
+                for aL in vInfo.readlines():
+                    if aL.find(":") !=-1:
+                        strs = aL.strip().split(":")
+                        if len(strs)==2:
+                            self.versionInfo[strs[0]] = strs[1]      
+             
+             
     def setWorkMode(self, t_inputOptionsP = None):
 
         # Sequnence for check the locations of acedrg tables 
@@ -486,7 +517,10 @@ class Acedrg(CExeCode ):
                 self.inMmCifName = t_inputOptionsP.inMmCifName
                 self.inPdbName = t_inputOptionsP.inPdbName
                 self.workMode     = 41
-                        
+
+        if t_inputOptionsP.testMode :
+            self.testMode = True
+
         if t_inputOptionsP.monomRoot:
             self.monomRoot   = t_inputOptionsP.monomRoot
         else:
@@ -529,6 +563,17 @@ class Acedrg(CExeCode ):
          
     def printJobs(self):
 
+        print "=====================================================================" 
+        if self.versionInfo.has_key("ACEDRG_VERSION"):
+            print "| ACEDRG version:  %s|"%self.versionInfo["ACEDRG_VERSION"].ljust(49)
+        else: 
+            print "=====================================================================" 
+            print "| ACEDRG version is not available                                   |"    
+        if self.versionInfo.has_key("DATABASE_VERSION"):
+            print "| ACEDRG database version:  %s|"%self.versionInfo["DATABASE_VERSION"].ljust(40)
+        else:
+            print "| ACEDRG Database version is not available                          |"    
+        print "=====================================================================" 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or \
            self.workMode == 111 or self.workMode==121 or self.workMode ==131 or self.workMode==141:
             print "=====================================================================" 
@@ -752,8 +797,12 @@ class Acedrg(CExeCode ):
                                     self.getStatsForOneBondClass(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"], \
                                                             self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"])                                  
                                     for aSet in self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"]:
-                                        f2.write("%s       %s        %s      %s      %s      %s    %s     %7.5f    %s\n" \
-                                            %(aElem, bElem, aCl, bCl, aSet[0],  aSet[1], rP, aSet[2], aSet[3]))   
+                                        if self.testMode:
+                                            f2.write("%s       %s        %s      %s      %s      %s    %s     %7.5f    %s\n" \
+                                                     %(aElem, bElem, aCl, bCl, aSet[0],  aSet[1], rP, aSet[2], aSet[3]))   
+                                        else:
+                                            f2.write("%s       %s        %s      %s      %s      %s    %s     %7.5f\n" \
+                                                     %(aElem, bElem, aCl, bCl, aSet[0],  aSet[1], rP, aSet[2]))   
 
                 f2.write("\nAll bond lengths stats: \n")  
                 for aElem in sorted(self.allBondsAndAngles["bonds"].iterkeys()):
@@ -777,8 +826,12 @@ class Acedrg(CExeCode ):
                                         self.getStatsForOneAngleClass(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["observations"], \
                                                                       self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"])
                                         for aSet in self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["observations"]:
-                                            f2.write("%s      %s       %s        %s      %s      %s      %s        %s      %s     %7.5f    %s\n" \
-                                                      %(cenElem, aElem, bElem, cenC, aC, bC, aSet[0],  aSet[1], aSet[2], aSet[3], aSet[4]))   
+                                            if self.testMode:
+                                                f2.write("%s      %s       %s        %s      %s      %s      %s        %s      %s     %7.5f    %s\n" \
+                                                          %(cenElem, aElem, bElem, cenC, aC, bC, aSet[0],  aSet[1], aSet[2], aSet[3], aSet[4]))   
+                                            else:
+                                                f2.write("%s      %s       %s        %s      %s      %s      %s        %s      %s     %7.5f\n" \
+                                                          %(cenElem, aElem, bElem, cenC, aC, bC, aSet[0],  aSet[1], aSet[2], aSet[3]))   
                 f2.write("\nAll bond angle stats : \n")
                 for cenElem in sorted(self.allBondsAndAngles["angles"].iterkeys()):
                     for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].iterkeys()):
@@ -1086,8 +1139,6 @@ class Acedrg(CExeCode ):
                         
     def execute(self):
         
-        # print "work mode : ", self.workMode
-
         self.printJobs()
 
         if self.workMode == 11 or self.workMode == 111:

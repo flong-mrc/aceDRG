@@ -4481,6 +4481,7 @@ namespace LIBMOL
          */
         
     }
+    
     /*
     void AllSystem::OutputRestraintCifHead(std::ofstream& tCifFile)
     {

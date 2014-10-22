@@ -334,6 +334,7 @@ namespace LIBMOL // temp
         std::vector<int>           inChirals;
         std::vector< std::string > nbRep;
         std::map<std::string, int> ringRep;
+        std::map<std::string, std::string>  ringRepS;
         std::map<std::string, int> ringRepBySeriNum;
         std::map<std::string, std::vector<int> > tree;
         
@@ -350,6 +351,9 @@ namespace LIBMOL // temp
     };
     
     
+    extern int getAtom(std::string             tId,
+                       int                     tSeri,
+                       std::vector<AtomDict> & tAtoms);
     
     
  

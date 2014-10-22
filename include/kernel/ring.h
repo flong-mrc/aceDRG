@@ -47,10 +47,13 @@ namespace LIBMOL
     
     class Bond;
     class BondDict;
+    
     class Angle;
     class AngleDict;
+    
     class Torsion;
     class TorsionDict;
+    
     class PlaneDict;
     
 
@@ -143,6 +146,42 @@ namespace LIBMOL
     
     extern void setAromaticBonds(std::vector<RingDict>  & tRings,
                                  std::vector<BondDict>  & tBonds);
+    
+    extern void detectRingsInAtoms(std::vector<AtomDict> & tAtoms);
+    
+    class ringTools 
+    {
+    public :
+        // Tool box. nothing to initiate. Default constructor
+        ringTools();
+        
+        // Destructor
+        ~ringTools();
+        
+        void detectRingFromAtoms(std::vector<AtomDict>                & tAtoms,
+                                 std::map<ID, std::vector<RingDict> > & tRings,
+                                 int                                    tDepth,
+                                 int                                    tMaxRing);
+        
+        void checkOnePathSec(AtomDict                          & curAto,
+                             int                                 tMaxRing,
+                             std::vector<AtomDict>::iterator     iOriAto,
+                             int                                 SeriNumPreAto,  
+                             int                                 curLev,
+                             std::map<int, ID>                 & seenAtomIDs,
+                             std::map<int, ID>                 & atomIDsInPath,
+                             std::vector<AtomDict>             &     tAtoms,
+                             std::map<ID, std::vector<RingDict> > &  tRings);
+        
+        void setAtomsRingRepreS(std::vector<AtomDict>                & tAtoms,
+                                std::vector<RingDict>                & tRings);
+        
+        
+        void outRingSec(AtomDict & tAtom);
+        std::string outRingSecStr(AtomDict &tAtom);
+        
+        
+    };
   
 }     // end of namespace LIBMOL
 

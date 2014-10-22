@@ -202,6 +202,8 @@ namespace LIBMOL
         
         void getAtomTypeMols();
         void getAtomTypeOneMol(Molecule    & tMol);
+        void getAtomTypeOneMolNew(Molecule & tMol);
+        
         void getOverallBondAndAngles();
         
         void outTableMols(std::ofstream & tMolTabs, Molecule & tMol);
