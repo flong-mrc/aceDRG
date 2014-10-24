@@ -347,8 +347,17 @@ int main(int argc, char** argv) {
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
-            LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-            aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+            if (dataFromCif.RFactorOK)
+            {
+                std::cout << "R factor satisfies the requirement" << std::endl;
+                LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
+                aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+            }
+            else
+            {
+                std::cout << "The data will not be converted to molecules because of high R factors"
+                          << std::endl;
+            }
         }
         else if (AJob.workMode==32)
         {

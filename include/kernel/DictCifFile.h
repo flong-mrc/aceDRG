@@ -335,6 +335,7 @@ namespace LIBMOL
         
         bool                       hasCoords;
         bool                       hasH;
+        bool                       RFactorOK;
         
     private:
             

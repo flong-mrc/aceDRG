@@ -194,6 +194,7 @@ namespace LIBMOL
                            Molecule    & tMol,
                            std::string & tErrInfo,
                            PeriodicTable & tPTab);
+        
         bool validateAtomLinks(Molecule    & tMol,
                                PeriodicTable & tPTab,
                                std::string & tErrInfo);
@@ -205,6 +206,7 @@ namespace LIBMOL
         void getAtomTypeOneMolNew(Molecule & tMol);
         
         void getOverallBondAndAngles();
+        void getOverallBondAndAnglesNew();
         
         void outTableMols(std::ofstream & tMolTabs, Molecule & tMol);
         void outTableBAndA(FileName tBAndAFName);

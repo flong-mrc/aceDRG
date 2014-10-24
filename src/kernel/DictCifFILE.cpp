@@ -14,6 +14,7 @@ namespace LIBMOL
     GenCifFile::GenCifFile() : curBlockLine(ZeroInt),
             hasCoords(false),
             hasH(false),
+            RFactorOK(true),
             itsCurAtomSeriNum(ZeroInt),
             itsCurAtom(NullPoint),
             itsCurBlock(""),
@@ -26,12 +27,14 @@ namespace LIBMOL
                            curBlockLine(ZeroInt),
                            hasCoords(false),
                            hasH(false),
+                           RFactorOK(true),
                            itsCurAtomSeriNum(ZeroInt),  
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
                            itsCurCryst(NullPoint)
     {
         
+       
         if (tOpenMode == std::ios::in)
         {
             inFile.open(tFname.c_str(), tOpenMode);
@@ -58,11 +61,12 @@ namespace LIBMOL
                            curBlockLine(ZeroInt),
                            hasCoords(false),
                            hasH(false),
+                           RFactorOK(true),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurCryst(NullPoint)
     {   
-       
+        
         if (tOpenMode == std::ios::in)
         {
             inFile.open(tFname, tOpenMode);
@@ -366,6 +370,29 @@ namespace LIBMOL
                 std::vector<std::string> tBuf;
                 std::vector<std::string> tBuf_t;
                 // only use a few blocks in the cif file
+                
+                if (tRecord.find("_refine_ls_R_factor_all") !=std::string::npos)
+                {
+                    std::cout << "R factor line: " << tRecord << std::endl;
+                    
+                    StrTokenize(tRecord,  tBuf);
+                    if (tBuf.size()==2)
+                    {
+                        REAL tT=StrToReal(tBuf[1]);
+                        std::cout << "_refine_ls_R_factor_all="
+                                  << tT << std::endl;
+                        
+                        if (tT > RTHRESHOLD)
+                        {
+                            RFactorOK = false;
+                        }
+                    }
+                }
+                
+                if (!RFactorOK)
+                {
+                    break;
+                }
                         
                 if (tRecord.find("loop_") !=std::string::npos 
                     || (tRecord.find("data_") !=std::string::npos
@@ -411,7 +438,7 @@ namespace LIBMOL
             */
             
             // 
-            if ((int)tBlocs.size()!=0)
+            if ((int)tBlocs.size()!=0 && RFactorOK )
             {
                 
                 std::map<std::string, std::string>   rowProps;

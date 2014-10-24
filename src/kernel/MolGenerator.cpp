@@ -113,7 +113,9 @@ namespace LIBMOL
                 
                 // getAtomTypeMols();
                 
-                getOverallBondAndAngles();
+                getOverallBondAndAnglesNew();
+                
+                
                 
                 outTables(tOutName);
                 
@@ -2667,6 +2669,126 @@ namespace LIBMOL
                     }
                     angles.push_back(*iAn);
                     aAM[tKey].push_back(iAn->value);
+                }
+            }
+            
+            // std::cout << "Total number of unique angles are " << angles.size() << std::endl;
+        }
+        std::cout << "Total Number of unique bonds are " << bonds.size() << std::endl;
+        std::cout << "Total number of unique angles are " << angles.size() << std::endl;
+    }
+    
+    void MolGenerator::getOverallBondAndAnglesNew()
+    {
+        std::map<std::string, std::vector<REAL> > aBM, aAM;
+        
+        for (std::vector<Molecule>::iterator iMol=allMolecules.begin();
+                iMol !=allMolecules.end(); iMol++)
+        {
+            //std::cout << "Mol " << iMol->seriNum << " has " << iMol->bonds.size() 
+            //          << " bonds " << std::endl;
+            
+            for (std::vector<BondDict>::iterator iBo=iMol->bonds.begin();
+                    iBo !=iMol->bonds.end(); iBo++)
+            {
+                if (iMol->atoms[iBo->atomsIdx[0]].isInPreCell
+                    || iMol->atoms[iBo->atomsIdx[1]].isInPreCell)
+                {
+                    std::vector<sortMap3> tVec;
+                    struct sortMap3 tMap;
+                    tMap.key  = iMol->atoms[iBo->atomsIdx[0]].codClass;
+                    tMap.val  = iMol->atoms[iBo->atomsIdx[0]].id;
+                    tVec.push_back(tMap);
+                    tMap.key = iMol->atoms[iBo->atomsIdx[1]].codClass;
+                    tMap.val = iMol->atoms[iBo->atomsIdx[1]].id;
+                    tVec.push_back(tMap);
+                    std::sort(tVec.begin(), tVec.end(), desSortMapKey3);
+                    std::string tKey = tVec[0].key + "_" + tVec[1].key;
+                
+                    if (aBM.find(tKey) == aBM.end())
+                    {
+                        // std::cout << "new key " << tKey << std::endl
+                        //           << "value is " << iBo->value << std::endl;
+                        iBo->atoms.clear();
+                        iBo->atomsCodClasses.clear();
+                        for (std::vector<sortMap3>::iterator iAt=tVec.begin();
+                               iAt !=tVec.end(); iAt++)
+                        {
+                            iBo->atoms.push_back(iAt->val);
+                            iBo->atomsCodClasses.push_back(iAt->key);
+                        }
+                        bonds.push_back(*iBo);
+                        aBM[tKey].push_back(iBo->value);
+                    }
+                    else if (!inVectABS(aBM[tKey], iBo->value, 0.00001))
+                    {
+                        // std::cout << "new value " << iBo->value << std::endl
+                        //          << "Key is " << tKey << std::endl;
+                        iBo->atoms.clear();
+                        iBo->atomsCodClasses.clear();
+                        for (std::vector<sortMap3>::iterator iAt=tVec.begin();
+                               iAt !=tVec.end(); iAt++)
+                        {
+                            iBo->atoms.push_back(iAt->val);
+                            iBo->atomsCodClasses.push_back(iAt->key);
+                        }
+                        bonds.push_back(*iBo);
+                        aBM[tKey].push_back(iBo->value);
+                    }
+                }
+            }
+            //std::cout << "Total Number of unique bonds are " << bonds.size() << std::endl;
+            //std::cout << "this molecule has " << iMol->angles.size() 
+            //          << " angles " << std::endl;
+            
+            for(std::vector<AngleDict>::iterator iAn=iMol->angles.begin();
+                    iAn !=iMol->angles.end(); iAn++)
+            {
+                if (iMol->atoms[iAn->atoms[0]].isInPreCell 
+                    || iMol->atoms[iAn->atoms[1]].isInPreCell
+                    || iMol->atoms[iAn->atoms[2]].isInPreCell)
+                {
+                    std::vector<sortMap3> tVec;
+                    struct sortMap3 tMap;
+                    tMap.key = iMol->atoms[iAn->atoms[1]].codClass;
+                    tMap.val = iMol->atoms[iAn->atoms[1]].id;
+                    tVec.push_back(tMap);
+                    tMap.key = iMol->atoms[iAn->atoms[2]].codClass;
+                    tMap.val = iMol->atoms[iAn->atoms[2]].id;
+                    tVec.push_back(tMap);
+                    std::sort(tVec.begin(), tVec.end(), desSortMapKey3);
+                    std::string tKey = iMol->atoms[iAn->atoms[0]].codClass 
+                                       + "_" + tVec[0].key + "_" + tVec[1].key;
+                    if(aAM.find(tKey)==aAM.end())
+                    {
+                        iAn->atomChemTypes.clear();
+                        iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].id);
+                        iAn->atomsCodClasses.clear();
+                        iAn->atomsCodClasses.push_back(iMol->atoms[iAn->atoms[0]].codClass);
+                        for (std::vector<sortMap3>::iterator iAt=tVec.begin();
+                                iAt !=tVec.end(); iAt++)
+                        {
+                            iAn->atomChemTypes.push_back(iAt->val);
+                            iAn->atomsCodClasses.push_back(iAt->key);
+                        }
+                        angles.push_back(*iAn);
+                        aAM[tKey].push_back(iAn->value);
+                    }
+                    else if (!inVectABS(aAM[tKey], iAn->value, 0.0001))
+                    {
+                        iAn->atomChemTypes.clear();
+                        iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].id);
+                        iAn->atomsCodClasses.clear();
+                        iAn->atomsCodClasses.push_back(iMol->atoms[iAn->atoms[0]].codClass);
+                        for (std::vector<sortMap3>::iterator iAt=tVec.begin();
+                                iAt !=tVec.end(); iAt++)
+                        {
+                            iAn->atomChemTypes.push_back(iAt->val);
+                            iAn->atomsCodClasses.push_back(iAt->key);
+                        }
+                        angles.push_back(*iAn);
+                        aAM[tKey].push_back(iAn->value);
+                    }
                 }
             }
             
