@@ -649,8 +649,9 @@ class Acedrg(CExeCode ):
         if self.workMode == 22 :
             if os.path.isdir(self.inStdCifDir):
                 bTable = self.outRoot + "_all_atoms_bonds_angles.table"
-                self.workMode == 21
+                self.workMode  == 21
                 tAllBondInMols = []
+                tExcludedCif   = []
                 for aCif in glob.glob(self.inStdCifDir+"/*.cif"):
                     tMonomRoot = os.path.basename(aCif).split(".")[0]
                     print "Generate molecules, bonds and angles from ", aCif
@@ -666,9 +667,13 @@ class Acedrg(CExeCode ):
                         tAllBondInMols.append(self.outBondsAndAnglesName)
                     else:
                         print "No bonds and angles are generated from ", aCif
-                
+                        tExcludedCif.append(aCif)
                 if len(tAllBondInMols) !=0:
                     self.getBondsAndAngles(bTable, tAllBondInMols)
+                if len(tExcludedCif) !=0:
+                    print "The following cif files have been excluded from calculations because their large R factors"
+                    for aExCif in tExcludedCif:
+                        print aExCif
 
         if self.workMode == 31 or self.workMode == 32 or self.workMode == 33 or self.workMode == 34 or self.workMode == 35 : 
             print "===================================================================" 
@@ -804,7 +809,14 @@ class Acedrg(CExeCode ):
                                             f2.write("%s       %s        %s      %s      %s      %s    %s     %7.5f\n" \
                                                      %(aElem, bElem, aCl, bCl, aSet[0],  aSet[1], rP, aSet[2]))   
 
-                f2.write("\nAll bond lengths stats: \n")  
+                f2.write("\nAll bond lengths stats: \n")
+                if self.testMode: 
+                    bCaseIdx =0
+                    casesDir = os.path.join(self.scrDir, "CasesNSTATS")
+                    if not glob.glob(casesDir):
+                        os.mkdir(casesDir)
+                     
+                
                 for aElem in sorted(self.allBondsAndAngles["bonds"].iterkeys()):
                     for bElem in sorted(self.allBondsAndAngles["bonds"][aElem].iterkeys()):
                         for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].iterkeys()):
@@ -814,6 +826,16 @@ class Acedrg(CExeCode ):
                                     sig = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["sig"]
                                     num = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["nObs"]
                                     f2.write("%s      %s    %7.5f      %7.5f      %d\n" %(aCl, bCl, ave, sig, num)) 
+                                    if self.testMode and num > 20 and aElem !="H" and bElem != "H" :
+                                        bCaseIdx +=1
+                                        tCasesNameR = aElem + "_" + bElem + str(bCaseIdx) + ".txt"
+                                        tCasesName  = os.path.join(casesDir, tCasesNameR)
+                                        tCases      = open(tCasesName, "w")
+                                        for aSet in self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"]:
+                                            tCases.write("%s      %s      %s      %s    %s     %7.5f    %s\n" \
+                                                     %(aCl, bCl, aSet[0],  aSet[1], rP, aSet[2], aSet[3]))        
+                                        tCases.close()
+                                        
   
             if len(self.allBondsAndAngles["angles"]):
                 f2.write("\n\nAll bond angles: \n")
@@ -888,9 +910,9 @@ class Acedrg(CExeCode ):
 
             for aTup in tBondObjList:
                 sum_diff_sq +=((aTup[2]- tBondStatsDict["mean"])*(aTup[2]- tBondStatsDict["mean"]))
-
+                              
             if numObjs > 1:
-                tBondStatsDict["sig"] = sum_diff_sq/(numObjs-1)
+                tBondStatsDict["sig"] = math.sqrt(sum_diff_sq/(numObjs-1))
             else:
                 tBondStatsDict["sig"] = 0.0  
             
@@ -930,7 +952,7 @@ class Acedrg(CExeCode ):
                 sum_diff_sq +=((aTup[3]- tAngleStatsDict["mean"])*(aTup[3]- tAngleStatsDict["mean"]))
 
             if numObjs > 1:
-                tAngleStatsDict["sig"] = sum_diff_sq/(numObjs-1)
+                tAngleStatsDict["sig"] = math.sqrt(sum_diff_sq/(numObjs-1))
             else:
                 tAngleStatsDict["sig"] = 0.0  
             

@@ -1729,6 +1729,8 @@ namespace LIBMOL
         std::cout << "Number of molecules after linked equiv class: " 
                   << moleculesInCell.size() << std::endl;
         
+        std::vector<Molecule> tmpMols;
+        
         int nMol =0;
         for (std::map<unsigned, std::vector<int> >::iterator iMol=moleculesInCell.begin(); 
                   iMol !=moleculesInCell.end(); iMol++)
@@ -1830,7 +1832,9 @@ namespace LIBMOL
                 }
                 }
                */    
-            
+               
+               tmpMols.push_back(aMol);
+               
                std::string  aMolErrInfo;    
                bool aPass = validateMolecule(aMol, tPTab, aMolErrInfo);
                if ( aPass && aMol.bonds.size() >0 )
@@ -1852,6 +1856,15 @@ namespace LIBMOL
         }
         std::cout << "Number of molecules in allMolecules after validation "
                   << allMolecules.size() << std::endl;
+        
+        std::cout << "Final check, whole structure " << std::endl;
+        std::string errInfoStr;
+        bool tOkStruct = validateBondValueDiffStruct(tmpMols, errInfoStr);
+        if (!tOkStruct)
+        {
+            allMolecules.clear();
+            std::cout <<  errInfoStr << std::endl;
+        }
       
     }
     
@@ -2193,6 +2206,45 @@ namespace LIBMOL
         return false;
     }
     
+    bool MolGenerator::connMetal2ndNB(std::vector<int>& tIdxs, 
+                                      std::vector<AtomDict>& tAtoms)
+    {
+        //std::cout << "Check if two atoms in a bond connect to a metal atom"
+        //          << std::endl;
+        
+        for (std::vector<int>::iterator iIdx=tIdxs.begin();
+                iIdx !=tIdxs.end(); iIdx++)
+        {
+            //std::cout << "Atom " << tAtoms[*iIdx].id << " : " << std::endl;
+            if (tAtoms[*iIdx].isMetal)
+            {
+                return true;
+            }
+            for (std::vector<int>::iterator iNB=tAtoms[*iIdx].connAtoms.begin();
+                    iNB !=tAtoms[*iIdx].connAtoms.end(); iNB++)
+            {
+                if (tAtoms[*iNB].isMetal)
+                {
+                    //std::cout << "its 1NB " << tAtoms[*iNB].id 
+                    //          << " is metal" << std::endl;
+                    return true;
+                }
+                for (std::vector<int>::iterator i2NB=tAtoms[*iNB].connAtoms.begin();
+                        i2NB !=tAtoms[*iNB].connAtoms.end(); i2NB++)
+                {
+                    if (tAtoms[*i2NB].isMetal)
+                    {
+                        //std::cout << "its 1NB " << tAtoms[*i2NB].id 
+                        //      << " is metal" << std::endl;
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    }
+    
     bool MolGenerator::validateBonds(std::vector<BondDict>::iterator tBo, 
                                      std::string & tErrInfo,
                                      PeriodicTable & tPTab)
@@ -2272,7 +2324,7 @@ namespace LIBMOL
         // low bounds of a bond length
         
         REAL covalent_sensitivity;
-        REAL covalent_sensitivity1 =0.25;
+        REAL covalent_sensitivity1 =0.20;
         REAL covalent_sensitivity2 =0.50;
         
         std::vector<REAL> linkRange;
@@ -2337,7 +2389,7 @@ namespace LIBMOL
         // low bounds of a bond length
         
         REAL covalent_sensitivity;
-        REAL covalent_sensitivity1 =0.25;
+        REAL covalent_sensitivity1 =0.20;
         REAL covalent_sensitivity2 =0.50;
         
         std::vector<REAL> linkRange;
@@ -2375,6 +2427,129 @@ namespace LIBMOL
         return true;
        
     }
+    
+    bool MolGenerator::validateBondValueDiff(Molecule& tMol, 
+                                             std::string& tErrInfo)
+    {
+        std::map<ID, std::vector<REAL> > aBondMap;
+        REAL diffThreshold =0.04;
+        
+        for (std::vector<BondDict>::iterator iBo=tMol.bonds.begin();
+                        iBo !=tMol.bonds.end(); iBo++)
+        {
+            if (tMol.atoms[iBo->atomsIdx[0]].chemType.compare("H") !=0
+                && tMol.atoms[iBo->atomsIdx[1]].chemType.compare("H"))
+            {
+                std::list<std::string> tCids;
+                tCids.push_back(tMol.atoms[iBo->atomsIdx[0]].codClass);
+                tCids.push_back(tMol.atoms[iBo->atomsIdx[1]].codClass);
+                tCids.sort(compareNoCase2);
+            
+                std::string aCombID;
+                int nRS =0;
+                for (std::list<std::string>::iterator iId=tCids.begin();
+                        iId !=tCids.end(); iId++)
+                {
+                    if (nRS==0)
+                    {
+                        aCombID.append(*iId);
+                    }
+                    else
+                    {
+                        aCombID.append("_" + *iId);
+                    }
+                    nRS++;
+                }
+                // std::cout << "bond_atom_IDS = " <<  aCombID
+                //          << std::endl;
+            
+                if (aBondMap.find(aCombID)==aBondMap.end())
+                {
+                    // std::cout << iBo->value << " added" << std::endl;
+                    aBondMap[aCombID].push_back(iBo->value);
+                }
+                else
+                {
+                    // std::cout << iBo->value << " under check " << std::endl;
+                
+                    if(outVectAbsDiff(aBondMap[aCombID], iBo->value, diffThreshold))
+                    {
+                        tErrInfo.append("bond between atom " + tMol.atoms[iBo->atomsIdx[0]].id +
+                                        " and " + tMol.atoms[iBo->atomsIdx[1]].id +
+                                        " is very different with another bond of the same atom types."
+                                       +" Molecule rejected \n");
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+   bool MolGenerator::validateBondValueDiffStruct(std::vector<Molecule> & tMols,
+                                                  std::string& tErrInfo)
+   {
+        std::map<ID, std::vector<REAL> > aBondMap;
+        REAL diffThreshold =0.05;
+        for (std::vector<Molecule>::iterator iMol=tMols.begin();
+                iMol !=tMols.end(); iMol++)
+        {
+            for (std::vector<BondDict>::iterator iBo=iMol->bonds.begin();
+                        iBo !=iMol->bonds.end(); iBo++)
+            {
+                if (iMol->atoms[iBo->atomsIdx[0]].chemType.compare("H") !=0
+                    && iMol->atoms[iBo->atomsIdx[1]].chemType.compare("H"))
+                {
+                    std::list<std::string> tCids;
+                    tCids.push_back(iMol->atoms[iBo->atomsIdx[0]].codClass);
+                    tCids.push_back(iMol->atoms[iBo->atomsIdx[1]].codClass);
+                    tCids.sort(compareNoCase2);
+            
+                    std::string aCombID;
+                    int nRS =0;
+                    for (std::list<std::string>::iterator iId=tCids.begin();
+                            iId !=tCids.end(); iId++)
+                    {
+                        if (nRS==0)
+                        {
+                            aCombID.append(*iId);
+                        }
+                        else
+                        {
+                            aCombID.append("_" + *iId);
+                        }
+                        nRS++;
+                    }
+                    // std::cout << "bond_atom_IDS = " <<  aCombID
+                    //          << std::endl;
+            
+                    if (aBondMap.find(aCombID)==aBondMap.end())
+                    {
+                        // std::cout << iBo->value << " added" << std::endl;
+                        aBondMap[aCombID].push_back(iBo->value);
+                    }
+                    else
+                    {
+                        // std::cout << iBo->value << " under check " << std::endl;
+                
+                        if(outVectAbsDiff(aBondMap[aCombID], iBo->value, diffThreshold))
+                        {
+                            tErrInfo.append("REJECTED STRCUTRUE: DIFF OF BOND VALUES TOO BIG\nbond between atom " 
+                                            + iMol->atoms[iBo->atomsIdx[0]].id +
+                                            " and " + iMol->atoms[iBo->atomsIdx[1]].id +
+                                            " is very different with another bond of the same atom types."
+                                           +" Molecule rejected \n");
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return true;
+    }
+    
     
     bool MolGenerator::validateAtomLinks(Molecule & tMol, 
                                          PeriodicTable & tPTab,
@@ -2466,6 +2641,8 @@ namespace LIBMOL
         
     }
     
+
+    
     bool MolGenerator::validateMolecule(Molecule      & tMol, 
                                         PeriodicTable & tPTab, 
                                         std::string   & tErrInfo)
@@ -2492,9 +2669,16 @@ namespace LIBMOL
             }
         }
         
+        // addition value difference check
+        if (!validateBondValueDiff(tMol, tErrInfo))
+        {
+            return false;
+        }
+        
         return true;
         
     }
+    
     
     void MolGenerator::getAtomTypeOneMol(Molecule& tMol)
     {
@@ -2535,8 +2719,8 @@ namespace LIBMOL
         CodClassify aCodSys(tMol.atoms);
         
         aCodSys.setAtomsBondingAndChiralCenter();
-        aCodSys.codAtomClassifyNew(2);
-        
+        // aCodSys.codAtomClassifyNew(2);
+        aCodSys.codAtomClassifyNew2(2);
         
         tMol.atoms.clear();         
         for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();
@@ -2620,6 +2804,7 @@ namespace LIBMOL
                     bonds.push_back(*iBo);
                     aBM[tKey].push_back(iBo->value);
                 }
+                
             }
             //std::cout << "Total Number of unique bonds are " << bonds.size() << std::endl;
             //std::cout << "this molecule has " << iMol->angles.size() 
@@ -2674,7 +2859,7 @@ namespace LIBMOL
             
             // std::cout << "Total number of unique angles are " << angles.size() << std::endl;
         }
-        std::cout << "Total Number of unique bonds are " << bonds.size() << std::endl;
+        std::cout << "Total Number of unique bonds are "  << bonds.size() << std::endl;
         std::cout << "Total number of unique angles are " << angles.size() << std::endl;
     }
     
@@ -2694,6 +2879,19 @@ namespace LIBMOL
                 if (iMol->atoms[iBo->atomsIdx[0]].isInPreCell
                     || iMol->atoms[iBo->atomsIdx[1]].isInPreCell)
                 {
+                    std::vector<int> aIdxSet;
+                    aIdxSet.push_back(iBo->atomsIdx[0]);
+                    aIdxSet.push_back(iBo->atomsIdx[1]);
+                
+                    std::cout << "Check a bond " << std::endl;
+                    std::cout << "atom 1 " << iMol->atoms[iBo->atomsIdx[0]].id
+                              << " with type " << iMol->atoms[iBo->atomsIdx[0]].codClass
+                              << std::endl 
+                              << "atom 2 " << iMol->atoms[iBo->atomsIdx[1]].id
+                              << " with type " << iMol->atoms[iBo->atomsIdx[1]].codClass;
+                if (!connMetal2ndNB(aIdxSet, iMol->atoms))
+                {
+                    std::cout << "bond contains no metal up to the 2NB " << std::endl;
                     std::vector<sortMap3> tVec;
                     struct sortMap3 tMap;
                     tMap.key  = iMol->atoms[iBo->atomsIdx[0]].codClass;
@@ -2735,6 +2933,7 @@ namespace LIBMOL
                         bonds.push_back(*iBo);
                         aBM[tKey].push_back(iBo->value);
                     }
+                }
                 }
             }
             //std::cout << "Total Number of unique bonds are " << bonds.size() << std::endl;
@@ -2844,24 +3043,30 @@ namespace LIBMOL
                 for (std::vector<BondDict>::iterator iBo=tMol.bonds.begin();
                         iBo !=tMol.bonds.end(); iBo++)
                 {
-                    std::string tStr;
-                    if (iBo->isInSameRing)
+                    std::vector<int> aIdxSet;
+                    aIdxSet.push_back(iBo->atomsIdx[0]);
+                    aIdxSet.push_back(iBo->atomsIdx[1]);
+                    if (!connMetal2ndNB(aIdxSet, tMol.atoms))
                     {
-                        tStr="Y";
-                    }
-                    else
-                    {
-                        tStr="N";
-                    }
+                        std::string tStr;
+                        if (iBo->isInSameRing)
+                        {
+                            tStr="Y";
+                        }
+                        else
+                        {
+                            tStr="N";
+                        }
                    
-                    tMolTabs << std::setw(6) << nBo
-                             << std::setw(6) << iBo->atomsIdx[0] + 1 
-                             << std::setw(6) << iBo->atomsIdx[1] + 1
-                             << std::setw(4) << tMol.atoms[iBo->atomsIdx[0]].chemType
-                             << std::setw(4) << tMol.atoms[iBo->atomsIdx[1]].chemType
-                             << std::setw(10)<< iBo->value 
-                             << std::setw(6) << tStr << std::endl;
-                    nBo++;
+                        tMolTabs << std::setw(6) << nBo
+                                 << std::setw(6) << iBo->atomsIdx[0] + 1 
+                                 << std::setw(6) << iBo->atomsIdx[1] + 1
+                                 << std::setw(4) << tMol.atoms[iBo->atomsIdx[0]].chemType
+                                 << std::setw(4) << tMol.atoms[iBo->atomsIdx[1]].chemType
+                                 << std::setw(10)<< iBo->value 
+                                 << std::setw(6) << tStr << std::endl;
+                        nBo++;
+                    }
                    
                 }
             
@@ -2919,24 +3124,25 @@ namespace LIBMOL
                 for (std::vector<BondDict>::iterator iBo=bonds.begin();
                         iBo !=bonds.end(); iBo++)
                 {
-                    std::string tStr;
-                    if (iBo->isInSameRing)
-                    {
-                        tStr="Y";
-                    }
-                    else
-                    {
-                        tStr="N";
-                    }
                     
-                    if (iBo->atomsCodClasses.size()==2)
-                    {
-                          aBAndAF <<  iBo->atomsCodClasses[0] << "\t"
-                                  <<  iBo->atomsCodClasses[1] << "\t"
-                                  <<  iBo->atoms[0] << "\t" << iBo->atoms[1] 
-                                  << "\t"  << iBo->value << "\t"  
-                                  <<  tStr << std::endl;
-                    }
+                        std::string tStr;
+                        if (iBo->isInSameRing)
+                        {
+                            tStr="Y";
+                        }
+                        else
+                        {
+                            tStr="N";
+                        }
+                    
+                        if (iBo->atomsCodClasses.size()==2)
+                        {
+                            aBAndAF <<  iBo->atomsCodClasses[0] << "\t"
+                                    <<  iBo->atomsCodClasses[1] << "\t"
+                                    <<  iBo->atoms[0] << "\t" << iBo->atoms[1] 
+                                    << "\t"  << iBo->value << "\t"  
+                                    <<  tStr << std::endl;
+                        }
                 }
                 
                 aBAndAF << std::endl;

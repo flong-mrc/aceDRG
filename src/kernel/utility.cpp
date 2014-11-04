@@ -348,6 +348,31 @@ namespace LIBMOL
         return false;
     }
     
+    extern bool outVectAbsDiff(std::vector<REAL> & tVect,
+                              REAL tVal, REAL tErr)
+    {
+        REAL x1=fabs(tVal);
+        for (std::vector<REAL>::iterator iV=tVect.begin();
+                iV !=tVect.end(); iV++)
+        {
+            REAL x2 = fabs(*iV);
+            // std::cout << " diff is " << 2.0*fabs(x1-x2)/(x1+x2) << std::endl;
+            if (x1 >= 0.0000001 && x2 >=0.0000001)
+            {
+                if (2.0*fabs(x1-x2)/(x1+x2) > tErr)
+                {
+                    return true;
+                }
+            }
+            else if (fabs(x1-x2) > tErr)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     extern void getFracReal(REAL tR, REAL & tFrac, REAL tTar)
     {
         // select a fraction of real number tR which is small than tTar,

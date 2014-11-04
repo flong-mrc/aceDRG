@@ -129,6 +129,9 @@ namespace LIBMOL
     extern bool inVectABS(std::vector<REAL>  & tVect,
                           REAL  tVal, REAL tErr);
     
+    extern bool outVectAbsDiff(std::vector<REAL>  & tVect,
+                              REAL  tVal, REAL tErr);
+    
     extern void getFracReal(REAL tR1, REAL & tFrac, REAL tTar);
     
     extern REAL lengthV(std::vector<REAL> & tV1);

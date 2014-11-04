@@ -186,6 +186,9 @@ namespace LIBMOL
         bool isASUAtomInMol(std::map<unsigned, std::vector<int> >::iterator tMol);
         bool connMetal(std::vector<int>      & tIdxs, 
                        std::vector<AtomDict> & tAtoms);
+        bool connMetal2ndNB(std::vector<int>      & tIdxs, 
+                       std::vector<AtomDict> & tAtoms);
+        
         bool checkAtomOcp(Molecule  & tMol, std::string  & tErrInfo);
         bool validateBonds(std::vector<BondDict>::iterator tBo, 
                            std::string & tErrInfo,
@@ -194,6 +197,10 @@ namespace LIBMOL
                            Molecule    & tMol,
                            std::string & tErrInfo,
                            PeriodicTable & tPTab);
+        bool validateBondValueDiff(Molecule    & tMol,
+                                   std::string & tErrInfo);
+        bool validateBondValueDiffStruct(std::vector<Molecule> & tMols,
+                                         std::string & tErrInfo);
         
         bool validateAtomLinks(Molecule    & tMol,
                                PeriodicTable & tPTab,

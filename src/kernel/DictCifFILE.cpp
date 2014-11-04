@@ -14,7 +14,7 @@ namespace LIBMOL
     GenCifFile::GenCifFile() : curBlockLine(ZeroInt),
             hasCoords(false),
             hasH(false),
-            RFactorOK(true),
+            RFactorOK(false),
             itsCurAtomSeriNum(ZeroInt),
             itsCurAtom(NullPoint),
             itsCurBlock(""),
@@ -27,7 +27,7 @@ namespace LIBMOL
                            curBlockLine(ZeroInt),
                            hasCoords(false),
                            hasH(false),
-                           RFactorOK(true),
+                           RFactorOK(false),
                            itsCurAtomSeriNum(ZeroInt),  
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
@@ -61,7 +61,7 @@ namespace LIBMOL
                            curBlockLine(ZeroInt),
                            hasCoords(false),
                            hasH(false),
-                           RFactorOK(true),
+                           RFactorOK(false),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurCryst(NullPoint)
@@ -379,19 +379,40 @@ namespace LIBMOL
                     if (tBuf.size()==2)
                     {
                         REAL tT=StrToReal(tBuf[1]);
+                        if (tT >=1.0)
+                        {
+                            tT = tT/100.0;
+                        }
                         std::cout << "_refine_ls_R_factor_all="
                                   << tT << std::endl;
                         
-                        if (tT > RTHRESHOLD)
+                        if (tT < RTHRESHOLD)
                         {
-                            RFactorOK = false;
+                            RFactorOK = true;
                         }
                     }
                 }
                 
-                if (!RFactorOK)
+                if (tRecord.find("_refine_ls_R_factor_gt") !=std::string::npos)
                 {
-                    break;
+                    std::cout << "R factor line: " << tRecord << std::endl;
+                    
+                    StrTokenize(tRecord,  tBuf);
+                    if (tBuf.size()==2)
+                    {
+                        REAL tT=StrToReal(tBuf[1]);
+                        if (tT >=1.0)
+                        {
+                            tT = tT/100.0;
+                        }
+                        std::cout << "_refine_ls_R_factor_all="
+                                  << tT << std::endl;
+                        
+                        if (tT < RTHRESHOLD)
+                        {
+                            RFactorOK = true;
+                        }
+                    }
                 }
                         
                 if (tRecord.find("loop_") !=std::string::npos 

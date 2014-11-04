@@ -540,6 +540,57 @@ namespace LIBMOL
         
     }
     
+    void CodClassify::codAtomClassifyNew2(int dLev)
+    {
+        ringTools aRingTool;
+        allRings.clear();
+        allPlanes.clear();
+        int nMaxRing = 7;
+        aRingTool.detectRingFromAtoms(allAtoms, allRings, dLev, nMaxRing);
+        
+        std::cout <<  "(2) Different tool. There are " 
+                  << allRings.size() << " rings. They are: "
+                  << std::endl;
+        std::vector<RingDict> allRingsV;    
+        for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
+                    iR1 !=allRings.end(); iR1++)
+        {
+            std::cout << "(2)Ring representation " << iR1->first << std::endl;
+            for (std::vector<RingDict>::iterator iR11=iR1->second.begin();
+                        iR11 !=iR1->second.end(); iR11++)
+            {
+                allRingsV.push_back(*iR11);
+                std::cout << "The ring consists of atoms: " << std::endl;
+                for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
+                        iAt1 !=iR11->atoms.end(); iAt1++)
+                {
+                    std::cout << iAt1->id << std::endl;
+                }
+            }
+                
+            std::cout << std::endl;
+            
+        }
+        
+        if (allRingsV.size())
+        {
+            checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
+        }
+            
+        aRingTool.setAtomsRingRepreS(allAtoms, allRingsV);
+        
+        for (int i=0; i < (int)allAtoms.size(); i++)
+        {
+            allAtoms[i].codClass = "";
+            setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
+            std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl 
+                      << "class is " << allAtoms[i].codClass << std::endl;            
+        }
+        
+    }
+    
+        
+    
     void CodClassify::codClassToAtom(ID  & tCodClass, AtomDict& tAt)
     {
         tCodClass=TrimSpaces(tCodClass);
@@ -2223,6 +2274,210 @@ namespace LIBMOL
         }
     }
     
+    void CodClassify::setAtomCodClassNameNew2(AtomDict & tAtom,
+                                             AtomDict & tOriAtom,
+                                             int tLev)
+    {
+        
+        if (tLev==1)
+        {
+            tAtom.codClass = "";
+            tAtom.codClass.append(tAtom.chemType);
+            outRingSecNew(tAtom);
+            
+            std::string tStr;
+            std::list<std::string> tStrList, tStrList1;
+            std::map<ID, int> comps;
+            
+            //tStrList.push_back(tAtom.chemType);
+            
+            //std::cout << "Id list size " << (int) tStrList.size() << std::endl;
+            // just get immediate neighbor atom ID
+            for (std::vector<int>::iterator tNBAtom=tAtom.connAtoms.begin();
+                    tNBAtom != tAtom.connAtoms.end(); tNBAtom++)
+            {
+                if(allAtoms[*tNBAtom].seriNum != tOriAtom.seriNum)
+                {
+                    // tStrList.push_back(allAtoms[*tNBAtom].chemType);
+                    std::string t2NBType;
+                    t2NBType.append(allAtoms[*tNBAtom].chemType);
+                    outRingSecNew2(t2NBType, allAtoms[*tNBAtom]);
+                    if(comps.find(t2NBType) != comps.end())
+                    {
+                        comps[t2NBType] += 1;
+                    }
+                    else
+                    {
+                        comps[t2NBType] = 1; 
+                    }
+                }
+            }
+            
+            sortMap  tCMap;
+            std::vector<sortMap> tCVec;
+            
+            for (std::map<ID, int>::iterator tM=comps.begin();
+                   tM !=comps.end(); tM++)
+            {
+                tCMap.key = tM->first;
+                tCMap.val = tM->second;
+                tCVec.push_back(tCMap);
+            }
+            
+            std::sort(tCVec.begin(),tCVec.end(), desSortMapKey);
+            
+            for (std::vector<sortMap>::iterator iMa=tCVec.begin();
+                    iMa !=tCVec.end(); iMa++)
+            {
+                std::string s1, s2;
+                s1 = iMa->key + IntToStr(iMa->val);
+                for (int i=0; i < iMa->val; i++)
+                {
+                    s2.append(iMa->key);
+                }
+                if ((int)s1.size() < (int)s2.size())
+                {
+                    tStrList.push_back(s1);
+                }
+                else
+                {
+                    tStrList.push_back(s2);
+                }
+            }
+            
+            /*
+            for (std::map<ID, int>::iterator iMa=comps.begin();
+                    iMa !=comps.end(); iMa++)
+            {
+                std::string s1, s2;
+                s1 = iMa->first + IntToStr(iMa->second);
+                for (int i=0; i < iMa->second; i++)
+                {
+                    s2.append(iMa->first);
+                }
+                if ((int)s1.size() < (int)s2.size())
+                {
+                    tStrList.push_back(s1);
+                }
+                else
+                {
+                    tStrList.push_back(s2);
+                }
+            }
+            */
+            
+            // tStrList.sort(compareNoCase2);
+            // std::cout << "sort Id list size " << (int) tStrList.size() << std::endl;
+            for (std::list<std::string>::iterator iL = tStrList.begin();
+                    iL != tStrList.end(); iL++)
+            {
+                tStr.append(*iL);
+            }
+            
+            //std::cout << "the final str size " << (int) tStr.size() << std::endl;
+            tAtom.nbRep.push_back(tStr);
+            tAtom.codClass.append(tStr);
+        }
+        else if(tLev==2)
+        {
+            tAtom.codClass = "";
+            tAtom.codClass.append(tAtom.chemType);
+            outRingSecNew(tAtom);
+            std::cout << "Atom " << tAtom.id << " its COD ring section " 
+                      <<  tAtom.codClass << std::endl;
+            
+            int lowLev = tLev - 1;
+            std::map<std::string, std::vector<int> > tIdMap;
+            for (std::vector<int>::iterator tNBA=tAtom.connAtoms.begin();
+                    tNBA != tAtom.connAtoms.end(); tNBA++)
+            {
+                AtomDict aNBAtom(allAtoms[*tNBA]);
+                setAtomCodClassNameNew2(aNBAtom, tOriAtom, lowLev);
+                /*
+                std::list<std::string> tStrList;
+                std::string tStr(allAtoms[*tNBA].chemType);
+                tStr.append(outRingSecStr(allAtoms[*tNBA]));
+                
+                for (std::vector<int>::iterator tNNBA=allAtoms[*tNBA].connAtoms.begin();
+                        tNNBA != allAtoms[*tNBA].connAtoms.end(); tNNBA++)
+                {
+                    if(allAtoms[*tNNBA].id.compare(tAtom.id) !=0)
+                    {
+                        tStrList.push_front(allAtoms[*tNNBA].chemType);
+                    }
+                }
+                tStrList.sort(compareNoCase);
+                for (std::list<std::string>::iterator iSL=tStrList.begin();
+                        iSL != tStrList.end(); iSL++)
+                {
+                    tStr.append(*iSL);
+                }
+                */
+                
+                if(tIdMap.find(aNBAtom.codClass) !=tIdMap.end())
+                {
+                    tIdMap[aNBAtom.codClass][0]++;
+                    
+                }
+                else
+                {
+                    tIdMap[aNBAtom.codClass].push_back(1);
+                    tIdMap[aNBAtom.codClass].push_back((int)aNBAtom.connAtoms.size());
+                }
+                 
+            }
+            
+            //sortMap  tSMap;
+            //std::vector<sortMap> tVec;
+            
+            
+            std::vector<sortMap2> tVec;
+            
+            for (std::map<std::string, std::vector<int> >::iterator tM=tIdMap.begin();
+                   tM !=tIdMap.end(); tM++)
+            {
+                struct sortMap2  tSMap2;
+                tSMap2.key = tM->first;
+                tSMap2.val = tM->second[0];
+                tSMap2.nNB = tM->second[1];
+                tVec.push_back(tSMap2);
+            }
+            
+            std::sort(tVec.begin(),tVec.end(), desSortMapKey2);
+            
+            // check
+            /*
+            if (tAtom.id == "B4")
+            {
+               std::cout << "After sorting " << std::endl;
+               for (std::vector<sortMap>::iterator iV=tVec.begin();
+                    iV != tVec.end(); iV++)
+               {
+                    std::cout << " key: " << iV->key << " value : "
+                          << iV->val << std::endl;
+               }
+            }
+            */
+            for(std::vector<sortMap2>::iterator iV=tVec.begin();
+                    iV !=tVec.end(); iV++)
+            {
+                if (iV->val ==1)
+                {
+                    tAtom.codClass.append("("+iV->key+")");
+                }
+                else
+                {
+                    tAtom.codClass.append("(" + iV->key + ")" + IntToStr(iV->val));
+                }
+            }
+            
+            //std::cout<<"For atom " << tAtom.id << " : " << std::endl;
+            //std::cout << "Its COD class is : " << tAtom.codClass 
+            //          << std::endl <<std::endl;
+        }
+    }
+    
+    
     void CodClassify::outRingSec(AtomDict &tAtom)
     {
         int numRings = (int)tAtom.ringRep.size();
@@ -2347,7 +2602,7 @@ namespace LIBMOL
     void CodClassify::outRingSecNew(AtomDict &tAtom)
     {
         int numRings = (int)tAtom.ringRepS.size();
-        std::cout << "tAtom.ringRepS.size() " << tAtom.ringRepS.size() << std::endl;
+        //std::cout << "tAtom.ringRepS.size() " << tAtom.ringRepS.size() << std::endl;
         
         if (numRings)
         {
@@ -2404,9 +2659,75 @@ namespace LIBMOL
                 i++;
             }
             
-            std::cout << "ring section atom " << tAtom.id << tAtom.codClass << std::endl;
+            //std::cout << "ring section atom " << tAtom.id << tAtom.codClass << std::endl;
         }
     }
+    
+    void CodClassify::outRingSecNew2(std::string & tAtmCodStr,
+                                     AtomDict &tAtom)
+    {
+        int numRings = (int)tAtom.ringRepS.size();
+        //std::cout << "tAtom.ringRepS.size() " << tAtom.ringRepS.size() << std::endl;
+        
+        if (numRings)
+        {
+            
+            std::map<std::string, int> sizeMap;
+            
+            
+            for (std::map<std::string, std::string>::iterator iMR=tAtom.ringRepS.begin();
+                    iMR != tAtom.ringRepS.end(); iMR++)
+            {
+                if (sizeMap.find(iMR->second) ==sizeMap.end())
+                {
+                    sizeMap[iMR->second] =1;
+                }
+                else
+                {
+                    sizeMap[iMR->second]++;
+                }   
+            }
+            
+            tAtmCodStr.append("[");
+            int i =0;
+            int j = (int)sizeMap.size();
+            for (std::map<ID, int>::iterator iSMa=sizeMap.begin();
+                    iSMa != sizeMap.end(); iSMa++)
+            {
+                // std::string tSize = IntToStr(iSMa->first);
+                std::string tSize(iSMa->first);
+                std::string tNum  = IntToStr(iSMa->second);
+                
+                if(iSMa->second >= 3)
+                {
+                    tAtmCodStr.append(tNum + "x" + tSize);
+                }
+                else if (iSMa->second==2)
+                {
+                    tAtmCodStr.append( tSize + "," + tSize);
+                }   
+                else if (iSMa->second==1)
+                {
+                    tAtmCodStr.append(tSize);
+                }
+                       
+                
+                if(i != j-1)
+                {
+                    tAtmCodStr.append(",");
+                }
+                else
+                {
+                    tAtmCodStr.append("]");
+                }
+                    
+                i++;
+            }
+            
+            //std::cout << "ring section atom " << tAtom.id << tAtom.codClass << std::endl;
+        }
+    }
+    
     
     std::string CodClassify::outRingSecStr(AtomDict &tAtom)
     {

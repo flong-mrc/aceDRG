@@ -355,7 +355,10 @@ int main(int argc, char** argv) {
             }
             else
             {
-                std::cout << "The data will not be converted to molecules because of high R factors"
+                std::cout << "REJECTED STRUCTURE: R factor related " << std::endl; 
+                std::cout << "The data will not be converted to molecules because of : "
+                          << std::endl << "(1) high R factors" << std::endl
+                          << "or " << std::endl << "(2) no R factors in the data"
                           << std::endl;
             }
         }
