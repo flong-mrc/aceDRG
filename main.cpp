@@ -397,7 +397,7 @@ int main(int argc, char** argv) {
             {
                 tmpAtomSet.push_back(*iAt);
             }
-            
+            /*
             std::cout <<  "There are " << aCodSystem.allRings.size() << " rings. They are: "
                       << std::endl;
             
@@ -419,8 +419,10 @@ int main(int argc, char** argv) {
                 std::cout << std::endl;
                 
             }
-            
-            aCodSystem.codAtomClassifyNew(2);
+            */
+            LIBMOL::CodClassify  aCodSystem2(aTargetSystem.allAtoms);
+            aCodSystem2.setAtomsBondingAndChiralCenter();
+            aCodSystem2.codAtomClassifyNew2(2);
             
             std::cout << "Different symbol system now: " << std::endl;
             for (unsigned i=0; i < aCodSystem.allAtoms.size(); i++)
@@ -429,7 +431,7 @@ int main(int argc, char** argv) {
                         !=0)
                 {
                     std::cout << "Atom " << aCodSystem.allAtoms[i].id 
-                              << " new Cod type " << aCodSystem.allAtoms[i].codClass
+                              << " new Cod type " << aCodSystem2.allAtoms[i].codClass
                               << " old Cod type " << tmpAtomSet[i].codClass 
                               << std::endl;
                 }

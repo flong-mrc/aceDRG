@@ -1049,7 +1049,8 @@ class Acedrg(CExeCode ):
                             if os.path.isfile(self.refmacXYZOUTName):
                                 finPdb = self.outRoot + ".pdb"
                                 finRst = self.outRoot + ".cif"
-                                os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
+                                #os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
+                                shutil.copy(self.refmacXYZOUTName, finPdb)
                                 #os.system("cp %s   %s "%(self.outRstCifName, finRst))
                                 if os.path.isfile(finPdb):
                                     self.inPdbName        = finPdb 
@@ -1279,7 +1280,8 @@ class Acedrg(CExeCode ):
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
                 tCif = self.outRoot + ".cif"
-                os.system("cp %s %s"%(self.outRstCifName, tCif)) 
+                #os.system("cp %s %s"%(self.outRstCifName, tCif)) 
+                shutil.copy(self.outRstCifName, tCif) 
             else:
                 print "acedrg failed to generate a dictionary file"       
 

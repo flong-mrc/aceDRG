@@ -756,10 +756,11 @@ namespace LIBMOL
         }
         */
         
-        REAL covalent_sensitivity;
+        REAL covalent_sensitivity =0.15;
         REAL covalent_sensitivity1 =0.15;
         REAL covalent_sensitivity2 =0.22;
-        REAL covalent_sensitivity3 =0.20;
+        REAL covalent_sensitivity3 =0.30;
+        REAL covalent_sensitivity4 =0.90;
         
         NeighbListDict  tNBListOfSystem;
         
@@ -821,21 +822,29 @@ namespace LIBMOL
                                                        tCryst->itsCell->beta, tCryst->itsCell->gamma);
                     
                     std::vector<REAL> bondRange;
-                    if (allAtoms[i].chemType=="H" || allAtoms[*iNB].chemType=="H")
+                    
+                    if ( (allAtoms[i].chemType=="H" && allAtoms[*iNB].chemType=="O")
+                        || (allAtoms[i].chemType=="O" && allAtoms[*iNB].chemType=="H"))
                     {
+                        
+                        covalent_sensitivity = covalent_sensitivity4;
+                        
+                    }
+                    else if (allAtoms[*iNB].chemType=="O" || allAtoms[i].chemType=="O" )
+                    {
+                        
                         covalent_sensitivity = covalent_sensitivity3;
                     }
                     else if ((!allAtoms[i].isMetal) && (!allAtoms[*iNB].isMetal))
                     {
                         covalent_sensitivity = covalent_sensitivity1;
                     }
-                    
                     else
                     {
                         covalent_sensitivity = covalent_sensitivity2;
                     }
                     
-                    // std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
+                    std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
 
                     getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                                          covalent_sensitivity, tPTab, 
@@ -852,6 +861,7 @@ namespace LIBMOL
                     
                     if (bondRange[0] >0.20 && bondRange[1] >0.20)
                     {
+                        
                         if (rD < bondRange[1])
                         {
                             
@@ -868,7 +878,6 @@ namespace LIBMOL
                                 allAtoms[*iNB].connAtoms.push_back(i);
                             }
                             
-                            // if (allAtoms[i].id=="C22" && allAtoms[i].isInPreCell)
                             
                             //std::cout << "a bond between " << allAtoms[i].id << " and "
                             //          << allAtoms[*iNB].id << " is added to the bond_list_cell " 
@@ -1194,7 +1203,14 @@ namespace LIBMOL
             REAL tRad, tExtraD;
             tRad  =  comp1 + comp2;      
             tExtraD= tSens*tRad;
-            tRange[0] =   tRad -tExtraD;
+            if (tAtm2.chemType=="H" || tAtm1.chemType=="H")
+            {
+                tRange[0] =   tRad -0.5*tExtraD;
+            }
+            else
+            {
+                tRange[0] =   tRad -tExtraD;
+            }
             if (tRange[0] < 0.2)
             {
                 tRange[0] =0.2;
@@ -2326,11 +2342,21 @@ namespace LIBMOL
         REAL covalent_sensitivity;
         REAL covalent_sensitivity1 =0.20;
         REAL covalent_sensitivity2 =0.50;
+        REAL covalent_sensitivity3 =0.30;
+        REAL covalent_sensitivity4 =0.80;
         
         std::vector<REAL> linkRange;
-                
-        
-        if ((!allAtoms[tBo->atomsIdx[0]].isMetal) && (!allAtoms[tBo->atomsIdx[1]].isMetal))
+        if ( (allAtoms[tBo->atomsIdx[0]].chemType=="H" && allAtoms[tBo->atomsIdx[1]].chemType=="O")
+             || (allAtoms[tBo->atomsIdx[0]].chemType=="O" && allAtoms[tBo->atomsIdx[1]].chemType=="H"))
+        {
+            covalent_sensitivity = covalent_sensitivity4;
+        }
+        else if ( allAtoms[tBo->atomsIdx[1]].chemType=="O"
+             || allAtoms[tBo->atomsIdx[0]].chemType=="O")
+        {
+            covalent_sensitivity = covalent_sensitivity3;
+        }
+        else if ((!allAtoms[tBo->atomsIdx[0]].isMetal) && (!allAtoms[tBo->atomsIdx[1]].isMetal))
         {
             covalent_sensitivity = covalent_sensitivity1;
         }
@@ -2391,11 +2417,21 @@ namespace LIBMOL
         REAL covalent_sensitivity;
         REAL covalent_sensitivity1 =0.20;
         REAL covalent_sensitivity2 =0.50;
+        REAL covalent_sensitivity3 =0.30;
+        REAL covalent_sensitivity4 =0.80;
         
         std::vector<REAL> linkRange;
-                
-        
-        if ((!tMol.atoms[tBo->atomsIdx[0]].isMetal) && (!tMol.atoms[tBo->atomsIdx[1]].isMetal))
+        if ((tMol.atoms[tBo->atomsIdx[0]].chemType=="H" && tMol.atoms[tBo->atomsIdx[1]].chemType=="O")
+             || (tMol.atoms[tBo->atomsIdx[0]].chemType=="O" && tMol.atoms[tBo->atomsIdx[1]].chemType=="H"))
+        {        
+            covalent_sensitivity = covalent_sensitivity4;
+        }
+        else if (tMol.atoms[tBo->atomsIdx[1]].chemType=="O"
+             || tMol.atoms[tBo->atomsIdx[0]].chemType=="O")
+        {
+            covalent_sensitivity = covalent_sensitivity3;
+        }
+        else if ((!tMol.atoms[tBo->atomsIdx[0]].isMetal) && (!tMol.atoms[tBo->atomsIdx[1]].isMetal))
         {
             covalent_sensitivity = covalent_sensitivity1;
         }
@@ -2617,10 +2653,24 @@ namespace LIBMOL
             else if (iAt->chemType.compare("H")==0 && iAt->connAtoms.size() >1) 
                   
             {
-                tErrInfo =  "Reject the molecule! H Atom " + iAt->id 
-                          + " serial number "   +  IntToStr(iAt->seriNum)
-                          + " has connections " +  IntToStr((int)iAt->connAtoms.size()); 
-                return false;
+                bool findO = false;
+                for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                        iNB !=iAt->connAtoms.end(); iNB++)
+                {
+                    if (tMol.atoms[*iNB].chemType=="O")
+                    {
+                        findO=true;
+                        break;
+                    }
+                }
+                if ((findO && iAt->connAtoms.size() >2)
+                     || (!findO && iAt->connAtoms.size() >1))
+                {
+                    tErrInfo =  "Reject the molecule! H Atom " + iAt->id 
+                               + " serial number "   +  IntToStr(iAt->seriNum)
+                               + " has connections " +  IntToStr((int)iAt->connAtoms.size()); 
+                    return false;
+                }
             }
             // Halogen group
             else if (tPTab.elements[iAt->chemType]["group"] == 17  

@@ -361,7 +361,8 @@ namespace LIBMOL
             std::string tRecord="";
             
             std::vector<std::string>     tBlocLines;
-            
+            REAL tROK1 = -1.0;
+            REAL tROK2 = -1.0;
             while(!inFile.eof())
             {   
                 std::getline(inFile, tRecord);
@@ -370,7 +371,7 @@ namespace LIBMOL
                 std::vector<std::string> tBuf;
                 std::vector<std::string> tBuf_t;
                 // only use a few blocks in the cif file
-                
+               
                 if (tRecord.find("_refine_ls_R_factor_all") !=std::string::npos)
                 {
                     std::cout << "R factor line: " << tRecord << std::endl;
@@ -378,18 +379,13 @@ namespace LIBMOL
                     StrTokenize(tRecord,  tBuf);
                     if (tBuf.size()==2)
                     {
-                        REAL tT=StrToReal(tBuf[1]);
-                        if (tT >=1.0)
+                        tROK1=StrToReal(tBuf[1]);
+                        if (tROK1 >=1.0)
                         {
-                            tT = tT/100.0;
+                            tROK1 = tROK1/100.0;
                         }
                         std::cout << "_refine_ls_R_factor_all="
-                                  << tT << std::endl;
-                        
-                        if (tT < RTHRESHOLD)
-                        {
-                            RFactorOK = true;
-                        }
+                                  << tROK1 << std::endl;
                     }
                 }
                 
@@ -400,21 +396,17 @@ namespace LIBMOL
                     StrTokenize(tRecord,  tBuf);
                     if (tBuf.size()==2)
                     {
-                        REAL tT=StrToReal(tBuf[1]);
-                        if (tT >=1.0)
+                        tROK2=StrToReal(tBuf[1]);
+                        if (tROK2 >=1.0)
                         {
-                            tT = tT/100.0;
+                            tROK2 = tROK2/100.0;
                         }
                         std::cout << "_refine_ls_R_factor_all="
-                                  << tT << std::endl;
-                        
-                        if (tT < RTHRESHOLD)
-                        {
-                            RFactorOK = true;
-                        }
+                                  << tROK2 << std::endl;
+          
                     }
                 }
-                        
+                
                 if (tRecord.find("loop_") !=std::string::npos 
                     || (tRecord.find("data_") !=std::string::npos
                         && tRecord.find("_data_") ==std::string::npos))
@@ -441,6 +433,30 @@ namespace LIBMOL
                 tBlocs.push_back(tBlocLines);
                 tBlocLines.clear();
             }
+            
+            if (tROK1 > 0.0 && tROK2 > 0.0)
+            {
+                if (tROK1 <RTHRESHOLD && tROK2 < RTHRESHOLD)
+                {
+                    RFactorOK = true;
+                }
+            }
+            else if (tROK1 > 0.0 && tROK2 < 0.0)
+            {
+                if (tROK1 <RTHRESHOLD)
+                {
+                    RFactorOK = true;
+                }
+            }
+            else if (tROK1 < 0.0 && tROK2 > 0.0)
+            {
+                if (tROK2 <RTHRESHOLD)
+                {
+                    RFactorOK = true;
+                }
+            }
+            
+            
             inFile.close();
             
             // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
