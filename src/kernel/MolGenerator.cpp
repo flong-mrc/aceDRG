@@ -835,6 +835,11 @@ namespace LIBMOL
                         
                         covalent_sensitivity = covalent_sensitivity3;
                     }
+                    else if ( allAtoms[*iNB].chemType=="H"
+                               || allAtoms[i].chemType=="H")
+                    {
+                        covalent_sensitivity = covalent_sensitivity3;
+                    }
                     else if ((!allAtoms[i].isMetal) && (!allAtoms[*iNB].isMetal))
                     {
                         covalent_sensitivity = covalent_sensitivity1;
@@ -2356,6 +2361,11 @@ namespace LIBMOL
         {
             covalent_sensitivity = covalent_sensitivity3;
         }
+        else if ( allAtoms[tBo->atomsIdx[1]].chemType=="H"
+             || allAtoms[tBo->atomsIdx[0]].chemType=="H")
+        {
+            covalent_sensitivity = covalent_sensitivity2;
+        }
         else if ((!allAtoms[tBo->atomsIdx[0]].isMetal) && (!allAtoms[tBo->atomsIdx[1]].isMetal))
         {
             covalent_sensitivity = covalent_sensitivity1;
@@ -2430,6 +2440,11 @@ namespace LIBMOL
              || tMol.atoms[tBo->atomsIdx[0]].chemType=="O")
         {
             covalent_sensitivity = covalent_sensitivity3;
+        }
+        else if ( allAtoms[tBo->atomsIdx[1]].chemType=="H"
+             || allAtoms[tBo->atomsIdx[0]].chemType=="H")
+        {
+            covalent_sensitivity = covalent_sensitivity2;
         }
         else if ((!tMol.atoms[tBo->atomsIdx[0]].isMetal) && (!tMol.atoms[tBo->atomsIdx[1]].isMetal))
         {
