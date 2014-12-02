@@ -16,7 +16,8 @@ import re,string
 from optparse import OptionParser 
 import time
 import math
-import select, fcntl
+import select
+#import select, fcntl
 import signal
 
 def listComp(a_list, b_list):
@@ -103,7 +104,7 @@ class CExeCode :
         log_max  = 100000000
         outfile_eof = 0
         if not mode:
-            self._nonBlockingFile(outfd_sub)
+            # self._nonBlockingFile(outfd_sub)
             while not outfile_eof :
                 ready_to_read, ready_to_write, in_error = \
                      select.select([outfd_sub],[],[],60.0)
@@ -127,7 +128,7 @@ class CExeCode :
                         logfile.write(out_quantum)
                         logfile.flush()
         else :
-            self._nonBlockingFile(outfd_sub)
+            # self._nonBlockingFile(outfd_sub)
             while not outfile_eof :
                 ready_to_read, ready_to_write, in_error = \
                      select.select([outfd_sub],[],[],10)
