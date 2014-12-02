@@ -48,6 +48,10 @@
 #include "chain.h"
 #endif
 
+#ifndef CHIRAL_H
+#include "chiral.h"
+#endif
+
 #ifndef MOLECULE_H
 #include "molecule.h"
 #endif
@@ -88,11 +92,16 @@
 #include "chemPropSet.h"
 #endif
 
+#ifndef CRYSTINFO_H
+#include "crystInfo.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
     class AtomDict;
     class Residue;
+    class ResidueDict;
     class Chain;
  
     class Bond;
@@ -234,8 +243,80 @@ namespace LIBMOL
     extern void  setOneHAtomCoordsSP2(std::vector<AtomDict> & tAtoms,
                                       std::vector<AtomDict>::iterator tIA);
     extern void  setOneHAtomCoordsSP(std::vector<AtomDict> & tAtoms,
-                                     std::vector<AtomDict>::iterator tIA);
+                                     std::vector<AtomDiYct>::iterator tIA);
    */ 
+    
+    class SYBLMol2File: public File
+    {
+        
+    public:
+        
+        // Default constructor 
+        SYBLMol2File();
+        
+        // The constructor using a string as the file name
+        SYBLMol2File(Name                        tFname,
+                     std::ios_base::openmode     tOpenMode);
+        
+        // The constructor using an char* as the file name
+        SYBLMol2File(FileName                    tFname,
+                     std::ios_base::openmode     tOpenMode);
+        
+        // Default destructor
+        ~SYBLMol2File();
+        
+        void setupSystem();
+        void setBlock(std::string tL);
+        
+        
+        
+        // Get information from the input file
+        void getAtomInfo(std::string tLine);
+        void getBondInfo(std::string tLine);
+        void getCrysInfo(std::string tLine);
+        
+        
+        void setAtomsCCP4Type();
+        
+        void addHAtoms(int tIdxAtm,
+                       REAL tNumH);
+        
+        void reNameHAtoms();
+        
+        /*
+        REAL  getTotalBondOrder(int tIdxMol,
+                                std::vector<AtomDict>::iterator  tIA);
+        REAL  getBondOrder(int tIdxMol,
+                          int tIdx1, int tIdx2);
+        */
+        
+        int  getNumOxyConnect(std::vector<AtomDict>::iterator iA);
+        void setAtomsBondingAndChiralCenter();
+        void setChiral();
+
+        void iniDict();    
+        
+        
+        
+        bool                    hasCoords;
+        bool                    hasConnect;
+        bool                    hasH;
+        bool                    containMetal;
+  
+        
+        std::vector<AtomDict>   atoms;
+        std::vector<BondDict>   bonds;
+        std::vector<ChiralDict> chirals;
+
+        std::ofstream           outFile;
+        std::ifstream           inFile;
+        
+        std::map<std::string, bool>      mol2Dict; 
+        
+    };
+    
+    
+    
 }
 
 

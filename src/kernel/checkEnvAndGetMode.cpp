@@ -126,6 +126,11 @@ namespace LIBMOL
                     // std::cout << "The input files are in " 
                     //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
+                case 'k':
+                    IOEntries["inMol2Name"] =  optarg;
+                    std::cout << "The input Mol2 files are in " 
+                              <<  IOEntries["inMol2Name"] << std::endl;
+                    break;
                 case 'm':
                     IOEntries["molGen"] =  optarg;
                     // std::cout << "The input files are in " 
@@ -440,6 +445,21 @@ namespace LIBMOL
                 {
                     // This mode outputs COD atom type only
                     workMode =42;
+                }
+            }
+        }
+        else if (IOEntries.find("inMol2Name") !=IOEntries.end())
+        {
+            if (IOEntries.find("monoRootName") != IOEntries.end())
+            {
+                workMode =14;
+            }
+            else if(IOEntries.find("AtomTypeOutName") !=IOEntries.end())
+            {
+                if (!IOEntries["AtomTypeOutName"].empty())
+                {
+                    // This mode outputs COD atom type only
+                    workMode =44;
                 }
             }
         }

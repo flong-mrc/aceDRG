@@ -380,10 +380,12 @@ namespace LIBMOL
         
         if (mergedRings.size() !=0)
         {
+            
             std::cout << "Merged planar rings : " << std::endl;
             for (std::vector<std::vector<int> >::iterator iMr=mergedRings.begin();
                     iMr != mergedRings.end(); iMr++)
             {
+                std::vector<int> atmIdxs;
                 std::cout << "A merged system contains " << iMr->size() 
                           << " rings. They are:  " << std::endl;
                 for (std::vector<int>::iterator iR=iMr->begin();
@@ -394,14 +396,39 @@ namespace LIBMOL
                             iA != tAllRings[*iR].atoms.end(); iA++)
                     {
                         std::cout << iA->id << std::endl;
+                        if(std::find(atmIdxs.begin(), atmIdxs.end(), iA->seriNum)
+                            ==atmIdxs.end())
+                        {
+                            atmIdxs.push_back(iA->seriNum);
+                        }
                     }
+                }
+                
+                std::cout << "Overall, The merged system contains " 
+                          << atmIdxs.size() << " atoms " << std::endl;
+                
+                if(checkAromaSys(atmIdxs, tAtoms))
+                {
+                    std::cout << "It is an aromatic system" << std::endl;
+                    tRingAtoms.push_back(atmIdxs);
+                    for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                    {
+                        tAllRings[*iR].isAromatic = true;
+                    }
+                }
+                else
+                {
+                    std::cout << "It is not aromatic system " << std::endl;
                 }
             }
             
         }
         
         
-        // 
+        //
+        
+        /*
         for (std::vector<std::vector<int> >::iterator iMr =mergedRings.begin();
                 iMr !=mergedRings.end(); iMr++)
         {
@@ -439,7 +466,7 @@ namespace LIBMOL
         }
         
         
-        /*
+        
         std::cout << "Number of merged atom rings " 
                   << tRingAtoms.size() << std::endl;
         
@@ -457,9 +484,6 @@ namespace LIBMOL
             }
         }
         */
-      
-        
-        
         
     }
     
@@ -547,6 +571,8 @@ namespace LIBMOL
         
         if (tAtoms[tIdx].bondingIdx ==2 && tAtoms[tIdx].formalCharge==0.0)
         {
+            if (tAtoms[tIdx].formalCharge==0.0)
+            {
             if (tAtoms[tIdx].chemType.compare("C") ==0)
             {           
                 if (tAtoms[tIdx].connAtoms.size() ==3)
@@ -635,7 +661,65 @@ namespace LIBMOL
                     aN=1.0;
                 }
             }
+            }
+            else
+            {
+                if (tAtoms[tIdx].chemType.compare("C") ==0)
+                {           
+                    if (tAtoms[tIdx].formalCharge==-1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==3)
+                        {
+                            aN =2.0;
+                        }
+                        else if (tAtoms[tIdx].connAtoms.size() ==2)
+                        {
+                            // Place holder in case for future. 
+                            aN=1.0;
+                        }
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("N") ==0)
+                {           
+                    if (tAtoms[tIdx].formalCharge==-1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==2)
+                        {
+                            aN =2.0;
+                        }
+                    }
+                    else if (tAtoms[tIdx].formalCharge==1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==3)
+                        {
+                            // Place holder in case for future. 
+                            aN=1.0;
+                        }
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("O") ==0)
+                {           
+                    if (tAtoms[tIdx].formalCharge==1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==2)
+                        {
+                            aN =1.0;
+                        }
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("B") ==0)
+                {           
+                    if (tAtoms[tIdx].formalCharge==-1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==3)
+                        {
+                            aN =1.0;
+                        }
+                    }
+                }
+            }
         }
+        
         
         return aN;
     }

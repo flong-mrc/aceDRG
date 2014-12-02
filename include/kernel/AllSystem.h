@@ -126,6 +126,7 @@ namespace LIBMOL
     class Molecule;
     
     class MolSdfFile;
+    class SYBLMol2File;
     
     class DictCifFile;
     class DictPDBFile;
@@ -162,6 +163,7 @@ namespace LIBMOL
         
         AllSystem(DictCifFile & tCifObj, std::string tLibmolTabDir);
         AllSystem(Molecule & tMol, std::string tLibmolTabDir);
+        AllSystem(SYBLMol2File & tMol2Obj, std::string tLibmolTabDir);
         // AllSystem(MolSdfFile & tSdfObj);
         
         // get the system after COD classification and search.

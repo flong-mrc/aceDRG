@@ -317,6 +317,42 @@ int main(int argc, char** argv) {
                           << " contains NO atoms! check the file " << std::endl;
             }
         }
+        else if (AJob.workMode == 14)
+        {
+            LIBMOL::SYBLMol2File dataFromMol2(AJob.IOEntries["inMol2Name"], std::ios::in);
+            
+            if (dataFromMol2.atoms.size() >0)
+            {
+                LIBMOL::AllSystem   aTargetSystem(dataFromMol2, AJob.IOEntries["libMolTabDir"]);
+                
+                if ( (int)aTargetSystem.allAtoms.size() > 0)
+                {   
+                    aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
+                                                              AJob.IOEntries["monoRootName"], 
+                                                              AJob.IOEntries["libMolTabDir"]);
+               
+                    LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
+                                     AJob.IOEntries["monoRootName"], 
+                                     aTargetSystem.allAtoms,
+                                     aTargetSystem.allHAtomIdx,
+                                     aTargetSystem.allBonds,
+                                     aTargetSystem.allAngles,
+                                     aTargetSystem.allTorsions,
+                                     aTargetSystem.allRings,
+                                     aTargetSystem.allPlanes,
+                                     aTargetSystem.allChirals);
+            
+                    LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
+                                   AJob.IOEntries["monoRootName"], 
+                                   aTargetSystem.allAtoms);
+                }
+                else
+                {
+                    std::cout << "The input Cif file " << AJob.IOEntries["inCifName"] 
+                              << " contains NO atoms! check the file " << std::endl;
+                }
+            }
+        }
     }
     else if (AJob.workMode == 21 || AJob.workMode == 22 )
     {

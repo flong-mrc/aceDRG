@@ -2,7 +2,6 @@
 # Python script
 #
 #
-#
 #     Copyright (C) 2014 --- 2019 Fei Long,  Murshudov
 #
 #     This code is distributed under the terms and conditions of the
@@ -192,6 +191,8 @@ class Acedrg(CExeCode ):
         self.outRoot          = ""
         self.baseRoot         = ""
 
+        self.geneInFileName   = ""
+        self.geneInFileType   = ""
         self.inStdCifName     = ""
         self.inStdCifDir      = ""
         self.inMmCifName      = ""
@@ -199,6 +200,7 @@ class Acedrg(CExeCode ):
         self.inMdlName        = ""
         self.inPdbName        = ""
         self.inSDFName        = ""
+        self.inMol2Name       = ""
         self.outRstCifName    = ""
         self.outRstPdb        = ""
         self.outAtmTypeName   = ""
@@ -230,12 +232,14 @@ class Acedrg(CExeCode ):
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
         #print self.acedrgDir
         inputOptionsP         = self.InputParser(t_argvs) 
-        
+
+        #if inputOptionsP.geneInFileName:
+        #    self.checInputFormat()          
+          
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
         self.checkVersionInfo()
         self.execute()  
-
         
     def InputParser(self, t_argvs):
 
@@ -272,6 +276,13 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-e",  "--molgen", dest="molGen",  
                                     action="store_true",  default=False,  
                                     help="The option when the user want to generate molecules and values of the associated bonds and angles in a cif file")
+
+        self.inputParser.add_option("-f",  "--infile", dest="geneInFileName",  
+                                    action="store",  type="string",   
+                                    help="user's input file, regardless what format it is")
+
+        self.inputParser.add_option("-g",  "--mol2", dest="inMol2Name", metavar="FILE", 
+                                    action="store", type="string", help="Input SYBL_MOL2 File containing coordinates and bonds")
 
         self.inputParser.add_option("-i",  "--smi", dest="inSmiName", metavar="FILE", 
                                     action="store", type="string", 
@@ -425,7 +436,67 @@ class Acedrg(CExeCode ):
                         if len(strs)==2:
                             self.versionInfo[strs[0]] = strs[1]      
              
-             
+    def checInputFormat(self):
+        
+        try:
+            tF =open(self.geneInFileName, "r")
+        except IOError:
+            print "%s can not be open for reading "%tFName
+            sys.exit()
+        else:
+            
+            tLines = tF.readlines()
+            tF.close()
+            for aL in tLines:
+                strs = aL.strip().split()
+                if aL.find("_chem_comp_atom") != -1: 
+                    self.inFileType = "MMCIF"
+                    break     
+                elif aL.find("_atom_site_") != -1:
+                    self.geneInName = "CIF" 
+                    break
+                elif len(strs)==8:
+                     if strs[7].find("V2000") != -1 or strs[7].find("V3000") != -1 :
+                         self.geneInName = "MOL" 
+                         break
+                
+        
+    def setMonoRoot(self):
+        
+        if self.inMdlName != "":
+            try:
+                tF =open(self.inMdlName, "r")
+            except IOError:
+                print "%s can not be open for reading "%self.inMdlName
+                sys.exit()
+            else:
+                tL = tF.readline().strip()
+                print tL
+                tF.close()
+                if len(tL) ==3:
+                    self.monomRoot= tL
+                elif len(tL) >3:
+                    self.monomRoot= tL[:4]
+                
+        elif self.inMmCifName != "":
+            try:
+                tF =open(self.inMmCifName, "r")
+            except IOError:
+                print "%s can not be open for reading "%self.inMmCifName
+                sys.exit()
+            else:
+                tLs = tF.readlines()
+                tF.close()
+                for aL in tLs:
+                    if aL.find("data_comp_") != -1:
+                        strs = aL.strip().split("_") 
+                        if len(strs) ==3:
+                            if len(strs[2]) ==3:
+                                self.monomRoot = strs[2]
+                                break
+        if len(self.monomRoot) < 3:
+            self.monomRoot = "UNL"
+
     def setWorkMode(self, t_inputOptionsP = None):
 
         # Sequnence for check the locations of acedrg tables 
@@ -476,6 +547,9 @@ class Acedrg(CExeCode ):
                 elif t_inputOptionsP.inSdfName: 
                     self.inSdfName = t_inputOptionsP.inSdfName
                     self.workMode    = 14
+                elif t_inputOptionsP.inMol2Name: 
+                    self.inMol2Name = t_inputOptionsP.inMol2Name
+                    self.workMode    = 15
             else:
                 if t_inputOptionsP.inMmCifName:
                     self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -489,6 +563,9 @@ class Acedrg(CExeCode ):
                 elif t_inputOptionsP.inSdfName: 
                     self.inSdfName = t_inputOptionsP.inSdfName
                     self.workMode    = 141
+                elif t_inputOptionsP.inMol2Name: 
+                    self.inMol2Name = t_inputOptionsP.inMol2Name
+                    self.workMode    = 151
         elif t_inputOptionsP.molGen:
             if t_inputOptionsP.inStdCifName: 
                 self.inStdCifName = t_inputOptionsP.inStdCifName
@@ -524,7 +601,10 @@ class Acedrg(CExeCode ):
         if t_inputOptionsP.monomRoot:
             self.monomRoot   = t_inputOptionsP.monomRoot
         else:
-            self.monomRoot   = "UNL"
+            print self.inMdlName
+            print "Here"
+            self.setMonoRoot()
+            # self.monomRoot   = "UNL"
 
         if t_inputOptionsP.outRoot:
             self.outRoot   = t_inputOptionsP.outRoot
@@ -574,8 +654,8 @@ class Acedrg(CExeCode ):
         else:
             print "| ACEDRG Database version is not available                          |"    
         print "=====================================================================" 
-        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or \
-           self.workMode == 111 or self.workMode==121 or self.workMode ==131 or self.workMode==141:
+        if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15 \
+           or self.workMode == 111 or self.workMode==121 or self.workMode ==131 or self.workMode==141 or self.workMode==151 :
             print "=====================================================================" 
             print "| Your job is  generating the dictionary (cif) and coord(pdb) files |"
             print "| for your ligand and/or monomer                                    |"
@@ -588,8 +668,10 @@ class Acedrg(CExeCode ):
                 print "Input file: %s"%os.path.basename(self.inMdlName)
             if self.workMode==14 or self.workMode==141:
                 print "Input file: %s"%os.path.basename(self.inSdfName)
+            if self.workMode==15 or self.workMode==151:
+                print "Input file: %s"%os.path.basename(self.inMol2Name)
             print "Output dictionary file: %s"%self.outRoot + ".cif"
-            if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14:
+            if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15:
                 print "Output coordinate file: %s"%self.outRoot + ".pdb"
 
         if self.workMode == 21 or self.workMode==22:
@@ -611,7 +693,8 @@ class Acedrg(CExeCode ):
         self._cmdline = self.libmol
         self._log_name       = os.path.join(self.scrDir, self.baseRoot + "_cod.log")
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 \
-           or self.workMode == 111 or self.workMode == 121 or self.workMode == 131 or self.workMode==141 :
+           or self.workMode == 111 or self.workMode == 121 or self.workMode == 131 \
+           or self.workMode==141 or self.workMode==151:
             print "===================================================================" 
             print "| Generate the dictionary file using the internal database        |"
             print "===================================================================" 
@@ -633,6 +716,15 @@ class Acedrg(CExeCode ):
             #print self._cmdline
             #os.system(self._cmdline)
             self.subExecute()
+        if self.workMode == 15 or self.workMode == 151 :
+            if tIn:
+                self.inMmCifName = tIn
+            self._cmdline += " -g %s  -D %s "%(self.inMmCifName, self.acedrgTables)
+            self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
+            #print self._cmdline
+            #os.system(self._cmdline)
+            self.subExecute()
+
 
         if self.workMode == 21 :
             if tIn:
@@ -1222,6 +1314,19 @@ class Acedrg(CExeCode ):
                 # Stage 2: optimization
                 self.runGeoOpt()            
 
+        if self.workMode == 15 or self.workMode == 151 :
+            
+            # Stage 1: dictionary generation using  a mol2 file
+            if os.path.isfile(self.inMol2Name):
+                self.runLibmol(self.inMol2Name)
+            else:
+                print "%s does not exist"%self.inMol2Name
+                sys.exit()
+           
+            if self.workMode == 15: 
+                # Stage 2: optimization
+                self.runGeoOpt()            
+
         if self.workMode == 21:
             
             # Stage 1: generate molecules and the associated bond and bond-angle values 
@@ -1287,7 +1392,6 @@ class Acedrg(CExeCode ):
 
 
 # Other supplement functions
-
 
 def main():
     acedrgObj = Acedrg(sys.argv[1:])

@@ -108,6 +108,27 @@ namespace LIBMOL
         
     }
     
+    AllSystem::AllSystem(SYBLMol2File& tMol2Obj, std::string tLibmolTab):
+                                               hasCoords(tMol2Obj.hasCoords),
+                                               
+                                               usingInChiral(true),
+                                               libmolTabDir(""),
+                                               itsContainMetal(false),
+                                               itsCurAngleSeriNum(ZeroInt),
+                                               itsCurAngle(NullPoint),
+                                               itsCurTorsionSeriNum(ZeroInt),
+                                               itsCurTorsion(NullPoint),
+                                               itsCurChiralSeriNum(ZeroInt),
+                                               itsCurChiral(NullPoint)
+    {
+        libmolTabDir  = tLibmolTab;
+        AddAtoms(tMol2Obj.atoms);
+        AddBonds(tMol2Obj.bonds);
+        // AddTorsions(tCifObj.allTorsions);
+        AddChirals(tMol2Obj.chirals);
+        setSysProps();
+        
+    }
     AllSystem::AllSystem(Molecule& tMol, std::string tLibmolTab):
                                          hasCoords(tMol.hasCoords),
                                          hasCCP4Type(false),
