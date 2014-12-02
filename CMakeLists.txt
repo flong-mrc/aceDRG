@@ -1,19 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(acedrg CXX)
 
-# search for SQLite3
-find_library(SQLITE3_LIBRARY NAMES SQLite3 sqlite3)
-if (NOT SQLITE3_LIBRARY)
-  message(FATAL_ERROR "SQLite3 library not found.")
-endif()
-message(STATUS "SQLite3 library: ${SQLITE3_LIBRARY}")
-find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h HINTS ${SQLITE3_LIBRARY}/Headers)
-message(STATUS "sqlite3.h is in: ${SQLITE3_INCLUDE_DIR}")
-if (NOT SQLITE3_INCLUDE_DIR)
-  message(FATAL_ERROR "SQLite3 header not found.")
-endif()
-
-include_directories(${SQLITE3_INCLUDE_DIR}})
 include_directories(${CMAKE_SOURCE_DIR}/include/kernel
                     ${CMAKE_SOURCE_DIR}/include/math
                     ${CMAKE_SOURCE_DIR}/include/go
@@ -68,7 +55,6 @@ set(SRC
 )
 
 add_executable(libmol ${SRC})
-target_link_libraries(libmol ${SQLITE3_LIBRARY})
 
 install(TARGETS libmol DESTINATION libexec)
 install(PROGRAMS bin/acedrg DESTINATION bin)
