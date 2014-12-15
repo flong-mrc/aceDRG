@@ -11,6 +11,7 @@ MOLGEN_MODE	_molgen_mode               "UNK"
 
 INPUT_FILE_TYPE	_text                      ""
 INPUT_FILES	_list_of_text              ""
+OUTPUT_FILES	_list_of_text              "MMCIFOUT XYZOUT"
 
 SMILESIN        _any_file                  ""
 DIR_SMILESIN	_default_dirs		   ""
