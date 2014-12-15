@@ -136,20 +136,22 @@ int main(int argc, char** argv) {
                                                           AJob.IOEntries["libMolTabDir"]);
                 //if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
                 //{
-                    LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                     AJob.IOEntries["monoRootName"], 
-                                     aTargetSystem.allAtoms,
-                                     aTargetSystem.allHAtomIdx,
-                                     aTargetSystem.allBonds,
-                                     aTargetSystem.allAngles,
-                                     aTargetSystem.allTorsions,
-                                     aTargetSystem.allRings,
-                                     aTargetSystem.allPlanes,
-                                     aTargetSystem.allChirals);
+                std::cout << "out-root " << AJob.IOEntries["monoRootName"] << std::endl;
+                
+                LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
+                                 AJob.IOEntries["monoRootName"], 
+                                 aTargetSystem.allAtoms,
+                                 aTargetSystem.allHAtomIdx,
+                                 aTargetSystem.allBonds,
+                                 aTargetSystem.allAngles,
+                                 aTargetSystem.allTorsions,
+                                 aTargetSystem.allRings,
+                                 aTargetSystem.allPlanes,
+                                 aTargetSystem.allChirals);
             
-                    LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                                   AJob.IOEntries["monoRootName"], 
-                                   aTargetSystem.allAtoms);
+                LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
+                               AJob.IOEntries["monoRootName"], 
+                               aTargetSystem.allAtoms);
                 //}
                 // aTargetSystem.chiralExch();
                 
