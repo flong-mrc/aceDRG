@@ -1,0 +1,45 @@
+CP4I VERSION CCP4Interface 1.4.4
+#CCP4I SCRIPT DEF acedrg
+#CCP4I DATE 11/11/2014 17:14:30
+#CCP4I USER long
+
+TITLE              _title_text                ""
+
+ACEDRG_MODE	_acedrg_mode               "LIG_GEN"
+LIGGEN_MODE	_liggen_mode               "UNK"
+MOLGEN_MODE	_molgen_mode               "UNK"
+
+INPUT_FILE_TYPE	_text                      ""
+INPUT_FILES	_list_of_text              ""
+
+SMILESIN        _any_file                  ""
+DIR_SMILESIN	_default_dirs		   ""
+MMCIFIN		_CIF_file                  ""
+DIR_MMCIFIN	_default_dirs              ""
+MOLIN		_any_file                  ""
+DIR_MOLIN	_default_dirs              ""
+CIFIN		_any_file                  ""
+DIR_CIFIN	_default_dirs              ""
+CIF_DIR_IN      _default_dirs              ""
+DIR_CIF_DIR_IN  _default_dirs              ""
+MOL2IN		_any_file                  ""
+DIR_MOL2IN	_default_dirs              ""
+
+MONOM_ID	_text                      "UNL"
+
+OUT_ROOTDIR    _default_dirs               ""
+
+OUT_ROOT        _text                      "AcedrgOut"
+DIR_OUT_ROOT    _default_dirs              ""
+
+MMCIFOUT	_CIF_file                 "AcedrgOut.cif"
+DIR_MMCIFOUT	_default_dirs              ""
+XYZOUT          _pdb_file                  "AcedrgOut.pdb"
+DIR_XYZOUT 	_default_dirs              ""
+
+MOLOUT          _any_file                  "AcedrgOut_all_mols.txt"
+DIR_MOLOUT	_default_dirs              ""
+UNIQUEOUT       _any_file                  "AcedrgOut__unique_bond_and_angles.txt"
+DIR_UNIQUEOUT	_default_dirs              ""
+
+

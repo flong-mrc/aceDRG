@@ -614,7 +614,6 @@ class Acedrg(CExeCode ):
             self.monomRoot   = t_inputOptionsP.monomRoot
         else:
             print self.inMdlName
-            print "Here"
             self.setMonoRoot()
             # self.monomRoot   = "UNL"
 
@@ -632,6 +631,7 @@ class Acedrg(CExeCode ):
         else:
             self.outRoot   = "AcedrgOut"
             self.baseRoot   = "AcedrgOut"
+        
 
       
         self.scrDir = self.outRoot + "_TMP"
@@ -1132,7 +1132,7 @@ class Acedrg(CExeCode ):
 
         # Geometrical optimization
         if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
-            if os.path.getsize(self.outRstPdbName) > 1000 and os.path.getsize(self.outRstCifName) > 500:
+            if os.path.getsize(self.outRstPdbName) > 100 and os.path.getsize(self.outRstCifName) > 50:
                 print "===================================================================" 
                 print "| Geometrical Optimization                                        |"
                 print "===================================================================" 
@@ -1276,7 +1276,7 @@ class Acedrg(CExeCode ):
             else:
                 print "%s does not exist"%self.inMmCifName
                 sys.exit()
-
+            
             if self.workMode == 11 :
                 # Stage 2: optimization
                 self.runGeoOpt()    

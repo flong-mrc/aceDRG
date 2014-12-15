@@ -1,0 +1,35 @@
+#CCP4I VERSION CCP4Interface 2.2.1
+#CCP4I SCRIPT DEF modules
+#CCP4I DATE 15 Dec 2014  15:12:53
+#CCP4I USER flong
+FOLDER_DESCRIPT,0         ""
+FOLDER_DESCRIPT,1         "Prepare restraints for refinement"
+FOLDER_MODULE,0           ""
+FOLDER_MODULE,1           refinement
+FOLDER_NAME,0             ""
+FOLDER_NAME,1             refinement_restrainprep
+FOLDER_TASK_LIST,0        ""
+FOLDER_TASK_LIST,1        acedrg
+FOLDER_TITLE,0            ""
+FOLDER_TITLE,1            "Restraint Preparation"
+MODULE_LIST               refinement
+MODULE_NAME,0             ""
+MODULE_NAME,1             refinement
+MODULE_TASK_LIST,0        ""
+MODULE_TASK_LIST,1        "{Restraint Preparation}"
+MODULE_TITLE,0            ""
+MODULE_TITLE,1            Refinement
+N_FOLDERS                 1
+N_MODULES                 1
+N_TASKS                   1
+PROJECT                   CCP4
+TASK_DESCRIPT,0           ""
+TASK_DESCRIPT,1           "Acedrg:monomer library generator  "
+TASK_MODULE,0             ""
+TASK_MODULE,1             refinement
+TASK_NAME,0               ""
+TASK_NAME,1               acedrg
+TASK_TITLE,0              ""
+TASK_TITLE,1              acedrg
+TITLE                     "CCP4 Program Interface"
+

@@ -1,0 +1,28 @@
+#CCP4I VERSION CCP4Interface 2.2.1
+#CCP4I SCRIPT DEF packages
+#CCP4I DATE 15 Dec 2014  15:12:53
+#CCP4I USER flong
+N_PACKAGES                1
+PACKAGE_BACKUPS,0         ""
+PACKAGE_BACKUPS,1         ""
+PACKAGE_CCP4I_VERSION,0   ""
+PACKAGE_CCP4I_VERSION,1   "CCP4Interface 2.2.1"
+PACKAGE_HELP,0            ""
+PACKAGE_HELP,1            ""
+PACKAGE_INSTALL_SCRIPT,0  ""
+PACKAGE_INSTALL_SCRIPT,1  ""
+PACKAGE_MODULES,0         ""
+PACKAGE_MODULES,1         ""
+PACKAGE_NAME,0            ""
+PACKAGE_NAME,1            ACEDRG_ccp4i
+PACKAGE_REFERENCES,0      ""
+PACKAGE_REFERENCES,1      "{acedrg acedrg {Acedrg:monomer library generator  } refinement Refinement refinement_restrainprep {Restraint Preparation} {Prepare restraints for refinement}}"
+PACKAGE_SCRIPTS,1         /Users/flong/NetBeansProjects/LIBMOL/ccp4i_acedrg/ACEDRG_ccp4i/scripts/acedrg.script
+PACKAGE_SCRIPTS,0         ""
+PACKAGE_TASKS,0           ""
+PACKAGE_TASKS,1           "/Users/flong/NetBeansProjects/LIBMOL/ccp4i_acedrg/ACEDRG_ccp4i/tasks/acedrg.tcl /Users/flong/NetBeansProjects/LIBMOL/ccp4i_acedrg/ACEDRG_ccp4i/tasks/acedrg.def"
+PACKAGE_TEMPLATES,0       ""
+PACKAGE_TEMPLATES,1       /Users/flong/NetBeansProjects/LIBMOL/ccp4i_acedrg/ACEDRG_ccp4i/templates/acedrg.com
+PACKAGE_VERSION,0         ""
+PACKAGE_VERSION,1         ""
+
