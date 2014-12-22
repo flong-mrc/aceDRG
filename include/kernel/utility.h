@@ -251,6 +251,7 @@ namespace LIBMOL
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID);
     extern void fromIdToChemType(ID tId, ID & tChemType);
     extern REAL StrToOrder(std::string  & tStrOrder);
+    extern REAL StrToOrder2(std::string  & tStrOrder);   // used for mol2 files, replace StrToOrder(std::string  & tStrOrder) later
     extern void OrderToStr(REAL tOrder, std::string  & sOrder);
     extern void OrderStrToStr(std::string & tOrder, std::string  & sOrder);
     extern void unifyStrForOrder(std::string & tOrder);

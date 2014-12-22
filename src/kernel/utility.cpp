@@ -1679,8 +1679,9 @@ namespace LIBMOL
         REAL tOrder = -1.0;
         
         StrUpper(tStrOrder);
+        
         std::string a4 = tStrOrder.substr(0,4);
-        if (a4.find("SING") !=std::string::npos)
+        if (a4.find("SING") !=std::string::npos )
         {
             tOrder = 1.0;
         }
@@ -1719,6 +1720,60 @@ namespace LIBMOL
         
     }
     
+    extern REAL StrToOrder2(std::string  & tStrOrder)
+    {
+        REAL tOrder = -1.0;
+        
+        StrUpper(tStrOrder);
+        std::string aStr;
+        if (tStrOrder.size() >=4)
+        {
+            aStr = tStrOrder.substr(0,4);
+        }
+        else
+        {
+            aStr = tStrOrder;
+        }
+        
+        
+        if (aStr.find("SING") !=std::string::npos || aStr.find("1") !=std::string::npos )
+        {
+            tOrder = 1.0;
+        }
+        else if (aStr.find("DOUB") !=std::string::npos || aStr.find("2") !=std::string::npos)
+        {
+            tOrder = 2.0;
+        }
+        else if (aStr.find("TRIP") !=std::string::npos || aStr.find("3") !=std::string::npos)
+        {
+            tOrder = 3.0;
+        }        
+        else if (aStr.find("AROM") !=std::string::npos || aStr.find("AR") !=std::string::npos)
+        {
+            //tOrder = 4.0;
+            tOrder = 1.5;
+        }
+        else if (aStr.find("DELO") !=std::string::npos)
+        {
+            tOrder = 1.5;
+        }
+        else if (aStr.find("BOTH") !=std::string::npos)
+        {
+            tOrder = 5.0;
+        }
+        else if (aStr.find("META") !=std::string::npos)
+        {
+            tOrder = 10.0;
+        }
+        else if (aStr.find(".") !=std::string::npos || aStr.find("UN") !=std::string::npos)
+        {
+            tOrder = 100.0;
+        }
+        // what about "single or aromatic"->6, "double or aromatic"->7
+        // and "any" -> 8
+        return tOrder;
+        
+    }
     
     extern void OrderToStr(REAL tOrder, std::string  & sOrder)
     {

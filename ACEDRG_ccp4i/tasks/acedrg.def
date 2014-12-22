@@ -6,11 +6,11 @@ CP4I VERSION CCP4Interface 1.4.4
 TITLE              _title_text                ""
 
 ACEDRG_MODE	_acedrg_mode               "LIG_GEN"
-LIGGEN_MODE	_liggen_mode               "UNK"
+LIGGEN_MODE	_liggen_mode               "MMC"
 MOLGEN_MODE	_molgen_mode               "UNK"
 
 INPUT_FILE_TYPE	_text                      ""
-INPUT_FILES	_list_of_text              ""
+INPUT_FILES	_list_of_text              "MMCIFIN MOLIN SMILESIN CIFIN "
 OUTPUT_FILES	_list_of_text              "MMCIFOUT XYZOUT"
 
 SMILESIN        _any_file                  ""

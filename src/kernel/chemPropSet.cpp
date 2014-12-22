@@ -319,6 +319,68 @@ namespace LIBMOL
     // to bond it.
     
     extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
+                                  std::vector<AtomDict>   & tAtoms,
+                                  std::vector<BondDict>   & tBonds,
+                                  PeriodicTable & tTab)
+    {
+        // REAL aNumH=0.0;
+        
+        REAL Order  = getTotalBondOrder(tBonds, tAtoms, tIA);
+        REAL Diff1  = Order -tIA->formalCharge;
+        std::cout << "For atom " << tIA->id << std::endl;
+        std::cout << "Total bond order is " << Order << std::endl;
+        std::cout << "formal charge is " << tIA->formalCharge << std::endl;
+        
+        std::map<int, int> Vals;
+        
+        Vals[1] = tTab.elements[tIA->chemType]["val"];
+        if (tTab.extraValences.find(tIA->chemType) !=tTab.extraValences.end())
+        {
+            int i=2;
+            for (std::vector<int>::iterator iM=tTab.extraValences[tIA->chemType].begin();
+                    iM !=tTab.extraValences[tIA->chemType].end(); iM++)
+            {
+                 Vals[i] = *iM;
+                 i++;
+            }
+        }
+        
+        // Now check all possibilities of element valences 
+        REAL minD=100.0;
+        
+        for (std::map<int, int>::iterator iM=Vals.begin();
+                iM !=Vals.end(); iM++)
+        {
+            REAL Diff2  = (REAL)iM->second
+                           -Diff1;
+      
+            //std::cout <<" diff2 is " << Diff2 << std::endl;
+            if (fabs(Diff2) <0.000001)
+            {
+                return 0.0;
+            }
+            else if (Diff2 >0 && Diff2 < minD )
+            {
+                minD = Diff2;
+            }
+            
+            if (minD >8)
+            {
+                std::cout << "Bond order or valance error " << std::endl;
+                exit(1);
+            }
+            
+            
+        }
+        
+        std::cout << minD <<" H atom should be added to bind atom " 
+                  << tIA->id << std::endl;
+        
+        return minD;
+   
+    }
+    
+    extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
                                   Molecule   & tMol, 
                                   PeriodicTable & tTab)
     {
@@ -378,6 +440,8 @@ namespace LIBMOL
         return minD;
    
     }
+    
+    
     
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
                                 REAL tTolBondOrder)
@@ -664,6 +728,41 @@ namespace LIBMOL
         return tVal;
     }
     
+    
+    extern REAL getTotalBondOrder(std::vector<BondDict>   & tBonds, 
+                                  std::vector<AtomDict>   & tAtoms,
+                                  std::vector<AtomDict>::iterator tIA)
+    {
+        REAL tVal = 0.0;
+        for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
+                    iNB !=tIA->connAtoms.end(); iNB++)
+        {  
+            REAL aOrd = getBondOrder(tBonds, tIA->seriNum, *iNB);
+            //std::cout << "bond order between atom " << tIA->seriNum+1 
+            //          << " and " << tMol.atoms[*iNB].seriNum+1
+            //          << " is " << aOrd << std::endl;
+            if (aOrd >0)
+            {
+                tVal +=aOrd;
+                // std::cout << "total order now " << tVal << std::endl;
+            }
+            else
+            {
+                std::cout << "Can not find the bond between atoms " << tIA->id 
+                          << " serial number " << tIA->seriNum + 1
+                          << " and " << tAtoms[*iNB].id 
+                          << " serial number " << tAtoms[*iNB].seriNum+1
+                          << std::endl;
+                std::cout << "Some thing is wrong in the Bond list " << std::endl;
+                exit(1);
+            }
+        }
+        
+        return tVal;
+    }
+    
+    
+    
     extern REAL getBondOrder(Molecule & tMol, int tIdx1, int tIdx2)
     {
         REAL tOrd = -1.0;
@@ -675,6 +774,35 @@ namespace LIBMOL
                 || (iB->atomsIdx[0]==tIdx2 && iB->atomsIdx[1]==tIdx1))
             {
                 tOrd = StrToReal(iB->order);
+                if (tOrd ==4.0)
+                {
+                    tOrd = 1.5;
+                }
+                
+                //std::cout << "Bond order " << iB->order << std::endl
+                //          << tOrd << std::endl;
+                break;
+            }
+        }
+        
+        return tOrd;
+        
+    }
+    
+    
+    extern REAL getBondOrder(std::vector<BondDict> & tBonds,
+                             int tIdx1, int tIdx2)
+    {
+        REAL tOrd = -1.0;
+        
+        for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                iB !=tBonds.end(); iB++)
+        {
+            if ((iB->atomsIdx[0]==tIdx1 && iB->atomsIdx[1]==tIdx2)
+                || (iB->atomsIdx[0]==tIdx2 && iB->atomsIdx[1]==tIdx1))
+            {
+                tOrd = StrToOrder2(iB->order);
+                
                 if (tOrd ==4.0)
                 {
                     tOrd = 1.5;

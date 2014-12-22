@@ -149,6 +149,14 @@ namespace LIBMOL
     extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
                                   Molecule   & tMol, 
                                   PeriodicTable & tTab);
+    extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
+                                  std::vector<AtomDict>   & tAtoms,
+                                  std::vector<BondDict>   & tBonds,
+                                  PeriodicTable & tTab);
+    
+    extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
+                                  Molecule   & tMol, 
+                                  PeriodicTable & tTab);
     
     extern REAL checkProtonateN(std::vector<AtomDict>::iterator tIA, 
                                 Molecule   & tMol,
@@ -190,8 +198,16 @@ namespace LIBMOL
         
     extern REAL  getTotalBondOrder(Molecule   & tMol,
                                    std::vector<AtomDict>::iterator  tIA);
+    extern REAL  getTotalBondOrder(std::vector<BondDict>   & tBonds, 
+                                   std::vector<AtomDict>   & tAtoms,
+                                   std::vector<AtomDict>::iterator tIA);
+    
     extern REAL  getBondOrder(Molecule   & tMol,
                               int tIdx1, int tIdx2);
+    
+    extern REAL  getBondOrder(std::vector<BondDict> & tBonds,
+                              int tIdx1, int tIdx2);
+    
     extern REAL  getBondOrderOneAtom(std::vector<BondDict> tBonds,
                                      std::vector<AtomDict> tAtoms,
                                      int tIdx1, int tIdx2);

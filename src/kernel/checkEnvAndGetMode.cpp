@@ -98,7 +98,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:m:n:o:p:r:s:t:y:z:A:D:O:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:")) != -1)
         {
             switch (c)
             {

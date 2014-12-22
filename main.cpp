@@ -82,8 +82,7 @@ int main(int argc, char** argv) {
     
     LIBMOL::CheckEnvAndGetMode AJob(argc, argv);
     
-    std::cout << "The work mode is " << AJob.workMode << std::endl;
-   
+    std::cout << "workMode " << AJob.workMode << std::endl;
     
     for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
             iKW !=AJob.IOEntries.end(); iKW++)

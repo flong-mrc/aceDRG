@@ -705,6 +705,7 @@ class Acedrg(CExeCode ):
         self._cmdline = self.libmol
         self._log_name       = os.path.join(self.scrDir, self.baseRoot + "_cod.log")
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 \
+           or self.workMode==15 \
            or self.workMode == 111 or self.workMode == 121 or self.workMode == 131 \
            or self.workMode==141 or self.workMode==151:
             print "===================================================================" 
@@ -731,12 +732,12 @@ class Acedrg(CExeCode ):
         if self.workMode == 15 or self.workMode == 151 :
             if tIn:
                 self.inMmCifName = tIn
-            self._cmdline += " -g %s  -D %s "%(self.inMmCifName, self.acedrgTables)
+            self._cmdline += " -k %s  -D %s "%(self.inMmCifName, self.acedrgTables)
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
-            #print self._cmdline
-            #os.system(self._cmdline)
+            print self._cmdline  
             self.subExecute()
-
+            print "Here "
+            sys.exit()
 
         if self.workMode == 21 :
             if tIn:
@@ -1130,6 +1131,7 @@ class Acedrg(CExeCode ):
     
     def runGeoOpt(self):
 
+        
         # Geometrical optimization
         if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
             if os.path.getsize(self.outRstPdbName) > 100 and os.path.getsize(self.outRstCifName) > 50:
@@ -1267,7 +1269,8 @@ class Acedrg(CExeCode ):
     def execute(self):
         
         self.printJobs()
-
+        
+        
         if self.workMode == 11 or self.workMode == 111:
 
             # Stage 1: dictionary generation using a mmcif file 

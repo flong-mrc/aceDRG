@@ -248,7 +248,7 @@ namespace LIBMOL
     
     class SYBLMol2File: public File
     {
-        
+    
     public:
         
         // Default constructor 
@@ -278,6 +278,7 @@ namespace LIBMOL
         
         void setAtomsCCP4Type();
         
+        void addAllHAtoms();
         void addHAtoms(int tIdxAtm,
                        REAL tNumH);
         
@@ -305,6 +306,7 @@ namespace LIBMOL
   
         
         std::vector<AtomDict>   atoms;
+        std::vector<AtomDict>   extraHAtoms;
         std::vector<BondDict>   bonds;
         std::vector<ChiralDict> chirals;
 

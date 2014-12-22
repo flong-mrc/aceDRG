@@ -457,8 +457,6 @@ namespace LIBMOL
         // consider protonated state based atom's property
         
         REAL addedH =0.0;
-        
-        
             
         if (tAt->chemType.compare("O")==0)
         {
@@ -598,6 +596,7 @@ namespace LIBMOL
         }
         return nO;
     }
+    
     
     void MolSdfFile::setAtomsBondingAndChiralCenter(int tIdxMol)
     {
@@ -1182,8 +1181,6 @@ namespace LIBMOL
              
             std::string tRecord="";
             
-            std::map<ID, std::vector<int> > tIDs;
-            
             while(!inFile.eof())
             {
                 std::getline(inFile, tRecord);
@@ -1214,10 +1211,76 @@ namespace LIBMOL
             }
             inFile.close();
             
+            
+            addAllHAtoms();
             setAtomsBondingAndChiralCenter();
             setChiral();
             
+            
+            
+            if (atoms.size() !=0)
+            {
+                std::cout << "The system contains " << atoms.size() << std::endl
+                      << "Including " << extraHAtoms.size() << " H atoms " 
+                      << std::endl;
+                
+                for (std::vector<AtomDict>::iterator iAt=atoms.begin();
+                        iAt != atoms.end(); iAt++)
+                {
+                    std::cout << std::endl << "For atom " << iAt->seriNum
+                              << ": its name is " << iAt->id
+                              << ", its element symbol is "
+                              << iAt->chemType << std::endl;
+                    if (iAt->connAtoms.size() >0)
+                    {
+                        std::cout << "It bonds to " << iAt->connAtoms.size()
+                                  << " atoms. These atoms are: " << std::endl;
+                        for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                                iNB !=iAt->connAtoms.end(); iNB++)
+                        {
+                            std::cout << "Atom " << atoms[*iNB].id << std::endl;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                std::cout << " Bug or wrong file format. system contain no atoms "
+                          << std::endl;
+            }
+            
+            if (bonds.size() !=0)
+            {
+                std::cout << "The system contains " << bonds.size() 
+                          << " bonds. They are: " <<  std::endl;
+                
+                for (std::vector<BondDict>::iterator iBo=bonds.begin();
+                        iBo !=bonds.end(); iBo++)
+                {
+                    std::cout << "Bond " << iBo->seriNum;
+                    
+                    if (iBo->atomsIdx.size()==2)
+                    {
+                      std::cout << ", which consists of atom, "
+                                << iBo->atoms[0] << " and "
+                                << iBo->atoms[1] << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "Bug, the bond consists of less than 2 atoms "
+                                  << std::endl;
+                    }
+                }
+            }
+            else
+            {
+                std::cout << "Warning: check the input mol2 file. it contains no bonds"
+                          << std::endl;
+            } 
+            
         }
+        
+        exit(0);
         
     }
     
@@ -1305,10 +1368,14 @@ namespace LIBMOL
             }
             
             atoms.push_back(aAtom);
+            std::cout << "Atom line "<< tLine << std::endl;
+            std::cout << " Set an atom: seriNum " << aAtom.seriNum 
+                      << ", id " << aAtom.id << " element symbol " 
+                      << aAtom.chemType << std::endl;
             
         }
     }
-    
+   
     void SYBLMol2File::getBondInfo(std::string tLine)
     {
         std::vector<std::string> tStrs;
@@ -1320,8 +1387,9 @@ namespace LIBMOL
             aBond.seriNum = StrToInt(tStrs[0])-1;
             aBond.atomsIdx.push_back(StrToInt(tStrs[1])-1);
             aBond.atomsIdx.push_back(StrToInt(tStrs[2])-1);
-            aBond.order   =    tStrs[3];
-            bonds.push_back(aBond);
+            aBond.order   = TrimSpaces(tStrs[3]);
+            aBond.orderN  = StrToOrder2(aBond.order);
+            
             int i=0;
             for (std::vector<AtomDict>::iterator iAt=atoms.begin();
                     iAt !=atoms.end(); iAt++)
@@ -1329,11 +1397,13 @@ namespace LIBMOL
                 if (iAt->seriNum==aBond.atomsIdx[0])
                 {
                     iAt->connAtoms.push_back(aBond.atomsIdx[1]);
+                    aBond.atoms.push_back(iAt->id);
                     i++;
                 }
                 else if (iAt->seriNum==aBond.atomsIdx[1])
                 {
                     iAt->connAtoms.push_back(aBond.atomsIdx[0]);
+                    aBond.atoms.push_back(iAt->id);
                     i++;
                 }
                 
@@ -1341,6 +1411,29 @@ namespace LIBMOL
                 {
                     break;
                 }
+            }
+            bonds.push_back(aBond);
+            // check 
+            std::cout << "A bond line " << tLine << std::endl;
+            std::cout << "A bond is added. Its seriNum " 
+                      << aBond.seriNum << ", contain "
+                      << aBond.atomsIdx.size() << " atoms " 
+                      << " bond order is " << aBond.order 
+                      << " bond order value is " << aBond.orderN 
+                      << std::endl;
+                      
+            if (aBond.atomsIdx.size() == 2)
+            {
+                std::cout << "Two atoms are: atom " << aBond.atomsIdx[0]
+                          << " id " << atoms[aBond.atomsIdx[0]].id
+                          << " and atom " << aBond.atomsIdx[1]
+                          << " id " << atoms[aBond.atomsIdx[1]].id 
+                          << std::endl;
+            }
+            else 
+            {
+                std::cout << "Bug. The bond contains less than 2 atom " 
+                          << std::endl;  
             }
             
         }
@@ -1351,6 +1444,105 @@ namespace LIBMOL
     {
         // std::vector<std::string> tStrs;
         // StrTokenize(tLine, tStrs);
+    }
+    
+    void SYBLMol2File::addAllHAtoms()
+    {
+                
+        std::vector<std::string> orgElems;
+        orgElems.push_back("C");
+        orgElems.push_back("O");
+        orgElems.push_back("N");
+        orgElems.push_back("S");
+        orgElems.push_back("P");
+        orgElems.push_back("B");
+        
+        orgElems.push_back("Si");
+        orgElems.push_back("S");
+        
+        PeriodicTable aPTab;
+        
+        for (std::vector<AtomDict>::iterator iA=atoms.begin();
+                iA !=atoms.end(); iA++)
+        {
+            
+            if (std::find(orgElems.begin(), orgElems.end(), iA->chemType)
+                 !=orgElems.end())
+            {
+                // need to check protonated form
+                REAL addH =checkProtonateAll(iA, atoms, bonds, aPTab);
+                // REAL addH =checkProtonated(iA, tIdxMol);
+                if (addH >0)
+                {
+                    addHAtoms(iA->seriNum, addH);
+                }
+            }
+        }
+        
+        // Now add newly generated H atoms to atoms in the molecule
+        // and add associated bonds to the bond set in the molecule
+        for (std::vector<AtomDict>::iterator iHA=extraHAtoms.begin();
+                iHA !=extraHAtoms.end(); iHA++)
+        {
+            atoms.push_back(*iHA);
+            BondDict aBo;
+            aBo.atomsIdx.push_back(iHA->connAtoms[0]);
+            aBo.atomsIdx.push_back(iHA->seriNum);
+            aBo.order = "1";
+            aBo.seriNum = (int)bonds.size();
+            aBo.atoms.push_back(atoms[iHA->connAtoms[0]].id);
+            aBo.atoms.push_back(iHA->id);
+            aBo.fullAtoms[iHA->id] = iHA->seriNum;
+            aBo.fullAtoms[atoms[iHA->connAtoms[0]].id] = atoms[iHA->connAtoms[0]].seriNum;
+                                                         bonds.push_back(aBo);
+        }
+        
+        // Rename H atoms
+        int aIdx =1;
+        for (std::vector<AtomDict>::iterator iHA=atoms.begin();
+                iHA !=atoms.end(); iHA++)
+        {
+            if (iHA->chemType.compare("H")==0)
+            {
+                iHA->id = "H" + IntToStr(aIdx);
+                aIdx+=1;
+            }
+        } 
+        
+    }
+    
+    void SYBLMol2File::addHAtoms(int tIdxAtm, REAL tNumH)
+    {
+        for (int i=0; i < (int)tNumH; i++)
+        {
+            AtomDict aH;
+            aH.chemType = "H";
+            
+            std::string tS;
+            getDigitSec(atoms[tIdxAtm].id, tS);
+            if (atoms[tIdxAtm].chemType=="C")
+            {
+                aH.id  = aH.chemType + tS +IntToStr(i+1);
+            }
+            else
+            {
+                aH.id  = aH.chemType + atoms[tIdxAtm].id;
+            }
+            
+            
+            aH.seriNum =  (int)atoms.size()
+                         +(int)extraHAtoms.size();
+            aH.connAtoms.push_back(atoms[tIdxAtm].seriNum);
+            atoms[tIdxAtm].connAtoms.push_back(aH.seriNum);
+            atoms[tIdxAtm].connHAtoms.push_back(aH.seriNum);
+            // allMols[tIdxMol].atoms.push_back(aH);
+            extraHAtoms.push_back(aH);
+            
+        }
+        // allMols[tIdxMol].hasCoords = false;
+        
+        std::cout << tNumH << " H atoms have been added to bind atom " 
+                  << atoms[tIdxAtm].id << std::endl;  
     }
     
     int SYBLMol2File::getNumOxyConnect(std::vector<AtomDict>::iterator iA)

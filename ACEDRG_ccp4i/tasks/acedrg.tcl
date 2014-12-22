@@ -22,11 +22,10 @@ proc acedrg_setup {typedefVar arrayname } {
   set typedef(_acedrg_mode) { menu { "Generate Ligands/Monomers" }
                               { LIG_GEN } }
 
-  set typedef(_liggen_mode) { menu {"UNKNOWN" 
+  set typedef(_liggen_mode) { menu {"MMCIF" 
                                     "SMILES"
-                                    "MMCIF"
                                     "MDL(MOLFILE)/SDF"}
-                              { UNK SMI  MMC MOL} }
+                              { MMC SMI  MOL} }
 
   DefineMenu _input_file_type [list "SMILES file " "MMCIF file " "MOL file " "(small mol) CIF file " ] \
                               [list SMILEIN MMCIIN MOLIN CIFIN  ] 
