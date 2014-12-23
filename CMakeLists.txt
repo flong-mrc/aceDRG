@@ -56,6 +56,18 @@ set(SRC
 
 add_executable(libmol ${SRC})
 
+set(CCP4I_DIR ACEDRG_ccp4i)
+set(CCP4I_DEST share/ccp4i)
+
 install(TARGETS libmol DESTINATION libexec)
 install(PROGRAMS bin/acedrg DESTINATION bin)
 install(DIRECTORY tables DESTINATION share/acedrg/)
+
+install(FILES ${CCP4I_DIR}/scripts/acedrg.script
+        DESTINATION ${CCP4I_DEST}/scripts/)
+install(FILES ${CCP4I_DIR}/templates/acedrg.com
+        DESTINATION ${CCP4I_DEST}/templates/)
+install(FILES ${CCP4I_DIR}/tasks/acedrg.def
+              ${CCP4I_DIR}/tasks/acedrg.tcl
+        DESTINATION ${CCP4I_DEST}/tasks/)
+
