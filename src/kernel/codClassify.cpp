@@ -8814,8 +8814,7 @@ namespace LIBMOL
             {
                 // could not find three exact matches on 3 atomic hashing values
                 // using approximate default values
-                if (allAtoms[iAN->atoms[0]].bondingIdx >0 && 
-                    allAtoms[iAN->atoms[0]].bondingIdx <4)
+                if (allAtoms[iAN->atoms[0]].bondingIdx <4)
                 {
                     // std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
                     iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];

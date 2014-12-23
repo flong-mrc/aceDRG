@@ -457,6 +457,8 @@ namespace LIBMOL
                 }
             }
         }
+        
+        
         /*
         std::cout << "There are " << allRingsV.size() << " rings " << std::endl
                   << "These are: " << std::endl;
