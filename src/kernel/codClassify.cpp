@@ -4289,7 +4289,7 @@ namespace LIBMOL
             }
             else
             {
-                std::cout << " search a org-related bond c " << std::endl;
+                std::cout << " search a organic-only bond " << std::endl;
                 
                 searchCodOrgBonds2(iGB);
             }
@@ -4660,12 +4660,15 @@ namespace LIBMOL
     {   
         
         
+        
+        
             std::vector<int> tPair;
             for (std::map<ID, int>::iterator iA=iB->fullAtoms.begin();
                     iA !=iB->fullAtoms.end(); iA++)
             {
                 tPair.push_back(iA->second);
             }
+            
             int ha1, ha2;
             ID a1NB2, a2NB2, a1NB, a2NB, a1C, a2C;
             int as0=-1, as1=-1;
@@ -10827,7 +10830,7 @@ namespace LIBMOL
     {
         
         
-        std::cout << "libmol table should be " << libmolTabDir << std::endl;
+        // std::cout << "libmol table should be " << libmolTabDir << std::endl;
        
         setupTargetBonds();
         // setupTargetBondsUsingSqlite();

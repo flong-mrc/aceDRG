@@ -7146,7 +7146,7 @@ namespace LIBMOL
     extern void outMMCif(FileName tFName, 
                          ID tMonoRootName,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
-                         std::vector<int>    & tHydroAtoms,
+                         // std::vector<int>    & tHydroAtoms,
                          std::vector<LIBMOL::BondDict>& tBonds, 
                          std::vector<LIBMOL::AngleDict>& tAngs, 
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
@@ -7190,6 +7190,9 @@ namespace LIBMOL
             std::string longName =tMonoRootName.substr(0,3);
             std::string sName =tMonoRootName.substr(0,3);
             
+            
+            int nH = getHAtomNum(tAtoms);
+            
             outRestrF << "# ------------------------------------------------" << std::endl
                     << "#" << std::endl
                     << "# ---   LIST OF MONOMERS ---" << std::endl
@@ -7205,7 +7208,8 @@ namespace LIBMOL
                     << "_chem_comp.desc_level" << std::endl
                     << longName <<"\t"<< sName << "\t" << "'.\t\t'\t"
                     << "non-polymer\t" << (int)tAtoms.size() << "\t" 
-                    << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
+                    << (int)tAtoms.size()- nH << "\t."
+                    // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
                     << std::endl;
             
             
@@ -7565,6 +7569,21 @@ namespace LIBMOL
         }
     }
     
+    extern int getHAtomNum(std::vector<LIBMOL::AtomDict>& tAtoms)
+    {
+        int tNumH=0;
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            if (iAt->chemType.compare("H") ==0)
+            {
+                tNumH++;
+            }
+        }
+        
+        return tNumH;
+    }
     
     extern void outMMCif3Secs(FileName tFName, 
                               ID tMonoRootName,

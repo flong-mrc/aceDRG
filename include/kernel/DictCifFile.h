@@ -589,17 +589,19 @@ namespace LIBMOL
     extern void outMMCif(FileName tFName, 
                          ID tMonoRootName,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
-                         std::vector<int>    & tHydroAtoms,
+                         // std::vector<int>    & tHydroAtoms,
                          std::vector<LIBMOL::BondDict>& tBonds, 
                          std::vector<LIBMOL::AngleDict>& tAngs, 
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
                          std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> > & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs);
+    
+    extern int getHAtomNum(std::vector<LIBMOL::AtomDict>& tAtoms);
 
     extern void outMMCif3Secs(FileName tFName, 
                               ID tMonoRootName,
-                              std::vector<LIBMOL::AtomDict>& tAtoms,
+                              std::vector<LIBMOL::AtomDict> & tAtoms,
                               std::map<std::string, std::vector<std::string> > & tUnChangedEntries);
 }
 

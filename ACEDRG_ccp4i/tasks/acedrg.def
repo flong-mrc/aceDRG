@@ -10,7 +10,7 @@ LIGGEN_MODE	_liggen_mode               "MMC"
 MOLGEN_MODE	_molgen_mode               "UNK"
 
 INPUT_FILE_TYPE	_text                      ""
-INPUT_FILES	_list_of_text              "MMCIFIN MOLIN SMILESIN CIFIN "
+INPUT_FILES	_list_of_text              "MMCIFIN MOLIN SMILESIN MOL2IN CIFIN "
 OUTPUT_FILES	_list_of_text              "MMCIFOUT XYZOUT"
 
 SMILESIN        _any_file                  ""
@@ -19,12 +19,12 @@ MMCIFIN		_CIF_file                  ""
 DIR_MMCIFIN	_default_dirs              ""
 MOLIN		_any_file                  ""
 DIR_MOLIN	_default_dirs              ""
+MOL2IN		_any_file                  ""
+DIR_MOL2IN	_default_dirs              ""
 CIFIN		_any_file                  ""
 DIR_CIFIN	_default_dirs              ""
 CIF_DIR_IN      _default_dirs              ""
 DIR_CIF_DIR_IN  _default_dirs              ""
-MOL2IN		_any_file                  ""
-DIR_MOL2IN	_default_dirs              ""
 
 MONOM_ID	_text                      "UNL"
 

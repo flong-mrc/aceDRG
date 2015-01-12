@@ -36,6 +36,21 @@ for aF in glob.glob("./inMol/*.mol"):
 
 
 print "========================================================="
+print "|  run all examples with input SYBYL/MOL2 files at ./inMOL2     |"
+print "========================================================="
+for aF in glob.glob("./inMol2/*.mol2"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+    else:
+        MonoName = aFRoot
+
+    if len(aFRoot) !=0:
+        cmdL = "acedrg -g %s  -o  %s_from_SYBYL_Mol2 "%(aF, aFRoot) 
+        print cmdL
+        os.system(cmdL)
+
+print "========================================================="
 print "|  run all examples with input mmCif files at ./inMmcif |"
 print "========================================================="
 for aF in glob.glob("./inMmcif/*.cif"):

@@ -24,8 +24,9 @@ proc acedrg_setup {typedefVar arrayname } {
 
   set typedef(_liggen_mode) { menu {"MMCIF" 
                                     "SMILES"
-                                    "MDL(MOLFILE)/SDF"}
-                              { MMC SMI  MOL} }
+                                    "MDL(MOLFILE)/SDF"
+                                    "(SYBYL)MOL2"}
+                              { MMC SMI  MOL MOL2} }
 
   DefineMenu _input_file_type [list "SMILES file " "MMCIF file " "MOL file " "(small mol) CIF file " ] \
                               [list SMILEIN MMCIIN MOLIN CIFIN  ] 
@@ -159,15 +160,15 @@ proc acedrg_task_window {arrayname} {
  
   # input file format: SYBYL_MOL2
 
-  #CreateInputFileLine line \
-  #      "Enter input Mol2 file name " \
-  #      "Input Mol2 file" \
-  #       MOL2IN DIR_MOL2IN \
-  #       -fileout MMCIFOUT DIR_MMCIFOUT "_acedrg" \
-  #       -fileout XYZOUT DIR_XYZOUT "_acedrg" \
-  #       toggle_display LIGGEN_MODE open [list MOL2 ]    
+  CreateInputFileLine line \
+        "Enter input Mol2 file name " \
+        "Input Mol2 file" \
+         MOL2IN DIR_MOL2IN \
+         -fileout MMCIFOUT DIR_MMCIFOUT "_acedrg" \
+         -fileout XYZOUT DIR_XYZOUT "_acedrg" \
+         toggle_display LIGGEN_MODE open [list MOL2 ]    
   
-  #CloseSubFrame
+  CloseSubFrame
 
   OpenSubFrame frame -toggle_display ACEDRG_MODE open [list LIG_GEN ]
 

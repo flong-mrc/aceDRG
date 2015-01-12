@@ -1280,7 +1280,6 @@ namespace LIBMOL
             
         }
         
-        exit(0);
         
     }
     
@@ -1323,6 +1322,15 @@ namespace LIBMOL
                 }
             }
         }
+        else
+        {
+            for (std::map<ID, bool>::iterator iM=mol2Dict.begin();
+                    iM !=mol2Dict.end(); iM++)
+            {
+                iM->second = false; 
+                
+            }
+        }
     }
   
     
@@ -1351,6 +1359,10 @@ namespace LIBMOL
             if (tStrs1.size() >0)
             {
                 aAtom.chemType = tStrs1[0];
+                if (tStrs1.size() > 1)
+                {
+                    atomSYBYLTypes[aAtom.id] = tStrs1[1];
+                }
             }
             else
             {
@@ -1369,10 +1381,19 @@ namespace LIBMOL
             
             atoms.push_back(aAtom);
             std::cout << "Atom line "<< tLine << std::endl;
-            std::cout << " Set an atom: seriNum " << aAtom.seriNum 
-                      << ", id " << aAtom.id << " element symbol " 
-                      << aAtom.chemType << std::endl;
+            std::cout << " Set an atom: seriNum : " << aAtom.seriNum 
+                      << ", id : " << aAtom.id << " element symbol : " 
+                      << aAtom.chemType;
             
+            if (aAtom.resName.size() !=0)
+            {
+                std::cout << " residueID : " << aAtom.resName;
+            }
+            if (atomSYBYLTypes.find(aAtom.id) !=atomSYBYLTypes.end())
+            {
+                std::cout << " atom SYBYL type : " << atomSYBYLTypes[aAtom.id]; 
+            }
+            std::cout << std::endl;
         }
     }
    
@@ -1398,12 +1419,14 @@ namespace LIBMOL
                 {
                     iAt->connAtoms.push_back(aBond.atomsIdx[1]);
                     aBond.atoms.push_back(iAt->id);
+                    aBond.fullAtoms[iAt->id] = iAt->seriNum;
                     i++;
                 }
                 else if (iAt->seriNum==aBond.atomsIdx[1])
                 {
                     iAt->connAtoms.push_back(aBond.atomsIdx[0]);
                     aBond.atoms.push_back(iAt->id);
+                    aBond.fullAtoms[iAt->id] = iAt->seriNum;
                     i++;
                 }
                 

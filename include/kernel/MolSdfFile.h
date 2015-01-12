@@ -306,6 +306,7 @@ namespace LIBMOL
   
         
         std::vector<AtomDict>   atoms;
+        std::map<ID, ID>        atomSYBYLTypes;
         std::vector<AtomDict>   extraHAtoms;
         std::vector<BondDict>   bonds;
         std::vector<ChiralDict> chirals;

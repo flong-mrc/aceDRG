@@ -353,8 +353,9 @@ namespace LIBMOL
         {
             REAL Diff2  = (REAL)iM->second
                            -Diff1;
-      
-            //std::cout <<" diff2 is " << Diff2 << std::endl;
+            std::cout << "Val " << iM->second << " Diff1 " << Diff1 << std::endl;
+            
+            std::cout <<" diff2 is " << Diff2 << std::endl;
             if (fabs(Diff2) <0.000001)
             {
                 return 0.0;
@@ -362,15 +363,19 @@ namespace LIBMOL
             else if (Diff2 >0 && Diff2 < minD )
             {
                 minD = Diff2;
+                if (minD >8)
+                {
+                    std::cout << "Bond order or valance error " << std::endl;
+                    exit(1);
+                }
             }
             
-            if (minD >8)
-            {
-                std::cout << "Bond order or valance error " << std::endl;
-                exit(1);
-            }
-            
-            
+        }
+        
+        if (minD >8)
+        {
+            std::cout << "Bond order or valance error " << std::endl;
+            exit(1);
         }
         
         std::cout << minD <<" H atom should be added to bind atom " 
