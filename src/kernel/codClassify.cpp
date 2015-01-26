@@ -5930,17 +5930,18 @@ namespace LIBMOL
         searchCodBonds();
         constrBondSigmas();
     }
-    
+    /*
     void CodClassify::setupTargetBondsUsingSqlite()
     {
         groupCodMetBonds();
         searchCodBondsUsingSqlite3();  
         constrBondSigmas();
     }
-    
+    */
+    /*
     void CodClassify::searchCodBondsUsingSqlite3()
     {
-        /*
+        
         sqlite3 * combDB;
         
         int rC=0;   
@@ -5998,14 +5999,15 @@ namespace LIBMOL
         
         
         sqlite3_close(combDB);
-         */
+         
     }
-    
-    
+    */
+   
+    /*
     void CodClassify::searchOneOrgBondFromCodUsingSqlite(sqlite3 * tCombDB,  
                                                          std::vector<BondDict>::iterator tB)
     {
-        /*
+        
         std::vector<int> tPair;
         for (std::map<ID, int>::iterator iA=tB->fullAtoms.begin();
                 iA !=tB->fullAtoms.end(); iA++)
@@ -6129,9 +6131,10 @@ namespace LIBMOL
             dLev = 5;
             searchOneOrgBondUsingSqliteL(tCombDB, tB, dLev, propNB, propHash);
         }  
-        */
+        
         
     }
+    */
     
     // a recursive function for searching 
     /*
@@ -6986,9 +6989,10 @@ namespace LIBMOL
         
     }
     
+    /*
     void CodClassify::searchCodAnglesUsingSqlite()
     {
-        /*
+        
         sqlite3 * combDB;
         
         int rC=0;   
@@ -7044,8 +7048,10 @@ namespace LIBMOL
                 std::cout << "Target angle value : " << iA->value << std::endl;
             }   
         }
-         */
+        
     }
+     * 
+     */
     
     void CodClassify::getIdealCNGeoAngles(std::vector<AngleDict>::iterator iAN)
     {
@@ -10222,7 +10228,7 @@ namespace LIBMOL
             tAN->numCodValues = allDictAnglesIdx2[tHa1][tHa2][tHa3][tA1NB2][tA2NB2][tA3NB2][0].numCodValues;
         }
     }
-    
+   
     void CodClassify::setupTargetAngleUsingMean3(std::vector<REAL>  & tAngValues,
                                         std::vector<int>            & tAngNums,
                                         std::vector<AngleDict>::iterator tAN)
@@ -10298,6 +10304,7 @@ namespace LIBMOL
         
     }
     
+    /*
     void CodClassify::setupTargetAnglesUsingSqlite()
     {
                 //initTargetAngles();
@@ -10316,7 +10323,7 @@ namespace LIBMOL
         std::cout << "Finish searching angles " << std::endl;
         
     }
-    
+   */
     
     // Torsion angles related 
     

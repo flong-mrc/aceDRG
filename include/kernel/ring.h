@@ -101,14 +101,17 @@ namespace LIBMOL
         
         bool                                     isPlanar;
         bool                                     isAromatic;
+        std::string                              isSugar;
         std::string                              rep;
         std::string                              sRep;
         
         std::vector<AtomDict>                    atoms;
         std::map<int, std::map<ID, int> >        atomsLink; 
+        std::map<ID, REAL>                       sugarTors;
               
     };
     
+    // about the internal structure of a ring 
     extern bool AtomsInSameRing(AtomDict & tAt1, AtomDict tAt2, 
                 std::vector<RingDict> & tRings);
     
@@ -120,6 +123,7 @@ namespace LIBMOL
                              int        tIdx,
                              std::vector<int> & tAtmsLink);
     
+    // Aromatic rings and Planes
     extern void mergePlaneRings(std::vector<RingDict>          & tAllRings,
                                 std::vector<std::vector<int> > & tRingAtms);
     
@@ -148,6 +152,12 @@ namespace LIBMOL
                                  std::vector<BondDict>  & tBonds);
     
     extern void detectRingsInAtoms(std::vector<AtomDict> & tAtoms);
+    
+    // Sugar rings
+    // 1. six-member rings
+    
+    extern void checkOneSugarRing(std::vector<AtomDict> & tAtoms,
+                                  std::vector<RingDict>::iterator tRing);
     
     class ringTools 
     {
@@ -181,6 +191,12 @@ namespace LIBMOL
         std::string outRingSecStr(AtomDict &tAtom);
         
         
+    };
+    
+    class SugarDict {
+    public :
+        
+        //Default 
     };
   
 }     // end of namespace LIBMOL

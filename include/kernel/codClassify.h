@@ -323,14 +323,14 @@ namespace LIBMOL
         void getCCP4Bonds(std::vector<BondDict>::iterator tB, ID tAtm1, ID tAtm2);
         
         // !!!!!!! These are newly added for using sqlite3 search engine
-        void searchCodBondsUsingSqlite3();
-        void searchOneOrgBondFromCodUsingSqlite(sqlite3 * tCombDB,  
-                                                std::vector<BondDict>::iterator tB);
-        bool searchOneOrgBondUsingSqliteL(sqlite3 * tCombDB, 
-                                          std::vector<BondDict>::iterator tB,
-                                          int  & tLev,
-                                          std::map<ID, ID> tPropNB,
-                                          std::map<ID, ID> tPropHash);
+        //void searchCodBondsUsingSqlite3();
+        //void searchOneOrgBondFromCodUsingSqlite(sqlite3 * tCombDB,  
+        //                                        std::vector<BondDict>::iterator tB);
+       // bool searchOneOrgBondUsingSqliteL(sqlite3 * tCombDB, 
+       //                                   std::vector<BondDict>::iterator tB,
+       //                                   int  & tLev,
+       //                                   std::map<ID, ID> tPropNB,
+       //                                   std::map<ID, ID> tPropHash);
         void setQueStr(std::string & tQue, int tLev,
                        std::map<ID, ID>  tPropNB,
                        std::map<ID, ID> tPropHash);
@@ -419,16 +419,16 @@ namespace LIBMOL
         
         void setupTargetAngles();
         // angles using sqlite3
-        void setupTargetAnglesUsingSqlite();
-        void searchCodAnglesUsingSqlite();
-        void searchOneOrgAngleFromCodUsingSqlite(sqlite3 * tCombDB,
-                                                 std::vector<AngleDict>::iterator tA);
+        //void setupTargetAnglesUsingSqlite();
+        //void searchCodAnglesUsingSqlite();
+        //void searchOneOrgAngleFromCodUsingSqlite(sqlite3 * tCombDB,
+        //                                         std::vector<AngleDict>::iterator tA);
         
-        bool searchOneOrgAngleUsingSqliteL(sqlite3 * tCombDB, 
-                                          std::vector<AngleDict>::iterator tA,
-                                          int            & tLev,
-                                          std::map<ID, ID> tPropNB,
-                                          std::string tA1C);
+        //bool searchOneOrgAngleUsingSqliteL(sqlite3 * tCombDB, 
+        //                                  std::vector<AngleDict>::iterator tA,
+        //                                  int            & tLev,
+        //                                  std::map<ID, ID> tPropNB,
+        //                                  std::string tA1C);
         
         void setQueStrAn(std::string & tQue, int tLev,
                          std::map<ID, ID>  tPropNB, 

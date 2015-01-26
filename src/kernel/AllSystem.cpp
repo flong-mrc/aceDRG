@@ -425,9 +425,9 @@ namespace LIBMOL
         {
             for (std::vector<RingDict>::iterator iR=iMR->second.begin();
                         iR != iMR->second.end(); iR++)
-            {
-                
+            {       
                 iR->setAtmsLink(allAtoms);
+                checkOneSugarRing(allAtoms, iR);
                 allRingsV.push_back(*iR);
             }
         }

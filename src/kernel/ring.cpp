@@ -58,12 +58,14 @@ namespace LIBMOL
     //Another ring class for the dictionary
     RingDict::RingDict():isPlanar(false),
             isAromatic(false),
+            isSugar(NullString),
             rep(NullString)
     {
     }
     
     RingDict::RingDict(const RingDict& tR):isPlanar(tR.isPlanar),
             isAromatic(tR.isAromatic),
+            isSugar(tR.isSugar),
             rep(tR.rep),
             sRep(tR.sRep)
     {
@@ -81,6 +83,12 @@ namespace LIBMOL
             {
                 atomsLink[iL->first][iI->first]=iI->second;
             }
+        }
+        
+        for (std::map<ID, REAL>::const_iterator iSR=tR.sugarTors.begin();
+                iSR !=tR.sugarTors.end(); iSR++)
+        {
+            sugarTors[iSR->first] = iSR->second; 
         }
     }
     
@@ -888,6 +896,102 @@ namespace LIBMOL
         }
     }
     
+    extern void checkOneSugarRing(std::vector<AtomDict> & tAtoms,
+                                  std::vector<RingDict>::iterator tRing)
+    {
+        // Six-member sugar ring (Pyranose)
+        
+        std::vector<ID> rAtmIds;
+        
+        for (std::vector<AtomDict>::iterator iAt = tRing->atoms.begin();
+                iAt !=tRing->atoms.end(); iAt++)
+        {
+            rAtmIds.push_back(iAt->id);
+        }
+        
+        std::map<ID, int>  rAtmFormat;
+        rAtmFormat["O"]        = 0;
+        rAtmFormat["C"]        = 0;
+        rAtmFormat["connectC"] = 0;
+        rAtmFormat["connectO"] = 0;
+        
+        for (std::vector<AtomDict>::iterator iAt = tRing->atoms.begin();
+                iAt !=tRing->atoms.end(); iAt++)
+        {
+            if (iAt->chemType.compare("C")==0)
+            {
+                 rAtmFormat["C"]++;
+                 
+                 int iCO=0;
+                 for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                         iNB !=iAt->connAtoms.end(); iNB++)
+                 {
+                     if (tAtoms[*iNB].chemType.compare("O")==0 
+                         && std::find(rAtmIds.begin(), rAtmIds.end(), tAtoms[*iNB].id) == rAtmIds.end())
+                     {
+                         iCO++;
+                     }
+                     else if (tAtoms[*iNB].chemType.compare("O")==0 
+                         && std::find(rAtmIds.begin(), rAtmIds.end(), tAtoms[*iNB].id) == rAtmIds.end())
+                     {
+                         rAtmFormat["connectC"]++;
+                     }
+                 }
+                 
+                 if (iCO > 1)
+                 {
+                     break;
+                 }
+                 else if (iCO==1)
+                 {
+                     rAtmFormat["connectO"]++;   
+                 }    
+            }
+            else if (iAt->chemType.compare("O")==0)
+            {
+                if (iAt->connAtoms.size()==2)
+                {
+                    int iOC=0;
+                    for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                            iNB !=iAt->connAtoms.end(); iNB++)
+                    {
+                        if (tAtoms[*iNB].chemType.compare("C")==0 
+                            &&  std::find(rAtmIds.begin(), rAtmIds.end(), tAtoms[*iNB].id) != rAtmIds.end())
+                        {
+                            iOC++;
+                        }
+                    }
+                    if (iOC==2)
+                    {
+                        rAtmFormat["O"]++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                break;
+            }
+            
+            if (rAtmFormat["O"]==1 && rAtmFormat["C"]==5
+                && rAtmFormat["connectO"]==4)
+            {
+                tRing->isSugar = "pyranose";
+            }
+            else if (rAtmFormat["O"]==1 && rAtmFormat["C"]==4
+                && rAtmFormat["connectO"]==3 && rAtmFormat["connectC"]==2 )
+            {
+                tRing->isSugar = "furanose";
+            }
+        }
+        
+        // 
+        
+        
+    }
     
     ringTools::ringTools()
     {
