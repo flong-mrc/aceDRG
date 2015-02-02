@@ -2961,43 +2961,41 @@ namespace LIBMOL
             if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                unsigned  n_sp1 = 0;
+                
                 if(t_len==3)
                 {
-                    bool l_sp2 = false;
-                    for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
-                            iCA != iAt->connAtoms.end(); iCA++)
+                    if (iAt->parCharge ==0.0)
                     {
-                        if(allAtoms[*iCA].bondingIdx == 2)
+                        bool l_sp2 = false;
+                        for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                                 iCA != iAt->connAtoms.end(); iCA++)
                         {
-                            l_sp2 = true;
+                            if(allAtoms[*iCA].bondingIdx == 2)
+                            {
+                                l_sp2 = true;
+                                break;
+                            }
                         }
-                        else if (allAtoms[*iCA].bondingIdx == 1 
-                                 && allAtoms[*iCA].chemType.compare("H") !=0)
+                        if (l_sp2)
                         {
-                            n_sp1++;
-                        }
-                    }
-                    if (l_sp2)
-                    {
-                        // Now we can say this atom is in sp2 orbits 
-                        iAt->chiralIdx  =  0;
-                        iAt->bondingIdx =  2;
-                    }
-                    else
-                    {
-                        if (iAt->chiralIdx ==0)
-                        {
-                            iAt->chiralIdx  = 2;
-                        }
-                        if (n_sp1==iAt->connAtoms.size())
-                        {
+                            // Now we can say this atom is in sp2 orbits 
+                            iAt->chiralIdx  =  0;
                             iAt->bondingIdx =  2;
                         }
                         else
                         {
+                            if (iAt->chiralIdx ==0)
+                            {
+                                iAt->chiralIdx  = 2;
+                            }
+                            
                             iAt->bondingIdx =  3;
                         }
+                    }
+                    else if (iAt->parCharge ==1.0)
+                    {
+                        iAt->chiralIdx  =  0;
+                        iAt->bondingIdx =  2;
                     }
                 } 
             }
