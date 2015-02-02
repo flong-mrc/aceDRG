@@ -708,6 +708,7 @@ namespace LIBMOL
                     iAt->chiralIdx  = 1;
                     iAt->bondingIdx = 3;  
                 }
+                
                 //else if (t_len==3) // temp
                 //{
                 //    iAt->chiralIdx  = -1;
@@ -836,7 +837,8 @@ namespace LIBMOL
                         {
                             l_sp2 = true;
                         }
-                        else if (allAtoms[*iCA].bondingIdx == 1)
+                        else if (allAtoms[*iCA].bondingIdx == 1
+                                && allAtoms[*iCA].chemType.compare("H") !=0)
                         {
                             n_sp1++;
                         }

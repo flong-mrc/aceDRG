@@ -2972,7 +2972,8 @@ namespace LIBMOL
                         {
                             l_sp2 = true;
                         }
-                        else if (allAtoms[*iCA].bondingIdx == 1)
+                        else if (allAtoms[*iCA].bondingIdx == 1 
+                                 && allAtoms[*iCA].chemType.compare("H") !=0)
                         {
                             n_sp1++;
                         }
