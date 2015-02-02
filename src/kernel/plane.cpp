@@ -220,6 +220,7 @@ namespace LIBMOL
             }
         }
         
+        
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
@@ -227,10 +228,11 @@ namespace LIBMOL
             if (iAt->bondingIdx==2)
             {
                 //std::cout << "atom " << iAt->id << std::endl;
+                //std::cout << "atom seri " << iAt->seriNum << std::endl;
                 if (std::find(atmIdxs.begin(), atmIdxs.end(), iAt->seriNum)
                       ==atmIdxs.end() && iAt->chemType.compare("H") !=0)
                 {
-                    std::cout << "sp2 plane center atom " << iAt->id << std::endl;
+                    //std::cout << "sp2 plane center atom " << iAt->id << std::endl;
                     PlaneDict aP;
                     aP.atoms[iAt->id] = iAt->seriNum;
                     for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();

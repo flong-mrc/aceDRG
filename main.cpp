@@ -133,9 +133,11 @@ int main(int argc, char** argv) {
                 aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                                                           AJob.IOEntries["monoRootName"], 
                                                           AJob.IOEntries["libMolTabDir"]);
+                
                 //if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
                 //{
-                std::cout << "out-root " << AJob.IOEntries["monoRootName"] << std::endl;
+                //std::cout << "out-root " << AJob.IOEntries["monoRootName"] << std::endl;
+                
                 
                 LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                  AJob.IOEntries["monoRootName"], 

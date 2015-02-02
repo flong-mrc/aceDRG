@@ -2884,6 +2884,10 @@ namespace LIBMOL
                 {
                     iAt->bondingIdx = 2;
                 }
+                else if (iAt->connAtoms.size()==1)
+                {
+                    iAt->bondingIdx = 1;
+                }
             }
             else if (iAt->chemType.compare("SI")==0 
                     || iAt->chemType.compare("P")==0)
@@ -2957,6 +2961,7 @@ namespace LIBMOL
             if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
+                unsigned  n_sp1 = 0;
                 if(t_len==3)
                 {
                     bool l_sp2 = false;
@@ -2966,6 +2971,10 @@ namespace LIBMOL
                         if(allAtoms[*iCA].bondingIdx == 2)
                         {
                             l_sp2 = true;
+                        }
+                        else if (allAtoms[*iCA].bondingIdx == 1)
+                        {
+                            n_sp1++;
                         }
                     }
                     if (l_sp2)
@@ -2980,8 +2989,14 @@ namespace LIBMOL
                         {
                             iAt->chiralIdx  = 2;
                         }
-           
-                        iAt->bondingIdx =  3;
+                        if (n_sp1==iAt->connAtoms.size())
+                        {
+                            iAt->bondingIdx =  2;
+                        }
+                        else
+                        {
+                            iAt->bondingIdx =  3;
+                        }
                     }
                 } 
             }
@@ -10587,7 +10602,7 @@ namespace LIBMOL
         // output the angle values
        
         // std::cout << "Internal angles in the ring " << tRv->rep << std::endl;
-        /*
+        
         REAL aSum=0.0;
         for (std::vector<int>::iterator iAd=angIdxs.begin();
                iAd !=angIdxs.end(); iAd++)
@@ -10601,7 +10616,7 @@ namespace LIBMOL
         }
         std::cout << "Sum for the values of all internal angles " 
                   << aSum << std::endl;
-        */
+       
     }
     
     void CodClassify::checkSP2Constraints(std::vector<int> tAngIdxs)

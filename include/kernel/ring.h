@@ -97,6 +97,7 @@ namespace LIBMOL
         ~RingDict(); 
         
         void setAtmsLink(std::vector<AtomDict> tAllAtoms);
+        void setRingAtmsLinks();
         void setPlaneProp();
         
         bool                                     isPlanar;
@@ -107,6 +108,7 @@ namespace LIBMOL
         
         std::vector<AtomDict>                    atoms;
         std::map<int, std::map<ID, int> >        atomsLink; 
+        std::map<int, std::vector<int> >         ringAtomLink;
         std::map<ID, REAL>                       sugarTors;
               
     };
@@ -158,6 +160,9 @@ namespace LIBMOL
     
     extern void checkOneSugarRing(std::vector<AtomDict> & tAtoms,
                                   std::vector<RingDict>::iterator tRing);
+    
+    extern void setSugarRingChairComf(std::vector<AtomDict> & tAtoms,
+                                      std::vector<RingDict>::iterator tRing);
     
     class ringTools 
     {

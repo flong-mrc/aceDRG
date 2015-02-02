@@ -741,6 +741,10 @@ namespace LIBMOL
                 {
                     iAt->bondingIdx = 2;
                 }
+                else if (iAt->connAtoms.size()==1)
+                {
+                    iAt->bondingIdx = 1;
+                }
             }
             else if (iAt->chemType.compare("SI")==0 
                     || iAt->chemType.compare("P")==0)
@@ -820,9 +824,11 @@ namespace LIBMOL
             if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
+                unsigned  n_sp1 = 0;
                 if(t_len==3)
                 {
                     bool l_sp2 = false;
+                    
                     for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                             iCA != iAt->connAtoms.end(); iCA++)
                     {
@@ -830,6 +836,12 @@ namespace LIBMOL
                         {
                             l_sp2 = true;
                         }
+                        else if (allAtoms[*iCA].bondingIdx == 1)
+                        {
+                            n_sp1++;
+                        }
+                        
+                        
                     }
                     if (l_sp2)
                     {
@@ -843,8 +855,10 @@ namespace LIBMOL
                         {
                             iAt->chiralIdx  = 2;
                         }
-           
-                        iAt->bondingIdx =  3;
+                        else
+                        {
+                            iAt->bondingIdx =  3;
+                        }
                     }
                 } 
             }

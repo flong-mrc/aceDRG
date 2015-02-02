@@ -85,6 +85,16 @@ namespace LIBMOL
             }
         }
         
+        for (std::map<int, std::vector<int> >::const_iterator iL=tR.ringAtomLink.begin();
+                iL !=tR.ringAtomLink.end(); iL++)
+        {
+            for (std::vector<int>::const_iterator iAt=iL->second.begin();
+                    iAt !=iL->second.end(); iAt++)
+            {
+                ringAtomLink[iL->first].push_back(*iAt);
+            }
+        }
+        
         for (std::map<ID, REAL>::const_iterator iSR=tR.sugarTors.begin();
                 iSR !=tR.sugarTors.end(); iSR++)
         {
@@ -203,6 +213,35 @@ namespace LIBMOL
             i++;        
         }while(i < tRSize);
         */
+    }
+    
+    void RingDict::setRingAtmsLinks()
+    {
+        
+        if (atoms.size() > 0)
+        {
+            std::vector<int> tSerNums;
+            
+            for (std::vector<AtomDict>::iterator iAt =atoms.begin();
+                    iAt != atoms.end(); iAt++)
+            {
+                tSerNums.push_back(iAt->seriNum);
+                ringAtomLink[iAt->seriNum].clear();
+            }
+            
+            for (std::vector<AtomDict>::iterator iAt =atoms.begin();
+                    iAt != atoms.end(); iAt++)
+            {
+                for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                        iNB !=iAt->connAtoms.end(); iAt++)
+                {
+                    if (std::find(tSerNums.begin(), tSerNums.end(), *iNB) !=tSerNums.end())
+                    {
+                        ringAtomLink[iAt->seriNum].push_back(*iNB);
+                    }
+                }
+            }
+        }
     }
     
     void RingDict::setPlaneProp()
@@ -918,7 +957,7 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt = tRing->atoms.begin();
                 iAt !=tRing->atoms.end(); iAt++)
         {
-            if (iAt->chemType.compare("C")==0)
+            if (iAt->chemType.compare("C")==0 && iAt->bondingIdx==3)
             {
                  rAtmFormat["C"]++;
                  
@@ -931,7 +970,7 @@ namespace LIBMOL
                      {
                          iCO++;
                      }
-                     else if (tAtoms[*iNB].chemType.compare("O")==0 
+                     else if (tAtoms[*iNB].chemType.compare("C")==0 
                          && std::find(rAtmIds.begin(), rAtmIds.end(), tAtoms[*iNB].id) == rAtmIds.end())
                      {
                          rAtmFormat["connectC"]++;
@@ -992,6 +1031,155 @@ namespace LIBMOL
         
         
     }
+    
+    
+    extern void setSugarRingChairComf(std::vector<AtomDict> & tAtoms,
+                                      std::vector<RingDict>::iterator tRing)
+    {
+        // A template function to set all six-member rings of pyranose to the "chair" conformation. 
+        // Using a proper class to generate Carbohydrate Conformations later on.
+        
+        tRing->setRingAtmsLinks();
+        
+        std::vector<int> branch1, branch2;
+        
+        for (unsigned i0=0; i0 < tRing->atoms.size(); i0++)
+        {
+            if (tRing->atoms[i0].chemType.compare("O")==0)
+            {
+                // O5 atom
+                branch1.push_back(tRing->atoms[i0].seriNum);
+                branch2.push_back(tRing->atoms[i0].seriNum);
+                
+                
+                if (tRing->atoms[i0].connAtoms.size() ==2)
+                {
+                    int i1=-1, i2=-1, i3=-1, i4=1, i5=-1;
+                    
+                    int it1=tRing->atoms[i0].connAtoms[0];
+                    int it2=tRing->atoms[i0].connAtoms[1];
+                    
+                    
+                    bool lConnO = false;
+                    for (unsigned inb1=0; inb1 !=tAtoms[it1].connAtoms.size(); 
+                            inb1++)
+                    {
+                         if (tAtoms[inb1].chemType.compare("O")==0
+                             && tAtoms[inb1].seriNum != tRing->atoms[i0].seriNum)
+                         {
+                             lConnO = true;
+                             break;
+                         }
+                    }
+                    
+                    if (lConnO)
+                    {
+                        i1 = it1;
+                        i2 = it2;
+                    }
+                    else
+                    {
+                        i1 = it2;
+                        i2 = it1;
+                    } 
+                       
+                    branch1.push_back(i1);
+                    branch2.push_back(i2);
+                    
+                    for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i1].begin();
+                            iNext != tRing->ringAtomLink[i1].end(); iNext++)
+                    {
+                        if (*iNext !=tRing->atoms[i0].seriNum)
+                        {
+                            i3 = *iNext;
+                            break;
+                        }
+                    }
+                    
+                    if (i3 !=-1)
+                    {
+                        branch1.push_back(i3);
+                        
+                        for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i3].begin();
+                            iNext != tRing->ringAtomLink[i3].end(); iNext++)
+                        {
+                            if (*iNext !=tRing->atoms[i1].seriNum)
+                            {
+                                i5 = *iNext;
+                                break;
+                            }
+                        }                   
+                    }
+                    else
+                    {
+                        std::cout << "Can not find one of ring atoms connected to atom "
+                                  << tAtoms[i1].id << std::endl;
+                        exit(1);
+                    }
+                    
+                    for (std::vector<int>::iterator iNext = tRing->ringAtomLink[i2].begin();
+                            iNext != tRing->ringAtomLink[i2].end(); iNext++)
+                    {
+                        if (*iNext !=tRing->atoms[i0].seriNum)
+                        {
+                            i4 = *iNext;
+                            break;
+                        }
+                    }
+                    
+                    if (i4 !=-1)
+                    {
+                        branch2.push_back(i4);
+                    }
+                    else
+                    {
+                        std::cout << "Can not find one of ring atoms connected to atom "
+                                  << tAtoms[i2].id << std::endl;
+                        exit(1);
+                    }
+                    
+                    if (i5 !=-1)
+                    {
+                        branch1.push_back(i5);
+                        branch2.push_back(i5);
+                    }
+                }
+                else
+                {
+                    std::cout << "Bug: O atom in the sugar ring connects "
+                              << tRing->atoms[i0].connAtoms.size() << " atoms"
+                              << std::endl;
+                    exit(1);
+                }
+                
+                break;
+                
+            }
+        }
+        
+        if (branch1.size() ==4 && branch2.size() ==4)
+        {
+            ID iD0  = tAtoms[branch1[0]].id;
+            ID iD11 = tAtoms[branch1[1]].id;
+            ID iD12 = tAtoms[branch1[2]].id;
+            ID iD13 = tAtoms[branch1[3]].id;
+            
+            ID iD21 = tAtoms[branch2[1]].id;
+            ID iD22 = tAtoms[branch2[2]].id;
+            
+            // Temporal values. 
+            // The typical id combination C5-O5-C1-C2   
+            tRing->sugarTors[iD21 + "_" + iD0  + "_" + iD11 + "_" + iD12 ] = -67.5;
+            tRing->sugarTors[iD0  + "_" + iD11 + "_" + iD12 + "_" + iD13 ] =  61.2;
+            tRing->sugarTors[iD11 + "_" + iD12 + "_" + iD13 + "_" + iD22 ] = -53.7;
+            tRing->sugarTors[iD12 + "_" + iD13 + "_" + iD22 + "_" + iD21 ] =  53.7;
+            tRing->sugarTors[iD13 + "_" + iD22 + "_" + iD21 + "_" + iD0  ] = -61.2;
+            tRing->sugarTors[iD22 + "_" + iD21 + "_" + iD0  + "_" + iD11 ] =  67.5;
+            
+        }
+        
+    }
+    
     
     ringTools::ringTools()
     {
