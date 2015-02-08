@@ -1093,8 +1093,8 @@ class Acedrg(CExeCode ):
     
     def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
      
-        #self._cmdline = self.refmac 
-        self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
+        self._cmdline = self.refmac 
+        #self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
         if tStage==1:
             self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
             self._cmdline += "end       \n"
