@@ -1321,7 +1321,7 @@ namespace LIBMOL
     }
     
     
-    void TransCoords::generateCoordTorsToCart3(std::vector<AtomDict>& tAtoms,
+    bool TransCoords::generateCoordTorsToCart3(std::vector<AtomDict>& tAtoms,
                                                std::vector<BondDict>    & tBonds,
                                                std::vector<AngleDict>   & tAngles,
                                                std::vector<TorsionDict> & tTorsions,
@@ -1333,7 +1333,7 @@ namespace LIBMOL
         
         LIBMOL::buildAtomTree tTool;
             
-        tTool.buildTree(tAtoms, tBonds, tAngles, tTorsions, 
+        bool tTree = tTool.buildTree(tAtoms, tBonds, tAngles, tTorsions, 
                         tRings, tPlas, tChs);
         
         //for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
@@ -1345,6 +1345,11 @@ namespace LIBMOL
         
         //tTool.setTreeAtomValues(tAtoms, tBonds, tAngs, tTorsions, 
         //                        tRings, tPlas, tChs);
+        
+        if (!tTree)
+        {
+            return tTree;
+        }
         
         for (std::map<int, std::map<int, std::vector<int> > >::iterator iBr=tTool.branches.begin();
                 iBr !=tTool.branches.end(); iBr++)
@@ -1381,6 +1386,8 @@ namespace LIBMOL
                 }
             }
         } 
+        
+        return true;
     }
     
     

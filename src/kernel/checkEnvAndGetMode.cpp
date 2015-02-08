@@ -128,8 +128,8 @@ namespace LIBMOL
                     break;
                 case 'k':
                     IOEntries["inMol2Name"] =  optarg;
-                    std::cout << "The input Mol2 files are in " 
-                              <<  IOEntries["inMol2Name"] << std::endl;
+                    //std::cout << "The input Mol2 files are in " 
+                    //          <<  IOEntries["inMol2Name"] << std::endl;
                     break;
                 case 'm':
                     IOEntries["molGen"] =  optarg;
@@ -143,7 +143,7 @@ namespace LIBMOL
                     break;
                 case 'o':
                     IOEntries["userOutName"] = optarg;
-                    //std::cout << "Output res file should be : " 
+                    // std::cout << "Output res file should be : " 
                     //          << IOEntries["userOutName"] << std::endl;
                     break;
                 case 'p':

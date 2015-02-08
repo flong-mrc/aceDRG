@@ -100,12 +100,12 @@ namespace LIBMOL
         elements["S"]["matType"]   = 2;
         elements["S"]["atomNum"]   = 16;
         elements["S"]["val"]       = 6;
-        elemProps["S"]["vdw"]       = 1.80;
-        elemProps["S"]["cova"]      = 1.05;
+        elemProps["S"]["vdw"]      = 1.80;
+        elemProps["S"]["cova"]     = 1.05;
         elemProps["S"]["vdw"]      = 1.80;
         elemProps["S"]["cova"]     = 1.02;
-        elemProps["S"]["ionM-"]   = 1.70;
-        elemProps["S"]["ionM+"]   = 0.51;
+        elemProps["S"]["ionM-"]    = 1.70;
+        elemProps["S"]["ionM+"]    = 0.51;
         //elemProps["S6+"]["cova"]   = 0.43;
         
         elements["Se"]["row"]      = 4;

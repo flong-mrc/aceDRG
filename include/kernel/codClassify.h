@@ -210,6 +210,7 @@ namespace LIBMOL
         
         
         void setupSystem();
+        void setupSystemTM();
         
         // get CCP4 energy lib 
         void getCCP4BondAndAngles();
@@ -312,6 +313,7 @@ namespace LIBMOL
         void setOrgBondHeadHashList2();
         void groupCodOrgBonds();
         void groupCodOrgBonds2();
+        void groupCodOrgBonds3();
         void searchCodOrgBonds(std::vector<BondDict>::iterator iOB);
         void searchCodOrgBonds2(std::vector<BondDict>::iterator iB);
         void groupCodMetBonds();

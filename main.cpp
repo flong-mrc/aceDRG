@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
     LIBMOL::CheckEnvAndGetMode AJob(argc, argv);
     
     std::cout << "workMode " << AJob.workMode << std::endl;
+    std::cout << "user output name " << AJob.IOEntries["userOutName"] << std::endl;
     
     for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
             iKW !=AJob.IOEntries.end(); iKW++)
@@ -133,11 +134,6 @@ int main(int argc, char** argv) {
                 aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                                                           AJob.IOEntries["monoRootName"], 
                                                           AJob.IOEntries["libMolTabDir"]);
-                
-                //if(AJob.IOEntries["NoGeoOpt"].substr(0,1).compare("y")==0)
-                //{
-                //std::cout << "out-root " << AJob.IOEntries["monoRootName"] << std::endl;
-                
                 
                 LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                  AJob.IOEntries["monoRootName"], 
@@ -228,35 +224,42 @@ int main(int argc, char** argv) {
                     if ( (int)aTargetSystem.allAtoms.size() > 0)
                     {
                         std::string tOutName(AJob.IOEntries["userOutName"]);
+                        // std::cout << "input name" << AJob.IOEntries["userOutName"] << std::endl;
+                        
+                        
                         if(dataFromSdf.allMols.size()>1)
                         {
                             tOutName.append("_");
                             tOutName.append(LIBMOL::IntToStr(i));
                         }
                         
+                        
                         aTargetSystem.setupAllTargetValuesFromCOD(tOutName.c_str(), 
                                                    AJob.IOEntries["monoRootName"],
                                                    AJob.IOEntries["libMolTabDir"]);
                         
-                        /*
+                        
+                        
                         LIBMOL::outMMCif(tOutName.c_str(),
-                                         AJob.IOEntries["monoRootName"], 
-                                             aTargetSystem.allAtoms,
-                                             aTargetSystem.allHAtomIdx,
-                                             aTargetSystem.allBonds,
-                                             aTargetSystem.allAngles,
-                                             aTargetSystem.allTorsions,
-                                             aTargetSystem.allRings,
-                                             aTargetSystem.allPlanes,
-                                             aTargetSystem.allChirals);
-            
+                                                 AJob.IOEntries["monoRootName"], 
+                                                 aTargetSystem.allAtoms,
+                                                 // aTargetSystem.allHAtomIdx,
+                                                 aTargetSystem.allBonds,
+                                                 aTargetSystem.allAngles,
+                                                 aTargetSystem.allTorsions,
+                                                 aTargetSystem.allRings,
+                                                 aTargetSystem.allPlanes,
+                                                 aTargetSystem.allChirals);
+                        
+                        
                         LIBMOL::outPDB(tOutName.c_str(),
                                 AJob.IOEntries["monoRootName"], 
                                 aTargetSystem.allAtoms);
-                        */
+                        
+                        
                         // aTargetSystem.chiralExch();
                         
-                        
+                        /*
                         if ( !aTargetSystem.containMetal()) 
                         {
                              
@@ -267,22 +270,46 @@ int main(int argc, char** argv) {
             
                             aGlobMinSystem.Driver();
             
-                            //aGlobMinSystem.PreIdealization();
+                            if (aGlobMinSystem.lGlob)
+                            {
+                                //aGlobMinSystem.PreIdealization();
                             
-                            LIBMOL::outMMCif(tOutName.c_str(),
-                                             AJob.IOEntries["monoRootName"], 
-                                             aGlobMinSystem.allAtoms,
-                                             // aTargetSystem.allHAtomIdx,
-                                             aGlobMinSystem.allBonds,
-                                             aGlobMinSystem.allAngles,
-                                             aGlobMinSystem.allTorsions,
-                                             aGlobMinSystem.allRings,
-                                             aGlobMinSystem.allPlanes,
-                                             aGlobMinSystem.allChirals);
+                                LIBMOL::outMMCif(tOutName.c_str(),
+                                                 AJob.IOEntries["monoRootName"], 
+                                                 aGlobMinSystem.allAtoms,
+                                                 // aTargetSystem.allHAtomIdx,
+                                                 aGlobMinSystem.allBonds,
+                                                 aGlobMinSystem.allAngles,
+                                                 aGlobMinSystem.allTorsions,
+                                                 aGlobMinSystem.allRings,
+                                                 aGlobMinSystem.allPlanes,
+                                                 aGlobMinSystem.allChirals);
             
-                            LIBMOL::outPDB(tOutName.c_str(),
-                                           AJob.IOEntries["monoRootName"], 
-                                           aGlobMinSystem.allAtoms);
+                                LIBMOL::outPDB(tOutName.c_str(),
+                                               AJob.IOEntries["monoRootName"], 
+                                               aGlobMinSystem.allAtoms);
+                            
+                                
+                            }
+                            else
+                            {
+                                std::cout << "Using initial coords " << std::endl;
+                                LIBMOL::outMMCif(tOutName.c_str(),
+                                             AJob.IOEntries["monoRootName"], 
+                                             aTargetSystem.allAtoms,
+                                             // aTargetSystem.allHAtomIdx,
+                                             aTargetSystem.allBonds,
+                                             aTargetSystem.allAngles,
+                                             aTargetSystem.allTorsions,
+                                             aTargetSystem.allRings,
+                                             aTargetSystem.allPlanes,
+                                             aTargetSystem.allChirals);
+                            
+                                LIBMOL::outPDB(tOutName.c_str(),
+                                               AJob.IOEntries["monoRootName"], 
+                                               aTargetSystem.allAtoms);
+                            }
+                           
                         }
                         else
                         {
@@ -306,6 +333,7 @@ int main(int argc, char** argv) {
                                       << "No atom coordinates will be generated at the momemt. " << std::endl
                                       << "They will be available soon. " << std::endl;
                         }
+                         */
                         
                     }
                     
@@ -351,7 +379,7 @@ int main(int argc, char** argv) {
                 }
                 else
                 {
-                    std::cout << "The input Cif file " << AJob.IOEntries["inCifName"] 
+                    std::cout << "The input MOl2 file " << AJob.IOEntries["inCifName"] 
                               << " contains NO atoms! check the file " << std::endl;
                 }
             }

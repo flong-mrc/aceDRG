@@ -22,12 +22,17 @@ namespace LIBMOL
         
         int iMax =-1;
         int nMax =0;
+        int n2NBMax=0;
+        int iMax2NB=-1;
         //std::map<int, int> tAN;
         
         for (int i=0; i < (int)allAtoms.size(); i++)
         {
-            int tN = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
-            // std::cout << "tN " << tN << std::endl;
+            int tN   = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
+            int t2NB = allAtoms[i].getNum1stNbHave2edNb(allAtoms);
+            std::cout << "Atom " << allAtoms[i].id << std::endl;
+            std::cout << "tN " << tN << std::endl;
+            std::cout << "t2NB " << t2NB << std::endl;
             
             unsigned tHC =0;
             for (std::vector<int>::iterator iNB=allAtoms[i].connAtoms.begin();
@@ -42,20 +47,37 @@ namespace LIBMOL
             
             
             if (allAtoms[i].id != "H" 
-                && (int)allAtoms[i].ringRep.size() ==0
-                && (int)allAtoms[i].connAtoms.size() > 2 
+                //&& (int)allAtoms[i].ringRep.size() ==0
+                && (int)allAtoms[i].connAtoms.size() > 2
+                // && t2NB >=2
                 && tDiff > 1
-                && tN > nMax)
+                && t2NB > n2NBMax)
             {
-                iMax = i;
-                nMax = tN;
+                
+                n2NBMax = t2NB;
+                iMax2NB = i;
+                if ((int)allAtoms[i].ringRep.size() ==0
+                     && tN > nMax )
+                {
+                    iMax = i;
+                    nMax = tN;
+                }
+                
             }
+            
+            
         }
         
-        std::cout << " Not found start atom under the first atom " << std::endl;
+        // std::cout << " Not found start atom under the first atom " << std::endl;
         
         if (iMax==-1)
         {
+            /*   
+            if (iMax2NB !=-1)
+            {
+                iMax=iMax2NB;
+            }
+             */
             
             nMax=0;
             // have to use a ring atom as the start atom
@@ -74,19 +96,17 @@ namespace LIBMOL
                 int tN = allAtoms[i].getNumAtomsWithin2stNB(allAtoms);
                 if (allAtoms[i].id != "H" 
                     && (int)allAtoms[i].connAtoms.size() > 2
+                    // && n2NBMax >=2
                     && tDiff > 1
                     && tN > nMax)
                 {
                     iMax = i;
                 }
             }
-            if (iMax==-1)
-            {
-                std::cout << "Can not find an atom as the starting atom." << std::endl;
-                std::cout << "They are either H or singly linked atoms " << std::endl;
-                exit(1);
-            }
-            else
+             
+            
+            
+            if (iMax!=-1)
             {
                 allAtoms[iMax].tree["parent"].push_back(-1);
             }
@@ -100,15 +120,17 @@ namespace LIBMOL
         return iMax;
        
     }
-    void buildAtomTree::setAtomsMST(std::vector<AtomDict>& allAtoms, 
+    
+    bool buildAtomTree::setAtomsMST(std::vector<AtomDict>& allAtoms, 
                                std::vector<BondDict>& allBonds)
     {
+        
         std::vector<int> atmsInT, atmsOutT;
         
         int iS = setMSTStartAtom(allAtoms);
         if (iS <0)
         {
-            exit(1);
+            return false;
         }
             
         // supplement variables
@@ -155,7 +177,7 @@ namespace LIBMOL
         if ((int)atmsInT.size() ==0)
         {
             std::cout << "Tree start atom error " << std::endl;
-            exit(1);
+            return false;
         }
         
         
@@ -285,6 +307,8 @@ namespace LIBMOL
                             << "\t" << "END" << std::endl; 
             }
         }
+        
+        return true;
         
     }
     
@@ -691,15 +715,15 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
-            //std::cout << "For atom " << iAt->id << std::endl;
+            std::cout << "For atom " << iAt->id << std::endl;
             int idxP = iAt->tree["parent"][0];
-            //std::cout << "its parent  " << std::endl;
+            std::cout << "its parent  " << std::endl;
             if (idxP >=0)
             {
-                // std::cout << tAtoms[iAt->tree["parent"][0]].id << std::endl;
+                std::cout << tAtoms[iAt->tree["parent"][0]].id << std::endl;
                 setTreeAtomBondValue(tAtoms, tBonds, iAt);
                 int idxGp=tAtoms[idxP].tree["parent"][0];
-                //std::cout << " its grand-p " << idxGp << std::endl;
+                std::cout << " its grand-p " << idxGp << std::endl;
                 if (idxGp >=0)
                 {
                     // std::cout << tAtoms[idxGp].id << std::endl;
@@ -755,7 +779,7 @@ namespace LIBMOL
                 else if (idxGp==-1)
                 {
                     // Now no need to set these torsions
-                    //std::cout << "Select Grand P from the start pack " << std::endl;
+                    std::cout << "Select Grand P from the start pack " << std::endl;
                     int iGp  =-2;
                     int iGgp =-2;
                     std::vector<int> tVec;
@@ -798,6 +822,7 @@ namespace LIBMOL
                     }
                     if (iGp==-2 || iGgp==-2)
                     {
+                        
                         std::cout << "Can not find the torsion angle for atom  " 
                                   << iAt->id << std::endl;
                         exit(1);
@@ -823,7 +848,182 @@ namespace LIBMOL
         
     }
     
-    void buildAtomTree::setTreeAtomValues(std::vector<AtomDict>& tAtoms)
+    void buildAtomTree::setTreeAtomValues2(std::vector<AtomDict>    & tAtoms, 
+                                           std::vector<BondDict>    & tBonds, 
+                                           std::vector<AngleDict>   & tAngles, 
+                                           std::vector<TorsionDict> & tTorsions)
+    {
+        
+        AtomDict aDAtom;
+        aDAtom.id    = "dummy";
+        TorsionDict aDTorsion;
+        aDTorsion.id = "dummy";
+        
+        int tS = startAtom;
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            std::cout << "For atom " << iAt->id << std::endl;
+            int idxP = iAt->tree["parent"][0];
+            std::cout << "its parent  " << std::endl;
+            if (idxP >=0)
+            {
+                std::cout << tAtoms[iAt->tree["parent"][0]].id << std::endl;
+                setTreeAtomBondValue(tAtoms, tBonds, iAt);
+                int idxGp=tAtoms[idxP].tree["parent"][0];
+                std::cout << " its grand-p " << idxGp << std::endl;
+                if (idxGp >=0)
+                {
+                    // std::cout << tAtoms[idxGp].id << std::endl;
+                    setTreeAtomAngleValue(tAtoms, tAngles, iAt);
+                    int idxGgp = tAtoms[idxGp].tree["parent"][0];
+                    //std::cout << "its great grand-pa " << idxGgp << std::endl;
+                    //std::cout << "1st "   << iAt->seriNum << " 2nd " 
+                    //          << idxP     << " 3rd " << idxGp 
+                    //          << " 4th "  << idxGgp << std::endl;
+                    if (idxGgp >=0)
+                    {
+                        //std::cout << "condition 1 " << std::endl;
+                        //std::cout << "Target: "   << std::endl 
+                        //          << "atom 1 "    << iAt->id 
+                        //          << "\t atom 2 " << tAtoms[idxP].id 
+                        //          << "\t atom 3 " << tAtoms[idxGp].id
+                        //          << "\t atom4 "  << tAtoms[idxGgp].id 
+                        //          << std::endl;
+                        setTreeAtomTorsionValue(tAtoms, tTorsions,  iAt, -1);
+                    }
+                    else
+                    {
+                        int tRoot=-1;
+                        for (int i=0; i < (int)startPack.size(); i++)
+                        {
+                            
+                            if (startPack[i] != tS && startPack[i] !=idxP )
+                            {
+                                tRoot = startPack[i];
+                                break;
+                            }
+                           
+                        }
+                       
+                        if(tRoot >=0)
+                        {
+                            //std::cout << "condition 2 " << std::endl;
+                            //std::cout << "Target: " << std::endl 
+                            //          << "atom 1 " << iAt->id 
+                            //          << "\t atom 2 " << tAtoms[idxP].id 
+                            //          << "\t atom 3 " << tAtoms[idxGp].id 
+                            //          << "\t atom 4 " << tAtoms[tRoot].id 
+                            //          << std::endl;
+                            setTreeAtomTorsionValue(tAtoms, tTorsions, iAt, tRoot);    
+                        }
+                        else
+                        {
+                            std::cout << "Could not find the start atom for "
+                                      << iAt->id << std::endl;
+                        }
+                    }
+                }
+                else if (idxGp==-1)
+                {
+                    // Now no need to set these torsions
+                    std::cout << "Select Grand P from the start pack " << std::endl;
+                    int iGp  =-2;
+                    int iGgp =-2;
+                    std::vector<int> tVec;
+                    for (std::vector<int>::iterator iNB=tAtoms[iAt->tree["parent"][0]].connAtoms.begin();
+                            iNB!=tAtoms[iAt->tree["parent"][0]].connAtoms.end(); iNB++)
+                    {
+                        if (tAtoms[*iNB].id !=iAt->id 
+                             && tAtoms[*iNB].chemType !="H")
+                        {
+                            iGp = *iNB;
+                            for (std::vector<int>::iterator iNNB=tAtoms[*iNB].connAtoms.begin();
+                                    iNNB!=tAtoms[*iNB].connAtoms.end(); iNNB++)
+                            {
+                                if (tAtoms[*iNNB].id !=tAtoms[iAt->tree["parent"][0]].id
+                                    && tAtoms[*iNNB].id !=iAt->id
+                                    && tAtoms[*iNNB].chemType !="H")
+                                {
+                                    iGgp = *iNNB;
+                                    break;
+                                }
+                            }
+                            if (iGgp ==-2)
+                            {
+                                for (std::vector<int>::iterator iNNB=tAtoms[*iNB].connAtoms.begin();
+                                    iNNB!=tAtoms[*iNB].connAtoms.end(); iNNB++)
+                                {
+                                    if (tAtoms[*iNNB].id !=tAtoms[iAt->tree["parent"][0]].id
+                                        && tAtoms[*iNNB].id !=iAt->id)
+                                    {
+                                        iGgp = *iNNB;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (iGgp !=-2)
+                            {
+                                 break;       
+                            }
+                        }
+                    }
+                    if (iGp==-2 || iGgp==-2)
+                    {
+                        std::vector<AtomDict> tmStartSet;
+                        tmStartSet.push_back(*iAt);
+                        tmStartSet.push_back(tAtoms[idxP]);
+                        bool lCh=false;
+                        for (std::vector<int>::iterator iC=tAtoms[idxP].tree["children"].begin();
+                                iC != tAtoms[idxP].tree["children"].end(); iC++)
+                        {
+                            if (tAtoms[*iC].seriNum !=iAt->seriNum)
+                            {
+                                tmStartSet.push_back(tAtoms[*iC]);
+                                lCh=true;
+                                break;
+                            }
+                        }
+                        
+                        if (!lCh)
+                        {
+                          std::cout << "Bug: One child? Wrongly selected starting atom for the tree " 
+                                    << std::endl;
+                          exit(1);
+                        }
+                        else
+                        {
+                            setTreeAtomAngleValue(tAtoms, tAngles, iAt, idxP, tmStartSet[2].seriNum);
+                            setOneDummyAtom(tmStartSet, aDAtom);
+                            aDAtom.seriNum = (int)tAtoms.size();
+                            tAtoms.push_back(aDAtom);  
+                            
+                        }
+                    }
+                    else if (iGp !=-2)
+                    {
+                        setTreeAtomAngleValue(tAtoms, tAngles, iAt, idxP, iGp);
+                        tVec.push_back(iGp);
+                        if (iGgp !=-2)
+                        {
+                            tVec.push_back(iGgp);
+                        }
+                    }
+                    
+                    setTreeAtomTorsionValue(tAtoms, tTorsions, iAt, tVec);
+                }
+            }
+            
+            std::cout << "atom id " << iAt->id << std::endl
+                      << "Its tree bond " << iAt->treeBond 
+                      << "\tIts tree angle " << iAt->treeAngle 
+                      << "\tIts tree torsion " << iAt->treeTorsion << std::endl; 
+               
+        }
+        
+    }
+    
+    void buildAtomTree::setTreeAtomValues(std::vector<AtomDict> & tAtoms)
     {
         
     }
@@ -934,7 +1134,7 @@ namespace LIBMOL
         
     }
     
-    void buildAtomTree::setTreeAtomTorsionValue(std::vector<AtomDict>& tAtoms, 
+    void buildAtomTree::setTreeAtomTorsionValue(std::vector<AtomDict>&   tAtoms, 
                                                std::vector<TorsionDict>& tTors,  
                                                std::vector<AtomDict>::iterator tAt,
                                                std::vector<int> &   tR)
@@ -1139,6 +1339,145 @@ namespace LIBMOL
         }  
         
         setBranches(tAtoms);
+        
+    }
+    
+    void buildAtomTree::setStartStruct2(std::vector<AtomDict>  & tAtoms,
+                                       std::vector<BondDict>  & tBonds,
+                                       std::vector<AngleDict> & tAngs,
+                                       std::vector<ChiralDict>& tChs)
+    {
+        setStartAtom(tAtoms);
+        
+        for (std::vector<int>::iterator iAt=tAtoms[startAtom].tree["children"].begin();
+                iAt !=tAtoms[startAtom].tree["children"].end(); iAt++)
+        {
+            if((int)startPack.size() < 2)
+            {
+                // First, do not include H in the start-set of atoms.
+                if(tAtoms[*iAt].chemType != "H"
+                   && tAtoms[*iAt].tree["children"].size() !=0)
+                {
+                    startPack.push_back(*iAt);
+                }
+            }
+        }
+        
+        if ((int)startPack.size() < 2)
+        {
+            // The number of start-set of atoms is still less 3, use H now.
+            for (std::vector<int>::iterator iAt=tAtoms[startAtom].tree["children"].begin();
+                         iAt !=tAtoms[startAtom].tree["children"].end(); iAt++)
+            {
+                if((int)startPack.size() < 2 && 
+                   std::find(startPack.begin(), startPack.end(), *iAt) ==startPack.end())
+                {
+                    startPack.push_back(*iAt);
+                }
+            }
+        }
+        
+        std::cout << "number of atoms in start pack " << startPack.size() << std::endl;
+        
+        std::cout << "atom in startPack " << std::endl;
+        
+        for(std::vector<int>::iterator iS=startPack.begin();
+                iS !=startPack.end(); iS++)
+        {
+            std::cout << "atom " << tAtoms[*iS].id << std::endl;
+        }
+        
+        
+        if((int)startPack.size() < 2)
+        {
+            std::cout << "Why there are still less than 2 atoms in the start-set "
+                    << std::endl;
+            exit(1);
+        }
+        
+        // Now build the structure for the start-set of atoms
+        
+        for (std::vector<REAL>::iterator iC=tAtoms[startAtom].coords.begin();
+                iC!=tAtoms[startAtom].coords.end(); iC++)
+        {
+            *iC= 0.0;
+        }
+        
+        
+        int nChs = (int)tAtoms[startAtom].tree["children"].size();
+        std::cout << "The tree starts on atom " << tAtoms[startAtom].id 
+                << " has " << nChs << " branches " << std::endl;
+        
+        if(nChs==2)
+        {
+            // two children do not mean sp1, depending on 
+            // the element type of root atom
+            // set2ConnStruct(tAtoms, tBonds, tAngs);
+            expandStartStruct(tAtoms);
+            
+        }
+        
+        
+        nChs = (int)startPack.size();
+        if (nChs >2 )
+        {
+            if (nChs==3)
+            {
+                set3ConnStruct(tAtoms, tBonds, tAngs, tChs);
+            }
+            else if(nChs==4)
+            {
+                set4ConnStruct(tAtoms, tBonds, tAngs, tChs);
+            }
+            
+        
+            // to be studied
+        }  
+        
+        setBranches(tAtoms);
+        
+    }
+    
+    
+    void buildAtomTree::expandStartStruct(std::vector<AtomDict>    & tAtoms)
+    {
+        AtomDict aDAtom;
+        aDAtom.id    = "dummy";
+        TorsionDict aDTorsion;
+        aDTorsion.id = "dummy";
+        
+        std::vector<AtomDict> tmStartSet;
+        
+        /*
+        tmStartSet.push_back(*iAt);
+                        tmStartSet.push_back(tAtoms[idxP]);
+                        bool lCh=false;
+                        for (std::vector<int>::iterator iC=tAtoms[idxP].tree["children"].begin();
+                                iC != tAtoms[idxP].tree["children"].end(); iC++)
+                        {
+                            if (tAtoms[*iC].seriNum !=iAt->seriNum)
+                            {
+                                tmStartSet.push_back(tAtoms[*iC]);
+                                lCh=true;
+                                break;
+                            }
+                        }
+                        
+                        if (!lCh)
+                        {
+                          std::cout << "Bug: One child? Wrongly selected starting atom for the tree " 
+                                    << std::endl;
+                          exit(1);
+                        }
+                        else
+                        {
+                            setTreeAtomAngleValue(tAtoms, tAngles, iAt, idxP, tmStartSet[2].seriNum);
+                            setOneDummyAtom(tmStartSet, aDAtom);
+                            aDAtom.seriNum = (int)tAtoms.size();
+                            tAtoms.push_back(aDAtom);  
+                            
+                        }
+         */
         
     }
     
@@ -1406,7 +1745,7 @@ namespace LIBMOL
         
     }
     
-    void buildAtomTree::buildTree(std::vector<AtomDict>& tAtoms, 
+    bool buildAtomTree::buildTree(std::vector<AtomDict>& tAtoms, 
                                   std::vector<BondDict>& tBonds, 
                                   std::vector<AngleDict>& tAngles, 
                                   std::vector<TorsionDict>& tTorsions, 
@@ -1414,11 +1753,16 @@ namespace LIBMOL
                                   std::vector<PlaneDict>& tPlas, 
                                   std::vector<ChiralDict>& tChs)
     {
-        setAtomsMST(tAtoms, tBonds);
+        bool aMST=setAtomsMST(tAtoms, tBonds);
         
-        setStartStruct(tAtoms,  tBonds, tAngles, tChs);
+        if (aMST)
+        {
+            setStartStruct(tAtoms,  tBonds, tAngles, tChs);
         
-        setTreeAtomValues(tAtoms, tBonds, tAngles, tTorsions);
+            setTreeAtomValues(tAtoms, tBonds, tAngles, tTorsions);
+        }
+        
+        return aMST;
        
     }
     

@@ -462,6 +462,20 @@ namespace LIBMOL
         return tN;
     }
     
+    int AtomDict::getNum1stNbHave2edNb(std::vector<AtomDict>& tAtoms)
+    {
+        int t12=0;
+        for (std::vector<int>::iterator iNB=connAtoms.begin();
+                iNB != connAtoms.end(); iNB++)
+        {
+            if (tAtoms[*iNB].connAtoms.size() >= 2)
+            {
+                t12++;
+            }
+        }
+        
+        return t12;
+    }
     /*
     void AtomDict::setCodClass()
     {

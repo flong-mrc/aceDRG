@@ -26,7 +26,8 @@ namespace GO
         return tSetA.objValue < tSetB.objValue;
     }
     
-    FindGlobMin::FindGlobMin():gWorkMode(1),
+    FindGlobMin::FindGlobMin():lGlob(true),
+                               gWorkMode(1),
                                lWorkMode(1),
                                workSpace(1),
                                lComp(100),
@@ -41,7 +42,8 @@ namespace GO
     
     FindGlobMin::FindGlobMin(const LIBMOL::AllSystem& aSystem, 
                              std::string    tFileNameeRoot,
-                             std::string    tMonoRoot):gWorkMode(1),
+                             std::string    tMonoRoot):lGlob(true),
+                                                       gWorkMode(1),
                                                        lWorkMode(1),
                                                        workSpace(1),
                                                        lComp(100),
@@ -282,7 +284,7 @@ namespace GO
     
     
     // Initial atom positions 
-    void FindGlobMin::SetDefinedInitPositions()
+    bool FindGlobMin::SetDefinedInitPositions()
     {
         // The coordinates linked with tree structures
         
@@ -299,16 +301,17 @@ namespace GO
         // tTransTool.generateCoordTorsToCart(allAtoms,allBonds, allAngles, allTorsions, 
         // allRings, allPlanes, allChirals);
        
-        tTransTool.generateCoordTorsToCart3(allAtoms,allBonds, allAngles, allTorsions, 
+        bool tt=tTransTool.generateCoordTorsToCart3(allAtoms,allBonds, allAngles, allTorsions, 
                                             allRingsV, allPlanes, allChirals);
         
-        // std::cout << "Done a set of coordinates based on the tree structure " << std::endl;
-        std::vector<std::string> parts;
-        LIBMOL::StrTokenize(itsFileNameRoot, parts, '.');
+        
+        std::cout << "Done a set of coordinates based on the tree structure " << std::endl;
+        // std::vector<std::string> parts;
+        //LIBMOL::StrTokenize(itsFileNameRoot, parts, '.');
         
         //std::string tFileName = parts[0] + "_tree";
-        //std::cout << tFileName << std::endl;
-        //LIBMOL::outPDB(tFileName.c_str(), itsMonoRoot, allAtoms);
+        // std::cout << tFileName << std::endl;
+        LIBMOL::outPDB("tt.pdb", "UNK", allAtoms);
        
         
         /*
@@ -336,11 +339,19 @@ namespace GO
         */
        
         // Initial optimization of the atom coordinates
+        for (int i=0; i <(int)allAtoms.size(); i++)
+        { 
+            std::cout << "Atom coordinates for atom " << allAtoms[i].id << std::endl
+                      << "X: " << allAtoms[i].coords[0] << "  Y:  " 
+                      << allAtoms[i].coords[1] << "  Z: " 
+                      << allAtoms[i].coords[2] << std::endl;
+        }
+        
+        return tt;
         /*
         
-        
         // Check 
-        //std::cout << "enter here " << std::endl;
+        std::cout << "enter here " << std::endl;
         
         for (int i=0; i <(int)allAtoms.size(); i++)
         {   
@@ -488,7 +499,7 @@ namespace GO
          hasIniCoords = false;
          if (!hasIniCoords)
          {
-             SetDefinedInitPositions();
+             lGlob=SetDefinedInitPositions();
          }
         
         //else
@@ -1022,29 +1033,31 @@ namespace GO
         // hasIniCoords = false;
         
         PreIdealization(); 
-       
-        if (gWorkMode == 1)
+        
+        if (lGlob)
         {
-            TunnellingAndMinDriver();
-        }
+            if (gWorkMode == 1)
+            {
+                TunnellingAndMinDriver();
+            }
         
-        // ProIdealization();
-        std::cout << "The following are optimized sets " << std::endl;
-        // std::sort(allOptimSets.begin(), allOptimSets.end(), sortOptSetByValues);
-        for (std::vector<OptimSet>::iterator iO=allOptimSets.begin(); 
-                iO != allOptimSets.end(); iO++)
-        {
-            std::cout << "Set objective value " << iO->objValue << std::endl;
-        }
+            // ProIdealization();
+            std::cout << "The following are optimized sets " << std::endl;
+            // std::sort(allOptimSets.begin(), allOptimSets.end(), sortOptSetByValues);
+            for (std::vector<OptimSet>::iterator iO=allOptimSets.begin(); 
+                    iO != allOptimSets.end(); iO++)
+            {
+                std::cout << "Set objective value " << iO->objValue << std::endl;
+            }
         
-        // SelectBestOpt();
+            // SelectBestOpt();
         
-        std::time(&tEnd);
-        std::cout << " Geometrical optimization finished at " << std::ctime(&tEnd);
+            std::time(&tEnd);
+            std::cout << " Geometrical optimization finished at " << std::ctime(&tEnd);
       
-        std::cout  << "it takes " << std::setprecision(3) << std::difftime(tEnd,tStart) 
-                   << " seconds" << std::endl;
-        
+            std::cout  << "it takes " << std::setprecision(3) << std::difftime(tEnd,tStart) 
+                       << " seconds" << std::endl;
+        }
     }
     
     

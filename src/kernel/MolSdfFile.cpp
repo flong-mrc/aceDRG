@@ -1216,8 +1216,6 @@ namespace LIBMOL
             setAtomsBondingAndChiralCenter();
             setChiral();
             
-            
-            
             if (atoms.size() !=0)
             {
                 std::cout << "The system contains " << atoms.size() << std::endl
@@ -1351,9 +1349,10 @@ namespace LIBMOL
             AtomDict  aAtom;
             aAtom.seriNum = StrToInt(tStrs[0])-1;
             aAtom.id      = tStrs[1];
-            aAtom.coords.push_back(StrToReal(tStrs[2]));
-            aAtom.coords.push_back(StrToReal(tStrs[3]));
-            aAtom.coords.push_back(StrToReal(tStrs[4]));
+            aAtom.coords[0]=StrToReal(tStrs[2]);
+            // std::cout << "Atom x " << aAtom.coords[0] << std::endl;
+            aAtom.coords[1]=StrToReal(tStrs[3]);
+            aAtom.coords[2]=StrToReal(tStrs[4]);
             std::vector<std::string> tStrs1;
             StrTokenize(tStrs[5], tStrs1, '.');
             if (tStrs1.size() >0)

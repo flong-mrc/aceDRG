@@ -161,8 +161,16 @@ namespace LIBMOL
     extern void checkOneSugarRing(std::vector<AtomDict> & tAtoms,
                                   std::vector<RingDict>::iterator tRing);
     
-    extern void setSugarRingChairComf(std::vector<AtomDict> & tAtoms,
+    extern void setPyranoseChairComf(std::vector<AtomDict> & tAtoms,
                                       std::vector<RingDict>::iterator tRing);
+    extern void setPyranoseChairComf(std::vector<AtomDict> & tAtoms,
+                                     std::vector<RingDict>::iterator tRing,
+                                     std::vector<TorsionDict> & tTors);
+    
+    extern void setTorsionAroundOneBondInRing(std::vector<TorsionDict> & tTors,
+                                              std::vector<AtomDict> & tAtoms,
+                                              int rAt1, int rAt2, int rAt3,
+                                              int rAt4, REAL vInit);
     
     class ringTools 
     {

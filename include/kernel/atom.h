@@ -242,6 +242,7 @@ namespace LIBMOL // temp
         ~AtomDict();
         
         int  getNumAtomsWithin2stNB(std::vector<AtomDict> & tAllAtoms);
+        int  getNum1stNbHave2edNb(std::vector<AtomDict> & tAllAtoms);
         void setCodClass();
         void outRingSec();
         int  getMinRing();

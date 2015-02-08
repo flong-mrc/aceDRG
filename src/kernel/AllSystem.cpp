@@ -839,6 +839,7 @@ namespace LIBMOL
                                 break;
                             }
                         }
+                        
                         if (l_sp2)
                         {
                             // Now we can say this atom is in sp2 orbits 
@@ -1136,9 +1137,9 @@ namespace LIBMOL
                  StrLower(iA->cChemType);
             }
             
-            std::cout << "Atom ID: " << iA->id << std::endl
-                      << "Atom chemType: " << iA->chemType << std::endl
-                      << "Atom chemType of COD classes: " << iA->cChemType << std::endl;
+            //std::cout << "Atom ID: " << iA->id << std::endl
+            //          << "Atom chemType: " << iA->chemType << std::endl
+            //          << "Atom chemType of COD classes: " << iA->cChemType << std::endl;
         }
     }
     

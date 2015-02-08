@@ -155,14 +155,10 @@ class CExeCode :
 
         outfile_sub.close()
 
-        if self.exitCode:   
-            print "#-----------------------------------------------------------#"
-            print "The process stoped because of a runtime error in code '%s'!"%p_name
-            if err_str:
-                print "%s"%err_str
-            else:
-                print "See the associated log file '%s'."%t__log_name
-            print "#-----------------------------------------------------------#"
+        if self.exitCode:
+            print "#-----------------------------------------------------------------#"
+            print "The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name
+            print "#-----------------------------------------------------------------#"
             if not err_str:
                 # if normal runtime errors, stop the program(using log. no err_str)  
                 sys.exit(1)
@@ -485,12 +481,15 @@ class Acedrg(CExeCode ):
                 sys.exit()
             else:
                 tL = tF.readline().strip()
-                print tL
                 tF.close()
-                if len(tL) ==3:
-                    self.monomRoot= tL
-                elif len(tL) >3:
-                    self.monomRoot= tL[:4]
+                #print tL
+                if tL.find("#") !=-1:
+                    self.monomRoot="UNL"
+                else:
+                    if len(tL) ==3:
+                        self.monomRoot= tL
+                    elif len(tL) >3:
+                        self.monomRoot= tL[:4]
                 
         elif self.inMmCifName != "":
             try:
@@ -615,10 +614,10 @@ class Acedrg(CExeCode ):
         if t_inputOptionsP.monomRoot:
             self.monomRoot   = t_inputOptionsP.monomRoot
         else:
-            print self.inMdlName
+            print self.monomRoot
             self.setMonoRoot()
             # self.monomRoot   = "UNL"
-
+        print "monomRoot: ", self.monomRoot
         if t_inputOptionsP.outRoot:
             self.outRoot   = t_inputOptionsP.outRoot
             self.baseRoot  = os.path.basename(t_inputOptionsP.outRoot)
@@ -722,7 +721,7 @@ class Acedrg(CExeCode ):
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
             #print self._cmdline
             #os.system(self._cmdline)
-            self.subExecute()
+            self.runExitCode = self.subExecute()
         if self.workMode == 13 or self.workMode == 14 or self.workMode == 131 or self.workMode == 141:
             if tIn:
                 self.inMmCifName = tIn
@@ -730,7 +729,7 @@ class Acedrg(CExeCode ):
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
             #print self._cmdline
             #os.system(self._cmdline)
-            self.subExecute()
+            self.runExitCode = self.subExecute()
         if self.workMode == 15 or self.workMode == 151 :
             if tIn:
                 self.inMmCifName = tIn
@@ -790,7 +789,7 @@ class Acedrg(CExeCode ):
                     self.inMmCifName    = tIn
                 self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, self.inMmCifName, self.outAtmTypeName)
-                print self._cmdline
+                #print self._cmdline
                 self.subExecute()
                 
         if self.workMode == 41 :
@@ -1094,7 +1093,8 @@ class Acedrg(CExeCode ):
     
     def setRefmacCom(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
      
-        self._cmdline = self.refmac 
+        #self._cmdline = self.refmac 
+        self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
         if tStage==1:
             self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
             self._cmdline += "end       \n"
@@ -1271,7 +1271,6 @@ class Acedrg(CExeCode ):
         
         self.printJobs()
         
-        
         if self.workMode == 11 or self.workMode == 111:
 
             # Stage 1: dictionary generation using a mmcif file 
@@ -1281,9 +1280,12 @@ class Acedrg(CExeCode ):
                 print "%s does not exist"%self.inMmCifName
                 sys.exit()
             
-            if self.workMode == 11 :
+            if self.workMode == 11 and not self.runExitCode :
                 # Stage 2: optimization
-                self.runGeoOpt()    
+                self.runGeoOpt() 
+            else:
+                self.printExitInfo() 
+  
         if self.workMode == 12 or self.workMode == 121:
             
             # Stage 1: Transfer the SMILE input into a mmcif file
@@ -1300,9 +1302,12 @@ class Acedrg(CExeCode ):
                 print "%s does not exist"%self.inMmCifName
                 sys.exit()
 
-            if self.workMode == 12:
+            if self.workMode == 12 and not self.runExitCode:
                 # Stage 3: optimization
                 self.runGeoOpt()            
+            else:
+                self.printExitInfo() 
+  
 
         if self.workMode == 13 or self.workMode == 131 :
             
@@ -1313,9 +1318,12 @@ class Acedrg(CExeCode ):
                 print "can not find %s to read "%self.inMdlName
                 sys.exit() 
             
-            if self.workMode == 13 : 
+            if self.workMode == 13 and not self.runExitCode: 
                 # Stage 2: optimization
                 self.runGeoOpt()            
+            else:
+                self.printExitInfo() 
+  
     
         if self.workMode == 14 or self.workMode == 141 :
             
@@ -1326,9 +1334,11 @@ class Acedrg(CExeCode ):
                 print "%s does not exist"%self.inSdfName
                 sys.exit()
            
-            if self.workMode == 14: 
+            if self.workMode == 14 and not self.runExitCode: 
                 # Stage 2: optimization
                 self.runGeoOpt()            
+            else:
+                self.printExitInfo() 
 
         if self.workMode == 15 or self.workMode == 151 :
             
@@ -1342,6 +1352,8 @@ class Acedrg(CExeCode ):
             if self.workMode == 15 and not self.runExitCode: 
                 # Stage 2: optimization
                 self.runGeoOpt()            
+            else:
+                self.printExitInfo() 
 
         if self.workMode == 21:
             
@@ -1406,6 +1418,14 @@ class Acedrg(CExeCode ):
             else:
                 print "acedrg failed to generate a dictionary file"       
 
+    def printExitInfo(self):
+
+        print "Error: check log file at %s"%self._log_name
+     
+    def checkMetalInSystem(self):
+ 
+        pass
+        
 
 # Other supplement functions
 

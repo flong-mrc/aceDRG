@@ -277,7 +277,8 @@ namespace LIBMOL
             }
         }
         
-        setupSystem();
+        // setupSystem();
+        setupSystemTM();
         
     }
     
@@ -368,6 +369,68 @@ namespace LIBMOL
         // detectPlaneGroups();
         
         // initTargetAngles();
+    }
+    
+    void CodClassify::setupSystemTM()
+    {
+        
+        int cLev = 2;      // should be a constant from an input file
+        
+       
+        codAtomClassify(cLev);
+        
+        setAtomsBondingAndChiralCenter();
+        
+        getCCP4BondAndAngles();
+        
+        // std::vector<RingDict>          tmpRings;
+        // std::vector<std::vector<int> > tmpAtoms;
+        
+        if (allRings.size() !=0)
+        {
+            for (std::map<ID, std::vector<RingDict> >::iterator iMr=allRings.begin();
+                    iMr !=allRings.end(); iMr++)
+            {
+                for(std::vector<RingDict>::iterator iR=iMr->second.begin();
+                        iR !=iMr->second.end(); iR++)
+                {
+                    // tmpRings.push_back(*iR);
+                    
+                    iR->setPlaneProp();
+                    
+                    checkOneSugarRing(allAtoms, iR);
+                    if (iR->isSugar.compare("pyranose")==0)
+                    {    
+                        std::cout << "Find one pyranose ring " << std::endl;
+                        // A pyranose ring, set torsions within the ring    
+                        setPyranoseChairComf(allAtoms, iR, allTorsions);
+                    }
+                    /*
+                    std::string PL("No");
+                    if (iR->isPlanar)
+                    {
+                        PL = "Yes";
+                    }
+                    
+                    std::cout << "Is ring, " << iMr->first << ", a planar ring? "
+                              <<  PL << std::endl;
+                    */
+                }
+            }
+        }
+        /*
+        std::cout << "Torsion angles are : " << std::endl;
+        for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor !=allTorsions.end(); iTor++)
+        {
+            std::cout << "Formed by " << allAtoms[iTor->atoms[0]].id 
+                      << "_" << allAtoms[iTor->atoms[1]].id  << "_"
+                      << allAtoms[iTor->atoms[2]].id << "_" 
+                      << allAtoms[iTor->atoms[3]].id << ", value is: "
+                      << iTor->value << std::endl;
+        }
+        */
+        
     }
     
     void CodClassify::codAtomClassify(int dLev)
@@ -4273,7 +4336,129 @@ namespace LIBMOL
         
     }
     
+    
+    void  CodClassify::groupCodOrgBonds3()
+    {
+        setOrgBondHeadHashList2();
+        time_t tStart, tEnd;
+       
+        std::time (&tStart);
+        std::cout << "Clustering COD org bonds started at " << std::ctime(&tStart);
         
+        int nline = 0;
+        
+        for (std::map<ID, ID>::iterator iBF=codOrgBondFiles2.begin();
+                    iBF !=codOrgBondFiles2.end(); iBF++)
+        {
+            try
+            {
+            
+                std::ifstream codBondFile(iBF->second.c_str()); 
+                
+                if(codBondFile.is_open())
+                {
+                    std::string tRecord="";
+                    while(!codBondFile.eof())
+                    {
+                        std::getline(codBondFile, tRecord);
+                        
+                        tRecord = TrimSpaces(tRecord);
+                        std::vector<std::string> tBuf;
+                        StrTokenize(tRecord, tBuf);
+                        
+                        if ((int)tBuf.size() ==20)
+                        {
+                            int ha1, ha2;
+                        
+                            ha1 = StrToInt(tBuf[0]);
+                            ha2 = StrToInt(tBuf[1]);
+                            
+                            // std::cout << "ha1 " << ha1 << " ha2 " << ha2 << std::endl;
+                        
+                            /*
+                            for (int i=2; i < (int)tBuf.size(); i++)
+                            {
+                                tBuf[i] = TrimSpaces(tBuf[i]);
+                            }
+                            */
+                            
+                            allDictBondsIdx[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]]= nline;  
+                            
+                            BondDict aBond;
+                            aBond.seriNum = nline;
+                            aBond.atomsHashingCodes.push_back(ha1);
+                            aBond.atomsHashingCodes.push_back(ha2);
+                            aBond.atomsNB2Rep.push_back(tBuf[2]);
+                            aBond.atomsNB2Rep.push_back(tBuf[3]);
+                            aBond.atomsNBRep.push_back(tBuf[4]);
+                            aBond.atomsNBRep.push_back(tBuf[5]);
+                            aBond.atomsCodClasses.push_back(tBuf[6]);
+                            aBond.atomsCodClasses.push_back(tBuf[7]);
+                            aBond.value      = StrToReal(tBuf[8]);
+                            aBond.sigValue   = StrToReal(tBuf[9]);
+                            //aBond.valueP     = StrToReal(tBuf[11]);
+                            //aBond.sigValueP  = StrToReal(tBuf[12]);
+                            if(aBond.sigValue < 0.01)
+                            {
+                                aBond.sigValue = 0.01;
+                            }
+                            aBond.numCodValues  = StrToInt(tBuf[10]);
+                            //aBond.numCodValuesP = StrToInt(tBuf[13]);
+                            //std::cout << aBond.atomsCodClasses[0] << std::endl;
+                            //std::cout << aBond.atomsCodClasses[1] << std::endl;
+                            //std::cout << nline << std::endl;
+                            allDictBonds.push_back(aBond);
+                         
+                            nline+=1;
+                            
+                            aValueSet tV1;
+                            tV1.value    = StrToReal(tBuf[11]);
+                            tV1.sigValue = StrToReal(tBuf[12]);
+                            tV1.numCodValues = StrToInt(tBuf[13]);
+                            allDictBondsIdx1[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]].push_back(tV1);
+                            aValueSet tV2;
+                            tV2.value    = StrToReal(tBuf[14]);
+                            tV2.sigValue = StrToReal(tBuf[15]);
+                            tV2.numCodValues = StrToInt(tBuf[16]);
+                            allDictBondsIdx2[ha1][ha2][tBuf[2]][tBuf[3]].push_back(tV2);
+                            
+                            aValueSet tV3;
+                            tV3.value    = StrToReal(tBuf[17]);
+                            tV3.sigValue = StrToReal(tBuf[18]);
+                            tV3.numCodValues = StrToInt(tBuf[19]);
+                            allDictBondsIdx3[ha1][ha2].push_back(tV3);
+                           
+                        }
+                        
+                    }
+                       
+                    codBondFile.close();
+                }
+                else 
+                {
+                    std::cout << "Error in setup the programs. " << std::endl;
+                    std::cout << iBF->second << " can not be open for reading "
+                              << std::endl;
+                    exit(1);
+                }
+                
+            }
+            catch (std::exception & e)
+            {
+                std::cout << e.what() << std::endl;
+            }
+        }
+        
+        std::cout << "Finish clustering COD org bonds " << std::endl;
+        std::time(&tEnd);
+        std::cout << "finished at " << std::ctime(&tEnd);
+        REAL tDiff;
+        tDiff = std::difftime(tEnd,tStart);
+        std::cout  << "it takes " << std::setprecision(3) <<tDiff 
+                   << " seconds to finish group COD bonds " << std::endl;
+        
+    }
+    
     void CodClassify::searchCodBonds()
     {
         int nFind =0;

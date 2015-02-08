@@ -111,7 +111,7 @@ namespace LIBMOL
                                      std::vector<PlaneDict>   & tPlas,
                                      std::vector<ChiralDict>  & tChs);
         
-        void generateCoordTorsToCart3(std::vector<AtomDict>& tAtoms,
+        bool generateCoordTorsToCart3(std::vector<AtomDict>& tAtoms,
                                      std::vector<BondDict>    & tBonds,
                                      std::vector<AngleDict>   & tAngles,
                                      std::vector<TorsionDict> & tTorsions,

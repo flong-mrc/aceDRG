@@ -196,23 +196,25 @@ namespace LIBMOL
         }
         
         // Check
-        // std::cout << "The ring connection are " << std::endl;
+        //
         
-        // std::cout << "Clockwise : " << std::endl;
-        /*
+        std::cout << "The ring connection are " << std::endl;
+        
+        std::cout << "Clockwise : " << std::endl;
+        
         int i =0;
         std::map<int, std::map<ID, int> >::iterator iA=atomsLink.begin();
         iCur = iA->first;
         int iLink = iA->second["c"];
         do
         {
-            // std::cout << "Atom " << tAllAtoms[iCur].id << " is linked to " 
-            //           <<  tAllAtoms[iLink].id << std::endl;
+            std::cout << "Atom " << tAllAtoms[iCur].id << " is linked to " 
+                       <<  tAllAtoms[iLink].id << std::endl;
             iCur  = iLink;
             iLink = atomsLink[iCur]["c"];
             i++;        
         }while(i < tRSize);
-        */
+       
     }
     
     void RingDict::setRingAtmsLinks()
@@ -221,27 +223,30 @@ namespace LIBMOL
         if (atoms.size() > 0)
         {
             std::vector<int> tSerNums;
-            
+            ringAtomLink.clear();
             for (std::vector<AtomDict>::iterator iAt =atoms.begin();
                     iAt != atoms.end(); iAt++)
             {
                 tSerNums.push_back(iAt->seriNum);
-                ringAtomLink[iAt->seriNum].clear();
+                
             }
             
             for (std::vector<AtomDict>::iterator iAt =atoms.begin();
                     iAt != atoms.end(); iAt++)
             {
+                // std::cout << "Atom " << iAt->id << " serN " << iAt->seriNum << std::endl;  
                 for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
-                        iNB !=iAt->connAtoms.end(); iAt++)
+                        iNB !=iAt->connAtoms.end(); iNB++)
                 {
                     if (std::find(tSerNums.begin(), tSerNums.end(), *iNB) !=tSerNums.end())
                     {
+                        //std::cout << "Atom " << *iNB << " linked to " << iAt->seriNum << std::endl;
                         ringAtomLink[iAt->seriNum].push_back(*iNB);
                     }
                 }
             }
         }
+        
     }
     
     void RingDict::setPlaneProp()
@@ -909,7 +914,7 @@ namespace LIBMOL
                     for (unsigned j=i+1; j < iR->atoms.size(); j++)
                     {
                         if (std::find(iR->atoms[i].connAtoms.begin(), 
-                                  iR->atoms[i].connAtoms.end(), iR->atoms[j].seriNum)
+                                      iR->atoms[i].connAtoms.end(), iR->atoms[j].seriNum)
                              !=iR->atoms[i].connAtoms.end())
                         {
                             int idxB=getBond(tBonds, iR->atoms[i].seriNum, iR->atoms[j].seriNum);
@@ -1033,7 +1038,7 @@ namespace LIBMOL
     }
     
     
-    extern void setSugarRingChairComf(std::vector<AtomDict> & tAtoms,
+    extern void setPyranoseChairComf(std::vector<AtomDict> & tAtoms,
                                       std::vector<RingDict>::iterator tRing)
     {
         // A template function to set all six-member rings of pyranose to the "chair" conformation. 
@@ -1169,17 +1174,317 @@ namespace LIBMOL
             
             // Temporal values. 
             // The typical id combination C5-O5-C1-C2   
-            tRing->sugarTors[iD21 + "_" + iD0  + "_" + iD11 + "_" + iD12 ] = -67.5;
-            tRing->sugarTors[iD0  + "_" + iD11 + "_" + iD12 + "_" + iD13 ] =  61.2;
-            tRing->sugarTors[iD11 + "_" + iD12 + "_" + iD13 + "_" + iD22 ] = -53.7;
-            tRing->sugarTors[iD12 + "_" + iD13 + "_" + iD22 + "_" + iD21 ] =  53.7;
-            tRing->sugarTors[iD13 + "_" + iD22 + "_" + iD21 + "_" + iD0  ] = -61.2;
-            tRing->sugarTors[iD22 + "_" + iD21 + "_" + iD0  + "_" + iD11 ] =  67.5;
+            tRing->sugarTors[iD21 + "_" + iD0  + "_" + iD11 + "_" + iD12 ] = -60.0;
+            tRing->sugarTors[iD0  + "_" + iD11 + "_" + iD12 + "_" + iD13 ] =  60.0;
+            tRing->sugarTors[iD11 + "_" + iD12 + "_" + iD13 + "_" + iD22 ] = -60.0;
+            tRing->sugarTors[iD12 + "_" + iD13 + "_" + iD22 + "_" + iD21 ] =  60.0;
+            tRing->sugarTors[iD13 + "_" + iD22 + "_" + iD21 + "_" + iD0  ] = -60.0;
+            tRing->sugarTors[iD22 + "_" + iD21 + "_" + iD0  + "_" + iD11 ] =  60.0;
             
         }
         
     }
     
+    extern void setPyranoseChairComf(std::vector<AtomDict> & tAtoms,
+                                     std::vector<RingDict>::iterator tRing,
+                                     std::vector<TorsionDict> & tTors)
+    {
+        // A template function to set all six-member rings of pyranose to the "chair" conformation. 
+        // Using a proper class to generate Carbohydrate Conformations later on.
+        
+        tRing->setRingAtmsLinks();
+        
+        std::vector<int> branch1, branch2;
+        
+        for (unsigned i0=0; i0 < tRing->atoms.size(); i0++)
+        {
+            if (tRing->atoms[i0].chemType.compare("O")==0)
+            {
+                // O5 atom
+                branch1.push_back(tRing->atoms[i0].seriNum);
+                branch2.push_back(tRing->atoms[i0].seriNum);
+                
+                
+                if (tRing->atoms[i0].connAtoms.size() ==2)
+                {
+                    int i1=-1, i2=-1, i3=-1, i4=1, i5=-1;
+                    
+                    int it1=tRing->atoms[i0].connAtoms[0];
+                    int it2=tRing->atoms[i0].connAtoms[1];
+                    
+                    
+                    bool lConnO = false;
+                    for (unsigned inb1=0; inb1 !=tAtoms[it1].connAtoms.size(); 
+                            inb1++)
+                    {
+                         if (tAtoms[inb1].chemType.compare("O")==0
+                             && tAtoms[inb1].seriNum != tRing->atoms[i0].seriNum)
+                         {
+                             lConnO = true;
+                             break;
+                         }
+                    }
+                    
+                    if (lConnO)
+                    {
+                        i1 = it1;
+                        i2 = it2;
+                    }
+                    else
+                    {
+                        i1 = it2;
+                        i2 = it1;
+                    } 
+                       
+                    branch1.push_back(i1);
+                    branch2.push_back(i2);
+                    
+                    for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i1].begin();
+                            iNext != tRing->ringAtomLink[i1].end(); iNext++)
+                    {
+                        if (*iNext !=tRing->atoms[i0].seriNum)
+                        {
+                            i3 = *iNext;
+                            break;
+                        }
+                    }
+                    
+                    if (i3 !=-1)
+                    {
+                        branch1.push_back(i3);
+                        
+                        for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i3].begin();
+                            iNext != tRing->ringAtomLink[i3].end(); iNext++)
+                        {
+                            if (*iNext !=tRing->atoms[i1].seriNum)
+                            {
+                                i5 = *iNext;
+                                break;
+                            }
+                        }                   
+                    }
+                    else
+                    {
+                        std::cout << "Can not find one of ring atoms connected to atom "
+                                  << tAtoms[i1].id << std::endl;
+                        exit(1);
+                    }
+                    
+                    for (std::vector<int>::iterator iNext = tRing->ringAtomLink[i2].begin();
+                            iNext != tRing->ringAtomLink[i2].end(); iNext++)
+                    {
+                        if (*iNext !=tRing->atoms[i0].seriNum)
+                        {
+                            i4 = *iNext;
+                            break;
+                        }
+                    }
+                    
+                    if (i4 !=-1)
+                    {
+                        branch2.push_back(i4);
+                    }
+                    else
+                    {
+                        std::cout << "Can not find one of ring atoms connected to atom "
+                                  << tAtoms[i2].id << std::endl;
+                        exit(1);
+                    }
+                    
+                    if (i5 !=-1)
+                    {
+                        branch1.push_back(i5);
+                        branch2.push_back(i5);
+                    }
+                }
+                else
+                {
+                    std::cout << "Bug: O atom in the sugar ring connects "
+                              << tRing->atoms[i0].connAtoms.size() << " atoms"
+                              << std::endl;
+                    exit(1);
+                }
+                
+                break;
+                
+            }
+        }
+        
+        
+        if (branch1.size() ==4 && branch2.size() ==4)
+        {
+            ID  iD0  = tAtoms[branch1[0]].id;
+            int n0   = tAtoms[branch1[0]].seriNum;
+            ID  iD11 = tAtoms[branch1[1]].id;
+            int n11  = tAtoms[branch1[1]].seriNum;
+            ID  iD12 = tAtoms[branch1[2]].id;
+            int n12  = tAtoms[branch1[2]].seriNum;
+            ID  iD13 = tAtoms[branch1[3]].id;
+            int n13  = tAtoms[branch1[3]].seriNum;
+            
+            ID  iD21 = tAtoms[branch2[1]].id;
+            int n21  = tAtoms[branch2[1]].seriNum;
+            ID  iD22 = tAtoms[branch2[2]].id;
+            int n22  = tAtoms[branch2[2]].seriNum;
+            
+            // Temporal values. 
+            int nT = -1, nTors=(int)tTors.size();
+            ID  aTorID = "";
+            // The typical id combination C5-O5-C1-C2  
+            aTorID = iD21 + "_" + iD0  + "_" + iD11 + "_" + iD12;
+            tRing->sugarTors[aTorID]  = -60.0;
+            setTorsionAroundOneBondInRing(tTors, tAtoms, n21, n0, n11, n12, -60.0);
+            
+            
+            aTorID = iD0  + "_" + iD11 + "_" + iD12 + "_" + iD13;
+            tRing->sugarTors[aTorID ] =  60.0;
+            setTorsionAroundOneBondInRing(tTors, tAtoms, n0, n11, n12, n13, 60.0);
+            
+            
+            
+            aTorID = iD11 + "_" + iD12 + "_" + iD13 + "_" + iD22;
+            tRing->sugarTors[aTorID] = -60.0;
+            setTorsionAroundOneBondInRing(tTors, tAtoms, n11, n12, n13, n22, -60.0);
+            
+            
+            aTorID = iD12 + "_" + iD13 + "_" + iD22 + "_" + iD21;
+            tRing->sugarTors[aTorID ] =  60.0;
+            setTorsionAroundOneBondInRing(tTors, tAtoms, n12, n13, n22, n21, 60.0);
+            
+            aTorID = iD13 + "_" + iD22 + "_" + iD21 + "_" + iD0;
+            tRing->sugarTors[aTorID] = -60.0;
+            setTorsionAroundOneBondInRing(tTors, tAtoms, n13, n22, n21, n0, -60.0);
+            
+            aTorID = iD22 + "_" + iD21 + "_" + iD0  + "_" + iD11;
+            tRing->sugarTors[aTorID] =  60.0;
+            setTorsionAroundOneBondInRing(tTors, tAtoms, n22, n21, n0, n11, 60.0);
+            nT = getTorsion(tTors, n22, n21, n0, n11);
+            
+        }
+        
+    }
+    
+    extern void setTorsionAroundOneBondInRing(std::vector<TorsionDict> & tTors,
+                                              std::vector<AtomDict>    & tAtoms,
+                                              int rAt1, int rAt2, int rAt3,
+                                              int rAt4, REAL vInit)
+    {
+        // set the torsion angle formed by 4 ring atoms 
+        
+        int nTors = (int)tTors.size();
+        int nT = getTorsion(tTors, rAt1, rAt2, rAt3, rAt4);
+        if (nT >=0 && nT < nTors )
+        {
+            tTors[nT].value = vInit;
+            // ID aTorID = tAtoms[rAt1].id + "_" + tAtoms[rAt2].id + "_" 
+            //            + tAtoms[rAt3].id + "_" + tAtoms[rAt4].id;
+            // std::cout << aTorID << "  torsion " << tTors[nT].value << std::endl;
+        }
+        else
+        {
+            ID aTorID = tAtoms[rAt1].id + "_" + tAtoms[rAt2].id + "_" 
+                        + tAtoms[rAt3].id + "_" + tAtoms[rAt4].id;
+            std::cout << "Bug: could not find the torsion angle by atoms "
+                          << aTorID << std::endl;
+            exit(1);
+        }
+        
+        
+        // Now re-set torsion angles around two sides of the bond formed
+        // rAt2, rAt3. 
+        // 1. the side of rAt2
+        
+        if (tAtoms[rAt3].connAtoms.size() >2 )      // O atoms are included
+        {
+            if (tAtoms[rAt3].bondingIdx==3)         // sp3. used for pyranose only at the moment
+            {
+                int n =1;
+                int n3=1;
+                for (std::vector<int>::iterator iNB=tAtoms[rAt3].connAtoms.begin();
+                        iNB !=tAtoms[rAt3].connAtoms.end(); iNB++)
+                {
+                    if (*iNB !=rAt2)
+                    {
+                        // starting point is rAt1; 
+                        if (*iNB != rAt4)
+                        {
+                            int nNT=getTorsion(tTors, rAt1, rAt2, rAt3, *iNB);
+                            if (nNT >=0 && nNT < nTors)
+                            {
+                                tTors[nNT].value = vInit + n*120.0;
+                                if (tTors[nNT].value > 180.01)
+                                {
+                                    tTors[nNT].value = tTors[nNT].value -360.0;
+                                }
+                                //ID aTorID =   tAtoms[rAt1].id + "_" + tAtoms[rAt2].id + "_" 
+                                //            + tAtoms[rAt3].id + "_" + tAtoms[*iNB].id;
+                                //std::cout << aTorID << "  torsion " << tTors[nNT].value << std::endl;
+                            }
+                            else
+                            {
+                                ID aTorID =   tAtoms[rAt1].id + "_" + tAtoms[rAt2].id + "_" 
+                                            + tAtoms[rAt3].id + "_" + tAtoms[*iNB].id;
+                                std::cout << "Bug: could not find the torsion angle by atoms "
+                                          << aTorID << std::endl;
+                                exit(1);
+                            }
+                            n++;
+                        }
+                        
+                        // rAt2 side 
+                        int n2 = 1;
+                        for (std::vector<int>::iterator iNB2=tAtoms[rAt2].connAtoms.begin();
+                                     iNB2 !=tAtoms[rAt2].connAtoms.end(); iNB2++)
+                        {
+                            if(*iNB2 !=rAt3 && *iNB2 != rAt1)
+                            {
+                                // starting point is rAt1; 
+                                int nNBT=getTorsion(tTors, *iNB2, rAt2, rAt3, *iNB);
+                                if (nNBT >=0 && nT < nTors)
+                                {
+                                    REAL vInit2 = vInit + n2*120.0;
+                                    if (vInit2 > 180.0)
+                                    {
+                                        vInit2 = vInit2 -360.0;
+                                    }
+                                    if (*iNB==rAt4)
+                                    {
+                                        tTors[nNBT].value = vInit2;
+                                    }
+                                    else
+                                    {
+                                        tTors[nNBT].value = vInit2 + n3*120.0;
+                                    }
+                                    if (tTors[nNBT].value > 180.0)
+                                    {
+                                        tTors[nNBT].value = tTors[nNBT].value -360.0;
+                                    }
+                                    n2++;
+                                    //ID aTorID =   tAtoms[*iNB2].id + "_" + tAtoms[rAt2].id + "_" 
+                                    //            + tAtoms[rAt3].id  + "_" + tAtoms[*iNB].id;
+                                    //std::cout << aTorID << "  torsion " << tTors[nNBT].value << std::endl;
+                                    
+                                }
+                                else
+                                {
+                                    ID aTorID =   tAtoms[*iNB2].id + "_" + tAtoms[rAt2].id + "_" 
+                                                + tAtoms[rAt3].id  + "_" + tAtoms[*iNB].id;
+                                    std::cout << "Bug: could not find the torsion angle by atoms "
+                                              << aTorID << std::endl;
+                                    exit(1);
+                                }   
+                            }
+                        }
+                        n3=n;
+                    }
+                }
+            }
+        }
+        
+        // std::cout <<std::endl << std::endl;
+        
+        
+    }
     
     ringTools::ringTools()
     {

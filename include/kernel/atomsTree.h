@@ -62,7 +62,7 @@ namespace LIBMOL
         ~buildAtomTree();
         
         int  setMSTStartAtom(std::vector<AtomDict> & allAtoms);
-        void setAtomsMST(std::vector<AtomDict> & allAtoms, 
+        bool setAtomsMST(std::vector<AtomDict> & allAtoms, 
                          std::vector<BondDict> & allBonds);
         
         void initDummyAtoms(std::vector<AtomDict> & allAtoms,
@@ -77,6 +77,12 @@ namespace LIBMOL
                             std::vector<BondDict>  & tAllBonds,
                             std::vector<AngleDict> & tAllAngs,
                             std::vector<ChiralDict>& tChs);
+        void setStartStruct2(std::vector<AtomDict>   & tAllAtoms,
+                             std::vector<BondDict>   & tAllBonds,
+                             std::vector<AngleDict>  & tAllAngs,
+                             std::vector<ChiralDict> & tChs);
+        
+        void expandStartStruct(std::vector<AtomDict>  & tStartPackAtoms);
         
         void set2ConnStruct(std::vector<AtomDict>  & tAllAtoms,
                             std::vector<BondDict>  & tAllBonds,
@@ -100,6 +106,11 @@ namespace LIBMOL
                                std::vector<BondDict>    & tBonds,
                                std::vector<AngleDict>   & tAngles,
                                std::vector<TorsionDict> & tTorsions);
+        void setTreeAtomValues2(std::vector<AtomDict>    & tAtoms,
+                                std::vector<BondDict>    & tBonds,
+                                std::vector<AngleDict>   & tAngles,
+                                std::vector<TorsionDict> & tTorsions);        
+        
         void setTreeAtomBondValue(std::vector<AtomDict> & tAtoms,
                                   std::vector<BondDict> & tBonds,
                                   std::vector<AtomDict>::iterator tAt);
@@ -130,11 +141,12 @@ namespace LIBMOL
                                      std::vector<int>         & tVec);
         
         // version 2 from the coordinates of the atoms
-        void setTreeAtomValues(std::vector<AtomDict>    & tAtoms);
+        void setTreeAtomValues(std::vector<AtomDict>     & tAtoms);
+        
         
         void setTreeAtomDepth();
         
-        void buildTree(std::vector<AtomDict>    & tAtoms,
+        bool buildTree(std::vector<AtomDict>    & tAtoms,
                        std::vector<BondDict>    & tBonds,
                        std::vector<AngleDict>   & tAngles,
                        std::vector<TorsionDict> & tTorsions,

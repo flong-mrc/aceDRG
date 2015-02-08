@@ -66,6 +66,21 @@ for aF in glob.glob("./inMmcif/*.cif"):
         os.system(cmdL)
 
 print "========================================================="
+print "|  run all examples containing pyranose at ./inPyro     |"
+print "========================================================="
+for aF in glob.glob("./inPyro/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+    else:
+        MonoName = aFRoot
+
+    if len(aFRoot) !=0:
+        cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
+        print cmdL
+        os.system(cmdL)
+
+print "========================================================="
 print "|  run all examples with input small molecule Cif files |"
 print "|  at ./inStdcif to generate molecules and derive       |"
 print "|  unique bond lengths and angles, and atom types       |"

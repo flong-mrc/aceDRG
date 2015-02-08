@@ -7202,10 +7202,25 @@ namespace LIBMOL
             
             // 'LIST OF MONOMERS' section
             
+            ID ligType = "non-polymer";
+            
+            for (std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> >::iterator iRG=tRings.begin();
+                    iRG != tRings.end(); iRG++)
+            {
+                for (std::vector<LIBMOL::RingDict>::iterator iR=iRG->second.begin();
+                        iR !=iRG->second.end(); iR++)
+                {
+                    if (iR->isSugar.compare("pyranose")==0)
+                    {
+                        ligType = "pyranose";
+                        break;
+                    }
+                }
+            }
+            
             std::string longName =tMonoRootName.substr(0,3);
             std::string sName =tMonoRootName.substr(0,3);
-            
-            
+   
             int nH = getHAtomNum(tAtoms);
             
             outRestrF << "# ------------------------------------------------" << std::endl
@@ -7219,10 +7234,10 @@ namespace LIBMOL
                     << "_chem_comp.name" << std::endl
                     << "_chem_comp.group" << std::endl
                     << "_chem_comp.number_atoms_all" << std::endl
-                    << "_chem_comp.number_atoms_nh" << std::endl
+                    << "_chem_comp.number_atoms_nh"  << std::endl
                     << "_chem_comp.desc_level" << std::endl
                     << longName <<"\t"<< sName << "\t" << "'.\t\t'\t"
-                    << "non-polymer\t" << (int)tAtoms.size() << "\t" 
+                    << ligType << "\t" << (int)tAtoms.size() << "\t" 
                     << (int)tAtoms.size()- nH << "\t."
                     // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
                     << std::endl;
