@@ -156,16 +156,22 @@ namespace LIBMOL
     extern void detectRingsInAtoms(std::vector<AtomDict> & tAtoms);
     
     // Sugar rings
+    
+    extern void setSugarRingInitComf(std::vector<AtomDict> & tAtoms,
+                                     std::vector<TorsionDict>  & tTors,
+                                     std::vector<RingDict>::iterator tRing);
+    
     // 1. six-member rings
     
     extern void checkOneSugarRing(std::vector<AtomDict> & tAtoms,
                                   std::vector<RingDict>::iterator tRing);
-    
     extern void setPyranoseChairComf(std::vector<AtomDict> & tAtoms,
                                       std::vector<RingDict>::iterator tRing);
     extern void setPyranoseChairComf(std::vector<AtomDict> & tAtoms,
                                      std::vector<RingDict>::iterator tRing,
                                      std::vector<TorsionDict> & tTors);
+    
+
     
     extern void setTorsionAroundOneBondInRing(std::vector<TorsionDict> & tTors,
                                               std::vector<AtomDict> & tAtoms,

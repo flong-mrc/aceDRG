@@ -283,6 +283,7 @@ namespace LIBMOL
             codCifName(NullString),
             codNBSymb(NullString),
             codNB2Symb(NullString),
+            codNB3Symb(NullString),
             hashingValue(ZeroInt),
             coordExist(false),
             numPi(ZeroInt),
@@ -300,6 +301,7 @@ namespace LIBMOL
         existProps["x"]          = -1;
         existProps["y"]          = -1;
         existProps["z"]          = -1;
+        
         int tDim=3;
         for (int i=0; i <  tDim; i++)
         {
@@ -307,6 +309,11 @@ namespace LIBMOL
             fracCoords.push_back(0.0);
             forces.push_back(0.0);
         }
+        
+        baseRingProp["size"]  ="";
+        baseRingProp["aroma"] ="";
+        
+        
     }
     
     AtomDict::AtomDict(const AtomDict& tAtom) : seriNum(tAtom.seriNum), 
@@ -334,6 +341,7 @@ namespace LIBMOL
             codCifName(tAtom.codCifName),
             codNBSymb(tAtom.codNBSymb),
             codNB2Symb(tAtom.codNB2Symb),
+            codNB3Symb(tAtom.codNB3Symb),
             hashingValue(tAtom.hashingValue),
             coordExist(tAtom.coordExist),
             numPi(tAtom.numPi),
@@ -429,6 +437,7 @@ namespace LIBMOL
         {
              ringRepBySeriNum.insert(std::pair<std::string,int>(iRdRep->first, iRdRep->second));
         }
+     
         for (std::vector<ID>::const_iterator iCod=tAtom.codClassV.begin();
                 iCod !=tAtom.codClassV.end(); iCod++)
         {
@@ -442,6 +451,12 @@ namespace LIBMOL
             {
                 tree[iTr->first].push_back(*iAt);
             }
+        }
+        
+        for (std::map<std::string, std::string>::const_iterator iMRP=tAtom.baseRingProp.begin();
+                iMRP != tAtom.baseRingProp.end(); iMRP++)
+        {
+            baseRingProp[iMRP->first] = iMRP->second;
         }
     }
     
@@ -475,6 +490,7 @@ namespace LIBMOL
         }
         
         return t12;
+        
     }
     /*
     void AtomDict::setCodClass()
@@ -545,6 +561,72 @@ namespace LIBMOL
         
         return rSize;
     }
+    
+    void AtomDict::setBaseRingProps()
+    {
+        if (codClass.size() !=0)
+        {
+            ID tClass = TrimSpaces(codClass);
+            std::vector<ID> tSecs;
+            StrTokenize(tClass, tSecs, '(');
+            if (tSecs.size() > 0)
+            {
+                if (tSecs[0].find("[") !=std::string::npos)
+                {
+                    std::vector<ID> tRS;
+                    StrTokenize(tSecs[0], tRS, '[');
+                    if (tRS.size() > 1)
+                    {
+                        if (tRS[1].find("a") !=std::string::npos)
+                        {
+                            baseRingProp["aroma"] = "y";
+                        }
+                        
+                        cleanChar(tRS[1], ']');
+                        
+                        if(tRS[1].find(",") !=std::string::npos)
+                        {
+                            std::vector<ID> tMinR;
+                            StrTokenize(tRS[1], tMinR, ',');
+                            if (tMinR.size() >0)
+                            {
+                                if (tMinR[0].find("x")==std::string::npos)
+                                {
+                                    if (tMinR[0].find("a")==std::string::npos)
+                                    {
+                                        baseRingProp["size"] = tMinR[0];    
+                                    }
+                                    else
+                                    {
+                                        std::vector<ID> tOS;
+                                        StrTokenize(tMinR[0], tOS, 'a');
+                                        baseRingProp["size"] = tOS[0];
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (tRS[1].find("x")==std::string::npos)
+                            {
+                                if (tRS[1].find("a")==std::string::npos)
+                                {
+                                    baseRingProp["size"] = tRS[1];    
+                                }
+                                else
+                                {
+                                    std::vector<ID> tOS;
+                                    StrTokenize(tRS[1], tOS, 'a');
+                                    baseRingProp["size"] = tOS[0];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     void AtomDict::setCodChemType()
     {
         // Change the second letter in element ID from upper to low case.

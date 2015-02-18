@@ -4519,6 +4519,33 @@ namespace LIBMOL
        
     }
     
+    
+    void AllSystem::setupAllTargetValuesFromCOD2(ID tOutName, ID tMonoName, 
+                                                ID tLibmolDir)
+    {
+       CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles, 
+                               allTorsions, allChirals, allPlanes, allRings,
+                               tLibmolDir, 2);
+      
+      
+       
+       aCodSystem.setupAllTargetValues2();
+       
+      
+      
+       resetSystem2(aCodSystem);
+       /*
+       for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+        {
+            std::cout << "Atom " << iAt->id << " is in " 
+                      << (int)iAt->ringRep.size() << std::endl;
+        }
+        
+        */ 
+       
+    }
+    
     void AllSystem::OutputRestraintCif(FileName tCifName)
     {
         /*

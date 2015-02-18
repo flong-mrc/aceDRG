@@ -246,6 +246,7 @@ namespace LIBMOL // temp
         void setCodClass();
         void outRingSec();
         int  getMinRing();
+        void setBaseRingProps();
         
         void setCodChemType();
         
@@ -286,6 +287,7 @@ namespace LIBMOL // temp
         ID       codCifName;
         ID       codNBSymb;
         ID       codNB2Symb;
+        ID       codNB3Symb;
         
        
         int      hashingValue;
@@ -337,6 +339,7 @@ namespace LIBMOL // temp
         std::map<std::string, int> ringRep;
         std::map<std::string, std::string>  ringRepS;
         std::map<std::string, int> ringRepBySeriNum;
+        std::map<std::string, std::string> baseRingProp;
         std::map<std::string, std::vector<int> > tree;
         
         REAL                       treeBond;

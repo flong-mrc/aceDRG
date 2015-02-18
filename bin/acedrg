@@ -245,7 +245,9 @@ class Acedrg(CExeCode ):
         #    self.checInputFormat()          
         
         self.runExitCode      = 0 
- 
+
+        self.chemCheck        = ChemCheck() 
+
         self.setWorkMode(inputOptionsP)
         self.checkDependency()
         self.checkVersionInfo()
@@ -470,7 +472,6 @@ class Acedrg(CExeCode ):
                          self.geneInName = "MOL" 
                          break
                 
-        
     def setMonoRoot(self):
         
         if self.inMdlName != "":
@@ -1097,21 +1098,21 @@ class Acedrg(CExeCode ):
         #self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
         if tStage==1:
             self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
+            self._cmdline += "make hout yes    \n"
+            self._cmdline += "ncyc 40    \n"
             self._cmdline += "end       \n"
 	    self._cmdline += "eof       \n"
         elif tStage==2: 
             self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
             self._cmdline += "mode newe \n"
+            self._cmdline += "make hydr no"
+            self._cmdline += "make news"
             self._cmdline += "end       \n"
 	    self._cmdline += "eof       \n"
         elif tStage==3: 
             self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "ncyc 1    \n"
-            self._cmdline += "end       \n"
-	    self._cmdline += "eof       \n"
-        elif tStage==4: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
             self._cmdline += "make hout yes    \n"
+            self._cmdline += "make hydr full \n"
             self._cmdline += "ncyc 40    \n"
             self._cmdline += "end       \n"
 	    self._cmdline += "eof       \n"
@@ -1131,7 +1132,6 @@ class Acedrg(CExeCode ):
         self.subExecute()
     
     def runGeoOpt(self):
-
         
         # Geometrical optimization
         if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
@@ -1150,25 +1150,19 @@ class Acedrg(CExeCode ):
                         stageNow = 3
                         self.runRefmac(tPdb1, self.outRstCifName, stageNow)
                         if os.path.isfile(self.refmacXYZOUTName):
-                            tPdb1 = self.refmacXYZOUTName
-                            stageNow = 4
-                            self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                            if os.path.isfile(self.refmacXYZOUTName):
-                                finPdb = self.outRoot + ".pdb"
-                                finRst = self.outRoot + ".cif"
-                                #os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                                shutil.copy(self.refmacXYZOUTName, finPdb)
-                                #os.system("cp %s   %s "%(self.outRstCifName, finRst))
-                                if os.path.isfile(finPdb):
-                                    self.inPdbName        = finPdb 
-                                    self.inMmCifName      = self.outRstCifName
-                                    self.outRstCifName    = finRst
-                                    self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                    print "===================================================================" 
-                                else:
-                                    print "Failed to produce %s after final geometrical optimization"%finPdb
+                            finPdb = self.outRoot + ".pdb"
+                            finRst = self.outRoot + ".cif"
+                            #os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
+                            shutil.copy(self.refmacXYZOUTName, finPdb)
+                            #os.system("cp %s   %s "%(self.outRstCifName, finRst))
+                            if os.path.isfile(finPdb):
+                                self.inPdbName        = finPdb 
+                                self.inMmCifName      = self.outRstCifName
+                                self.outRstCifName    = finRst
+                                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+                                print "===================================================================" 
                             else:
-                                print "Failed to produce the final coordinates at stage 4 optimization" 
+                                print "Failed to produce %s after final geometrical optimization"%finPdb
                         else:
                             print "Failed to produce the  coordinates at stage 3 optimization" 
                     else:
@@ -1270,20 +1264,24 @@ class Acedrg(CExeCode ):
     def execute(self):
         
         self.printJobs()
-        
+       
         if self.workMode == 11 or self.workMode == 111:
 
             # Stage 1: dictionary generation using a mmcif file 
             if os.path.isfile(self.inMmCifName):
+                if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
+                    print "The input system contains metal or other heavier element"
+                    print "The current version deals only with the atoms in the set of 'organic' elements" 
+                    sys.exit()
                 self.runLibmol(self.inMmCifName)
             else:
-                print "%s does not exist"%self.inMmCifName
+                print "The input %s does not exist"%self.inMmCifName
                 sys.exit()
             
             if self.workMode == 11 and not self.runExitCode :
                 # Stage 2: optimization
                 self.runGeoOpt() 
-            else:
+            elif not self.workMode == 111:
                 self.printExitInfo() 
   
         if self.workMode == 12 or self.workMode == 121:
@@ -1297,17 +1295,20 @@ class Acedrg(CExeCode ):
 
             # Stage 2: dictionary generation using a mmcif file
             if os.path.isfile(self.libcheckLibName):
+                if not self.chemCheck.isOrganic(self.libcheckLibName, 11):
+                    print "The input system contains metal or other heavier element"
+                    print "The current version deals only with the atoms in the set of 'organic' elements" 
+                    sys.exit()
                 self.runLibmol(self.libcheckLibName)
             else:
-                print "%s does not exist"%self.inMmCifName
+                print "The input smiles contain metal elements "
                 sys.exit()
 
             if self.workMode == 12 and not self.runExitCode:
                 # Stage 3: optimization
                 self.runGeoOpt()            
-            else:
+            elif not self.workMode == 121:
                 self.printExitInfo() 
-  
 
         if self.workMode == 13 or self.workMode == 131 :
             
@@ -1321,7 +1322,7 @@ class Acedrg(CExeCode ):
             if self.workMode == 13 and not self.runExitCode: 
                 # Stage 2: optimization
                 self.runGeoOpt()            
-            else:
+            elif not self.workMode == 131:
                 self.printExitInfo() 
   
     
@@ -1337,7 +1338,7 @@ class Acedrg(CExeCode ):
             if self.workMode == 14 and not self.runExitCode: 
                 # Stage 2: optimization
                 self.runGeoOpt()            
-            else:
+            elif not self.workMode == 141:
                 self.printExitInfo() 
 
         if self.workMode == 15 or self.workMode == 151 :
@@ -1422,11 +1423,85 @@ class Acedrg(CExeCode ):
 
         print "Error: check log file at %s"%self._log_name
      
-    def checkMetalInSystem(self):
- 
-        pass
-        
 
+class ChemCheck():
+
+    def __init__( self):
+
+        self.organicSec = ["AT", "At", "at", "B", "b", "BR", "Br", "br", "C", "c", "CL", "Cl", "cl", 
+                   "F", "f", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "Se", "se"]
+
+        self.atomFileType = {}
+        self.atomFileType["mmCif"]  = [11, 111]
+        self.atomFileType["simils"] = [12, 121]
+        self.atomFileType["mdl"]    = [13, 131]
+        self.atomFileType["mol2"]   = [14, 141]
+
+    def isOrganic(self, tInFileName, tTypeIdx):
+
+        allAtomElems = []
+        self.getAtomElems(tInFileName, tTypeIdx, allAtomElems)
+
+        organicOnly = True
+        for aAtomElem in allAtomElems:
+            if not aAtomElem in self.organicSec:
+                organicOnly = False
+                break;
+
+        return organicOnly 
+
+    def getAtomElems(self, tInFileName, tTypeIdx, tAtomElems):
+  
+        if tTypeIdx in self.atomFileType["mmCif"]: 
+            self.getAtomElemsFromMmcif(tInFileName, tAtomElems)
+        elif tTypeIdx in self.atomFileType["simils"]: 
+            self.getAtomElemsFromSmiles(tInFileName, tAtomElems)
+        elif tTypeIdx in self.atomFileType["mdl"]: 
+            self.getAtomElemsFromMdl(tInFileName, tAtomElems)
+        elif tTypeIdx in self.atomFileType["mol2"]: 
+            self.getAtomElemsFromMol2(tInFileName, tAtomElems)
+        else: 
+            print "Could not recognize format for the input file. It should be one of cif, smiles, sdf/mol, mol2"
+            sys.exit(1)   
+        print tAtomElems         
+
+    def getAtomElemsFromMmcif(self, tInFileName, tAtomElems):
+
+        try :
+            inFile = open(tInFileName, "r")
+        except IOError :
+             print "%s can not be opened for reading "%tInFileName
+             sys.exit(1)
+        else:
+             allLines = inFile.readlines()
+             inFile.close()
+             lAtom = False
+             iCol = 0
+             colDict = {}
+             for aL in allLines:
+                if aL.find("loop") != -1 and lAtom:
+                    lAtom = False
+                    iCol =0
+                    break
+                elif lAtom and aL.find("_chem_comp_atom.") ==-1 :
+                    strGrp = aL.strip().split()
+                    if colDict.has_key("type_symbol") and len(strGrp) == len(colDict) \
+                       and colDict["type_symbol"] < len(strGrp):
+                        aAtomElem = strGrp[colDict["type_symbol"]]
+                        if not aAtomElem in tAtomElems:
+                            tAtomElems.append(aAtomElem)
+                elif aL.find("_chem_comp_atom.") !=-1 :
+                    strGrp = aL.strip().split(".")
+                    if not lAtom:
+                        lAtom = True
+                    if len(strGrp) ==2:
+                        colDict[strGrp[1]] = iCol
+                        iCol +=1
+                    else:
+                        print "Definition error in the input cif file %s"%tInFileName
+                        print "The entry is ", aL
+                    
+            
 # Other supplement functions
 
 def main():

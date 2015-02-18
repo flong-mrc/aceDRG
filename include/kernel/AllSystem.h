@@ -289,6 +289,8 @@ namespace LIBMOL
         
         // COD applications 
         void setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName, ID tLibmolTabDir);
+        void setupAllTargetValuesFromCOD2(ID tOutName, ID tMonoName, ID tLibmolTabDir);
+        
         // Other applications 
         
         //void SetupCoords();

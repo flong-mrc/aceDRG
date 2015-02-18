@@ -471,7 +471,28 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "It is not aromatic system " << std::endl;
+                    std::cout << "It is not aromatic system for the merged system" 
+                              << std::endl;
+                    // Further check 
+                    std::vector<int> atmIdxsOR;
+                    for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                    {
+                        if (!tAllRings[*iR].isAromatic)
+                        {
+                           for (std::vector<AtomDict>::iterator iRAt=tAllRings[*iR].atoms.begin();
+                                   iRAt !=tAllRings[*iR].atoms.end(); iRAt++)
+                           {
+                               atmIdxsOR.push_back(iRAt->seriNum);
+                           }
+                           if (checkAromaSys(atmIdxsOR, tAtoms))
+                           {
+                               tAllRings[*iR].isAromatic = true;
+                           }
+                        }
+                    }
+                    
+                    
                 }
             }
             
@@ -829,10 +850,9 @@ namespace LIBMOL
         
         setAllRingPlanes(tAllRings, tAtoms, tPlanes);
         
-        // std::cout << "Check other planes " << std::endl;
         setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
         
-        std::cout << "There are " << tPlanes.size() 
+        std::cout << "There are "         << tPlanes.size() 
                   << " planes. They are " << std::endl;
         
         for (std::vector<PlaneDict>::iterator iPl= tPlanes.begin();
@@ -937,6 +957,20 @@ namespace LIBMOL
                     }
                 }
             }
+        }
+    }
+    
+    
+    extern void setSugarRingInitComf(std::vector<AtomDict>     & tAtoms,
+                                     std::vector<TorsionDict>  & tTors,
+                                     std::vector<RingDict>::iterator tRing)
+    {
+        checkOneSugarRing(tAtoms, tRing);
+        if (tRing->isSugar.compare("pyranose")==0)
+        {    
+            std::cout << "Find one pyranose ring " << std::endl;
+            // A pyranose ring, set torsions within the ring    
+            setPyranoseChairComf(tAtoms, tRing, tTors);
         }
     }
     

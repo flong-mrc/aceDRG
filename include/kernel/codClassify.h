@@ -195,6 +195,17 @@ namespace LIBMOL
                     const std::map<ID, std::vector<RingDict> >  & tRings, 
                     std::string                                   tLibmolTabDir);
         
+        CodClassify(const std::vector<AtomDict>                 & tAtoms,
+                    const std::vector<int>                      & tHAtomIdx, 
+                    const std::vector<BondDict>                 & tBonds,
+                    const std::vector<AngleDict>                & tAngles,
+                    const std::vector<TorsionDict>              & tTorsions,
+                    const std::vector<ChiralDict>               & tChirals,
+                    const std::vector<PlaneDict>                & tPlans,
+                    const std::map<ID, std::vector<RingDict> >  & tRings, 
+                    std::string                                 tLibmolTabDir,
+                    int                                         nTM);
+        
         // Constructor by a DictCifFile object
         CodClassify(const DictCifFile & tCifObj, 
                     std::string   tLibmolTabDir);
@@ -210,7 +221,7 @@ namespace LIBMOL
         
         
         void setupSystem();
-        void setupSystemTM();
+        void setupSystem2();
         
         // get CCP4 energy lib 
         void getCCP4BondAndAngles();
@@ -223,6 +234,7 @@ namespace LIBMOL
         void codAtomClassify2(int dLev);
         void codAtomClassifyNew(int dLev);
         void codAtomClassifyNew2(int dLev);
+        void codAtomClassifyNew3(int dLev);
         
         void codClassToAtom(ID & tCC, AtomDict & tAt);
         void codClassToAtomAng(ID & tCC, AtomDict & tAt);
@@ -270,6 +282,7 @@ namespace LIBMOL
         void setAtomCodClassName2(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void setAtomCodClassNameNew(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void setAtomCodClassNameNew2(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
+        void setAtomCodClassNameNew3(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
         void outRingSec(AtomDict & tAtom);
         void outRingSec2(AtomDict & tAtom);
         void outRingSecNew(AtomDict & tAtom);
@@ -301,6 +314,7 @@ namespace LIBMOL
         void readTablesForHashing(std::map<int, ID>  & tDigitKeys,
                                   std::map<int, int> & tLinkedHA);
         void hashingAtoms();
+        void hashingAtoms2();
         void setAtomsNBSymb(); 
         
         // Tree-related 
@@ -352,11 +366,13 @@ namespace LIBMOL
         
         // Using meaning values when secondary NBs have the same "space"
         // such as "c[6,6]-3:n[5,6]-3:N[5]-2:"
+        
         void setupTargetBondsUsingMean(std::vector<BondDict> & tBonds,
                                    std::vector<BondDict>::iterator tB);
         void setupTargetBondsUsingValueSetMean(std::vector<aValueSet> & tSets,
                                    std::vector<BondDict>::iterator tB);
         void setupTargetBonds();
+        void setupTargetBonds2();
         void setupTargetBondsUsingSqlite();
         
         void addAtomClassToBonds(std::vector<BondDict> & tBonds);
@@ -452,6 +468,8 @@ namespace LIBMOL
         void fixTorIDs();
         // 
         void setupAllTargetValues();
+        void setupAllTargetValues2();
+        
         void setupAllStdValues();
         
         
@@ -473,6 +491,10 @@ namespace LIBMOL
         void outPDB(FileName tFName, ID tMonoRootName);
         void outAtomTypes(ID tMonoRootName);
         void getAnglesFromPDB(ID tFName);
+        
+        
+        void setSpecial3NBSymb(std::vector<AtomDict>::iterator tAt);
+        void setSpecial3NBSymb2(std::vector<AtomDict>::iterator tAt);
         
         // This should be moved into another specifically designed sqlite3 class
         //void sqlite3Query(sqlite3 *      tDB,
