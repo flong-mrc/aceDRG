@@ -234,13 +234,14 @@ namespace LIBMOL
             for (std::vector<AtomDict>::iterator iAt =atoms.begin();
                     iAt != atoms.end(); iAt++)
             {
-                // std::cout << "Atom " << iAt->id << " serN " << iAt->seriNum << std::endl;  
+                std::cout << "Atom " << iAt->id << " serN " << iAt->seriNum << std::endl;  
                 for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
                         iNB !=iAt->connAtoms.end(); iNB++)
                 {
                     if (std::find(tSerNums.begin(), tSerNums.end(), *iNB) !=tSerNums.end())
                     {
-                        //std::cout << "Atom " << *iNB << " linked to " << iAt->seriNum << std::endl;
+                        std::cout << "Atom " << *iNB  
+                                  << " linked to " << iAt->seriNum << std::endl;
                         ringAtomLink[iAt->seriNum].push_back(*iNB);
                     }
                 }
@@ -979,6 +980,7 @@ namespace LIBMOL
     {
         // Six-member sugar ring (Pyranose)
         
+        std::cout << "Check pyranose " << std::endl; 
         std::vector<ID> rAtmIds;
         
         for (std::vector<AtomDict>::iterator iAt = tRing->atoms.begin();
@@ -1055,7 +1057,7 @@ namespace LIBMOL
             }
             
             if (rAtmFormat["O"]==1 && rAtmFormat["C"]==5
-                && rAtmFormat["connectO"]==4)
+                && rAtmFormat["connectO"] >1)
             {
                 tRing->isSugar = "pyranose";
             }
@@ -1064,6 +1066,15 @@ namespace LIBMOL
             {
                 tRing->isSugar = "furanose";
             }
+        }
+        
+        if (tRing->isSugar.size() !=0)
+        {
+            std::cout << "The ring is " << tRing->isSugar << std::endl;
+        }
+        else
+        {
+            std::cout << "The ring is not sugar ring " << std::endl;
         }
         
         // 
@@ -1091,12 +1102,14 @@ namespace LIBMOL
                 branch2.push_back(tRing->atoms[i0].seriNum);
                 
                 
+                
                 if (tRing->atoms[i0].connAtoms.size() ==2)
                 {
                     int i1=-1, i2=-1, i3=-1, i4=1, i5=-1;
                     
                     int it1=tRing->atoms[i0].connAtoms[0];
                     int it2=tRing->atoms[i0].connAtoms[1];
+                    
                     
                     
                     bool lConnO = false;
@@ -1125,6 +1138,8 @@ namespace LIBMOL
                     branch1.push_back(i1);
                     branch2.push_back(i2);
                     
+                    
+                    
                     for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i1].begin();
                             iNext != tRing->ringAtomLink[i1].end(); iNext++)
                     {
@@ -1145,6 +1160,7 @@ namespace LIBMOL
                             if (*iNext !=tRing->atoms[i1].seriNum)
                             {
                                 i5 = *iNext;
+                                
                                 break;
                             }
                         }                   
@@ -1169,6 +1185,7 @@ namespace LIBMOL
                     if (i4 !=-1)
                     {
                         branch2.push_back(i4);
+                        
                     }
                     else
                     {
@@ -1180,6 +1197,7 @@ namespace LIBMOL
                     if (i5 !=-1)
                     {
                         branch1.push_back(i5);
+                        
                         branch2.push_back(i5);
                     }
                 }
@@ -1238,6 +1256,7 @@ namespace LIBMOL
                 branch1.push_back(tRing->atoms[i0].seriNum);
                 branch2.push_back(tRing->atoms[i0].seriNum);
                 
+                std::cout << "Starting atom " << tRing->atoms[i0].id << std::endl;
                 
                 if (tRing->atoms[i0].connAtoms.size() ==2)
                 {
@@ -1273,6 +1292,9 @@ namespace LIBMOL
                     branch1.push_back(i1);
                     branch2.push_back(i2);
                     
+                    std::cout << "Branch 1 connected " <<   tAtoms[i1].id << std::endl;
+                    std::cout << "Branch 2 connected " <<   tAtoms[i2].id << std::endl;
+                   
                     for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i1].begin();
                             iNext != tRing->ringAtomLink[i1].end(); iNext++)
                     {
@@ -1286,11 +1308,11 @@ namespace LIBMOL
                     if (i3 !=-1)
                     {
                         branch1.push_back(i3);
-                        
+                        std::cout << "Branch 1 connected " <<   tAtoms[i3].id << std::endl;
                         for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i3].begin();
                             iNext != tRing->ringAtomLink[i3].end(); iNext++)
                         {
-                            if (*iNext !=tRing->atoms[i1].seriNum)
+                            if (*iNext !=tAtoms[i1].seriNum)
                             {
                                 i5 = *iNext;
                                 break;
@@ -1307,9 +1329,13 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNext = tRing->ringAtomLink[i2].begin();
                             iNext != tRing->ringAtomLink[i2].end(); iNext++)
                     {
+                        std::cout << "iPre " << tAtoms[i0].id << std::endl;
+                        std::cout << "iCen " << tAtoms[i2].id << std::endl;
+                        std::cout << "iNext " << tAtoms[*iNext].id << std::endl; 
                         if (*iNext !=tRing->atoms[i0].seriNum)
                         {
                             i4 = *iNext;
+                            
                             break;
                         }
                     }
@@ -1317,6 +1343,7 @@ namespace LIBMOL
                     if (i4 !=-1)
                     {
                         branch2.push_back(i4);
+                        std::cout << "Branch 2 connected " <<   tAtoms[i4].id << std::endl;
                     }
                     else
                     {
@@ -1328,7 +1355,9 @@ namespace LIBMOL
                     if (i5 !=-1)
                     {
                         branch1.push_back(i5);
+                        std::cout << "Branch 1 connected " <<   tAtoms[i5].id << std::endl;
                         branch2.push_back(i5);
+                        std::cout << "Branch 2 connected " <<   tAtoms[i5].id << std::endl;
                     }
                 }
                 else
@@ -1366,30 +1395,36 @@ namespace LIBMOL
             ID  aTorID = "";
             // The typical id combination C5-O5-C1-C2  
             aTorID = iD21 + "_" + iD0  + "_" + iD11 + "_" + iD12;
+            std::cout << aTorID << std::endl;
             tRing->sugarTors[aTorID]  = -60.0;
             setTorsionAroundOneBondInRing(tTors, tAtoms, n21, n0, n11, n12, -60.0);
             
             
             aTorID = iD0  + "_" + iD11 + "_" + iD12 + "_" + iD13;
+            std::cout << aTorID << std::endl;
             tRing->sugarTors[aTorID ] =  60.0;
             setTorsionAroundOneBondInRing(tTors, tAtoms, n0, n11, n12, n13, 60.0);
             
             
             
             aTorID = iD11 + "_" + iD12 + "_" + iD13 + "_" + iD22;
+            std::cout << aTorID << std::endl;
             tRing->sugarTors[aTorID] = -60.0;
             setTorsionAroundOneBondInRing(tTors, tAtoms, n11, n12, n13, n22, -60.0);
             
             
             aTorID = iD12 + "_" + iD13 + "_" + iD22 + "_" + iD21;
+            std::cout << aTorID << std::endl;
             tRing->sugarTors[aTorID ] =  60.0;
             setTorsionAroundOneBondInRing(tTors, tAtoms, n12, n13, n22, n21, 60.0);
             
             aTorID = iD13 + "_" + iD22 + "_" + iD21 + "_" + iD0;
+            std::cout << aTorID << std::endl;
             tRing->sugarTors[aTorID] = -60.0;
             setTorsionAroundOneBondInRing(tTors, tAtoms, n13, n22, n21, n0, -60.0);
             
             aTorID = iD22 + "_" + iD21 + "_" + iD0  + "_" + iD11;
+            std::cout << aTorID << std::endl;
             tRing->sugarTors[aTorID] =  60.0;
             setTorsionAroundOneBondInRing(tTors, tAtoms, n22, n21, n0, n11, 60.0);
             nT = getTorsion(tTors, n22, n21, n0, n11);
@@ -1540,7 +1575,7 @@ namespace LIBMOL
          for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
          {
-             if (!iA->isMetal)
+             if (!iA->isMetal && iA->chemType.compare("H") !=0)
              {
                  int preSeriNum = -999;
                  int startLev   = 1;
@@ -1626,9 +1661,9 @@ namespace LIBMOL
                     tNBA != curAto.connAtoms.end(); tNBA++)
                 {
                     int tSeriNum = tAtoms[*tNBA].seriNum;
-                    
+                    ID  tNbId    = tAtoms[*tNBA].chemType;
                     if (tSeriNum == iOriAto->seriNum && tSeriNum != SeriNumPreAto
-                        && curLev > 2)
+                        && curLev > 2 && tNbId.compare("H") !=0)
                     {
                         //std::cout << iOriAto->id << " : "
                         //          << curAto.id << " : " << allAtoms[*tNBA].id

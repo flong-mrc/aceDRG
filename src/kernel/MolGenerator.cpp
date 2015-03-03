@@ -2780,8 +2780,8 @@ namespace LIBMOL
                 std::cout << "Atom " << iAt->id << " has COD class id "
                                      << iAt->codClass << std::endl;
             }
-        }
-                        
+        }  
+        
     }
    
     void MolGenerator::getAtomTypeMols()

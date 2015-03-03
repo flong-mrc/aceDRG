@@ -1501,6 +1501,20 @@ class ChemCheck():
                         print "Definition error in the input cif file %s"%tInFileName
                         print "The entry is ", aL
                     
+    def getAtomElemsFromMdl(self, tInFileName, tAtomElems):
+
+        try :
+            inFile = open(tInFileName, "r")
+        except IOError :
+            print "%s can not be opened for reading "%tInFileName
+            sys.exit(1)
+        else:
+            allLines = inFile.readlines()
+            inFile.close()
+            if len(allLines) > 3 :
+                pass
+
+   
             
 # Other supplement functions
 

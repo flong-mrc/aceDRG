@@ -17,7 +17,6 @@ namespace LIBMOL
     }
     
     
-    
     /*
     CodClassify::CodClassify(const CodClassify& tCodC)
     {
@@ -113,6 +112,7 @@ namespace LIBMOL
             
         }
         */
+        
         for (std::vector<TorsionDict>::const_iterator iTor=tCifObj.allTorsions.begin();
                 iTor != tCifObj.allTorsions.end(); iTor++)
         {
@@ -1437,7 +1437,7 @@ namespace LIBMOL
             //    tempIDs.clear();
             //}
    
-            if (!iA->isMetal)
+            if (!iA->isMetal )
             {
                 int preSeriNum = -999;
                 int startLev   = 1;
