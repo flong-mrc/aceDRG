@@ -248,6 +248,11 @@ namespace LIBMOL
         {
             atomsHashingCodes.push_back(*tA);
         }
+        for (std::vector<ID>::const_iterator tA = tBond.atomsMainRep.begin();
+                tA != tBond.atomsMainRep.end(); tA++)
+        {
+            atomsMainRep.push_back(*tA);
+        }
         for (std::vector<ID>::const_iterator tA = tBond.atomsNB2Rep.begin();
                 tA != tBond.atomsNB2Rep.end(); tA++)
         {
@@ -257,6 +262,11 @@ namespace LIBMOL
                 tA != tBond.atomsNBRep.end(); tA++)
         {
             atomsNBRep.push_back(*tA);
+        }
+        for (std::vector<ID>::const_iterator tA = tBond.atomsNB3Rep.begin();
+                tA != tBond.atomsNB3Rep.end(); tA++)
+        {
+            atomsNB3Rep.push_back(*tA);
         }
         for (std::vector<REAL>::const_iterator iV=tBond.codBondValues.begin();
                 iV != tBond.codBondValues.end(); iV++)
@@ -276,8 +286,7 @@ namespace LIBMOL
     }
     
     std::string BondDict::bondOrderNumToStr()
-    {
-        
+    {        
     }
     
     bool BondDict::checkIfInSameRing(std::vector<AtomDict>& tAtoms, 

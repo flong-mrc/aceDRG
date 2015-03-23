@@ -2762,7 +2762,7 @@ namespace LIBMOL
         
         aCodSys.setAtomsBondingAndChiralCenter();
         
-        aCodSys.codAtomClassifyNew3(2);
+        aCodSys.codAtomClassifyNew2(2);
         
         tMol.atoms.clear();         
         for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();

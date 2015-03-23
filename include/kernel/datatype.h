@@ -100,6 +100,15 @@ struct sortMap3
     std::string val;
 };
 
+struct sortMap4
+{
+    std::string key;
+    int         ha;
+    std::string lev2;
+    std::string lev3;
+    std::string lev4;
+};
+
 class sortLine
 {
 public:

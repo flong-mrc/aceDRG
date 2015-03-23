@@ -281,9 +281,11 @@ namespace LIBMOL
             codClass(NullString),
             codMolIdx(ZeroInt),
             codCifName(NullString),
+            codAtmRoot(NullString),
             codNBSymb(NullString),
             codNB2Symb(NullString),
             codNB3Symb(NullString),
+            codAtmMain(NullString),
             hashingValue(ZeroInt),
             coordExist(false),
             numPi(ZeroInt),
@@ -339,9 +341,11 @@ namespace LIBMOL
             codClass(tAtom.codClass),
             codMolIdx(tAtom.codMolIdx),
             codCifName(tAtom.codCifName),
+            codAtmRoot(tAtom.codAtmRoot),
             codNBSymb(tAtom.codNBSymb),
             codNB2Symb(tAtom.codNB2Symb),
             codNB3Symb(tAtom.codNB3Symb),
+            codAtmMain(tAtom.codAtmMain),
             hashingValue(tAtom.hashingValue),
             coordExist(tAtom.coordExist),
             numPi(tAtom.numPi),
@@ -557,6 +561,71 @@ namespace LIBMOL
                 }
             }
             rSize = rMin;
+        }
+        
+        return rSize;
+    }
+    
+    int AtomDict::getMinRing2() 
+    {
+        int rSize = 0;
+        
+        if (codClass.size() !=0)
+        {
+            std::vector<ID> tmpStrs1, tmpStrs2, tmpStrs3, tmpStrs4;
+            StrTokenize(codClass, tmpStrs1, '(');
+            if (tmpStrs1.size() > 0)
+            {
+                if (tmpStrs1[0].find("[") !=std::string::npos)
+                {
+                    StrTokenize(tmpStrs1[0],  tmpStrs2, '[');
+                    if (tmpStrs2.size() > 1)
+                    {
+                        if (tmpStrs2[1].find(",") !=std::string::npos)
+                        {
+                            StrTokenize(tmpStrs2[1],  tmpStrs3, ',');
+                            if (tmpStrs3.size() >0)
+                            {
+                                if (tmpStrs3[0].find("x") !=std::string::npos)
+                                {
+                                    StrTokenize(tmpStrs3[0],  tmpStrs4, 'x');
+                                    if (tmpStrs4.size() >1)
+                                    {
+                                        rSize = StrToInt(tmpStrs4[1]); 
+                                    }
+                                }
+                                else
+                                {
+                                    rSize = StrToInt(tmpStrs3[0]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            StrTokenize(tmpStrs2[1],  tmpStrs3, ']');
+                            if (tmpStrs3.size() >0)
+                            {
+                                if (tmpStrs3[0].find('x') !=std::string::npos)
+                                {
+                                    StrTokenize(tmpStrs3[0],  tmpStrs4, 'x');
+                                    if (tmpStrs4.size() >1)
+                                    {
+                                        rSize = StrToInt(tmpStrs4[1]); 
+                                    } 
+                                }
+                                else
+                                {
+                                    rSize = StrToInt(tmpStrs3[0]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            rSize = getMinRing();
         }
         
         return rSize;

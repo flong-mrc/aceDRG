@@ -48,7 +48,6 @@ namespace LIBMOL
                 std::cout << tFname << " Can not be opened for reading " << std::endl;
                 exit(1);
             }
-            
         }
         else
         {
@@ -2099,8 +2098,8 @@ namespace LIBMOL
     }
     */
     
-        DictCifFile::DictCifFile(FileName                tCifName,
-                                 FileName                tPdbName) :
+    DictCifFile::DictCifFile(FileName                tCifName,
+                             FileName                tPdbName) :
                              curBlockLine(ZeroInt),
                              hasConnect(false),
                              hasCoords(false),

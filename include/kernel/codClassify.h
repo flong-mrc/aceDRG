@@ -173,6 +173,12 @@ namespace LIBMOL
         // 
     };
     
+    struct NB1stFam {
+        std::string                   name;
+        std::vector<std::string>      NB2ndList;
+        int                           repN;
+    };
+    
     class CodClassify 
     {
     public :
@@ -236,8 +242,15 @@ namespace LIBMOL
         void codAtomClassifyNew2(int dLev);
         void codAtomClassifyNew3(int dLev);
         
+        void getSmallFamily(std::string tInStr, NB1stFam & aNBFam);
+        
         void codClassToAtom(ID & tCC, AtomDict & tAt);
+        void codClassToAtom2(ID & tCC, AtomDict & tAt);
+        
+        
         void codClassToAtomAng(ID & tCC, AtomDict & tAt);
+        void codClassToAtomAng2(ID & tCC, AtomDict & tAt);
+        
         void codNBProps(std::vector<ID> tarStrs, std::vector<ID> & tCTs,
                         std::vector<int> & tNB2s, 
                         std::vector<int> & tRis, std::vector<int> & tPls);
@@ -313,9 +326,12 @@ namespace LIBMOL
         // Atom hashing related 
         void readTablesForHashing(std::map<int, ID>  & tDigitKeys,
                                   std::map<int, int> & tLinkedHA);
+        void readTablesForHashing2(std::map<int, ID>  & tDigitKeys,
+                                   std::map<int, int> & tLinkedHA);
         void hashingAtoms();
         void hashingAtoms2();
         void setAtomsNBSymb(); 
+        void setAtomsNBSymb2();
         
         // Tree-related 
         void setAtomsMST();
@@ -352,6 +368,7 @@ namespace LIBMOL
                        std::map<ID, ID> tPropHash);
         void setOneBondByMean(std::vector<std::vector<std::string> > & tResults,
                         std::vector<BondDict>::iterator tB);
+        
         void setOneBondByDist(std::vector<std::vector<std::string> > & tResults,
                               std::vector<BondDict>::iterator tB);
         //End !!!!!!!
@@ -371,6 +388,7 @@ namespace LIBMOL
                                    std::vector<BondDict>::iterator tB);
         void setupTargetBondsUsingValueSetMean(std::vector<aValueSet> & tSets,
                                    std::vector<BondDict>::iterator tB);
+        void setValueSet(aValueSet & tVs, std::vector<aValueSet> & tVecVs);
         void setupTargetBonds();
         void setupTargetBonds2();
         void setupTargetBondsUsingSqlite();
@@ -385,10 +403,13 @@ namespace LIBMOL
         void setDefaultCoordGeos();
         void setOrgAngleHeadHashList();
         void setOrgAngleHeadHashList2();
+        void setOrgAngleHeadHashList22();
         void groupCodOrgAngles();
         void groupCodOrgAngles2();
+        void groupCodOrgAngles22();
         void searchCodOrgAngles(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles2(std::vector<AngleDict>::iterator iAN);
+        void searchCodOrgAngles22(std::vector<AngleDict>::iterator iAN);
         bool searchCodOrgAnglesCen(std::vector<AngleDict>::iterator iAN, 
                                    int tHa1, int tHal2, int tHa3);
         bool getCCP4Angle(std::vector<AngleDict>::iterator tAN);
@@ -411,6 +432,7 @@ namespace LIBMOL
                              std::vector<int> tIdxs, int & rIdx);
         void searchCodAnglesWithNonCenteredMetal(std::vector<AngleDict>::iterator iAN);
         void searchCodAngles();
+        void searchCodAngles2();
         
         void setupTargetAngleUsingdist(std::vector<AngleDict> & tAngles,
                                        std::vector<AngleDict>::iterator tA,
@@ -436,6 +458,8 @@ namespace LIBMOL
                                         std::vector<AngleDict>::iterator tA);
         
         void setupTargetAngles();
+        void setupTargetAngles2();
+        
         // angles using sqlite3
         //void setupTargetAnglesUsingSqlite();
         //void searchCodAnglesUsingSqlite();
@@ -536,6 +560,46 @@ namespace LIBMOL
         std::map<ID, std::map<ID, std::map<int, std::map<int, 
                      std::map<ID, std::map<ID, REAL> > > > > > allDictMetBonds;
         
+        //DB3 
+        std::vector<aValueSet>                    allDictBondsD;
+        std::map<int, std::map<int, std::map<ID, std::map<ID,  std::map<ID,
+                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
+                 std::map<ID, std::map<ID, int > > > > > > > > > > >allDictBondsIdxD;
+        
+        
+        std::map<int, std::map<int, std::map<ID,  std::map<ID, 
+                std::map<ID,  std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
+                std::vector<aValueSet> > > > > > > > > >allDictBondsIdx1D;
+        
+        std::map<int, std::map<int, std::map<ID,  std::map<ID, 
+                std::map<ID,  std::map<ID, std::map<ID,   
+                std::vector<aValueSet> > > > > > > >   allDictBondsIdx2D;
+        
+        std::vector<aValueSet>                         allDictAnglesD;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID, 
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        int > > > > > > > > > > > > > > >              allDictAnglesIdxD;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID, 
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::vector<aValueSet> > > > > > > > > > > > > allDictAnglesIdx1D;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID, 
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::vector<aValueSet> > > > > > > > > >       allDictAnglesIdx2D;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID, 
+        std::vector<aValueSet> > > > > > >             allDictAnglesIdx3D;
+        
+        
         // angles 
         std::vector<AngleDict>                         allAngles;
         std::map<int, std::vector<std::vector<int> > > allAnglesIdxs;
@@ -546,7 +610,7 @@ namespace LIBMOL
         std::map<ID,  std::map<ID,  std::map<ID, 
         std::map<ID,  std::map<ID,  std::map<ID,
         std::map<ID,  std::map<ID,  std::map<ID,
-        int > > > > > > > > > > > >                         allDictAnglesIdx;
+        int > > > > > > > > > > > >                    allDictAnglesIdx;
         
         std::map<int, std::map<int, std::map<int, 
         std::map<ID,  std::map<ID,  std::map<ID, 

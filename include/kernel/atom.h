@@ -246,6 +246,7 @@ namespace LIBMOL // temp
         void setCodClass();
         void outRingSec();
         int  getMinRing();
+        int  getMinRing2();
         void setBaseRingProps();
         
         void setCodChemType();
@@ -285,9 +286,11 @@ namespace LIBMOL // temp
         ID       codClass;
         int      codMolIdx;
         ID       codCifName;
+        ID       codAtmRoot;
         ID       codNBSymb;
         ID       codNB2Symb;
         ID       codNB3Symb;
+        ID       codAtmMain;
         
        
         int      hashingValue;

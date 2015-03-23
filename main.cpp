@@ -131,10 +131,13 @@ int main(int argc, char** argv) {
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
-                aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
-                                                          AJob.IOEntries["monoRootName"], 
-                                                          AJob.IOEntries["libMolTabDir"]);
+                aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
+                                                           AJob.IOEntries["monoRootName"], 
+                                                           AJob.IOEntries["libMolTabDir"]);
                 
+                //aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
+                //                                           AJob.IOEntries["monoRootName"], 
+                //                                           AJob.IOEntries["libMolTabDir"]);
                 
                 LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                  AJob.IOEntries["monoRootName"], 
@@ -596,7 +599,117 @@ int main(int argc, char** argv) {
         aCodSystem.codAtomClassify(2);
         aCodSystem.outAtomTypes(AJob.IOEntries["monoRootName"]);
     }
+    else if (AJob.workMode == 900)
+    {
+        if (AJob.IOEntries.find("codAtomStr") !=AJob.IOEntries.end())
+        {
+            LIBMOL::CodClassify aTool;
+            
+            
+            
+            std::ifstream    aInFile(AJob.IOEntries["codAtomStr"].c_str());
+            if (aInFile.is_open())
+            {
+                int i=0;
+                while(!aInFile.eof())
+                {
+                    std::string aRecord;
+                    std::getline(aInFile, aRecord);
+                    aRecord = LIBMOL::TrimSpaces(aRecord);
+                    std::cout << aRecord << std::endl;
+                    if (aRecord.size())
+                    {
+                        std::vector<std::string> aSetStrs;
+                        LIBMOL::StrTokenize(aRecord, aSetStrs);
+                        /*
+                        if (aSetStrs.size() ==2)
+                        {
+                            LIBMOL::BondDict aBond;
+                            
+                            for (unsigned j=0; j < aSetStrs.size(); j++)
+                            {
+                                LIBMOL::AtomDict aAtom;
+                                aAtom.id = "Test_" + LIBMOL::IntToStr(int(i));
+                                aAtom.seriNum = i;
+                                std::cout << aAtom.id << std::endl;
+                                aTool.codClassToAtom2(aSetStrs[j], aAtom);
+                                std::vector<LIBMOL::ID> tConns;
+                                LIBMOL::StrTokenize(aAtom.codNB2Symb, tConns, ':');
+                                for (int k=0; k < (int)tConns.size(); k++)
+                                {
+                                    aAtom.connAtoms.push_back(k);
+                                }
+                                aTool.allAtoms.push_back(aAtom);
+                                aBond.fullAtoms[aAtom.id] = i;
+                                aBond.atomsIdx.push_back(i);
+                                
+                                i++;
+                                
+                            }
+                            
+                            aTool.allBonds.push_back(aBond);
+                        }
+                         */
+                        if (aSetStrs.size() ==3)
+                        {
+                            LIBMOL::AngleDict aAng;
+                            for (unsigned j=0; j < aSetStrs.size(); j++)
+                            {
+                                LIBMOL::AtomDict aAtom;
+                                aAtom.id = "Test_" + LIBMOL::IntToStr(int(i));
+                                aAtom.seriNum = i;
+                                std::cout << aAtom.id << std::endl;
+                                aTool.codClassToAtom2(aSetStrs[j], aAtom);
+                                std::vector<LIBMOL::ID> tConns;
+                                LIBMOL::StrTokenize(aAtom.codNB2Symb, tConns, ':');
+                                for (int k=0; k < (int)tConns.size(); k++)
+                                {
+                                    aAtom.connAtoms.push_back(k);
+                                }
+                                aTool.allAtoms.push_back(aAtom);
+                                aAng.atoms.push_back(i);
+                                i++;
+                                
+                            }
+                            aTool.allAngles.push_back(aAng);
+                        }
+                        
+                    }
+                         
+                    
+                }
+                aInFile.close();
+                
+                std::cout << "number of angles " << aTool.allAngles.size() << std::endl;
+                std::cout << "number of atoms " << aTool.allAtoms.size() << std::endl;
+                
+                
+                if (aTool.allAtoms.size() && aTool.allAngles.size())
+                {
+                    
+                    aTool.hashingAtoms2();
+                    //aTool.setOrgBondHeadHashList2();
+                    //aTool.groupCodOrgBonds2();
+                    //aTool.setOrgAngleHeadHashList22();
+                    
+                    
+                    aTool.groupCodOrgAngles22();
+                    aTool.searchCodAngles2();
+                    
+                    /*
+                    for (std::vector<LIBMOL::BondDict>::iterator iBo=aTool.allBonds.begin();
+                            iBo !=aTool.allBonds.end(); iBo++)
+                    {
+                        aTool.searchCodOrgBonds2(iBo);
+                    }
+                     */            
+                }
+            }
+            
+        }
+    }
     
     return 0;
+    
 }
 

@@ -196,8 +196,10 @@ namespace LIBMOL
         std::vector<ID>         atomsCodClasses;
         std::vector<int>        atomsHashingCodes;
         
+        std::vector<ID>         atomsMainRep;
         std::vector<ID>         atomsNBRep;
         std::vector<ID>         atomsNB2Rep;
+        std::vector<ID>         atomsNB3Rep;
         std::vector<REAL>       codBondValues;
        
         

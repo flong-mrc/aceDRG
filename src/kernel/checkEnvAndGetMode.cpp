@@ -98,7 +98,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:S:T:")) != -1)
         {
             switch (c)
             {
@@ -199,12 +199,17 @@ namespace LIBMOL
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
+                case 'S':
+                    IOEntries["codAtomStr"] = optarg;
+                    //std::cout << "COD atom types are output to : " 
+                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    break;
                 case 'T':
                     IOEntries["TestMode"] = optarg;
                     StrLower(IOEntries["TestMode"]);
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
-                    break;
+                    break;                    
                 case '?':
                     if (std::isprint(optopt))
                     {
@@ -343,8 +348,11 @@ namespace LIBMOL
     void CheckEnvAndGetMode::SetWorkMode()
     {
         
-        
-        if ( IOEntries.find("inCifName")!=IOEntries.end())
+        if (IOEntries.find("TestMode") !=IOEntries.end())
+        {
+            workMode = 900;
+        }
+        else if ( IOEntries.find("inCifName")!=IOEntries.end())
         {
             if (!IOEntries["inCifName"].empty())
             {
@@ -471,10 +479,7 @@ namespace LIBMOL
                 }
             }
         }
-        else if (IOEntries.find("TestMode") !=IOEntries.end())
-        {
-            workMode = 900;
-        }
+        
         else
         {
             std::cout << "what is the input file ? " << std::endl;

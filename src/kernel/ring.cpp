@@ -980,7 +980,7 @@ namespace LIBMOL
     {
         // Six-member sugar ring (Pyranose)
         
-        std::cout << "Check pyranose " << std::endl; 
+        // std::cout << "Check pyranose " << std::endl; 
         std::vector<ID> rAtmIds;
         
         for (std::vector<AtomDict>::iterator iAt = tRing->atoms.begin();
@@ -1256,7 +1256,7 @@ namespace LIBMOL
                 branch1.push_back(tRing->atoms[i0].seriNum);
                 branch2.push_back(tRing->atoms[i0].seriNum);
                 
-                std::cout << "Starting atom " << tRing->atoms[i0].id << std::endl;
+                // std::cout << "Starting atom " << tRing->atoms[i0].id << std::endl;
                 
                 if (tRing->atoms[i0].connAtoms.size() ==2)
                 {
@@ -1292,8 +1292,8 @@ namespace LIBMOL
                     branch1.push_back(i1);
                     branch2.push_back(i2);
                     
-                    std::cout << "Branch 1 connected " <<   tAtoms[i1].id << std::endl;
-                    std::cout << "Branch 2 connected " <<   tAtoms[i2].id << std::endl;
+                    // std::cout << "Branch 1 connected " <<   tAtoms[i1].id << std::endl;
+                    // std::cout << "Branch 2 connected " <<   tAtoms[i2].id << std::endl;
                    
                     for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i1].begin();
                             iNext != tRing->ringAtomLink[i1].end(); iNext++)
@@ -1308,7 +1308,7 @@ namespace LIBMOL
                     if (i3 !=-1)
                     {
                         branch1.push_back(i3);
-                        std::cout << "Branch 1 connected " <<   tAtoms[i3].id << std::endl;
+                        // std::cout << "Branch 1 connected " <<   tAtoms[i3].id << std::endl;
                         for (std::vector<int>::iterator iNext=tRing->ringAtomLink[i3].begin();
                             iNext != tRing->ringAtomLink[i3].end(); iNext++)
                         {
@@ -1329,9 +1329,9 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNext = tRing->ringAtomLink[i2].begin();
                             iNext != tRing->ringAtomLink[i2].end(); iNext++)
                     {
-                        std::cout << "iPre " << tAtoms[i0].id << std::endl;
-                        std::cout << "iCen " << tAtoms[i2].id << std::endl;
-                        std::cout << "iNext " << tAtoms[*iNext].id << std::endl; 
+                        //std::cout << "iPre " << tAtoms[i0].id << std::endl;
+                        //std::cout << "iCen " << tAtoms[i2].id << std::endl;
+                        //std::cout << "iNext " << tAtoms[*iNext].id << std::endl; 
                         if (*iNext !=tRing->atoms[i0].seriNum)
                         {
                             i4 = *iNext;
@@ -1343,7 +1343,7 @@ namespace LIBMOL
                     if (i4 !=-1)
                     {
                         branch2.push_back(i4);
-                        std::cout << "Branch 2 connected " <<   tAtoms[i4].id << std::endl;
+                        //std::cout << "Branch 2 connected " <<   tAtoms[i4].id << std::endl;
                     }
                     else
                     {
@@ -1355,9 +1355,9 @@ namespace LIBMOL
                     if (i5 !=-1)
                     {
                         branch1.push_back(i5);
-                        std::cout << "Branch 1 connected " <<   tAtoms[i5].id << std::endl;
+                        // std::cout << "Branch 1 connected " <<   tAtoms[i5].id << std::endl;
                         branch2.push_back(i5);
-                        std::cout << "Branch 2 connected " <<   tAtoms[i5].id << std::endl;
+                        // std::cout << "Branch 2 connected " <<   tAtoms[i5].id << std::endl;
                     }
                 }
                 else

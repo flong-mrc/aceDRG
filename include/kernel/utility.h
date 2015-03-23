@@ -99,6 +99,7 @@ namespace LIBMOL
     // sort-related functions
     extern bool compareNoCase (std::string first, std::string second);
     extern bool compareNoCase2 (std::string first, std::string second);
+    extern bool compareNoCase3 (std::string first, std::string second);
     extern bool sortStrByLen(std::string first, std::string second);
     
     extern bool desSortMapKey(const sortMap& a ,const sortMap& b);
@@ -106,6 +107,8 @@ namespace LIBMOL
     extern bool desSortMapKey2(const sortMap2 & a ,const sortMap2 & b);
     
     extern bool desSortMapKey3(const sortMap3 & a ,const sortMap3 & b);
+    
+    extern bool sortMapkey4(const sortMap4 & a ,const sortMap4 & b);
     
     extern bool compareNoCaseClass(const sortLine & tL1, const sortLine & tL2);
     
