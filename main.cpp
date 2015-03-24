@@ -238,10 +238,9 @@ int main(int argc, char** argv) {
                         }
                         
                         
-                        aTargetSystem.setupAllTargetValuesFromCOD(tOutName.c_str(), 
+                        aTargetSystem.setupAllTargetValuesFromCOD2(tOutName.c_str(), 
                                                    AJob.IOEntries["monoRootName"],
                                                    AJob.IOEntries["libMolTabDir"]);
-                        
                         
                         
                         LIBMOL::outMMCif(tOutName.c_str(),
@@ -362,7 +361,7 @@ int main(int argc, char** argv) {
                 
                 if ( (int)aTargetSystem.allAtoms.size() > 0)
                 {   
-                    aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
+                    aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
                                                               AJob.IOEntries["monoRootName"], 
                                                               AJob.IOEntries["libMolTabDir"]);
                
@@ -421,6 +420,7 @@ int main(int argc, char** argv) {
             {
                 std::cout << "R factor satisfies the requirement" << std::endl;
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
+                aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
                 aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
             }
             else

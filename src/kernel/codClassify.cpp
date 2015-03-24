@@ -59,9 +59,11 @@ namespace LIBMOL
     }
     */
     
-    CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms):wSize(1000),
+    CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms):wSize(1000), 
                                                                   libmolTabDir("")
+                                                                  
     {
+        
         pPeriodictable = new PeriodicTable();
         
         for (std::vector<AtomDict>::const_iterator iA=tAtoms.begin();
@@ -591,8 +593,23 @@ namespace LIBMOL
                 iAt != allAtoms.end(); iAt++)
         {
             iAt->setBaseRingProps();
+            
         }
         
+        
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            std::cout << "Atom " << iAt->seriNum << " : " << std::endl
+                      << "Its ID " << iAt->id << std::endl
+                      << "Its element type " << iAt->chemType
+                      << "Its acedrg atom type " << iAt->codClass << std::endl
+                      << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
+                      << "Its ccp4 atom type " << iAt->ccp4Type 
+                      << std::endl;
+           
+            
+        }
         /*
         std::cout << "Torsion angles are : " << std::endl;
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
@@ -4572,9 +4589,11 @@ namespace LIBMOL
             
             AtomDict tAtm;
             codClassToAtom2(iAt->codClass, tAtm);
+            iAt->codAtmMain = tAtm.codAtmMain;
             iAt->codNBSymb  = tAtm.codNBSymb;
             iAt->codNB2Symb = tAtm.codNB2Symb;
             iAt->codNB3Symb = tAtm.codNB3Symb;
+            
             /*
             std::list<ID> tList1;
             
@@ -5864,7 +5883,7 @@ namespace LIBMOL
             
             int ha1, ha2;
             ID a1NB2, a2NB2, a1NB, a2NB, a1M, a2M, a1C, a2C;
-            int as0=-1, as1=-1;
+            // int as0=-1, as1=-1;
             
             if((int) allAtoms[tPair[0]].hashingValue < 
                    (int) allAtoms[tPair[1]].hashingValue )
@@ -5879,8 +5898,8 @@ namespace LIBMOL
                 a2M  = allAtoms[tPair[1]].codAtmMain;
                 a1C  = allAtoms[tPair[0]].codClass;
                 a2C  = allAtoms[tPair[1]].codClass;
-                as0 =0;
-                as1 =1;
+                //as0 =0;
+                //as1 =1;
             }
             else if ((int) allAtoms[tPair[0]].hashingValue == 
                    (int) allAtoms[tPair[1]].hashingValue)
@@ -5916,8 +5935,8 @@ namespace LIBMOL
                 a1C    = vM[0].lev4;
                 a2C    = vM[1].lev4;
                 
-                as0 =0;
-                as1 =1;
+                //as0 =0;
+                //as1 =1;
                 
                 
                 /*
@@ -5962,8 +5981,8 @@ namespace LIBMOL
                 a2M  = allAtoms[tPair[0]].codAtmMain;
                 a1C  = allAtoms[tPair[1]].codClass;
                 a2C  = allAtoms[tPair[0]].codClass;
-                as0 =1;
-                as1 =0;
+                //as0 =1;
+                //as1 =0;
             }
             
             ID tInR, tInR1("Y"), tInR2("N");
@@ -5977,7 +5996,7 @@ namespace LIBMOL
                 tInR = "N";
             }
             
-            int dLev = 0;
+            // int dLev = 0;
             
             std::cout << "for target bond of atoms " <<iB->atoms[0] << " and "
                         << iB->atoms[1] <<std::endl;
@@ -5992,7 +6011,7 @@ namespace LIBMOL
             std::cout << "ha1 " << ha1 << " ha2 " << ha2 << std::endl
                       << " a1NB2 " << a1NB2 << " a2NB2 " << a2NB2  << std::endl
                       << " a1NB "  << a1NB  << " a2NB " << a2NB << std::endl
-                      << " a1M " << a1M     << " a2M "  << std::endl
+                      << " a1M " << a1M     << " a2M "  << a2M <<  std::endl
                       << " a1C "   << a1C   << " a2C "  << a2C << std::endl;
             
             std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
@@ -6112,6 +6131,7 @@ namespace LIBMOL
                                                 iB->valueST  =iB->value;
                                                 iB->sigValue = allDictBondsIdx1D[ha1][ha2][a1NB2][a2NB2][a1NB][a2NB][tInR][a1M][a2M][0].sigValue;
                                                 iB->sigValueST =iB->sigValue;
+                                                std::cout << "iFind 8" << std::endl;
                                             }
                                             
                                         }
@@ -6123,6 +6143,7 @@ namespace LIBMOL
                                             iB->valueST  =iB->value;
                                             iB->sigValue = allDictBondsIdx1D[ha1][ha2][a1NB2][a2NB2][a1NB][a2NB][tInR][a1M][a2M][0].sigValue;
                                             iB->valueST  =iB->value;
+                                            std::cout << "iFind 7" << std::endl;
                                         }        
                                     }
                                     else   
@@ -6135,7 +6156,7 @@ namespace LIBMOL
                                         iB->sigValue     =tVaS.sigValue;
                                         iB->sigValueST   =iB->sigValue;
                                         iB->numCodValues =tVaS.numCodValues;
-                                        // std::cout << "iFind 6" << std::endl;
+                                        std::cout << "iFind 6" << std::endl;
                                     }
                                 }
                                 else  // iFind5 failed a1M .
@@ -6147,7 +6168,7 @@ namespace LIBMOL
                                     iB->sigValue     =tVaS.sigValue;
                                     iB->sigValueST   =iB->sigValue;
                                     iB->numCodValues =tVaS.numCodValues;
-                                    // std::cout << "iFind 5" << std::endl;
+                                    std::cout << "iFind 5: " << a1M << std::endl;
                                 }
                             }
                             else // iFind4 failed  a2NB
@@ -6184,7 +6205,7 @@ namespace LIBMOL
                                 std::cout << "iFind 4" << std::endl;
                             }
                         }
-                        else // iFind3 failed a1NB 
+                        else // iFind3 failed a1NB2 
                         {
                             std::vector<aValueSet> tBs3;
                                 
@@ -6281,6 +6302,7 @@ namespace LIBMOL
                         }
                         else
                         {
+                            /*
                             std::vector<BondDict> tBs6;
                             
                             for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
@@ -6327,6 +6349,38 @@ namespace LIBMOL
                         
                             dLev = 2;
                             setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
+                             */
+                            std::vector<aValueSet> tBs2;
+                                
+                            for (std::map<ID, std::map<ID, std::map<ID, 
+                                 std::map<ID, std::vector<aValueSet> > > > >::iterator iB3
+                                     =allDictBondsIdx2D[ha1][ha2][a1NB2].begin();
+                                 iB3 !=allDictBondsIdx2D[ha1][ha2][a1NB2].end();
+                                         iB3++)
+                            {
+                                for (std::map<ID, std::map<ID, std::map<ID,  
+                                     std::vector<aValueSet> > > >::iterator iB4
+                                        =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
+                                {
+                                    for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5=iB4->second.begin();
+                                        iB5 !=iB4->second.end(); iB5++)
+                                    {
+                                        for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
+                                                iB6 !=iB5->second.end(); iB6++)
+                                        {
+                                            for(std::vector<aValueSet>::iterator iB7=iB6->second.begin();
+                                                iB7 !=iB6->second.end(); iB7++)
+                                            {
+                                                tBs2.push_back(*iB7);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            aValueSet   tVaS;
+                            setValueSet(tVaS, tBs2);
+                            
                         }
                         
                         std::cout << "iFind 2" << std::endl;
@@ -8128,8 +8182,8 @@ namespace LIBMOL
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string fRoot = clibMonDir + "allOrgAngleTables/";
         // std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
-        // std::string fRoot = libmolTabDir  + "/allOrgAngleTables/";
-        std::string fRoot = "/Applications/ccp4-6.5/share/acedrg/tables_DB3/allOrgAngleTables/";
+        std::string fRoot = libmolTabDir  + "/allOrgAngleTables/";
+        // std::string fRoot = "/Applications/ccp4-6.5/share/acedrg/tables_DB3/allOrgAngleTables/";
         std::string fIdx  = fRoot + "angle_idx.table";
         std::ifstream codAngleIdxFile(fIdx.c_str());
         if (codAngleIdxFile.is_open())
@@ -11129,8 +11183,9 @@ namespace LIBMOL
                             iAN->levelCodValue = 3;
                         }
                     }
-                    else // iFind2 a2N2
+                    else // iFind2 a2NB2
                     {
+                        std::cout << "iFind2 " <<  a2NB2 << std::endl;
                         std::vector<aValueSet> tDictANs;
                                     
                         for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
@@ -11203,10 +11258,10 @@ namespace LIBMOL
                                     
 
                             aValueSet   tVaS;
-                                            
                             setValueSet(tVaS, tDictANs);
-                            if (allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues >=10 
-                                 && allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue < 5.00)
+                            
+                            if (tVaS.numCodValues >=10 
+                                 && tVaS.sigValue < 5.00)
                             {
                                 iAN->value        = tVaS.value;
                                 iAN->sigValue     = tVaS.sigValue;

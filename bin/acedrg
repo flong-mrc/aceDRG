@@ -1462,8 +1462,10 @@ class ChemCheck():
             self.getAtomElemsFromMol2(tInFileName, tAtomElems)
         else: 
             print "Could not recognize format for the input file. It should be one of cif, smiles, sdf/mol, mol2"
-            sys.exit(1)   
-        print tAtomElems         
+            sys.exit(1) 
+        print "The system contains atoms of the following elements" 
+        for aEl in tAtomElems:
+            print aEl
 
     def getAtomElemsFromMmcif(self, tInFileName, tAtomElems):
 

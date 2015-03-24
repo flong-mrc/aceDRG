@@ -219,7 +219,9 @@ namespace LIBMOL
         void outTableBAndA(FileName tBAndAFName);
         void outTables(FileName tOutName);
         
-        void execute(FileName tOutName);   
+        void execute(FileName tOutName);
+        
+        std::string                     aLibmolTabDir;
         
         std::vector<CCP4DictParas>      ccp4DictParas;
         std::vector<AtomDict>           initAtoms;
@@ -235,6 +237,7 @@ namespace LIBMOL
         
         std::map<unsigned, std::vector<int> >  moleculesInCell;
         std::map<unsigned, std::vector<int> >  moleculesInCryst;
+        
         
     private :
         
