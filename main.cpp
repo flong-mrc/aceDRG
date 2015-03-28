@@ -131,11 +131,11 @@ int main(int argc, char** argv) {
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
-                aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
+                 aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
                                                            AJob.IOEntries["monoRootName"], 
                                                            AJob.IOEntries["libMolTabDir"]);
                 
-                //aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
+                //aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                 //                                           AJob.IOEntries["monoRootName"], 
                 //                                           AJob.IOEntries["libMolTabDir"]);
                 
