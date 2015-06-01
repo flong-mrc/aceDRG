@@ -76,7 +76,7 @@ for aF in glob.glob("./inPyro/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
+        cmdL = "acedrg -c %s  -o  %s_fromMmcif -k 10 "%(aF, aFRoot) 
         print cmdL
         os.system(cmdL)
 

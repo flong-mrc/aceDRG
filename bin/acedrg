@@ -9,6 +9,7 @@
 #
 #====================================================================
 ## The date of last modification: 19/05/2015
+#
 
 import os,os.path,sys
 import glob,shutil
@@ -678,6 +679,9 @@ class Acedrg(CExeCode ):
             self.baseRoot   = "AcedrgOut"
         
 
+        if t_inputOptionsP.numConformers:
+            self.numConformers = t_inputOptionsP.numConformers
+            
       
         self.scrDir = self.outRoot + "_TMP"
         if not os.path.isdir(self.scrDir):
@@ -1232,9 +1236,6 @@ class Acedrg(CExeCode ):
         # Geometrical optimization
         if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
             if os.path.getsize(self.outRstPdbName) > 100 and os.path.getsize(self.outRstCifName) > 50:
-                print "===================================================================" 
-                print "| Geometrical Optimization                                        |"
-                print "===================================================================" 
                 stageNow = 1
                 self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
                 if os.path.isfile(self.refmacXYZOUTName):
@@ -1275,9 +1276,6 @@ class Acedrg(CExeCode ):
         # Geometrical optimization
         if os.path.isfile(tPdbIn) and os.path.isfile(tCifLibIn):
             if os.path.getsize(tPdbIn) > 100 and os.path.getsize(tCifLibIn) > 50:
-                print "===================================================================" 
-                print "| Geometrical Optimization                                        |"
-                print "===================================================================" 
                 stageNow = 1
                 self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
                 #if os.path.isfile(self.refmacXYZOUTName):
@@ -1703,6 +1701,7 @@ class Acedrg(CExeCode ):
                             print "Number of atoms in molecule %d is %d "%(idxMol+1, self.rdKit.molecules[idxMol].GetNumAtoms())
                             nConf = self.rdKit.molecules[idxMol].GetNumConformers()
                             print "Number of conformers generated for molecule %d is %d "%(idxMol+1, nConf) 
+
                             for idxConf in range(nConf): 
                                 tPdbRoot = "mol_" + str(iMol) + "_conf_" + str(idxConf+1)
                                 aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
@@ -1712,10 +1711,16 @@ class Acedrg(CExeCode ):
                                 if os.path.isfile(aConfPdb):
                                     inPdbNamesRoot[idxMol].append(tPdbRoot)
                         # Stage 2: optimization
+                        print "===================================================================" 
+                        print "| Geometrical Optimization                                        |"
+                        print "===================================================================" 
+                        
+                        aLibCifIn = self.outRstCifName 
                         for idxMol in range(len(self.rdKit.molecules)): 
                             for aFRoot in inPdbNamesRoot[idxMol]: 
                                 aPdbIn    = os.path.join(self.scrDir, aFRoot + "_init.pdb")
-                                aLibCifIn = self.outRstCifName 
+                                print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
+                                print "|%s%s|"%("Input LIB : ".ljust(12),aLibCifIn.ljust(53))
                                 self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
                                 if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
                                     self.getFinalOutputFiles(aFRoot, self.fileConv.ccp4DataDes)
@@ -2033,7 +2038,7 @@ class AcedrgRDKit():
 
         AllChem.EmbedMolecule(tMol)
         tFailure =0
-        tFailure = self.optOneConformer(tMol, tConfId, tMaxIters, tMaxMult)
+        tFailure = self.optOneConformer(tMol, tMaxIters, tMaxMult, tConfId)
        
         return tFailure
 
@@ -2049,13 +2054,12 @@ class AcedrgRDKit():
         return tFailure
 
     def optOneConformer(self, tMol, tMaxIters=1000, tMaxMult=20, tConfId=-1):
-        AllChem.EmbedMolecule(tMol)
         tFailure = 0
         tFailure=AllChem.UFFOptimizeMolecule(tMol, tMaxIters)
         if tFailure ==1:
             nFac = 2
             while tFailure ==1 and nFac < tMaxMult:
-                maxIters=nFac*nMaxIters
+                maxIters=nFac*tMaxIters
                 tFailure=AllChem.UFFOptimizeMolecule(tMol, maxIters)
                 nFac += 1
         return tFailure
@@ -2098,18 +2102,16 @@ class AcedrgRDKit():
                 self.molecules.append(aM) 
            
     def setInitConformersOneMol(self, tMol, tNConfId=1, tConfId=-1, tMaxIters=1000, tMaxMult=20):
-
             
         #  Setup conformers for the molecules
         if tNConfId == 1:
             #  One initail conformer 
-            lFailure =self.optOneConformer(tMol)
             lFailure = self.setInitGeomOneMol(tMol)
             if not lFailure:
                 # Setup chiral information associated with this conformer 
                 rdmolops.AssignAtomChiralTagsFromStructure(tMol)
-            else:
-                print "Geometry of molecule %d can not be optimized within %d circles "%(len(self.allMols), self.nMaxMult*self.nMaxIters)
+            #else:
+            #    print "Geometry of molecule %d can not be optimized within %d circles "%(len(self.allMols), self.nMaxMult*self.nMaxIters)
         elif tNConfId > 1:
             #  multiple conformers
             confIds =AllChem.EmbedMultipleConfs(tMol, tNConfId)
@@ -2117,8 +2119,8 @@ class AcedrgRDKit():
                 aFailure = self.optOneConformer(tMol, aId)
                 if not aFailure:
                     rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
-                else:
-                    print "Conformer: ", aId, " is not optimized"
+                #else:
+                #    print "Conformer: ", aId, " is not optimized"
 
         self.molecules.append(tMol) 
 
@@ -2131,17 +2133,17 @@ class AcedrgRDKit():
         # Check
 
         #print "Number of all atoms in this molecule is ", aMol.GetNumAtoms()
-        for aAtom in tMol.GetAtoms():
-            idxA  = aAtom.GetIdx()
-            elemA = aAtom.GetSymbol()
-            name  = aAtom.GetProp("Name") 
-            charge = aAtom.GetFormalCharge()
-            val    = aAtom.GetTotalValence()
-            print "For atom of index ", idxA
-            print "Its element symbol  ", elemA
-            print "Its name ", name
-            print "Its formal charge ", charge
-            print "Its total valence ", val
+        #for aAtom in tMol.GetAtoms():
+        #    idxA  = aAtom.GetIdx()
+        #    elemA = aAtom.GetSymbol()
+        #    name  = aAtom.GetProp("Name") 
+        #    charge = aAtom.GetFormalCharge()
+        #    val    = aAtom.GetTotalValence()
+        #    print "For atom of index ", idxA
+        #    print "Its element symbol  ", elemA
+        #    print "Its name ", name
+        #    print "Its formal charge ", charge
+        #    print "Its total valence ", val
 
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
@@ -2171,13 +2173,13 @@ class AcedrgRDKit():
                 print "Its element symbol  ", elemA
                 print "Its name ", name
                 print "Its formal charge ", charge
-                for i in range (len(conformers)):
-                    aConf = conformers[i]
-                    pos = aConf.GetAtomPosition(idxA)
-                    print "In conformer ", i+1, " the coordinates are:"
-                    print "X : %7.4f."%pos.x
-                    print "Y : %7.4f"%pos.y
-                    print "Z : %7.4f"%pos.z
+                #for i in range (len(conformers)):
+                #    aConf = conformers[i]
+                #    pos = aConf.GetAtomPosition(idxA)
+                #    print "In conformer ", i+1, " the coordinates are:"
+                #    print "X : %7.4f."%pos.x
+                #    print "Y : %7.4f"%pos.y
+                #    print "Z : %7.4f"%pos.z
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tMonoName="UNL", tGroupName="non-polymer", tIdxConform=-1):
 
