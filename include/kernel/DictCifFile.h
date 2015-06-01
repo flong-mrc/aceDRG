@@ -135,12 +135,14 @@ namespace LIBMOL
     
     struct DictCifHead {
         Name   libName;
+        ID     monType;
+        ID     group;
         ID     libVersion;
         Date   libUpdate;
-        DictCifHead():libName("?"), libVersion("?"),libUpdate("?")
-        {}
+        DictCifHead():libName("?"),monType(""),group(""),libVersion("?"),libUpdate("?"){}
     };
     
+    /*
     struct ChemComp {
         ID    id;
         Name  code;        // three-letter code
@@ -154,7 +156,7 @@ namespace LIBMOL
         group(NullString), numAtoms(0), numH(0), level(NullString)
         {}         
     };
-    
+    */
     class GenCifFile : public File
     {
         
@@ -317,13 +319,12 @@ namespace LIBMOL
         std::map<int, ID>                              DefaultCoordGeos;
         std::map<ID, std::map<int,ID> >                DefaultCoordGeos2;
               
-        std::vector<TorsionDict>   allTorsions;
-        std::vector<ChiralDict>    allChirals;
-        std::vector<PlaneDict>     allPlanes;
+        std::vector<TorsionDict>                 allTorsions;
+        std::vector<ChiralDict>                  allChirals;
+        std::vector<PlaneDict>                   allPlanes;
         std::map<ID, std::vector<RingDict> >     allRings;
         std::vector<RingDict>                    allRingsV;
-        // std::vector<Ring>          allRings;
-        
+        // std::vector<Ring>          allRings;    
         
         std::vector<int>           allHydroAtoms;
         
@@ -588,6 +589,7 @@ namespace LIBMOL
     
     extern void outMMCif(FileName tFName, 
                          ID tMonoRootName,
+                         ChemComp  &         tPropComp,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
                          // std::vector<int>    & tHydroAtoms,
                          std::vector<LIBMOL::BondDict>& tBonds, 

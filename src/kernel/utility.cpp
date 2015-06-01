@@ -1633,6 +1633,32 @@ namespace LIBMOL
         
     }
     
+    extern bool isOrganc(std::vector<ID> & tOrgTab, ID tID)
+    {
+        
+        
+    }
+    
+    extern void initAminoAcidTab(std::vector<ID> & tAATab)
+    {
+        ID aminoAcids [] = {"ALA", "ARG", "ASN", "ASP", "CYS",
+                            "GLN", "GLU", "GLY", "HIS", "ILE",
+                            "LEU", "LYS", "MET", "PHE", "PRO",
+                            "SER", "THR", "TRP", "TYR", "VAL"};
+        
+        tAATab.assign(aminoAcids, aminoAcids+19);
+    }
+    extern bool isAminoAcid(std::vector<ID> & tAATab, ID tID)
+    {
+        std::vector<ID>::iterator iFind = std::find(tAATab.begin(), tAATab.end(), tID);
+        if (iFind != tAATab.end())
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
     extern void initMetalTab(std::vector<ID> & tMeTab)
     {
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
@@ -1665,6 +1691,7 @@ namespace LIBMOL
         }
          */
     }
+    
     
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID)
     {

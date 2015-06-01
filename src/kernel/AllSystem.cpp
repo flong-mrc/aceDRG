@@ -104,6 +104,7 @@ namespace LIBMOL
         AddBonds(tCifObj.allBonds);
         // AddTorsions(tCifObj.allTorsions);
         AddChirals(tCifObj.allChirals);
+        AddPropComp(tCifObj.propComp);
         setSysProps();
         
     }
@@ -363,6 +364,17 @@ namespace LIBMOL
         allRingsV.push_back(tRing);
     }
     
+    void AllSystem::AddPropComp(const ChemComp& tPropComp)
+    {
+        propComp.id    = tPropComp.id;
+        propComp.code  = tPropComp.code;
+        propComp.name  = tPropComp.name;
+        propComp.group = tPropComp.group;
+        propComp.numAtoms = tPropComp.numAtoms;
+        propComp.numH     = tPropComp.numH;
+        propComp.level    = tPropComp.level;
+    }
+    
     bool AllSystem::isOrgSys()
     {
         std::vector<std::string> aOrgTab;
@@ -399,25 +411,55 @@ namespace LIBMOL
     void AllSystem::setSysProps()
     {
         // setHydroAtomConnect();
-            
+        /*
+        std::cout << std::endl << "Test protonation " << std::endl;
+        std::cout << "Before protonation, number of atoms is " << allAtoms.size() << std::endl;
+        std::cout << "They are : " << std::endl;
+        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            std::cout << iA->id << std::endl;
+        }
+        
+        std::vector<int>  addHAtmIdxs;
+        ProtonateFunctionGroupInOneMol(allAtoms, allBonds, addHAtmIdxs);
+        std::cout << "After protonation, number of atoms is " << allAtoms.size() << std::endl;
+        std::cout << "They are : " << std::endl;
+        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            std::cout << iA->id << std::endl;
+            std::cout << "with formal charge " << iA->formalCharge << std::endl;
+        }
+        
+        std::cout << "Number of bonds now is " << allBonds.size() << std::endl;
+        std::cout << "They are: " << std::endl;
+        for (std::vector<BondDict>::iterator iB=allBonds.begin();
+                iB != allBonds.end(); iB++)
+        {
+            std::cout << "Bond between atom " << iB->atoms[0]
+                      << " and atom " << iB->atoms[1] << std::endl;
+        }
+        */        
         setAtomsBondingAndChiralCenter();
-      
+        
+        //setAllAddedHAtomCoords(allAtoms, addHAtmIdxs);
+        
         setAtomsCChemType();
-   
             
         setAtomsMetalType();
         
-        setAtomsPartialCharges();
+        // setAtomsPartialCharges();
           
         setAllAngles();
            
         ringDetecting();
         
-        if (!hasCCP4Type)
-        {
+        //if (!hasCCP4Type)
+        //{
             
             setAtomsCCP4Type();
-        }
+        //}
        
         
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
@@ -524,6 +566,7 @@ namespace LIBMOL
             }
         
         }
+        
     }
     
     int AllSystem::getNumSpecAtomConnect(int idxAtm, ID tChemType)

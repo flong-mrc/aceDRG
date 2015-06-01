@@ -1177,7 +1177,6 @@ namespace LIBMOL
         if(outPDB.is_open())
         {
             // Header section
-            
             srand((unsigned)std::time( NULL ));
             outPDB.width(10);
             outPDB << std::left << "HEADER";

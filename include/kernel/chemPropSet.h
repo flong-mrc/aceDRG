@@ -122,11 +122,10 @@ namespace LIBMOL
     
     class PeriodicTable;
     
-    
     extern bool assignElementType(PeriodicTable & tP, std::string tStr,  
                                   std::vector<AtomDict>::iterator tAtom);
     
-    extern int getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,
+    extern int  getNumOxyConnect(std::vector<AtomDict>  &  tAtoms,
                                 std::vector<AtomDict>::iterator iA);
     
     extern void getHydroAtomConnect(std::vector<AtomDict>  &  tAtoms);
@@ -153,6 +152,10 @@ namespace LIBMOL
                                   std::vector<AtomDict>   & tAtoms,
                                   std::vector<BondDict>   & tBonds,
                                   PeriodicTable & tTab);
+    // The following function replaces the previous function addHAtomToMols().
+    extern void ProtonateFunctionGroupInOneMol(std::vector<AtomDict>  & tA,
+                                               std::vector<BondDict>  & tBonds,
+                                               std::vector<int>       & tAddHIdx); 
     
     extern REAL checkProtonateAll(std::vector<AtomDict>::iterator tIA, 
                                   Molecule   & tMol, 
@@ -176,23 +179,38 @@ namespace LIBMOL
                                 Molecule   & tMol,
                                 REAL tPka,           REAL tPh);
     
-    extern void checkProtonatedCarBoxylicAcids(std::vector<AtomDict>::iterator tIA,
-                                               std::vector<AtomDict> & tAtoms,
-                                               std::vector<BondDict> & tBonds,
-                                               REAL tPH=7.0);
+    // Function groups at the moment. 
+    extern void checkProtonatedCarBoxylicTerminus(std::vector<AtomDict>::iterator tIA,
+                                                  std::vector<AtomDict> & tAtoms,
+                                                  std::vector<BondDict> & tBonds,
+                                                  REAL tPH, REAL tPka,
+                                                  std::vector<int> tDoneAtoms);
     
     extern void checkProtonatedSulfuricAcids(std::vector<AtomDict>::iterator tIA,
                                            std::vector<AtomDict> & tAtoms,
                                            std::vector<BondDict> & tBonds,
-                                           REAL tPH=7.0);
-    extern void checkProtonatedNAcids(std::vector<AtomDict>::iterator tIA,
+                                           REAL tPH, std::vector<int> tDoneAtoms);
+    
+    extern void checkProtonatedAminoTerminus(std::vector<AtomDict>::iterator tIA,
                                            std::vector<AtomDict> & tAtoms,
                                            std::vector<BondDict> & tBonds,
-                                           REAL tPH=7.0);
+                                           REAL tPH, REAL tPka,
+                                           std::vector<int> tDoneAtoms);
+    
     extern void checkProtonatedPAcids(std::vector<AtomDict>::iterator tIA,
                                            std::vector<AtomDict> & tAtoms,
                                            std::vector<BondDict> & tBonds,
-                                           REAL tPH=7.0);
+                                           REAL tPH, std::vector<int> tDoneAtoms);
+    
+    // The following function overwrites addHAtoms in MolSdfFile class  
+    extern void adjustHAtoms(std::vector<AtomDict> & tAtoms,
+                          std::vector<BondDict> & tBonds,
+                          int                     tAtmIdx,
+                          int                     tAddH,
+                          std::vector<int>      & tHAtmIdxs);
+    
+    extern void setAllAddedHAtomCoords(std::vector<AtomDict> & tAtoms,
+                                       std::vector<int>      & tHAtmIdxs);
     
     // Bond order sections 
         
@@ -211,7 +229,7 @@ namespace LIBMOL
     extern REAL  getBondOrderOneAtom(std::vector<BondDict> tBonds,
                                      std::vector<AtomDict> tAtoms,
                                      int tIdx1, int tIdx2);
-    extern void setAllBondOrders(std::vector<AtomDict> & tAtoms,
+    extern void  setAllBondOrders(std::vector<AtomDict> & tAtoms,
                                  std::vector<BondDict> & tBonds);
     
     extern void  setOneHAtomCoords();

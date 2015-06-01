@@ -739,17 +739,22 @@ namespace LIBMOL
                                   std::vector<AtomDict>::iterator tIA)
     {
         REAL tVal = 0.0;
+        //std::cout << "see atom " << tIA->id << std::endl;
+        
+        //std::cout << "It connected " << tIA->connAtoms.size() << " atoms " << std::endl;
+        
         for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
                     iNB !=tIA->connAtoms.end(); iNB++)
         {  
+            //std::cout << "connected atom " << *iNB << std::endl;
             REAL aOrd = getBondOrder(tBonds, tIA->seriNum, *iNB);
             //std::cout << "bond order between atom " << tIA->seriNum+1 
-            //          << " and " << tMol.atoms[*iNB].seriNum+1
+            //          << " and " << tAtoms[*iNB].seriNum+1
             //          << " is " << aOrd << std::endl;
             if (aOrd >0)
             {
                 tVal +=aOrd;
-                // std::cout << "total order now " << tVal << std::endl;
+                //std::cout << "total order now " << tVal << std::endl;
             }
             else
             {
@@ -870,7 +875,7 @@ namespace LIBMOL
                                       std::vector<AtomDict>::iterator tIA)
     {   
         
-        //std::cout << "set H atom " << tIA->id  << " coords " << std::endl;
+        std::cout << "set H atom " << tIA->id  << " coords " << std::endl;
         
         TransCoords   aTransTool;
         
@@ -1200,117 +1205,157 @@ namespace LIBMOL
     
     // New section for Protonated - de-protonated forms of functional groups
     
-    extern void checkProtonatedCarBoxylicAcids(std::vector<AtomDict>::iterator tIA,
+    extern void checkProtonatedCarBoxylicTerminus(std::vector<AtomDict>::iterator tIA,
                                                std::vector<AtomDict> & tAtoms,
                                                std::vector<BondDict> & tBonds,
-                                               REAL tPH)
+                                               REAL tPh, REAL tPka, 
+                                               std::vector<int> tDoneAtomsIdx)
     {
-        if (tIA->chemType=="C")
+        
+        // This is for Carboxy-Terminus
+        
+        if (tIA->connAtoms.size() == 3)
         {
+            //tDoneAtomsIdx.push_back(tIA->seriNum);
+            // (1) Check if it is a carboxylic acid 
+            std::vector<int> tAtIdx;   // remember which atoms are done
+            
             std::map<int, int> Oxys, Others;    // key: serial number, value: number of connection 
+            std::vector<int> doubleOs, singleOs;
+            tAtIdx.push_back(tIA->seriNum);
             for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
                    iNB !=tIA->connAtoms.end(); iNB++)
             {
                 if (tAtoms[*iNB].chemType =="O")
                 {
-                    Oxys[*iNB] = tAtoms[*iNB].connAtoms.size();
+                    
+                    int nS = (int)tAtoms[*iNB].connAtoms.size();
+                    Oxys[*iNB]   = nS;
+                    if (nS==2)
+                    {
+                        doubleOs.push_back(*iNB);
+                    }
+                    else if (nS==1)
+                    {
+                        singleOs.push_back(*iNB);
+                    }
                 }
-                else
+                else 
                 {
                     Others[*iNB] = tAtoms[*iNB].connAtoms.size();
                 }
-                    
-                // Now check possible de-protonated form:
-                // Required: C connects to two O and one other atom
-                if (Oxys.size() ==2 && Others.size()==1)
+                tAtIdx.push_back(*iNB);
+            }
+             
+            if (doubleOs.size() !=0)
+            {
+                for (std::vector<int>::iterator iOa=doubleOs.begin();
+                        iOa !=doubleOs.end(); iOa++)
                 {
-                    REAL tPKa = 4.0;
-                    
-                    bool tOD=true;
-                    bool lDeloc =false;
-                    for (std::map<int, int>::iterator iNo=Oxys.begin();
-                            iNo !=Oxys.end(); iNo++)
+                    for (std::vector<int>::iterator iOb=tAtoms[*iOa].connAtoms.begin();
+                            iOb!=tAtoms[*iOa].connAtoms.end(); iOb++)
                     {
-                        // Further check Oxygen atoms connect only to C
-                        if (iNo->second !=1)
+                        if (*iOb !=tIA->seriNum)
                         {
-                            tOD = false;
-                            break;
+                            tAtIdx.push_back(*iOb);
                         }
-                        else
+                    }
+                }
+            }
+                
+            // Possible carboxylic acid Requirement:
+            // C connects to two O and one other atom
+            if (Oxys.size() ==2 && Others.size()==1)
+            {
+                std::cout << "It is a possible c-Ter " << std::endl;
+                std::cout << "It connects  " << doubleOs.size() << " O atoms of double linked " << std::endl;
+                std::cout << "It connects  " << singleOs.size() << " O atoms of single linked " << std::endl;
+                // (2) Further check if it is a terminus
+                // Two O atoms must connected with either one atom 
+                // or two atoms with one atom is a H atom 
+                bool isTer = true;
+                
+                if((doubleOs.size()==1 && singleOs.size()==1)
+                   || singleOs.size()==2)
+                {
+                    if (doubleOs.size()==1)
+                    {
+                        std::cout << "O atom " << tAtoms[doubleOs[0]].id << std::endl;
+                        for (unsigned iOc=0; iOc < tAtoms[doubleOs[0]].connAtoms.size(); 
+                             iOc++)
                         {
-                            int aBIdx=getBond(tBonds, tIA->seriNum, iNo->first);
-                            if (aBIdx !=-1)
+                            
+                            if (tAtoms[tAtoms[doubleOs[0]].connAtoms[iOc]].seriNum !=tIA->seriNum)
                             {
-                                if (tBonds[aBIdx].order.substr(0,4).compare("deloc")==0)
+                                // Not carbon atom itself
+                                std::cout << "atom " << tAtoms[tAtoms[doubleOs[0]].connAtoms[iOc]].id << std::endl;
+                                if(tAtoms[tAtoms[doubleOs[0]].connAtoms[iOc]].chemType !="H")
                                 {
-                                    lDeloc = true;
+                                    // Not H atom either, then not terminus 
+                                    isTer = false;
                                     break;
                                 }
                             }
                         }
                     }
-                    
-                    std::map<int, int>::iterator iOther= Others.begin();
-                    if(tAtoms[iOther->first].connAtoms.size()==1)
+                }
+                else
+                {
+                    isTer = false;
+                }
+                
+                
+                if (isTer)
+                {
+                    // It is a C-terminus 
+                    std::cout << "It is a C-ter " << std::endl;
+                    // Default values: tPH = 7.0 tPka =4.0 (3-5) 
+                    if (tPh > tPka) 
                     {
-                        tOD=false;
-                    }
                         
-                    if (tOD)
-                    {
-                        if (lDeloc || (tPH > tPKa))
+                        // In this case, de-protonation should happen 
+                        if (doubleOs.size()==1 && singleOs.size()==1)
                         {
-                            // If no pKa and PH values are given.
-                            // we take the default action, by 
-                            // assuming tPKa between 3-5 and tPH =7
-                            
-                        
-                            unsigned i=0;
-                            for (std::map<int, int>::iterator iNo=Oxys.begin();
-                                iNo !=Oxys.end(); iNo++)
+                            // de-protonate the double connected O atom
+                            int idxH =-1;
+                            int posH =-1;
+                            for (unsigned iOc=0; iOc !=tAtoms[doubleOs[0]].connAtoms.size();
+                                 iOc++)
                             {
-                                if (i==0)
+                                if (tAtoms[tAtoms[doubleOs[0]].connAtoms[iOc]].chemType=="H")
                                 {
-                                    // change this one to a double bond O atom
-                                    int aBIdx=getBond(tBonds, tIA->seriNum, iNo->first);
-                                    if (aBIdx !=-1)
-                                    {
-                                        tBonds[aBIdx].order="2";
-                                    }
-                                    else
-                                    {
-                                        std::cout << "Can not find the bond between atom "
-                                                  << tIA->id << " and " << tAtoms[iNo->first].id
-                                                  << std::endl;
-                                        exit(1);
-                                    }
+                                    idxH = tAtoms[doubleOs[0]].connAtoms[iOc];
+                                    posH = iOc;
+                                    break;
                                 }
-                                else if (i==1)
-                                {
-                                    // add a charge to this O atoms and set it as single bond.
-                                    tAtoms[iNo->first].formalCharge = -1.0;
-                                    int aBIdx=getBond(tBonds, tIA->seriNum, iNo->first);
-                                    if (aBIdx !=-1)
-                                    {
-                                        tBonds[aBIdx].order="1";
-                                    }
-                                    else
-                                    {
-                                        std::cout << "Can not find the bond between atom "
-                                                  << tIA->id << " and " << tAtoms[iNo->first].id
-                                                  << std::endl;
-                                        exit(1);
-                                    }
-                                }
-                                i++;
                             }
-                        }    
+                            
+                            if (idxH !=-1)
+                            {
+                                
+                                // erase H atom and set formal charge on O to -1.0
+                                ID aH =tAtoms[idxH].id;
+                                tAtoms.erase(tAtoms.begin() + idxH);
+                                std::cout << "Atom " << aH << " is deleted " << std::endl;
+                                tAtoms[doubleOs[0]].formalCharge = -1.0;
+                                tAtoms[doubleOs[0]].connAtoms.erase(tAtoms[doubleOs[0]].connAtoms.begin()+posH);
+                                
+                                // delete the bond between O and H
+                                int aBIdx=getBond(tBonds, doubleOs[0], idxH);
+                                if (aBIdx != -1)
+                                {
+                                    tBonds.erase(tBonds.begin() + aBIdx);
+                                }
+                            }
+                        }  
                     }
-                    
+                }
+                for (std::vector<int>::iterator iDone = tAtIdx.begin();
+                        iDone != tAtIdx.end(); iDone++)
+                {
+                    tDoneAtomsIdx.push_back(*iDone);
                 }
             }
-            
         }
     }
     
@@ -1318,7 +1363,7 @@ namespace LIBMOL
     extern void checkProtonatedSulfuricAcids(std::vector<AtomDict>::iterator tIA,
                                                std::vector<AtomDict> & tAtoms,
                                                std::vector<BondDict> & tBonds,
-                                               REAL tPH)
+                                               REAL tPH, std::vector<int> tDoneAtomsIdx)
     {
         // According to the empirical rules  from the examples (see the note,
         // assuming default pH value 7.0, pka value varies depending on connection)
@@ -1327,18 +1372,21 @@ namespace LIBMOL
         // (2) if S atom connects 3 atoms one of which is double bonded. 
         //     do nothing at the moment.
         // (3) if S atom connects to 4 atoms. Situation varies 
-        
+        tDoneAtomsIdx.push_back(tIA->seriNum);
         REAL tPKa;
         if (tIA->connAtoms.size()==2)
         {
             //De-protonated only when a user gives a very high PH value.
             tPKa = 10.0;
+            
             if (tPH > tPKa)
             {
                 
                 for (std::vector<int>::iterator iNA=tIA->connAtoms.begin();
                         iNA !=tIA->connAtoms.end(); iNA++)
                 {
+                    
+                    tDoneAtomsIdx.push_back(*iNA);
                     if (tAtoms[*iNA].chemType !="H")
                     {
                         tAtoms[*iNA].formalCharge = -1.0;
@@ -1353,6 +1401,8 @@ namespace LIBMOL
             for (std::vector<int>::iterator iOB=tIA->connAtoms.begin();
                     iOB !=tIA->connAtoms.end(); iOB++)
             {
+                
+                tDoneAtomsIdx.push_back(*iOB);
                 if (tAtoms[*iOB].chemType=="O")
                 {
                     Oxys.push_back(*iOB);
@@ -1380,45 +1430,54 @@ namespace LIBMOL
         }
     }
     
-    extern void checkProtonatedNAcids(std::vector<AtomDict>::iterator tIA,
+    extern void checkProtonatedAminoTerminus(std::vector<AtomDict>::iterator tIA,
                                       std::vector<AtomDict> & tAtoms,
                                       std::vector<BondDict> & tBonds,
-                                      REAL tPH)
+                                      REAL tPH, REAL tPka,
+                                      std::vector<int> tDoneAtomsIdx)
     {
-        if (tIA->connAtoms.size()==2)
+        
+        tDoneAtomsIdx.push_back(tIA->seriNum);
+       
+        if (tIA->connAtoms.size() ==3)
         {
-            // Make sure the formal charge of N atom is 0.0 so that
-            // later on a H atom will added (protonation)
-            tIA->formalCharge = 0.0;
-        }
-        else if (tIA->connAtoms.size() ==3)
-        {
-            std::vector<int> bondOtherSingle;
+            std::cout << "It is a possible N-ter " << std::endl;
+            
+            std::vector<int> tAtIdx;   // remember which atoms are done
+            tAtIdx.push_back(tIA->seriNum);
+            
+            std::vector<int> Hs, others;
             for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
                     iNB !=tIA->connAtoms.end(); iNB++)
-            {
-                std::string tStr;
-                int aIdxB=getBond(tBonds, tIA->seriNum, *iNB);
-                if (aIdxB !=-1)
+            {               
+                if (tAtoms[*iNB].chemType == "H")
                 {
-                    tStr.append(tBonds[aIdxB].order);
-                    StrUpper(tStr);
-                    if (tStr.compare("1")==0) 
-                    {
-                        bondOtherSingle.push_back(aIdxB);
-                    }
-                    else if (tStr.size() >=4)
-                    {
-                        if (tStr.substr(0,4).compare("SING")==0)
-                        {
-                            bondOtherSingle.push_back(aIdxB);
-                        }
-                    }
+                    Hs.push_back(*iNB);
                 }
-                
-                if (bondOtherSingle.size()==3)
+                else
+                {
+                    others.push_back(*iNB);
+                }
+                tAtIdx.push_back(*iNB);
+            }
+            std::cout << "It connects to " << Hs.size() << " H atoms " << std::endl
+                      << " and " << others.size() << " other atoms " << std::endl;
+            
+            if (Hs.size()==2 && others.size()==1)
+            {
+                // It is Amino-Terminus
+                if (tPH < tPka)
                 {
                     tIA->formalCharge =1.0;
+                    std::cout << "Atom " << tIA->id 
+                              << " has formal charge " << tIA->formalCharge 
+                              << std::endl;
+                            
+                    for (std::vector<int>::iterator iDone=tAtIdx.begin();
+                           iDone !=tAtIdx.end(); iDone++)
+                    {
+                        tDoneAtomsIdx.push_back(*iDone);
+                    }
                 }
             }
         }
@@ -1427,15 +1486,21 @@ namespace LIBMOL
     extern void checkProtonatedPAcids(std::vector<AtomDict>::iterator tIA,
                                       std::vector<AtomDict> & tAtoms,
                                       std::vector<BondDict> & tBonds,
-                                      REAL tPH)
+                                      REAL tPH, std::vector<int> tDoneAtomsIdx)
     {
         if (tIA->connAtoms.size()==4)
         {
+            
+            tDoneAtomsIdx.push_back(tIA->seriNum);
+            
             std::vector<int> Oxys, OxysS, bondOs, bondOtherSingle;
             
             for (std::vector<int>::iterator iOB=tIA->connAtoms.begin();
                     iOB!=tIA->connAtoms.end(); iOB++)
             {
+                
+                tDoneAtomsIdx.push_back(*iOB);
+                
                 std::string tStr;
                 int aIdxB=getBond(tBonds, tIA->seriNum, *iOB);
                 if (aIdxB !=-1)
@@ -1486,10 +1551,12 @@ namespace LIBMOL
             }
             else if (Oxys.size()==2 && OxysS.size()==1 && bondOtherSingle.size()==2)
             {
+                
                 // PO2 with one single O bond and one double O bond
                 // the user assigned the valence correctly, just
                 // make sure the formal charges are right.
                 tAtoms[OxysS[0]].formalCharge=-1.0;
+                
             }
             else if (Oxys.size()==3 && OxysS.size()==3 && bondOtherSingle.size()==1)
             {
@@ -1527,6 +1594,242 @@ namespace LIBMOL
         }
         
     }
+    
+    // The following function replaces the previous function addHAtomToMols().
+    extern void ProtonateFunctionGroupInOneMol(std::vector<AtomDict>  & tAtoms,
+                                               std::vector<BondDict>  & tBonds, 
+                                               std::vector<int>       & tAddHIdx)
+    {
+        
+        
+        REAL PH=7.0;
+        
+        std::vector<int> doneAtomList;
+        
+        std::vector<std::string> orgElems;
+        orgElems.push_back("C");
+        orgElems.push_back("N");
+        orgElems.push_back("S");
+        orgElems.push_back("P");
+        
+        
+        PeriodicTable aPTab;
+        
+        // Correct the formal charges for all atoms in the molecule.
+        
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            
+            if (std::find(orgElems.begin(), orgElems.end(), iA->chemType)
+                 !=orgElems.end() 
+                 && std::find(doneAtomList.begin(), doneAtomList.end(), iA->seriNum) 
+                    ==doneAtomList.end())
+            {
+                // need to check protonated form
+                if (iA->chemType =="C")
+                {
+                    REAL aPka = 4.0;
+                    std::cout << "Get a C atom " << iA->id << std::endl;
+                    checkProtonatedCarBoxylicTerminus(iA, tAtoms, tBonds, PH, aPka, doneAtomList);         
+                }
+                else if (iA->chemType =="N")
+                {
+                    REAL aPka = 10.0;
+                    std::cout << "Get a N atom " << iA->id << std::endl;
+                    checkProtonatedAminoTerminus(iA, tAtoms, tBonds, PH, aPka, doneAtomList);
+                }   
+                else if (iA->chemType =="S")
+                {
+                    checkProtonatedSulfuricAcids(iA, tAtoms, tBonds, PH, doneAtomList);
+                }   
+                else if (iA->chemType =="P")
+                {
+                    checkProtonatedPAcids(iA, tAtoms, tBonds, PH, doneAtomList);
+                }  
+                
+            }
+        }
+        
+        
+        // Now add H atoms based on previous calculations
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            std::cout << "atom " << iA->id << std::endl;
+            if (iA->chemType !="H")
+            {
+                int addH =(int)checkProtonateAll(iA, tAtoms, tBonds,  aPTab);
+                std::cout << "Here 1" << std::endl;
+                // REAL addH =checkProtonated(iA, tIdxMol);
+                if (addH != 0)
+                {
+                    adjustHAtoms(tAtoms, tBonds, iA->seriNum, addH, tAddHIdx);
+                }
+                std::cout << "Here 2 " << std::endl;
+            }
+        } 
+        
+        std::cout << "Here 3" << std::endl;
+        
+        exit(1);
+         
+    }
+    
+    // The following function overwrites addHAtoms in MolSdfFile class.
+    // Add or delete H atoms 
+    extern void adjustHAtoms(std::vector<AtomDict> & tAtoms,
+                             std::vector<BondDict> & tBonds,
+                             int                     tIdxAtm,
+                             int                     tAddH,
+                             std::vector<int>      & tHAtmIdxs)
+    {
+        // For setup H atom's name. How many H atoms it already connects
+        
+        int nH=0;
+        std::vector<int> Hs;   // index of H atoms already connected. For deprotonized mainly
+        
+        for (std::vector<int>::iterator iH=tAtoms[tIdxAtm].connAtoms.begin();
+                iH !=tAtoms[tIdxAtm].connAtoms.end(); iH++)
+        {
+            if (tAtoms[*iH].chemType =="H")
+            {
+                Hs.push_back(tAtoms[*iH].seriNum);
+                nH++;
+            }
+        }
+        
+        std::string tS;
+        getDigitSec(tAtoms[tIdxAtm].id, tS);
+        
+        if (tAddH > 0)
+        {
+            int j= 1;
+            for (int i=0; i < (int)tAddH; i++)
+            {
+                AtomDict aH;
+                aH.chemType = "H";
+            
+                if (tAtoms[tIdxAtm].chemType=="C")
+                {
+                    aH.id  = aH.chemType + tS + IntToStr(i+1);
+                }
+                else
+                {
+                    if ((nH+j)==1)
+                    {
+                        aH.id  = aH.chemType + tAtoms[tIdxAtm].id;
+                    }
+                    else
+                    {
+                        aH.id  = aH.chemType + tAtoms[tIdxAtm].id +  IntToStr(nH+j);
+                    }
+                }
+                
+                aH.seriNum =  (int)tAtoms.size();
+                aH.connAtoms.push_back(tAtoms[tIdxAtm].seriNum);
+                tAtoms[tIdxAtm].connAtoms.push_back(aH.seriNum);
+                tAtoms[tIdxAtm].connHAtoms.push_back(aH.seriNum);
+                tHAtmIdxs.push_back((int)tAtoms.size());
+                tAtoms.push_back(aH);
+                
+                BondDict   aB;
+                aB.seriNum = (int)tBonds.size();
+                aB.order   = "single";
+                aB.orderN  = 1.0;
+                aB.atoms.push_back(tAtoms[tIdxAtm].id);
+                aB.atoms.push_back(aH.id);
+                aB.atomsIdx.push_back(tAtoms[tIdxAtm].seriNum);
+                aB.atomsIdx.push_back(aH.seriNum);
+                aB.fullAtoms[aH.id] = aH.seriNum;
+                aB.fullAtoms[tAtoms[tIdxAtm].id] = tIdxAtm;
+                tBonds.push_back(aB);
+                
+            }
+        }
+        else if (tAddH <0)
+        {
+            for (unsigned i=0; i < abs(tAddH); i++)
+            {
+                if (i < Hs.size())
+                {
+                    // Delete that H atom
+                    tAtoms.erase(tAtoms.begin()+Hs[i]);
+                    std::cout << "H atom " << tAtoms[Hs[i]].id 
+                              << " has been deleted " << std::endl;
+                }
+                else
+                {
+                    std::cout << "Bug in de-protonation: not enough H atoms to remove " 
+                              << std::endl;
+                    break;
+                }
+                
+                // delete the bond associated with that H atom
+                int aHB=getBond(tBonds, tAtoms[tIdxAtm].seriNum, Hs[i]);
+                if (aHB !=-1)
+                {
+                    tBonds.erase(tBonds.begin()+aHB);
+                    std::cout << "Bond of atom " << tAtoms[tIdxAtm].id 
+                              << " and H atom " <<  tAtoms[Hs[i]].id 
+                              << " has been deleted " << std::endl;
+                }
+                else
+                {
+                    std::cout << "Bug: there is no bond between atom " 
+                              << tAtoms[tIdxAtm].id 
+                              << " and H atom " <<  tAtoms[Hs[i]].id << std::endl;
+                }
+            }
+        }     
+        
+        
+        
+    }
+    
+    extern void setAllAddedHAtomCoords(std::vector<AtomDict> & tAtoms,
+                                       std::vector<int>      & tHAtmIdxs)
+    {
+        
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            if (std::find(tHAtmIdxs.begin(), tHAtmIdxs.end(), iA->seriNum) !=tHAtmIdxs.end())
+            {
+                if (iA->connAtoms.size() ==1 )
+                {
+                    if (tAtoms[iA->connAtoms[0]].bondingIdx==3)
+                    {
+                        
+                        setOneHAtomCoordsSP3(tAtoms, iA);
+                    }
+                    else if (tAtoms[iA->connAtoms[0]].bondingIdx==2)
+                    {
+                        setOneHAtomCoordsSP2(tAtoms, iA);
+                    }
+                    else if (tAtoms[iA->connAtoms[0]].bondingIdx==1)
+                    {
+                        setOneHAtomCoordsSP(tAtoms, iA);
+                    }
+                    else
+                    {
+                        std::cout << "The bondingIdx for atom " 
+                                  <<  tAtoms[iA->connAtoms[0]].id
+                                  << " is " << tAtoms[iA->connAtoms[0]].bondingIdx
+                                  << std::endl;
+                    }
+                }
+                else
+                {
+                    std::cout << "Bug. H atom " << iA->id << " connects to "
+                              << iA->connAtoms.size() << " atom(s)" << std::endl;
+                    exit(1);
+                }
+            }
+        }
+    }
+    
+    
     
     
     void extern setAromPlanes(std::vector<AtomDict>  & tAtoms,

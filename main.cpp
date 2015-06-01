@@ -127,13 +127,14 @@ int main(int argc, char** argv) {
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
                                            
             
+            
             LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
                  aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
-                                                           AJob.IOEntries["monoRootName"], 
-                                                           AJob.IOEntries["libMolTabDir"]);
+                                                            AJob.IOEntries["monoRootName"], 
+                                                            AJob.IOEntries["libMolTabDir"]);
                 
                 //aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
                 //                                           AJob.IOEntries["monoRootName"], 
@@ -141,6 +142,7 @@ int main(int argc, char** argv) {
                 
                 LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                  AJob.IOEntries["monoRootName"], 
+                                 aTargetSystem.propComp,
                                  aTargetSystem.allAtoms,
                                  // aTargetSystem.allHAtomIdx,
                                  aTargetSystem.allBonds,
@@ -245,6 +247,7 @@ int main(int argc, char** argv) {
                         
                         LIBMOL::outMMCif(tOutName.c_str(),
                                                  AJob.IOEntries["monoRootName"], 
+                                                 aTargetSystem.propComp,
                                                  aTargetSystem.allAtoms,
                                                  // aTargetSystem.allHAtomIdx,
                                                  aTargetSystem.allBonds,
@@ -359,6 +362,20 @@ int main(int argc, char** argv) {
             {
                 LIBMOL::AllSystem   aTargetSystem(dataFromMol2, AJob.IOEntries["libMolTabDir"]);
                 
+                LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
+                                     AJob.IOEntries["monoRootName"], 
+                                     aTargetSystem.propComp,
+                                     aTargetSystem.allAtoms,
+                                     // aTargetSystem.allHAtomIdx,
+                                     aTargetSystem.allBonds,
+                                     aTargetSystem.allAngles,
+                                     aTargetSystem.allTorsions,
+                                     aTargetSystem.allRings,
+                                     aTargetSystem.allPlanes,
+                                     aTargetSystem.allChirals);
+                
+                
+                /*
                 if ( (int)aTargetSystem.allAtoms.size() > 0)
                 {   
                     aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
@@ -367,6 +384,7 @@ int main(int argc, char** argv) {
                
                     LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                      AJob.IOEntries["monoRootName"], 
+                                     aTargetSystem.propComp,
                                      aTargetSystem.allAtoms,
                                      // aTargetSystem.allHAtomIdx,
                                      aTargetSystem.allBonds,
@@ -385,7 +403,9 @@ int main(int argc, char** argv) {
                     std::cout << "The input MOl2 file " << AJob.IOEntries["inCifName"] 
                               << " contains NO atoms! check the file " << std::endl;
                 }
+                */
             }
+                 
         }
     }
     else if (AJob.workMode == 21 || AJob.workMode == 22 )

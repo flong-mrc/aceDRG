@@ -189,6 +189,7 @@ namespace LIBMOL
         void AddPlane(const PlaneDict                     & tPlane);
         void AddRings(const std::map<ID, std::vector<RingDict> > & tAllRings);
         void AddRing(const RingDict                              & tRing);
+        void AddPropComp(const ChemComp & tPropComp);
         
         void resetSystem(CodClassify & tCodSys);
         void resetSystem2(CodClassify & tCodSys);
@@ -310,6 +311,8 @@ namespace LIBMOL
         bool                                     usingInChiral;
         std::string                              libmolTabDir;
         
+        ChemComp                                 propComp;
+        
         std::vector<AtomDict>                    allAtoms;
         std::vector<int>                         allHAtomIdx;      //repeated ones
         std::vector<int>                         allHydroAtoms;
@@ -330,6 +333,8 @@ namespace LIBMOL
         std::map<ID, std::map<int,ID> >          DefaultCoordGeos2;
         
         std::vector<AtomDict>                    allDummyAtoms;
+        
+        
         
     private:
         

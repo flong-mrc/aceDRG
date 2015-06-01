@@ -1434,7 +1434,9 @@ namespace LIBMOL
                     break;
                 }
             }
+            
             bonds.push_back(aBond);
+            
             // check 
             std::cout << "A bond line " << tLine << std::endl;
             std::cout << "A bond is added. Its seriNum " 
@@ -2097,6 +2099,9 @@ namespace LIBMOL
             }
         }
     }
+    
+    
+    
     
     
 }

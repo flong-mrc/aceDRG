@@ -250,8 +250,11 @@ namespace LIBMOL
     
     // Chemical properties related functions 
     extern void initOrgTable(std::vector<std::string> & tOrgTab);
+    extern bool isOrganc(std::vector<ID> & tOrgTab, ID tID);
     extern void initMetalTab(std::vector<ID> & tMeTab);
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID);
+    extern void initAminoAcidTab(std::vector<ID> & tAATab);
+    extern bool isAminoAcid(std::vector<ID> & tAATab, ID tID);
     extern void fromIdToChemType(ID tId, ID & tChemType);
     extern REAL StrToOrder(std::string  & tStrOrder);
     extern REAL StrToOrder2(std::string  & tStrOrder);   // used for mol2 files, replace StrToOrder(std::string  & tStrOrder) later

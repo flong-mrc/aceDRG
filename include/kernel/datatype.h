@@ -116,6 +116,19 @@ public:
     std::string line;
 };
 
+struct ChemComp {
+        ID    id;
+        Name  code;        // three-letter code
+        Name  name;
+        Name  group;       // non-polymer, peptide or DNA etc.
+        int   numAtoms;   
+        int   numH;
+        ID    level;
+        
+        ChemComp():id(NullString), code(NullString), name(NullString),
+        group(NullString), numAtoms(0), numH(0), level(NullString)
+        {}         
+    };
 }
 
 #endif /* TYPE_H_ */

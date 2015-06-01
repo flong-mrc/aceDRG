@@ -114,7 +114,6 @@ namespace LIBMOL
     void GenCifFile::setupSystem()
     {   
         
-        
         if (inFile.is_open() )
         { 
             std::vector<std::vector<std::string> > tBlocs;
@@ -2190,6 +2189,7 @@ namespace LIBMOL
         allCifKeys["dataDesc"].push_back("id");
         allCifKeys["dataDesc"].push_back("name");
         allCifKeys["dataDesc"].push_back("type");
+        allCifKeys["dataDesc"].push_back("group");
         allCifKeys["dataDesc"].push_back("pdbx_type");
         allCifKeys["dataDesc"].push_back("formula");
         allCifKeys["dataDesc"].push_back("mon_nstd_parent_comp_id");
@@ -2368,6 +2368,18 @@ namespace LIBMOL
             }
             
             inFile.close();
+            
+            
+            std::cout << "The following is the property of the system in the input cif: "
+                      << std::endl;
+            
+            std::cout << "The system ID " << propComp.id << std::endl;
+            std::cout << "The system three-letter code " << propComp.code << std::endl;
+            std::cout << "The system name  "  << propComp.name  << std::endl;
+            std::cout << "The system group " << propComp.group << std::endl;
+            std::cout << "Number of atoms in the system  " << propComp.numAtoms << std::endl;
+            std::cout << "Number of H atoms in the system " << propComp.numH << std::endl;
+            std::cout << "The system description level " << propComp.level << std::endl;
             
             // Set the bonding properties for all atoms based
             // on their connections
@@ -2594,7 +2606,8 @@ namespace LIBMOL
                     //std::cout<< "Setup flag head " <<std::endl;
                     setFlags(tL, "head");
                 }
-                else if (TrimSpaces(tF[0]).find("_chem_comp.") 
+                else if (! tL["compList"] && 
+                         TrimSpaces(tF[0]).find("_chem_comp.") 
                          !=std::string::npos)
                 {
                     //std::cout << "setup compound info " << std::endl;
@@ -2684,23 +2697,27 @@ namespace LIBMOL
         {
            // std::cout << tF[0] << "  " << tF[1] << std::endl;
            
-           if(tF[0].find("_name") !=std::string::npos)
+           if(tF[0].find(".name") !=std::string::npos)
            {
                dictCifHead.libName = TrimSpaces(tF[1]);
            }
-           else if (tF[0].find("_version") !=std::string::npos)
+           else if (tF[0].find(".version") !=std::string::npos)
            {
                dictCifHead.libVersion = TrimSpaces(tF[1]);
            }
-           else if (tF[0].find("_update") !=std::string::npos)
+           else if (tF[0].find(".type") !=std::string::npos)
+           {
+               dictCifHead.monType = TrimSpaces(tF[1]);
+           }
+           else if (tF[0].find(".group") !=std::string::npos)
+           {
+               dictCifHead.group = TrimSpaces(tF[1]);
+           }
+           else if (tF[0].find(".update") !=std::string::npos)
            {
                dictCifHead.libUpdate = TrimSpaces(tF[1]);
            }
         }
-        
-        //std::cout << "dictCifHead.libName: " <<  dictCifHead.libName << std::endl;
-        //std::cout << "dictCifHead.libUpdate: " <<  dictCifHead.libUpdate << std::endl;
-        //std::cout << "dictCifHead.libVersion: " <<  dictCifHead.libVersion << std::endl;
     }
     
     void DictCifFile::getChemInfo(std::string tRe)
@@ -2726,7 +2743,6 @@ namespace LIBMOL
                     else if(tF1[1].find("three_letter_code") !=std::string::npos)
                     {
                         hasProps["compoundInfo"].insert(std::pair<std::string, int>("three_letter_code",curBlockLine));
-                       
                         curBlockLine++;
                     }
                     else if(tF1[1].find("name") !=std::string::npos)
@@ -2758,7 +2774,10 @@ namespace LIBMOL
                 }
             }
             
+            
+            
             tF.clear();
+            
             
             tF = StrTokenize(tRe, '\'');       
             
@@ -2776,7 +2795,7 @@ namespace LIBMOL
                 {
                     tF4.push_back(*iS);
                 }
-                tF4.push_back(tF[1]);
+                tF4.push_back("\'"+ tF[1] + "\'");
                 for(std::vector<std::string>::iterator iS=tF2.begin();
                         iS != tF2.end(); iS++)
                 {
@@ -2791,22 +2810,22 @@ namespace LIBMOL
                     if (hasProps["compoundInfo"].find("id") != hasProps["compoundInfo"].end())
                     {
                         propComp.id   = TrimSpaces(tF4[hasProps["compoundInfo"]["id"]]);
-                        //std::cout << "Compound ID " << propComp.id  << std::endl;
+                        std::cout << "Compound ID " << propComp.id  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("three_letter_code") != hasProps["compoundInfo"].end())
                     {
                         propComp.code = TrimSpaces(tF4[hasProps["compoundInfo"]["three_letter_code"]]);
-                        //std::cout << "Compound Code " << propComp.code  << std::endl;
+                        std::cout << "Compound Code " << propComp.code  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("name") != hasProps["compoundInfo"].end())
                     {
                         propComp.name = TrimSpaces(tF4[hasProps["compoundInfo"]["name"]]);
-                        // std::cout << "Compound name " << propComp.name  << std::endl;
+                        std::cout << "Compound name " << propComp.name  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("group") != hasProps["compoundInfo"].end())
                     {
                         propComp.group = TrimSpaces(tF4[hasProps["compoundInfo"]["group"]]);
-                        //std::cout << "Compound group " << propComp.group  << std::endl;
+                        std::cout << "Compound group " << propComp.group  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("number_atoms_all") != hasProps["compoundInfo"].end())
                     {
@@ -2814,7 +2833,7 @@ namespace LIBMOL
                         if (isInt(tST1))
                         {
                             propComp.numAtoms = StrToInt(tST1);
-                            //std::cout << "Number of atoms  " << propComp.numAtoms  << std::endl;
+                            std::cout << "Number of atoms  " << propComp.numAtoms  << std::endl;
                         }
                     }
                     if (hasProps["compoundInfo"].find("number_atoms_nh") != hasProps["compoundInfo"].end())
@@ -2823,7 +2842,7 @@ namespace LIBMOL
                         if (isInt(tST2))
                         {
                             propComp.numH = StrToInt(tST2);
-                            // std::cout << "number of H atoms " << propComp.numH  << std::endl;
+                            std::cout << "number of H atoms " << propComp.numH  << std::endl;
                         }
                     }
                     if (hasProps["compoundInfo"].find("desc_level") != hasProps["compoundInfo"].end())
@@ -7159,6 +7178,7 @@ namespace LIBMOL
     
     extern void outMMCif(FileName tFName, 
                          ID tMonoRootName,
+                         ChemComp  &         tPropComp,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
                          // std::vector<int>    & tHydroAtoms,
                          std::vector<LIBMOL::BondDict>& tBonds, 
@@ -7201,6 +7221,13 @@ namespace LIBMOL
             
             // 'LIST OF MONOMERS' section
             
+            
+            std::string longName =tMonoRootName.substr(0,3);
+            std::string sName =tMonoRootName.substr(0,3);
+            
+            StrUpper(longName);
+            
+            
             ID ligType = "non-polymer";
             
             for (std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> >::iterator iRG=tRings.begin();
@@ -7217,10 +7244,16 @@ namespace LIBMOL
                 }
             }
             
-            std::string longName =tMonoRootName.substr(0,3);
-            std::string sName =tMonoRootName.substr(0,3);
+            std::vector<ID>  aAATab;
+            initAminoAcidTab(aAATab);
+            if (isAminoAcid(aAATab, longName))
+            {
+                ligType = "L-peptide";
+            }
+            
    
             int nH = getHAtomNum(tAtoms);
+            
             
             outRestrF << "# ------------------------------------------------" << std::endl
                     << "#" << std::endl
@@ -7234,20 +7267,34 @@ namespace LIBMOL
                     << "_chem_comp.group" << std::endl
                     << "_chem_comp.number_atoms_all" << std::endl
                     << "_chem_comp.number_atoms_nh"  << std::endl
-                    << "_chem_comp.desc_level" << std::endl
-                    << longName <<"\t"<< sName << "\t" << "'.\t\t'\t"
-                    << ligType << "\t" << (int)tAtoms.size() << "\t" 
-                    << (int)tAtoms.size()- nH << "\t."
-                    // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
-                    << std::endl;
+                    << "_chem_comp.desc_level" << std::endl;
             
+            //if (tPropComp.id !=NullString)
+            //{
+            //    outRestrF << tPropComp.id  <<"\t"<< tPropComp.code << "\t" 
+            //              << tPropComp.name << "\t" << tPropComp.group << "\t" 
+            //              << tPropComp.numAtoms << "\t" 
+            //              << tPropComp.numH << "\t."
+                          // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
+            //              << std::endl;
+                
+            //}
+            //else
+            //{
+            
+            
+            outRestrF << longName <<"\t"<< sName << "\t" << "'.\t\t'\t"
+                      << ligType << "\t" << (int)tAtoms.size() << "\t" 
+                      << (int)tAtoms.size()- nH << "\t."
+                          // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
+                      << std::endl;
             
             outRestrF <<"# ------------------------------------------------------" << std::endl
                       <<"# ------------------------------------------------------" << std::endl
                       <<"#" << std::endl
                       <<"# --- DESCRIPTION OF MONOMERS ---" << std::endl
                       <<"#" << std::endl
-                      <<"data_comp_" << tMonoRootName << std::endl
+                      <<"data_comp_" << longName << std::endl
                       <<"#" << std::endl; 
         
             if (tAtoms.size() >0)
@@ -7269,13 +7316,23 @@ namespace LIBMOL
                     //double r1 =  (double) rand()/RAND_MAX;
                     //double r2 =  (double) rand()/RAND_MAX;
                     //double r3 =  (double) rand()/RAND_MAX;
+                    REAL tCharge =0.0;
+                    if (iA->parCharge !=0.0)
+                    {
+                        tCharge = iA->parCharge;
+                    }
+                    else if (iA->formalCharge !=0.0)
+                    {
+                        tCharge = iA->formalCharge;
+                    }
+                    
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
                     outRestrF << longName
                               << std::setw(12) << iA->id 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
-                              << std::setw(8) << iA->parCharge 
+                              << std::setw(8) << tCharge 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
                               << iA->coords[0] 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
