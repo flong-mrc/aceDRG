@@ -4589,6 +4589,7 @@ namespace LIBMOL
         {
             
             AtomDict tAtm;
+            // std::cout << "The atom serial number " << iAt->seriNum << std::endl; 
             codClassToAtom2(iAt->codClass, tAtm);
             iAt->codAtmMain = tAtm.codAtmMain;
             iAt->codNBSymb  = tAtm.codNBSymb;

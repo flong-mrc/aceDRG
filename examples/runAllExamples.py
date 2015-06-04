@@ -80,6 +80,21 @@ for aF in glob.glob("./inPyro/*.cif"):
         print cmdL
         os.system(cmdL)
 
+print "========================================================="
+print "|  run all examples in inFuns                           |"
+print "========================================================="
+for aF in glob.glob("./inFuns/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+    else:
+        MonoName = aFRoot
+
+    if len(aFRoot) !=0:
+        cmdL = "acedrg -c %s -o  %s_Funs "%(aF, aFRoot) 
+        print cmdL
+        os.system(cmdL)
+
 print "=============================================================="
 print "|  run those cif in CCP4 monomer lib which had some problems |"
 print "=============================================================="
