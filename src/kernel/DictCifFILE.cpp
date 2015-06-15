@@ -2484,7 +2484,8 @@ namespace LIBMOL
                         << "Its Chemical Type : " << iA->chemType << std::endl
                         << "Its CCP4 chemical type " << iA->ccp4Type << std::endl
                         << "Its bonding index : "   << iA->bondingIdx << std::endl
-                        << "Its residue Name: " << iA->resName<< std::endl;
+                        << "Its residue Name: " << iA->resName<< std::endl
+                        << "Its formal charge " << iA->parCharge << std::endl;
                 std::cout << "Its connected atoms are : " << std::endl;
                 for (std::vector<int>::iterator iSer= iA->connAtoms.begin();
                         iSer != iA->connAtoms.end(); iSer++)
@@ -3019,6 +3020,8 @@ namespace LIBMOL
                 itsCurAtom->existProps["parChange"] = hasProps["atom"]["parCharge"];
                 
                 itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["parChange"]]);
+                // partial charge and formal charge are same in mmcif files in ccp4 monomer lib 
+                itsCurAtom->formalCharge = itsCurAtom->parCharge;
                 //std::cout << "Its partialCharge :" 
                 //        << itsCurAtom->parCharge
                 //        << std::endl;

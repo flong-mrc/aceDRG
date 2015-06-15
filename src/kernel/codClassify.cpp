@@ -4450,13 +4450,13 @@ namespace LIBMOL
                 d5 = 24 + pPeriodictable->elements[iAt->chemType]["group"];
                 
                 
-                //std::cout << "chemType " << iAt->chemType << std::endl
-                //          << "codClass " << iAt->codClass << std::endl;
-                //std::cout << "row " << pPeriodictable->elements[iAt->chemType]["row"] << std::endl;
-                //std::cout << "group "<< pPeriodictable->elements[iAt->chemType]["group"] << std::endl;
+                std::cout << "chemType " << iAt->chemType << std::endl
+                          << "codClass " << iAt->codClass << std::endl;
+                std::cout << "row " << pPeriodictable->elements[iAt->chemType]["row"] << std::endl;
+                std::cout << "group "<< pPeriodictable->elements[iAt->chemType]["group"] << std::endl;
                 
-                //std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
-                //          << " d4 " << d4  << " d5 " << d5 << std::endl;
+                std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
+                          << " d4 " << d4  << " d5 " << d5 << std::endl;
                 
                 
                 
@@ -4947,7 +4947,7 @@ namespace LIBMOL
                 if ((int)tBuf.size() ==3)
                 {
                     allBoIdx[tBuf[0]][tBuf[1]] = tBuf[2];
-                    std::cout << "allBoIdx[" << tBuf[0] << "][" << tBuf[1] << "] =" << tBuf[2] << std::endl;
+                    // std::cout << "allBoIdx[" << tBuf[0] << "][" << tBuf[1] << "] =" << tBuf[2] << std::endl;
                 }
             }
             codBondIdxFile.close();
@@ -13664,6 +13664,7 @@ namespace LIBMOL
        
         setupTargetBonds2();
         // setupTargetBondsUsingSqlite();
+       
         
         setupTargetAngles2();
         // setupTargetAnglesUsingSqlite();
@@ -13671,7 +13672,6 @@ namespace LIBMOL
         // from an input cif file. The following is in case we need the 
         // values from COD
         // setupTargetTorsions();
-       
         
         fixTorIDs();
         

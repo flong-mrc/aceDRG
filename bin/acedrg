@@ -8,7 +8,7 @@
 #     CCP4 Program Suite Licence Agreement as a CCP4 Library.
 #
 #====================================================================
-## The date of last modification: 19/05/2015
+## The date of last modification: 08/06/2015
 #
 
 import os,os.path,sys
@@ -1996,14 +1996,10 @@ class AcedrgRDKit():
                                  tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0])
                             else:
                                  tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H")
-
                         else :
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                if lH:
-                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + numList[i])
-                                else:
-                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H"  + numList[i])
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + numList[i])
                                 i +=1 
                     elif len(twoP[0])==1 and len(twoP[1]) !=0 :
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -2145,7 +2141,6 @@ class AcedrgRDKit():
         nAtoms   =  tMol.GetNumAtoms()
         print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
-        """
         # Check
         print "\nBefore setup formal charges in the molecule"
         for aAtom in tMol.GetAtoms():
@@ -2159,14 +2154,12 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
 
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
         else:
             self.setAllFormalChargeFuncGroupAtoms(tMol)
 
-        """
         print "\nNumber of all atoms in this molecule is ", tMol.GetNumAtoms()
         print "Before Sanitize the molecule"
         for aAtom in tMol.GetAtoms():
@@ -2180,11 +2173,9 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
 
         Chem.SanitizeMol(tMol)
 
-        """
         print "\nAfter Sanitize the molecule"
         for aAtom in tMol.GetAtoms():
             idxA  = aAtom.GetIdx()
@@ -2197,7 +2188,6 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
 
         aMol = Chem.AddHs(tMol)
 
@@ -2228,6 +2218,7 @@ class AcedrgRDKit():
                 #    print "X : %7.4f."%pos.x
                 #    print "Y : %7.4f"%pos.y
                 #    print "Z : %7.4f"%pos.z
+
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tMonoName="UNL", tGroupName="non-polymer", tIdxConform=-1):
 
         # A simplified mmcif file contains:
@@ -2438,42 +2429,42 @@ class AcedrgRDKit():
             for aFuncG in self.funcGroups.keys():
                 #print "check ", aFuncG 
                 if aFuncG.find("CARBOXY-AMINO-TERS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeC_A_T(tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-TER")!=-1:
                     self.setFormalChargeC_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("AMINO-TER") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeA_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-LYS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeNH_LYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-HIS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeNH_HIS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-ARG") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeNH_ARG(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SH-CYS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeSH_CYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-TYR") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeBZ_TYR(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-NH") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeBZ_NH(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-NHA") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeBZ_NHA(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SO3") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeSO3(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SO4") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeSO4(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO4") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargePO4(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
 
     def setFormalChargeC_A_T(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -2690,7 +2681,7 @@ class FileTransformer :
         self.bondTypeMmcifToMol["3"]    = "3"
         self.bondTypeMmcifToMol["AROM"] = "4"
         self.bondTypeMmcifToMol["AR"] = "4"
-        self.bondTypeMmcifToMol["DELO"] = "2"
+        self.bondTypeMmcifToMol["DELO"] = "1"
         self.bondTypeMmcifToMol["ANY"]  = "8"
      
         self.bondTypeMolToMmcif = {}
@@ -3010,6 +3001,44 @@ class FileTransformer :
                     self.ccp4MmCifDataMap[self.dataDescriptor[aIdx][0]]=aIdx
                     nFind +=1    
                                 
+    def DelocBondConvertor(self):
+
+        doneList =[]
+        delocMap = {}
+        aBarg = ""
+        for i in range(len(self.bonds)):
+            aB2 = ""
+            if self.bonds[i].has_key("_chem_comp_bond.value_order"):
+                aBarg = "_chem_comp_bond.value_order"
+                aB2 = self.bonds[i]["_chem_comp_bond.value_order"]
+            elif self.bonds[i].has_key("_chem_comp_bond.type"):             
+                aBarg = "_chem_comp_bond.type"
+                aB2 = self.bonds[i]["_chem_comp_bond.type"]
+            print aB2
+            if len(aB2) !=0:
+                if aB2.lower().find("delo") !=-1:
+                    print "here "
+                    a1 = self.bonds[i]["_chem_comp_bond.atom_id_1"]
+                    a2 = self.bonds[i]["_chem_comp_bond.atom_id_2"]
+                    print "at1 ", a1
+                    print "at2 ", a2
+                    if not delocMap.has_key(a1) :
+                        delocMap[a1] = []
+                    if not delocMap.has_key(a2) :
+                        delocMap[a2] = []
+                    delocMap[a1].append(i)
+                    delocMap[a2].append(i)
+
+        if len(delocMap) !=0 and aBarg !="":
+            for aKey in sorted(delocMap.iterkeys()):
+                if len(delocMap[aKey])==2 or len(delocMap[aKey])==3:
+                    if not delocMap[aKey][0] in doneList and not delocMap[aKey][1] in doneList:
+                        self.bonds[delocMap[aKey][0]][aBarg] = "1"
+                        self.bonds[delocMap[aKey][1]][aBarg] = "2"
+                        doneList.append(delocMap[aKey][0])
+                        doneList.append(delocMap[aKey][1])
+                    
+
     def MmCifToMolFile(self, tInFileName, tOutMolName):
  
         self.mmCifReader(tInFileName)
@@ -3109,12 +3138,15 @@ class FileTransformer :
                                                                      iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
                                                                      eee.rjust(3)))
             # Bond block
-            
+           
+            self.DelocBondConvertor()
+ 
             sss ="0"
             xxx ="0"
             rrr ="0"
             ccc ="0"
             for aBond in self.bonds:
+                print "m1 ", aBond["_chem_comp_bond.atom_id_1"]
                 a1 = str(mapIdNum[aBond["_chem_comp_bond.atom_id_1"]])
                 a2 = str(mapIdNum[aBond["_chem_comp_bond.atom_id_2"]])
                 b4 = ""

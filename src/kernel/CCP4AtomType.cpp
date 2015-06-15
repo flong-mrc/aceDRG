@@ -477,7 +477,29 @@ namespace LIBMOL
                 }  
                 else
                 {
-                    tAtom.ccp4Type = "O";
+                    if (tAtom.formalCharge)
+                    {
+                        if(lP)
+                        {
+                            tAtom.ccp4Type = "OP";
+                        }
+                        else if(lS)
+                        {
+                            tAtom.ccp4Type = "OS";
+                        }
+                        else if(lB)
+                        {
+                            tAtom.ccp4Type = "OB";
+                        }
+                        else
+                        {
+                            tAtom.ccp4Type = "OC";
+                        }
+                    }
+                    else
+                    {
+                        tAtom.ccp4Type = "O";
+                    }
                 }
             }
             else if (tAtom.bondingIdx==3)
@@ -559,7 +581,31 @@ namespace LIBMOL
                     tAtom.ccp4Type = "OC";
                 }
                  */
+                if (tAtom.formalCharge)
+                    {
+                        if(lP)
+                        {
+                            tAtom.ccp4Type = "OP";
+                        }
+                        else if(lS)
+                        {
+                            tAtom.ccp4Type = "OS";
+                        }
+                        else if(lB)
+                        {
+                            tAtom.ccp4Type = "OB";
+                        }
+                        else
+                        {
+                            tAtom.ccp4Type = "OC";
+                        }
+                    }
+                    else
+                    {
+                        tAtom.ccp4Type = "O";
+                    }
             }
+            
             else
             {
                 tAtom.ccp4Type = "O";
