@@ -1369,7 +1369,7 @@ class Acedrg(CExeCode ):
                 lOther = False
                 
                 if tDataDescriptor:
-                    cifCont['atoms'].append("_chem_comp_atom.comp_id")
+                    cifCont['atoms'].append("_chem_comp_atom.comp_id\n")
                     for aLine in allCifLines:
                         if not lAtom and aLine.find("_chem_comp_atom.comp_id") != -1:
                             lAtom  = True
