@@ -1301,7 +1301,7 @@ class Acedrg(CExeCode ):
         else:
             print "No dictionary file produced ! " 
                         
-    def getFinalOutputFiles(self, tRoot, tDataDescriptor=None):
+    def getFinalOutputFiles(self, tRoot, tDataDescriptor=None, tDelocList=None):
        
         if os.path.isfile(self.refmacXYZOUTName):
             if tRoot !="":
@@ -1315,12 +1315,12 @@ class Acedrg(CExeCode ):
                 self.inPdbName        = finPdb 
                 self.inMmCifName      = self.outRstCifName
                 self.outRstCifName    = finRst
-                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tDataDescriptor)
+                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tDataDescriptor, tDelocList)
                 print "===================================================================" 
         else:
             print "Failed to produce %s after final geometrical optimization"%finPdb
 
-    def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tDataDescriptor=None):
+    def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tDataDescriptor=None, tDelocList=None):
 
         cifCont = {}
         cifCont['head'] = []
@@ -1336,6 +1336,10 @@ class Acedrg(CExeCode ):
             
         cifCont['atoms']  = []
         cifCont['others'] = []
+        cifCont['others1'] = []
+        cifCont['others2'] = []
+        if len(tDelocList) !=0:
+            cifCont['bonds'] = []
         pdbAtoms = {}
         try:
             tPdbIn = open(tPdbInName, "r")
@@ -1365,8 +1369,11 @@ class Acedrg(CExeCode ):
     
                 allCifLines = tCifIn.readlines()
                 tCifIn.close()
-                lAtom  = False
-                lOther = False
+                lAtom   = False
+                lBond   = False
+                lOther  = False
+                lOther1 = False
+                lOther2 = False
                 
                 if tDataDescriptor:
                     cifCont['atoms'].append("_chem_comp_atom.comp_id\n")
@@ -1375,8 +1382,20 @@ class Acedrg(CExeCode ):
                             lAtom  = True
                         elif lAtom and aLine.find("loop") != -1:
                             lAtom  = False
-                            lOther = True
-                            cifCont['others'].append(aLine)
+                            lBond  = False
+                            lOther1 = True
+                            lOther2 = False
+                            cifCont['others1'].append(aLine)
+                        elif lBond and aLine.find("loop") != -1:
+                            lAtom  = False
+                            lBond  = False
+                            lOther1 = False 
+                            lOther2 = True
+                            cifCont['others2'].append(aLine)
+                        elif len(tDelocList)!=0 and lOther1 and aLine.find("_chem_comp_bond.comp_id") != -1:
+                            lBond  = True
+                            lOther1 = False
+                            cifCont['bonds'].append(aLine)
                         elif lAtom:
                             strGrp = aLine.split()
                             if len(strGrp) ==1:
@@ -1400,8 +1419,12 @@ class Acedrg(CExeCode ):
                                 else: 
                                     print "Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName) 
                                     sys.exit()
-                        elif lOther:
-                            cifCont['others'].append(aLine)
+                        elif lBond:
+                            cifCont['bonds'].append(aLine)
+                        elif lOther1:
+                            cifCont['others1'].append(aLine)
+                        elif lOther2:
+                            cifCont['others2'].append(aLine)
                 else :
                     lStart = True
                     for aLine in allCifLines:
@@ -1437,7 +1460,50 @@ class Acedrg(CExeCode ):
                                 sys.exit()
                         elif lOther:
                             cifCont['others'].append(aLine)
-  
+ 
+                if cifCont.has_key("bonds") and len(cifCont['bonds']) !=0:
+                    idxMap = {}
+                    tHead  = []
+                    tBLs   = []
+                    iB=0
+                    for aL in cifCont['bonds']:
+                        strGrp = aL.strip().split()
+                        if len(strGrp)==1:
+                            if aL.find("_chem_comp_bond.atom_id_1") !=-1:
+                                idxMap["atom1"]= iB
+                                print "atom 1 ", iB
+                            elif aL.find("_chem_comp_bond.atom_id_2") !=-1:
+                                idxMap["atom2"]= iB
+                                print "atom 2 ", iB
+                            elif aL.find("_chem_comp_bond.type") !=-1:
+                                idxMap["bondType"]= iB
+                            tHead.append(aL)
+                            iB+=1
+                        else:
+                            tBLs.append(aL)
+
+    
+                    cifCont["bonds"] = []
+                    for aL in tHead:
+                        cifCont["bonds"].append(aL)
+
+                    for aB in tBLs:
+                        for aDe in tDelocList:
+                            aDe[0] = aDe[0].strip()
+                            aDe[1] = aDe[1].strip()
+                            print strGrp[idxMap["atom1"]]
+                            print strGrp[idxMap["atom2"]]
+                            strGrp = aB.strip().split()
+                            if (strGrp[idxMap["atom1"]].strip()==aDe[0] and strGrp[idxMap["atom2"]].strip()==aDe[1]) \
+                                or (strGrp[idxMap["atom2"]].strip()==aDe[0] and strGrp[idxMap["atom1"]].strip()==aDe[1]):
+                                 strGrp[idxMap["bondType"]] = "deloc"
+                                 aB = ""                                             
+                                 for aS in strGrp:
+                                     aB+=("%s"%aS.ljust(len(aS)+8))
+                                 aB+="\n"
+                                 break
+                        cifCont["bonds"].append(aB)
+                                  
                 try:
                     tOutCif = open(tCifOutName, "w")
                 except IOError:
@@ -1448,13 +1514,38 @@ class Acedrg(CExeCode ):
                         tOutCif.write(aL)
                     for aL in cifCont['atoms']:
                         tOutCif.write(aL)
-                    for aL in cifCont['others']:
-                        strGrp = aL.strip().split()
-                        if len(strGrp)==1:
-                            tOutCif.write(aL)
-                        else:
-                            aL1 = monoId + aL[3:]
-                            tOutCif.write(aL1)
+                    if tDataDescriptor:
+                        for aL in cifCont['others1']:
+                            strGrp = aL.strip().split()
+                            if len(strGrp)==1:
+                                tOutCif.write(aL)
+                            else:
+                                aL1 = monoId + aL[3:]
+                                tOutCif.write(aL1)
+                        if cifCont.has_key('bonds'):
+                            for aL in  cifCont['bonds']:
+                                strGrp = aL.strip().split()
+                                if len(strGrp)==1:
+                                    tOutCif.write(aL)
+                                else:
+                                    aL1 = monoId + aL[3:]
+                                    tOutCif.write(aL1)
+                        for aL in cifCont['others2']:
+                            strGrp = aL.strip().split()
+                            if len(strGrp)==1:
+                                tOutCif.write(aL)
+                            else:
+                                aL1 = monoId + aL[3:]
+                                tOutCif.write(aL1)
+                    else:
+                        for aL in cifCont["others"]:
+                            strGrp = aL.strip().split()
+                            if len(strGrp)==1:
+                                tOutCif.write(aL)
+                            else:
+                                aL1 = monoId + aL[3:]
+                                tOutCif.write(aL1)
+
                     tOutCif.close()
                         
     def execute(self):
@@ -1728,7 +1819,7 @@ class Acedrg(CExeCode ):
                                 if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
                                     if len(self.rdKit.molecules) ==1 and len(inPdbNamesRoot[idxMol])==1:
                                         aFRoot = ""
-                                    self.getFinalOutputFiles(aFRoot, self.fileConv.ccp4DataDes)
+                                    self.getFinalOutputFiles(aFRoot, self.fileConv.ccp4DataDes,self.fileConv.delocBondList)
                                 else:
                                     print "Failed to produce the final coordinates after geometrical optimization"
                                     sys.exit()
@@ -1910,6 +2001,7 @@ class AcedrgRDKit():
         if len(tIdxHs1) !=0:
             
             for aIdxH in tIdxHs1:
+                #print "For atom ", aIdxH
                 aB = tMol.GetAtomWithIdx(aIdxH).GetBonds()
                 if len(aB) ==0:
                     print "Bug: a H atom of index %d does not bond to any atom "%aIdxH
@@ -1928,6 +2020,8 @@ class AcedrgRDKit():
                     else:
                         print "Bug: a H atom of index %d is not in the bond of index %d "%(aB.GetIdx())
                         sys.exit()
+
+                    # print "It bonds atom ", tIdxBH
    
                     if not tIdxHs.has_key(tIdxBH):
                         tIdxHs[tIdxBH] =[]
@@ -1946,6 +2040,7 @@ class AcedrgRDKit():
                 twoP = self.getTwoParts(tMol.GetAtomWithIdx(aIdxBH).GetProp("Name"))
                 #print "twoP[0] : ", twoP[0]
                 #print "twoP[1] : ", twoP[1]
+                #print "LH ", lH
                 if tMol.GetAtomWithIdx(aIdxBH).GetSymbol() in elemList :
                     if len(twoP[0])==1 and len(twoP[1]) ==0:
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -1959,6 +2054,8 @@ class AcedrgRDKit():
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
                                 tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + numListCN[i])
+                                if i==0:
+                                    lH = True
                                 i +=1 
                     elif len(twoP[0])==1 and len(twoP[1]) !=0:
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -1980,7 +2077,7 @@ class AcedrgRDKit():
                                 i +=1
                     elif len(twoP[0]) > 1 and len(twoP[1]) !=0:
                         name1 = tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")[1:] 
-                        # print "Name ", tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")
+                        #print "Name ", tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
                             tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + name1)
@@ -2200,8 +2297,8 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
 
+        """
         aMol = Chem.AddHs(tMol)
 
         self.setInitConformersOneMol(aMol, tNumConf)
@@ -2715,9 +2812,11 @@ class FileTransformer :
         self.ccp4MmCifDataMap = {}
 
         self.nameMapingCifMol = {}             # e.g. self.nameMapingCifMol[1]   = name 
-                                               # where 1 : atom serial number   name : atom name 
+                                               # where 1 : atom serial number   name : atom name
+ 
+        self.delocBondList    = []             # recording bonds of the deloc type to put back late on 
 
-        self.PdbForMols    = {}
+        self.PdbForMols       = {}
 
     def mmCifReader(self, tFileName):
         """Read a detailed mmicif file to get basic information"""
@@ -3018,9 +3117,11 @@ class FileTransformer :
                                 
     def DelocBondConvertor(self):
 
-        doneList =[]
+        doneList = []
         delocMap = {}
+
         aBarg = ""
+
         for i in range(len(self.bonds)):
             aB2 = ""
             if self.bonds[i].has_key("_chem_comp_bond.value_order"):
@@ -3039,6 +3140,7 @@ class FileTransformer :
                         delocMap[a2] = []
                     delocMap[a1].append(i)
                     delocMap[a2].append(i)
+                    self.delocBondList.append([a1.strip(), a2.strip()])
 
         if len(delocMap) !=0 and aBarg !="":
             for aKey in sorted(delocMap.iterkeys()):
@@ -3048,7 +3150,11 @@ class FileTransformer :
                         self.bonds[delocMap[aKey][1]][aBarg] = "2"
                         doneList.append(delocMap[aKey][0])
                         doneList.append(delocMap[aKey][1])
-                    
+
+        if len(self.delocBondList) !=0:
+            print "Deloc bonds exist between the following atom pairs "
+            for aPair in self.delocBondList:
+                print "Atom %s and %s "%(aPair[0], aPair[1]) 
 
     def MmCifToMolFile(self, tInFileName, tOutMolName):
  
