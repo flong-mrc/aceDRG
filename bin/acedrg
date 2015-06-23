@@ -1471,10 +1471,10 @@ class Acedrg(CExeCode ):
                         if len(strGrp)==1:
                             if aL.find("_chem_comp_bond.atom_id_1") !=-1:
                                 idxMap["atom1"]= iB
-                                print "atom 1 ", iB
+                                #print "atom 1 ", iB
                             elif aL.find("_chem_comp_bond.atom_id_2") !=-1:
                                 idxMap["atom2"]= iB
-                                print "atom 2 ", iB
+                                #print "atom 2 ", iB
                             elif aL.find("_chem_comp_bond.type") !=-1:
                                 idxMap["bondType"]= iB
                             tHead.append(aL)
@@ -1491,8 +1491,8 @@ class Acedrg(CExeCode ):
                         for aDe in tDelocList:
                             aDe[0] = aDe[0].strip()
                             aDe[1] = aDe[1].strip()
-                            print strGrp[idxMap["atom1"]]
-                            print strGrp[idxMap["atom2"]]
+                            #print strGrp[idxMap["atom1"]]
+                            #print strGrp[idxMap["atom2"]]
                             strGrp = aB.strip().split()
                             if (strGrp[idxMap["atom1"]].strip()==aDe[0] and strGrp[idxMap["atom2"]].strip()==aDe[1]) \
                                 or (strGrp[idxMap["atom2"]].strip()==aDe[0] and strGrp[idxMap["atom1"]].strip()==aDe[1]):
@@ -1917,6 +1917,7 @@ class AcedrgRDKit():
                 aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
                 #print "Molecule name:  ", aMolName
                 aMolT     = Chem.MolFromMolFile(tFileName)
+                #aMolT = Chem.AddHs(aMolT1)
 
             else:
                 print "File %s does not exist "%tFileName
@@ -2072,8 +2073,12 @@ class AcedrgRDKit():
                             tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0][1:])
                         else :
                             i=0
+                            aLen = len(tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()])
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0][1:]+ numList[i])
+                                if aLen < 4:
+                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0][1:]+ numList[i])
+                                else:
+                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0][1:]+ str(aLen-i))
                                 i +=1
                     elif len(twoP[0]) > 1 and len(twoP[1]) !=0:
                         name1 = tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")[1:] 
@@ -2090,7 +2095,8 @@ class AcedrgRDKit():
                 else: 
                     name1 = tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")
                     name2 = name1[1:]
-                    #print name1 
+                    #print "name1 ", name1
+                    #print "twoP ", twoP 
                     if len(twoP[0]) ==1 and len(twoP[1]) ==0:
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
@@ -2100,8 +2106,12 @@ class AcedrgRDKit():
                                  tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H")
                         else :
                             i=0
+                            aLen = len(tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()])
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + numList[i])
+                                if aLen < 4:
+                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + numList[i])
+                                else:
+                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + str(aLen-i))
                                 i +=1 
                     elif len(twoP[0])==1 and len(twoP[1]) !=0 :
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -2243,7 +2253,8 @@ class AcedrgRDKit():
         nAtoms   =  tMol.GetNumAtoms()
         #print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
-        """
+
+        """        
         # Check
         print "\nBefore setup formal charges in the molecule"
         for aAtom in tMol.GetAtoms():
@@ -2257,15 +2268,14 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
+        """        
 
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
         else:
             self.setAllFormalChargeFuncGroupAtoms(tMol)
 
-        """
-
+        """        
         print "\nNumber of all atoms in this molecule is ", tMol.GetNumAtoms()
         print "Before Sanitize the molecule"
         for aAtom in tMol.GetAtoms():
@@ -2279,8 +2289,7 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-
-        """
+        """        
 
         Chem.SanitizeMol(tMol)
 
@@ -2297,8 +2306,8 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-
         """
+
         aMol = Chem.AddHs(tMol)
 
         self.setInitConformersOneMol(aMol, tNumConf)
@@ -2306,8 +2315,8 @@ class AcedrgRDKit():
         # Further: give names to those newly added H atoms
 
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
-        
-        """
+
+        """        
         print "\nFinally, Number of molecules in the system is ", len(self.molecules)
         # Check
         for aMol in self.molecules:
@@ -2329,7 +2338,8 @@ class AcedrgRDKit():
                 #    print "X : %7.4f."%pos.x
                 #    print "Y : %7.4f"%pos.y
                 #    print "Z : %7.4f"%pos.z
-        """
+ 
+        """        
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tMonoName="UNL", tGroupName="non-polymer", tIdxConform=-1):
 
@@ -2512,25 +2522,29 @@ class AcedrgRDKit():
         for aKey in sorted(self.funcGroupTab.iterkeys()):
             #print "SMARTS string for functional group %s is %s "%(aKey, self.funcGroupTab[aKey][0])                  
             #print "Its pKa value is  %5.3f "%(self.funcGroupTab[aKey][1])                  
-            self.stdFuncGroupMols.append([aKey, Chem.MolFromSmarts(self.funcGroupTab[aKey][0])])
+            self.stdFuncGroupMols.append([aKey, Chem.MolFromSmarts(self.funcGroupTab[aKey][0]),  Chem.MolFromSmiles(self.funcGroupTab[aKey][0])])
 
     def getAllFuncGroupAtoms(self, tMol):
 
-        for aPair in self.stdFuncGroupMols:
-            #print "search for the functional group %s "%aPair[0]
-            atmGrpIdxs = tMol.GetSubstructMatches(aPair[1])
+        for aTri in self.stdFuncGroupMols:
+            #print "search for the functional group %s "%aTri[0]
+            #print "its substructure ", aTri[1]
+            atmGrpIdxs = tMol.GetSubstructMatches(aTri[1])
+            if len(atmGrpIdxs)==0:
+                atmGrpIdxs = tMol.GetSubstructMatches(aTri[2])
+            #print "number of substruct ", atmGrpIdxs
             if len(atmGrpIdxs):
-                #print "Those atoms in this molecule are found in functional group %s: "%aPair[0]
+                #print "Those atoms in this molecule are found in functional group %s: "%aTri[0]
                 allAs = tMol.GetAtoms()
                 #for i in range(len(atmGrpIdxs)):
                 #    for aIdx in atmGrpIdxs[i]:
                 #        print "atom ", allAs[aIdx].GetProp("Name")
                 #    print ""
-                if not self.funcGroups.has_key(aPair[0]):
-                    self.funcGroups[aPair[0]] = []
+                if not self.funcGroups.has_key(aTri[0]):
+                    self.funcGroups[aTri[0]] = []
                 for oneAtmIdxGrp in atmGrpIdxs:
-                    #print aPair[0], "add func atoms"
-                    self.funcGroups[aPair[0]].append(oneAtmIdxGrp)
+                    #print aTri[0], "add func atoms"
+                    self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
 
     # The following methods are migrated from Acedrg c++ section
 
@@ -2633,12 +2647,11 @@ class AcedrgRDKit():
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N" \
-                        and tMol.GetAtomWithIdx(aIdx).GetTotalValence()==3\
                         and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==1:
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
-                        # print "atom %s has a charge %d "%(txMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                        #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
-                        # print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                               tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                        print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
 
     def setFormalChargeNH_HIS(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -2646,14 +2659,27 @@ class AcedrgRDKit():
         #print "Pka ", tPka
         #print "PH  ", tPH
         if tPH <= tPka +2 :
+            lNSet = False
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalValence() != 3:   
-                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)      # protonation
-                        #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                        #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
-                        #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
+                        print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
+                        if (tMol.GetAtomWithIdx(aIdx).GetTotalValence() > 3 \
+                            and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==2) \
+                            or \
+                           (tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 and \
+                            len(tMol.GetAtomWithIdx(aIdx).GetBonds())==2 and \
+                            tMol.GetAtomWithIdx(aIdx).GetTotalNumHs()==0) :
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                        else:
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(0)      # only one N has positive charge
+                        print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                               tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                        print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
         elif tPH > tPka + 2:
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
@@ -3150,11 +3176,12 @@ class FileTransformer :
                         self.bonds[delocMap[aKey][1]][aBarg] = "2"
                         doneList.append(delocMap[aKey][0])
                         doneList.append(delocMap[aKey][1])
-
+        """
         if len(self.delocBondList) !=0:
             print "Deloc bonds exist between the following atom pairs "
             for aPair in self.delocBondList:
                 print "Atom %s and %s "%(aPair[0], aPair[1]) 
+        """
 
     def MmCifToMolFile(self, tInFileName, tOutMolName):
  
