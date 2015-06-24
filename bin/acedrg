@@ -2027,7 +2027,8 @@ class AcedrgRDKit():
                     if not tIdxHs.has_key(tIdxBH):
                         tIdxHs[tIdxBH] =[]
                     tIdxHs[tIdxBH].append(aIdxH)
-                    
+         
+            hNameDone = []           
             #elemList = ["C", "N", "S", "O"]
             elemList = ["C"]
             charList = ["A", "B", "C", "D", "E", "F"]
@@ -2036,7 +2037,7 @@ class AcedrgRDKit():
             numListCN2  = [ "1", "2", "3", "4", "5", "6"]
             lH = False
             rName = tMol.GetProp("ResidueName")
-
+         
             for aIdxBH in tIdxHs.keys():
                 twoP = self.getTwoParts(tMol.GetAtomWithIdx(aIdxBH).GetProp("Name"))
                 #print "twoP[0] : ", twoP[0]
@@ -2054,14 +2055,20 @@ class AcedrgRDKit():
                         else :
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + numListCN[i])
+                                tH = "H" + numListCN[i]
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", tH)
+                                hNameDone.append(tH)
                                 if i==0:
                                     lH = True
                                 i +=1 
                     elif len(twoP[0])==1 and len(twoP[1]) !=0:
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
-                            tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[1])
+                            tH = "H" + twoP[1]
+                            if not tH in hNameDone:
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", tH)
+                            else:
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", tH+"G")
                         else :
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
@@ -2254,7 +2261,7 @@ class AcedrgRDKit():
         #print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
 
-        """        
+        """
         # Check
         print "\nBefore setup formal charges in the molecule"
         for aAtom in tMol.GetAtoms():
@@ -2268,14 +2275,14 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """        
+        """
 
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
         else:
             self.setAllFormalChargeFuncGroupAtoms(tMol)
 
-        """        
+        """
         print "\nNumber of all atoms in this molecule is ", tMol.GetNumAtoms()
         print "Before Sanitize the molecule"
         for aAtom in tMol.GetAtoms():
@@ -2289,7 +2296,7 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """        
+        """
 
         Chem.SanitizeMol(tMol)
 
@@ -2316,7 +2323,7 @@ class AcedrgRDKit():
 
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
 
-        """        
+        """
         print "\nFinally, Number of molecules in the system is ", len(self.molecules)
         # Check
         for aMol in self.molecules:
@@ -2331,15 +2338,15 @@ class AcedrgRDKit():
                 print "Its element symbol  ", elemA
                 print "Its name ", name
                 print "Its formal charge ", charge
-                #for i in range (len(conformers)):
-                #    aConf = conformers[i]
-                #    pos = aConf.GetAtomPosition(idxA)
-                #    print "In conformer ", i+1, " the coordinates are:"
-                #    print "X : %7.4f."%pos.x
-                #    print "Y : %7.4f"%pos.y
-                #    print "Z : %7.4f"%pos.z
+                for i in range (len(conformers)):
+                    aConf = conformers[i]
+                    pos = aConf.GetAtomPosition(idxA)
+                    print "In conformer ", i+1, " the coordinates are:"
+                    print "X : %7.4f."%pos.x
+                    print "Y : %7.4f"%pos.y
+                    print "Z : %7.4f"%pos.z
+        """
  
-        """        
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tMonoName="UNL", tGroupName="non-polymer", tIdxConform=-1):
 
