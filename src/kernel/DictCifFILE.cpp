@@ -2516,10 +2516,10 @@ namespace LIBMOL
                 std::cout << "Its component atom2 " << iBo->atoms[1] << std::endl;
                 //std::cout << "Its length : "    << iBo->length << std::endl;
                 //std::cout << "Its sigLength : " << iBo->sigLength << std::endl;
-                //std::cout << "its order : " << iBo->order << std::endl;
-            }
-             
+                std::cout << "its order : " << iBo->order << std::endl;
+            }    
         }
+        
     }
     
     void DictCifFile::setupSystem3Secs(std::ifstream & tInCif)

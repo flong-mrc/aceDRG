@@ -1731,7 +1731,6 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inMmCifName):
                 aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                 self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName)
-                print "number of entries in DataDes ", len(self.fileConv.dataDescriptor)
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)  
                 if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \

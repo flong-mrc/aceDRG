@@ -610,6 +610,9 @@ namespace LIBMOL
            
             
         }
+        
+        
+        
         /*
         std::cout << "Torsion angles are : " << std::endl;
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
@@ -5518,6 +5521,8 @@ namespace LIBMOL
             {
                 nFind++;
             }
+            
+            
         }   
         std::cout << "Number of Bonds to be found " << (int)allBonds.size() << std::endl
                   << "Number of Bonds found " << nFind << std::endl;
@@ -6572,6 +6577,7 @@ namespace LIBMOL
         OrderToStr(ccp4Bonds[tAtm1][tAtm2]["order"], tB->order);
         tB->value    = ccp4Bonds[tAtm1][tAtm2]["length"];
         tB->sigValue = ccp4Bonds[tAtm1][tAtm2]["sigValue"];
+        
     }
     
     void CodClassify::groupCodMetBonds()
@@ -7330,13 +7336,17 @@ namespace LIBMOL
                                             // std::cout << tRecord << std::endl;
                                             ccp4Bonds[tBuf[0]][tBuf[1]]["order"] = aOrder;
                                             ccp4Bonds[tBuf[0]][tBuf[1]]["length"]= StrToReal(tBuf[4]);
+                                            ccp4Bonds[tBuf[1]][tBuf[0]]["order"] = aOrder;
+                                            ccp4Bonds[tBuf[1]][tBuf[0]]["length"]= StrToReal(tBuf[4]);
                                             if (tBuf[5].find('.') == std::string::npos)
                                             {
                                                 ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = StrToReal(tBuf[5]);
+                                                ccp4Bonds[tBuf[1]][tBuf[0]]["sigValue"] = StrToReal(tBuf[5]);
                                             }
                                             else
                                             {
-                                                ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = 0.20; 
+                                                ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = 0.20;
+                                                ccp4Bonds[tBuf[1]][tBuf[0]]["sigValue"] = StrToReal(tBuf[5]);
                                             }
                                             nBond++;
                                         }
@@ -13664,7 +13674,6 @@ namespace LIBMOL
        
         setupTargetBonds2();
         // setupTargetBondsUsingSqlite();
-       
         
         setupTargetAngles2();
         // setupTargetAnglesUsingSqlite();

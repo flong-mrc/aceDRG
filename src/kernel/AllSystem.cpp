@@ -567,6 +567,17 @@ namespace LIBMOL
         
         }
         
+        for (std::vector<BondDict>::iterator iB=allBonds.begin(); 
+                iB !=allBonds.end(); iB++)
+        {
+            std::cout << "\nBond " << iB->seriNum << " : " << std::endl
+                      << "Its component atom 1  : " << iB->atoms[0] << std::endl
+                      << "Its component atom 2  : " << iB->atoms[1] << std::endl
+                      << "Its bond order : " << iB->order << std::endl;
+        }
+        
+        
+        
     }
     
     int AllSystem::getNumSpecAtomConnect(int idxAtm, ID tChemType)
@@ -4572,10 +4583,11 @@ namespace LIBMOL
                                 allTorsions, allChirals, allPlanes, allRings,
                                 tLibmolDir, 2);
       
-       
+        
         aCodSystem.setupAllTargetValues2();
        
-      
+        
+        
       
         resetSystem2(aCodSystem);
        /*
