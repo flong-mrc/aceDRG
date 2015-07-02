@@ -266,6 +266,7 @@ class Acedrg(CExeCode ):
         self.checkDependency()
         self.checkVersionInfo()
 
+
         if os.path.isfile(self.funcGroupTable):
             self.rdKit = AcedrgRDKit(self.funcGroupTable)
         else:
@@ -509,7 +510,10 @@ class Acedrg(CExeCode ):
                          break
                 
     def setMonoRoot(self, tDataDesc=None):
-    
+   
+        if len(self.monomRoot) !=0 and self.monomRoot.find("UNL")==-1:
+            return
+ 
         if tDataDesc:
             for aIdx in tDataDesc.keys():
                 if tDataDesc[aIdx][0].find("_chem_comp.id") !=-1:
@@ -1324,16 +1328,24 @@ class Acedrg(CExeCode ):
 
         cifCont = {}
         cifCont['head'] = []
+        monoId = ""
+        if self.monomRoot.find("UNL") ==-1:
+            monoId = self.monomRoot
+        elif tDataDescriptor:
+            monoId = tDataDescriptor[-1].strip().split()[0]
+        else:
+            monoId = "UNL"
+      
         if tDataDescriptor:
             cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
             for aL in tDataDescriptor:
                 cifCont['head'].append(aL+"\n")   
             cifCont['head'].append("#\n")
-            monoId = tDataDescriptor[-1].strip().split()[0]
+            # monoId = tDataDescriptor[-1].strip().split()[0]
             cifCont['head'].append("data_comp_%s\n"%monoId)
             cifCont['head'].append("#\n")
             cifCont['head'].append("loop_\n")
-            
+        
         cifCont['atoms']  = []
         cifCont['others'] = []
         cifCont['others1'] = []
@@ -1719,11 +1731,12 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inMmCifName):
                 aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                 self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName)
+                print "number of entries in DataDes ", len(self.fileConv.dataDescriptor)
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)  
                 if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \
                    and os.path.isfile(aIniMolName) :
-                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, self.fileConv.nameMapingCifMol) 
+                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
         if self.workMode == 12 or self.workMode == 121:
           
             # The input file is  a SMILES file
@@ -1767,10 +1780,11 @@ class Acedrg(CExeCode ):
             self.workMode = 111
 
         #print "workMode : ", self.workMode
+        #print "Ligand ID ", self.monomRoot
 
         if self.workMode == 11 or self.workMode == 111:
             if len(self.rdKit.molecules):
-                self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck)
+                self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
             for iMol in range(len(self.rdKit.molecules)):
                 self.inMmCifName =  os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(iMol) + ".cif")
                 self.initMmcifMolMap[iMol] = self.inMmCifName 
@@ -1910,7 +1924,7 @@ class AcedrgRDKit():
          
         self.chemCheck = ChemCheck()
 
-    def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tNameMap=None):
+    def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tNameMap=None, tChargeList=None):
 
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
@@ -1957,7 +1971,7 @@ class AcedrgRDKit():
             sys.exit()
         else:
             aMolT.SetProp("ResidueName", tMonoRoot)
-            self.setOtherMolInfo(aMolT, tNumConf, tChemCheck, tPH, tNameMap)
+            self.setOtherMolInfo(aMolT, tNumConf, tChemCheck, tPH, tNameMap, tChargeList)
  
 
     def setNamesForAtomsInMol(self, tMol, tChemCheck, tNameMap, tStage=0):
@@ -2254,13 +2268,23 @@ class AcedrgRDKit():
 
         self.molecules.append(tMol) 
 
-    def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap):
+    def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tChargeList=None):
 
         print "A molecule with residue name %s is generated"%tMol.GetProp("ResidueName")
         nAtoms   =  tMol.GetNumAtoms()
         #print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
 
+        # Make sure an atom in the molecule has the same charge in the input file. 
+        # RDKit sometimes change it when initiating the molecule
+        if tChargeList:
+            for aAtom in tMol.GetAtoms():
+                name  = aAtom.GetProp("Name")
+                if tChargeList.has_key(name): 
+                    aAtom.SetFormalCharge(int(tChargeList[name]))
+                else:
+                    aAtom.SetFormalCharge(0)
+                    
         """
         # Check
         print "\nBefore setup formal charges in the molecule"
@@ -2276,6 +2300,7 @@ class AcedrgRDKit():
             print "Its formal charge ", charge
             print "Its total valence ", val
         """
+
 
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
@@ -2316,6 +2341,7 @@ class AcedrgRDKit():
         """
 
         aMol = Chem.AddHs(tMol)
+ 
 
         self.setInitConformersOneMol(aMol, tNumConf)
 
@@ -2358,7 +2384,7 @@ class AcedrgRDKit():
         # (4) Chiral section 
     
         # This file is mainly used as an input file for Acedrg
-        #print tMmcifName
+        #print "Ligand ID ", tMonoName 
         try:
             aMmCif = open(tMmcifName, "w")
         except IOError:
@@ -2399,7 +2425,7 @@ class AcedrgRDKit():
             aMmCif.write("#\n")
             aMmCif.write("# --- DESCRIPTION OF MONOMERS ---\n")
             aMmCif.write("#\n")
-            aMmCif.write("data_comp_UNL\n")
+            aMmCif.write("data_comp_%s\n"%tMonoName)
             aMmCif.write("#\n")
         
             # Atom section
@@ -2569,6 +2595,9 @@ class AcedrgRDKit():
                 elif aFuncG.find("AMINO-TER") !=-1:
                     #print "Doing ", aFuncG
                     self.setFormalChargeA_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("VAR-A-TER") !=-1:
+                    print "Doing ", aFuncG
+                    self.setFormalChargeV_A_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-LYS") !=-1:
                     #print "Doing ", aFuncG
                     self.setFormalChargeNH_LYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
@@ -2599,6 +2628,11 @@ class AcedrgRDKit():
                 elif aFuncG.find("PO4") !=-1:
                     #print "Doing ", aFuncG
                     self.setFormalChargePO4(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("PO3R") !=-1:
+                    print "Doing ", aFuncG
+                    print self.funcGroups[aFuncG] 
+                    self.setFormalChargePO3R(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+
 
     def setFormalChargeC_A_T(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -2645,6 +2679,19 @@ class AcedrgRDKit():
                             #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                             # print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
          
+    def setFormalChargeV_A_T(self, tMol, tFunG, tAtomIdxs, tPH):
+
+        tPka = self.funcGroupTab[tFunG][1]
+        if tPH < tPka :
+            for aSetIdxs in tAtomIdxs:
+                for aIdx in aSetIdxs:
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:    # implicit H included in the count
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+         
     def setFormalChargeNH_LYS(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
@@ -2656,9 +2703,9 @@ class AcedrgRDKit():
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N" \
                         and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==1:
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
-                        print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                               tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
-                        print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                        #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                        #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
 
     def setFormalChargeNH_HIS(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -2670,11 +2717,11 @@ class AcedrgRDKit():
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
-                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
-                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
-                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
-                        print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
-                        print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
+                        #print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        #print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        #print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        #print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
+                        #print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
                         if (tMol.GetAtomWithIdx(aIdx).GetTotalValence() > 3 \
                             and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==2) \
                             or \
@@ -2684,9 +2731,9 @@ class AcedrgRDKit():
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                         else:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(0)      # only one N has positive charge
-                        print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                               tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
-                        print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                            #   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                        #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
         elif tPH > tPka + 2:
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
@@ -2806,6 +2853,33 @@ class AcedrgRDKit():
                         # need to deprotonation for the O atom 
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
 
+    def setFormalChargePO3R(self, tMol, tFunG, tAtomIdxs, tPH):
+        tPka = self.funcGroupTab[tFunG][1]
+        # Should exclude PO4
+        for aSetIdxs in tAtomIdxs:
+            nO=0
+            print ""
+            for aIdx in aSetIdxs:
+                print "atom %s : "%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
+                    nO+=1
+            if nO==3:
+                if tPH > tPka :
+                # Put charge -1 to all 3 singly bonded Os 
+                    for aIdx in aSetIdxs:
+                        if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O" : #and tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0 :
+                            print "\nHere are details of O: "           
+                            print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                            print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                            print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                            print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs()
+                            print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors()) 
+                            if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0 :
+                                # need to deprotonation for the O atom 
+                                tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                                print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
+
+         
 class FileTransformer :
 
     def __init__(self):
@@ -2848,6 +2922,8 @@ class FileTransformer :
                                                # where 1 : atom serial number   name : atom name
  
         self.delocBondList    = []             # recording bonds of the deloc type to put back late on 
+
+        self.inputCharge      = {}             # input charges in a mmCif file
 
         self.PdbForMols       = {}
 
@@ -2998,11 +3074,11 @@ class FileTransformer :
         #print "\n"
  
 
-    def getCCP4DataDescritor(self, tMol, tChemCheck):
+    def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):
 
         # Get a CCP4 monomer lib data descriptor
-        s1 ="UNL"
-        s2 ="UNL"
+        s1 =tMonomRoot
+        s2 =tMonomRoot
         s3 =".         "
         s4 ="non-polymer"
         s5 = str(tMol.GetNumAtoms())
@@ -3102,6 +3178,16 @@ class FileTransformer :
                     tAtoms.append(aAtom)
                 else:
                     tHAtoms.append(aAtom)
+
+                if aAtom.has_key("_chem_comp_atom.atom_id"):
+                    tCharge =0.0
+                    if aAtom.has_key("_chem_comp_atom.charge"):
+                        tCharge = float(aAtom["_chem_comp_atom.charge"])
+                    elif aAtom.has_key("_chem_comp_atom.partial_charge"):
+                        tCharge = float(aAtom["_chem_comp_atom.partial_charge"])
+                    if math.fabs(float(tCharge)) >=0:
+                        self.inputCharge[aAtom["_chem_comp_atom.atom_id"]] = tCharge
+                
             self.atoms = []
             for aAtom in tAtoms:
                 self.atoms.append(aAtom)
@@ -3110,6 +3196,11 @@ class FileTransformer :
             
         # Check
         """
+        if len(self.inputCharge) !=0:
+            print "The following atoms have charges "
+            for aName in self.inputCharge.keys():
+                print "Name : ", aName, " charge : ", self.inputCharge[aName]
+
         if len(colIdx):
             for i in range(len(colIdx)):
                 print colIdx[i]
