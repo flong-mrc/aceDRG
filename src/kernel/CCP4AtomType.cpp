@@ -613,7 +613,7 @@ namespace LIBMOL
         }
         else if (tAtom.chemType.compare("S")==0)
         {
-            if (tAtom.connAtoms.size() ==3)
+            if (tAtom.connAtoms.size() ==3 || tAtom.connAtoms.size() ==4)
             {
                 if(tAtom.connHAtoms.size()==0)
                 {

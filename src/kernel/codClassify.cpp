@@ -678,6 +678,8 @@ namespace LIBMOL
                 
         }
         */ 
+        
+        
     }
     
     void CodClassify::codAtomClassify2(int dLev)
@@ -5526,6 +5528,7 @@ namespace LIBMOL
         }   
         std::cout << "Number of Bonds to be found " << (int)allBonds.size() << std::endl
                   << "Number of Bonds found " << nFind << std::endl;
+        
     }
     
     void CodClassify::searchCodOrgBonds(std::vector<BondDict>::iterator iB)
@@ -6246,36 +6249,37 @@ namespace LIBMOL
                                 iB->valueST      =iB->value;
                                 iB->sigValue     =tVaS.sigValue;
                                 iB->sigValueST   =iB->sigValue;
-                                iB->numCodValues =tVaS.numCodValues;   
+                                iB->numCodValues =tVaS.numCodValues;
+                                
                                 std::cout << "iFind 3 A" << std::endl;
                                 
                             }
-                            else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
-                                     && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                     !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                            else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                                     && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                     !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                             {
                                 
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                                 std::cout << "iFind 3 B" << std::endl;
                             }
-                            else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
-                                     && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                     !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                            else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                                     && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                     !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
                             {
                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                                std::cout << "iFind 3 C" << std::endl;
                                 
                             }
-                            else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
-                                     && ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(".")
-                                     !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                            else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                                     && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".")
+                                     !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                             {
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
                                 std::cout << "iFind 3 D" << std::endl;
                             }
-                            else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
-                                     && ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(".")
-                                     !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                            else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                                     && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".")
+                                     !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
                             {
                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
                                std::cout << "iFind 3 E" << std::endl;
@@ -6295,14 +6299,14 @@ namespace LIBMOL
                     else // iFind2 a2NB2 
                     {
                         
-                        if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
-                            && (ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end()
-                                || ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(".") 
-                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end()))
+                        if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()
+                                || ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".") 
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
                         {
-                            if(ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                            if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                             {
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                             }
@@ -6311,14 +6315,14 @@ namespace LIBMOL
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
                             }
                         }
-                        else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
-                            && (ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end()
-                                || ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(".") 
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end()))
+                        else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()
+                                || ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".") 
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
                         {
-                            if(ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                            if(ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
                             {
                                 getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                             }
@@ -6425,13 +6429,62 @@ namespace LIBMOL
                         iB->numCodValues =allDictBondsIdx3[ha1][ha2][0].numCodValues;
                      }
                      */
-                    if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
-                        && (ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                        !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end() 
-                         || ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(".") !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end()))
+                    
+                    std::vector<aValueSet> tBs1;
+                    
+                    for (std::map<ID, std::map<ID, std::map<ID, 
+                         std::map<ID, std::map<ID, std::vector<aValueSet> > > > > >::iterator iB1
+                         =allDictBondsIdx2D[ha1][ha2].begin();
+                         iB1 !=allDictBondsIdx2D[ha1][ha2].end(); iB1++)
                     {
-                        if(ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                            !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                        for (std::map<ID, std::map<ID, std::map<ID, 
+                             std::map<ID, std::vector<aValueSet> > > > >::iterator iB2
+                                =iB1->second.begin(); 
+                             iB2 !=iB1->second.end(); iB2++)
+                        {
+                            if (iB2->first == a2NB2)
+                            {
+                                for (std::map<ID, std::map<ID, std::map<ID,  
+                                     std::vector<aValueSet> > > >::iterator iB3
+                                     =iB2->second.begin(); iB3 !=iB2->second.end(); iB3++)
+                                {
+                                    for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB4=iB3->second.begin();
+                                         iB4 !=iB3->second.end(); iB4++)
+                                    {
+                                        for(std::map<ID, std::vector<aValueSet> >::iterator iB5=iB4->second.begin();
+                                                iB5 !=iB4->second.end(); iB5++)
+                                        {
+                                            for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
+                                                iB6 !=iB5->second.end(); iB6++)
+                                            {
+                                                tBs1.push_back(*iB6);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    aValueSet   tVaS;
+                    setValueSet(tVaS, tBs1);
+                    if (tVaS.numCodValues > 10 && tVaS.sigValue <0.03)
+                    {
+                        iB->value        =tVaS.value;
+                        iB->valueST      =iB->value;
+                        iB->sigValue     =tVaS.sigValue;
+                        iB->sigValueST   =iB->sigValue;
+                        iB->numCodValues =tVaS.numCodValues;
+                                
+                        std::cout << "iFind 1 A" << std::endl;           
+                    }        
+                    else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                        && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                        !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end() 
+                        || ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".") 
+                        !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+                    {
+                        if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                            !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                             {
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                             }
@@ -6440,14 +6493,14 @@ namespace LIBMOL
                                 getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
                             }
                     }
-                    else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
-                            && (ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end() 
-                               || ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(".") 
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end()))
+                    else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end() 
+                               || ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".") 
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
                     {
-                        if(ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                        if(ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                             {
                                 getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                             }
@@ -6508,32 +6561,36 @@ namespace LIBMOL
                 }
                 
             }
-            else if (ccp4Bonds.find(allAtoms[tPair[0]].ccp4Type) !=ccp4Bonds.end() 
-                            && (ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end()
-                               || ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(".") !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end()))
+            else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()
+                               || ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".") !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
             {
                 // Without hash code matching for those combination of two atoms. try CCP4 type matching
                 // It is very unlikely we have ccp4 type matching when hash code matching failed.
-                if(ccp4Bonds[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[0]].ccp4Type].end())
+                
+                if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                 {
+                    std::cout << "Here 1 " << std::endl;
                     getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                 }
                 else
                 {
+                    std::cout << "Here 1 " << std::endl;
+                    
                     getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
                 }
             }
-            else if (ccp4Bonds.find(allAtoms[tPair[1]].ccp4Type) !=ccp4Bonds.end() 
-                            && (ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end()
-                                || ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(".") !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end()))
+            else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()
+                                || ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".") !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
             {
                 // Without hash code matching for those combination of two atoms. try CCP4 type matching
                 // It is very unlikely we have ccp4 type matching when hash code matching failed.
-                if(ccp4Bonds[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4Bonds[allAtoms[tPair[1]].ccp4Type].end())
+                if(ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
                 {
                     getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                 }
@@ -6571,13 +6628,104 @@ namespace LIBMOL
     }
     
     void CodClassify::getCCP4Bonds(std::vector<BondDict>::iterator tB, 
-                                   ID tAtm1, ID tAtm2)
+                                   ID tAtom1, ID tAtom2)
     {
-        tB->order    = RealToStr(ccp4Bonds[tAtm1][tAtm2]["order"]);
-        OrderToStr(ccp4Bonds[tAtm1][tAtm2]["order"], tB->order);
-        tB->value    = ccp4Bonds[tAtm1][tAtm2]["length"];
-        tB->sigValue = ccp4Bonds[tAtm1][tAtm2]["sigValue"];
         
+        
+        std::string aOrdS = tB->order.substr(0,4);
+        StrLower(aOrdS);
+     
+        std::string tAtm1, tAtm2; 
+        
+        if (tAtom1.find(".") == std::string::npos)
+        {
+            tAtm1 = tAtom1;
+            tAtm2 = tAtom2;
+        }
+        else
+        {
+            tAtm1 = tAtom2;
+            tAtm2 = tAtom1;
+        }
+        
+        if (ccp4BondsA.find(tAtm1) != ccp4BondsA.end() )
+        {
+            if (ccp4BondsA[tAtm1].find(tAtm2) != ccp4BondsA[tAtm1].end())
+            {
+                if (ccp4BondsA[tAtm1][tAtm2].find(aOrdS) !=ccp4BondsA[tAtm1][tAtm2].end())
+                { 
+                    tB->value    = ccp4BondsA[tAtm1][tAtm2][aOrdS]["length"];
+                    tB->sigValue = ccp4BondsA[tAtm1][tAtm2][aOrdS]["sigValue"];
+                }
+                else
+                {
+                    tB->value    = 
+                    ccp4BondsA[tAtm1][tAtm2][ccp4BondsA[tAtm1][tAtm2].begin()->first]["length"];
+                    tB->sigValue = 
+                    ccp4BondsA[tAtm1][tAtm2][ccp4BondsA[tAtm1][tAtm2].begin()->first]["sigValue"];
+                }
+            }
+            else if (ccp4BondsA[tAtm1].find(".") != ccp4BondsA[tAtm1].end())
+            {
+                if (ccp4BondsA[tAtm1]["."].find(aOrdS) !=ccp4BondsA[tAtm1]["."].end())
+                { 
+                    tB->value    = ccp4BondsA[tAtm1]["."][aOrdS]["length"];
+                    tB->sigValue = ccp4BondsA[tAtm1]["."][aOrdS]["sigValue"];
+                }
+                else
+                {
+                    tB->value    = 
+                    ccp4BondsA[tAtm1]["."][ccp4BondsA[tAtm1]["."].begin()->first]["length"];
+                    tB->sigValue = 
+                    ccp4BondsA[tAtm1]["."][ccp4BondsA[tAtm1]["."].begin()->first]["sigValue"];
+                }
+            }
+            else
+            {
+                std::cout << "Bug: can not find the bond type beginning with CCP4 atom type " 
+                          << tAtm1  << std::endl;
+                exit(1);
+            }
+        }
+        else if (tAtm2.compare(".") != 0 && ccp4BondsA.find(tAtm2) != ccp4BondsA.end() )
+        {
+            if (ccp4BondsA[tAtm2].find(tAtm1) != ccp4BondsA[tAtm2].end())
+            {
+                if (ccp4BondsA[tAtm2][tAtm1].find(aOrdS) !=ccp4BondsA[tAtm2][tAtm1].end())
+                { 
+                    tB->value    = ccp4BondsA[tAtm2][tAtm1][aOrdS]["length"];
+                    tB->sigValue = ccp4BondsA[tAtm2][tAtm1][aOrdS]["sigValue"];
+                }
+                else
+                {
+                    tB->value    = 
+                    ccp4BondsA[tAtm2][tAtm1][ccp4BondsA[tAtm2][tAtm1].begin()->first]["length"];
+                    tB->sigValue = 
+                    ccp4BondsA[tAtm2][tAtm1][ccp4BondsA[tAtm2][tAtm1].begin()->first]["sigValue"];
+                }
+            }
+            else if (ccp4BondsA[tAtm2].find(".") != ccp4BondsA[tAtm2].end())
+            {
+                if (ccp4BondsA[tAtm2]["."].find(aOrdS) !=ccp4BondsA[tAtm2]["."].end())
+                { 
+                    tB->value    = ccp4BondsA[tAtm2]["."][aOrdS]["length"];
+                    tB->sigValue = ccp4BondsA[tAtm2]["."][aOrdS]["sigValue"];
+                }
+                else
+                {
+                    tB->value    = 
+                    ccp4BondsA[tAtm2]["."][ccp4BondsA[tAtm2]["."].begin()->first]["length"];
+                    tB->sigValue = 
+                    ccp4BondsA[tAtm2]["."][ccp4BondsA[tAtm2]["."].begin()->first]["sigValue"];
+                }
+            }
+            else
+            {
+                std::cout << "Bug: can not find the bond type beginning with CCP4 atom type " 
+                          << tAtm2  << std::endl;
+                exit(1);
+            }
+        }
     }
     
     void CodClassify::groupCodMetBonds()
@@ -6708,7 +6856,6 @@ namespace LIBMOL
             tIdx = tPair[0];
             id1   =allAtoms[tPair[1]].chemType;
             id2   =allAtoms[tPair[0]].chemType;
-            
             
             ha1   = (int)allAtoms[tPair[1]].connAtoms.size();
             for (std::vector<int>::iterator iN=allAtoms[tPair[0]].connAtoms.begin();
@@ -7320,6 +7467,7 @@ namespace LIBMOL
                             {
                                 
                                 REAL aOrder = StrToOrder(tBuf[2]);
+                                ID  aSym    = tBuf[2].substr(0,4);
                                 if (aOrder < 0.0)
                                 {
                                     std::cout << "Unknown bond order " << tRecord 
@@ -7336,8 +7484,10 @@ namespace LIBMOL
                                             // std::cout << tRecord << std::endl;
                                             ccp4Bonds[tBuf[0]][tBuf[1]]["order"] = aOrder;
                                             ccp4Bonds[tBuf[0]][tBuf[1]]["length"]= StrToReal(tBuf[4]);
+                                            
                                             ccp4Bonds[tBuf[1]][tBuf[0]]["order"] = aOrder;
                                             ccp4Bonds[tBuf[1]][tBuf[0]]["length"]= StrToReal(tBuf[4]);
+                                            
                                             if (tBuf[5].find('.') == std::string::npos)
                                             {
                                                 ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = StrToReal(tBuf[5]);
@@ -7348,6 +7498,23 @@ namespace LIBMOL
                                                 ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = 0.20;
                                                 ccp4Bonds[tBuf[1]][tBuf[0]]["sigValue"] = StrToReal(tBuf[5]);
                                             }
+                                            
+                                            ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["order"] = aOrder;
+                                            ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["length"]= StrToReal(tBuf[4]);
+                                            ccp4BondsA[tBuf[1]][tBuf[0]][aSym]["order"] = aOrder;
+                                            ccp4BondsA[tBuf[1]][tBuf[0]][aSym]["length"]= StrToReal(tBuf[4]);
+                                            
+                                            if (tBuf[5].find('.') == std::string::npos)
+                                            {
+                                                ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["sigValue"] = StrToReal(tBuf[5]);
+                                                ccp4BondsA[tBuf[1]][tBuf[0]][aSym]["sigValue"] = StrToReal(tBuf[5]);
+                                            }
+                                            else
+                                            {
+                                                ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["sigValue"] = 0.20;
+                                                ccp4BondsA[tBuf[1]][tBuf[0]][aSym]["sigValue"] = 0.20;
+                                            }
+                                            
                                             nBond++;
                                         }
                                         else
@@ -7362,6 +7529,18 @@ namespace LIBMOL
                                             {
                                                 ccp4Bonds[tBuf[0]][tBuf[1]]["sigValue"] = 0.20; 
                                             }
+                                            
+                                            ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["order"] = aOrder;
+                                            ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["length"]= StrToReal(tBuf[4]);
+                                            if (tBuf[5].find('.') == std::string::npos)
+                                            {
+                                                ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["sigValue"] = StrToReal(tBuf[5]);
+                                            }
+                                            else
+                                            {
+                                                ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["sigValue"] = 0.20; 
+                                            }
+                                            
                                             nBond++;
                                         }
                                     }

@@ -57,7 +57,7 @@ namespace LIBMOL
         for(std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA!=tAtoms.end(); iA++)
         {
-            if(!iA->chemType.compare("H")==0)
+            if(iA->chemType.compare("H") !=0)
             {
                 for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
                     iNB !=iA->connAtoms.end(); iNB++)

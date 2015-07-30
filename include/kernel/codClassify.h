@@ -185,9 +185,8 @@ namespace LIBMOL
         
         // Default constructor
         CodClassify();
-        // Copy constructor
-        // CodClassify(const CodClassify & tCodC);
-        // Constructor initiated by a vector of AtomDicts
+        
+        
         CodClassify(const std::vector<AtomDict> & tAtoms);
         
         // 
@@ -649,6 +648,8 @@ namespace LIBMOL
         std::map<ID, ID>                                    codOrgAngleFiles2;
         
         std::map<ID, std::map<ID, std::map<ID, REAL> > >    ccp4Bonds;
+        std::map<ID, std::map<ID, std::map<ID, 
+        std::map<ID, REAL> > > >                            ccp4BondsA;
         std::map<ID, std::map<ID, std::map<ID, REAL> > >    ccp4Angles;
     };
     

@@ -1843,7 +1843,7 @@ namespace LIBMOL
         {
             sOrder = "trip";
         }
-        else if (tOrder == 4)
+        else if (tOrder == 4 || tOrder==1.5)
         {
             sOrder = "aromatic";
         }      
@@ -1880,7 +1880,7 @@ namespace LIBMOL
         {
             sOrder = "trip";
         }
-        else if (tOrder == "4")
+        else if (tOrder == "4" || tOrder=="1.5" )
         {
             sOrder = "aromatic";
         }      

@@ -25,6 +25,8 @@ from rdkit.Chem import rdchem
 from rdkit.Chem import rdmolfiles
 from rdkit.Chem import rdMolTransforms
 from rdkit.Chem import rdmolops
+from rdkit.Chem import Pharm3D 
+from rdkit.Chem.Pharm3D import EmbedLib  
 
 if os.name != 'nt':
     import fcntl
@@ -2391,8 +2393,9 @@ class AcedrgRDKit():
         else:
            
             aConformer =  tMol.GetConformer(tIdxConform)
-            rdmolops.AssignAtomChiralTagsFromStructure(tMol, confId=tIdxConform)
             allAtoms = tMol.GetAtoms()
+
+            rdmolops.AssignAtomChiralTagsFromStructure(tMol, confId=tIdxConform)
 
             # Header section 
            
@@ -2488,6 +2491,7 @@ class AcedrgRDKit():
                 aMmCif.write("_chem_comp_chir.volume_sign\n")
 
                 # Set all chiral atom according to format of mmCif 
+                rdmolops.AssignStereochemistry(tMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
                 chiralIdx = 1
                 for aAtom in allAtoms:      
                     aCT = aAtom.GetChiralTag()
@@ -2505,16 +2509,25 @@ class AcedrgRDKit():
                         #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
                         
                         outSign = ""
-                        aSetIdx = []
+                        aSetIdx = [0, 1, 2]
                         aSetName = []
-                        if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW: 
-                            aSetIdx = [0, 1, 2]
-                            outSign = "positiv"
-                        elif aCT==rdchem.ChiralType.CHI_TETRAHEDRAL_CCW :
-                            aSetIdx = [0, 2, 1]
-                            outSign = "negativ"
+                        if aAtom.HasProp('_CIPCode'):
+                            print "Atom %s "%aAtom.GetProp("Name")
+                            print "CIPCode ", aAtom.GetProp("_CIPCode") 
+                            print "Chiral volume ", EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
+                            tetSign = "Unkown"
+                            if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW:
+                                tetSign = "CW"
+                            elif aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CCW:
+                                tetSign = "CCW"
+                            print "ChiralType ", tetSign
+                            if str(aAtom.GetProp("_CIPCode")).strip()=="S":
+                                outSign = "positive"
+                            elif str(aAtom.GetProp("_CIPCode")).strip()=="R":
+                                outSign = "negative"
+                            else:
+                                outSign = "both"
                         else:
-                            aSetIdx = [0, 1, 2]
                             outSign = "both"
 
                         for bIdx in aSetIdx:
@@ -3405,8 +3418,9 @@ class FileTransformer :
                 else:
                     print "Input file bug: no bond type(order) for bonds!"        
                     sys.exit()
+                    
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
-                                                   sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
+                               sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
             
         
             tOutFile.write("M  END\n")

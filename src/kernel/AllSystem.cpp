@@ -220,7 +220,7 @@ namespace LIBMOL
         
     }
     
-    void AllSystem::resetSystem2(CodClassify& tCodSys)
+    void AllSystem::resetSystem2(CodClassify & tCodSys)
     {
         
         allAtoms.clear();
