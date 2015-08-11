@@ -185,8 +185,7 @@ namespace LIBMOL
         
         // Default constructor
         CodClassify();
-        
-        
+            
         CodClassify(const std::vector<AtomDict> & tAtoms);
         
         // 
@@ -235,6 +234,7 @@ namespace LIBMOL
         int atomPosition(ID tID);
         
         // Transfering between atoms and COD classes
+        
         void codAtomClassify(int dLev);
         void codAtomClassify2(int dLev);
         void codAtomClassifyNew(int dLev);

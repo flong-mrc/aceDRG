@@ -149,7 +149,7 @@ namespace LIBMOL
         setSysProps();
     }
     
-    AllSystem::AllSystem(const CodClassify& tProCodSys, std::string tLibmolTab)
+    AllSystem::AllSystem(const CodClassify & tProCodSys, std::string tLibmolTab)
                           :itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
                            itsCurTorsionSeriNum(ZeroInt),

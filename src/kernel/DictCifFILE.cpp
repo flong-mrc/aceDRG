@@ -7308,7 +7308,7 @@ namespace LIBMOL
                           << "_chem_comp_atom.atom_id" << std::endl
                           << "_chem_comp_atom.type_symbol" << std::endl
                           << "_chem_comp_atom.type_energy" << std::endl
-                          << "_chem_comp_atom.partial_charge" << std::endl
+                          << "_chem_comp_atom.charge" << std::endl
                           << "_chem_comp_atom.x" << std::endl
                           << "_chem_comp_atom.y" << std::endl
                           << "_chem_comp_atom.z" << std::endl;

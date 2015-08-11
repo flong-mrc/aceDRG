@@ -2512,15 +2512,15 @@ class AcedrgRDKit():
                         aSetIdx = [0, 1, 2]
                         aSetName = []
                         if aAtom.HasProp('_CIPCode'):
-                            print "Atom %s "%aAtom.GetProp("Name")
-                            print "CIPCode ", aAtom.GetProp("_CIPCode") 
-                            print "Chiral volume ", EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
+                            #print "Atom %s "%aAtom.GetProp("Name")
+                            #print "CIPCode ", aAtom.GetProp("_CIPCode") 
+                            #print "Chiral volume ", EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
                             tetSign = "Unkown"
                             if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW:
                                 tetSign = "CW"
                             elif aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CCW:
                                 tetSign = "CCW"
-                            print "ChiralType ", tetSign
+                            #print "ChiralType ", tetSign
                             if str(aAtom.GetProp("_CIPCode")).strip()=="S":
                                 outSign = "positive"
                             elif str(aAtom.GetProp("_CIPCode")).strip()=="R":
@@ -3197,17 +3197,17 @@ class FileTransformer :
                         tCharge = float(aAtom["_chem_comp_atom.charge"])
                     elif aAtom.has_key("_chem_comp_atom.partial_charge"):
                         tCharge = float(aAtom["_chem_comp_atom.partial_charge"])
+                        aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.partial_charge"]
                     if math.fabs(float(tCharge)) >=0:
                         self.inputCharge[aAtom["_chem_comp_atom.atom_id"]] = tCharge
-                
             self.atoms = []
             for aAtom in tAtoms:
                 self.atoms.append(aAtom)
             for aAtom in tHAtoms:
                 self.atoms.append(aAtom)
-            
-        # Check
+    
         """
+        # Check
         if len(self.inputCharge) !=0:
             print "The following atoms have charges "
             for aName in self.inputCharge.keys():
