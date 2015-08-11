@@ -2,7 +2,7 @@
   set acedrg_ccp4i [FileJoin [GetEnvPath CCP4] bin acedrg]
   
   # Set commandline scripts  
-  set cmd "[BinPath $acedrg_ccp4i] "
+  set cmd "[BinPath ccp4-python] -u $acedrg_ccp4i "
 
   # Append the command line files with input files according to the working mode
   if { [StringSame $ACEDRG_MODE LIG_GEN] } {
