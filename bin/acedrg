@@ -51,6 +51,16 @@ def listComp(a_list, b_list):
     elif a_list[0] < b_list[0]:
         return -1
 
+def listCompDes(a_list, b_list):
+
+    
+    if int(a_list[1]) < int(b_list[1]):
+        return 1
+    elif int(a_list[1]) > int(b_list[1]):
+        return -1
+    else :
+        return 0
+
 
 #################################################   
 
@@ -2349,14 +2359,17 @@ class AcedrgRDKit():
         # Further: give names to those newly added H atoms
 
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
+        
 
-        """
         print "\nFinally, Number of molecules in the system is ", len(self.molecules)
         # Check
         for aMol in self.molecules:
+            rdmolops.AssignStereochemistry(aMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
             conformers =  aMol.GetConformers()
             print "Number of all atoms in this molecule is ", aMol.GetNumAtoms()
-            for aAtom in aMol.GetAtoms():
+            allAtoms = aMol.GetAtoms()
+            for aAtom in allAtoms:
+                print "******************************"
                 idxA  = aAtom.GetIdx()
                 elemA = aAtom.GetSymbol()
                 name  = aAtom.GetProp("Name") 
@@ -2372,8 +2385,48 @@ class AcedrgRDKit():
                     print "X : %7.4f."%pos.x
                     print "Y : %7.4f"%pos.y
                     print "Z : %7.4f"%pos.z
-        """
- 
+                    aCT = aAtom.GetChiralTag()
+                    aSetAtomNames = []
+                    rdmolops.AssignAtomChiralTagsFromStructure(aMol,  confId=i)
+                    if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
+                        aSetBonds = aAtom.GetBonds()
+                        print "It is in the following bonds: "
+                        for aB in aSetBonds:
+                            print "Bond ", aB.GetIdx()
+                            print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                            print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+                        
+                    outSign = ""
+                    tetSign = "Unkown"
+                    aSetIdx = [0, 1, 2]
+                    aSetName = []
+                    if aAtom.HasProp('_CIPCode'):
+                        print "Chiral center ", name
+                        for bIdx in aSetIdx:
+                            atmIdx1 = aSetBonds[bIdx].GetBeginAtomIdx()  
+                            atmIdx2 = aSetBonds[bIdx].GetEndAtomIdx()  
+                            if atmIdx1 == idxA:                      
+                                aSetName.append(allAtoms[atmIdx2].GetProp("Name"))
+                                print "NB atom ", allAtoms[atmIdx2].GetProp("Name"), " CIPRank:    ", allAtoms[atmIdx2].GetProp("_CIPRank")
+                            elif atmIdx2 == idxA:
+                                aSetName.append(allAtoms[atmIdx1].GetProp("Name"))
+                                print "NB atom ", allAtoms[atmIdx1].GetProp("Name"), " CIPRank:    ", allAtoms[atmIdx1].GetProp("_CIPRank")
+                        print "CIPCode ", aAtom.GetProp("_CIPCode") 
+                        print "Chiral volume ", EmbedLib.ComputeChiralVolume(aMol, aAtom.GetIdx(), i)
+                        if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW:
+                            tetSign = "CW"
+                        elif aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CCW:
+                            tetSign = "CCW"
+                        if str(aAtom.GetProp("_CIPCode")).strip()=="S":
+                            outSign = "positive"
+                        elif str(aAtom.GetProp("_CIPCode")).strip()=="R":
+                            outSign = "negative"
+                        else:
+                            outSign = "both"
+                          
+                    print "ChiralType ", tetSign
+                    print "Stereo     ", outSign
+                print "******************************"
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tMonoName="UNL", tGroupName="non-polymer", tIdxConform=-1):
 
@@ -2534,14 +2587,22 @@ class AcedrgRDKit():
                             atmIdx1 = aSetBonds[bIdx].GetBeginAtomIdx()  
                             atmIdx2 = aSetBonds[bIdx].GetEndAtomIdx()  
                             if atmIdx1 == aIdx:                      
-                                aSetName.append(allAtoms[atmIdx2].GetProp("Name"))
+                                aSetName.append([allAtoms[atmIdx2].GetProp("Name"), allAtoms[atmIdx2].GetProp("_CIPRank")])
                             elif atmIdx2 == aIdx:
-                                aSetName.append(allAtoms[atmIdx1].GetProp("Name"))
+                                aSetName.append([allAtoms[atmIdx1].GetProp("Name"), allAtoms[atmIdx1].GetProp("_CIPRank")])
                             else:
                                 print "Bug! atom %d of %s is not in bonds obtained by aAtom.GetBonds()"%(aIdx, aAtom.GetProp("Name"))
+
+                        aSetName.sort(listCompDes)
+                        print "For chiral center %s  : "%aAtom.GetProp("Name")
+                        print "----------------------------------------------"
+                        for aPair in aSetName:
+                            print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
+                        print "----------------------------------------------"
+                                         
                         aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
-                                     %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0], \
-                                       aSetName[1], aSetName[2], outSign))
+                                     %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0], \
+                                       aSetName[1][0], aSetName[2][0], outSign))
 
             aMmCif.close()
 
