@@ -7249,7 +7249,7 @@ namespace LIBMOL
             
             std::vector<ID>  aAATab;
             initAminoAcidTab(aAATab);
-            if (isAminoAcid(aAATab, longName))
+            if (isAminoAcid(aAATab, longName) && longName.find("PRO")==std::string::npos)
             {
                 ligType = "L-peptide";
             }
