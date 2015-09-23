@@ -98,7 +98,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:S:T:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:S:T:X:Y:")) != -1)
         {
             switch (c)
             {
@@ -185,8 +185,6 @@ namespace LIBMOL
                     break;                    
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
-                    //std::cout << "COD atom types are output to : " 
-                    //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
                 case 'D':
                     IOEntries["libMolTabDir"] = optarg;
@@ -209,7 +207,18 @@ namespace LIBMOL
                     StrLower(IOEntries["TestMode"]);
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
-                    break;                    
+                    break;   
+                case 'X':
+                    IOEntries["Type1"] = optarg;
+                    std::cout << "The file containing atom type set A is "
+                              << IOEntries["Type1"] << std::endl;
+                    break;
+                case 'Y':
+                    IOEntries["Type2"] = optarg;
+                    std::cout << "The file containing atom type set B is "
+                              << IOEntries["Type1"] << std::endl;
+                    break;
+                    
                 case '?':
                     if (std::isprint(optopt))
                     {

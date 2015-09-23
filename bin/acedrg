@@ -53,7 +53,6 @@ def listComp(a_list, b_list):
 
 def listCompDes(a_list, b_list):
 
-    
     if int(a_list[1]) < int(b_list[1]):
         return 1
     elif int(a_list[1]) > int(b_list[1]):
@@ -61,6 +60,14 @@ def listCompDes(a_list, b_list):
     else :
         return 0
 
+def listCompAcd(a_list, b_list):
+
+    if int(a_list[0]) > int(b_list[0]):
+        return 1
+    elif int(a_list[0]) < int(b_list[0]):
+        return -1
+    else :
+        return 0
 
 #################################################   
 
@@ -238,6 +245,9 @@ class Acedrg(CExeCode ):
         self.acedrgTables     = ""
         self.libmol           = ""
         self.libmolLogName    = ""
+        self.libmolAT1        = ""
+        self.libmolAT2        = ""
+        self.libmolMatched    = ""
         self.libcheck         = ""
         self.libcheckLogName  = ""
         self.refmac           = ""
@@ -853,14 +863,20 @@ class Acedrg(CExeCode ):
                         print aExCif
 
         if self.workMode == 31 or self.workMode == 32 or self.workMode == 33 or self.workMode == 34 or self.workMode == 35 : 
-            print "===================================================================" 
-            print "| Generate atom types of Acedrg style and CCP4 style              |"
-            print "===================================================================" 
+            #print "===================================================================" 
+            #print "| Generate atom types of Acedrg style                             |"
+            #print "===================================================================" 
             if self.workMode == 31 or self.workMode == 32:
                 if tIn:
-                    self.inMmCifName    = tIn
-                self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
-                self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, self.inMmCifName, self.outAtmTypeName)
+                    inFileName    = tIn
+                else:
+                    inFileName    = self.inMmCifName
+                if tIdxMol !=-1:  
+                    aStr = "1"
+                else:
+                    aStr = "2"
+                self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
+                self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
                 #print self._cmdline
                 self.subExecute()
                 
@@ -870,7 +886,12 @@ class Acedrg(CExeCode ):
             self._cmdline += " -y y -o %s "%(self.outRstCifName)
             #print self._cmdline
             self.subExecute()
-             
+
+        if self.workMode ==900:
+            self._cmdline += " -T yes -X %s -Y %s"%(self.libmolAT1, self.libmolAT2)
+            self._cmdline += " -o %s "%self.libmolMatched
+            self.subExecute()
+        
     def getBondsAndAngles(self, tFName, tMolTabs):
         
         for aMonTab in tMolTabs:
@@ -1317,7 +1338,7 @@ class Acedrg(CExeCode ):
         else:
             print "No dictionary file produced ! " 
                         
-    def getFinalOutputFiles(self, tRoot, tDataDescriptor=None, tDelocList=None):
+    def getFinalOutputFiles(self, tRoot, tMol, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
        
         if os.path.isfile(self.refmacXYZOUTName):
             if tRoot !="":
@@ -1331,12 +1352,12 @@ class Acedrg(CExeCode ):
                 self.inPdbName        = finPdb 
                 self.inMmCifName      = self.outRstCifName
                 self.outRstCifName    = finRst
-                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tDataDescriptor, tDelocList)
+                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
                 print "===================================================================" 
         else:
             print "Failed to produce %s after final geometrical optimization"%finPdb
 
-    def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tDataDescriptor=None, tDelocList=None):
+    def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
 
         cifCont = {}
         cifCont['head'] = []
@@ -1569,7 +1590,28 @@ class Acedrg(CExeCode ):
                             else:
                                 aL1 = monoId + aL[3:]
                                 tOutCif.write(aL1)
-
+                    
+                    if tStrDescriptors.has_key("props") and len(tStrDescriptors["props"]) !=0:
+                        tOutCif.write("loop_"+"\n")
+                        for aL in tStrDescriptors["props"]:
+                            tOutCif.write(aL+"\n")
+                        for aL in tStrDescriptors["entries"]:
+                            tOutCif.write(aL)
+                    elif tStrDescriptors.has_key("defProps") and tStrDescriptors.has_key("defSmiles"):
+                        for aProp in tStrDescriptors["defProps"]:
+                            tOutCif.write(aProp+"\n")
+                        for aL in tStrDescriptors["defSmiles"]:
+                            tOutCif.write(aL+"\n")
+                    else:
+                        aList = ["loop_", "_pdbx_chem_comp_descriptor.comp_id", "_pdbx_chem_comp_descriptor.type", \
+                               "_pdbx_chem_comp_descriptor.program", "_pdbx_chem_comp_descriptor.program_version",\
+                               "_pdbx_chem_comp_descriptor.descriptor"]
+                        
+                        for aProp in aList:
+                            tOutCif.write(aProp+"\n")
+                        aSmi             = tMol.GetProp("SmilesOut")
+                        tOutCif.write("%s%s%s%s\"%s\"\n"%(monoId.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00", \
+                                    aSmi))           
                     tOutCif.close()
                         
     def execute(self):
@@ -1739,21 +1781,97 @@ class Acedrg(CExeCode ):
         # print self.workMode
         if self.workMode == 11 or self.workMode == 111:
             # The input file is an mmcif file     
-            aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
             if os.path.isfile(self.inMmCifName):
-                aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
-                self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName)
+                self.fileConv.mmCifReader(self.inMmCifName)
                 if len(self.fileConv.dataDescriptor):
-                    self.setMonoRoot(self.fileConv.dataDescriptor)  
-                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \
-                   and os.path.isfile(aIniMolName) :
-                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
+                    self.setMonoRoot(self.fileConv.dataDescriptor) 
+                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 :
+                    # Option A: 
+                    if self.fileConv.strDescriptors.has_key("props") \
+                       and self.fileConv.strDescriptors.has_key("entries"):
+                        iProp = 0
+                        iType = -1
+                        iDes  = -1
+                        lSmi  = False
+                        aSmi  = ""
+
+                        for aProp in self.fileConv.strDescriptors["props"]:
+                            if aProp.find("_pdbx_chem_comp_descriptor.type") !=-1:
+                                iType = iProp
+                            elif aProp.find("_pdbx_chem_comp_descriptor.descriptor") !=-1:
+                                iDes = iProp
+                            iProp +=1
+                        if iType > 0  and iDes > 0 :
+                            # Get Canonical one 
+                            for aEnt in self.fileConv.strDescriptors["entries"]:
+                                strGrp = aEnt.strip().split()
+                                if len(strGrp)==len(self.fileConv.strDescriptors["props"]):
+                                    if strGrp[iType].upper().find("CANONICAL") !=-1:
+                                        if strGrp[iDes][0].find('\"') !=-1 or strGrp[iDes][0].find("\'") !=-1: 
+                                            aSmi = strGrp[iDes][1:-1]
+                                        else:
+                                            aSmi = strGrp[iDes][0:]
+                                        lSmi = True    
+                                        break
+                            if not lSmi:   # Get any smiles
+                                for aEnt in self.fileConv.strDescriptors["entries"]:
+                                    strGrp = aEnt.strip().split()
+                                    if len(strGrp)==len(self.fileConv.strDescriptors["props"]):
+                                        if strGrp[iType].upper().find("SMILES") !=-1:
+                                            lSmi = True    
+                                            aSmi = strGrp[iDes][1:-1]
+                                            break
+
+                        if lSmi :
+                            aIniSmiName = os.path.join(self.scrDir, self.baseRoot + "_init.smi")
+                            #print "Smiles file ", aIniSmiName
+                            #print "Smiles str  ", aSmi
+                            fSmi = open(aIniSmiName, "w")
+                            fSmi.write(aSmi+"\n")
+                            fSmi.close()
+                            self.rdKit.initMols("smi", aIniSmiName, self.monomRoot,\
+                                                self.chemCheck, self.inputPara["PH"], self.numConformers, 0)
+                            if len(self.rdKit.molecules) !=0:
+                                self.workMode = 31
+                                tSmiMmcifName = os.path.join(self.scrDir, "tSmi.cif")
+                                self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tSmiMmcifName, self.monomRoot)
+                                self.runLibmol(tSmiMmcifName, 1)
+
+                                # Mode 2           
+                                aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                                if os.path.isfile(self.inMmCifName):
+                                    aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                                    self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
+                                    if os.path.isfile(aIniMolName) :
+                                        self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
+                                             self.chemCheck, self.inputPara["PH"], self.numConformers, 2,\
+                                             self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
+                                        tMolMmcifName = os.path.join(self.scrDir, "tSmi.cif")
+                                        self.rdKit.MolToSimplifiedMmcif(self.rdKit.moleculesB[0], tMolMmcifName, self.monomRoot)
+                                        self.runLibmol(tMolMmcifName)
+                            self.libmolAT1     = os.path.join(self.scrDir, "atomTypes_1.txt")
+                            self.libmolAT2     = os.path.join(self.scrDir, "atomTypes_2.txt")
+                            self.libmolMatched = os.path.join(self.scrDir, "matchedType.txt")
+                            if os.path.isfile(self.libmolAT1) and os.path.isfile(self.libmolAT2):
+                                 self.workMode = 900
+                                 self.runLibmol()
+                                 self.fileConv.mergeAtomNames(self.libmolMatched, self.rdKit.molecules[0]) 
+                            self.workMode = 11
+                    else: 
+                        aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                        if os.path.isfile(self.inMmCifName):
+                            aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                            self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 1)
+                            if os.path.isfile(aIniMolName) :
+                                self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
+                                                self.numConformers, 0, self.fileConv.nameMapingCifMol,\
+                                                self.fileConv.inputCharge) 
+                    
         if self.workMode == 12 or self.workMode == 121:
           
             # The input file is  a SMILES file
             if os.path.isfile(self.inSmiName):
                 self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)           
-                        
         if self.workMode == 13 or self.workMode == 131 :
                 
             # The input file is  a mol file
@@ -1771,16 +1889,16 @@ class Acedrg(CExeCode ):
             # The input file is a mol2 file
             if os.path.isfile(self.inMol2Name):
                 self.runLibmol(self.inMol2Name)
-                print self.outRstCifName
+                #print self.outRstCifName
                 if not self.runExitCode and os.path.isfile(self.outRstCifName):
                     aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                     if os.path.isfile(self.outRstCifName):
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
-                        print aIniMolName
+                        #print aIniMolName
                         self.fileConv.MmCifToMolFile(self.outRstCifName, aIniMolName)
                         if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \
                            and os.path.isfile(aIniMolName) :
-                            self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, self.fileConv.nameMapingCifMol)    
+                            self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingCifMol)    
             else: 
                 print self.inMol2Name, "can not be found for reading "
                 sys.exit()
@@ -1791,9 +1909,10 @@ class Acedrg(CExeCode ):
             self.workMode = 111
 
         #print "workMode : ", self.workMode
-        print "Ligand ID ", self.monomRoot
+        #print "Ligand ID ", self.monomRoot
 
         if self.workMode == 11 or self.workMode == 111:
+            #print len(self.rdKit.molecules)
             if len(self.rdKit.molecules):
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
             for iMol in range(len(self.rdKit.molecules)):
@@ -1832,6 +1951,7 @@ class Acedrg(CExeCode ):
                                 self.fileConv.MolToPDBFile(aConfPdb, idxMol, self.rdKit.molecules[idxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf)
                                 if os.path.isfile(aConfPdb):
                                     inPdbNamesRoot[idxMol].append(tPdbRoot)
+
                         # Stage 2: optimization
                         print "===================================================================" 
                         print "| Geometrical Optimization                                        |"
@@ -1847,7 +1967,7 @@ class Acedrg(CExeCode ):
                                 if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
                                     if len(self.rdKit.molecules) ==1 and len(inPdbNamesRoot[idxMol])==1:
                                         aFRoot = ""
-                                    self.getFinalOutputFiles(aFRoot, self.fileConv.ccp4DataDes,self.fileConv.delocBondList)
+                                    self.getFinalOutputFiles(aFRoot, self.rdKit.molecules[idxMol], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
                                 else:
                                     print "Failed to produce the final coordinates after geometrical optimization"
                                     sys.exit()
@@ -1926,6 +2046,8 @@ class AcedrgRDKit():
     def __init__(self, tGFFName = ""):
 
         self.molecules = []
+        self.moleculesA = []
+        self.moleculesB = []
 
         self.funcGroupTab     = {}
         self.stdFuncGroupMols = []
@@ -1938,7 +2060,7 @@ class AcedrgRDKit():
          
         self.chemCheck = ChemCheck()
 
-    def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tNameMap=None, tChargeList=None):
+    def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tMode=0, tNameMap=None, tChargeList=None):
 
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
@@ -1957,7 +2079,6 @@ class AcedrgRDKit():
                 #print "Molecule name:  ", aMolName
                 aMolT     = Chem.MolFromMol2File(tFileName)
                 self.chemCheck.addHs(aMolT)
-                
             else:
                 print "File %s does not exist "%tFileName
                 sys.exit()
@@ -1974,9 +2095,10 @@ class AcedrgRDKit():
                     aSmiStr = fSmi.read()
                     #print aSmiStr 
                     aMolT     = Chem.MolFromSmiles(aSmiStr)
+                    aMolT.SetProp("SmilesIn", aSmiStr)
             else:
                 # SMILES string in from a commandline  
-                print tFileName
+                #print tFileName
                 aMolT     = Chem.MolFromSmiles(tFileName)
 
         if not aMolT:
@@ -1985,8 +2107,16 @@ class AcedrgRDKit():
             sys.exit()
         else:
             aMolT.SetProp("ResidueName", tMonoRoot)
-            self.setOtherMolInfo(aMolT, tNumConf, tChemCheck, tPH, tNameMap, tChargeList)
- 
+            self.setOtherMolInfo(aMolT, tNumConf, tChemCheck, tPH, tNameMap, tMode, tChargeList)
+
+            """
+            lenA = len(self.moleculesA)
+            lenB = len(self.moleculesB)
+            lenG = len(self.molecules)
+            if lenA !=0 and lenB !=0 and lenA==lenB :
+                self.mergeAtomNames()
+                self.molecules = []
+            """
 
     def setNamesForAtomsInMol(self, tMol, tChemCheck, tNameMap, tStage=0):
    
@@ -2280,9 +2410,9 @@ class AcedrgRDKit():
                 #else:
                 #    print "Conformer: ", aId, " is not optimized"
 
-        self.molecules.append(tMol) 
+        #self.molecules.append(tMol) 
 
-    def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tChargeList=None):
+    def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None):
 
         print "A molecule with residue name %s is generated"%tMol.GetProp("ResidueName")
         nAtoms   =  tMol.GetNumAtoms()
@@ -2298,10 +2428,10 @@ class AcedrgRDKit():
                     aAtom.SetFormalCharge(int(tChargeList[name]))
                 else:
                     aAtom.SetFormalCharge(0)
-                    
-        """
+        """            
         # Check
         print "\nBefore setup formal charges in the molecule"
+        allAtoms = tMol.GetAtoms()
         for aAtom in tMol.GetAtoms():
             idxA  = aAtom.GetIdx()
             elemA = aAtom.GetSymbol()
@@ -2313,7 +2443,14 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
+            print "It is in the following bonds: "
+            aSetBonds = aAtom.GetBonds()
+            for aB in aSetBonds:
+                print "Bond ", aB.GetIdx()
+                print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+        print "==========================================="
+        """            
 
 
         if tPH[0] :
@@ -2321,9 +2458,9 @@ class AcedrgRDKit():
         else:
             self.setAllFormalChargeFuncGroupAtoms(tMol)
 
-        """
-        print "\nNumber of all atoms in this molecule is ", tMol.GetNumAtoms()
+        """            
         print "Before Sanitize the molecule"
+        print "Number of all atoms in this molecule is ", tMol.GetNumAtoms()
         for aAtom in tMol.GetAtoms():
             idxA  = aAtom.GetIdx()
             elemA = aAtom.GetSymbol()
@@ -2335,12 +2472,11 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
+        """            
 
         Chem.SanitizeMol(tMol)
 
         """
-        print "\nAfter Sanitize the molecule"
         for aAtom in tMol.GetAtoms():
             idxA  = aAtom.GetIdx()
             elemA = aAtom.GetSymbol()
@@ -2356,22 +2492,54 @@ class AcedrgRDKit():
 
         aMol = Chem.AddHs(tMol)
  
+        allAtoms = aMol.GetAtoms()
+        #print "After sanitize the molecule"
+        #print "Number of atom is ", len(allAtoms)
 
         self.setInitConformersOneMol(aMol, tNumConf)
 
         # Further: give names to those newly added H atoms
 
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
-        
 
-        print "\nNumber of molecules in the system is ", len(self.molecules)
+        if aMol.HasProp('SmilesIn'):
+            #print "Input SMILES : ", aMol.GetProp("SmilesIn")
+            aMol.SetProp("SmilesOut", aMol.GetProp("SmilesIn"))
+        else:
+            isomericSmiles   = True
+            kekuleSmiles     = True 
+            rootedAtAtom     = -1
+            canonical        = True
+            allBondsExplicit = False
+            aMol.SetProp("SmilesOut", Chem.MolToSmiles(aMol, isomericSmiles, kekuleSmiles, rootedAtAtom, canonical, allBondsExplicit))
+            #print "Output SMILES ", aMol.GetProp("SmilesOut")         
+      
+        tCurMols = [] 
+        if tMode ==0: 
+            self.molecules.append(aMol)
+            tCurMols = self.molecules 
+        elif tMode ==1:
+            self.moleculesA.append(aMol) 
+            tCurMols = self.moleculesA 
+        elif tMode ==2:
+            self.moleculesB.append(aMol) 
+            tCurMols = self.moleculesB 
         """
         # Check
-        for aMol in self.molecules:
+        tCurMols = [] 
+        if tMode ==0: 
+            tCurMols = self.molecules 
+        elif tMode ==1:
+            tCurMols = self.moleculesA 
+        elif tMode ==2:
+            tCurMols = self.moleculesB 
+
+        for aMol in tCurMols:
             rdmolops.AssignStereochemistry(aMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
             conformers =  aMol.GetConformers()
             print "Number of all atoms in this molecule is ", aMol.GetNumAtoms()
             allAtoms = aMol.GetAtoms()
+            #print "Number of atom is ", len(allAtoms)
             for aAtom in allAtoms:
                 print "******************************"
                 idxA  = aAtom.GetIdx()
@@ -2433,12 +2601,47 @@ class AcedrgRDKit():
                 print "******************************"
         """
 
+    def mergeAtomNames(self):
+
+        if len(self.moleculesA) == len(self.moleculesB):
+            for iMolA in range(len(self.moleculesA)):
+                allAtomsA =  self.moleculesA[iMolA].GetAtoms()
+                allAtomsB =  self.moleculesB[iMolA].GetAtoms()
+                aList =[]
+                bList =[]
+                aLen = len(allAtomsA)
+                bLen = len(allAtomsB)
+
+                for iAtmsA in range(aLen):
+                    aCR = allAtomsA[iAtmsA].GetProp("_CIPRank")
+                    aList.append([iAtmsA, int(aCR), allAtomsA[iAtmsA]])
+                    if iAtmsA < bLen:
+                        bCR = allAtomsB[iAtmsA].GetProp("_CIPRank")
+                        bList.append([iAtmsA, int(bCR), allAtomsB[iAtmsA]])
+
+                aList.sort(listCompDes)
+                bList.sort(listCompDes)
+                """
+                for iA in range(aLen):
+                    print "A: atom ",  aList[iA][2].GetProp("Name")
+                    print "CIPRank ",  aList[iA][1]
+                print "\n"
+                for iB in range(bLen):
+                    print "B: atom ",  bList[iB][2].GetProp("Name")
+                    print "CIPRank ",  bList[iB][1]
+                """
+                for iP in range(aLen):
+                    if iP < bLen:
+                        # print "AList : atom ", aList[iP][2].GetProp("Name"), " is with CIPRank ", aList[iP][1]
+                        aList[iP][2].SetProp("Name", bList[iP][2].GetProp("Name"))
+                        #print "AList: new name ", aList[iP][2].GetProp("Name")
+                        #print "BList: atom ", bList[iP][2].GetProp("Name"), " is with CIPRank ", bList[iP][1]
+
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tMonoName="UNL", tGroupName="non-polymer", tIdxConform=-1):
 
         # A simplified mmcif file contains:
         # (1) Header section      
         # (2) Description of atoms in the molecule
-        #     where atom ccp4 type will be absent first and be setup later
         # (3) Description of bonds in the molecule
         # (4) Chiral section 
     
@@ -2640,26 +2843,25 @@ class AcedrgRDKit():
             self.stdFuncGroupMols.append([aKey, Chem.MolFromSmarts(self.funcGroupTab[aKey][0]),  Chem.MolFromSmiles(self.funcGroupTab[aKey][0])])
 
     def getAllFuncGroupAtoms(self, tMol):
-
+        self.funcGroups = {}
         for aTri in self.stdFuncGroupMols:
-            #print "search for the functional group %s "%aTri[0]
-            #print "its substructure ", aTri[1]
             atmGrpIdxs = tMol.GetSubstructMatches(aTri[1])
             if len(atmGrpIdxs)==0:
                 atmGrpIdxs = tMol.GetSubstructMatches(aTri[2])
-            #print "number of substruct ", atmGrpIdxs
             if len(atmGrpIdxs):
+                #print "search for the functional group %s "%aTri[0]
+                #print "number of substruct ", atmGrpIdxs
                 #print "Those atoms in this molecule are found in functional group %s: "%aTri[0]
                 allAs = tMol.GetAtoms()
                 #for i in range(len(atmGrpIdxs)):
                 #    for aIdx in atmGrpIdxs[i]:
                 #        print "atom ", allAs[aIdx].GetProp("Name")
-                #    print ""
                 if not self.funcGroups.has_key(aTri[0]):
                     self.funcGroups[aTri[0]] = []
                 for oneAtmIdxGrp in atmGrpIdxs:
                     #print aTri[0], "add func atoms"
                     self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
+                #print ""
 
     # The following methods are migrated from Acedrg c++ section
 
@@ -2673,14 +2875,16 @@ class AcedrgRDKit():
                     #print "Doing ", aFuncG
                     self.setFormalChargeC_A_T(tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-TER")!=-1:
+                    #print "Doing ", aFuncG
                     self.setFormalChargeC_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-ASP")!=-1:
+                    #print "Doing ", aFuncG
                     self.setFormalChargeC_ASP(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("AMINO-TER") !=-1:
                     #print "Doing ", aFuncG
                     self.setFormalChargeA_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("VAR-A-TER") !=-1:
-                    print "Doing ", aFuncG
+                    #print "Doing ", aFuncG
                     self.setFormalChargeV_A_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-LYS") !=-1:
                     #print "Doing ", aFuncG
@@ -2713,8 +2917,8 @@ class AcedrgRDKit():
                     #print "Doing ", aFuncG
                     self.setFormalChargePO4(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO3R") !=-1:
-                    print "Doing ", aFuncG
-                    print self.funcGroups[aFuncG] 
+                    #print "Doing ", aFuncG
+                    #print self.funcGroups[aFuncG] 
                     self.setFormalChargePO3R(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
 
     def setFormalChargeC_T(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -2757,7 +2961,10 @@ class AcedrgRDKit():
         #print "PH  ", tPH
         if tPH > tPka :
             for aSetIdxs in tAtomIdxs:
+                #print "a set of atoms: "
+                #print aSetIdxs
                 for aIdx in aSetIdxs:
+                    #print "Atom : ", tMol.GetAtomWithIdx(aIdx).GetProp("Name")
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
@@ -2786,9 +2993,9 @@ class AcedrgRDKit():
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:    # implicit H included in the count
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
-                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
-                            print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
          
     def setFormalChargeNH_LYS(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -2911,6 +3118,8 @@ class AcedrgRDKit():
     def setFormalChargeBZ_TYR(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
+        #print "PH ", tPH
+        #print "tPka ", tPka
         if tPH > tPka :
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
@@ -2983,11 +3192,21 @@ class FileTransformer :
     def __init__(self):
 
         self.dataDescriptor  = {} 
+        self.strDescriptors  = {} 
+        self.strDescriptors["defProps"]    = ["loop_", "_pdbx_chem_comp_descriptor.comp_id", "_pdbx_chem_comp_descriptor.type", \
+                               "_pdbx_chem_comp_descriptor.program", "_pdbx_chem_comp_descriptor.program_version",\
+                               "_pdbx_chem_comp_descriptor.descriptor"]
+        self.strDescriptors["defSmiles"]   = []
+
         self.atoms           = []
         self.bonds           = []
         self.chirals         = []
 
-        self.allBlockLs     =  []
+        self.atomTypeMaps    = {}
+        self.atomTypeMaps["atomTypes"]    = {}
+        self.atomTypeMaps["connections"] = {}
+
+        self.allBlockLs      = []
 
         self.bondTypeMmcifToMol = {}
         self.bondTypeMmcifToMol["SING"] = "1"
@@ -2997,7 +3216,7 @@ class FileTransformer :
         self.bondTypeMmcifToMol["TRIP"] = "3"
         self.bondTypeMmcifToMol["3"]    = "3"
         self.bondTypeMmcifToMol["AROM"] = "4"
-        self.bondTypeMmcifToMol["AR"] = "4"
+        self.bondTypeMmcifToMol["AR"]   = "4"
         self.bondTypeMmcifToMol["DELO"] = "1"
         self.bondTypeMmcifToMol["ANY"]  = "8"
      
@@ -3013,6 +3232,8 @@ class FileTransformer :
                             "_chem_comp.name", "_chem_comp.group",    \
                             "_chem_comp.number_atoms_all", "_chem_comp.number_atoms_nh", \
                             "_chem_comp.desc_level"]
+
+        self.rdkitSmiles  = {}
 
         self.ccp4MmCifDataMap = {}
 
@@ -3050,8 +3271,8 @@ class FileTransformer :
                         self.allBlockLs.append(aBlockLs)
                     aBlockLs     = []
                 else:
-                    if aL.find("#") == -1:
-                        aBlockLs.append(aL)         
+                    if aL.strip()[0].find("#") == -1:
+                        aBlockLs.append(aL)  
 
             # Last block
             if len(aBlockLs):
@@ -3062,7 +3283,7 @@ class FileTransformer :
             if len(self.allBlockLs):
                 for aBlk in self.allBlockLs:
                     self.parseOneMmCifBlk(aBlk)
-              
+  
     def parseOneMmCifBlk(self, tBlk):
 
         if len(tBlk):
@@ -3079,6 +3300,10 @@ class FileTransformer :
                 elif aL.find("_chem_comp_chir.") !=-1:
                     self.getProp(tBlk, "chiral")
                     break
+                elif aL.find("_pdbx_chem_comp_descriptor") !=-1:
+                    self.getProp(tBlk, "strDescriptor")
+                    break
+
 
     def getDataDescriptor(self, tBlk):
 
@@ -3104,15 +3329,15 @@ class FileTransformer :
         if l2: # 2 col format
             iC =0
             for aL in tBlk:
-                if aL.find("\'") !=-1:
-                    strGrp = aL.strip().split("\'")
-                    if len(strGrp) >= 2: 
-                        self.dataDescriptor[iC]=[strGrp[0], "\'"+ strGrp[1] + "\'"]
-                        iC +=1
-                elif aL.find("\"") !=-1:
+                if aL.find("\"") !=-1:
                     strGrp = aL.strip().split("\"")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\""+ strGrp[1] + "\""]
+                        iC +=1
+                elif aL.find("\'") !=-1 :
+                    strGrp = aL.strip().split("\'")
+                    if len(strGrp) >= 2: 
+                        self.dataDescriptor[iC]=[strGrp[0], "\'"+ strGrp[1] + "\'"]
                         iC +=1
                 else:
                     strGrp = aL.strip().split()
@@ -3194,6 +3419,10 @@ class FileTransformer :
             elif self.dataDescriptor[aKey][0].find("_chem_comp.type") !=-1:
                 if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
                     s4 = "L-PEPTIDE"
+                elif self.dataDescriptor[aKey][1].upper().find("DNA ") !=-1 :
+                    s4 = "DNA"
+                elif self.dataDescriptor[aKey][1].upper().find("RNA ") !=-1 :
+                    s4 = "RNA"
                 else:
                     s4 = self.dataDescriptor[aKey][1]  
             
@@ -3203,6 +3432,12 @@ class FileTransformer :
                                     s7.ljust(len(s7)+5))
         self.ccp4DataDes.append(aLine)
 
+        # set a SMILES string here from the molecule
+        aSmi             = tMol.GetProp("SmilesOut")
+        aLine = "%s%s%s%s\"%s\"\n"%(tMonomRoot.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00", \
+                                    aSmi)                                    
+        self.strDescriptors["defSmiles"].append(aLine)
+
         # Check
         #for aL in self.ccp4DataDes:
         #    print aL
@@ -3211,13 +3446,24 @@ class FileTransformer :
 
         # multiple col format          
         colIdx = []
+        iStrD = 0
         for aL in tBlk:
             strGrp = aL.strip().split()
-            if len(strGrp) == 1:
+            if len(strGrp) == 1 and strGrp[0].find(";")==-1:
                 colIdx.append(strGrp[0])
             else:
-                if aL.find("\"") ==-1:
-                    if len(strGrp) ==len(colIdx):
+                if aL.find("\"") !=-1:
+                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
+                        strGrp1 = aL.strip().split("\"")
+                        strGrp  = []
+                        for aStrC in strGrp1:
+                            strGrp2 = aStrC.strip().split()
+                            if len(strGrp2) !=0:
+                                for aS in strGrp2:
+                                    strGrp.append(aS)
+
+                if len(strGrp)==len(colIdx):
+                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
                         aProp = {}
                         for i in range(len(strGrp)):
                             aProp[colIdx[i]] = strGrp[i]
@@ -3227,47 +3473,15 @@ class FileTransformer :
                             self.bonds.append(aProp)
                         elif tProp =="chiral":
                             self.chirals.append(aProp)
-                else:    
-                    strGrp1 = aL.strip().split("\"")
-                    strGrp  = []
-                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
-                        for aStrC in strGrp1:
-                            strGrp2 = aStrC.strip().split()
-                            if len(strGrp2) !=0:
-                                for aS in strGrp2:
-                                    strGrp.append(aS)
-                        if len(strGrp)==len(colIdx):
-                            aProp = {}
-                            for i in range(len(strGrp)):
-                                aProp[colIdx[i]] = strGrp[i]
-                            if tProp =="atom":
-                                self.atoms.append(aProp)
-                            elif tProp =="bond":
-                                self.bonds.append(aProp)
-                            elif tProp =="chiral":
-                                self.chirals.append(aProp)
-                    """
-                    if len(strGrp1) == 3: 
-	                strGrp10 = strGrp1[0].strip().split()
-                        strGrp12 = strGrp1[2].strip().split()
-                        for aS in strGrp10:
-                            strGrp.append(aS)
-                        strGrp.append("\"" + strGrp1[1] + "\"")
-                        for aS in strGrp12:
-                            strGrp.append(aS)
-                        if len(strGrp)==len(colIdx):
-                            aProp = {}
-                            for i in range(len(strGrp)):
-                                aProp[colIdx[i]] = strGrp[i]
-                            if tProp =="atom":
-                                self.atoms.append(aProp)
-                            elif tProp =="bond":
-                                self.bonds.append(aProp)
-                            elif tProp =="chiral":
-                                self.chirals.append(aProp)
-                    """
-
-
+                    elif tProp =="strDescriptor":
+                        if not self.strDescriptors.has_key("props"):
+                            self.strDescriptors["props"] = []
+                            for iProp in colIdx: 
+                                self.strDescriptors["props"].append(iProp)
+                        if not self.strDescriptors.has_key("entries"):
+                            self.strDescriptors["entries"] = []
+                        self.strDescriptors["entries"].append(aL)
+    
         if tProp =="atom":
             tAtoms = []
             tHAtoms = []
@@ -3320,6 +3534,14 @@ class FileTransformer :
                     for i in range(len(colIdx)):
                         aStr +="%s"%aChiral[colIdx[i]].ljust(8)
                     print aStr
+
+        if tProp =="strDescriptor":
+            if len(self.strDescriptors["props"]):
+                for aProp in self.strDescriptors["props"]:
+                    print aProp
+                for aEn in self.strDescriptors["entries"]:
+                    print aEn.strip()
+
         """
 
     def getCCP4MmCifMap(self):
@@ -3379,9 +3601,187 @@ class FileTransformer :
                 print "Atom %s and %s "%(aPair[0], aPair[1]) 
         """
 
-    def MmCifToMolFile(self, tInFileName, tOutMolName):
+    def mergeAtomNames(self, tFileName, tMol):
+
+        try:
+            tFile = open(tFileName, "r")
+        except IOError:
+            print "%s can not be open for reading "%tFileName
+            sys.exit()
+        else:
+            nameMap = {}
+            for aL in tFile.readlines():
+                aL = aL.strip()
+                if len(aL) !=0:
+                    if aL.find("#")==-1:
+                        strGrp= aL.split()
+                        if len(strGrp)==2:
+                            nameMap[strGrp[0].strip()] = strGrp[1].strip()
+            tFile.close()
+
+            for aAtom in tMol.GetAtoms():
+                oldName = aAtom.GetProp("Name") 
+                if nameMap.has_key(oldName):
+                    aAtom.SetProp("Name", nameMap[oldName]) 
+                    print "Atom' old name %s : new name %s"%(oldName, aAtom.GetProp("Name"))
+
+         
+    def setAtomDicts(self, tFileName, tAtomTypeMaps):
+
+        try:
+            tFile = open(tFileName, "r")
+        except IOError:
+            print "%s can not be open for reading "%tFileName
+            sys.exit()
+        else:
+            lA = False
+            lC = False
+            for aL in tFile.readlines():
+                aL = aL.strip()
+                if len(aL) !=0:
+                    if aL.find("ATOMS:") !=-1:
+                        lA = True
+                        lC = False
+                    elif aL.find("CONNECTIONS:") !=-1:
+                        lC = True
+                        lA = False
+                    else:
+                        strGrp = aL.strip().split()
+                        if len(strGrp)==4: 
+                            if lA :
+                                idxA = int(strGrp[0])
+                                if not tAtomTypeMaps["atomTypes"].has_key(strGrp[3]):
+                                    tAtomTypeMaps["atomTypes"][strGrp[3]]=[]
+                                tAtomTypeMaps["atomTypes"][strGrp[3]].append(idxA)
+                                if not tAtomTypeMaps["atoms"].has_key(idxA):
+                                    tAtomTypeMaps["atoms"][idxA]={}
+                                tAtomTypeMaps["atoms"][idxA]["elem"]  = strGrp[1]
+                                tAtomTypeMaps["atoms"][idxA]["name"]  = strGrp[2]
+                                tAtomTypeMaps["atoms"][idxA]["class"] = strGrp[3]
+                        if len(strGrp)==2: 
+                            if lC :
+                                idx0 = int(strGrp[0])
+                                idx1 = int(strGrp[1])
+                                if not tAtomTypeMaps["connections"].has_key(idx0):
+                                    tAtomTypeMaps["connections"][idx0]=[]
+                                if not tAtomTypeMaps["connections"].has_key(idx1):
+                                    tAtomTypeMaps["connections"][idx1]=[]
+                                tAtomTypeMaps["connections"][idx0].append(idx1)
+                                tAtomTypeMaps["connections"][idx1].append(idx0)
+          
+            tFile.close() 
+
+            # Check 
+            print "Here are the details for atoms: "
+            nAtms =0
+            for aT in  sorted(tAtomTypeMaps["atomTypes"].iterkeys()):
+                tAtomTypeMaps["atomTypes"][aT].sort()
+                print " %d atoms has atom-type %s "%(len(tAtomTypeMaps["atomTypes"][aT]), aT)
+                nAtms += len(tAtomTypeMaps["atomTypes"][aT])
+                for aA in tAtomTypeMaps["atomTypes"][aT]:
+                    print "atom %s  of serial number %d "%(tAtomTypeMaps["atoms"][aA]["name"], aA)                                               
+                    print "which bonds the following atoms :"
+                    print tAtomTypeMaps["connections"][aA]
+                    for aNA in tAtomTypeMaps["connections"][aA]:
+                        print "atom %s "%tAtomTypeMaps["atoms"][aNA]["name"]
+            print "Total number of atoms is ", nAtms
+    
+    def AtomDictMapping(self, atomSet1, atomSet2, tMol):
  
-        self.mmCifReader(tInFileName)
+        allIdxs  = []
+        nonHIdxs = []
+        for aIdx in sorted(atomSet1["atoms"].iterkeys()):
+            allIdxs.append(aIdx)
+            if atomSet1["atoms"][aIdx]["elem"].find("H")==-1:
+                nonHIdxs.append(aIdx)
+                
+        print "total number of atoms ", len(allIdxs)
+        print "total number of nonH atoms ", len(nonHIdxs)
+
+        doneList        = []
+        matchedAtoms    = {}
+        remainClasses   = []
+       
+        # Match unique classses
+        for aClass in atomSet1["atomTypes"].keys():
+            if len(atomSet1["atomTypes"][aClass]) == 1 and aClass in atomSet2["atomTypes"]:
+                if len(atomSet2["atomTypes"][aClass]) == 1 :
+                    aIdx1 = atomSet1["atomTypes"][aClass][0]
+                    aIdx2 = atomSet2["atomTypes"][aClass][0]
+                    matchedAtoms[aIdx1] = aIdx2
+                    doneList.append(aIdx2)
+                else:
+                    print "atom type %s appears in sys 1 and sys 2 different times "%aClass 
+                    sys.exit()
+            else:
+                remainClasses.append(aClass)
+  
+        print "number of matched atoms ", len(doneList)
+        print "Matched atoms:  "
+        for aIdx in sorted(matchedAtoms.iterkeys()):
+            bIdx = matchedAtoms[aIdx]
+            print atomSet1["atoms"][aIdx]["class"]
+            print "Atom %s to Atom %s "%(atomSet1["atoms"][aIdx]["name"],\
+                                         atomSet2["atoms"][bIdx]["name"]) 
+
+        print "Number of atoms to be matched ", len(atomSet1["atoms"])-len(doneList)
+        print "Un-matched atoms:  "
+        for aIdx in allIdxs:
+            if not aIdx in doneList:
+                print "Atom : %s of class %s "%(atomSet1["atoms"][aIdx]["name"], atomSet1["atoms"][aIdx]["class"])
+
+        # Match symmetrical ones (Non-H) 
+        # 1. singly bonded classes
+        for aC in remainClasses:
+            nAC1 = len(atomSet1["atomTypes"][aC])
+            if aC in atomSet2["atomTypes"].keys():
+                nAC2 = len(atomSet2["atomTypes"][aC])
+            else:
+                print "Check %s in sys1 but not in sys2 "%aC
+                sys.exit()
+
+            if nAC1 > 1 and nAC1==nAC2:
+                aIdx0 = atomSet1["atomTypes"][aC][0]
+                if len(atomSet1["connections"][aIdx0])==1 and atomSet1["atoms"][aIdx0]["elem"].find("H")==-1:
+                    for i in range(nAC1):
+                        aIdx1 = atomSet1["atomTypes"][aC][i]
+                        aIdx2 = atomSet2["atomTypes"][aC][i]
+                        matchedAtoms[aIdx1] = aIdx2
+                        print "Atom %s to Atom %s "%(atomSet1["atoms"][aIdx1]["name"],\
+                                                     atomSet2["atoms"][aIdx2]["name"])
+                        doneList.append(aIdx2)
+
+        # 2. Linked symmetrical classes
+        # Match the rest using connections 
+        tmpDoneList1 = matchedAtoms.keys()
+        tmpDoneList2 = []
+        for aIdx in tmpDoneList1:
+            for aNA in atomSet1["connection"][aIdx]:
+                if not aNA1 in doneList and not aNA1 in tmpDoneList \
+                   and atomSet1["atoms"][aNA1]["elem"].find("H")==-1 :
+                    group1 = []
+                    group2 = []
+                    aClassNA = atomSet1["atoms"][aNA1]["class"]
+                    if not atomSet2["atomTypes"].has_key(aClassNA):
+                        print "Discrepany in sys 1 and 2 at %s"%aClassNA
+                    else:      
+                        for aNNA1 in atomSet1["connection"][aNA1]:
+                            if aNNA1 != aIdx and atomSet1["atoms"][aNNA1]["elem"].find("H")==-1 :
+                                group1.append([aNA1, aNNA1])
+                            #if atomSet2["atomTypes"].has_key(aClassNA) and atomSet2["atomTypes"].has_key(aClassNA):
+                      
+                         
+                                             
+                     
+        sys.exit()
+
+       
+        
+               
+    def MmCifToMolFile(self, tInFileName, tOutMolName, tMode=0):
+
+        if tMode==0: 
+            self.mmCifReader(tInFileName)
 
         #print "Num of atoms ", len(self.atoms)
         #print "Num of bonds ", len(self.bonds)
@@ -3616,13 +4016,12 @@ class ChemCheck():
 
     def addHs(self, tMol):
 
-        print "Number of atom before is ", tMol.GetNumAtoms()
+        # print "Number of atom before is ", tMol.GetNumAtoms()
         aMolT=Chem.MolFromSmiles(rdmolfiles.MolToSmiles(tMol))
         print rdmolfiles.MolToSmiles(tMol)
         aMol = Chem.AddHs(aMolT)
         rdmolfiles.MolToMolFile(tMol, "1.mol")
         print "Number of atom now is ", aMol.GetNumAtoms()
-        sys.exit()       
         tDoneAtms = []
         for i in range(len(tMol.GetAtoms())):
             elem = tMol.GetAtomWithIdx(i).GetSymbol()
@@ -3634,7 +4033,6 @@ class ChemCheck():
 
         aMolT = Chem.AddHs(tMol)
         print "Number of atom after is ", aMolT.GetNumAtoms()
-        sys.exit()
         
     def getAtomElems(self, tInFileName, tTypeIdx, tAtomElems):
   

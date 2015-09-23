@@ -102,6 +102,7 @@ struct sortMap3
 
 struct sortMap4
 {
+    std::string id;
     std::string key;
     int         ha;
     std::string lev2;
@@ -129,6 +130,15 @@ struct ChemComp {
         group(NullString), numAtoms(0), numH(0), level(NullString)
         {}         
     };
+    
+struct Graph {
+    
+    std::map<int,  std::map<ID,ID> >       nodes;
+    std::map<int,  std::vector<int> >      adjacencies;
+    
+};
+
+
 }
 
 #endif /* TYPE_H_ */

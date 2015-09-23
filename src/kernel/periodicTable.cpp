@@ -616,7 +616,6 @@ namespace LIBMOL
         elements["Rh"]["atomNum"]   = 45;
         //elements["Rh"]["val"]       = 6;
         //elements["Rh"]["vdw"]       = 1.35;
-        elements["Rh"]["cova"]      = 1.45;
         elemProps["Rh"]["vdw"]      = 1.35;
         elemProps["Rh"]["cova"]     = 1.42;
         elemProps["Rh"]["ionM+"]   = 0.805;

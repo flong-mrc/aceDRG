@@ -561,6 +561,24 @@ namespace LIBMOL
         }
     }
     
+    extern void matCopyInt(std::vector<std::vector<int> > & tM1,
+                           std::vector<std::vector<int> > & tM2)
+    {
+        if (not tM2.empty())
+        {
+            tM2.clear();
+        }
+        
+        for (unsigned i=0; i < tM1.size(); i++ )
+        {
+            std::vector<int> aRow;
+            for (unsigned j=0; j < tM1[i].size(); j++)
+            {
+                aRow.push_back(tM1[i][j]);
+            }
+            tM2.push_back(aRow);
+        }
+    }
     extern void matMultVec(std::vector<std::vector<REAL> >  & tMat,
                 std::vector<REAL> & tInitV, std::vector<REAL> & tFinV)
     {
@@ -585,6 +603,77 @@ namespace LIBMOL
         }
     }
     
+    extern void matMultMatInt(std::vector<std::vector<int> >    & tMat1,
+                              std::vector<std::vector<int> >    & tMat2,
+                              std::vector<std::vector<int> >    & tOutMat)
+    {
+        unsigned nRow1 = tMat1.size();
+        unsigned nRow2 = tMat2.size();
+        
+        if (nRow1 > 0 && nRow2 > 0)
+        {
+            unsigned nCol1 = tMat1[0].size();
+            unsigned nCol2 = tMat2[0].size();
+            
+            if (nCol1 == nRow2 && nCol2 > 0)
+            {
+                if (!tOutMat.empty())
+                {
+                    tOutMat.clear();
+                }
+                for (unsigned i=0; i < nRow1; i++)
+                {
+                    std::vector<int> aRow;
+                    for (unsigned j=0; j < nCol2; j++)
+                    {
+                        aRow.push_back(0.0);
+                    }
+                    tOutMat.push_back(aRow);
+                }
+                
+                for (unsigned i=0; i < nRow1; i++)
+                {
+                    for (unsigned j=0; j < nCol2; j++)
+                    {
+                        // std::cout << i << " " << j << std::endl;
+                        for (unsigned k=0; k < nCol1; k++)
+                        {
+                            // std::cout << "k  " << tMat1[i][k] << "  " 
+                            //           <<  tMat2[k][j] << std::endl;
+                            
+                            tOutMat[i][j]+=(tMat1[i][k]*tMat2[k][j]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    extern void printMatrix(std::vector<std::vector<int> >    & tMat)
+    {
+        unsigned nR=tMat.size();
+        if (nR > 0)
+        {
+            unsigned nC=tMat[0].size();
+            std::cout << std::setw(6) << "C-R";
+            for (unsigned i=0; i < nR; i++)
+            {
+                 std::cout << std::setw(6) << i;
+            }
+            std::cout << std::endl;
+            
+            for (unsigned i=0; i < nR; i++)
+            {
+                std::cout << std::setw(6) << i;
+                for (unsigned j=0; j < nC; j++)
+                {
+                    std::cout << std::setw(6) << tMat[i][j];
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::endl;
+        }
+    }
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // 
     //   The following are functions imported directly from
@@ -859,14 +948,9 @@ namespace LIBMOL
                 //     << A[i][j] << std::endl;
             }
         }
-  
-        
-        
-
         //Matrix_File.close();
    
     }
-    
     
     // Normalization of matrix A only.
     // Overload version 2
@@ -1635,7 +1719,13 @@ namespace LIBMOL
     
     extern bool isOrganc(std::vector<ID> & tOrgTab, ID tID)
     {
+        std::vector<ID>::iterator iFind = std::find(tOrgTab.begin(), tOrgTab.end(), tID);
+        if (iFind != tOrgTab.end())
+        {
+            return true;
+        }
         
+        return false;
         
     }
     
@@ -2183,11 +2273,9 @@ namespace LIBMOL
            {
               tRow[2]=1.0;
            }
-
         }
     }
               
-    
     extern void TranslateIntoUnitCell(std::vector<REAL> & tInitFracX,
                                     std::vector<REAL> & tFinFracX)
     {
@@ -2319,5 +2407,811 @@ namespace LIBMOL
         return NullString; 
     }
     
+    // The class for graph isomorphism 
+    isomorGraph::isomorGraph()
+    {
+    }
+    
+    isomorGraph::~isomorGraph()
+    {
+    }
+    
+    void isomorGraph::isomorSubGraph(Graph & tSubGraph, 
+                                     Graph & tGraph, 
+                                     int     tMode, 
+                                     std::vector<std::map<int,int> > & tOutMatchs)
+    {  
         
+        std::vector<std::vector<int> > adjA, adjB, M0, tM;
+        
+        setInitMatrixs(adjA, adjB, M0, tMode, tSubGraph, tGraph);        
+        
+        std::vector<int> usedCols;
+        
+        matCopyInt(M0, tM);
+        
+        unsigned curRow = 0;
+        
+        bool tDone = false;
+        recurseMandIsomor(adjA, adjB, M0, usedCols, curRow, tM, 
+                          tOutMatchs, tMode, tDone);
+        
+    }
+    
+    void isomorGraph::copyNodes(std::map<ID,ID> & tNodeI, 
+                                std::map<ID,ID> & tNodeD)
+    {
+        for(std::map<ID, ID>::iterator iMI=tNodeI.begin();
+                iMI !=tNodeI.end(); iMI++)
+        {
+            tNodeD[iMI->first] = iMI->second; 
+        }
+    }
+    
+    void isomorGraph::copyAdjacencies(std::vector<int> & tConnI, 
+                                      std::vector<int> & tConnD)
+    {
+        for (std::vector<int>::iterator iC=tConnI.begin();
+                iC !=tConnI.end(); iC++)
+        {
+            tConnD.push_back(*iC);
+        }
+    }
+    
+    void isomorGraph::setOneGraph(FileName tFName, Graph& tG)
+    {  
+        std::ifstream FofG(tFName);
+        
+        if (FofG.is_open())
+        {
+            bool lA = false;
+            bool lC = false;
+            
+            std::string tRecord="";
+            
+            while(!FofG.eof())
+            {   
+                std::getline(FofG, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                
+                std::vector<std::string> tBuf;
+                
+                if (tRecord.find("ATOMS:") !=std::string::npos )
+                {
+                    lA=true;
+                    lC=false;
+                }
+                else if (tRecord.find("CONNECTIONS:") !=std::string::npos )
+                {
+                    lA=false;
+                    lC=true;
+                }
+                else if(lA)
+                {
+                    StrTokenize(tRecord, tBuf);
+                    if (tBuf.size()==4)
+                    {
+                        int a = StrToInt(tBuf[0]);
+                        tG.nodes[a]["elem"]=TrimSpaces(tBuf[1]);
+                        tG.nodes[a]["name"]=TrimSpaces(tBuf[2]);
+                        tG.nodes[a]["type"]=TrimSpaces(tBuf[3]);
+                    }
+                }
+                else if(lC)
+                {
+                    StrTokenize(tRecord, tBuf);
+                    if (tBuf.size()==2)
+                    {
+                        int c1=StrToInt(tBuf[0]);
+                        int c2=StrToInt(tBuf[1]);
+                        if(std::find(tG.adjacencies[c1].begin(), 
+                                     tG.adjacencies[c1].end(), c2)==tG.adjacencies[c1].end())
+                        {
+                            tG.adjacencies[c1].push_back(c2);
+                        }
+                        
+                        if(std::find(tG.adjacencies[c2].begin(), 
+                                     tG.adjacencies[c2].end(), c1)==tG.adjacencies[c2].end())
+                        {
+                            tG.adjacencies[c2].push_back(c1);
+                        }
+                    }
+                }
+            }
+            FofG.close();  
+        }
+        
+        // Check
+        if (tG.nodes.size() !=0)
+        {
+            for (std::map<int, std::map<ID,ID> >::iterator iN=tG.nodes.begin();
+                    iN !=tG.nodes.end(); iN++)
+            {
+                std::cout << "For Node " << iN->first << std::endl
+                          << "    its name: "    << iN->second["name"] << std::endl
+                          << "    its element: " << iN->second["elem"] << std::endl
+                          << "    its type: "    << iN->second["type"] << std::endl;
+                std::cout << "The Node connects to the following Node: " << std::endl;
+                for (std::vector<int>::iterator iC=tG.adjacencies[iN->first].begin();
+                        iC !=tG.adjacencies[iN->first].end(); iC++)
+                {
+                    std::cout << "Node " << *iC << " of " 
+                              << tG.nodes[*iC]["name"] << std::endl;
+                } 
+            }
+        }
+    }
+    
+    void isomorGraph::reducedGraph(Graph& tFullG, Graph& tReducedG,
+                                   std::map<int, int> & tNonHMapR2F,
+                                   std::map<int, int> & tNonHMapF2R,
+                                   std::map<int, std::vector<int> > & tLinkedH )
+    {
+        if (!tReducedG.nodes.empty())
+        {
+            tReducedG.nodes.clear();
+        }
+        
+        if (!tReducedG.adjacencies.empty())
+        {
+            tReducedG.adjacencies.clear();
+        }
+        
+        if (!tNonHMapR2F.empty())
+        {
+            tNonHMapR2F.clear();
+        }
+        
+        if (!tNonHMapF2R.empty())
+        {
+            tNonHMapF2R.clear();
+        }
+        
+        
+        if (!tLinkedH.empty())
+        {
+            tLinkedH.clear();
+        }
+        
+        unsigned nNonH=0;
+        
+        for (unsigned i=0; i < tFullG.nodes.size(); i++)
+        {
+            if (tFullG.nodes[i]["elem"].find("H")==std::string::npos)
+            {
+                copyNodes(tFullG.nodes[i], tReducedG.nodes[nNonH]);
+                tNonHMapR2F[nNonH]=i;
+                tNonHMapF2R[i] = nNonH;
+                nNonH++;
+            }
+            else
+            {
+                if (tFullG.adjacencies[i].size()==1)
+                {
+                    tLinkedH[tFullG.adjacencies[i][0]].push_back(i);
+                }
+                else
+                {
+                    std::cout << "Error : H node " << tFullG.nodes[i]["name"]
+                              << " connects " << tFullG.adjacencies[i].size()
+                              << " nodes " << std::endl;
+                    exit(1);
+                   
+                }
+            }
+        }
+        
+        // copy connections, be careful not to let H atoms into them 
+        for (unsigned i=0; i < tFullG.adjacencies.size(); i++)
+        {
+            if (tFullG.nodes[i]["elem"].find("H")==std::string::npos)
+            {
+                for (std::vector<int>::iterator iC=tFullG.adjacencies[i].begin();
+                        iC !=tFullG.adjacencies[i].end(); iC++)
+                {
+                    if (tFullG.nodes[*iC]["elem"].find("H")==std::string::npos)
+                    {
+                        tReducedG.adjacencies[tNonHMapF2R[i]].push_back(tNonHMapF2R[*iC]);
+                    }
+                }
+            }
+        }
+        
+        // Check 
+        
+        std::cout << "Original graph : " << std::endl;
+        for (unsigned i=0; i < tFullG.nodes.size(); i++)
+        {
+            std::cout << "Node " << i << std::endl
+                      << "name : " << tFullG.nodes[i]["name"] << std::endl
+                      << "type : " << tFullG.nodes[i]["type"] << std::endl;
+            
+            std::cout << "This node connects to : " << std::endl;
+            for (unsigned j=0; j < tFullG.adjacencies[i].size(); j++)
+            {
+                std::cout << "Node " << tFullG.nodes[tFullG.adjacencies[i][j]]["name"]
+                          << std::endl;
+            }
+            std::cout << std::endl;
+        }
+        
+        std::cout << "\nReduced graph now : " << std::endl;
+        
+        for (unsigned i=0; i < tReducedG.nodes.size(); i++)
+        {
+            std::cout << "Node " << i << std::endl
+                      <<" name : " << tReducedG.nodes[i]["name"] << std::endl
+                      <<" type : " << tReducedG.nodes[i]["type"] << std::endl
+                      << "It corresponds to Node  " << tFullG.nodes[tNonHMapR2F[i]]["name"]
+                      << " in original graph " << std::endl; 
+            std::cout << "This node connects to : " << std::endl;
+            for (unsigned j=0; j < tReducedG.adjacencies[i].size(); j++)
+            {
+                std::cout << "Node " << tReducedG.nodes[tReducedG.adjacencies[i][j]]["name"]
+                          << std::endl;
+            }
+        }
+        
+        std::cout << "Nodes with H links " << std::endl;
+        
+        for (std::map<int, std::vector<int> >::iterator iLH=tLinkedH.begin();
+                iLH !=tLinkedH.end(); iLH++)
+        {
+            std::cout << "Node " << tFullG.nodes[iLH->first]["name"] 
+                      << "Linked with following H nodes: " << std::endl;
+            
+            for (std::vector<int>::iterator iH=iLH->second.begin();
+                    iH!=iLH->second.end(); iH++)
+            {
+                std::cout << "Node " << tFullG.nodes[*iH]["name"] << std::endl;
+            }
+            
+        }
+        
+    }
+    
+    void isomorGraph::setHLinks(Graph& tFullG1, 
+                                std::map<int,int>& tNonHMapF2R_1, 
+                                std::map<int,std::vector<int> > & tLinkedH1, 
+                                Graph& tFullG2, 
+                                std::map<int,int>& tNonHMapR2F_2, 
+                                std::map<int,std::vector<int> >& tLinkedH2, 
+                                std::map<int,int>& tOneSetR2RMap,
+                                std::map<int,int>& tOneSetH2HMap)
+    {
+        // 
+        for (std::map<int, std::vector<int> >::iterator iLH1=tLinkedH1.begin();
+                iLH1 !=tLinkedH1.end(); iLH1++)
+        {
+            int nF2R_1 = tNonHMapF2R_1[iLH1->first];
+            if (tOneSetR2RMap.find(nF2R_1) != tOneSetR2RMap.end())
+            {
+                int nR2F_2=tNonHMapR2F_2[tOneSetR2RMap[nF2R_1]];
+                
+                if (iLH1->second.size() ==tLinkedH2[nR2F_2].size())
+                {
+                    for (unsigned iH=0; iH<iLH1->second.size(); iH++)
+                    {
+                        tOneSetH2HMap[iLH1->second[iH]]= tLinkedH2[nR2F_2][iH];
+                    }
+                }
+                else
+                {
+                    std::cout << "Numbers of H atoms are not consistent " << std::endl;
+                    exit(1);
+                }
+            }
+        }
+    }
+    
+    void isomorGraph::recoverFullGraphMatch(Graph& tGraph1,
+                                            std::map<int,int>& tNonHMapF2R_1,
+                                            std::map<int,int>& tNonHMapR2F_1,
+                                            std::map<int,std::vector<int> >& tLinkedH1,
+                                            Graph& tGraph2,
+                                            std::map<int,int>& tNonHMapF2R_2,
+                                            std::map<int,int>& tNonHMapR2F_2,
+                                            std::map<int,std::vector<int> >& tLinkedH2,
+                                            std::map<int,int>    & tOneSetReducedOutMatch,
+                                            std::map<int,int>    & tOneSetOutMatch)
+    {
+        std::map<int,int> aSetH2HMap;
+        
+        setHLinks(tGraph1, tNonHMapF2R_1, tLinkedH1, 
+                  tGraph2, tNonHMapR2F_2, tLinkedH2, 
+                  tOneSetReducedOutMatch, aSetH2HMap);
+        
+        // Non H
+        for (std::map<int, int>::iterator iNonH=tOneSetReducedOutMatch.begin();
+                iNonH !=tOneSetReducedOutMatch.end(); iNonH++)
+        {
+           tOneSetOutMatch[tNonHMapR2F_1[iNonH->first]] =  tNonHMapR2F_2[iNonH->second];
+        }
+        
+        // H
+        for (std::map<int, int>::iterator iH=aSetH2HMap.begin();
+                iH !=aSetH2HMap.end(); iH++)
+        {
+            tOneSetOutMatch[iH->first] =  iH->second;
+        }
+        
+        // Check
+        /*
+        std::cout << "Number of matched nodes : " << tOneSetOutMatch.size()
+                  << std::endl;
+        for (std::map<int, int>::iterator iM=tOneSetOutMatch.begin();
+                iM != tOneSetOutMatch.end(); iM++)
+        {
+            std::cout << "Node " << tGraph1.nodes[iM->first]["name"] 
+                      << " corresponds to Node " 
+                      << tGraph2.nodes[iM->second]["name"] << std::endl;
+        }
+         */
+        
+        
+    }
+    
+    void isomorGraph::setInitMatrixs(std::vector<std::vector<int> >& tAdjA, 
+                                     std::vector<std::vector<int> >& tAdjB, 
+                                     std::vector<std::vector<int> >& tM0, 
+                                     int   tMode,
+                                     Graph& tGraph1, Graph& tGraph2)
+    {
+        unsigned nN1 = tGraph1.nodes.size();
+        unsigned nN2 = tGraph2.nodes.size();
+        
+        std::cout << "For Node A: " << std::endl;
+        
+        for (unsigned i=0; i < nN1; i++)
+        {
+            std::vector<int> tN;
+            for (unsigned j=0; j < nN1; j++)
+            {
+                if (std::find(tGraph1.adjacencies[i].begin(), 
+                              tGraph1.adjacencies[i].end(), j)
+                        !=tGraph1.adjacencies[i].end())
+                {
+                    tN.push_back(1);
+                    std::cout << "Node " << i << " connects Node " << j << std::endl;
+                }
+                else
+                {
+                    tN.push_back(0);
+                }
+            }
+            tAdjA.push_back(tN);   
+        }
+        std::cout << "\n\n";
+        
+        
+        std::cout << "For Node B: " << std::endl;
+        for (unsigned i=0; i < nN2; i++)
+        {
+            std::vector<int> tN;
+            for (unsigned j=0; j < nN2; j++)
+            {
+                if (std::find(tGraph2.adjacencies[i].begin(), 
+                              tGraph2.adjacencies[i].end(), j)
+                        !=tGraph2.adjacencies[i].end())
+                {
+                    tN.push_back(1);
+                    std::cout << "Node " << i << " connects Node " << j << std::endl;
+                }
+                else
+                {
+                    tN.push_back(0);
+                }
+            }
+            tAdjB.push_back(tN);
+        }
+        std::cout << "\n\n";
+        
+        if (tMode==1)
+        {
+            setExactMatch_M0(tM0, tGraph1, tGraph2);
+            std::cout << "Number of rows in M0 " << tM0.size() << std::endl;
+            std::cout << "Number of cols in M0 " << tM0[0].size() << std::endl;
+        }
+    }
+    
+    void isomorGraph::setExactMatch_M0(std::vector<std::vector<int> > & tM0,
+                          Graph  & tGraph1, Graph & tGraph2)
+    {
+        unsigned nN1 = tGraph1.nodes.size();
+        unsigned nN2 = tGraph2.nodes.size();
+        
+        for (unsigned i=0; i < nN1; i++)
+        {
+            std::vector<int> tN;
+            for (unsigned j=0; j < nN2; j++)
+            {
+                if (tGraph1.nodes[i]["type"] == tGraph2.nodes[j]["type"])
+                {
+                    tN.push_back(1);
+                    std::cout << "Node " << i << " and Node " << j 
+                              << " have the same types "  << std::endl;
+                    std::cout << "confirm : " << std::endl
+                              << "Graph 1: " << tGraph1.nodes[i]["type"] << std::endl
+                              << "Graph 2: " << tGraph2.nodes[j]["type"] << std::endl;
+                    std::cout << "M0 " << i << " and " << tN.size()-1 
+                              << "==" << tN[tN.size()-1] << std::endl;
+                    std::cout << std::endl;
+                }
+                else
+                {
+                    tN.push_back(0);
+                }
+            }
+            tM0.push_back(tN);
+        }
+        std::cout << "Matrix M0 is: " << std::endl;
+        printMatrix(tM0);
+        std::cout << std::endl;
+        
+        int nMax=1;
+        for (unsigned i=0; i < tM0.size(); i++)
+        {
+            int sumR=0;
+            for (unsigned j=0; j < tM0[i].size(); j++)
+            {
+                sumR+=tM0[i][j];
+            }
+            if (sumR !=0)
+            {  
+                nMax = nMax*sumR;
+                std::cout << "row " << i << " has " << sumR << " 1s " << std::endl; 
+                std::cout << "nMax now " << nMax << std::endl;
+            }
+            else
+            {
+                std::cout << "Error : " << std::endl
+                          << "row " << i << " does not has any match candidate" << std::endl; 
+            }
+        }
+        std::cout << "Max number of tries : " <<  nMax << std::endl;
+       
+    }
+    
+    void isomorGraph::recurseMandIsomor(std::vector<std::vector<int> >  & tAdjA, 
+                                        std::vector<std::vector<int> >  & tAdjB, 
+                                        std::vector<std::vector<int> >  & tM0, 
+                                        std::vector<int> & usedCols, int curRow, 
+                                        std::vector<std::vector<int> >  & tM,
+                                        std::vector<std::map<int,int> > & tOutMatch,
+                                        int                               tMode,
+                                        bool                            & tDone)
+    {
+        
+        if (curRow==tM0.size())
+        {
+            std::cout << "None Zero elements in One M are : " << std::endl;
+            
+            for (unsigned i=0; i < tM.size(); i++)
+            {
+                unsigned nNR=0;
+                for (unsigned j=0; j < tM[i].size(); j++)
+                {
+                    if (tM[i][j]==1)
+                    {
+                        std::cout << "None zero element at row " << i 
+                                  << " and col " << j << std::endl;
+                        nNR++;
+                    }
+                    if (nNR > 1)
+                    {
+                        std::cout << "Error : row " << i 
+                                  << " has more than one none zero elements "
+                                  << std::endl;
+                        exit(1);
+                    }
+                }
+            }        
+            // printMatrix(tM);
+            checkIsomor(tAdjA, tAdjB, tM, tOutMatch);
+            std::cout << "Number of match set " << tOutMatch.size() << std::endl;
+            if (tMode==1 && tOutMatch.size() !=0)
+            {
+                tDone = true;
+            }
+            
+        }
+        else
+        {
+            //std::cout << "\ntM0 row size " << tM0.size() << std::endl 
+            //          << "tM0 col size " << tM0[curRow].size() << std::endl;
+            std::cout << "\nCurrent row Now " << curRow << std::endl;
+            
+            
+            unsigned iCol=0;
+            do 
+            {
+                std::cout << "current col " << iCol << std::endl;
+                std::cout << "M0 [" << curRow << "][" << iCol 
+                          << "]=" << tM0[curRow][iCol] << std::endl;
+                while(std::find(usedCols.begin(), usedCols.end(),iCol)==usedCols.end()
+                      && iCol < tM0[curRow].size() && !tDone)
+                {
+                    std::cout << "current row inside " << curRow << std::endl;
+                    std::cout << "current col inside " << iCol << std::endl;
+                    if (tM0[curRow][iCol]==1)
+                    {
+                        tM[curRow][iCol] =1;
+                        usedCols.push_back(iCol);
+                        std::cout << "tM " << curRow << "  " << iCol << " ==1 " << std::endl;
+                        /*
+                        std::cout << "Number of used cols " << usedCols.size() << std::endl;
+                        for (unsigned iC=0; iC < usedCols.size(); iC++)
+                        {
+                            std::cout << "Col: " << usedCols[iC] << std::endl;
+                        }
+                        */    
+                        for (unsigned j=0; j < tM[curRow].size(); j++)
+                        {
+                            if (j!=iCol)
+                            {
+                                tM[curRow][j]=0;
+                                //std::cout << "set col " << j << " in row " << curRow 
+                                //          << " to be zero " << std::endl;
+                            }
+                        }
+                        curRow = curRow+1;
+                        recurseMandIsomor(tAdjA, tAdjB, tM0, usedCols, 
+                                          curRow, tM,  tOutMatch, tMode, tDone);
+                        curRow = curRow-1;
+                        usedCols.pop_back();
+                    }
+                    //std::cout << "row " << curRow << " and col " << iCol 
+                    //          << " not used (zero M0 element) " << std::endl;
+                    iCol++;
+                }
+           
+                //std::cout << "row " << curRow << " and col " << iCol 
+                //          << " not used (in used_list) " << std::endl;
+                iCol++;
+            }while(iCol <tM0[curRow].size() && !tDone);
+        }
+    }
+    
+    void isomorGraph::checkIsomor(std::vector<std::vector<int> >  & tAdjA, 
+                                  std::vector<std::vector<int> >  & tAdjB, 
+                                  std::vector<std::vector<int> >  & tM,
+                                  std::vector<std::map<int,int> > & tOutMatch)
+    {
+        std::vector<std::vector<int> >  aM, transM, cM;
+        
+        //MxtAdjB
+        matMultMatInt(tM, tAdjB, aM);
+        //std::cout << "Matrix B: " << std::endl;
+        //printMatrix(tAdjB);
+        //std::cout << "Matrix (M X B) " << std::endl;
+        //printMatrix(aM);
+        
+        //(MxtAdjB)^T
+        unsigned nAM=aM.size();
+        if (nAM >0)
+        {
+            unsigned mAM = aM[0].size();  
+            for (unsigned i=0; i < mAM; i++ )
+            {
+                std::vector<int> aT;
+                for (unsigned j=0; j < nAM; j++)
+                {
+                    aT.push_back(aM[j][i]);
+                }
+                transM.push_back(aT);
+            }
+        }
+        //std::cout << "Matrix (M X B)^T " << std::endl;
+        //printMatrix(transM);
+        
+        
+        // M x (MxtAdjB)^T
+        matMultMatInt(tM, transM, cM);
+        
+        //std::cout << "Matrix C: " << std::endl;
+        //printMatrix(cM);
+        
+        //std::cout << "Matrix A: " << std::endl;
+        //printMatrix(tAdjA);
+        // Final check
+        
+        bool lIso=true;
+        unsigned nRow = tAdjA.size();
+        unsigned nRowCM= cM.size();
+        //std::cout << "A with " << nRow   << " rows " << std::endl;
+        //std::cout << "C with " << nRowCM << " rows " << std::endl;
+        if (nRow > 0 && nRowCM==nRow)
+        {
+            unsigned nCol   = tAdjA[0].size();
+            unsigned nColCM = cM[0].size();
+            if (nCol==nColCM)
+            {
+                for (unsigned i=0; i < nRow; i++)
+                {
+                    for (unsigned j=0; j < nCol; j++)
+                    {
+                        if (tAdjA[i][j]!=cM[i][j])
+                        {
+                            //std::cout << "A[" << i << "][" << j << "]" 
+                            //          << tAdjA[i][j] << std::endl;
+                            //std::cout << "C[" << i << "][" << j << "]" 
+                            //          << cM[i][j] << std::endl;
+                            lIso = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                lIso = false;
+            }
+        }
+        else
+        {
+            lIso = false;
+        }
+        
+        if (lIso)
+        {
+            std::map<int, int> aMatch;
+            for (unsigned i=0; i < tM.size(); i++)
+            {
+                for (unsigned j=0; j < tM[0].size(); j++)
+                {
+                    if (tM[i][j]==1)
+                    {
+                        aMatch[i]=j;
+                    }
+                }
+            }
+            tOutMatch.push_back(aMatch);   
+        }
+    }
+    
+    void isomorGraph::graphMatch(FileName tSubGraphFName, 
+                                 Graph &  tSubGraph,
+                                 FileName tGraphFName,
+                                 Graph &  tGraph,
+                                 std::vector<std::map<int,int> > & tOutMatch,
+                                 int tMode)
+    {     
+        
+        Graph reducedSubG, reducedG;
+        std::map<int, int> nonHMapR2F_SubG, nonHMapF2R_SubG;
+        std::map<int, int> nonHMapR2F_G, nonHMapF2R_G;
+        std::map<int, std::vector<int> > linkedHMap_subG, linkedHMap_G;
+        std::vector<std::map<int,int> >  tOutMatchOnreducedG;
+        
+        setOneGraph(tSubGraphFName, tSubGraph);
+        reducedGraph(tSubGraph, reducedSubG, nonHMapR2F_SubG, 
+                     nonHMapF2R_SubG, linkedHMap_subG);
+        
+        setOneGraph(tGraphFName, tGraph);
+        reducedGraph(tGraph, reducedG, 
+                     nonHMapR2F_G, nonHMapF2R_G, linkedHMap_G);
+        
+        if (reducedSubG.nodes.size() !=0 && reducedSubG.adjacencies.size() !=0
+                && reducedG.nodes.size() !=0 && reducedG.adjacencies.size() !=0)
+        {
+            isomorSubGraph(reducedSubG, reducedG, tMode, tOutMatchOnreducedG);
+        }
+        else
+        {
+            if (reducedSubG.nodes.size() ==0 || reducedSubG.adjacencies.size() ==0)
+            {
+                std::cout << "Check : " << tSubGraphFName
+                          << " does not provide the correct info to build a graph"
+                          << std::endl;
+            }
+            else if (reducedSubG.nodes.size() ==0 || reducedSubG.adjacencies.size() ==0)
+            {
+                std::cout << "Check : " << tGraphFName
+                          << " does not provide the correct info to build a graph"
+                          << std::endl;
+            }
+            else
+            {
+                std::cout << "Check: File format errors in  " << tSubGraphFName
+                          << " or " << tGraphFName << std::endl;
+            }
+        }
+        
+        unsigned nMSets=tOutMatchOnreducedG.size();
+        std::cout << "Number of matched sets of nodes (reduced set): " << nMSets << std::endl;
+        if (nMSets !=0)
+        {
+            for (unsigned i=0; i < nMSets; i++ )
+            {
+                std::cout << "For matched node set " << i+1 << std::endl;
+                for (std::map<int, int>::iterator iM=tOutMatchOnreducedG[i].begin(); 
+                        iM !=tOutMatchOnreducedG[i].end(); iM++)
+                {  
+                    std::cout << "Atom " << reducedSubG.nodes[iM->first]["name"]  
+                              << " corresponds to atom " 
+                              << reducedG.nodes[iM->second]["name"] << std::endl;
+                }
+            }
+            
+            for (unsigned i=0; i < nMSets; i++ )
+            {
+                std::map<int, int> aSetMatchFull;
+                recoverFullGraphMatch(tSubGraph, nonHMapF2R_SubG, 
+                                      nonHMapR2F_SubG, linkedHMap_subG,
+                                      tGraph, nonHMapF2R_G, 
+                                      nonHMapR2F_G, linkedHMap_G,
+                                      tOutMatchOnreducedG[i],
+                                      aSetMatchFull);
+                if (aSetMatchFull.size() !=0)
+                {
+                    tOutMatch.push_back(aSetMatchFull);
+                }
+            }
+        }
+        
+        
+        
+        /*
+        if (tSubGraph.nodes.size() !=0 && tSubGraph.adjacencies.size() !=0
+                && tGraph.nodes.size() !=0 && tGraph.adjacencies.size() !=0)
+        {
+            isomorSubGraph(tSubGraph, tGraph, tMode, tOutMatch);
+        }
+        else
+        {
+            if (tSubGraph.nodes.size() ==0 || tSubGraph.adjacencies.size() ==0)
+            {
+                std::cout << "Check : " << tSubGraphFName
+                          << " does not provide the correct info to build a graph"
+                          << std::endl;
+            }
+            else if (tSubGraph.nodes.size() ==0 || tSubGraph.adjacencies.size() ==0)
+            {
+                std::cout << "Check : " << tGraphFName
+                          << " does not provide the correct info to build a graph"
+                          << std::endl;
+            }
+            else
+            {
+                std::cout << "Check: File format errors in  " << tSubGraphFName
+                          << " or " << tGraphFName << std::endl;
+            }
+        }
+        */ 
+    }
+    
+    void isomorGraph::outputMatchedGraphs(Graph & tSubGraph, 
+                                          Graph & tGraph, 
+                                          std::vector<std::map<int,int> > & tOutMatch,
+                                          int                               tMode,
+                                          FileName    tOutMatchFileName)
+    {
+        std::ofstream outFile(tOutMatchFileName);
+        
+        if (outFile.is_open())
+        {
+            for (unsigned i=0; i < tOutMatch.size(); i++)
+            {
+                if (tMode==1)
+                {
+                    outFile << "#Exact match between two graphs" << std::endl;
+                }
+                else
+                {
+                    outFile << "#Match between two graphs, set " << i+1 << std::endl;
+                }
+                
+                for (std::map<int,int>::iterator iAt=tOutMatch[i].begin();
+                        iAt != tOutMatch[i].end(); iAt++)
+                {
+                    outFile << std::setw(10) << tSubGraph.nodes[iAt->first]["name"] 
+                            << std::setw(10) << tGraph.nodes[iAt->second]["name"] 
+                            << std::endl;
+                }
+            }
+            outFile.close();
+        }
+        
+    }
+    
 }

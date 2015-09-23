@@ -476,18 +476,20 @@ int main(int argc, char** argv) {
         
         if ( (int)aTargetSystem.allAtoms.size() > 0)
         {     
-            // CodClassify  aCodSystem(aTargetSystem.allAtoms);
-            std::vector<LIBMOL::AtomDict>  tmpAtomSet;
             
             LIBMOL::CodClassify  aCodSystem(aTargetSystem, AJob.IOEntries["libMolTabDir"]);
             aCodSystem.codAtomClassifyNew2(2);
-            
+            LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
+                                               aCodSystem.allAtoms,
+                                               aCodSystem.allBonds);
+            /*
+             std::vector<LIBMOL::AtomDict>  tmpAtomSet;
             for (std::vector<LIBMOL::AtomDict>::iterator iAt=aCodSystem.allAtoms.begin();
                     iAt !=aCodSystem.allAtoms.end(); iAt++)
             {
                 tmpAtomSet.push_back(*iAt);
             }
-            /*
+           
             std::cout <<  "There are " << aCodSystem.allRings.size() << " rings. They are: "
                       << std::endl;
             
@@ -509,7 +511,7 @@ int main(int argc, char** argv) {
                 std::cout << std::endl;
                 
             }
-            */
+            
             LIBMOL::CodClassify  aCodSystem2(aTargetSystem.allAtoms);
             aCodSystem2.setAtomsBondingAndChiralCenter();
             aCodSystem2.codAtomClassifyNew2(2);
@@ -527,9 +529,6 @@ int main(int argc, char** argv) {
                 }
             }
             
-            
-            
-            /*
             LIBMOL::ringTools aRingTool;
             aTargetSystem.allRings.clear();
             int nMaxRing = 7, nDep=2;
@@ -575,7 +574,7 @@ int main(int argc, char** argv) {
                                          aTargetSystem.allRingsV);
             
             
-            */
+            
             
             LIBMOL::outCodAndCcp4AtomTypes(AJob.IOEntries["userOutName"].c_str(),
                                    aCodSystem.allAtoms);
@@ -610,6 +609,7 @@ int main(int argc, char** argv) {
                 
             }
             
+            */
         }
     }
     else if (AJob.workMode == 42)
@@ -621,111 +621,31 @@ int main(int argc, char** argv) {
     }
     else if (AJob.workMode == 900)
     {
-        if (AJob.IOEntries.find("codAtomStr") !=AJob.IOEntries.end())
-        {
-            LIBMOL::CodClassify aTool;
+        if (AJob.IOEntries.find("Type1") !=AJob.IOEntries.end()
+            and AJob.IOEntries.find("Type2") !=AJob.IOEntries.end())
+        {   
+            LIBMOL::isomorGraph graphTool;
+            LIBMOL::Graph  g1, g2;
             
+            std::vector<std::map<int, int> > matchedList;
             
-            
-            std::ifstream    aInFile(AJob.IOEntries["codAtomStr"].c_str());
-            if (aInFile.is_open())
+         
+            graphTool.graphMatch(AJob.IOEntries["Type1"].c_str(), 
+                                     g1,
+                                     AJob.IOEntries["Type2"].c_str(),
+                                     g2,
+                                     matchedList,
+                                     1);
+            if (matchedList.size()>0)
             {
-                int i=0;
-                while(!aInFile.eof())
-                {
-                    std::string aRecord;
-                    std::getline(aInFile, aRecord);
-                    aRecord = LIBMOL::TrimSpaces(aRecord);
-                    std::cout << aRecord << std::endl;
-                    if (aRecord.size())
-                    {
-                        std::vector<std::string> aSetStrs;
-                        LIBMOL::StrTokenize(aRecord, aSetStrs);
-                        /*
-                        if (aSetStrs.size() ==2)
-                        {
-                            LIBMOL::BondDict aBond;
-                            
-                            for (unsigned j=0; j < aSetStrs.size(); j++)
-                            {
-                                LIBMOL::AtomDict aAtom;
-                                aAtom.id = "Test_" + LIBMOL::IntToStr(int(i));
-                                aAtom.seriNum = i;
-                                std::cout << aAtom.id << std::endl;
-                                aTool.codClassToAtom2(aSetStrs[j], aAtom);
-                                std::vector<LIBMOL::ID> tConns;
-                                LIBMOL::StrTokenize(aAtom.codNB2Symb, tConns, ':');
-                                for (int k=0; k < (int)tConns.size(); k++)
-                                {
-                                    aAtom.connAtoms.push_back(k);
-                                }
-                                aTool.allAtoms.push_back(aAtom);
-                                aBond.fullAtoms[aAtom.id] = i;
-                                aBond.atomsIdx.push_back(i);
-                                
-                                i++;
-                                
-                            }
-                            
-                            aTool.allBonds.push_back(aBond);
-                        }
-                         */
-                        if (aSetStrs.size() ==3)
-                        {
-                            LIBMOL::AngleDict aAng;
-                            for (unsigned j=0; j < aSetStrs.size(); j++)
-                            {
-                                LIBMOL::AtomDict aAtom;
-                                aAtom.id = "Test_" + LIBMOL::IntToStr(int(i));
-                                aAtom.seriNum = i;
-                                std::cout << aAtom.id << std::endl;
-                                aTool.codClassToAtom2(aSetStrs[j], aAtom);
-                                std::vector<LIBMOL::ID> tConns;
-                                LIBMOL::StrTokenize(aAtom.codNB2Symb, tConns, ':');
-                                for (int k=0; k < (int)tConns.size(); k++)
-                                {
-                                    aAtom.connAtoms.push_back(k);
-                                }
-                                aTool.allAtoms.push_back(aAtom);
-                                aAng.atoms.push_back(i);
-                                i++;
-                                
-                            }
-                            aTool.allAngles.push_back(aAng);
-                        }
-                        
-                    }
-                         
-                    
-                }
-                aInFile.close();
-                
-                std::cout << "number of angles " << aTool.allAngles.size() << std::endl;
-                std::cout << "number of atoms " << aTool.allAtoms.size() << std::endl;
-                
-                
-                if (aTool.allAtoms.size() && aTool.allAngles.size())
-                {
-                    
-                    aTool.hashingAtoms2();
-                    //aTool.setOrgBondHeadHashList2();
-                    //aTool.groupCodOrgBonds2();
-                    //aTool.setOrgAngleHeadHashList22();
-                    
-                    
-                    aTool.groupCodOrgAngles22();
-                    aTool.searchCodAngles2();
-                    
-                    /*
-                    for (std::vector<LIBMOL::BondDict>::iterator iBo=aTool.allBonds.begin();
-                            iBo !=aTool.allBonds.end(); iBo++)
-                    {
-                        aTool.searchCodOrgBonds2(iBo);
-                    }
-                     */            
-                }
+                graphTool.outputMatchedGraphs(g1, g2, matchedList, 1,
+                                              AJob.IOEntries["userOutName"].c_str());
+                std::cout << "Graph matching done. " << std::endl;
             }
-            
+            else
+            {
+                std::cout << "No matched graphs found. " << std::endl;
+            }
         }
     }
     

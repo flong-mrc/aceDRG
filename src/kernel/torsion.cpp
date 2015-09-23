@@ -336,17 +336,14 @@ namespace LIBMOL
             }
         }
         
-        if ((int)tDoneCAs.size() !=0)
+        REAL retV =0.0;
+        
+        if ((int)tDoneCAs.size() ==0)
         {
-            if (iPrev >=0)
-            {
-                
-            }
+            retV=tAtoms[iNext].treeTorsion;
         }
-        else
-        {
-            return tAtoms[iNext].treeTorsion;
-        }
+        
+        return retV;
                 
     }
     

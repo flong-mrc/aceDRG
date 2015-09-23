@@ -78,6 +78,7 @@ namespace LIBMOL
                                                          
     {
         libmolTabDir = tLibmolTabDir;
+        
         pPeriodictable = new PeriodicTable();
         
         for (std::vector<AtomDict>::const_iterator iA=tCifObj.allAtoms.begin();
@@ -533,8 +534,6 @@ namespace LIBMOL
         */
         
     }
-    
-    
     
     void CodClassify::setupSystem2()
     {
@@ -5918,6 +5917,8 @@ namespace LIBMOL
                 
                 sortMap4   m1, m2;
                 
+                m1.id    = allAtoms[tPair[0]].id;
+                m2.id    = allAtoms[tPair[0]].id;
                 m1.ha    =(int)allAtoms[tPair[0]].hashingValue;
                 m2.ha    =(int)allAtoms[tPair[1]].hashingValue;
                 m1.lev2  = allAtoms[tPair[0]].codNB2Symb;
@@ -6242,6 +6243,9 @@ namespace LIBMOL
                             aValueSet   tVaS;
                             setValueSet(tVaS, tBs3);
                             
+                            std::cout << "iFind  3 A1 " << std::endl
+                                      << "tVaS num " << tVaS.numCodValues << std::endl
+                                      << "tVaS sig " << tVaS.sigValue << std::endl;
                             
                             if (tVaS.numCodValues > 10 && tVaS.sigValue <0.03)
                             {
@@ -6254,45 +6258,129 @@ namespace LIBMOL
                                 std::cout << "iFind 3 A" << std::endl;
                                 
                             }
-                            else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
-                                     && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                     !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
-                            {
-                                
-                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
-                                std::cout << "iFind 3 B" << std::endl;
-                            }
-                            else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
-                                     && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                     !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
-                            {
-                               getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
-                               std::cout << "iFind 3 C" << std::endl;
-                                
-                            }
-                            else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
-                                     && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".")
-                                     !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
-                                std::cout << "iFind 3 D" << std::endl;
-                            }
-                            else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
-                                     && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".")
-                                     !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
-                            {
-                               getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
-                               std::cout << "iFind 3 E" << std::endl;
-                            }
                             else
                             {
-                                iB->value        =tVaS.value;
-                                iB->valueST      =iB->value;
-                                iB->sigValue     =tVaS.sigValue;
-                                iB->sigValueST   =iB->sigValue;
-                                iB->numCodValues =tVaS.numCodValues;   
-                                std::cout << "iFind 3" << std::endl;
+                                //Test 
+                                for (std::map<ID, std::map<ID, std::map<ID, 
+                                 std::map<ID, std::vector<aValueSet> > > > >::iterator iB3
+                                     =allDictBondsIdx2D[ha1][ha2][a1NB2].begin();
+                                     iB3 !=allDictBondsIdx2D[ha1][ha2][a1NB2].end();
+                                         iB3++)
+                                {
+                                    if (iB3->first !=a2NB2)
+                                    {
+                                        for (std::map<ID, std::map<ID, std::map<ID,  
+                                             std::vector<aValueSet> > > >::iterator iB4
+                                             =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
+                                        {
+                                            for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5=iB4->second.begin();
+                                                 iB5 !=iB4->second.end(); iB5++)
+                                            {
+                                                for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
+                                                    iB6 !=iB5->second.end(); iB6++)
+                                                {
+                                                    for(std::vector<aValueSet>::iterator iB7=iB6->second.begin();
+                                                        iB7 !=iB6->second.end(); iB7++)
+                                                    {
+                                                        tBs3.push_back(*iB7);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 
+                                for (std::map<ID, std::map<ID, std::map<ID, 
+                                     std::map<ID, std::map<ID, std::vector<aValueSet> > > > > >::iterator iB1
+                                     =allDictBondsIdx2D[ha1][ha2].begin();
+                                     iB1 !=allDictBondsIdx2D[ha1][ha2].end(); iB1++)
+                                {
+                                    if (iB1->first !=a1NB2)
+                                    {
+                                        for (std::map<ID, std::map<ID, std::map<ID, 
+                                             std::map<ID, std::vector<aValueSet> > > > >::iterator iB2
+                                             =iB1->second.begin(); 
+                                             iB2 !=iB1->second.end(); iB2++)
+                                        {
+                                            if (iB2->first == a2NB2)
+                                            {
+                                                for (std::map<ID, std::map<ID, std::map<ID,  
+                                                     std::vector<aValueSet> > > >::iterator iB3
+                                                     =iB2->second.begin(); iB3 !=iB2->second.end(); iB3++)
+                                                {
+                                                    for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB4=iB3->second.begin();
+                                                         iB4 !=iB3->second.end(); iB4++)
+                                                    {
+                                                        for(std::map<ID, std::vector<aValueSet> >::iterator iB5=iB4->second.begin();
+                                                            iB5 !=iB4->second.end(); iB5++)
+                                                        {
+                                                            for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
+                                                                iB6 !=iB5->second.end(); iB6++)
+                                                            {
+                                                                tBs3.push_back(*iB6);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                setValueSet(tVaS, tBs3);
+                                std::cout << "iFind  3 A2 " << std::endl
+                                        << "tVaS num " << tVaS.numCodValues << std::endl
+                                        << "tVaS sig " << tVaS.sigValue << std::endl;
+                                
+                                        
+                                if (tVaS.numCodValues > 10 && tVaS.sigValue <0.03)
+                                {
+                                    iB->value        =tVaS.value;
+                                    iB->valueST      =iB->value;
+                                    iB->sigValue     =tVaS.sigValue;
+                                    iB->sigValueST   =iB->sigValue;
+                                    iB->numCodValues =tVaS.numCodValues;
+                                
+                                    std::cout << "iFind 3 A2" << std::endl;
+                                
+                                }
+                                else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                                         && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                         !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
+                                {
+                                    getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                                    std::cout << "iFind 3 B" << std::endl;
+                                }
+                                else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                                         && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                         !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
+                                {
+                                    getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                                    std::cout << "iFind 3 C" << std::endl;
+                                }
+                                else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                                         && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".")
+                                         !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
+                                {
+                                    getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
+                                    std::cout << "iFind 3 D" << std::endl;
+                                }
+                                else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                                         && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".")
+                                         !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
+                                {
+                                    getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
+                                    std::cout << "iFind 3 E" << std::endl;
+                                }
+                                else
+                                {
+                                    iB->value        =tVaS.value;
+                                    iB->valueST      =iB->value;
+                                    iB->sigValue     =tVaS.sigValue;
+                                    iB->sigValueST   =iB->sigValue;
+                                    iB->numCodValues =tVaS.numCodValues;   
+                                    std::cout << "iFind 3" << std::endl;    
+                                }
                             }
                         }
                     }
@@ -6572,12 +6660,12 @@ namespace LIBMOL
                 if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                                 !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                 {
-                    std::cout << "Here 1 " << std::endl;
+                    
                     getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
                 }
                 else
                 {
-                    std::cout << "Here 1 " << std::endl;
+                    
                     
                     getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
                 }
@@ -6633,8 +6721,8 @@ namespace LIBMOL
         
         
         std::string aOrdS = tB->order.substr(0,4);
-        StrLower(aOrdS);
-     
+        StrUpper(aOrdS);
+        
         std::string tAtm1, tAtm2; 
         
         if (tAtom1.find(".") == std::string::npos)
@@ -6652,8 +6740,11 @@ namespace LIBMOL
         {
             if (ccp4BondsA[tAtm1].find(tAtm2) != ccp4BondsA[tAtm1].end())
             {
+                
+                        
                 if (ccp4BondsA[tAtm1][tAtm2].find(aOrdS) !=ccp4BondsA[tAtm1][tAtm2].end())
                 { 
+                   
                     tB->value    = ccp4BondsA[tAtm1][tAtm2][aOrdS]["length"];
                     tB->sigValue = ccp4BondsA[tAtm1][tAtm2][aOrdS]["sigValue"];
                 }
@@ -7468,6 +7559,7 @@ namespace LIBMOL
                                 
                                 REAL aOrder = StrToOrder(tBuf[2]);
                                 ID  aSym    = tBuf[2].substr(0,4);
+                                
                                 if (aOrder < 0.0)
                                 {
                                     std::cout << "Unknown bond order " << tRecord 
@@ -7503,6 +7595,7 @@ namespace LIBMOL
                                             ccp4BondsA[tBuf[0]][tBuf[1]][aSym]["length"]= StrToReal(tBuf[4]);
                                             ccp4BondsA[tBuf[1]][tBuf[0]][aSym]["order"] = aOrder;
                                             ccp4BondsA[tBuf[1]][tBuf[0]][aSym]["length"]= StrToReal(tBuf[4]);
+                                            
                                             
                                             if (tBuf[5].find('.') == std::string::npos)
                                             {
@@ -8943,9 +9036,7 @@ namespace LIBMOL
         for (std::vector<AngleDict>::iterator iA=allAngles.begin();
                 iA !=allAngles.end(); iA++)
         { 
-            std::cout << "Angle between " << allAtoms[iA->atoms[0]].id 
-                              << "(center) and " << allAtoms[iA->atoms[1]].id
-                              << " and " << allAtoms[iA->atoms[2]].id << std::endl;
+            
             
             if (allAtoms[iA->atoms[0]].isMetal)
             {
@@ -10867,18 +10958,13 @@ namespace LIBMOL
             int ha1, ha2, ha3; // s2, s3;
             ID a1NB2, a1NB, a1M, a1C, a2NB2, a2NB, a2M, a2C,a3NB2, a3NB, a3M, a3C;
             ID id2, id3;
+            
             ha1   = allAtoms[iAN->atoms[0]].hashingValue;
             a1NB2 = allAtoms[iAN->atoms[0]].codNB2Symb;
             a1NB  = allAtoms[iAN->atoms[0]].codNBSymb;
             a1M   = allAtoms[iAN->atoms[0]].codAtmMain;
             a1C   = allAtoms[iAN->atoms[0]].codClass;
-            
-            std::cout << "Center Atom :" <<  allAtoms[iAN->atoms[0]].id 
-                      <<  "Hashing code  " << ha1 <<std::endl
-                      <<  "Its codNBSymb " <<  a1NB << " its codNB2Symb " << a1NB2 << std::endl
-                      <<  "atom type main sec " << a1M << std::endl
-                      <<  "atom type full " << a1C << std::endl;
-            
+                     
             if ((int)allAtoms[iAN->atoms[1]].hashingValue
                     <(int)allAtoms[iAN->atoms[2]].hashingValue )
             {
@@ -10906,56 +10992,9 @@ namespace LIBMOL
             else if ((int)allAtoms[iAN->atoms[1]].hashingValue
                     ==(int)allAtoms[iAN->atoms[2]].hashingValue)
             {
-                
-                std::vector<sortMap4> vM;
-                
-                sortMap4   m1, m2;
-                
-                m1.ha    =(int)allAtoms[iAN->atoms[1]].hashingValue;
-                m2.ha    =(int)allAtoms[iAN->atoms[2]].hashingValue;
-                m1.lev2  = allAtoms[iAN->atoms[1]].codNB2Symb;
-                m2.lev2  = allAtoms[iAN->atoms[2]].codNB2Symb;
-                m1.lev3  = allAtoms[iAN->atoms[1]].codNBSymb;
-                m2.lev3  = allAtoms[iAN->atoms[2]].codNBSymb;
-                m1.key   = allAtoms[iAN->atoms[1]].codAtmMain;
-                m2.key   = allAtoms[iAN->atoms[2]].codAtmMain;
-                m1.lev4  = allAtoms[iAN->atoms[1]].codClass;
-                m2.lev4  = allAtoms[iAN->atoms[2]].codClass;
-                
-                vM.push_back(m1);
-                vM.push_back(m2);
-                
-                std::sort(vM.begin(), vM.end(), sortMapkey4);
-                
-                ha2    = vM[0].ha;
-                ha3    = vM[1].ha;
-                a2NB2  = vM[0].lev2;
-                a3NB2  = vM[1].lev2;
-                a2NB   = vM[0].lev3;
-                a3NB   = vM[1].lev3;
-                a2M    = vM[0].key;
-                a3M    = vM[1].key;
-                a2C    = vM[0].lev4;
-                a3C    = vM[1].lev4;
-                
-                /*
-                if (a2M==allAtoms[iAN->atoms[1]].codAtmMain)
+                if (allAtoms[iAN->atoms[1]].codAtmMain.size() 
+                     > allAtoms[iAN->atoms[2]].codAtmMain.size())
                 {
-                    s2 =1;
-                    s3 =2;
-                }
-                else
-                {
-                    s2 =2;
-                    s3 =1;
-                }
-                
-                
-                if ((int)allAtoms[iAN->atoms[1]].codClass.size() <=
-                        (int)allAtoms[iAN->atoms[2]].codClass.size())
-                {
-                    s2 =1;
-                    s3 =2;
                     ha2  =allAtoms[iAN->atoms[1]].hashingValue;
                     ha3  =allAtoms[iAN->atoms[2]].hashingValue;
            
@@ -10965,16 +11004,19 @@ namespace LIBMOL
                     a2NB = allAtoms[iAN->atoms[1]].codNBSymb;
                     a3NB = allAtoms[iAN->atoms[2]].codNBSymb;
          
+                    a2M  = allAtoms[iAN->atoms[1]].codAtmMain;
+                    a3M  = allAtoms[iAN->atoms[2]].codAtmMain;
+                
                     a2C  = allAtoms[iAN->atoms[1]].codClass;
                     a3C  = allAtoms[iAN->atoms[2]].codClass;
                 
                     id2  = allAtoms[iAN->atoms[1]].id;
                     id3  = allAtoms[iAN->atoms[2]].id;
+                    
                 }
-                else
+                else if (allAtoms[iAN->atoms[1]].codAtmMain.size() 
+                     <  allAtoms[iAN->atoms[2]].codAtmMain.size())
                 {
-                    s2 =2;
-                    s3 =1;
                     ha2  =allAtoms[iAN->atoms[2]].hashingValue;
                     ha3  =allAtoms[iAN->atoms[1]].hashingValue;
            
@@ -10990,7 +11032,43 @@ namespace LIBMOL
                     id2  = allAtoms[iAN->atoms[2]].id;
                     id3  = allAtoms[iAN->atoms[1]].id;
                 }
-                 */
+                else
+                {
+                    std::vector<sortMap4> vM;
+                
+                    sortMap4   m1, m2;
+                
+                    m1.id    = allAtoms[iAN->atoms[1]].id;
+                    m2.id    = allAtoms[iAN->atoms[2]].id;
+                    m1.ha    =(int)allAtoms[iAN->atoms[1]].hashingValue;
+                    m2.ha    =(int)allAtoms[iAN->atoms[2]].hashingValue;
+                    m1.lev2  = allAtoms[iAN->atoms[1]].codNB2Symb;
+                    m2.lev2  = allAtoms[iAN->atoms[2]].codNB2Symb;
+                    m1.lev3  = allAtoms[iAN->atoms[1]].codNBSymb;
+                    m2.lev3  = allAtoms[iAN->atoms[2]].codNBSymb;
+                    m1.key   = allAtoms[iAN->atoms[1]].codAtmMain;
+                    m2.key   = allAtoms[iAN->atoms[2]].codAtmMain;
+                    m1.lev4  = allAtoms[iAN->atoms[1]].codClass;
+                    m2.lev4  = allAtoms[iAN->atoms[2]].codClass;
+                
+                    vM.push_back(m1);
+                    vM.push_back(m2);
+                
+                    std::sort(vM.begin(), vM.end(), sortMapkey4);
+                
+                    id2    = vM[0].id;
+                    id3    = vM[1].id;
+                    ha2    = vM[0].ha;
+                    ha3    = vM[1].ha;
+                    a2NB2  = vM[0].lev2;
+                    a3NB2  = vM[1].lev2;
+                    a2NB   = vM[0].lev3;
+                    a3NB   = vM[1].lev3;
+                    a2M    = vM[0].key;
+                    a3M    = vM[1].key;
+                    a2C    = vM[0].lev4;
+                    a3C    = vM[1].lev4;
+                }
             }
             else
             {
@@ -11005,6 +11083,9 @@ namespace LIBMOL
                 a2NB = allAtoms[iAN->atoms[2]].codNBSymb;
                 a3NB = allAtoms[iAN->atoms[1]].codNBSymb;
          
+                a2M  = allAtoms[iAN->atoms[2]].codAtmMain;
+                a3M  = allAtoms[iAN->atoms[1]].codAtmMain;
+                
                 a2C  = allAtoms[iAN->atoms[2]].codClass;
                 a3C  = allAtoms[iAN->atoms[1]].codClass;
                 
@@ -11013,17 +11094,28 @@ namespace LIBMOL
                 
             }
             
-            std::cout << "Atom2: "  << std::endl
-                      << "Hashing code "    << ha2   << std::endl
-                      << "Its codNBSymb " <<  a2NB << " its codNB2Symb " << a2NB2 << std::endl
-                      << "Its atom type main section " << a2M << std::endl
-                      << " Its atom type full " <<  a2C << std::endl; 
+            std::cout << "\n%=========================================%" << std::endl;
+            std::cout << "Angle between " << allAtoms[iAN->atoms[0]].id 
+                      << "(center) and " << id2 << " and " 
+                      << id3 << std::endl << std::endl;
             
-            std::cout << "Atom3: "         <<  std::endl
-                      << "Hashing code  "  <<  ha3  <<std::endl
-                      << "Its codNBSymb "  <<  a3NB     << " its codNB2Symb "  << a3NB2 << std::endl
+            std::cout << "Center Atom : " <<  allAtoms[iAN->atoms[0]].id << std::endl
+                      <<  "Its Hashing code  " << ha1 <<std::endl
+                      <<  "Its codNBSymb " <<  a1NB << " its codNB2Symb " << a1NB2 << std::endl
+                      <<  "atom type main sec " << a1M << std::endl
+                      <<  "atom type full " << a1C << std::endl<< std::endl;
+            
+            std::cout << "Atom2 : "  << id2 << std::endl
+                      << "Its Hashing code "  << ha2    << std::endl
+                      << "Its codNBSymb " <<  a2NB  << " its codNB2Symb " << a2NB2 << std::endl
+                      << "Its atom type main section " << a2M << std::endl
+                      << " Its atom type full " <<  a2C << std::endl << std::endl; 
+            
+            std::cout << "Atom3: "   << id3 << std::endl
+                      << "Its Hashing code  " <<  ha3   <<std::endl
+                      << "Its codNBSymb " <<  a3NB  << " its codNB2Symb "  << a3NB2 << std::endl
                       << "Its atom type main section " << a3M << std::endl
-                      << "Its atom type full " << a3C << std::endl;
+                      << "Its atom type full " << a3C << std::endl << std::endl;
             
             // int dLev = 0;
             
@@ -13850,7 +13942,7 @@ namespace LIBMOL
         
         
         // std::cout << "libmol table should be " << libmolTabDir << std::endl;
-       
+        
         setupTargetBonds2();
         // setupTargetBondsUsingSqlite();
         

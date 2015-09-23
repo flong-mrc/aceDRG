@@ -7204,10 +7204,18 @@ namespace LIBMOL
         }
         
         // std::cout << "Print Pos " << std::endl;
+        // Open a temp file for writing 
+        std::vector<std::string> aSetStrs;
+        StrTokenize(tFName, aSetStrs, '.');
+        std::string outTempFName;
+        for (unsigned i=0; i < aSetStrs.size()-1; i++ )
+        {
+            outTempFName+=aSetStrs[i];
+        }
+        outTempFName +="_ac.txt";
+        std::cout << "output AandC file name : " << outTempFName << std::endl;
         
         std::ofstream outRestrF(tFName);
-        
-        
         
         if(outRestrF.is_open())
         {
@@ -7313,6 +7321,8 @@ namespace LIBMOL
                           << "_chem_comp_atom.y" << std::endl
                           << "_chem_comp_atom.z" << std::endl;
                 
+                
+                
                 for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
                         iA != tAtoms.end(); iA++)
                 {
@@ -7342,6 +7352,7 @@ namespace LIBMOL
                               << iA->coords[1]
                               << std::setw(12) << std::setprecision(3) << std::fixed 
                               << iA->coords[2] << std::endl;
+                    
                 }
             }
             
@@ -7357,6 +7368,7 @@ namespace LIBMOL
                           << "_chem_comp_bond.value_dist"<< std::endl
                           << "_chem_comp_bond.value_dist_esd" << std::endl;
                           // << "_chem_comp_bond.exact_cod_dist" << std::endl;
+               
                 
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
@@ -7391,7 +7403,6 @@ namespace LIBMOL
                     //   {
                     //       outRestrF << "No "  << std::endl;
                     //   }
-                        
                 }
             }
            
@@ -7614,8 +7625,6 @@ namespace LIBMOL
                 */
             }
             
-            
-            
             // Planar group section
             if ((int)tPlas.size() >0)
             {
@@ -7656,6 +7665,8 @@ namespace LIBMOL
             }
             outRestrF.close();
         }
+        
+        
     }
     
     extern int getHAtomNum(std::vector<LIBMOL::AtomDict>& tAtoms)
@@ -7758,6 +7769,46 @@ namespace LIBMOL
                     outRestrF << *iStr;
                 }
             }
+        }
+    }
+    
+    extern void outAtomTypesAndConnections(FileName tFName,
+                                           std::vector<LIBMOL::AtomDict>& tAtoms,
+                                           std::vector<LIBMOL::BondDict>& tBonds)
+    {
+        
+        if (tAtoms.size() !=0 && tBonds.size())
+        {
+            std::ofstream outTempF(tFName);
+            if (outTempF.is_open())
+            {
+                outTempF << "ATOMS:" << std::endl;
+                int nA=0;
+                std::map<int, int> seriMap;
+                for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
+                        iA != tAtoms.end(); iA++)
+                {
+                    outTempF << std::setw(10) << nA 
+                             << std::setw(8)  << iA->chemType
+                             << std::setw(10) << iA->id 
+                             << std::setw(iA->codClass.size()+6) 
+                             << iA->codClass << std::endl;
+                    seriMap[iA->seriNum] = nA;
+                    nA++;
+                }
+                
+                outTempF << "CONNECTIONS:" << std::endl;
+                for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                          iB !=tBonds.end(); iB++)
+                {
+                    outTempF << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[0]].seriNum] 
+                             << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[1]].seriNum]
+                             << std::endl;
+                }
+                outTempF.close();
+                
+            }
+            
         }
     }
     

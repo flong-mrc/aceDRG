@@ -285,9 +285,11 @@ namespace LIBMOL
         
     }
     
+    /*
     std::string BondDict::bondOrderNumToStr()
     {        
     }
+    */
     
     bool BondDict::checkIfInSameRing(std::vector<AtomDict>& tAtoms, 
                                      int tIdx1, int tIdx2)

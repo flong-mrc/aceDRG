@@ -605,6 +605,10 @@ namespace LIBMOL
                               ID tMonoRootName,
                               std::vector<LIBMOL::AtomDict> & tAtoms,
                               std::map<std::string, std::vector<std::string> > & tUnChangedEntries);
+    
+    extern void outAtomTypesAndConnections(FileName tFName,
+                                           std::vector<LIBMOL::AtomDict>& tAtoms,
+                                           std::vector<LIBMOL::BondDict>& tBonds);
 }
 
 

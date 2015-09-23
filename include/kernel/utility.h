@@ -159,8 +159,17 @@ namespace LIBMOL
                        std::vector<REAL> & tV2,
                        std::vector<REAL> & tV3);
     
+    extern void matCopyInt(std::vector<std::vector<int> > & tM1,
+                           std::vector<std::vector<int> > & tM2);
+    
     extern void matMultVec(std::vector<std::vector<REAL> >    & tMat,
                 std::vector<REAL> & tInitV, std::vector<REAL> & tFinV);
+    
+    extern void matMultMatInt(std::vector<std::vector<int> >    & tMat1,
+                              std::vector<std::vector<int> >    & tMat2,
+                              std::vector<std::vector<int> >    & tOutMat);
+    
+    extern void printMatrix(std::vector<std::vector<int> >    & tMat);
 
     // The following functions are copied from a old version of global optimization codes
     extern REAL length_v(REAL *v, int tDim);
@@ -297,6 +306,102 @@ namespace LIBMOL
     extern void cmdExecute(std::string & tCom);
     
     extern std::string getLibmolDir();
+    
+    class isomorGraph
+    {
+    public:
+        // default constructor
+        isomorGraph();
+        
+        // default destructor
+        ~isomorGraph();
+        
+        void copyNodes(std::map<ID, ID> & tNodeI, 
+                       std::map<ID, ID> & tNodeD);
+        
+        void copyAdjacencies(std::vector<int> & tConnI,
+                             std::vector<int> & tConnD);
+        
+        void setOneGraph(FileName tFName, Graph & tG);
+        
+        void reducedGraph(Graph & tFullG, Graph & tReducedG,
+                          std::map<int, int> & tNonHMapR2F, 
+                          std::map<int, int> & tNonHMapF2R,
+                          std::map<int, std::vector<int> > & tLinkedH);
+        
+        void setHLinks(Graph                            & tFullG1,
+                       std::map<int, int>               & tNonHMapF2R_1,
+                       std::map<int, std::vector<int> > & tLinkedH1,
+                       Graph                            & tFullG2, 
+                       std::map<int, int>               & tNonHMapR2F_2,
+                       std::map<int, std::vector<int> > & tLinkedH2,
+                       std::map<int,int>                & tOneSetR2RMap,
+                       std::map<int,int>                & tOneSetH2HMap);
+        
+        void recoverFullGraphMatch(Graph& tGraph1,                                 
+                                   std::map<int,int>& tNonHMapF2R_1,
+                                   std::map<int,int>& tNonHMapR2F_1,
+                                   std::map<int,std::vector<int> >& tLinkedH1,
+                                   Graph& tGraph2,
+                                   std::map<int,int>& tNonHMapF2R_2,
+                                   std::map<int,int>& tNonHMapR2F_2,
+                                   std::map<int,std::vector<int> >& tLinkedH2, 
+                                   std::map<int,int> & tReducedOutMatchs,
+                                   std::map<int,int> & tOutMatchs);
+        
+                           
+        void setInitMatrixs(std::vector<std::vector<int> > & tAdjA,
+                            std::vector<std::vector<int> > & tAdjB,
+                            std::vector<std::vector<int> > & tM0,
+                            int tMode, Graph  & tGraph1, Graph & tGraph2);
+        
+        void setExactMatch_M0(std::vector<std::vector<int> > & tM0,
+                             Graph  & tGraph1, Graph & tGraph2);
+        
+        void setIsomorMatchLevel1_M0(std::vector<std::vector<int> > & tM0,
+                                     Graph  & tGraph1, Graph & tGraph2);
+        
+        void setIsomorMatchLevel2_M0(std::vector<std::vector<int> > & tM0,
+                                     Graph  & tGraph1, Graph & tGraph2);
+        
+        void setIsomorMatchLevel3_M0(std::vector<std::vector<int> > & tM0,
+                                     Graph  & tGraph1, Graph & tGraph2);
+        
+        void recurseMandIsomor(std::vector<std::vector<int> > & tAdjA,
+                               std::vector<std::vector<int> > & tAdjB,
+                               std::vector<std::vector<int> > & tM0,
+                               std::vector<int>               & usedCols,
+                               int                              curRow,
+                               std::vector<std::vector<int> >  & tM,
+                               std::vector<std::map<int,int> > & tOutMatch,
+                               int                               tMode,
+                               bool                            & tDone);
+        
+        void checkIsomor(std::vector<std::vector<int> > & tAdjA,
+                         std::vector<std::vector<int> > & tAdjB,
+                         std::vector<std::vector<int> >& tM,
+                         std::vector<std::map<int,int> > & tOutMatch);
+       
+        void isomorSubGraph(Graph    & tSubGraph,
+                            Graph    & tGraph,
+                            int        tMode,
+                            std::vector<std::map<int, int> > & tOutMatchs);
+        
+        void graphMatch(FileName tsubGraphFName,
+                        Graph    & tSubGraph, 
+                        FileName tGraphFName,
+                        Graph    & tGraph,
+                        std::vector<std::map<int, int> > & tOutMatch,
+                        int tMode);
+        
+        void outputMatchedGraphs(Graph    & tSubGraph,
+                                 Graph    & tGraph,
+                                 std::vector<std::map<int, int> > & tOutMatch,
+                                 int         tMode, 
+                                 FileName    tOutMatchFileName);
+        
+        
+    };
 
 }
 
