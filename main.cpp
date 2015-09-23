@@ -471,14 +471,27 @@ int main(int argc, char** argv) {
     else if (AJob.workMode == 41)
     {
        
-        
-        LIBMOL::DictCifFile aTargetSystem(AJob.IOEntries["inCifName"], std::ios::in);
-        
-        if ( (int)aTargetSystem.allAtoms.size() > 0)
-        {     
+        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
+                                           
             
-            LIBMOL::CodClassify  aCodSystem(aTargetSystem, AJob.IOEntries["libMolTabDir"]);
-            aCodSystem.codAtomClassifyNew2(2);
+        
+            
+        
+        // LIBMOL::DictCifFile aTargetSystem(AJob.IOEntries["inCifName"], std::ios::in);
+        
+        if (dataFromCif.allAtoms.size() > 0)
+        {     
+            LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
+            LIBMOL::CodClassify  aCodSystem(aTargetSystem.allAtoms,
+                                            aTargetSystem.allHAtomIdx, 
+                                            aTargetSystem.allBonds, 
+                                            aTargetSystem.allAngles, 
+                                            aTargetSystem.allTorsions, 
+                                            aTargetSystem.allChirals, 
+                                            aTargetSystem.allPlanes, 
+                                            aTargetSystem.allRings,
+                                            AJob.IOEntries["libMolTabDir"], 2);
+            // aCodSystem.codAtomClassifyNew2(2);
             LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
                                                aCodSystem.allAtoms,
                                                aCodSystem.allBonds);

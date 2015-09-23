@@ -115,15 +115,15 @@ namespace LIBMOL
         {
             
         }
-        */
+  
         
         for (std::vector<TorsionDict>::const_iterator iTor=tCifObj.allTorsions.begin();
                 iTor != tCifObj.allTorsions.end(); iTor++)
         {
             allTorsions.push_back(*iTor);
         }
-        
-        
+    
+         */    
         
         for (std::vector<ChiralDict>::const_iterator iCh=tCifObj.allChirals.begin();
                 iCh !=tCifObj.allChirals.end(); iCh++)
@@ -477,6 +477,8 @@ namespace LIBMOL
         // std::vector<RingDict>          tmpRings;
         // std::vector<std::vector<int> > tmpAtoms;
         
+        
+        
         if (allRings.size() !=0)
         {
             for (std::map<ID, std::vector<RingDict> >::iterator iMr=allRings.begin();
@@ -532,6 +534,8 @@ namespace LIBMOL
                       << iTor->value << std::endl;
         }
         */
+        
+        
         
     }
     

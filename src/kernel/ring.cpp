@@ -1442,6 +1442,8 @@ namespace LIBMOL
         
         int nTors = (int)tTors.size();
         int nT = getTorsion(tTors, rAt1, rAt2, rAt3, rAt4);
+        std::cout << "Torsion index here is " << nT << std::endl;
+        
         if (nT >=0 && nT < nTors )
         {
             tTors[nT].value = vInit;

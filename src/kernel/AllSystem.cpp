@@ -110,8 +110,7 @@ namespace LIBMOL
     }
     
     AllSystem::AllSystem(SYBLMol2File& tMol2Obj, std::string tLibmolTab):
-                                               hasCoords(tMol2Obj.hasCoords),
-                                               
+                                               hasCoords(tMol2Obj.hasCoords),             
                                                usingInChiral(true),
                                                libmolTabDir(""),
                                                itsContainMetal(false),
@@ -541,6 +540,8 @@ namespace LIBMOL
               
         detectPlaneGroups(); 
        
+        
+        
         setAllTorsions2();
         
         if (!hasCCP4Type)

@@ -50,6 +50,21 @@ for aF in glob.glob("./inMol2/*.mol2"):
         print cmdL
         os.system(cmdL)
 
+print "============================================================"
+print "|  run all examples with input mmCif files at ./inMmcifPDB |"
+print "============================================================"
+for aF in glob.glob("./inMmcifPDB/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+    else:
+        MonoName = aFRoot
+
+    if len(aFRoot) !=0:
+        cmdL = "acedrg -c %s  -o  %s_fromMmcifPDB "%(aF, aFRoot) 
+        print cmdL
+        os.system(cmdL)
+
 print "========================================================="
 print "|  run all examples with input mmCif files at ./inMmcif |"
 print "========================================================="
