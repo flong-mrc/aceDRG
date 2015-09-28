@@ -182,6 +182,8 @@ namespace LIBMOL
         REAL                    valueP;
         REAL                    sigValueP;
         
+        int                     nLevel;
+        
         bool                    hasMetal;
         bool                    hasCodValue;
         int                     numCodValues;

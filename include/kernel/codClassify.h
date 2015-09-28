@@ -352,6 +352,14 @@ namespace LIBMOL
         void searchCodBonds();
         
         void getCCP4Bonds(std::vector<BondDict>::iterator tB, ID tAtm1, ID tAtm2);
+        // TEMP, should replace getCCP4Bonds before committing it
+        void getCCP4Bonds2(std::vector<BondDict>::iterator tB, ID tAtm1, ID tAtm2);
+        void setCCP4BondByMode(std::vector<BondDict>::iterator tB,
+                               ID tAtm1, ID tAtm2, ID tOrdS,
+                               std::map<int, bool> & tPosM);
+        void setCCP4Mix(std::vector<BondDict>::iterator tB,
+                               ID tAtm1, ID tAtm2, 
+                               ID tOrdS, int tMode);
         
         // !!!!!!! These are newly added for using sqlite3 search engine
         //void searchCodBondsUsingSqlite3();

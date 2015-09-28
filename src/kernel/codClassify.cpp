@@ -6251,7 +6251,7 @@ namespace LIBMOL
                                       << "tVaS num " << tVaS.numCodValues << std::endl
                                       << "tVaS sig " << tVaS.sigValue << std::endl;
                             
-                            if (tVaS.numCodValues > 10 && tVaS.sigValue <0.03)
+                            if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
                             {
                                 iB->value        =tVaS.value;
                                 iB->valueST      =iB->value;
@@ -6337,7 +6337,7 @@ namespace LIBMOL
                                         << "tVaS sig " << tVaS.sigValue << std::endl;
                                 
                                         
-                                if (tVaS.numCodValues > 10 && tVaS.sigValue <0.03)
+                                if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
                                 {
                                     iB->value        =tVaS.value;
                                     iB->valueST      =iB->value;
@@ -6362,20 +6362,6 @@ namespace LIBMOL
                                     getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                                     std::cout << "iFind 3 C" << std::endl;
                                 }
-                                else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
-                                         && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".")
-                                         !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
-                                {
-                                    getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
-                                    std::cout << "iFind 3 D" << std::endl;
-                                }
-                                else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
-                                         && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".")
-                                         !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
-                                {
-                                    getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
-                                    std::cout << "iFind 3 E" << std::endl;
-                                }
                                 else
                                 {
                                     iB->value        =tVaS.value;
@@ -6390,38 +6376,57 @@ namespace LIBMOL
                     }
                     else // iFind2 a2NB2 
                     {
-                        
-                        if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
-                            && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()
-                                || ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".") 
-                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+                        std::vector<aValueSet> tBs2;
+                                
+                        for (std::map<ID, std::map<ID, std::map<ID, 
+                             std::map<ID, std::vector<aValueSet> > > > >::iterator iB3
+                                     =allDictBondsIdx2D[ha1][ha2][a1NB2].begin();
+                             iB3 !=allDictBondsIdx2D[ha1][ha2][a1NB2].end();
+                             iB3++)
                         {
-                            if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
+                            for (std::map<ID, std::map<ID, std::map<ID,  
+                                 std::vector<aValueSet> > > >::iterator iB4
+                                 =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
                             {
-                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
-                            }
-                            else
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
+                                for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5=iB4->second.begin();
+                                     iB5 !=iB4->second.end(); iB5++)
+                                {
+                                    for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
+                                          iB6 !=iB5->second.end(); iB6++)
+                                    {
+                                        for(std::vector<aValueSet>::iterator iB7=iB6->second.begin();
+                                            iB7 !=iB6->second.end(); iB7++)
+                                        {
+                                            tBs2.push_back(*iB7);
+                                        }
+                                    }
+                                }
                             }
                         }
-                        else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
-                            && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()
-                                || ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".") 
-                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
+                            
+                        aValueSet   tVaS;
+                        setValueSet(tVaS, tBs2);
+                        
+                        if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
                         {
-                            if(ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
-                            }
-                            else
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
-                            }
+                            iB->value        =tVaS.value;
+                            iB->valueST      =iB->value;
+                            iB->sigValue     =tVaS.sigValue;
+                            iB->sigValueST   =iB->sigValue;
+                            iB->numCodValues =tVaS.numCodValues;        
+                        }
+                        else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                                 && ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                 !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
+                        {
+                            getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                        }
+                        else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                                 && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                 !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
+                        {
+                            getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                                    
                         }
                         else
                         {
@@ -6472,34 +6477,7 @@ namespace LIBMOL
                         
                             dLev = 2;
                             setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
-                             */
-                            std::vector<aValueSet> tBs2;
-                                
-                            for (std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, std::vector<aValueSet> > > > >::iterator iB3
-                                     =allDictBondsIdx2D[ha1][ha2][a1NB2].begin();
-                                 iB3 !=allDictBondsIdx2D[ha1][ha2][a1NB2].end();
-                                         iB3++)
-                            {
-                                for (std::map<ID, std::map<ID, std::map<ID,  
-                                     std::vector<aValueSet> > > >::iterator iB4
-                                        =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
-                                {
-                                    for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5=iB4->second.begin();
-                                        iB5 !=iB4->second.end(); iB5++)
-                                    {
-                                        for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
-                                                iB6 !=iB5->second.end(); iB6++)
-                                        {
-                                            for(std::vector<aValueSet>::iterator iB7=iB6->second.begin();
-                                                iB7 !=iB6->second.end(); iB7++)
-                                            {
-                                                tBs2.push_back(*iB7);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            */
                             
                             aValueSet   tVaS;
                             setValueSet(tVaS, tBs2);
@@ -6521,7 +6499,7 @@ namespace LIBMOL
                         iB->numCodValues =allDictBondsIdx3[ha1][ha2][0].numCodValues;
                      }
                      */
-                    
+                                       
                     std::vector<aValueSet> tBs1;
                     
                     for (std::map<ID, std::map<ID, std::map<ID, 
@@ -6550,6 +6528,7 @@ namespace LIBMOL
                                                 iB6 !=iB5->second.end(); iB6++)
                                             {
                                                 tBs1.push_back(*iB6);
+                                                // std::cout << "Bond value " << iB6->value << std::endl;
                                             }
                                         }
                                     }
@@ -6559,7 +6538,10 @@ namespace LIBMOL
                     }
                     aValueSet   tVaS;
                     setValueSet(tVaS, tBs1);
-                    if (tVaS.numCodValues > 10 && tVaS.sigValue <0.03)
+                    
+                    // std::cout << "N values " << tVaS.numCodValues << std::endl;
+                    // std::cout << "N  siga "  << tVaS.sigValue << std::endl;
+                    if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
                     {
                         iB->value        =tVaS.value;
                         iB->valueST      =iB->value;
@@ -6567,87 +6549,78 @@ namespace LIBMOL
                         iB->sigValueST   =iB->sigValue;
                         iB->numCodValues =tVaS.numCodValues;
                                 
-                        std::cout << "iFind 1 A" << std::endl;           
+                        // std::cout << "iFind 1 A" << std::endl;           
                     }        
                     else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
                         && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                        !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end() 
-                        || ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".") 
-                        !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+                        !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()) )
                     {
                         if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                             !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
-                            }
-                            else
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
-                            }
+                        {
+                            getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                        }
                     }
                     else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
                             && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end() 
-                               || ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".") 
                                 !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
                     {
                         if(ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
                                 !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
-                            }
-                            else
-                            {
-                                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
-                            }
+                        {
+                            getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                        }
                     }
                     else
                     {
-                        /*
-                        std::vector<BondDict> tBs6;
-                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                std::map<ID, std::map<ID, int> > > > > >::iterator iB1
-                                =allDictBondsIdxD[ha1][ha2].begin();
-                                iB1 !=allDictBondsIdxD[ha1][ha2].end();
-                                iB1++)
+                        
+                        for (std::map<ID, std::map<ID, std::map<ID, 
+                         std::map<ID, std::map<ID, std::vector<aValueSet> > > > > >::iterator iB1
+                         =allDictBondsIdx2D[ha1][ha2].begin();
+                         iB1 !=allDictBondsIdx2D[ha1][ha2].end(); iB1++)
                         {
-                            for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                std::map<ID, int> > > > >::iterator iB2=iB1->second.begin();
-                                    iB2!=iB1->second.end(); iB2++)
+                            for (std::map<ID, std::map<ID, std::map<ID, 
+                                 std::map<ID, std::vector<aValueSet> > > > >::iterator iB2
+                                   =iB1->second.begin(); 
+                                 iB2 !=iB1->second.end(); iB2++)
                             {
-                                for(std::map<ID, std::map<ID, std::map<ID, std::map<ID, int> > > >::iterator iB3=iB2->second.begin();
-                                    iB3!=iB2->second.end(); iB3++)
+                                if (iB2->first != a2NB2)
                                 {
-                                    for(std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iB4=iB3->second.begin();
-                                        iB4!=iB3->second.end(); iB4++)
+                                    for (std::map<ID, std::map<ID, std::map<ID,  
+                                         std::vector<aValueSet> > > >::iterator iB3
+                                         =iB2->second.begin(); iB3 !=iB2->second.end(); iB3++)
                                     {
-                                        for(std::map<ID, std::map<ID, int> >::iterator iB5=iB4->second.begin();
-                                            iB5!=iB4->second.end(); iB5++)
+                                        for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB4=iB3->second.begin();
+                                             iB4 !=iB3->second.end(); iB4++)
                                         {
-                                            for (std::map<ID, int>::iterator iB6=iB5->second.begin();
-                                                 iB6 !=iB5->second.end(); iB6++)
+                                            for(std::map<ID, std::vector<aValueSet> >::iterator iB5=iB4->second.begin();
+                                                iB5 !=iB4->second.end(); iB5++)
                                             {
-                                                tBs6.push_back(allDictBonds[iB6->second]);
+                                                for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
+                                                    iB6 !=iB5->second.end(); iB6++)
+                                                {
+                                                    tBs1.push_back(*iB6);
+                                                    // std::cout << "Bond value " << iB6->value << std::endl;
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                         
+                    
+                        aValueSet   tVaS1;
+                        setValueSet(tVaS1, tBs1);
+                        /*
                         dLev = 1;
                         setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
                          */
-                        std::cout << "Could not find the basic bond classes in Cod and CCP4-energy-type" << std::endl
-                          << "for the dictionary bond of atoms " <<iB->atoms[0] << " and "
-                          << iB->atoms[1] <<std::endl;
-                
-                        for (std::map<ID, int>::iterator iAt=iB->fullAtoms.begin();
-                              iAt != iB->fullAtoms.end(); iAt++)
-                        {
-                            std::cout << "chemType : " << allAtoms[iAt->second].chemType << " atom COD classes : " 
-                                      << allAtoms[iAt->second].codClass << std::endl;
-                        }
+                        iB->value        =tVaS1.value;
+                        iB->valueST      =iB->value;
+                        iB->sigValue     =tVaS1.sigValue;
+                        iB->sigValueST   =iB->sigValue;
+                        iB->numCodValues =tVaS1.numCodValues;
+                        
                         std::cout << "iFind 1" << std::endl;
                     }
                 }
@@ -6821,6 +6794,140 @@ namespace LIBMOL
                 exit(1);
             }
         }
+    }
+    
+    
+    void CodClassify::getCCP4Bonds2(std::vector<BondDict>::iterator tB, 
+                                    ID tAtom1, ID tAtom2)
+    {
+        
+        std::string aOrdS = tB->order.substr(0,4);
+        StrUpper(aOrdS);
+        
+        std::string tAtm1, tAtm2; 
+        
+        if (tAtom1.find(".") == std::string::npos)
+        {
+            tAtm1 = tAtom1;
+            tAtm2 = tAtom2;
+        }
+        else
+        {
+            tAtm1 = tAtom2;
+            tAtm2 = tAtom1;
+        }
+        
+        std::map<int, bool> posM;
+        posM[111]=false;
+        posM[110]=false;
+        posM[100]=false;
+        posM[121]=false;
+        posM[120]=false;
+        posM[211]=false;
+        posM[210]=false;
+        posM[200]=false;
+        posM[221]=false;
+        posM[220]=false;
+        
+        posM[000]=false;
+        
+        // Different situations
+        
+        if (ccp4BondsA.find(tAtm1) != ccp4BondsA.end())
+        {
+            if (ccp4BondsA[tAtm1].find(tAtm2) != ccp4BondsA[tAtm1].end())
+            {
+                if(ccp4BondsA[tAtm1][tAtm2].find(aOrdS) !=ccp4BondsA[tAtm1][tAtm2].end())
+                {
+                    // type1, type2 and order are matched
+                    posM[111]=true;
+                }
+                posM[110] = true;
+            }
+            else if (ccp4BondsA[tAtm1].find(".") != ccp4BondsA[tAtm1].end())
+            {
+                if (ccp4BondsA[tAtm1]["."].find(aOrdS) !=ccp4BondsA[tAtm1]["."].end())
+                {
+                    posM[121] = true;
+                }
+                else 
+                {
+                    posM[120] = true;
+                }
+            }
+            posM[100] = true;
+        }
+        else if (ccp4BondsA.find(tAtm2) != ccp4BondsA.end())
+        {
+            if (ccp4BondsA[tAtm2].find(tAtm1) != ccp4BondsA[tAtm2].end())
+            {
+                if(ccp4BondsA[tAtm2][tAtm1].find(aOrdS) !=ccp4BondsA[tAtm2][tAtm1].end())
+                {
+                    // type1, type2 and order are matched
+                    posM[211]=true;
+                }
+                posM[210] = true;
+            }
+            else if (ccp4BondsA[tAtm2].find(".") != ccp4BondsA[tAtm2].end())
+            {
+                if (ccp4BondsA[tAtm2]["."].find(aOrdS) !=ccp4BondsA[tAtm2]["."].end())
+                {
+                    posM[221] = true;
+                }
+                else 
+                {
+                    posM[220] = true;
+                }
+            }
+            posM[200] = true;
+        }
+        else
+        {
+            posM[000] = true;
+        }
+        
+        setCCP4BondByMode(tB, tAtm1, tAtm2, aOrdS, posM);
+        
+    }
+
+    void CodClassify::setCCP4BondByMode(std::vector<BondDict>::iterator tB,
+                                        ID tAtm1, ID tAtm2, ID tOrdS,
+                                        std::map<int, bool> & tPosM)
+    {
+        if (tPosM[111])
+        {
+            tB->value    = ccp4BondsA[tAtm1][tAtm2][tOrdS]["length"];
+            tB->sigValue = ccp4BondsA[tAtm1][tAtm2][tOrdS]["sigValue"];
+            tB->nLevel   = 0;
+        }
+        else if (tPosM[211])
+        {
+            tB->value    = ccp4BondsA[tAtm2][tAtm1][tOrdS]["length"];
+            tB->sigValue = ccp4BondsA[tAtm2][tAtm1][tOrdS]["sigValue"];
+            tB->nLevel   = 0;
+        }
+        else if (tPosM[110])
+        {
+            setCCP4Mix(tB, tAtm1, tAtm2, tOrdS, 110);
+        }
+        else if(tPosM[210])
+        {
+            setCCP4Mix(tB, tAtm1, tAtm2, tOrdS, 210);
+        }
+        else if(tPosM[121] && tPosM[221])
+        {
+            setCCP4Mix(tB, tAtm1, tAtm2, tOrdS, 342);
+        }
+        else if(tPosM[121] && tPosM[220])
+        {
+            setCCP4Mix(tB, tAtm1, tAtm2, tOrdS, 341);
+        }
+    }
+    
+    void CodClassify::setCCP4Mix(std::vector<BondDict>::iterator tB,
+                               ID tAtm1, ID tAtm2, 
+                               ID tOrdS, int tMode)
+    {
     }
     
     void CodClassify::groupCodMetBonds()
