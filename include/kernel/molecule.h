@@ -70,7 +70,7 @@ namespace LIBMOL
     class ChiralDict;
     
     class Ring;
-    class RinDict;
+    class RingDict;
     
     class PeriodicTable;
     class CCP4AtomType;
@@ -81,6 +81,7 @@ namespace LIBMOL
         // related by special connections
         
     public :
+        
         // Default constructor
         Molecule();
         // Copy constructor

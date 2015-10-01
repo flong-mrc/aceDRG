@@ -198,9 +198,9 @@ namespace LIBMOL
         // Check
         //
         
-        std::cout << "The ring connection are " << std::endl;
+        //std::cout << "The ring connection are " << std::endl;
         
-        std::cout << "Clockwise : " << std::endl;
+        //std::cout << "Clockwise : " << std::endl;
         
         int i =0;
         std::map<int, std::map<ID, int> >::iterator iA=atomsLink.begin();
@@ -208,8 +208,8 @@ namespace LIBMOL
         int iLink = iA->second["c"];
         do
         {
-            std::cout << "Atom " << tAllAtoms[iCur].id << " is linked to " 
-                       <<  tAllAtoms[iLink].id << std::endl;
+            //std::cout << "Atom " << tAllAtoms[iCur].id << " is linked to " 
+            //           <<  tAllAtoms[iLink].id << std::endl;
             iCur  = iLink;
             iLink = atomsLink[iCur]["c"];
             i++;        
@@ -434,21 +434,21 @@ namespace LIBMOL
         if (mergedRings.size() !=0)
         {
             
-            std::cout << "Merged planar rings : " << std::endl;
+            // std::cout << "Merged planar rings : " << std::endl;
             for (std::vector<std::vector<int> >::iterator iMr=mergedRings.begin();
                     iMr != mergedRings.end(); iMr++)
             {
                 std::vector<int> atmIdxs;
-                std::cout << "A merged system contains " << iMr->size() 
-                          << " rings. They are:  " << std::endl;
+                //std::cout << "A merged system contains " << iMr->size() 
+                //          << " rings. They are:  " << std::endl;
                 for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
                 {
-                    std::cout << "The Ring with atoms " << std::endl;
+                    //std::cout << "The Ring with atoms " << std::endl;
                     for (std::vector<AtomDict>::iterator iA=tAllRings[*iR].atoms.begin();
                             iA != tAllRings[*iR].atoms.end(); iA++)
                     {
-                        std::cout << iA->id << std::endl;
+                        // std::cout << iA->id << std::endl;
                         if(std::find(atmIdxs.begin(), atmIdxs.end(), iA->seriNum)
                             ==atmIdxs.end())
                         {
@@ -457,12 +457,12 @@ namespace LIBMOL
                     }
                 }
                 
-                std::cout << "Overall, The merged system contains " 
-                          << atmIdxs.size() << " atoms " << std::endl;
+                //std::cout << "Overall, The merged system contains " 
+                //          << atmIdxs.size() << " atoms " << std::endl;
                 
                 if(checkAromaSys(atmIdxs, tAtoms))
                 {
-                    std::cout << "It is an aromatic system" << std::endl;
+                    //std::cout << "It is an aromatic system" << std::endl;
                     tRingAtoms.push_back(atmIdxs);
                     for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
@@ -472,8 +472,8 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "It is not aromatic system for the merged system" 
-                              << std::endl;
+                    //std::cout << "It is not aromatic system for the merged system" 
+                    //          << std::endl;
                     // Further check 
                     std::vector<int> atmIdxsOR;
                     for (std::vector<int>::iterator iR=iMr->begin();
@@ -619,16 +619,16 @@ namespace LIBMOL
                 iAt !=tSubAtoms.end(); iAt++)
         {
             REAL numOneAtm = setPiForOneAtom(*iAt, tAtoms);
-            std::cout << "Atom " << tAtoms[*iAt].id 
-                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            //std::cout << "Atom " << tAtoms[*iAt].id 
+            //          << " add " << numOneAtm << " pi atoms" << std::endl;
             if (numOneAtm > 0.0)
             {
                 numPiAll +=numOneAtm;
             }
         }       
         
-        std::cout << "number of pi electron in the system is " 
-                  <<  numPiAll << std::endl;
+        //std::cout << "number of pi electron in the system is " 
+        //          <<  numPiAll << std::endl;
         
         if (numPiAll > 0.0 && fabs(fmod(numPiAll, 4.0)-2.0) < 0.001)
         {
@@ -805,20 +805,20 @@ namespace LIBMOL
         
         // Check aromaticity for individual rings
         std::vector<RingDict> tAroRings;
-        std::cout << "\nCheck aromaticity for individual ring " << std::endl;
-                for (std::vector<RingDict>::iterator iR=tAllRings.begin();
+        //std::cout << "\nCheck aromaticity for individual ring " << std::endl;
+        for (std::vector<RingDict>::iterator iR=tAllRings.begin();
                 iR !=tAllRings.end(); iR++)
         {
             if (iR->isPlanar)
             {
-                std::cout << "One Planar Ring! It contains " << iR->atoms.size()
-                          << " atoms. They are : " << std::endl;
+                //std::cout << "One Planar Ring! It contains " << iR->atoms.size()
+                //          << " atoms. They are : " << std::endl;
                 std::vector<int> atmIdx;
                 for (std::vector<AtomDict>::iterator iAt=iR->atoms.begin();
                     iAt !=iR->atoms.end(); iAt++)
                 {
                     atmIdx.push_back(iAt->seriNum);
-                    std::cout << iAt->id << std::endl;
+                    // std::cout << iAt->id << std::endl;
                 }        
                 
                 bool lAro = checkAromaSys(atmIdx, tAtoms);
@@ -826,12 +826,12 @@ namespace LIBMOL
                 {
                     iR->isAromatic = true;
                     tAroRings.push_back(*iR);
-                    std::cout << "It is an aromatic ring " << std::endl;
+                    // std::cout << "It is an aromatic ring " << std::endl;
                 }
                 else
                 {
                     iR->isAromatic = false;
-                    std::cout << "It is not an aromatic ring " << std::endl;
+                    // std::cout << "It is not an aromatic ring " << std::endl;
                 }
                 
                 std::cout << std::endl;
@@ -943,10 +943,10 @@ namespace LIBMOL
                             {
                                 tBonds[idxB].isAromatic = true;
                                 tBonds[idxB].order      = "aromatic";
-                                std::cout << "Bond between atom "  
-                                          << iR->atoms[i].id << " and "
-                                          << iR->atoms[j].id << " is aromatic " 
-                                          << std::endl;
+                                //std::cout << "Bond between atom "  
+                                ///          << iR->atoms[i].id << " and "
+                                //          << iR->atoms[j].id << " is aromatic " 
+                                //          << std::endl;
                             }
                             else
                             {
@@ -1067,7 +1067,7 @@ namespace LIBMOL
                 tRing->isSugar = "furanose";
             }
         }
-        
+        /*
         if (tRing->isSugar.size() !=0)
         {
             std::cout << "The ring is " << tRing->isSugar << std::endl;
@@ -1076,7 +1076,7 @@ namespace LIBMOL
         {
             std::cout << "The ring is not sugar ring " << std::endl;
         }
-        
+        */
         // 
         
         
@@ -1859,7 +1859,7 @@ namespace LIBMOL
             }
             
          
-            std::cout << "Ring " << aRepId << std::endl;
+            // std::cout << "Ring " << aRepId << std::endl;
             
             for (std::vector<AtomDict>::iterator iAt=tRings[i].atoms.begin();
                     iAt !=tRings[i].atoms.end(); iAt++)
@@ -1885,8 +1885,8 @@ namespace LIBMOL
                               << iAt->seriNum << std::endl;
                     exit(1);
                 }
-                std::cout << "Atom " << iAt->id << " add a ring sign " 
-                          << iAt->ringRepS[aRepId] << std::endl;
+                //std::cout << "Atom " << iAt->id << " add a ring sign " 
+                //          << iAt->ringRepS[aRepId] << std::endl;
             }
         }
     }

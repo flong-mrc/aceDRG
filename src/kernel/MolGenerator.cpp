@@ -372,10 +372,7 @@ namespace LIBMOL
                           << "z = " << iRA->coords[2] << std::endl;
             }
         }
-        */
-       
-        
-        
+        */   
     }
     
     

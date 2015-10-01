@@ -142,8 +142,9 @@ namespace LIBMOL
                 
     }
     
-    CodClassify::CodClassify(const std::vector<Molecule>& tMols):wSize(1000),
-                                                                 libmolTabDir("")
+    CodClassify::CodClassify(const std::vector<Molecule>& tMols,
+                             std::string                   tTables):wSize(1000),
+                                                                 libmolTabDir(tTables)
     {
         pPeriodictable = new PeriodicTable();
         
@@ -774,17 +775,17 @@ namespace LIBMOL
         for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
-            std::cout << "(2)Ring representation " << iR1->first << std::endl;
+            // std::cout << "(2)Ring representation " << iR1->first << std::endl;
             for (std::vector<RingDict>::iterator iR11=iR1->second.begin();
                         iR11 !=iR1->second.end(); iR11++)
             {
                 allRingsV.push_back(*iR11);
-                std::cout << "The ring consists of atoms: " << std::endl;
-                for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
-                        iAt1 !=iR11->atoms.end(); iAt1++)
-                {
-                    std::cout << iAt1->id << std::endl;
-                }
+                //std::cout << "The ring consists of atoms: " << std::endl;
+                //for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
+                //        iAt1 !=iR11->atoms.end(); iAt1++)
+                //{
+                    // std::cout << iAt1->id << std::endl;
+                //}
             }
                 
             std::cout << std::endl;
@@ -816,24 +817,24 @@ namespace LIBMOL
         int nMaxRing = 7;
         aRingTool.detectRingFromAtoms(allAtoms, allRings, dLev, nMaxRing);
         
-        std::cout <<  "(2) Different tool. There are " 
-                  << allRings.size() << " rings. They are: "
-                  << std::endl;
+        //std::cout <<  "(2) Different tool. There are " 
+        //          << allRings.size() << " rings. They are: "
+        //          << std::endl;
         std::vector<RingDict> allRingsV;    
         for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
-            std::cout << "(2)Ring representation " << iR1->first << std::endl;
+            //std::cout << "(2)Ring representation " << iR1->first << std::endl;
             for (std::vector<RingDict>::iterator iR11=iR1->second.begin();
                         iR11 !=iR1->second.end(); iR11++)
             {
                 allRingsV.push_back(*iR11);
-                std::cout << "The ring consists of atoms: " << std::endl;
-                for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
-                        iAt1 !=iR11->atoms.end(); iAt1++)
-                {
-                    std::cout << iAt1->id << std::endl;
-                }
+                //std::cout << "The ring consists of atoms: " << std::endl;
+                //for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
+                //        iAt1 !=iR11->atoms.end(); iAt1++)
+                //{
+                    //std::cout << iAt1->id << std::endl;
+                //}
             }
                 
             std::cout << std::endl;
@@ -882,25 +883,25 @@ namespace LIBMOL
         int nMaxRing = 7;
         aRingTool.detectRingFromAtoms(allAtoms, allRings, dLev, nMaxRing);
         
-        std::cout <<  "(2) Different tool. There are " 
-                  << allRings.size() << " rings. They are: "
-                  << std::endl;
+        //std::cout <<  "(2) Different tool. There are " 
+        //          << allRings.size() << " rings. They are: "
+        //          << std::endl;
         
         std::vector<RingDict> allRingsV;    
         for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
-            std::cout << "(2)Ring representation " << iR1->first << std::endl;
+            //std::cout << "(2)Ring representation " << iR1->first << std::endl;
             for (std::vector<RingDict>::iterator iR11=iR1->second.begin();
                         iR11 !=iR1->second.end(); iR11++)
             {
                 allRingsV.push_back(*iR11);
-                std::cout << "The ring consists of atoms: " << std::endl;
-                for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
-                        iAt1 !=iR11->atoms.end(); iAt1++)
-                {
-                    std::cout << iAt1->id << std::endl;
-                }
+                //std::cout << "The ring consists of atoms: " << std::endl;
+                //for (std::vector<AtomDict>::iterator iAt1=iR11->atoms.begin();
+                //        iAt1 !=iR11->atoms.end(); iAt1++)
+                //{
+                    //std::cout << iAt1->id << std::endl;
+                //}
             }
                 
             std::cout << std::endl;
@@ -1295,12 +1296,12 @@ namespace LIBMOL
                 allNBs.push_back(aNBFam);
             }
         }
-        
+        /*
         if ( tAt.codNB3Symb.size() !=0)
         {
             std::cout << "The 3rd NB part is " << tAt.codNB3Symb << std::endl;
         }
-        
+        */
         
         for (std::vector<NB1stFam>::iterator iNB=allNBs.begin();
                 iNB != allNBs.end(); iNB++)
@@ -1313,6 +1314,7 @@ namespace LIBMOL
             }
         }
         
+        /*
         std::cout << "Summary: " << std::endl
                   << "Atom class " << tAt.codClass << std::endl
                   << "Atom class main section " << tAt.codAtmMain << std::endl
@@ -1322,6 +1324,7 @@ namespace LIBMOL
         {
             std::cout << "The 3rd NB section is "   << tAt.codNB3Symb << std::endl;
         }
+        */
                   
     }
     
@@ -4458,13 +4461,13 @@ namespace LIBMOL
                 d5 = 24 + pPeriodictable->elements[iAt->chemType]["group"];
                 
                 
-                std::cout << "chemType " << iAt->chemType << std::endl
-                          << "codClass " << iAt->codClass << std::endl;
-                std::cout << "row " << pPeriodictable->elements[iAt->chemType]["row"] << std::endl;
-                std::cout << "group "<< pPeriodictable->elements[iAt->chemType]["group"] << std::endl;
+                //std::cout << "chemType " << iAt->chemType << std::endl
+                //          << "codClass " << iAt->codClass << std::endl;
+                //std::cout << "row " << pPeriodictable->elements[iAt->chemType]["row"] << std::endl;
+                //std::cout << "group "<< pPeriodictable->elements[iAt->chemType]["group"] << std::endl;
                 
-                std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
-                          << " d4 " << d4  << " d5 " << d5 << std::endl;
+                //std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
+                //          << " d4 " << d4  << " d5 " << d5 << std::endl;
                 
                 
                 
@@ -4534,8 +4537,8 @@ namespace LIBMOL
                           << iAt->codClass << std::endl;
             }
             
-            std::cout << "Atom " << iAt->id << " has hashing code : " 
-                      << iAt->hashingValue << std::endl;
+            //std::cout << "Atom " << iAt->id << " has hashing code : " 
+            //          << iAt->hashingValue << std::endl;
         }   
         
     }
@@ -5010,14 +5013,14 @@ namespace LIBMOL
         }
         
        
-        
+        /*
         std::cout << "Bonds are in the following files :" << std::endl;
         for (std::map<ID, ID>::iterator iBF = codOrgBondFiles2.begin();
                 iBF !=codOrgBondFiles2.end(); iBF++)
         {
             std::cout << iBF->second << std::endl;
         } 
-        
+        */
         
     }
  
@@ -6251,7 +6254,7 @@ namespace LIBMOL
                                       << "tVaS num " << tVaS.numCodValues << std::endl
                                       << "tVaS sig " << tVaS.sigValue << std::endl;
                             
-                            if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
+                            if (tVaS.numCodValues > 5 && tVaS.sigValue <0.05)
                             {
                                 iB->value        =tVaS.value;
                                 iB->valueST      =iB->value;
@@ -6337,7 +6340,7 @@ namespace LIBMOL
                                         << "tVaS sig " << tVaS.sigValue << std::endl;
                                 
                                         
-                                if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
+                                if (tVaS.numCodValues > 5 && tVaS.sigValue <0.05)
                                 {
                                     iB->value        =tVaS.value;
                                     iB->valueST      =iB->value;
@@ -6407,7 +6410,7 @@ namespace LIBMOL
                         aValueSet   tVaS;
                         setValueSet(tVaS, tBs2);
                         
-                        if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
+                        if (tVaS.numCodValues > 5 && tVaS.sigValue <0.05)
                         {
                             iB->value        =tVaS.value;
                             iB->valueST      =iB->value;
@@ -6478,9 +6481,11 @@ namespace LIBMOL
                             dLev = 2;
                             setupTargetBondsUsingSymblDist2(tBs6, iB, as0, as1, dLev);
                             */
-                            
-                            aValueSet   tVaS;
-                            setValueSet(tVaS, tBs2);
+                            iB->value        =tVaS.value;
+                            iB->valueST      =iB->value;
+                            iB->sigValue     =tVaS.sigValue;
+                            iB->sigValueST   =iB->sigValue;
+                            iB->numCodValues =tVaS.numCodValues;   
                             
                         }
                         
@@ -6541,7 +6546,7 @@ namespace LIBMOL
                     
                     // std::cout << "N values " << tVaS.numCodValues << std::endl;
                     // std::cout << "N  siga "  << tVaS.sigValue << std::endl;
-                    if (tVaS.numCodValues > 10 && tVaS.sigValue <0.05)
+                    if (tVaS.numCodValues > 5 && tVaS.sigValue <0.05)
                     {
                         iB->value        =tVaS.value;
                         iB->valueST      =iB->value;
@@ -6622,6 +6627,7 @@ namespace LIBMOL
                         iB->numCodValues =tVaS1.numCodValues;
                         
                         std::cout << "iFind 1" << std::endl;
+                        
                     }
                 }
                 
@@ -8697,14 +8703,14 @@ namespace LIBMOL
                 }
             }
         }
-        
+        /*
         std::cout << "Angles are in the following files :" << std::endl;
         for (std::map<ID, ID>::iterator iAF = codOrgAngleFiles2.begin();
                 iAF !=codOrgAngleFiles2.end(); iAF++)
         {
             std::cout << iAF->second << std::endl;
         } 
-        
+        */
         
     }
  
@@ -15778,8 +15784,8 @@ namespace LIBMOL
     void CodClassify::setSpecial3NBSymb2(std::vector<AtomDict>::iterator tAt)
     {
         
-        std::cout << "For atom " << tAt->id 
-                  << " of serial number " << tAt->seriNum << " : " << std::endl;
+        //std::cout << "For atom " << tAt->id 
+        //          << " of serial number " << tAt->seriNum << " : " << std::endl;
         
         std::vector<int> serNumNB123;
         std::map<std::string, int>   NB3Props;
@@ -15837,7 +15843,7 @@ namespace LIBMOL
                                         NB3Props[tProp]++;
                                     }
                                     serNumNB123.push_back(*iNB3);
-                                    std::cout << "add 3NB atom " << allAtoms[*iNB3].id << std::endl;
+                                    // std::cout << "add 3NB atom " << allAtoms[*iNB3].id << std::endl;
                                 }
                             }
                         }
@@ -15860,8 +15866,8 @@ namespace LIBMOL
             
             tComps.sort(compareNoCase2);
             
-            std::cout << "The following are special 3 NB around atom " 
-                      << tAt->id << std::endl;
+            //std::cout << "The following are special 3 NB around atom " 
+            //          << tAt->id << std::endl;
             
             for (std::list<std::string>::iterator iID=tComps.begin();
                     iID !=tComps.end(); iID++)
@@ -15891,7 +15897,7 @@ namespace LIBMOL
             
             all3.append("}");
         
-            std::cout << "The special 3NB string is " << all3 << std::endl;
+            // std::cout << "The special 3NB string is " << all3 << std::endl;
             
             tAt->codClass.append(all3);
             

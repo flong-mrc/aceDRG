@@ -473,10 +473,6 @@ int main(int argc, char** argv) {
        
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
                                            
-            
-        
-            
-        
         // LIBMOL::DictCifFile aTargetSystem(AJob.IOEntries["inCifName"], std::ios::in);
         
         if (dataFromCif.allAtoms.size() > 0)
@@ -621,16 +617,88 @@ int main(int argc, char** argv) {
                 LIBMOL::checkAndSetupPlanes(aRingSys, aCodSystem.allPlanes, aCodSystem.allAtoms);
                 
             }
-            
             */
         }
     }
-    else if (AJob.workMode == 42)
+    else if (AJob.workMode == 43)
     {
-        LIBMOL::MolSdfFile aMolFile(AJob.IOEntries["inSdfName"],  std::ios::in);
-        LIBMOL::CodClassify  aCodSystem(aMolFile.allMols);
-        aCodSystem.codAtomClassify(2);
-        aCodSystem.outAtomTypes(AJob.IOEntries["monoRootName"]);
+        LIBMOL::MolSdfFile aMolFile(AJob.IOEntries["inSdfName"].c_str());
+        std::cout << "Number of molecules in " << AJob.IOEntries["inSdfName"] 
+                  << " is " << aMolFile.allMols.size() << std::endl;
+        
+        std::map<std::string, std::vector<std::string> >    allAtomTypes;
+        std::vector<std::string>                            allBondLines;
+        std::vector<std::string>                            allAngleLines;
+        
+        for (unsigned i=0; i < aMolFile.allMols.size(); i++)
+        {
+            std::cout << "DEAL WITH MOLECULE " << i+1 << " in " 
+                      << AJob.IOEntries["inSdfName"] << std::endl;
+            
+            LIBMOL::AllSystem   aTargetSystem(aMolFile.allMols[i], AJob.IOEntries["libMolTabDir"]);
+            
+            LIBMOL::CodClassify  aCodSystem(aTargetSystem.allAtoms,
+                                            aTargetSystem.allHAtomIdx, 
+                                            aTargetSystem.allBonds, 
+                                            aTargetSystem.allAngles, 
+                                            aTargetSystem.allTorsions, 
+                                            aTargetSystem.allChirals, 
+                                            aTargetSystem.allPlanes, 
+                                            aTargetSystem.allRings,
+                                            AJob.IOEntries["libMolTabDir"], 2);
+            
+            //std::string aPN = AJob.IOEntries["userOutName"] + "_" + LIBMOL::IntToStr(i+1);
+            //std::cout << "A PDB for molecule " << i+1 << " is generated. Its name " 
+            //          << aPN << std::endl;
+            
+            //LIBMOL::outPDB(aPN.c_str(),
+            //               AJob.IOEntries["monoRootName"], 
+            //               aCodSystem.allAtoms);
+            
+            //LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
+            //                                   aCodSystem.allAtoms,
+            //                                   aCodSystem.allBonds);
+            
+            LIBMOL::accumInfoMols(aMolFile.allMols[i].comments[0],
+                                  aCodSystem.allAtoms,
+                                  aCodSystem.allBonds,
+                                  aCodSystem.allAngles,
+                                  allAtomTypes, 
+                                  allBondLines, 
+                                  allAngleLines);
+        }
+        // Check 
+        /*
+        for (std::map<std::string,std::vector<std::string> >::iterator iAt=allAtomTypes.begin();
+                    iAt != allAtomTypes.end(); iAt++)
+        {
+            std::cout << "Atom type : " << iAt->first << "  appears "
+                      << iAt->second.size() << " times " << std::endl;
+        }
+            
+        for (std::vector<std::string>::iterator iB=allBondLines.begin();
+              iB != allBondLines.end(); iB++)
+        {
+            std::cout << *iB;
+        }
+         */
+        std::string  aAtName = AJob.IOEntries["userOutName"] + "_atomType.txt";
+        std::ofstream outAtomTypes(aAtName.c_str());
+        for (std::map<std::string,std::vector<std::string> >::iterator iAt=allAtomTypes.begin();
+                    iAt != allAtomTypes.end(); iAt++)
+        {
+             outAtomTypes << "Atom type : " << iAt->first << "  appears "
+                      << iAt->second.size() << " times " << std::endl;
+        }
+        
+        std::string  aBaName = AJob.IOEntries["userOutName"] + "_bonds.txt";
+        std::ofstream outBonds(aBaName.c_str());
+        for (std::vector<std::string>::iterator iB=allBondLines.begin();
+              iB != allBondLines.end(); iB++)
+        {
+            outBonds << *iB;
+        }
+        
     }
     else if (AJob.workMode == 900)
     {
@@ -642,7 +710,6 @@ int main(int argc, char** argv) {
             
             std::vector<std::map<int, int> > matchedList;
             
-         
             graphTool.graphMatch(AJob.IOEntries["Type1"].c_str(), 
                                      g1,
                                      AJob.IOEntries["Type2"].c_str(),

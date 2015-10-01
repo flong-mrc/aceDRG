@@ -62,8 +62,7 @@ namespace LIBMOL
         
         
         if (tOpenMode == std::ios::in)
-        {
-            
+        {   
             inFile.open(tFname, tOpenMode);
             setupSystem();
         }
@@ -71,6 +70,19 @@ namespace LIBMOL
         {
             outFile.open(tFname, tOpenMode);
         }    
+    }
+    
+    MolSdfFile::MolSdfFile(FileName tInSDFName)
+    {
+        inFile.open(tInSDFName);
+        
+        if (inFile.is_open())
+        {
+            setupSystemSimp();
+            
+            inFile.close();
+        }
+        
     }
     
     MolSdfFile::~MolSdfFile()
@@ -195,7 +207,6 @@ namespace LIBMOL
                                 tBondIdx++;
                             }
                         }
-                        
                         iLineIdx++;
                     }
                     
@@ -339,6 +350,213 @@ namespace LIBMOL
             }
         }
         
+    }
+    
+    void MolSdfFile::setupSystemSimp()
+    {
+        // related to records
+        bool  lStart=true, lEnd=false;
+        ID    curProp;
+        int   nAtoms=0, nBonds=0;
+        int   iLineIdx =0, tAtomIdx =0, tBondIdx=0;
+        std::map<ID, std::vector<int> > tIDs;
+        
+        while(!inFile.eof())
+        {       
+            std::string tRecord="";
+            std::getline(inFile, tRecord);
+            tRecord = TrimSpaces(tRecord);
+            // std::cout << tRecord << std::endl;
+                
+            if (lStart)
+            {
+                createCurMol(); 
+                iLineIdx =0;
+                tAtomIdx = 0;
+                tBondIdx = 0;
+                lStart   = false;        
+            }
+                
+            std::size_t tFind1 = tRecord.find("$$$$");
+            std::size_t tFind2 = tRecord.find("END");
+            std::size_t tFind3 = tRecord.find(">");
+                
+            if (tFind1==std::string::npos)
+            {
+                if(lEnd)
+                {
+                    if (tFind3 ==std::string::npos && tRecord.size() !=0)
+                    {
+                        itsCurMol->propData[curProp].push_back(tRecord);
+                    }
+                    else
+                    { 
+                        std::vector<std::string> tKeyBuf;
+                        StrTokenize(tRecord, tKeyBuf, '<');
+                        if (tKeyBuf.size() ==2)
+                        {
+                            curProp = tKeyBuf[1].erase(tKeyBuf[1].size()-1, 1);
+                        }
+                        else
+                        {
+                            std::cout << "The property key word in SDF file is "
+                                      << tRecord << std::endl;
+                        }
+                    }
+                }
+                else if(tFind2 !=std::string::npos)
+                {
+                    iLineIdx =0;
+                    lEnd = true;
+                }
+                else
+                {
+                    if (iLineIdx <=2)
+                    {
+                        itsCurMol->comments.push_back(tRecord);
+                    }
+                    else if (iLineIdx ==3)
+                    {
+                        std::vector<std::string> tBuf;
+                        StrTokenize(tRecord, tBuf);
+                        nAtoms = StrToInt(tBuf[0]);
+                        nBonds = StrToInt(tBuf[1]);
+                    }
+                    else if (iLineIdx > 3)
+                    {
+                        std::vector<std::string> tBuf;
+                        StrTokenize(tRecord, tBuf);
+                        if (iLineIdx <= nAtoms+3)
+                        {
+                            AtomDict aAtom;
+                            aAtom.seriNum = tAtomIdx;
+                            // std::cout << "aAtom.seriNum " << tAtomIdx << std::endl;
+                            aAtom.coords[0] = StrToReal(tBuf[0]);
+                            aAtom.coords[1] = StrToReal(tBuf[1]);
+                            aAtom.coords[2] = StrToReal(tBuf[2]);
+                            aAtom.coordExist = true;
+                            aAtom.chemType  = TrimSpaces(tBuf[3]);
+                            aAtom.formalCharge = strToCharge(tBuf[5]);
+                            aAtom.inChiralIdx = StrToInt(tBuf[6]); 
+                            aAtom.chiralIdx = StrToInt(tBuf[6]); 
+                            tIDs[aAtom.chemType].push_back(aAtom.seriNum);
+                            int tSize = (int)tIDs[aAtom.chemType].size();
+                            aAtom.id       = aAtom.chemType + IntToStr(tSize);
+                            itsCurMol->atoms.push_back(aAtom);
+                            tAtomIdx++;
+                        }
+                        else if (iLineIdx > (nAtoms+3) && iLineIdx <=(nAtoms+nBonds+3))
+                        {
+                            BondDict aBond;
+                            int t1 = StrToInt(tBuf[0])-1;
+                            int t2 = StrToInt(tBuf[1])-1;
+                            aBond.atomsIdx.push_back(t1);
+                            aBond.atomsIdx.push_back(t2);
+                            aBond.atoms.push_back(itsCurMol->atoms[t1].id);
+                            aBond.atoms.push_back(itsCurMol->atoms[t2].id);
+                            itsCurMol->atoms[t1].connAtoms.push_back(t2);
+                            itsCurMol->atoms[t2].connAtoms.push_back(t1);
+                            aBond.fullAtoms[itsCurMol->atoms[t1].id] = t1;
+                            aBond.fullAtoms[itsCurMol->atoms[t2].id] = t2;
+                            aBond.order = tBuf[2];
+                            aBond.seriNum = tBondIdx;
+                            // std::cout << "aBond.seriNum " << aBond.seriNum << std::endl;
+                            itsCurMol->bonds.push_back(aBond);
+                            tBondIdx++;
+                        }
+                    }
+                        iLineIdx++;
+                }
+                    
+            }
+            else
+            {
+                allMols.push_back(*itsCurMol);
+                deleteCurMol();
+                nAtoms=0; 
+                nBonds=0;
+                iLineIdx =0;
+                tAtomIdx =0; 
+                tBondIdx =0;
+                lStart   =true;
+                lEnd     =false;
+                tIDs.clear();
+            }
+        }
+        if (itsCurMol->atoms.size() !=0)
+        {
+            allMols.push_back(*itsCurMol);
+        }
+        inFile.close();  
+        
+        for (unsigned i=0; i < allMols.size(); i++)
+        {
+            
+            setAtomsBondingAndChiralCenter(i);
+            
+            for (std::vector<BondDict>::iterator iB=allMols[i].bonds.begin();
+                    iB !=allMols[i].bonds.end(); iB++)
+            {
+                std::string tS = iB->order;
+                OrderStrToStr(tS, iB->order);
+                iB->oriValue = distanceV(allMols[i].atoms[iB->atomsIdx[0]].coords,
+                                         allMols[i].atoms[iB->atomsIdx[1]].coords);
+            }
+            allMols[i].hasCoords = true;
+        }
+        
+        std::cout << "There are " << (int)allMols.size() 
+                << " molecule(s) in the SDF file " << std::endl;
+        int i = 0;
+        for (std::vector<Molecule>::iterator iM=allMols.begin();
+                iM !=allMols.end(); iM++)
+        {
+            i++;
+            std::cout << "For Molecule No. " << i << " : " << std::endl;
+            std::cout << "Its header information is " << std::endl;
+            for (std::vector<std::string>::iterator iComm=iM->comments.begin();
+                    iComm != iM->comments.end(); iComm++)
+            {
+                std::cout<< *iComm << std::endl;
+            }
+            
+            std::cout << "The molecule has " <<  iM->atoms.size() 
+                      << " atoms, including " << iM->extraHAtoms.size()
+                      << " newly added H atoms. "<< std::endl;
+            std::cout << "These atoms are : " << std::endl;
+            
+            for (std::vector<AtomDict>::iterator iA=iM->atoms.begin();
+                    iA !=iM->atoms.end(); iA++)
+            {
+                std::cout << "atom " << iA->seriNum +1  << "\t" << iA->chemType 
+                          << " id : " << iA->id << "\t"
+                          << " charge " << iA->formalCharge << std::endl
+                          << "Coordinates : " 
+                          << iA->coords[0] << "\t" 
+                          << iA->coords[1] << "\t"
+                          << iA->coords[2] << std::endl;
+                if (iA->connAtoms.size() !=0)
+                {
+                    std::cout << "It connects to the following atoms: " <<std::endl;
+                    for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
+                             iNB !=iA->connAtoms.end(); iNB++)
+                    {
+                        std::cout << "Atom " << iM->atoms[*iNB].id << std::endl;
+                    }
+                }
+            }
+            
+            std::cout << "There are " << (int)iM->bonds.size() 
+                    << " bonds in the molecule and they are :" << std::endl;
+            for (std::vector<BondDict>::iterator iB=iM->bonds.begin();
+                    iB != iM->bonds.end(); iB++)
+            {
+                std::cout << "bond " << iB->seriNum + 1 << std::endl
+                          << " between atom " << iB->atomsIdx[0]+1
+                          << " and atom " << iB->atomsIdx[1]+1
+                          << " of order " << iB->order << std::endl;
+            }
+        }
     }
     
     void MolSdfFile::createCurMol()
@@ -2094,13 +2312,88 @@ namespace LIBMOL
                     //std::cout << "Atom " << iA->id << " is the chiral center " 
                     //          << iA->inChirals[0]
                     //          << std::endl;
-                }
-                
+                }  
             }
         }
     }
     
-    
+    extern void accumInfoMols(ID                                  tMolId,
+                              std::vector<AtomDict>             & tAllAtomsOneMol,
+                              std::vector<BondDict>             & tAllBondsOneMol,
+                              std::vector<AngleDict>            & tAllAnglesOneMol,
+                              std::map<ID, std::vector<ID> >    & tAllAtomTypes,
+                              std::vector<std::string>          & tAllBondLines,
+                              std::vector<std::string>          & tAllAngleLines)
+    {
+        for (std::vector<AtomDict>::iterator iA=tAllAtomsOneMol.begin();
+                iA !=tAllAtomsOneMol.end(); iA++)
+        {
+            tAllAtomTypes[iA->codClass].push_back(tMolId);
+        }
+        
+        for (std::vector<BondDict>::iterator iB=tAllBondsOneMol.begin();
+                iB !=tAllBondsOneMol.end(); iB++)
+        {
+            int idxA1 = iB->atomsIdx[0];
+            int idxA2 = iB->atomsIdx[1];
+            
+            std::string aLine="";
+            
+            if (tAllAtomsOneMol[idxA1].hashingValue < tAllAtomsOneMol[idxA2].hashingValue)
+            {
+                aLine.append(IntToStr(tAllAtomsOneMol[idxA1].hashingValue) + "    ");
+                aLine.append(IntToStr(tAllAtomsOneMol[idxA2].hashingValue) + "    ");
+                aLine.append(tAllAtomsOneMol[idxA1].codClass     + "    ");
+                aLine.append(tAllAtomsOneMol[idxA2].codClass     + "    ");
+                aLine.append(RealToStr(iB->oriValue)  +  "      ");
+                aLine.append(tAllAtomsOneMol[idxA1].id     + "    ");
+                aLine.append(tAllAtomsOneMol[idxA2].id     + "    ");
+                aLine.append(tMolId  +  "\n");
+            }
+            else if (tAllAtomsOneMol[idxA1].hashingValue == tAllAtomsOneMol[idxA2].hashingValue)
+            {
+                sortMap tCH1, tCH2;
+                tCH1.key  = tAllAtomsOneMol[idxA1].codClass;
+                tCH1.val  = idxA1;
+                
+                tCH2.key  = tAllAtomsOneMol[idxA2].codClass;
+                tCH2.val  = idxA2;
+                
+                std::vector<sortMap> tVec;
+                tVec.push_back(tCH1);
+                tVec.push_back(tCH2);
+                
+                std::sort(tVec.begin(),tVec.end(), desSortMapKey1);
+                
+                int sIdx1 = tVec[0].val;
+                int sIdx2 = tVec[1].val;
+                
+                aLine.append(IntToStr(tAllAtomsOneMol[sIdx1].hashingValue) + "    ");
+                aLine.append(IntToStr(tAllAtomsOneMol[sIdx2].hashingValue) + "    ");
+                aLine.append(tAllAtomsOneMol[sIdx1].codClass     + "    ");
+                aLine.append(tAllAtomsOneMol[sIdx2].codClass     + "    ");
+                aLine.append(RealToStr(iB->oriValue)  +  "      ");
+                aLine.append(tAllAtomsOneMol[sIdx1].id     + "    ");
+                aLine.append(tAllAtomsOneMol[sIdx2].id     + "    ");
+                aLine.append(tMolId  +  "\n");    
+                
+            }
+            else
+            {
+                aLine.append(IntToStr(tAllAtomsOneMol[idxA2].hashingValue) + "    ");
+                aLine.append(IntToStr(tAllAtomsOneMol[idxA1].hashingValue) + "    ");
+                aLine.append(tAllAtomsOneMol[idxA2].codClass     + "    ");
+                aLine.append(tAllAtomsOneMol[idxA1].codClass     + "    ");
+                aLine.append(RealToStr(iB->oriValue)  +  "      ");
+                aLine.append(tAllAtomsOneMol[idxA2].id     + "    ");
+                aLine.append(tAllAtomsOneMol[idxA1].id     + "    ");
+                aLine.append(tMolId  +  "\n");
+            }
+            
+            tAllBondLines.push_back(aLine);
+        }
+        
+    }
     
     
     

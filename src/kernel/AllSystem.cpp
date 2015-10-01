@@ -549,6 +549,7 @@ namespace LIBMOL
             setAtomsCCP4Type();
         }
         
+        /*
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
         {
@@ -576,7 +577,7 @@ namespace LIBMOL
                       << "Its component atom 2  : " << iB->atoms[1] << std::endl
                       << "Its bond order : " << iB->order << std::endl;
         }
-        
+        */
         
         
     }
@@ -1207,10 +1208,10 @@ namespace LIBMOL
         for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
         {
             allAtoms[i].ccp4Type = aCPP4TypeTool.allAtoms[i].ccp4Type;
-            std::cout << "Atom " << allAtoms[i].id 
-                      << " Its sp idx " << allAtoms[i].bondingIdx 
-                      << " CCP4 atom type is " << allAtoms[i].ccp4Type 
-                      << std::endl;
+            //std::cout << "Atom " << allAtoms[i].id 
+            //          << " Its sp idx " << allAtoms[i].bondingIdx 
+            //          << " CCP4 atom type is " << allAtoms[i].ccp4Type 
+            //          << std::endl;
         }
       
     }
@@ -3662,16 +3663,16 @@ namespace LIBMOL
                 // std::cout << "tPos.size() " << (int)tPos.size() << std::endl;
                 if((int)tPos.size() ==2)
                 {
-                    std::cout << "Set torsion angles around the bond of atom "
-                              << allAtoms[tPos[0]].id << " and "
-                              << allAtoms[tPos[1]].id << std::endl;
+                    //std::cout << "Set torsion angles around the bond of atom "
+                    //          << allAtoms[tPos[0]].id << " and "
+                    //          << allAtoms[tPos[1]].id << std::endl;
                     
                     setTorsionFromOneBond(tPos[0], tPos[1]);
                 }
             }
         }
         
-        
+        /*
         std::cout << "All torsions have been setup " << std::endl;
        
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
@@ -3685,7 +3686,7 @@ namespace LIBMOL
                 std::cout << "atom " << allAtoms[*iA].id << std::endl;
             }
         }
-      
+        */
     }
     
     void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs, 

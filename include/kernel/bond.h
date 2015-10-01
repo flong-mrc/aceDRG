@@ -181,6 +181,7 @@ namespace LIBMOL
         REAL                    sigValueST;
         REAL                    valueP;
         REAL                    sigValueP;
+        REAL                    oriValue;
         
         int                     nLevel;
         

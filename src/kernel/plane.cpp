@@ -160,12 +160,12 @@ namespace LIBMOL
             if (iR->isAromatic)
             { 
                 PlaneDict aPL;
-                std::cout << "Add planes " << std::endl;
+                //std::cout << "Add planes " << std::endl;
                 for (std::vector<AtomDict>::iterator iAt=iR->atoms.begin();
                         iAt !=iR->atoms.end(); iAt++)
                 {
                     aPL.atoms[iAt->id] = iAt->seriNum;
-                    std::cout << "added atom " << iAt->id << std::endl;
+                    // std::cout << "added atom " << iAt->id << std::endl;
                     for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
                             iNB !=iAt->connAtoms.end(); iNB++)
                     {

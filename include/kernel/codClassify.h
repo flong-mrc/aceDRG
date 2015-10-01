@@ -215,7 +215,8 @@ namespace LIBMOL
                     std::string   tLibmolTabDir);
         
         // Constructor by a Mol/Sdf molecules
-        CodClassify(const std::vector<Molecule> & tMols);
+        CodClassify(const std::vector<Molecule> & tMols,
+                    std::string     tLibmolTabDir);
        
         // Constructor using a general system
         CodClassify(const AllSystem & tAllSys);

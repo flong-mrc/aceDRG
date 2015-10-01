@@ -139,11 +139,14 @@ namespace LIBMOL
         MolSdfFile(FileName                    tFname,
                    std::ios_base::openmode     tOpenMode);
         
+        MolSdfFile(FileName                    tInSDFName);
+        
         // destructor
         ~MolSdfFile();
         
         
         void setupSystem();
+        void setupSystemSimp();
         
         void createCurMol();
         void deleteCurMol();
@@ -318,7 +321,13 @@ namespace LIBMOL
         
     };
     
-    
+    extern void accumInfoMols(ID                    tMolId,
+                              std::vector<AtomDict>   & tAllAtomsOneMol,
+                              std::vector<BondDict>   & tAllBondsOneMol,
+                              std::vector<AngleDict>  & tAllAnglesOneMol,
+                              std::map<ID, std::vector<ID> >    & tAllAtomTypes,
+                              std::vector<std::string>          & tAllBondLines,
+                              std::vector<std::string>          & tAllAngleLines);
     
 }
 

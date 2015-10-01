@@ -104,6 +104,8 @@ namespace LIBMOL
     
     extern bool desSortMapKey(const sortMap& a ,const sortMap& b);
     
+    extern bool desSortMapKey1(const sortMap& a ,const sortMap& b);
+    
     extern bool desSortMapKey2(const sortMap2 & a ,const sortMap2 & b);
     
     extern bool desSortMapKey3(const sortMap3 & a ,const sortMap3 & b);

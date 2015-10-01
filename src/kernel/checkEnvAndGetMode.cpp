@@ -445,17 +445,18 @@ namespace LIBMOL
         }
         else if (IOEntries.find("inSdfName") !=IOEntries.end())
         {
-            if (IOEntries.find("monoRootName") != IOEntries.end())
-            {
-                workMode =13;
-            }
-            else if(IOEntries.find("AtomTypeOutName") !=IOEntries.end())
+            
+            if(IOEntries.find("AtomTypeOutName") !=IOEntries.end())
             {
                 if (!IOEntries["AtomTypeOutName"].empty())
                 {
                     // This mode outputs COD atom type only
                     workMode =43;
                 }
+            }
+            else
+            {
+                workMode =13;
             }
         }
         else if (IOEntries.find("inSmiName") !=IOEntries.end())

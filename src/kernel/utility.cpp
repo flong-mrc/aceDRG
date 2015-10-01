@@ -247,6 +247,10 @@ namespace LIBMOL
         return a.key.length() > b.key.length();
     }
     
+    bool desSortMapKey1(const sortMap& a ,const sortMap & b)
+    {
+        return compareNoCase3(a.key, b.key);
+    }
     
     bool desSortMapKey2(const sortMap2 & a ,const sortMap2 & b)
     {
@@ -278,7 +282,7 @@ namespace LIBMOL
     
     bool sortMapkey4(const sortMap4 & a ,const sortMap4 & b)
     {
-        return compareNoCase3(a.key, b.key);
+        return compareNoCase2(a.key, b.key);
     }
     
     bool compareNoCaseClass(const sortLine & first, const sortLine & second)
@@ -1681,7 +1685,7 @@ namespace LIBMOL
         //std::string primName = clibMonDir + "primes.table";
         //std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
         std::string primName = tLibmolTabDir + "/primes.table";
-        std::cout << primName << std::endl;
+        // std::cout << primName << std::endl;
         
         std::ifstream primFile;
         primFile.open(primName.c_str(), std::ios::in);
