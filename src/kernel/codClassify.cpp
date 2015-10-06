@@ -15742,8 +15742,8 @@ namespace LIBMOL
             
             tComps.sort(compareNoCase2);
             
-            std::cout << "The following are special 3 NB around atom " 
-                      << tAt->id << std::endl;
+            //std::cout << "The following are special 3 NB around atom " 
+            //          << tAt->id << std::endl;
             
             for (std::list<std::string>::iterator iID=tComps.begin();
                     iID !=tComps.end(); iID++)

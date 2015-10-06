@@ -687,8 +687,8 @@ int main(int argc, char** argv) {
         for (std::map<std::string,std::vector<std::string> >::iterator iAt=allAtomTypes.begin();
                     iAt != allAtomTypes.end(); iAt++)
         {
-             outAtomTypes << "Atom type : " << iAt->first << "  appears "
-                      << iAt->second.size() << " times " << std::endl;
+             outAtomTypes << iAt->first << "  :  "
+                      << iAt->second.size() << std::endl;
         }
         
         std::string  aBaName = AJob.IOEntries["userOutName"] + "_bonds.txt";

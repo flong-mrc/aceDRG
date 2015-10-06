@@ -1792,6 +1792,7 @@ class Acedrg(CExeCode ):
                         iProp = 0
                         iType = -1
                         iDes  = -1
+                        iProg = -1
                         lSmi  = False
                         aSmi  = ""
 
@@ -1800,19 +1801,69 @@ class Acedrg(CExeCode ):
                                 iType = iProp
                             elif aProp.find("_pdbx_chem_comp_descriptor.descriptor") !=-1:
                                 iDes = iProp
+                            elif aProp.find("_pdbx_chem_comp_descriptor.program") !=-1\
+                                 and aProp.find("_version")==-1:
+                                iProg = iProp
                             iProp +=1
+                        #print "prog col ", iProg
                         if iType > 0  and iDes > 0 :
                             # Get Canonical one 
                             for aEnt in self.fileConv.strDescriptors["entries"]:
-                                strGrp = aEnt.strip().split()
+                                strGrp = []
+                                if aEnt.find("\"") !=-1:
+                                   strGrpT = []
+                                   lStart = False
+                                   lEnd   = False
+                                   strT = ""
+                                   for aC in aEnt:
+                                       if lStart == False and aC=="\"":
+                                           lStart = True
+                                           if len(strT.strip()) !=0:
+                                               strGrpT.append(strT)
+                                               strT = ""
+                                           strT+=(aC)
+                                       elif lStart == True and aC=="\"":
+                                           lStart = False
+                                           strT+=(aC)
+                                           strGrpT.append(strT)
+                                           strT = ""
+                                       else:
+                                           strT +=(aC) 
+                                   if len(strT) !=0:
+                                       strGrpT.append(strT)
+                                       strT = ""
+                                   if len(strGrpT) !=0:
+                                       for aElem in strGrpT:
+                                           if aElem[0].find("\"") ==-1:
+                                               strGrpTT=aElem.strip().split()
+                                               for aSubE in strGrpTT:
+                                                   strGrp.append(aSubE)
+                                           else:
+                                               strGrp.append(aElem)
+                                else:
+                                    strGrp = aEnt.strip().split()
+                                #print strGrp
+                                #print strGrp[iType].upper()
                                 if len(strGrp)==len(self.fileConv.strDescriptors["props"]):
-                                    if strGrp[iType].upper().find("CANONICAL") !=-1:
+                                    if strGrp[iType].upper().find("CANONICAL") !=-1\
+                                        and strGrp[iProg].upper().find("OPENEYE") !=-1:
                                         if strGrp[iDes][0].find('\"') !=-1 or strGrp[iDes][0].find("\'") !=-1: 
                                             aSmi = strGrp[iDes][1:-1]
                                         else:
                                             aSmi = strGrp[iDes][0:]
                                         lSmi = True    
                                         break
+                            if not lSmi:   # Get non-openEye and "CANONICAL" SMILES
+                                for aEnt in self.fileConv.strDescriptors["entries"]:
+                                    strGrp = aEnt.strip().split()
+                                    if len(strGrp)==len(self.fileConv.strDescriptors["props"]):
+                                        if strGrp[iType].upper().find("CANONICAL") !=-1 :
+                                            if strGrp[iDes][0].find('\"') !=-1 or strGrp[iDes][0].find("\'") !=-1: 
+                                                aSmi = strGrp[iDes][1:-1]
+                                            else:
+                                                aSmi = strGrp[iDes][0:]
+                                            lSmi = True    
+                                            break
                             if not lSmi:   # Get any smiles
                                 for aEnt in self.fileConv.strDescriptors["entries"]:
                                     strGrp = aEnt.strip().split()
@@ -1821,8 +1872,9 @@ class Acedrg(CExeCode ):
                                             lSmi = True    
                                             aSmi = strGrp[iDes][1:-1]
                                             break
-
+                       
                         if lSmi :
+                            print "Smiles str  ", aSmi
                             aIniSmiName = os.path.join(self.scrDir, self.baseRoot + "_init.smi")
                             #print "Smiles file ", aIniSmiName
                             #print "Smiles str  ", aSmi
@@ -1908,6 +1960,7 @@ class Acedrg(CExeCode ):
         elif self.workMode in [111, 121, 131, 141, 151]:
             self.workMode = 111
 
+        
         #print "workMode : ", self.workMode
         #print "Ligand ID ", self.monomRoot
 
@@ -1922,7 +1975,6 @@ class Acedrg(CExeCode ):
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.monomRoot, "L-peptide")
                 #else:
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.monomRoot)
-
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                         print "The input system contains metal or other heavier element"
@@ -1932,7 +1984,6 @@ class Acedrg(CExeCode ):
                 else:
                     print "The input %s does not exist"%self.inMmCifName
                     sys.exit()
- 
                 if self.workMode == 11 and not self.runExitCode :
                     if len(self.rdKit.molecules) != 0 and os.path.isfile(self.outRstCifName):
                         inPdbNamesRoot = {} 
@@ -2062,6 +2113,8 @@ class AcedrgRDKit():
 
     def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tMode=0, tNameMap=None, tChargeList=None):
 
+        aMolT = None
+
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
                 aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
@@ -2100,6 +2153,16 @@ class AcedrgRDKit():
                 # SMILES string in from a commandline  
                 #print tFileName
                 aMolT     = Chem.MolFromSmiles(tFileName)
+
+        elif tFileType == "sdf" :
+            if os.path.isfile(tFileName):
+                aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
+                #print "Molecule name:  ", aMolName
+                aMolT     = Chem.MolFromMolFile(tFileName)
+                #aMolT = Chem.AddHs(aMolT1)
+
+            else:
+                print "File %s does not exist "%tFileName
 
         if not aMolT:
             print "Molecules can not generated  from file %s ! "%tFileName
@@ -2526,14 +2589,6 @@ class AcedrgRDKit():
             tCurMols = self.moleculesB 
         """
         # Check
-        tCurMols = [] 
-        if tMode ==0: 
-            tCurMols = self.molecules 
-        elif tMode ==1:
-            tCurMols = self.moleculesA 
-        elif tMode ==2:
-            tCurMols = self.moleculesB 
-
         for aMol in tCurMols:
             rdmolops.AssignStereochemistry(aMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
             conformers =  aMol.GetConformers()
@@ -2599,6 +2654,7 @@ class AcedrgRDKit():
                     print "ChiralType ", tetSign
                     print "Stereo     ", outSign
                 print "******************************"
+
         """
 
     def mergeAtomNames(self):
@@ -2763,20 +2819,11 @@ class AcedrgRDKit():
                         aCTName = "chir_" + str(chiralIdx)
                         chiralIdx+=1
                         aIdx = aAtom.GetIdx()
-                        #print "atom ", aAtom.GetProp("Name"), " chiraltype ",  aAtom.GetChiralTag()
-                        aSetBonds = aAtom.GetBonds()
-                        #print "It is in the following bonds: "
-                        #for aB in aSetBonds:
-                        #    print "Bond ", aB.GetIdx()
-                        #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                        #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
-                        
                         outSign = ""
-                        aSetIdx = [0, 1, 2]
-                        aSetName = []
                         if aAtom.HasProp('_CIPCode'):
                             #print "Atom %s "%aAtom.GetProp("Name")
-                            #print "CIPCode ", aAtom.GetProp("_CIPCode") 
+                            #print "Chiraltype ",  aAtom.GetChiralTag()
+                            #print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
                             #print "Chiral volume ", EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
                             tetSign = "Unkown"
                             if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW:
@@ -2793,7 +2840,16 @@ class AcedrgRDKit():
                         else:
                             outSign = "both"
 
-                        for bIdx in aSetIdx:
+                        aSetBonds = aAtom.GetBonds()
+                        #print "It is in the following bonds: "
+                        #for aB in aSetBonds:
+                        #    print "Bond ", aB.GetIdx()
+                        #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                        #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+                        nNB = len(aAtom.GetNeighbors())
+                        #print "Number of NB ", nNB
+                        aSetName = []
+                        for bIdx in range(nNB):
                             atmIdx1 = aSetBonds[bIdx].GetBeginAtomIdx()  
                             atmIdx2 = aSetBonds[bIdx].GetEndAtomIdx()  
                             if atmIdx1 == aIdx:                      
@@ -2803,8 +2859,16 @@ class AcedrgRDKit():
                             else:
                                 print "Bug! atom %d of %s is not in bonds obtained by aAtom.GetBonds()"%(aIdx, aAtom.GetProp("Name"))
 
+
+                        #print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
+                        #print "Before sorting "
+                        #print "----------------------------------------------"
+                        #for aPair in aSetName:
+                        #    print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
+                        #print "----------------------------------------------"
+                                         
+                        #print "After sorting "
                         aSetName.sort(listCompDes)
-                        #print "For chiral center %s  : "%aAtom.GetProp("Name")
                         #print "----------------------------------------------"
                         #for aPair in aSetName:
                         #    print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
@@ -3271,8 +3335,9 @@ class FileTransformer :
                         self.allBlockLs.append(aBlockLs)
                     aBlockLs     = []
                 else:
-                    if aL.strip()[0].find("#") == -1:
-                        aBlockLs.append(aL)  
+                    if len(aL.strip()) >0:                   
+                        if aL.strip()[0].find("#") == -1:
+                            aBlockLs.append(aL)  
 
             # Last block
             if len(aBlockLs):
