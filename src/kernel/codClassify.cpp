@@ -6634,41 +6634,43 @@ namespace LIBMOL
             }
             else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
                             && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()
-                               || ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".") !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
             {
                 // Without hash code matching for those combination of two atoms. try CCP4 type matching
                 // It is very unlikely we have ccp4 type matching when hash code matching failed.
-                
+                std::cout << "Here 1 " << std::endl;
                 if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
                                 !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
                 {
-                    
                     getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
-                }
-                else
-                {
-                    
-                    
-                    getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
                 }
             }
             else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
                             && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
-                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()
-                                || ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".") !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
             {
                 // Without hash code matching for those combination of two atoms. try CCP4 type matching
                 // It is very unlikely we have ccp4 type matching when hash code matching failed.
+                std::cout << "Here 2 " << std::endl;
                 if(ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
                                 !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end())
                 {
                     getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
                 }
-                else
-                {
-                    getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
-                }
+            }
+            else if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".")
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+            {
+                std::cout << "Here 3" <<  std::endl;
+                getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
+            }
+            else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                            && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".")
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
+            {
+                std::cout << "Here 4" <<  std::endl;
+                getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
             }
             else
             {
@@ -6800,6 +6802,9 @@ namespace LIBMOL
                 exit(1);
             }
         }
+        
+        
+        
     }
     
     
@@ -7636,13 +7641,38 @@ namespace LIBMOL
                 bool tOK    = true;       // stop reading if false
                 
                 std::string tRecord="";
+              
                 
                 while(!enerF.eof() && tOK)
                 {
-                    std::getline(enerF, tRecord);
-                    tRecord = TrimSpaces(tRecord);
+                    std::string tRecord1;
                     
-                    std::string tFC=tRecord.substr(0,1);
+                    std::getline(enerF, tRecord1);
+                    tRecord1 = TrimSpaces(tRecord1);
+                    
+                    tRecord = "";
+                    for (unsigned i=0; i < tRecord1.size(); i++)
+                    {
+                        std::string tSRe1 =tRecord1.substr(i,1);
+                        if (tSRe1.find('#')==std::string::npos)
+                        {
+                            tRecord.append(tSRe1);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
+                    std::string tFC;
+                    if (tRecord.size() > 0)
+                    {
+                        tFC=tRecord.substr(0,1);
+                    }
+                    else
+                    {
+                        tFC="#";
+                    }
                     
                     if (tFC.find('#') ==std::string::npos && 
                         tFC.find('.') ==std::string::npos &&  

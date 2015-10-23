@@ -86,7 +86,7 @@ namespace LIBMOL
     }
     
     
-    AllSystem::AllSystem(DictCifFile& tCifObj, std::string tLibmolTab):
+    AllSystem::AllSystem(DictCifFile & tCifObj, std::string tLibmolTab):
                                                hasCoords(tCifObj.hasCoords),
                                                hasCCP4Type(tCifObj.hasCCP4Type),
                                                usingInChiral(true),

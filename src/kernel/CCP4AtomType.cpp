@@ -73,6 +73,8 @@ namespace LIBMOL
             }
         }
         
+        
+        
         // Combining all neighboring atoms information
         // But do not do anything on metal atoms at present.
         /*
@@ -152,10 +154,22 @@ namespace LIBMOL
         //in this stage. Hydrogen bonds will be added in sometime later
         
         tAtom.ccp4Type = "H";
+        
+        if ((int)tAtom.connAtoms.size() == 1)   
+        {
+            int i = tAtom.connAtoms[0];
+            std::cout << "NB atom id " << allAtoms[i].id << std::endl;
+            std::cout << "NB atom element type " << allAtoms[i].chemType << std::endl;
+            if (allAtoms[i].chemType.compare("S")==0)
+            {
+                tAtom.ccp4Type="HSH1";
+            }
+        }
         /*
         if ((int)tAtom.connAtoms.size() == 1 && (int)tAtom.ccp4Type.size()==0)   
         {
             int i = tAtom.connAtoms[0];
+            
             if (allAtoms[i].chemType.compare("C")==0)
             {
                 ID cNum=allAtoms[i].id.substr(1); // e.g. 11 for C11, 25 for C25 

@@ -151,12 +151,13 @@ namespace LIBMOL
         int   numAtoms;   
         int   numH;
         ID    level;
-        
+     
         ChemComp():id(NullString), code(NullString), name(NullString),
         group(NullString), numAtoms(0), numH(0), level(NullString)
         {}         
     };
     */
+    
     class GenCifFile : public File
     {
         

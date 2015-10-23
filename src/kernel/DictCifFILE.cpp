@@ -198,8 +198,7 @@ namespace LIBMOL
             {
                 allCryst.push_back(*itsCurCryst);
             }
-            
-            
+                 
             // check
            
             std::cout << "There are " << (int)allAtoms.size() 
@@ -219,134 +218,7 @@ namespace LIBMOL
                           << "y:   " << iA->coords[1] << std::endl
                           << "z:   " << iA->coords[2] << std::endl;           
             }
-            
-            
-            
-            /*
-            std::cout << "There are " << (int)allHydroAtoms.size() 
-                    << " Hydrogen atoms in the system. They are " << std::endl;
-            
-            for (std::vector<int>::iterator iA=allHydroAtoms.begin();
-                   iA !=allHydroAtoms.end(); iA++)
-            {
-                std::cout << "Atom " << allAtoms[*iA].id << std::endl;
-            }
-          
-            std::cout << "There are " << (int)allBonds.size() 
-                    << " bonds in the system. They are : " << std::endl;
-            for (std::vector<BondDict>::iterator iB = allBonds.begin();
-                    iB !=allBonds.end(); iB++)
-            {
-                std::cout << "Bond between atom " << iB->atoms[0]  
-                          << " and atom " << iB->atoms[1] << std::endl ; 
-            }
-            
-            std::cout << "There are " << (int)allChirals.size() 
-                      << " chirals in the system. They are: " <<std::endl;
-            
-            for (std::vector<ChiralDict>::iterator iCh = allChirals.begin();
-                        iCh != allChirals.end(); iCh++)
-            {
-                std::cout << iCh->id  << "\t";
-                for (std::vector<int>::iterator iAt=iCh->atoms.begin();
-                            iAt != iCh->atoms.end(); iAt++)
-                {
-                    std::cout << allAtoms[*iAt].id << "\t";
-                }
-                std::cout << iCh->sign << std::endl;
-            }
-                
-            setHydroAtomConnect();
-            
-            // addMissHydroAtoms();
-            
-            setAtomsBondingAndChiralCenter();
-            
-            // setAllAngles();
-            
-            setAtomsCChemType();
-            
-            setAtomsMetalType();
-            
-            setAtomsVDWRadius();
-            
-            setAtomsPartialCharges();
-            
-            ringDetecting();
-            
-            setAtomsCCP4Type();
-        
-           
-            setAllAngles();
-            ringDetecting();
-            
-            for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
-                    iMR != allRings.end(); iMR++)
-            {
-                for (std::vector<RingDict>::iterator iR=iMR->second.begin();
-                        iR != iMR->second.end(); iR++)
-                {
-                    allRingsV.push_back(*iR);
-                }
-            }
-            detectPlaneGroups();
-            
-            //setAllTorsions();
-            setAllTorsions2();
-            */
-            
-            //buildAtomTree tTool;
-            
-            //tTool.buildTree(allAtoms, allBonds, allAngles, allTorsions, 
-            //                allRingsV, allPlanes, allChirals);
-            
-           
-            
-            
-            // std::cout << "finish reading the input cif file: " 
-            //          << std::endl
-            /*
-            if (hasCoords)
-            {
-                std::cout << "The system has coords " << std::endl;
-            }
-            else
-            {
-                std::cout << "The system has no coords " << std::endl;
-            }
-            for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
-                    iA != allAtoms.end(); iA++)
-            {
-                std::cout << "\nAtom " << iA->seriNum << " : " << std::endl
-                        << "Its ID : " << iA->id << std::endl
-                        << "Its Chemical Type : " << iA->chemType << std::endl
-                        << "Its COD chemical type " << iA->cChemType << std::endl
-                        << "Its bonding index : "   << iA->bondingIdx << std::endl
-                        << "Its residue Name: " << iA->resName<< std::endl;
-                std::cout << "Its connected atoms are : " << std::endl;
-                for (std::vector<int>::iterator iSer= iA->connAtoms.begin();
-                        iSer != iA->connAtoms.end(); iSer++)
-                {
-                    std::cout << allAtoms[*iSer].id << std::endl;
-                }  
-                
-                if (hasCoords)
-                {
-                    std::cout << "The coords for the atom are : " << std::endl;
-                    
-                    for (std::vector<REAL>::iterator iX= iA->coords.begin();
-                        iX !=iA->coords.end(); iX++)
-                    {
-                        std::cout << *iX << std::endl;
-                    }
-                }
-                
-            }
-             */
         }
-        
-       
-        
     } 
     
     void GenCifFile::setupSystem2()
@@ -2074,28 +1946,7 @@ namespace LIBMOL
             outFile.open(tFname, tOpenMode);
         }        
     }
-    /*
-    DictCifFile::DictCifFile(FileName                tFname):
-                             curBlockLine(ZeroInt),
-                             hasConnect(false),
-                             hasCoords(false),
-                             hasH(false),
-                             hasCCP4Type(false),
-                             itsCurAtomSeriNum(ZeroInt),
-                             itsCurAtom(NullPoint),
-                             itsCurBondSeriNum(ZeroInt),
-                             itsCurBond(NullPoint),
-                             itsCurAngleSeriNum(ZeroInt),
-                             itsCurAngle(NullPoint),
-                             itsCurTorsionSeriNum(ZeroInt),
-                             itsCurTorsion(NullPoint),
-                             itsCurChiralSeriNum(ZeroInt),
-                             itsCurChiral(NullPoint)
-    {
-        
-        
-    }
-    */
+    
     
     DictCifFile::DictCifFile(FileName                tCifName,
                              FileName                tPdbName) :
@@ -2136,8 +1987,6 @@ namespace LIBMOL
                       << std::endl;
             exit(1);
         }
-            
-        
     }
     
     DictCifFile::~DictCifFile()
@@ -2415,67 +2264,7 @@ namespace LIBMOL
                 setAtomsCCP4Type();
             }
             
-            /*
-            std::map<unsigned, ID> tCMap;
-            // check 
-            for (unsigned i=0; i < allAtoms.size(); i++)
-            {
-                tCMap[i] = allAtoms[i].ccp4Type;
-            }
-            setAtomsCCP4Type();
             
-            std::cout << "CCP4 atom types : " << std::endl;
-            
-            for (unsigned i=0; i < allAtoms.size(); i++)
-            {
-                if (allAtoms[i].ccp4Type.compare(tCMap[i]) !=0)
-                {
-                    std::cout << "For atom " << i << " id : " << allAtoms[i].id
-                            << std::endl << "Its CCP4 type: " << allAtoms[i].ccp4Type
-                            << " and " << tCMap[i] << std::endl;
-                }
-            }
-                
-            */
-            //}
-          
-            /*
-            setAllAngles();
-            ringDetecting();
-            
-            for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
-                    iMR != allRings.end(); iMR++)
-            {
-                for (std::vector<RingDict>::iterator iR=iMR->second.begin();
-                        iR != iMR->second.end(); iR++)
-                {
-                    allRingsV.push_back(*iR);
-                }
-            }
-            detectPlaneGroups();
-            
-            //setAllTorsions();
-            setAllTorsions2();
-            */
-            //buildAtomTree tTool;
-            
-            //tTool.buildTree(allAtoms, allBonds, allAngles, allTorsions, 
-            //                allRingsV, allPlanes, allChirals);
-            
-           
-            
-            // std::cout << "finish reading the input cif file: " 
-            //          << std::endl
-            /*
-            if (hasCoords)
-            {
-                std::cout << "The system has coords " << std::endl;
-            }
-            else
-            {
-                std::cout << "The system has no coords " << std::endl;
-            }
-             */
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
             {
@@ -2979,8 +2768,6 @@ namespace LIBMOL
             }
         }
         
-        //if ((int)tF.size() == (int)hasProps["atom"].size() 
-        //        && (int)tF.size() >2 && tF[0].find("#") ==std::string::npos)
         if ((int)tF.size() >2 && tF[0].find("#") ==std::string::npos)
         {
             itsCurAtom = new AtomDict();
@@ -3121,7 +2908,6 @@ namespace LIBMOL
         }
        
     }
-    
     
     void DictCifFile::setAtomsCCP4Type()
     {

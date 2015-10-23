@@ -1907,7 +1907,8 @@ class Acedrg(CExeCode ):
                             if os.path.isfile(self.libmolAT1) and os.path.isfile(self.libmolAT2):
                                  self.workMode = 900
                                  self.runLibmol()
-                                 self.fileConv.mergeAtomNames(self.libmolMatched, self.rdKit.molecules[0]) 
+                                 self.fileConv.mergeAtomNames(self.libmolMatched, self.rdKit.molecules[0])
+                                 self.fileConv.addAtomOrigChiralSign(self.rdKit.molecules[0])
                             self.workMode = 11
                     else: 
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -2110,6 +2111,8 @@ class AcedrgRDKit():
         self.nMaxMult =20
          
         self.chemCheck = ChemCheck()
+
+        self.torsins   = []
 
     def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tMode=0, tNameMap=None, tChargeList=None):
 
@@ -2576,7 +2579,14 @@ class AcedrgRDKit():
             allBondsExplicit = False
             aMol.SetProp("SmilesOut", Chem.MolToSmiles(aMol, isomericSmiles, kekuleSmiles, rootedAtAtom, canonical, allBondsExplicit))
             #print "Output SMILES ", aMol.GetProp("SmilesOut")         
-      
+     
+        aSetTorsions = []
+        self.assignTorsions(aMol, aSetTorsions)
+
+        print "Number of torsions in this molecule is ", len(aSetTorsions)
+
+   
+
         tCurMols = [] 
         if tMode ==0: 
             self.molecules.append(aMol)
@@ -2699,7 +2709,8 @@ class AcedrgRDKit():
         # (1) Header section      
         # (2) Description of atoms in the molecule
         # (3) Description of bonds in the molecule
-        # (4) Chiral section 
+        # (4) Description of torsion angles in the molecules
+        # (5) Description of chiral centers in the molecules 
     
         # This file is mainly used as an input file for Acedrg
         #print "Ligand ID ", tMonoName 
@@ -2710,7 +2721,6 @@ class AcedrgRDKit():
         except IOError:
             print tMmcifName, " Could not be opened for reading"
         else:
-           
             aConformer =  tMol.GetConformer(tIdxConform)
             allAtoms = tMol.GetAtoms()
 
@@ -2795,6 +2805,18 @@ class AcedrgRDKit():
                              %(tMonoName, name1, name2,  aBond.GetBondType(), \
                                isAro, bLen, dBlen))
 
+            # Torsion section
+            aMmCif.write("#\n")
+            aMmCif.write("_chem_comp_tor.comp_id\n")
+            aMmCif.write("_chem_comp_tor.id\n")
+            aMmCif.write("_chem_comp_tor.atom_id_1\n")
+            aMmCif.write("_chem_comp_tor.atom_id_2\n")
+            aMmCif.write("_chem_comp_tor.atom_id_3\n")
+            aMmCif.write("_chem_comp_tor.atom_id_4\n")
+            aMmCif.write("_chem_comp_tor.value_angle\n")
+            aMmCif.write("_chem_comp_tor.value_angle_esd\n")
+            aMmCif.write("_chem_comp_tor.period\n")
+
             #print "Number of chiral centers is ", nTetraChi
             # chiral center section
             if nTetraChi !=0: 
@@ -2821,24 +2843,36 @@ class AcedrgRDKit():
                         aIdx = aAtom.GetIdx()
                         outSign = ""
                         if aAtom.HasProp('_CIPCode'):
-                            #print "Atom %s "%aAtom.GetProp("Name")
-                            #print "Chiraltype ",  aAtom.GetChiralTag()
-                            #print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
-                            #print "Chiral volume ", EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
+                            print "Atom %s "%aAtom.GetProp("Name")
+                            print "Chiraltype ",  aCT
+                            print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
+                            aCVol = EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
+                            print "Chiral volume ", aCVol
+                            aCVol = float(aCVol)
                             tetSign = "Unkown"
                             if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW:
                                 tetSign = "CW"
                             elif aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CCW:
                                 tetSign = "CCW"
                             #print "ChiralType ", tetSign
-                            if str(aAtom.GetProp("_CIPCode")).strip()=="S":
-                                outSign = "positive"
-                            elif str(aAtom.GetProp("_CIPCode")).strip()=="R":
-                                outSign = "negative"
+                            #if str(aAtom.GetProp("_CIPCode")).strip()=="S":
+                            if aCVol > 0.000001:
+                                if aAtom.HasProp("pdb_stereo") and aAtom.GetProp("pdb_stereo")=="N":
+                                    outSign = "both"
+                                else: 
+                                    outSign = "positive"
+                            #elif str(aAtom.GetProp("_CIPCode")).strip()=="R":
+                            elif aCVol < -0.000001:
+                                if aAtom.HasProp("pdb_stereo") and aAtom.GetProp("pdb_stereo")=="N":
+                                    outSign = "both"
+                                else: 
+                                    outSign = "negative"
                             else:
                                 outSign = "both"
                         else:
                             outSign = "both"
+
+                        print "combined with original stereo sign, the chiral sign is ", outSign
 
                         aSetBonds = aAtom.GetBonds()
                         #print "It is in the following bonds: "
@@ -2860,19 +2894,19 @@ class AcedrgRDKit():
                                 print "Bug! atom %d of %s is not in bonds obtained by aAtom.GetBonds()"%(aIdx, aAtom.GetProp("Name"))
 
 
-                        #print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
-                        #print "Before sorting "
-                        #print "----------------------------------------------"
-                        #for aPair in aSetName:
-                        #    print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
-                        #print "----------------------------------------------"
+                        print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
+                        print "Before sorting "
+                        print "----------------------------------------------"
+                        for aPair in aSetName:
+                            print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
+                        print "----------------------------------------------"
                                          
-                        #print "After sorting "
+                        print "After sorting "
                         aSetName.sort(listCompDes)
-                        #print "----------------------------------------------"
-                        #for aPair in aSetName:
-                        #    print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
-                        #print "----------------------------------------------"
+                        print "----------------------------------------------"
+                        for aPair in aSetName:
+                            print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
+                        print "----------------------------------------------"
                                          
                         aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
                                      %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0], \
@@ -3017,7 +3051,6 @@ class AcedrgRDKit():
                             #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                             #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
          
-
     def setFormalChargeC_ASP(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
@@ -3251,6 +3284,84 @@ class AcedrgRDKit():
                                 print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
 
          
+    def assignTorsions(self, tMol, tAllTorsions):
+
+        allAtoms    = tMol.GetAtoms()
+        for aBond in tMol.GetBonds():
+            atom1Idx   = aBond.GetBeginAtomIdx()
+            atom1      = aBond.GetBeginAtom()
+            atom2Idx   = aBond.GetEndAtomIdx()
+            atom2      = aBond.GetEndAtom()
+            atom1NBs   = atom1.GetNeighbors()
+            atom1NBIdx = []
+            atom2NBs   = atom2.GetNeighbors()
+            atom2NBIdx = []
+            for aNB in atom1NBs:
+                idx1 = aNB.GetIdx()
+                if idx1 != atom2Idx:
+                    atom1NBIdx.append(idx1)
+            for aNB in atom2NBs:
+                idx2 = aNB.GetIdx()
+                if idx2 != atom1Idx:
+                    atom2NBIdx.append(idx2)
+             
+            if len(atom1NBIdx) > 0 and len(atom2NBIdx) > 0:
+                for aEndOneAtomIdx in atom1NBIdx:
+                    for aEndTwoAtomIdx in atom2NBIdx:
+                        self.assignOneTorsion(aBond, allAtoms[aEndOneAtomIdx],\
+                                               allAtoms[atom1Idx], allAtoms[atom2Idx],\
+                                               allAtoms[aEndTwoAtomIdx], tAllTorsions)
+
+    def assignOneTorsion(self, tBond, tAtom1, tAtom2, tAtom3, tAtom4, tAllTorsions):
+        
+        # Do not do actually torsion value calculations here. leave them 
+        # to the corresponding "libmol" section
+        # Here we just set-up other properties of a torsion
+        aTor = {}
+        aTor["compAtoms"] =[tAtom1.GetProp("Name"), tAtom2.GetProp("Name"), tAtom3.GetProp("Name"), tAtom4.GetProp("Name")]        
+        if tBond.GetStereo()==Chem.rdchem.BondStereo.STEREOE\
+           or tBond.GetStereo()==Chem.rdchem.BondStereo.STEREOZ:
+            aTor["periodic"] = 1
+            aTor["hybrid"]   = "const"
+        else:
+            if tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP2\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP2:
+                aTor["periodic"] = 2
+                aTor["hybrid"]   = "sp2_sp2"
+            elif tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP3\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP3:
+                aTor["periodic"] = 3
+                aTor["hybrid"]   = "sp3_sp3"
+            elif (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP3)\
+               or (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP3\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP):
+                aTor["periodic"] = 3
+                aTor["hybrid"]   = "sp_sp3"
+            elif (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP2\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP3)\
+               or (tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP2\
+               and tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP3):
+                aTor["periodic"] = 6
+                aTor["hybrid"]   = "sp2_sp3"
+            elif (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP)\
+               or (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP):
+                aTor["periodic"] = 1
+                aTor["hybrid"]   = "sp_sp"
+            elif (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP2)\
+               or (tAtom2.GetHybridization() == Chem.rdchem.HybridizationType.SP2\
+               and tAtom3.GetHybridization() == Chem.rdchem.HybridizationType.SP):
+                aTor["periodic"] = 1
+                aTor["hybrid"]   = "sp_sp2"
+            else:
+                aTor["periodic"] = 1
+                aTor["hybrid"]   = "others"
+
+            tAllTorsions.append(aTor) 
+        
 class FileTransformer :
 
     def __init__(self):
@@ -3348,6 +3459,21 @@ class FileTransformer :
             if len(self.allBlockLs):
                 for aBlk in self.allBlockLs:
                     self.parseOneMmCifBlk(aBlk)
+           
+     
+            # check
+            """
+            idKey = "_chem_comp_atom.atom_id"
+            for aAtom in self.atoms:
+                if aAtom.has_key(idKey):
+                    print "==============================="
+                    print "For atom ", aAtom[idKey], " : "
+                    print "-------------------------------"  
+                    for aKey in aAtom.keys():
+                        print "label : ", aKey, " Value : ", aAtom[aKey]
+                    print "==============================="
+            """
+
   
     def parseOneMmCifBlk(self, tBlk):
 
@@ -3690,7 +3816,22 @@ class FileTransformer :
                     aAtom.SetProp("Name", nameMap[oldName]) 
                     print "Atom' old name %s : new name %s"%(oldName, aAtom.GetProp("Name"))
 
-         
+    def addAtomOrigChiralSign(self, tMol):
+
+        nameMap = {}
+   
+        for i in range(len(self.atoms)):
+            if self.atoms[i].has_key("_chem_comp_atom.atom_id"):
+                nameMap[self.atoms[i]["_chem_comp_atom.atom_id"].strip()] = i
+ 
+        for aAtom in tMol.GetAtoms():
+            atomId = aAtom.GetProp("Name").strip()
+            if nameMap.has_key(atomId):
+                if self.atoms[nameMap[atomId]].has_key("_chem_comp_atom.pdbx_stereo_config"):
+                    tSign = self.atoms[nameMap[atomId]]["_chem_comp_atom.pdbx_stereo_config"].strip() 
+                    aAtom.SetProp("pdb_stereo", tSign)
+                    #print "atom %s now has pdb_stereo %s"%(aAtom.GetProp("Name"), aAtom.GetProp("pdb_stereo"))
+
     def setAtomDicts(self, tFileName, tAtomTypeMaps):
 
         try:
@@ -4047,7 +4188,6 @@ class FileTransformer :
             tPDB.close()
 
 class ChemCheck():
-    
 
     def __init__( self):
 
@@ -4065,6 +4205,8 @@ class ChemCheck():
                            "GLN", "GLU", "GLY", "HIS", "ILE", \
                            "LEU", "LYS", "MET", "PHE", "PRO", \
                            "SER", "THR", "TRP", "TYR", "VAL"]
+
+        self.torsions   = []
 
     def isOrganic(self, tInFileName, tTypeIdx):
 
@@ -4167,7 +4309,9 @@ class ChemCheck():
             if len(allLines) > 3 :
                 pass
 
-   
+
+        
+
             
 # Other supplement functions
 
