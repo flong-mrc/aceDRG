@@ -156,7 +156,7 @@ proc acedrg_task_window {arrayname} {
   
   CloseSubFrame
 
-  #OpenSubFrame frame -toggle_display LIGGEN_MODE open [list MOL2 ]
+  OpenSubFrame frame -toggle_display LIGGEN_MODE open [list MOL2 ]
  
   # input file format: SYBYL_MOL2
 

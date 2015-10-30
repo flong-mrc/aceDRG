@@ -2259,7 +2259,8 @@ class AcedrgRDKit():
             numList  = [ "3", "2", "1"]
             numListCN  = [ "", "2", "3"]
             numListCN2  = [ "1", "2", "3", "4", "5", "6"]
-            lH = False
+            lH       = False
+            lNumOnly = False
             rName = tMol.GetProp("ResidueName")
          
             for aIdxBH in tIdxHs.keys():
@@ -2267,7 +2268,8 @@ class AcedrgRDKit():
                 #print "twoP[0] : ", twoP[0]
                 #print "twoP[1] : ", twoP[1]
                 #print "LH ", lH
-                if tMol.GetAtomWithIdx(aIdxBH).GetSymbol() in elemList :
+                mainElem = tMol.GetAtomWithIdx(aIdxBH).GetSymbol()
+                if mainElem in elemList :
                     if len(twoP[0])==1 and len(twoP[1]) ==0:
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
@@ -2325,8 +2327,11 @@ class AcedrgRDKit():
                                 i +=1
                 else: 
                     name1 = tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")
-                    name2 = name1[1:]
+                    name2 = ""
+                    if len(name1) > 1:
+                        name2 = name1[1:]
                     #print "name1 ", name1
+                    #print "name2 ", name2
                     #print "twoP ", twoP 
                     if len(twoP[0]) ==1 and len(twoP[1]) ==0:
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -2335,14 +2340,27 @@ class AcedrgRDKit():
                                  tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0])
                             else:
                                  tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H")
+                                 lH=True
                         else :
                             i=0
                             aLen = len(tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()])
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                if aLen < 4:
-                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + numList[i])
+                                if mainElem.find("N") !=-1:
+                                    if not lH:
+                                        tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H")
+                                        lH = True
+                                    else:
+                                        if not lNumOnly:
+                                            tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + numListCN2[i]) 
+                                        else:
+                                            tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + str(aLen-i))
+                                    if i==(aLen-1) and not lNumOnly:
+                                        lNumOnly = True
                                 else:
-                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + str(aLen-i))
+                                    if aLen < 4:
+                                        tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + numList[i])
+                                    else:
+                                        tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[0] + str(aLen-i))
                                 i +=1 
                     elif len(twoP[0])==1 and len(twoP[1]) !=0 :
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -2584,8 +2602,6 @@ class AcedrgRDKit():
         self.assignTorsions(aMol, aSetTorsions)
 
         print "Number of torsions in this molecule is ", len(aSetTorsions)
-
-   
 
         tCurMols = [] 
         if tMode ==0: 
@@ -2843,11 +2859,11 @@ class AcedrgRDKit():
                         aIdx = aAtom.GetIdx()
                         outSign = ""
                         if aAtom.HasProp('_CIPCode'):
-                            print "Atom %s "%aAtom.GetProp("Name")
-                            print "Chiraltype ",  aCT
-                            print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
+                            #print "Atom %s "%aAtom.GetProp("Name")
+                            #print "Chiraltype ",  aCT
+                            #print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
                             aCVol = EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
-                            print "Chiral volume ", aCVol
+                            #print "Chiral volume ", aCVol
                             aCVol = float(aCVol)
                             tetSign = "Unkown"
                             if aCT == rdchem.ChiralType.CHI_TETRAHEDRAL_CW:
@@ -2872,7 +2888,7 @@ class AcedrgRDKit():
                         else:
                             outSign = "both"
 
-                        print "combined with original stereo sign, the chiral sign is ", outSign
+                        #print "combined with original stereo sign, the chiral sign is ", outSign
 
                         aSetBonds = aAtom.GetBonds()
                         #print "It is in the following bonds: "
@@ -2894,19 +2910,19 @@ class AcedrgRDKit():
                                 print "Bug! atom %d of %s is not in bonds obtained by aAtom.GetBonds()"%(aIdx, aAtom.GetProp("Name"))
 
 
-                        print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
-                        print "Before sorting "
-                        print "----------------------------------------------"
-                        for aPair in aSetName:
-                            print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
-                        print "----------------------------------------------"
+                        #print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
+                        #print "Before sorting "
+                        #print "----------------------------------------------"
+                        #for aPair in aSetName:
+                        #    print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
+                        #print "----------------------------------------------"
                                          
-                        print "After sorting "
+                        #print "After sorting "
                         aSetName.sort(listCompDes)
-                        print "----------------------------------------------"
-                        for aPair in aSetName:
-                            print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
-                        print "----------------------------------------------"
+                        #print "----------------------------------------------"
+                        #for aPair in aSetName:
+                        #    print "Atom %s : CIPRank %s "%(aPair[0], aPair[1])
+                        #print "----------------------------------------------"
                                          
                         aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
                                      %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0], \
@@ -3136,10 +3152,15 @@ class AcedrgRDKit():
                             #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                             #   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                         #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
-        elif tPH > tPka + 2:
+        elif tPH > tPka + 2 :
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
+                        print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
                         if tMol.GetAtomWithIdx(aIdx).GetFormalCharge() > 0:    # implicit H included in the count
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(0)       # de-protonation
          
@@ -3814,7 +3835,7 @@ class FileTransformer :
                 oldName = aAtom.GetProp("Name") 
                 if nameMap.has_key(oldName):
                     aAtom.SetProp("Name", nameMap[oldName]) 
-                    print "Atom' old name %s : new name %s"%(oldName, aAtom.GetProp("Name"))
+                    print "Atom: old name %s : new name %s"%(oldName, aAtom.GetProp("Name"))
 
     def addAtomOrigChiralSign(self, tMol):
 
