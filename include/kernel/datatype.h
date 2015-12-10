@@ -105,6 +105,7 @@ struct sortMap4
     std::string id;
     std::string key;
     int         ha;
+    std::string root;
     std::string lev2;
     std::string lev3;
     std::string lev4;

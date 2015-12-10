@@ -416,12 +416,20 @@ namespace LIBMOL
         void groupCodOrgAngles();
         void groupCodOrgAngles2();
         void groupCodOrgAngles22();
+        
+        
         void searchCodOrgAngles(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles2(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles22(std::vector<AngleDict>::iterator iAN);
+        void levelSearchAngles( std::vector<int>          &      tKeySet,
+                                std::vector<std::string>  &      tKeySet2,
+                                int                              tLev,
+                                std::vector<AngleDict>::iterator iAN);
+        
         bool searchCodOrgAnglesCen(std::vector<AngleDict>::iterator iAN, 
                                    int tHa1, int tHal2, int tHa3);
         bool getCCP4Angle(std::vector<AngleDict>::iterator tAN);
+        
         
         // bond-angles involving metal atoms as NB atoms 
         void groupCodMetAngles();
@@ -588,26 +596,42 @@ namespace LIBMOL
         
         std::map<int, std::map<int, std::map<int, 
         std::map<ID,  std::map<ID,  std::map<ID, 
+        std::map<ID,
         std::map<ID,  std::map<ID,  std::map<ID,
         std::map<ID,  std::map<ID,  std::map<ID,
         std::map<ID,  std::map<ID,  std::map<ID,
-        int > > > > > > > > > > > > > > >              allDictAnglesIdxD;
+        std::map<ID,  std::map<ID,  std::map<ID,
+        int > > > > > > > > > > > > > > > > > > >               allDictAnglesIdxD;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::vector<aValueSet> > > > > > > > > > > > > > > > >  allDictAnglesIdx1D;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,
+        std::vector<aValueSet> > > > > > > > > > > > > >      allDictAnglesIdx2D;
         
         std::map<int, std::map<int, std::map<int, 
         std::map<ID,  std::map<ID,  std::map<ID, 
-        std::map<ID,  std::map<ID,  std::map<ID,
-        std::map<ID,  std::map<ID,  std::map<ID,
-        std::vector<aValueSet> > > > > > > > > > > > > allDictAnglesIdx1D;
+        std::map<ID,
+        std::map<ID,  std::map<ID,  std::map<ID,     
+        std::vector<aValueSet> > > > > > > > > > >            allDictAnglesIdx3D;
         
         std::map<int, std::map<int, std::map<int, 
         std::map<ID,  std::map<ID,  std::map<ID, 
-        std::map<ID,  std::map<ID,  std::map<ID,
-        std::vector<aValueSet> > > > > > > > > >       allDictAnglesIdx2D;
+        std::map<ID,  
+        std::vector<aValueSet> > > > > > > >                  allDictAnglesIdx4D;
         
         std::map<int, std::map<int, std::map<int, 
-        std::map<ID,  std::map<ID,  std::map<ID, 
-        std::vector<aValueSet> > > > > > >             allDictAnglesIdx3D;
-        
+        std::map<ID,     
+        std::vector<aValueSet> > > > >                        allDictAnglesIdx5D;
         
         // angles 
         std::vector<AngleDict>                         allAngles;
@@ -648,6 +672,7 @@ namespace LIBMOL
         std::vector<ChiralDict>                             allChirals;
         std::vector<PlaneDict>                              allPlanes;
         std::map<ID, std::vector<RingDict> >                allRings;
+        std::vector<RingDict>                               allRingsV;
         
         std::vector<int>                                    allHydroAtoms;
         std::vector<AtomDict>                               allDummyAtoms;

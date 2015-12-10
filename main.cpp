@@ -79,7 +79,6 @@
  */
 int main(int argc, char** argv) {
     
-    
     LIBMOL::CheckEnvAndGetMode AJob(argc, argv);
     
     std::cout << "workMode " << AJob.workMode << std::endl;

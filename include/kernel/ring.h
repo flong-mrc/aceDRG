@@ -117,6 +117,10 @@ namespace LIBMOL
     extern bool AtomsInSameRing(AtomDict & tAt1, AtomDict tAt2, 
                 std::vector<RingDict> & tRings);
     
+    extern int  checkIfAngleInSameRing(std::vector<AtomDict> & tAtoms,
+                                       std::vector<RingDict> & tRings,
+                                       int tIdxCen, int tIdx1, int tIdx2);
+    
     extern void buildOneRing(std::vector<AtomDict> & tAtoms, 
                              std::vector<AtomDict>   sSet,
                              std::vector<AtomDict> & doneSet);

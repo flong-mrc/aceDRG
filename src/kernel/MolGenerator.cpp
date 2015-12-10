@@ -734,7 +734,7 @@ namespace LIBMOL
         REAL covalent_sensitivity1 =0.15;
         REAL covalent_sensitivity2 =0.22;
         REAL covalent_sensitivity3 =0.30;
-        REAL covalent_sensitivity4 =0.90;
+        REAL covalent_sensitivity4 =0.60;
         
         NeighbListDict  tNBListOfSystem;
         
@@ -1585,6 +1585,30 @@ namespace LIBMOL
                 }
             }
         } 
+        
+        
+        for (std::vector<RingDict>::iterator iR=tMol.rings.begin();
+                iR !=tMol.rings.end(); iR++)
+        {
+            std::cout << "For ring " << iR->rep << std::endl;
+            std::cout << "Its representation  " << iR->sRep << std::endl;
+            std::cout << "Its atoms are : " << std::endl;
+            for (std::vector<AtomDict>::iterator iA=iR->atoms.begin();
+                    iA !=iR->atoms.end(); iA++)
+            {
+                std::cout << "atom " << iA->id << std::endl;
+            }
+            std::cout << std::endl;
+        }
+        
+        for (std::vector<AngleDict>::iterator iAn=tMol.angles.begin();
+               iAn !=tMol.angles.end(); iAn++)
+        {
+            iAn->isInSameRing = checkIfAngleInSameRing(tMol.atoms, 
+                                                       tMol.rings,
+                                                       iAn->atoms[0],
+                                                       iAn->atoms[1], iAn->atoms[2]);
+        }
         
         /*
         for (std::vector<AngleDict>::iterator iA=angles.begin();
@@ -2777,7 +2801,13 @@ namespace LIBMOL
                 std::cout << "Atom " << iAt->id << " has COD class id "
                                      << iAt->codClass << std::endl;
             }
-        }  
+        }
+        
+        for (std::vector<RingDict>::iterator iR=aCodSys.allRingsV.begin();
+                iR!=aCodSys.allRingsV.end(); iR++)
+        {
+            tMol.rings.push_back(*iR);
+        }
         
     }
    
@@ -3134,11 +3164,14 @@ namespace LIBMOL
                           << "_chem_comp_angle.atom1_id" << std::endl
                           << "_chem_comp_angle.atom2_id" << std::endl
                           << "_chem_comp_angle.atom3_id" << std::endl
-                          << "_chem_comp_angle.value_angle"          << std::endl;
+                          << "_chem_comp_angle.value_angle"        << std::endl
+                          << "_chem_comp_angle.ring_size_of_angle"    << std::endl;
                 int nAn = 1;
                 for (std::vector<AngleDict>::iterator iAn=tMol.angles.begin();
                         iAn !=tMol.angles.end(); iAn++)
                 {
+                    
+                    
                     tMolTabs << std::setw(6)  << nAn
                               << std::setw(6)  << iAn->atoms[0] +1 
                               << std::setw(6)  << iAn->atoms[1] +1
@@ -3146,7 +3179,8 @@ namespace LIBMOL
                               << std::setw(4)  << tMol.atoms[iAn->atoms[0]].chemType 
                               << std::setw(4)  << tMol.atoms[iAn->atoms[1]].chemType 
                               << std::setw(4)  << tMol.atoms[iAn->atoms[2]].chemType 
-                              << std::setw(10) << iAn->value*PID180 << std::endl;
+                              << std::setw(10) << iAn->value*PID180 
+                              << std::setw(6)  << iAn->isInSameRing << std::endl;
                     nAn++;
                 }
                 
@@ -3198,19 +3232,22 @@ namespace LIBMOL
             
             if (angles.size() !=0)
             {
+                
                 aBAndAF << "Center_Atom_COD_type        Atom1_COD_type          Atom2_COD_type     " 
-                        << "Center_Atom_id      Atom1_id     Atom2_id     Angle_length"
+                        << "Center_Atom_id      Atom1_id     Atom2_id     Angle_value      RingSize"
                         << std::endl;
                 for (std::vector<AngleDict>::iterator iAn=angles.begin();
                         iAn !=angles.end(); iAn++)
                 {
+                    
                     aBAndAF << iAn->atomsCodClasses[0] << "\t" 
                             << iAn->atomsCodClasses[1] << "\t"
                             << iAn->atomsCodClasses[2] << "\t"
                             << iAn->atomChemTypes[0] << "\t"
                             << iAn->atomChemTypes[1] << "\t"
                             << iAn->atomChemTypes[2] << "\t"
-                            << iAn->value*PID180 << std::endl;
+                            << iAn->value*PID180 << "\t" 
+                            << iAn->isInSameRing << std::endl;
                 }
                 aBAndAF << std::endl;
                 

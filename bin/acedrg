@@ -253,6 +253,12 @@ class Acedrg(CExeCode ):
         self.refmac           = ""
         self.refmacLogName    = ""
 
+        self.refmacXYSList    = {}
+        self.refmacMinFValueList = {}
+        self.refmacMinFValueList["value"] =100000.00
+        self.refmacMinFValueList["fileName"] =""
+        
+
         self.funcGroupTable   = ""
 
         self.numConformers    = 1
@@ -1315,42 +1321,112 @@ class Acedrg(CExeCode ):
             if os.path.getsize(tPdbIn) > 100 and os.path.getsize(tCifLibIn) > 50:
                 stageNow = 1
                 self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
-                #if os.path.isfile(self.refmacXYZOUTName):
-                    #tPdb1 = self.refmacXYZOUTName
-                    #stageNow = 2
-                    #self.runRefmac(tPdb1, tCifLibIn, tRoot, stageNow)
-                    #if os.path.isfile(self.refmacXYZOUTName):
-                    #    tPdb1 = self.refmacXYZOUTName
-                    #    stageNow = 3
-                    #    self.runRefmac(tPdb1, tCifLibIn, tRoot, stageNow)
-                    #    if not os.path.isfile(self.refmacXYZOUTName):
-                    #        print "Failed to produce the  coordinates at stage 3 optimization" 
-                    #else:
-                    #    print "Failed to produce the coordinates at stage 2 optimization" 
-                #else:
                 if not os.path.isfile(self.refmacXYZOUTName):
-                    print "Failed to produce the coordinates at stage 1 optimization" 
+                    print "Failed to produce the coordinates for input file %s in optimization"%tPdbIn 
                 else:
-                    print "| Done                                                            |"
-  
+                    tFValue = -1.0 
+                    tFValue = self.getRefmacFValue(self._log_name)
+                    if tFValue > 0.0:
+                        if len(tRoot) !=0:
+                            if not self.refmacXYSList.has_key(tRoot):
+                                 self.refmacXYSList[tRoot] = {}
+                            self.refmacXYSList[tRoot]["log"]    = self._log_name 
+                            self.refmacXYSList[tRoot]["xyz"]    = self.refmacXYZOUTName 
+                            self.refmacXYSList[tRoot]["fvalue"] = tFValue 
+                            # print "| %s|"%("Done: " + tRoot).ljust(64) 
+                        #else:
+                        #    print "| Done                                                            |"
+                        #    if not self.refmacXYSList.has_key("sing"):
+                        #         self.refmacXYSList["sing"] = {}
+                        #    self.refmacXYSList["sing"]["log"]    = self._log_name 
+                        #    self.refmacXYSList["sing"]["xyz"]    = self.refmacXYZOUTName 
+                        #    self.refmacXYSList["sing"]["fvalue"] = tFValue 
+                        # print "FValue is ", tFValue  
+                        if tFValue < self.refmacMinFValueList["value"]:
+                            self.refmacMinFValueList["value"]     = tFValue
+                            self.refmacMinFValueList["fileName"]  = self.refmacXYZOUTName
+                        #print "Overall lower fvalue is ", self.refmacMinFValueList["value"]
+                        #print "The file associated with it is ", self.refmacMinFValueList["fileName"]
             else:
-                print "No dictionary file produced ! " 
+                print "No dictionary file for optimization ! " 
         else:
-            print "No dictionary file produced ! " 
-                        
-    def getFinalOutputFiles(self, tRoot, tMol, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
+            print "No input pdb and/or dictionary files for optimization ! " 
+
+    def runGeoOptOneMolFull(self, tIdxMol):
+
+        print "Number of conformers generated for molecule %d is %d "%(tIdxMol+1, self.numConformers)
+        tmpStr = ""
+        if self.numConformers == 1:
+            tmpStr = "_tmp"
+        nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
+        print "Number of actual conf to be done is ", nConf
+
+        inPdbNamesRoot =[]
+        for idxConf in range(nConf): 
+            tPdbRoot = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxConf+1) + tmpStr
+            aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
+            #print "PDB root ", tPdbRoot
+            #print aConfPdb
+            self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf)
+            if os.path.isfile(aConfPdb):
+                inPdbNamesRoot.append(tPdbRoot)
+
+        aLibCifIn = self.outRstCifName 
+        for aFRoot in inPdbNamesRoot: 
+            aPdbIn    = os.path.join(self.scrDir, aFRoot + "_init.pdb")
+            #print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
+            #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
+            self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
+            #print "out cif name ", self.outRstCifName
+            if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
+                if self.numConformers !=1:
+                    self.getFinalOutputFiles(aFRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacXYZOUTName, self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+            else:
+                print "Failed to produce the final coordinates for %s after geometrical optimization"%aPdbIn
+        
+        if self.numConformers == 1:
+            self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList["fileName"], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+            
+    def getRefmacFValue(self, tLogName):
+
+        aFva = -1.0
+
+        try:
+            aLogIn = open(tLogName, "r")
+        except IOError:
+            print "Error %s can not be opened for reading"%tLogName
+        else:
+            allLs = aLogIn.readlines()
+            aLogIn.close()
+
+            for aL in allLs:
+                if aL.find("fvalues") !=-1:
+                    allStrs= aL.strip().split()
+                    if len(allStrs)==5:
+                        aFva = float(allStrs[2])
+                        #print aL
+                        #print "fvalue taken : ", aFva
+
+        
+        # print "Fvalue taken from %s is %10.5f"%(tLogName, aFva)     
+
+        return aFva
+        
+    def getFinalOutputFiles(self, tRoot, tMol, tInCif, tInPdb, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
        
-        if os.path.isfile(self.refmacXYZOUTName):
+        iIter = 0
+        if os.path.isfile(tInPdb):
             if tRoot !="":
                 finPdb = self.outRoot + "_"+ tRoot + ".pdb"
                 finRst = self.outRoot +  "_"+ tRoot +".cif"
+                tStr = tRoot.strip().split("_")[-1]
             else:
                 finPdb = self.outRoot +  ".pdb"
                 finRst = self.outRoot +  ".cif"
-            shutil.copy(self.refmacXYZOUTName, finPdb)
+            shutil.copy(tInPdb, finPdb)
             if os.path.isfile(finPdb):
                 self.inPdbName        = finPdb 
-                self.inMmCifName      = self.outRstCifName
+                self.inMmCifName      = tInCif
                 self.outRstCifName    = finRst
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
                 print "===================================================================" 
@@ -1604,13 +1680,13 @@ class Acedrg(CExeCode ):
                             tOutCif.write(aL+"\n")
                     else:
                         aList = ["loop_", "_pdbx_chem_comp_descriptor.comp_id", "_pdbx_chem_comp_descriptor.type", \
-                               "_pdbx_chem_comp_descriptor.program", "_pdbx_chem_comp_descriptor.program_version",\
-                               "_pdbx_chem_comp_descriptor.descriptor"]
-                        
+                                 "_pdbx_chem_comp_descriptor.program", "_pdbx_chem_comp_descriptor.program_version",\
+                                 "_pdbx_chem_comp_descriptor.descriptor"]
+                      
                         for aProp in aList:
                             tOutCif.write(aProp+"\n")
-                        aSmi             = tMol.GetProp("SmilesOut")
-                        aSmilen          = len(aSmi)
+                            aSmi             = tMol.GetProp("SmilesOut")
+                            aSmilen          = len(aSmi)
                         tOutCif.write("%s%s%s%s \"%s\"\n"%(monoId.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00".ljust(6), \
                                     aSmi.ljust(aSmilen)))           
                     tOutCif.close()
@@ -1877,8 +1953,8 @@ class Acedrg(CExeCode ):
                         if lSmi :
                             print "Smiles str  ", aSmi
                             aIniSmiName = os.path.join(self.scrDir, self.baseRoot + "_init.smi")
-                            #print "Smiles file ", aIniSmiName
-                            #print "Smiles str  ", aSmi
+                            print "Smiles file ", aIniSmiName
+                            print "Smiles str  ", aSmi
                             fSmi = open(aIniSmiName, "w")
                             fSmi.write(aSmi+"\n")
                             fSmi.close()
@@ -1889,7 +1965,6 @@ class Acedrg(CExeCode ):
                                 tSmiMmcifName = os.path.join(self.scrDir, "tSmi.cif")
                                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tSmiMmcifName, self.monomRoot)
                                 self.runLibmol(tSmiMmcifName, 1)
-
                                 # Mode 2           
                                 aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                                 if os.path.isfile(self.inMmCifName):
@@ -1899,7 +1974,7 @@ class Acedrg(CExeCode ):
                                         self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
                                              self.chemCheck, self.inputPara["PH"], self.numConformers, 2,\
                                              self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
-                                        tMolMmcifName = os.path.join(self.scrDir, "tSmi.cif")
+                                        tMolMmcifName = os.path.join(self.scrDir, "tSmi2.cif")
                                         self.rdKit.MolToSimplifiedMmcif(self.rdKit.moleculesB[0], tMolMmcifName, self.monomRoot)
                                         self.runLibmol(tMolMmcifName)
                             self.libmolAT1     = os.path.join(self.scrDir, "atomTypes_1.txt")
@@ -1987,43 +2062,18 @@ class Acedrg(CExeCode ):
                     print "The input %s does not exist"%self.inMmCifName
                     sys.exit()
                 if self.workMode == 11 and not self.runExitCode :
+                    # Stage 2: optimization
+                    print "===================================================================" 
+                    print "| Geometrical Optimization                                        |"
+                    print "===================================================================" 
+                        
                     if len(self.rdKit.molecules) != 0 and os.path.isfile(self.outRstCifName):
                         inPdbNamesRoot = {} 
                         for idxMol in range(len(self.rdKit.molecules)): 
                             if not inPdbNamesRoot.has_key(idxMol):
                                 inPdbNamesRoot[idxMol] = []
                             print "Number of atoms in molecule %d is %d "%(idxMol+1, self.rdKit.molecules[idxMol].GetNumAtoms())
-                            nConf = self.rdKit.molecules[idxMol].GetNumConformers()
-                            print "Number of conformers generated for molecule %d is %d "%(idxMol+1, nConf) 
-
-                            for idxConf in range(nConf): 
-                                tPdbRoot = "mol_" + str(iMol) + "_conf_" + str(idxConf+1)
-                                aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
-                                #print "PDB root ", tPdbRoot
-                                #print aConfPdb
-                                self.fileConv.MolToPDBFile(aConfPdb, idxMol, self.rdKit.molecules[idxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf)
-                                if os.path.isfile(aConfPdb):
-                                    inPdbNamesRoot[idxMol].append(tPdbRoot)
-
-                        # Stage 2: optimization
-                        print "===================================================================" 
-                        print "| Geometrical Optimization                                        |"
-                        print "===================================================================" 
-                        
-                        aLibCifIn = self.outRstCifName 
-                        for idxMol in range(len(self.rdKit.molecules)): 
-                            for aFRoot in inPdbNamesRoot[idxMol]: 
-                                aPdbIn    = os.path.join(self.scrDir, aFRoot + "_init.pdb")
-                                #print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
-                                #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
-                                self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
-                                if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
-                                    if len(self.rdKit.molecules) ==1 and len(inPdbNamesRoot[idxMol])==1:
-                                        aFRoot = ""
-                                    self.getFinalOutputFiles(aFRoot, self.rdKit.molecules[idxMol], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
-                                else:
-                                    print "Failed to produce the final coordinates after geometrical optimization"
-                                    sys.exit()
+                            self.runGeoOptOneMolFull(idxMol)
 
                 elif not self.workMode == 111:
                     self.printExitInfo() 
@@ -2150,6 +2200,7 @@ class AcedrgRDKit():
                     sys.exit()
                 else:
                     aSmiStr = fSmi.read()
+                    aSmiStr = aSmiStr.strip()
                     #print aSmiStr 
                     aMolT     = Chem.MolFromSmiles(aSmiStr)
                     aMolT.SetProp("SmilesIn", aSmiStr)
@@ -2212,9 +2263,36 @@ class AcedrgRDKit():
                 for aAtom in tMol.GetAtoms():
                     aAtom.SetProp("Name", tNameMap[aAtom.GetIdx()]) 
             elif tStage ==1:
-                self.setNamesForHAtomsInMol(tMol, tChemCheck)
+                if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
+                    self.setNamesForHAtomsInMol_PP(tMol, tChemCheck)
+                else:
+                    self.setNamesForHAtomsInMol(tMol, tChemCheck)
+         
 
     def setNamesForHAtomsInMol(self, tMol, tChemCheck):
+      
+        tIdxHs = {}
+        tIdxHs = []
+        
+        for aAtom in tMol.GetAtoms():
+            if aAtom.GetSymbol() =="H":
+                tIdxHs.append(aAtom.GetIdx())
+
+        if len(tIdxHs) !=0:
+            
+            hNameDone = [] 
+            nH = 1
+            for aIdxH in tIdxHs:
+                aHName = "H" + str(nH)
+                if aHName in hNameDone:
+                    nH += 1
+                    aHName = "H" + str(nH)
+                tMol.GetAtomWithIdx(aIdxH).SetProp("Name", aHName)
+                nH += 1
+                    
+
+          
+    def setNamesForHAtomsInMol_PP(self, tMol, tChemCheck):
       
         tIdxHs = {}
         tIdxHs1 = []
@@ -2269,37 +2347,53 @@ class AcedrgRDKit():
                 #print "twoP[0] : ", twoP[0]
                 #print "twoP[1] : ", twoP[1]
                 #print "LH ", lH
+                aHName = ""
                 mainElem = tMol.GetAtomWithIdx(aIdxBH).GetSymbol()
                 if mainElem in elemList :
                     if len(twoP[0])==1 and len(twoP[1]) ==0:
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
                             if not lH:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H")
+                                aHName = "H"
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
                                 lH = True
                             else:     
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H1")
+                                aHName = "H1"
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
+                            hNameDone.append(aHName)
                         else :
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                tH = "H" + numListCN[i]
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", tH)
-                                hNameDone.append(tH)
+                                aHName = "H" + numListCN[i]
+                                if not aHName in hNameDone:
+                                   tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
+                                else:
+                                   i +=1 
+                                   tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
+                                hNameDone.append(aHName)
                                 if i==0:
                                     lH = True
                                 i +=1 
                     elif len(twoP[0])==1 and len(twoP[1]) !=0:
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
-                            tH = "H" + twoP[1]
-                            if not tH in hNameDone:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", tH)
+                            aHName = "H" + twoP[1]
+                            if not aHName in hNameDone:
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
                             else:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", tH+"G")
+                                aHName =aHName+"G"
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName+"G")
+                            hNameDone.append(aHName)
                         else :
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + twoP[1]+ charList[i])
+                                aHName = "H" + twoP[1]+ charList[i]
+                                if not aHName in hNameDone: 
+                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
+                                else:
+                                    aHName = "H" + twoP[1]+ charList[i+1]
+                                    tMol.GetAtomWithIdx(curIdxH).SetProp("Name", aHName)
+                                hNameDone.append(aHName)
                                 i +=1
                     elif len(twoP[0]) > 1 and len(twoP[1]) ==0:
                         if len(tIdxHs[aIdxBH]) ==1:
@@ -2346,8 +2440,9 @@ class AcedrgRDKit():
                             i=0
                             aLen = len(tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()])
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                if mainElem.find("N") !=-1:
+                                if mainElem.find("N") !=-1 :
                                     if not lH:
+                                        
                                         tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H")
                                         lH = True
                                     else:
@@ -2478,15 +2573,21 @@ class AcedrgRDKit():
             
         #  Setup conformers for the molecules
         if tNConfId == 1:
-            #  One initail conformer 
-            lFailure = self.setInitGeomOneMol(tMol)
-            if not lFailure:
+            #  20 initail conformers 
+            ttNConfId = 20
+            confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId)
+            for aId in confIds:
+                aFailure = self.optOneConformer(tMol, aId)
+                if not aFailure:
+                    rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
+            #lFailure = self.setInitGeomOneMol(tMol)
+            #if not lFailure:
                 # Setup chiral information associated with this conformer 
-                rdmolops.AssignAtomChiralTagsFromStructure(tMol)
+                # rdmolops.AssignAtomChiralTagsFromStructure(tMol)
             #else:
             #    print "Geometry of molecule %d can not be optimized within %d circles "%(len(self.allMols), self.nMaxMult*self.nMaxIters)
         elif tNConfId > 1:
-            #  multiple conformers
+            #  multiple conformers according to input number of conformations
             confIds =AllChem.EmbedMultipleConfs(tMol, tNConfId)
             for aId in confIds:
                 aFailure = self.optOneConformer(tMol, aId)

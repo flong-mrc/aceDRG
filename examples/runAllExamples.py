@@ -1,5 +1,9 @@
 import os, os.path, sys, glob, string
 
+numAllJobs =0
+numJobsS   =0
+numJobsF   =0
+
 if len(sys.argv) > 1:
     print "Usuage: python runAllExamples.py"
     sys.exit()
@@ -17,7 +21,14 @@ for aF in glob.glob("./inSmi/*.smiles"):
     if len(aFRoot) !=0:
         cmdL = "acedrg -i %s  -o  %s_fromSmiles "%(aF, aFRoot) 
         print cmdL
+        numAllJobs += 1
         os.system(cmdL)
+        outCif = "%s_fromSmiles.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
+            
 
 print "========================================================="
 print "|  run all examples with input MOL files at ./inMOL     |"
@@ -32,7 +43,13 @@ for aF in glob.glob("./inMol/*.mol"):
     if len(aFRoot) !=0:
         cmdL = "acedrg -m %s  -o  %s_fromMol "%(aF, aFRoot) 
         print cmdL
+        numAllJobs += 1
         os.system(cmdL)
+        outCif = "%s_fromMol.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
 
 
 print "========================================================="
@@ -47,8 +64,15 @@ for aF in glob.glob("./inMol2/*.mol2"):
 
     if len(aFRoot) !=0:
         cmdL = "acedrg -g %s  -o  %s_from_SYBYL_Mol2 "%(aF, aFRoot) 
+        numAllJobs += 1
         print cmdL
         os.system(cmdL)
+        outCif = "%s_from_SYBYL_Mol2.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
+
 
 print "============================================================"
 print "|  run all examples with input mmCif files at ./inMmcifPDB |"
@@ -63,7 +87,14 @@ for aF in glob.glob("./inMmcifPDB/*.cif"):
     if len(aFRoot) !=0:
         cmdL = "acedrg -c %s  -o  %s_fromMmcifPDB "%(aF, aFRoot) 
         print cmdL
+        numAllJobs += 1
         os.system(cmdL)
+        outCif = "%s_fromMmcifPDB.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
+
 
 print "========================================================="
 print "|  run all examples with input mmCif files at ./inMmcif |"
@@ -77,8 +108,15 @@ for aF in glob.glob("./inMmcif/*.cif"):
 
     if len(aFRoot) !=0:
         cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
+        numAllJobs += 1
         print cmdL
         os.system(cmdL)
+        outCif = "%s_fromMmcif.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
+
 
 print "========================================================="
 print "|  run all examples containing pyranose at ./inPyro     |"
@@ -95,6 +133,7 @@ for aF in glob.glob("./inPyro/*.cif"):
         print cmdL
         os.system(cmdL)
 
+
 print "========================================================="
 print "|  run all examples in inFuns                           |"
 print "========================================================="
@@ -109,6 +148,12 @@ for aF in glob.glob("./inFuns/*.cif"):
         cmdL = "acedrg -c %s -o  %s_Funs "%(aF, aFRoot) 
         print cmdL
         os.system(cmdL)
+        outCif = "%s_Funs.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
+
 
 print "=============================================================="
 print "|  run those cif in CCP4 monomer lib which had some problems |"
@@ -121,9 +166,17 @@ for aF in glob.glob("./inDictProb/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
+        cmdL = "acedrg -c %s  -o  %s_inDictProb "%(aF, aFRoot) 
         print cmdL
+        numAllJobs += 1
         os.system(cmdL)
+        outCif = "%s_inDictProb.cif"%aF
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
+
+
 print "========================================================="
 print "|  run all examples with input small molecule Cif files |"
 print "|  at ./inStdcif to generate molecules and derive       |"
@@ -146,3 +199,7 @@ if os.path.isdir("inStdcif"):
     print cmdL
     os.system(cmdL)
 
+print "Total Number of jobs running for dictionary generation ", numAllJobs 
+print "Total Number of job successfully finished", numJobsS 
+print "Total Number of job failed", numJobsF
+ 

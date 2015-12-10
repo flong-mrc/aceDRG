@@ -600,13 +600,23 @@ namespace LIBMOL
             
         }
         
+        // set ring properties of all angles
+        for (std::vector<AngleDict>::iterator iAn=allAngles.begin();
+               iAn !=allAngles.end(); iAn++)
+        {
+            iAn->isInSameRing = checkIfAngleInSameRing(allAtoms, 
+                                                       allRingsV,
+                                                       iAn->atoms[0],
+                                                       iAn->atoms[1], iAn->atoms[2]);
+        }
         
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {
             std::cout << "Atom " << iAt->seriNum << " : " << std::endl
                       << "Its ID " << iAt->id << std::endl
-                      << "Its element type " << iAt->chemType
+                      << "Its element type " << iAt->chemType << std::endl
+                      << "Its COD root atom type " << iAt->codAtmRoot << std::endl
                       << "Its acedrg atom type " << iAt->codClass << std::endl
                       << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
                       << "Its ccp4 atom type " << iAt->ccp4Type 
@@ -614,8 +624,6 @@ namespace LIBMOL
            
             
         }
-        
-        
         
         /*
         std::cout << "Torsion angles are : " << std::endl;
@@ -771,7 +779,7 @@ namespace LIBMOL
         std::cout <<  "(2) Different tool. There are " 
                   << allRings.size() << " rings. They are: "
                   << std::endl;
-        std::vector<RingDict> allRingsV;    
+        allRingsV.clear();    
         for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
@@ -820,7 +828,7 @@ namespace LIBMOL
         //std::cout <<  "(2) Different tool. There are " 
         //          << allRings.size() << " rings. They are: "
         //          << std::endl;
-        std::vector<RingDict> allRingsV;    
+        allRingsV.clear();    
         for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
@@ -887,7 +895,7 @@ namespace LIBMOL
         //          << allRings.size() << " rings. They are: "
         //          << std::endl;
         
-        std::vector<RingDict> allRingsV;    
+        allRingsV.clear();    
         for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
@@ -1199,9 +1207,6 @@ namespace LIBMOL
         {
              tAt.codAtmMain = tCodClass;
         }
-        //std::cout << "Atom class is " << tCodClass << std::endl;
-        //std::cout << "Main section " << tAt.codAtmMain << std::endl;
-        
         
         
         std::vector<std::string> atmStrs;
@@ -4600,9 +4605,11 @@ namespace LIBMOL
         {
             
             AtomDict tAtm;
-            // std::cout << "The atom serial number " << iAt->seriNum << std::endl; 
+            //std::cout << "The atom serial number " << iAt->seriNum << std::endl; 
+            //std::cout << "The atom ID " << iAt->id << std::endl;
             codClassToAtom2(iAt->codClass, tAtm);
             iAt->codAtmMain = tAtm.codAtmMain;
+            iAt->codAtmRoot = tAtm.codAtmRoot;
             iAt->codNBSymb  = tAtm.codNBSymb;
             iAt->codNB2Symb = tAtm.codNB2Symb;
             iAt->codNB3Symb = tAtm.codNB3Symb;
@@ -8904,7 +8911,7 @@ namespace LIBMOL
                     std::vector<std::string> tBuf;
                     StrTokenize(tRecord, tBuf);
                     
-                    if ((int)tBuf.size() ==27)
+                    if ((int)tBuf.size() ==37)
                     {
                         int ha1, ha2, ha3;
                         
@@ -8919,69 +8926,132 @@ namespace LIBMOL
                             tBuf[i] = TrimSpaces(tBuf[i]);
                         }
                         */
-                        // exact match  
+                        
+                        // Exact match  
                         allDictAnglesIdxD[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]]
-                                        [tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]][tBuf[13]][tBuf[14]]
-                                       =nLine;
+                        [tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]][tBuf[16]][tBuf[17]][tBuf[18]]
+                        =nLine;
                         nLine +=1;
                         
                         aValueSet aAng;
-                        aAng.value        = StrToReal(tBuf[15]);
-                        aAng.sigValue     = StrToReal(tBuf[16]);
+                        aAng.value        = StrToReal(tBuf[19]);
+                        aAng.sigValue     = StrToReal(tBuf[20]);
                         if(aAng.sigValue <0.0001 || aAng.sigValue > 3.0)
                         {
                             aAng.sigValue = 3.0;
                         }
-                        aAng.numCodValues  = StrToInt(tBuf[17]);
+                        aAng.numCodValues  = StrToInt(tBuf[21]);
                         allDictAnglesD.push_back(aAng);
                         
                         
-                        // AxC not found 
+                        // AxM values, AxC not found 
                         aValueSet aAngS1;
-                        aAngS1.value        = StrToReal(tBuf[18]);
-                        aAngS1.sigValue     = StrToReal(tBuf[19]);
+                        aAngS1.value        = StrToReal(tBuf[22]);
+                        aAngS1.sigValue     = StrToReal(tBuf[23]);
                         if(aAngS1.sigValue <0.0001 || aAngS1.sigValue > 3.0)
                         {
                             aAngS1.sigValue = 3.0;
                         }
-                        aAngS1.numCodValues = StrToInt(tBuf[20]);
+                        aAngS1.numCodValues = StrToInt(tBuf[24]);
                        
                         if (allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
-                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]].size()==0)
+                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]]
+                             [tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]].size()==0)
                         {
+                              
                             allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
-                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]].push_back(aAngS1);
+                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]].push_back(aAngS1);
+                            /*
+                            if (ha1==466 && ha2==466 & ha3==958 
+                                && tBuf[13]=="C[6](C[6]C[6]HN)(C[6]C[6]HO)(OH)(H)")
+                            {
+                                std::cout << "Ha1 " << ha1 << std::endl
+                                          << "Ha2 " << ha2 << std::endl 
+                                          << "Ha3 " << ha3 << std::endl
+                                          << "R3A " << tBuf[3] << std::endl
+                                          << "A1R " << tBuf[4] << std::endl
+                                          << "A2R " << tBuf[5] << std::endl
+                                          << "A3R " << tBuf[6] << std::endl
+                                          << "a1NB2 " << tBuf[7] << std::endl
+                                          << "a2NB2 " << tBuf[8] << std::endl
+                                          << "a3NB2 " << tBuf[9] << std::endl
+                                          << "a1NB "  << tBuf[10] << std::endl
+                                          << "a2NB "  << tBuf[11] << std::endl
+                                          << "a3NB "  << tBuf[12] << std::endl
+                                          << "a1M "   << tBuf[13] << std::endl
+                                          << "a2M "   << tBuf[14] << std::endl
+                                          << "a3M "   << tBuf[15] << std::endl;
+                            
+                                std::cout << "angle value : "
+                                          << allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
+                                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]]
+                                             [tBuf[13]][tBuf[14]][tBuf[15]][0].value << std::end
+                            }
+                             */
                         } 
                         
-                        // AxM not found 
+                        // A_NB values, AxM not found 
                         aValueSet aAngS2;
-                        aAngS2.value        = StrToReal(tBuf[21]);
-                        aAngS2.sigValue     = StrToReal(tBuf[22]);
+                        aAngS2.value        = StrToReal(tBuf[25]);
+                        aAngS2.sigValue     = StrToReal(tBuf[26]);
                         if(aAngS2.sigValue <0.0001 || aAngS2.sigValue > 3.0)
                         {
                             aAngS2.sigValue = 3.0;
                         }
-                        aAngS2.numCodValues = StrToInt(tBuf[23]);
+                        aAngS2.numCodValues = StrToInt(tBuf[27]);
                        
                         if (allDictAnglesIdx2D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
-                             [tBuf[6]][tBuf[7]][tBuf[8]].size()==0)
+                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]].size()==0)
                         {
                             allDictAnglesIdx2D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
-                              [tBuf[6]][tBuf[7]][tBuf[8]].push_back(aAngS2);
+                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]].push_back(aAngS2);
                         } 
                         
-                        // axNB not found 
+                        // A_NB2 values, A_NB not found 
                         aValueSet aAngS3;
-                        aAngS3.value        = StrToReal(tBuf[24]);
-                        aAngS3.sigValue     = StrToReal(tBuf[25]);
+                        aAngS3.value        = StrToReal(tBuf[28]);
+                        aAngS3.sigValue     = StrToReal(tBuf[29]);
                         if(aAngS3.sigValue <0.0001 || aAngS3.sigValue > 3.0)
                         {
                             aAngS3.sigValue = 3.0;
                         }
-                        aAngS3.numCodValues = StrToInt(tBuf[26]);
-                        if (allDictAnglesIdx3D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]].size()==0)
+                        aAngS3.numCodValues = StrToInt(tBuf[30]);
+                        
+                        if (allDictAnglesIdx3D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
+                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]].size()==0)
                         {
-                            allDictAnglesIdx3D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]].push_back(aAngS3);
+                            allDictAnglesIdx3D[ha1][ha2][ha3][tBuf[3]]
+                            [tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]].push_back(aAngS3);
+                        }
+                        
+                        // a1R, a2R, a3R values, A_NB2 not found 
+                        aValueSet aAngS4;
+                        aAngS4.value        = StrToReal(tBuf[31]);
+                        aAngS4.sigValue     = StrToReal(tBuf[32]);
+                        if(aAngS4.sigValue <0.0001 || aAngS4.sigValue > 3.0)
+                        {
+                            aAngS4.sigValue = 3.0;
+                        }
+                        aAngS4.numCodValues = StrToInt(tBuf[33]);
+                        
+                        if (allDictAnglesIdx4D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]].size()==0)
+                        {
+                            allDictAnglesIdx4D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]].push_back(aAngS4);
+                        }
+                        
+                        // R3A values, a1R, a2R, a3R not found 
+                        aValueSet aAngS5;
+                        aAngS5.value        = StrToReal(tBuf[34]);
+                        aAngS5.sigValue     = StrToReal(tBuf[35]);
+                        if(aAngS5.sigValue <0.0001 || aAngS5.sigValue > 3.0)
+                        {
+                            aAngS5.sigValue = 3.0;
+                        }
+                        aAngS5.numCodValues = StrToInt(tBuf[36]);
+                        
+                        if (allDictAnglesIdx5D[ha1][ha2][ha3][tBuf[3]].size()==0)
+                        {
+                            allDictAnglesIdx5D[ha1][ha2][ha3][tBuf[3]].push_back(aAngS5);
                         }
                         
                     }
@@ -9007,7 +9077,11 @@ namespace LIBMOL
         tDiff = std::difftime(tEnd,tStart);
         std::cout  << "it takes " << std::setprecision(3) <<tDiff 
                    << " seconds to finish group COD angles " << std::endl;
+        
+        
     }
+
+
   
     void CodClassify::groupCodMetAngles()
     {
@@ -11103,10 +11177,14 @@ namespace LIBMOL
             */
         
             int ha1, ha2, ha3; // s2, s3;
-            ID a1NB2, a1NB, a1M, a1C, a2NB2, a2NB, a2M, a2C,a3NB2, a3NB, a3M, a3C;
+            ID R3A = IntToStr(iAN->isInSameRing);
+            ID a1R, a1NB2, a1NB, a1M, a1C; 
+            ID a2R, a2NB2, a2NB, a2M, a2C; 
+            ID a3R, a3NB2, a3NB, a3M, a3C;
             ID id2, id3;
             
             ha1   = allAtoms[iAN->atoms[0]].hashingValue;
+            a1R   = allAtoms[iAN->atoms[0]].codAtmRoot;
             a1NB2 = allAtoms[iAN->atoms[0]].codNB2Symb;
             a1NB  = allAtoms[iAN->atoms[0]].codNBSymb;
             a1M   = allAtoms[iAN->atoms[0]].codAtmMain;
@@ -11121,6 +11199,9 @@ namespace LIBMOL
                 ha2  =allAtoms[iAN->atoms[1]].hashingValue;
                 ha3  =allAtoms[iAN->atoms[2]].hashingValue;
            
+                a2R   = allAtoms[iAN->atoms[1]].codAtmRoot;
+                a3R   = allAtoms[iAN->atoms[2]].codAtmRoot;
+                
                 a2NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
                 a3NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
           
@@ -11145,6 +11226,9 @@ namespace LIBMOL
                     ha2  =allAtoms[iAN->atoms[1]].hashingValue;
                     ha3  =allAtoms[iAN->atoms[2]].hashingValue;
            
+                    a2R   = allAtoms[iAN->atoms[1]].codAtmRoot;
+                    a3R   = allAtoms[iAN->atoms[2]].codAtmRoot;
+                
                     a2NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
                     a3NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
           
@@ -11167,12 +11251,18 @@ namespace LIBMOL
                     ha2  =allAtoms[iAN->atoms[2]].hashingValue;
                     ha3  =allAtoms[iAN->atoms[1]].hashingValue;
            
+                    a2R   = allAtoms[iAN->atoms[2]].codAtmRoot;
+                    a3R   = allAtoms[iAN->atoms[1]].codAtmRoot;
+                    
                     a2NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
                     a3NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
           
                     a2NB = allAtoms[iAN->atoms[2]].codNBSymb;
                     a3NB = allAtoms[iAN->atoms[1]].codNBSymb;
          
+                    a2M  = allAtoms[iAN->atoms[2]].codAtmMain;
+                    a3M  = allAtoms[iAN->atoms[1]].codAtmMain;
+                    
                     a2C  = allAtoms[iAN->atoms[2]].codClass;
                     a3C  = allAtoms[iAN->atoms[1]].codClass;
                 
@@ -11189,6 +11279,8 @@ namespace LIBMOL
                     m2.id    = allAtoms[iAN->atoms[2]].id;
                     m1.ha    =(int)allAtoms[iAN->atoms[1]].hashingValue;
                     m2.ha    =(int)allAtoms[iAN->atoms[2]].hashingValue;
+                    m1.root  = allAtoms[iAN->atoms[1]].codAtmRoot;
+                    m2.root  = allAtoms[iAN->atoms[2]].codAtmRoot;
                     m1.lev2  = allAtoms[iAN->atoms[1]].codNB2Symb;
                     m2.lev2  = allAtoms[iAN->atoms[2]].codNB2Symb;
                     m1.lev3  = allAtoms[iAN->atoms[1]].codNBSymb;
@@ -11197,7 +11289,9 @@ namespace LIBMOL
                     m2.key   = allAtoms[iAN->atoms[2]].codAtmMain;
                     m1.lev4  = allAtoms[iAN->atoms[1]].codClass;
                     m2.lev4  = allAtoms[iAN->atoms[2]].codClass;
-                
+                    //std::cout << "Before sorting " << std::endl;
+                    //std::cout << "Key 1 is " << m1.key << std::endl;
+                    //std::cout << "Key 2 is " << m2.key << std::endl;
                     vM.push_back(m1);
                     vM.push_back(m2);
                 
@@ -11207,12 +11301,17 @@ namespace LIBMOL
                     id3    = vM[1].id;
                     ha2    = vM[0].ha;
                     ha3    = vM[1].ha;
+                    a2R    = vM[0].root;
+                    a3R    = vM[1].root;
                     a2NB2  = vM[0].lev2;
                     a3NB2  = vM[1].lev2;
                     a2NB   = vM[0].lev3;
                     a3NB   = vM[1].lev3;
                     a2M    = vM[0].key;
                     a3M    = vM[1].key;
+                    //std::cout << "After sorting " << std::endl;
+                    //std::cout << "Key 1 is " << vM[0].key << std::endl;
+                    //std::cout << "Key 2 is " << vM[1].key << std::endl;
                     a2C    = vM[0].lev4;
                     a3C    = vM[1].lev4;
                 }
@@ -11224,6 +11323,9 @@ namespace LIBMOL
                 ha2  =allAtoms[iAN->atoms[2]].hashingValue;
                 ha3  =allAtoms[iAN->atoms[1]].hashingValue;
            
+                a2R   = allAtoms[iAN->atoms[2]].codAtmRoot;
+                a3R   = allAtoms[iAN->atoms[1]].codAtmRoot;
+                    
                 a2NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
                 a3NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
           
@@ -11247,769 +11349,502 @@ namespace LIBMOL
                       << id3 << std::endl << std::endl;
             
             std::cout << "Center Atom : " <<  allAtoms[iAN->atoms[0]].id << std::endl
-                      <<  "Its Hashing code  " << ha1 <<std::endl
-                      <<  "Its codNBSymb " <<  a1NB << " its codNB2Symb " << a1NB2 << std::endl
-                      <<  "atom type main sec " << a1M << std::endl
-                      <<  "atom type full " << a1C << std::endl<< std::endl;
+                      << "Its Hashing code  " << ha1 <<std::endl
+                      << "Its root atom symbol " << a1R << std::endl
+                      << "Its codNB2Symb " <<  a1NB2 << std::endl 
+                      << "Its codNBSymb " << a1NB << std::endl
+                      << "Its atom type main sec " << a1M << std::endl
+                      << "Its atom type full " << a1C << std::endl<< std::endl;
             
             std::cout << "Atom2 : "  << id2 << std::endl
                       << "Its Hashing code "  << ha2    << std::endl
-                      << "Its codNBSymb " <<  a2NB  << " its codNB2Symb " << a2NB2 << std::endl
+                      << "Its root atom symbol " << a2R << std::endl
+                      << "Its codNB2Symb " <<  a2NB2 << std::endl  
+                      << "Its codNBSymb " << a2NB << std::endl
                       << "Its atom type main section " << a2M << std::endl
-                      << " Its atom type full " <<  a2C << std::endl << std::endl; 
+                      << "Its atom type full " <<  a2C << std::endl << std::endl; 
             
             std::cout << "Atom3: "   << id3 << std::endl
                       << "Its Hashing code  " <<  ha3   <<std::endl
-                      << "Its codNBSymb " <<  a3NB  << " its codNB2Symb "  << a3NB2 << std::endl
+                      << "Its root atom symbol " << a3R << std::endl
+                      << "Its codNB2Symb " <<  a3NB2 << std::endl
+                      << "Its codNBSymb "  << a3NB << std::endl
                       << "Its atom type main section " << a3M << std::endl
                       << "Its atom type full " << a3C << std::endl << std::endl;
+                      
+            std::cout << "These 3 atoms are in a ring of size "
+                      << R3A << std::endl;
             
-            // int dLev = 0;
             
-                    
+            
+            std::vector<int> hashSet;
+            hashSet.push_back(ha1);
+            hashSet.push_back(ha2);
+            hashSet.push_back(ha3);
+            
             if(allDictAnglesIdxD.find(ha1) != allDictAnglesIdxD.end() &&
                allDictAnglesIdxD[ha1].find(ha2) != allDictAnglesIdxD[ha1].end() &&
                allDictAnglesIdxD[ha1][ha2].find(ha3) != allDictAnglesIdxD[ha1][ha2].end())
             {
-                    
-                //std::map<ID,  std::map<ID,  std::map<ID, 
-                //std::vector<aValueSet> > > >::iterator  iFind1 
-                //=allDictAnglesIdx2[ha1][ha2][ha3].find(a1NB2);
+                std::cout << "Find ha1 " << ha1 << std::endl;
+                std::cout << "Find ha2 " << ha2 << std::endl;
+                std::cout << "Find ha3 " << ha3 << std::endl;
                 
-                
-                if(allDictAnglesIdxD[ha1][ha2][ha3].find(a1NB2) != allDictAnglesIdxD[ha1][ha2][ha3].end())
+                if(allDictAnglesIdxD[ha1][ha2][ha3].find(R3A) != allDictAnglesIdxD[ha1][ha2][ha3].end())
                 {
-                    // iFind1 a1NB2 matches
-                    std::cout << "Found " << a1NB2 << std::endl;
-                    // a1NB2 
-                  
-                    if ( allDictAnglesIdxD[ha1][ha2][ha3][a1NB2].find(a2NB2)!=allDictAnglesIdxD[ha1][ha2][ha3][a1NB2].end())
+                    // iFind1 R3A matches
+                    std::cout << "Found " << R3A << std::endl;
+                    if(allDictAnglesIdxD[ha1][ha2][ha3][R3A].find(a1R) != allDictAnglesIdxD[ha1][ha2][ha3][R3A].end())
                     {
-                        //iFind2: a1NB2, a2NB2 match
-                        std::cout << "Found " << a2NB2 << std::endl;
-                        
-                        if (allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2].find(a3NB2)
-                            != allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2].end())
+                        //iFind2 a1R matches
+                        std::cout << "Found " << a1R << std::endl;
+                        if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R].find(a2R) 
+                             != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R].end())
                         {
-                            //iFind3: a1NB2, a2NB2 and a3NB2 match
-                            std::cout << "Found " << a3NB2 << std::endl;
-                            if ( allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].find(a1NB) 
-                                 !=allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].end())
+                            //iFind3 a2R matches
+                            std::cout << "Found " << a2R << std::endl;
+                            if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R].find(a3R) 
+                               != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R].end())
                             {
-     
-                                // iFind4: a1NB2, a2NB2, a3NB2, a1NB match
-                                std::cout << "Found " << a1NB << std::endl;
-                                
-                                if ( allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].find(a2NB)
-                                     != allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].end())
+                                //iFind4 a3R matches
+                                std::cout << "Found " << a3R << std::endl;
+                                if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R].find(a1NB2) 
+                                   != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R].end())
                                 {
-                                    // iFind5: a1NB2, a2NB2, a3NB2, a1NB, a2NB match
-                                    std::cout << "Found " << a2NB << std::endl;
-                                   
-                                    if ( allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].find(a3NB)
-                                         !=allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].end())
+                                    //iFind5 a1NB2 matches
+                                    std::cout << "Found " << a1NB2 << std::endl;
+                                    if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                       [a1NB2].find(a2NB2) 
+                                       != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                          [a1NB2].end())
                                     {
-                                        //iFind6 a1NB2, a2NB2, a3NB2, a1NB, a2NB, a3NB match
-                                        std::cout << "Found " << a3NB << std::endl;
-                                        
-                                        if(allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].find(a1M)
-                                            != allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].end())
+                                        //iFind6 a2NB2 matches
+                                        std::cout << "Found " << a2NB2 << std::endl;
+                                        if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                           [a1NB2][a2NB2].find(a3NB2) 
+                                           != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                           [a1NB2][a2NB2].end())
                                         {
-                                            // iFind7: a1NB2, a2NB2, a3NB2, a1NB, a2NB, a3NB, a1M match
-                                            std::cout << "Found " << a1M << std::endl;
-                                            if(allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M].find(a2M)
-                                               != allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M].end())
+                                            //iFind7 a3NB2 matches
+                                            std::cout << "Found " << a3NB2 << std::endl;
+                                            if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                               [a1NB2][a2NB2][a3NB2].find(a1NB) 
+                                               != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                               [a1NB2][a2NB2][a3NB2].end())
                                             {
-                                                //iFind8: a1NB2, a2NB2, a3NB2, a1NB, a2NB, a3NB, a1M, a2M match
-                                                std::cout << "Found " << a2M << std::endl;
-                                                
-                                                if( allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M].find(a3M)!=
-                                                    allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M].end())
+                                                //iFind8 a1NB matches
+                                                std::cout << "Found " << a1NB << std::endl;
+                                                if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                   [R3A][a1R][a2R][a3R]
+                                                   [a1NB2][a2NB2][a3NB2]
+                                                   [a1NB].find(a2NB) 
+                                                   != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                   [R3A][a1R][a2R][a3R]
+                                                   [a1NB2][a2NB2][a3NB2]
+                                                   [a1NB].end())
                                                 {
-                                                    //iFind9: a1NB2, a2NB2, a3NB2, a1NB, a2NB, a3NB, a1M, a2M and a3M all match
-                                                    std::cout << "Found " << a3M << std::endl;
-                                                    if( allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M][a3M].find(a1C)!=
-                                                        allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M][a3M].end())
+                                                    //iFind9 a2NB matches
+                                                    std::cout << "Found " << a2NB << std::endl;
+                                                    if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                       [R3A][a1R][a2R][a3R]
+                                                       [a1NB2][a2NB2][a3NB2]
+                                                       [a1NB][a2NB].find(a3NB) 
+                                                       != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                       [R3A][a1R][a2R][a3R]
+                                                       [a1NB2][a2NB2][a3NB2]
+                                                       [a1NB][a2NB].end())
                                                     {
-                                                        //iFind10: a1NB2, a2NB2, a3NB2, a1NB, a2NB, a3NB, a1M, a2M, a3M, a1C all match
-                                                        std::cout << "Found " << a1C << std::endl;
-                                                        
-                                                        if(allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M][a3M][a1C].find(a2C)!=
-                                                           allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M][a3M][a1C].end())
+                                                        //iFind10 a3NB matches
+                                                        std::cout << "Found " << a3NB << std::endl;
+                                                        if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                           [R3A][a1R][a2R][a3R]
+                                                           [a1NB2][a2NB2][a3NB2]
+                                                           [a1NB][a2NB][a3NB].find(a1M) 
+                                                           != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                           [R3A][a1R][a2R][a3R]
+                                                           [a1NB2][a2NB2][a3NB2]
+                                                           [a1NB][a2NB][a3NB].end())
                                                         {
-                                                            //iFind11: a1NB2, a2NB2, a3NB2, a1NB, a2NB, a3NB, a1M, a2M, a3M, a1C, a2C all match
-                                                            std::cout << "Found " << a2C << std::endl;
-                                                            if(allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M][a3M][a1C][a2C].find(a3C)!=
-                                                               allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1M][a2M][a3M][a1C][a2C].end())
+                                                            // iFind11 a1M matches
+                                                            std::cout << "Found " << a1M << std::endl;
+                                                            if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                               [R3A][a1R][a2R][a3R]
+                                                               [a1NB2][a2NB2][a3NB2]
+                                                               [a1NB][a2NB][a3NB]
+                                                               [a1M].find(a2M) 
+                                                               != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                               [R3A][a1R][a2R][a3R]
+                                                               [a1NB2][a2NB2][a3NB2]
+                                                               [a1NB][a2NB][a3NB]
+                                                               [a1M].end())
                                                             {
-                                                                //iFind12:  all keys match
-                                                                std::cout << "Found " << a3C << std::endl;
-                                                                // COD has such an angle value
-                                                                int iPos = allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                           [a1NB][a2NB][a3NB][a1M][a2M][a3M][a1C][a2C][a3C];
-                                                                //std::cout << "iPos =" << iPos << std::endl;
-                                                                if (allDictAnglesD[iPos].numCodValues > 5)
+                                                                // iFind12 a2M matches
+                                                                std::cout << "Found " << a2M << std::endl;
+                                                                if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                   [R3A][a1R][a2R][a3R]
+                                                                   [a1NB2][a2NB2][a3NB2]
+                                                                   [a1NB][a2NB][a3NB]
+                                                                   [a1M][a2M].find(a3M) 
+                                                                   != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                   [R3A][a1R][a2R][a3R]
+                                                                   [a1NB2][a2NB2][a3NB2]
+                                                                   [a1NB][a2NB][a3NB]
+                                                                   [a1M][a2M].end())
                                                                 {
-                                                                    iAN->value        = allDictAnglesD[iPos].value;
-                                                                    iAN->sigValue     = allDictAnglesD[iPos].sigValue;
-                                                                    iAN->numCodValues = allDictAnglesD[iPos].numCodValues;
-                                                                    iAN->hasCodValue  = true;
-                                                                    iAN->levelCodValue = 0;
-                                                                    std::cout << "COD finds the exact value " << iAN->value << std::endl;
-                                                                    std::cout << "the sigma value " << iAN->sigValue << std::endl;
+                                                                    // iFind13 a3M matches
+                                                                    std::cout << "Found " << a3M << std::endl;
+                                                                    if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                       [R3A][a1R][a2R][a3R]
+                                                                       [a1NB2][a2NB2][a3NB2]
+                                                                       [a1NB][a2NB][a3NB]
+                                                                       [a1M][a2M][a3M].find(a1C) 
+                                                                       != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                       [R3A][a1R][a2R][a3R]
+                                                                       [a1NB2][a2NB2][a3NB2]
+                                                                       [a1NB][a2NB][a3NB]
+                                                                       [a1M][a2M][a3M].end())
+                                                                    {
+                                                                        // iFind14 a1C matches
+                                                                        std::cout << "Found " << a1C << std::endl;
+                                                                        if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                           [R3A][a1R][a2R][a3R]
+                                                                           [a1NB2][a2NB2][a3NB2]
+                                                                           [a1NB][a2NB][a3NB]
+                                                                           [a1M][a2M][a3M]
+                                                                           [a1C].find(a2C) 
+                                                                           != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                           [R3A][a1R][a2R][a3R]
+                                                                           [a1NB2][a2NB2][a3NB2]
+                                                                           [a1NB][a2NB][a3NB]
+                                                                           [a1M][a2M][a3M]
+                                                                           [a1C].end())
+                                                                        {
+                                                                            // iFind15 a2C matches
+                                                                            std::cout << "Found " << a2C << std::endl;
+                                                                            if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                               [R3A][a1R][a2R][a3R]
+                                                                               [a1NB2][a2NB2][a3NB2]
+                                                                               [a1NB][a2NB][a3NB]
+                                                                               [a1M][a2M][a3M]
+                                                                               [a1C][a2C].find(a3C) 
+                                                                               != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                               [R3A][a1R][a2R][a3R]
+                                                                               [a1NB2][a2NB2][a3NB2]
+                                                                               [a1NB][a2NB][a3NB]
+                                                                               [a1M][a2M][a3M]
+                                                                               [a1C][a2C].end())
+                                                                            {
+                                                                                // iFind16 a3C matches
+                                                                                // Everything exactly matches
+                                                                                std::cout << "Found " << a3C << std::endl;
+                                                                                std::vector<std::string>    aKeySet;
+                                                                                aKeySet.push_back(R3A);
+                                                                                aKeySet.push_back(a1R);
+                                                                                aKeySet.push_back(a2R);
+                                                                                aKeySet.push_back(a3R);
+                                                                                aKeySet.push_back(a1NB2);
+                                                                                aKeySet.push_back(a2NB2);
+                                                                                aKeySet.push_back(a3NB2);
+                                                                                aKeySet.push_back(a1NB);
+                                                                                aKeySet.push_back(a2NB);
+                                                                                aKeySet.push_back(a3NB);
+                                                                                aKeySet.push_back(a1M);
+                                                                                aKeySet.push_back(a2M);
+                                                                                aKeySet.push_back(a3M);
+                                                                                aKeySet.push_back(a1C);
+                                                                                aKeySet.push_back(a2C);
+                                                                                aKeySet.push_back(a3C);
+                                                                                int aLev =0;
+                                                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                                 
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                // iFind16 failed a3C not matches
+                                                                                std::vector<std::string>    aKeySet;
+                                                                                aKeySet.push_back(R3A);
+                                                                                aKeySet.push_back(a1R);
+                                                                                aKeySet.push_back(a2R);
+                                                                                aKeySet.push_back(a3R);
+                                                                                aKeySet.push_back(a1NB2);
+                                                                                aKeySet.push_back(a2NB2);
+                                                                                aKeySet.push_back(a3NB2);
+                                                                                aKeySet.push_back(a1NB);
+                                                                                aKeySet.push_back(a2NB);
+                                                                                aKeySet.push_back(a3NB);
+                                                                                aKeySet.push_back(a1M);
+                                                                                aKeySet.push_back(a2M);
+                                                                                aKeySet.push_back(a3M);
+                                                                                int aLev =1;
+                                                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            // iFind15 failed a2C not matches
+                                                                            std::vector<std::string>    aKeySet;
+                                                                            
+                                                                            aKeySet.push_back(R3A);
+                                                                            aKeySet.push_back(a1R);
+                                                                            aKeySet.push_back(a2R);
+                                                                            aKeySet.push_back(a3R);
+                                                                            aKeySet.push_back(a1NB2);
+                                                                            aKeySet.push_back(a2NB2);
+                                                                            aKeySet.push_back(a3NB2);
+                                                                            aKeySet.push_back(a1NB);
+                                                                            aKeySet.push_back(a2NB);
+                                                                            aKeySet.push_back(a3NB);
+                                                                            aKeySet.push_back(a1M);
+                                                                            aKeySet.push_back(a2M);
+                                                                            aKeySet.push_back(a3M);
+                                                                            int aLev =1;
+                                                                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        // iFind14 failed a1C not matches
+                                                                        std::vector<std::string>    aKeySet;
+                                                                        aKeySet.push_back(R3A);
+                                                                        aKeySet.push_back(a1R);
+                                                                        aKeySet.push_back(a2R);
+                                                                        aKeySet.push_back(a3R);
+                                                                        
+                                                                        aKeySet.push_back(a1NB2);
+                                                                        aKeySet.push_back(a2NB2);
+                                                                        aKeySet.push_back(a3NB2);
+                                                                        aKeySet.push_back(a1NB);
+                                                                        aKeySet.push_back(a2NB);
+                                                                        aKeySet.push_back(a3NB);
+                                                                        aKeySet.push_back(a1M);
+                                                                        aKeySet.push_back(a2M);
+                                                                        aKeySet.push_back(a3M);
+                                                                        int aLev =1;
+                                                                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                    }
                                                                 }
                                                                 else
                                                                 {
-                                                                    iAN->value = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                 [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].value;
-                                                                    iAN->sigValue = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                    [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].sigValue;
-                                                                    iAN->numCodValues = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                        [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].numCodValues;
-                                                                    iAN->hasCodValue  = true;
-                                                                    iAN->levelCodValue = 1;
+                                                                    // iFind13 failed a3M matches
+                                                                    std::vector<std::string>    aKeySet;
+                                                                    aKeySet.push_back(R3A);
+                                                                    aKeySet.push_back(a1R);
+                                                                    aKeySet.push_back(a2R);
+                                                                    aKeySet.push_back(a3R);
+                                                                    
+                                                                    aKeySet.push_back(a1NB2);
+                                                                    aKeySet.push_back(a2NB2);
+                                                                    aKeySet.push_back(a3NB2);
+                                                                    aKeySet.push_back(a1NB);
+                                                                    aKeySet.push_back(a2NB);
+                                                                    aKeySet.push_back(a3NB);
+                                                                        
+                                                                    int aLev =2;
+                                                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                // iFind12 failed a3C
-                                                                iAN->value = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                 [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].value;
-                                                                iAN->sigValue = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                 [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].sigValue;
-                                                                iAN->numCodValues = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                 [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].numCodValues;
-                                                                iAN->hasCodValue  = true;
-                                                                iAN->levelCodValue = 1;   
+                                                                // iFind12 failed and a2M not matches
+                                                                std::vector<std::string>    aKeySet;
+                                                                aKeySet.push_back(R3A);
+                                                                aKeySet.push_back(a1R);
+                                                                aKeySet.push_back(a2R);
+                                                                aKeySet.push_back(a3R);
+                                                                
+                                                                aKeySet.push_back(a1NB2);
+                                                                aKeySet.push_back(a2NB2);
+                                                                aKeySet.push_back(a3NB2);
+                                                                aKeySet.push_back(a1NB);
+                                                                aKeySet.push_back(a2NB);
+                                                                aKeySet.push_back(a3NB);
+                                                                        
+                                                                int aLev =2;
+                                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            //iFind11 failed a2C
-                                                            iAN->value = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                         [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].value;
-                                                            iAN->sigValue = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                         [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].sigValue;
-                                                            iAN->numCodValues = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                         [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].numCodValues;
-                                                            iAN->hasCodValue  = true;
-                                                            iAN->levelCodValue = 1;
-                                                        }                  
+                                                            // iFind11 failed and a1M not matches
+                                                            std::vector<std::string>    aKeySet;
+                                                            aKeySet.push_back(R3A);
+                                                            aKeySet.push_back(a1R);
+                                                            aKeySet.push_back(a2R);
+                                                            aKeySet.push_back(a3R);
+                                                            
+                                                            aKeySet.push_back(a1NB2);
+                                                            aKeySet.push_back(a2NB2);
+                                                            aKeySet.push_back(a3NB2);
+                                                            aKeySet.push_back(a1NB);
+                                                            aKeySet.push_back(a2NB);
+                                                            aKeySet.push_back(a3NB);
+                                                                        
+                                                            int aLev =2;
+                                                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        //iFind10 failed a1C
-                                                        iAN->value = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                       [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].value;
-                                                        iAN->sigValue = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                          [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].sigValue;
-                                                        iAN->numCodValues = allDictAnglesIdx1D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2]
-                                                                                        [a1NB][a2NB][a3NB][a1M][a2M][a3M][0].numCodValues;
-                                                        iAN->hasCodValue  = true;
-                                                        iAN->levelCodValue = 1;
+                                                        //iFind10 failed  a3NB not matches
+                                                        std::vector<std::string>    aKeySet;
+                                                        aKeySet.push_back(R3A);
+                                                        aKeySet.push_back(a1R);
+                                                        aKeySet.push_back(a2R);
+                                                        aKeySet.push_back(a3R);
                                                         
-                                                    }    
-                                                }
-                                                else // iFind9 failed a3M
-                                                {
-                                                    //aValueSet   tVaS;
-                                                    //setValueSet(tVaS, allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB]);
-                                                    
-                                                    iAN->value         = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].value;
-                                                    iAN->sigValue      = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].sigValue;
-                                                    if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
-                                                    {
-                                                       iAN->sigValue = 3.0;
+                                                        aKeySet.push_back(a1NB2);
+                                                        aKeySet.push_back(a2NB2);
+                                                        aKeySet.push_back(a3NB2);
+                                                        
+                                                        int aLev =3;
+                                                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                                     }
-                                                    iAN->numCodValues  = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].numCodValues;
-                                                    iAN->levelCodValue = 1;
+                                                }
+                                                else
+                                                {
+                                                    //iFind9 failed a2NB not matches
+                                                    std::vector<std::string>    aKeySet;
+                                                    aKeySet.push_back(R3A);
+                                                    aKeySet.push_back(a1R);
+                                                    aKeySet.push_back(a2R);
+                                                    aKeySet.push_back(a3R);
                                                     
+                                                    aKeySet.push_back(a1NB2);
+                                                    aKeySet.push_back(a2NB2);
+                                                    aKeySet.push_back(a3NB2);
+                                                    
+                                                    int aLev =3;
+                                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                                 }
                                             }
-                                            else // iFind8 failed a2M
+                                            else
                                             {
-                                                //aValueSet   tVaS;
-                                                //setValueSet(tVaS, allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB]);
-                                                    
-                                                iAN->value        = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].value;        
-                                                iAN->sigValue     = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].sigValue;
-                                                if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
-                                                {
-                                                    iAN->sigValue = 3.0;
-                                                }
-                                                iAN->numCodValues = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].numCodValues;
-                                                    
-                                                iAN->levelCodValue = 1;
+                                                //iFind8 failed a1NB not matches
+                                                std::vector<std::string>    aKeySet;
+                                                aKeySet.push_back(R3A);
+                                                aKeySet.push_back(a1R);
+                                                aKeySet.push_back(a2R);
+                                                aKeySet.push_back(a3R);
                                                 
+                                                aKeySet.push_back(a1NB2);
+                                                aKeySet.push_back(a2NB2);
+                                                aKeySet.push_back(a3NB2);
+                                                
+                                                int aLev =3;
+                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                             }
                                         }
-                                        else //iFind7 failed a1M
+                                        else
                                         {
+                                            //iFind7 failed a3NB2 not matches
+                                            std::vector<std::string>    aKeySet;
+                                            aKeySet.push_back(R3A);
+                                            aKeySet.push_back(a1R);
+                                            aKeySet.push_back(a2R);
+                                            aKeySet.push_back(a3R);
                                             
-                                            //aValueSet   tVaS;
-                                            //setValueSet(tVaS, allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB]);
-                                                    
-                                            iAN->value          = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].value;        
-                                            iAN->sigValue       = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].sigValue;
-                                            if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
-                                            {
-                                                iAN->sigValue = 3.0;
-                                            }
-                                            iAN->numCodValues   = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].numCodValues;                        
-                                            iAN->levelCodValue = 1;
-                                            
+                                            int aLev =4;
+                                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                         }
+                                    }
+                                    else
+                                    {
+                                        //iFind6 failed a2NB2 not matches
+                                        std::vector<std::string>    aKeySet;
+                                        aKeySet.push_back(R3A);
+                                        aKeySet.push_back(a1R);
+                                        aKeySet.push_back(a2R);
+                                        aKeySet.push_back(a3R);
                                         
-                                    }
-                                    else // iFind6 failed a3NB 
-                                    {
-                                        /*
-                                        std::vector<aValueSet> tDictANs;
-                                        for (std::map<ID, std::vector<aValueSet> >::iterator iDictANs1 
-                                             = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].begin();
-                                             iDictANs1 !=
-                                             allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB].end();
-                                             iDictANs1++)
-                                        {
-                                            for(std::vector<aValueSet>::iterator iDictANs2
-                                                = iDictANs1->second.begin(); 
-                                                iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                                            {
-                                                tDictANs.push_back(*iDictANs2);
-                                            }
-                                        }
-
-                                        aValueSet   tVaS;
-                                            
-                                        setValueSet(tVaS, tDictANs);
-                                        **/
-                                        
-                                        iAN->value             = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].value;        
-                                        iAN->sigValue          = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].sigValue;
-                                        if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
-                                        {
-                                            iAN->sigValue = 3.0;
-                                        }
-                                        iAN->numCodValues      = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].numCodValues;                        
-                                        
-                                        iAN->levelCodValue = 2;
+                                        int aLev =4;
+                                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                     }
                                 }
-                                else // iFind5 failed a2NB
-                                {   /*
-                                    std::vector<aValueSet> tDictANs;
-                                    
-                                    for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iDictANs1 
-                                             = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].begin();
-                                             iDictANs1 !=
-                                             allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB].end();
-                                             iDictANs1++)
-                                    {
-                                        for(std::map<ID, std::vector<aValueSet> >::iterator iDictANs2
-                                                = iDictANs1->second.begin(); 
-                                                iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                                        {
-                                            for(std::vector<aValueSet>::iterator iDictANs3
-                                                   = iDictANs2->second.begin(); 
-                                                  iDictANs3 != iDictANs2->second.end(); iDictANs3++)
-                                            {
-                                                tDictANs.push_back(*iDictANs2);
-                                            }
-                                            
-                                        }
-                                    }
-
-                                    aValueSet   tVaS;
-                                            
-                                    setValueSet(tVaS, tDictANs);
-                                    */                
-                                    iAN->value             = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].value;        
-                                    iAN->sigValue          = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].sigValue;
-                                    if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
-                                    {
-                                        iAN->sigValue = 3.0;
-                                    }
-                                    iAN->numCodValues      = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].numCodValues;                           
-                                    iAN->levelCodValue = 2;
-                                }
-                            }
-                            else // iFind4 a1NB
-                            {
-                                /*
-                                std::vector<aValueSet> tDictANs;
-                                    
-                                for (std::map<ID, std::map<ID, std::map<ID, std::vector<aValueSet> > > >::iterator iDictANs1 
-                                       = allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].begin();
-                                     iDictANs1 != allDictAnglesIdx2D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2].end();
-                                             iDictANs1++)
+                                else
                                 {
-                                    for(std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iDictANs2
-                                            = iDictANs1->second.begin(); 
-                                            iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                                    {
-                                        for(std::map<ID, std::vector<aValueSet> >::iterator iDictANs3
-                                             = iDictANs2->second.begin(); 
-                                            iDictANs3 != iDictANs2->second.end(); iDictANs3++)
-                                        { 
-                                            for(std::vector<aValueSet>::iterator iDictANs4 =
-                                                  iDictANs3->second.begin();
-                                                iDictANs4 != iDictANs3->second.end(); iDictANs4++)
-                                            {
-                                                tDictANs.push_back(*iDictANs4);
-                                            }
-                                        }   
-                                    }
-                                }
-
-                                aValueSet   tVaS;
+                                    //iFind5 failed a1NB2 not matches
+                                    std::vector<std::string>    aKeySet;
+                                    aKeySet.push_back(R3A);
+                                    aKeySet.push_back(a1R);
+                                    aKeySet.push_back(a2R);
+                                    aKeySet.push_back(a3R);
                                             
-                                setValueSet(tVaS, tDictANs);
-                                */
-                                
-                                iAN->value             = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].value;        
-                                iAN->sigValue          = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].sigValue;
-                                if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
-                                {
-                                    iAN->sigValue  = 3.0;
-                                }
-                                iAN->numCodValues  = allDictAnglesIdx3D[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].numCodValues;                           
-                                    
-                                iAN->levelCodValue = 2;
-                                
-                            }
-                        }
-                        else // iFind3 failed a3NB2
-                        {
-                            
-                            std::vector<aValueSet> tDictANs;
-                                    
-                            for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,
-                                 std::map<ID, std::map<ID, std::map<ID, std::map<ID,
-                                 std::map<ID, std::map<ID, int> > > > > > > > > >::iterator iDictANs1 
-                                       = allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2].begin();
-                                   iDictANs1 != allDictAnglesIdxD[ha1][ha2][ha3][a1NB2][a2NB2].end();
-                                             iDictANs1++)
-                            {
-                                for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,
-                                     std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                     std::map<ID, int> > > > > > > > >::iterator iDictANs2 
-                                     = iDictANs1->second.begin(); iDictANs2 !=iDictANs1->second.end(); iDictANs2++)
-                                {
-                                    for (std::map<ID, std::map<ID, std::map<ID,
-                                         std::map<ID, std::map<ID, std::map<ID,
-                                         std::map<ID, std::map<ID, int> > > > > > > >::iterator iDictANs3 
-                                         = iDictANs2->second.begin(); iDictANs3 !=iDictANs2->second.end(); iDictANs3++)
-                                    {
-                                        for (std::map<ID, std::map<ID, std::map<ID,
-                                             std::map<ID, std::map<ID, std::map<ID,
-                                             std::map<ID, int> > > > > > >::iterator iDictANs4 
-                                             = iDictANs3->second.begin(); iDictANs4 !=iDictANs3->second.end(); iDictANs4++)
-                                        {
-                                            for (std::map<ID, std::map<ID, std::map<ID,
-                                                 std::map<ID, std::map<ID, 
-                                                 std::map<ID, int> > > > > >::iterator iDictANs5 
-                                                 = iDictANs4->second.begin(); iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
-                                            {
-                                                for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                                                     std::map<ID, int> > > > >::iterator iDictANs6 
-                                                 = iDictANs5->second.begin(); iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
-                                                {
-                                                    for (std::map<ID, std::map<ID, std::map<ID,   
-                                                         std::map<ID, int> > > >::iterator iDictANs7 
-                                                         = iDictANs6->second.begin(); 
-                                                         iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                                    {
-                                                       for (std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iDictANs8 
-                                                            = iDictANs7->second.begin(); 
-                                                            iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                       {
-                                                           for (std::map<ID, std::map<ID, int> >::iterator iDictANs9 
-                                                            = iDictANs8->second.begin(); 
-                                                            iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
-                                                           {
-                                                               for (std::map<ID, int>::iterator iDictANs10 
-                                                               = iDictANs9->second.begin(); 
-                                                               iDictANs10 !=iDictANs9->second.end(); iDictANs10++)
-                                                               {
-                                                                   tDictANs.push_back(allDictAnglesD[iDictANs10->second]);
-                                                               }
-                                                           }
-                                                       }      
-                                                    }
-                                                }
-                                            }
-                                            
-                                         }    
-                                    }
-                                    
-                                }
-                            }
-                                    
-
-                            aValueSet   tVaS;
-                                            
-                            setValueSet(tVaS, tDictANs);
-                            
-                            if (tVaS.numCodValues >=10 && tVaS.sigValue < 5.00)
-                            {
-                                iAN->value        = tVaS.value;
-                                iAN->sigValue     = tVaS.sigValue;
-                                iAN->numCodValues = tVaS.numCodValues;
+                                    int aLev =4;
+                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                }  
                             }
                             else
                             {
-                                bool aCCP4S=getCCP4Angle(iAN);
-                            
-                                if (!aCCP4S)
-                                {
-                                    iAN->value        = tVaS.value;
-                                    iAN->sigValue     = tVaS.sigValue;
-                                    iAN->numCodValues = tVaS.numCodValues;
-                                }
+                                //iFind4 failed a3R not matches
+                                std::vector<std::string>    aKeySet;
+                                aKeySet.push_back(R3A);
+                                aKeySet.push_back(a1R);
+                                
+                                int aLev =5;
+                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                
                             }
-                            iAN->levelCodValue = 3;
+                        
+                        }
+                        else
+                        {
+                            //iFind3 failed and a2R not matches
+                            std::vector<std::string>    aKeySet;
+                            aKeySet.push_back(R3A);
+                                
+                            int aLev =5;
+                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                            
                         }
                     }
-                    else // iFind2 a2NB2
+                    else
                     {
-                        std::cout << "iFind2 " <<  a2NB2 << std::endl;
-                        std::vector<aValueSet> tDictANs;
-                                    
-                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, int> > > > > > > > > > >::iterator iDictANs1 
-                                = allDictAnglesIdxD[ha1][ha2][ha3][a1NB2].begin();
-                             iDictANs1 != allDictAnglesIdxD[ha1][ha2][ha3][a1NB2].end();
-                             iDictANs1++)
-                        {
-                            for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, int> > > > > > > > > >::iterator iDictANs2 
-                                 = iDictANs1->second.begin(); iDictANs2 !=iDictANs1->second.end(); iDictANs2++)
-                                {
-                                    for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                         std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                         std::map<ID, int> > > > > > > > >::iterator iDictANs3 
-                                         = iDictANs2->second.begin(); iDictANs3 !=iDictANs2->second.end(); iDictANs3++)
-                                    {
-                                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                             std::map<ID, std::map<ID, std::map<ID,
-                                             std::map<ID, int> > > > > > > >::iterator iDictANs4 
-                                             = iDictANs3->second.begin(); iDictANs4 !=iDictANs3->second.end(); iDictANs4++)
-                                        {
-                                            for (std::map<ID, std::map<ID, std::map<ID,
-                                                 std::map<ID, std::map<ID, std::map<ID, 
-                                                 std::map<ID, int> > > > > > >::iterator iDictANs5 
-                                                 = iDictANs4->second.begin(); iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
-                                            {
-                                                for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                                                     std::map<ID, std::map<ID, int> > > > > >::iterator iDictANs6 
-                                                 = iDictANs5->second.begin(); iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
-                                                {
-                                                    for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,   
-                                                         std::map<ID, int> > > > >::iterator iDictANs7 
-                                                         = iDictANs6->second.begin(); 
-                                                         iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                                    {
-                                                       for (std::map<ID, std::map<ID, 
-                                                            std::map<ID, std::map<ID, int> > > >::iterator iDictANs8 
-                                                            = iDictANs7->second.begin(); 
-                                                            iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                       {
-                                                           for (std::map<ID, std::map<ID, std::map<ID, int> > >::iterator iDictANs9 
-                                                            = iDictANs8->second.begin(); 
-                                                            iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
-                                                           {
-                                                               for (std::map<ID, std::map<ID, int> >::iterator iDictANs10 
-                                                               = iDictANs9->second.begin(); 
-                                                               iDictANs10 !=iDictANs9->second.end(); iDictANs10++)
-                                                               {
-                                                                   for (std::map<ID, int>::iterator iDictANs11 
-                                                                        = iDictANs10->second.begin(); 
-                                                                        iDictANs11 !=iDictANs10->second.end(); iDictANs11++)
-                                                                   {
-                                                                        tDictANs.push_back(allDictAnglesD[iDictANs11->second]);
-                                                                   }
-                                                               }
-                                                           }
-                                                       }      
-                                                    }
-                                                }
-                                            }
-                                            
-                                         }    
-                                    }
-                                    
-                                }
-                            }
-                                    
-
-                            aValueSet   tVaS;
-                            setValueSet(tVaS, tDictANs);
-                            
-                            if (tVaS.numCodValues >=10 
-                                 && tVaS.sigValue < 5.00)
-                            {
-                                iAN->value        = tVaS.value;
-                                iAN->sigValue     = tVaS.sigValue;
-                                iAN->numCodValues = tVaS.numCodValues;
-                            }
-                            else
-                            {
-                                bool aCCP4S=getCCP4Angle(iAN);
-                            
-                                if (!aCCP4S)
-                                {
-                                    iAN->value        = tVaS.value;
-                                    iAN->sigValue     = tVaS.sigValue;
-                                    iAN->numCodValues = tVaS.numCodValues;
-                                    
-                                    // Finding the bond with shortest atomic distances 
-                                    // (or the lowest substitute costs)
-                                    /*
-                                    std::vector<AngleDict> tDictANs;
-                                    for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
-                                     std::map<ID, std::map<ID, std::map<ID, 
-                                     std::map<ID, int> > > > > > > >::iterator iDictANs1 
-                                     = allDictAnglesIdx[ha1][ha2][ha3][a1NB2].begin();
-                                     iDictANs1 !=
-                                     allDictAnglesIdx[ha1][ha2][ha3][a1NB2].end();
-                                     iDictANs1++)
-                                {
-                                    for(std::map<ID, std::map <ID, std::map<ID, 
-                                        std::map<ID, std::map<ID, std::map<ID,  
-                                        std::map<ID, int > > > > > > >::iterator iDictANs2
-                                        = iDictANs1->second.begin(); 
-                                        iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                                    {
-                                        for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                            std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs3
-                                            = iDictANs2->second.begin(); 
-                                            iDictANs3 != iDictANs2->second.end(); iDictANs3++)
-                                        {
-                                            for(std::map<ID, std::map <ID, std::map<ID,  
-                                                std::map<ID, std::map<ID, int > > > > >::iterator iDictANs4
-                                                = iDictANs3->second.begin(); 
-                                                iDictANs4 != iDictANs3->second.end(); iDictANs4++)
-                                            {
-                                                for(std::map<ID, std::map <ID, 
-                                                    std::map<ID, std::map<ID, int > > > >::iterator iDictANs5
-                                                    = iDictANs4->second.begin(); 
-                                                    iDictANs5 != iDictANs4->second.end(); iDictANs5++)
-                                                {
-                                                    for (std::map<ID, std::map<ID, std::map<ID, int > > >::iterator iDictANs6
-                                                         =iDictANs5->second.begin();
-                                                         iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
-                                                    {
-                                                        for (std::map<ID, std::map<ID, int > >::iterator iDictANs7
-                                                             =iDictANs6->second.begin();
-                                                             iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                                        {
-                                                            for (std::map<ID, int >::iterator iDictANs8
-                                                                 =iDictANs7->second.begin();
-                                                                 iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                            {
-                                                                tDictANs.push_back(allDictAngles[iDictANs8->second]);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                dLev = 2;
-                                setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
-                                */
-                            }
-                        }
-                        iAN->levelCodValue =3;
+                        //iFind2 failed and a1R not matches
+                        std::vector<std::string>    aKeySet;
+                        aKeySet.push_back(R3A);
+                                
+                        int aLev =5;
+                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                        
                     }
                 }
-                else // iFind1 a1NB2
+                else
                 {
-                    //if (allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues >=10 
-                    //                && allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue < 5.00)
-                   // {
-                   //     iAN->value        = allDictAnglesIdx3[ha1][ha2][ha3][0].value;
-                   //     iAN->sigValue     = allDictAnglesIdx3[ha1][ha2][ha3][0].sigValue;
-                   //     iAN->numCodValues = allDictAnglesIdx3[ha1][ha2][ha3][0].numCodValues;
-                   // }
-                   // else
-                   //
-                    bool aCCP4S=getCCP4Angle(iAN);
-                            
-                    if (!aCCP4S)
+                    // iFind1 failed and R3A not matches
+                    if(R3A !="0" &&
+                       allDictAnglesIdxD[ha1][ha2][ha3].find("0")!=
+                       allDictAnglesIdxD[ha1][ha2][ha3].end())
                     {
-                        std::vector<aValueSet> tDictANs;
-                                    
-                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, std::map<ID, int> > > > > > > > > > > >::iterator iDictANs1 
-                                = allDictAnglesIdxD[ha1][ha2][ha3].begin();
-                             iDictANs1 != allDictAnglesIdxD[ha1][ha2][ha3].end();
-                             iDictANs1++)
+                        std::vector<std::string>    aKeySet;
+                        aKeySet.push_back("0");
+                                
+                        int aLev =5;
+                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                    }
+                    else
+                    {
+                     
+                        if (allAtoms[iAN->atoms[0]].bondingIdx <4)
                         {
-                            for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, int> > > > > > > > > > >::iterator iDictANs2 
-                                 = iDictANs1->second.begin(); iDictANs2 !=iDictANs1->second.end(); iDictANs2++)
-                                {
-                                    for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                         std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                         std::map<ID, std::map<ID, int> > > > > > > > > >::iterator iDictANs3 
-                                         = iDictANs2->second.begin(); iDictANs3 !=iDictANs2->second.end(); iDictANs3++)
-                                    {
-                                        for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                             std::map<ID, std::map<ID, std::map<ID, std::map<ID,
-                                             std::map<ID, int> > > > > > > > >::iterator iDictANs4 
-                                             = iDictANs3->second.begin(); iDictANs4 !=iDictANs3->second.end(); iDictANs4++)
-                                        {
-                                            for (std::map<ID, std::map<ID, std::map<ID,
-                                                 std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                                                 std::map<ID, int> > > > > > > >::iterator iDictANs5 
-                                                 = iDictANs4->second.begin(); iDictANs5 !=iDictANs4->second.end(); iDictANs5++)
-                                            {
-                                                for (std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                                     std::map<ID, std::map<ID, int> > > > > > >::iterator iDictANs6 
-                                                 = iDictANs5->second.begin(); iDictANs6 !=iDictANs5->second.end(); iDictANs6++)
-                                                {
-                                                    for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,   
-                                                         std::map<ID,std::map<ID, int> > > > > >::iterator iDictANs7 
-                                                         = iDictANs6->second.begin(); 
-                                                         iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                                    {
-                                                       for (std::map<ID, std::map<ID, std::map<ID,  
-                                                            std::map<ID, std::map<ID, int> > > > >::iterator iDictANs8 
-                                                            = iDictANs7->second.begin(); 
-                                                            iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                       {
-                                                           for (std::map<ID, std::map<ID, std::map<ID,  
-                                                                std::map<ID, int> > > >::iterator iDictANs9 
-                                                            = iDictANs8->second.begin(); 
-                                                            iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
-                                                           {
-                                                               for (std::map<ID, std::map<ID,  
-                                                                    std::map<ID, int> > >::iterator iDictANs10 
-                                                               = iDictANs9->second.begin(); 
-                                                               iDictANs10 !=iDictANs9->second.end(); iDictANs10++)
-                                                               {
-                                                                   for (std::map<ID, std::map<ID, int> >::iterator iDictANs11 
-                                                                        = iDictANs10->second.begin(); 
-                                                                        iDictANs11 !=iDictANs10->second.end(); iDictANs11++)
-                                                                   {
-                                                                       for (std::map<ID, int>::iterator iDictANs12 
-                                                                            = iDictANs11->second.begin(); 
-                                                                            iDictANs12 !=iDictANs11->second.end(); iDictANs12++)
-                                                                       {
-                                                                           tDictANs.push_back(allDictAnglesD[iDictANs12->second]);
-                                                                       }
-                                                                   }
-                                                               }
-                                                           }
-                                                       }      
-                                                    }
-                                                }
-                                            }
-                                            
-                                         }    
-                                    }
-                                    
-                                }
-                            }
-                                    
-
-                            aValueSet   tVaS;
-                                            
-                            setValueSet(tVaS, tDictANs);
-                            
-                            iAN->value        = tVaS.value;
-                            iAN->sigValue     = tVaS.sigValue;
-                            iAN->numCodValues = tVaS.numCodValues;
-                            
-                            // Finding the bond with shortest atomic distances 
-                            // (or the lowest substitute costs)
-                            
-                            /*
-                            std::vector<AngleDict> tDictANs;
-                            for (std::map<ID, std::map<ID, std::map <ID, std::map<ID,  
-                                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                                 std::map<ID, int> > > > > > > > >::iterator iDictANs1 
-                                 = allDictAnglesIdx[ha1][ha2][ha3].begin();
-                                 iDictANs1 !=
-                                 allDictAnglesIdx[ha1][ha2][ha3].end();
-                                 iDictANs1++)
-                            {
-                                for(std::map<ID, std::map <ID, std::map<ID, 
-                                    std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                                    std::map<ID, int > > > > > > > >::iterator iDictANs2
-                                    = iDictANs1->second.begin(); 
-                                    iDictANs2 != iDictANs1->second.end(); iDictANs2++)
-                                {
-                                    for(std::map<ID, std::map <ID, std::map<ID, 
-                                        std::map<ID, std::map<ID, std::map<ID,  
-                                        std::map<ID, int > > > > > > >::iterator iDictANs3
-                                        = iDictANs2->second.begin(); 
-                                        iDictANs3 != iDictANs2->second.end(); iDictANs3++)
-                                    {
-                                        for(std::map<ID, std::map <ID, std::map<ID, std::map<ID, 
-                                            std::map<ID, std::map<ID, int > > > > > >::iterator iDictANs4
-                                            = iDictANs3->second.begin(); 
-                                            iDictANs4 != iDictANs3->second.end(); iDictANs4++)
-                                        {
-                                            for(std::map<ID, std::map <ID, std::map<ID,  
-                                                std::map<ID, std::map<ID, int > > > > >::iterator iDictANs5
-                                                = iDictANs4->second.begin(); 
-                                                iDictANs5 != iDictANs4->second.end(); iDictANs5++)
-                                            {
-                                                for(std::map<ID, std::map <ID, 
-                                                    std::map<ID, std::map<ID, int > > > >::iterator iDictANs6
-                                                    = iDictANs5->second.begin(); 
-                                                    iDictANs6 != iDictANs5->second.end(); iDictANs6++)
-                                                {
-                                                    for (std::map<ID, std::map<ID, 
-                                                         std::map<ID, int > > >::iterator iDictANs7
-                                                         =iDictANs6->second.begin();
-                                                         iDictANs7 !=iDictANs6->second.end(); iDictANs7++)
-                                                    {
-                                                        for (std::map<ID, std::map<ID, int > >::iterator iDictANs8
-                                                             =iDictANs7->second.begin();
-                                                             iDictANs8 !=iDictANs7->second.end(); iDictANs8++)
-                                                        {
-                                                            for (std::map<ID, int >::iterator iDictANs9
-                                                                 =iDictANs8->second.begin();
-                                                                 iDictANs9 !=iDictANs8->second.end(); iDictANs9++)
-                                                            {
-                                                                tDictANs.push_back(allDictAngles[iDictANs9->second]);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                              
-                            }
-                            dLev = 1;
-                            setupTargetAngleUsingdist2(tDictANs, iAN, s2, s3, dLev);
-                             */
+                            // std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
+                            iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                            iAN->levelCodValue = 4;
                         }
-                    
-                    iAN->levelCodValue =3;
-                
+                        else
+                        {
+                            std::cout << "Could not find COD angle value and even default angle value."
+                                      << std::endl << "The atoms in the target angle are: " << std::endl
+                                      << "The inner atom "   << allAtoms[iAN->atoms[0]].id << std::endl
+                                      << "Its COD class is " << allAtoms[iAN->atoms[0]].codClass << std::endl
+                                      << "The outer atom 1 " << allAtoms[iAN->atoms[1]].id << std::endl
+                                      << "Its COD class is " << allAtoms[iAN->atoms[1]].codClass << std::endl
+                                      << "The outer atom 2 "  << allAtoms[iAN->atoms[2]].id << std::endl
+                                      << "Its COD class is " << allAtoms[iAN->atoms[2]].codClass << std::endl;
+                            exit(1);
+                        }
+                    }
                 }
-                //std::cout << "Final angle is " << iAN->value << std::endl;
-                //if (iAN->hasCodValue)
-                //{
-                //    std::cout << "It has exact matches to a COD angle " << std::endl;
-                //}
-                //else
-                //{
-                //    std::cout << "It is generated by either averaging or shortest distance " << std::endl;
-                //}
-                
-            }
+            }   
             else   
             {
                 // could not find three exact matches on 3 atomic hashing values
@@ -12035,9 +11870,183 @@ namespace LIBMOL
                 }
                  
             }
+            if (iAN->sigValue < 0.1 || iAN->sigValue > 3.0)
+            {
+                iAN->sigValue = 3.0;
+            }
+
+            
+                 
     }
     
-    
+    void CodClassify::levelSearchAngles(std::vector<int>          &      tHa,
+                                        std::vector<std::string>  &      tKeySet,
+                                        int                              tLev,
+                                        std::vector<AngleDict>::iterator iAN)
+    {
+        /*
+        std::cout << " Search level " << tLev << std::endl;
+        std::cout << " Hashing key : " << std::endl;
+        for (std::vector<int>::iterator iH=tHa.begin();
+                iH !=tHa.end(); iH++)
+        {
+            std::cout << *iH << std::endl;
+        }
+        
+        std::cout << "Other search keys : " << std::endl;
+        for (std::vector<std::string>::iterator iK=tKeySet.begin();
+                iK !=tKeySet.end(); iK++)
+        {
+            std::cout << *iK << std::endl;
+        }
+        */
+        if (tLev==0)
+        {
+            int iPos = allDictAnglesIdxD[tHa[0]][tHa[1]][tHa[2]]
+                       [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                       [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                       [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                       [tKeySet[10]][tKeySet[11]][tKeySet[12]]
+                       [tKeySet[13]][tKeySet[14]][tKeySet[15]];
+            //std::cout << "iPos =" << iPos << std::endl;
+            if (allDictAnglesD[iPos].numCodValues >= 5)
+            {
+                iAN->value        = allDictAnglesD[iPos].value;
+                iAN->sigValue     = allDictAnglesD[iPos].sigValue;
+                iAN->numCodValues = allDictAnglesD[iPos].numCodValues;
+                iAN->hasCodValue  = true;
+                iAN->levelCodValue = 0;
+                std::cout << "COD finds the exact value " << iAN->value << std::endl;
+                std::cout << "the sigma value " << iAN->sigValue << std::endl;
+                std::cout << "the number of observation " << iAN->numCodValues << std::endl;
+            }
+            else
+            {
+                iAN->value = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                                               [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                                               [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                                               [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                                               [tKeySet[10]][tKeySet[11]][tKeySet[12]]
+                                               [0].value;
+                iAN->sigValue = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                                               [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                                               [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                                               [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                                               [tKeySet[10]][tKeySet[11]][tKeySet[12]]
+                                               [0].sigValue;
+                                                                                                
+                iAN->numCodValues = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                                               [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                                               [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                                               [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                                               [tKeySet[10]][tKeySet[11]][tKeySet[12]]
+                                               [0].numCodValues;
+                iAN->hasCodValue   = true;
+                iAN->levelCodValue = 1;
+            }
+        }
+        else if (tLev==1)
+        {
+            
+            
+            //std::cout << "Angle value : " << allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+            //             [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+            //             [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+            //             [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+            //             [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].value 
+            //             << std::endl;
+           
+            iAN->value = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                         [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].value;
+            //iAN->sigValue = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+            //             [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+            //             [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+            //             [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+            //             [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].sigValue;                                                                                 
+            //iAN->numCodValues = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+            //             [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+            //             [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+            //             [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+            //             [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].numCodValues;
+            //iAN->hasCodValue   = true;
+            //iAN->levelCodValue = 1;   
+            std::cout << "angle value " << iAN ->value << std::endl;
+            //std::cout << "angle siga " << iAN->sigValue << std::endl;
+            //std::cout << "number of observations  " << iAN->numCodValues << std::endl;
+            
+        }
+        else if (tLev==2)
+        {
+             iAN->value = allDictAnglesIdx2D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]][0].value;
+                         
+            iAN->sigValue = allDictAnglesIdx2D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]][0].sigValue;
+                                                                                                          
+            iAN->numCodValues = allDictAnglesIdx2D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]][0].numCodValues;
+                         
+            iAN->hasCodValue   = false;
+            iAN->levelCodValue = 2;       
+        }
+        else if (tLev==3)
+        {
+            iAN->value = allDictAnglesIdx3D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]][0].value;
+                         
+            iAN->sigValue = allDictAnglesIdx3D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]][0].sigValue;
+                                                                                                          
+            iAN->numCodValues = allDictAnglesIdx3D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]][0].numCodValues;
+                         
+            iAN->hasCodValue   = false;
+            iAN->levelCodValue = 3;
+            
+        }
+        else if (tLev==4)
+        {
+            iAN->value = allDictAnglesIdx4D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]][0].value;
+                         
+            iAN->sigValue = allDictAnglesIdx4D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]][0].sigValue;
+                                                                                                          
+            iAN->numCodValues = allDictAnglesIdx4D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]][0].numCodValues;
+                         
+            iAN->hasCodValue   = false;
+            iAN->levelCodValue = 4;
+            
+        }
+        else if (tLev==5)
+        {
+            iAN->value = allDictAnglesIdx5D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][0].value;
+                         
+            iAN->sigValue = allDictAnglesIdx5D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][0].sigValue;
+                                                                                                          
+            iAN->numCodValues = allDictAnglesIdx5D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][0].numCodValues;
+                         
+            iAN->hasCodValue   = false;
+            iAN->levelCodValue = 5;
+        }
+           
+    }
     
     bool CodClassify::getCCP4Angle(std::vector<AngleDict>::iterator iAN)
     {
@@ -14089,7 +14098,7 @@ namespace LIBMOL
         
         
         // std::cout << "libmol table should be " << libmolTabDir << std::endl;
-        
+
         setupTargetBonds2();
         // setupTargetBondsUsingSqlite();
         
