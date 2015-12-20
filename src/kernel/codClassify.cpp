@@ -11,6 +11,9 @@
 namespace LIBMOL
 {
     
+    
+    
+    
     CodClassify::CodClassify():wSize(1000),
                                libmolTabDir("")
     {    
@@ -210,9 +213,9 @@ namespace LIBMOL
         {
             allTorsions.push_back(*iTor);
         }
-        
-        
+            
         setupSystem();
+        
     }
     
     CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms, 
@@ -3443,23 +3446,15 @@ namespace LIBMOL
                     iAt->bondingIdx = 2;
                 } 
             }
-            else if (iAt->chemType.compare("N")==0)
+            else if (iAt->chemType.compare("N")==0 
+                    || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
+                if(t_len==4 || t_len==3)
                 {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    } 
                     iAt->chiralIdx  = 1;
                     iAt->bondingIdx = 3;  
                 }
-                //else if (t_len==3) // temp
-                //{
-                //    iAt->chiralIdx  = -1;
-                //    iAt->bondingIdx =  2;
-                //}
                 else if (t_len ==2)
                 {
                     iAt->chiralIdx  = 0;
@@ -3479,7 +3474,7 @@ namespace LIBMOL
             {
                 if ((int)iAt->connAtoms.size()==2)
                 {
-                    iAt->bondingIdx = 2;
+                    iAt->bondingIdx = 3;
                 }
                 else if (iAt->connAtoms.size()==1)
                 {
@@ -3528,7 +3523,7 @@ namespace LIBMOL
             else if (iAt->chemType.compare("S")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3)
+                if(t_len==4 || t_len==3 || t_len==2)
                 {
                     if (iAt->chiralIdx ==0)
                     {
@@ -3541,7 +3536,55 @@ namespace LIBMOL
         }
         
         // more conditions 
+        // Do oxygen atom first, to see if an Oxygen atom of two connections 
+        // is sp2. The default one in the above step is sp3 
         
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {   
+            int t_len =0;
+            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                    iConn !=iAt->connAtoms.end(); iConn++)
+            {
+                if(!allAtoms[*iConn].isMetal)
+                {
+                    t_len++;
+                }
+            }
+
+            if (iAt->chemType.compare("O")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                
+                if(t_len==2)
+                {
+                    if (iAt->parCharge ==0.0)
+                    {
+                        bool l_sp2 = false;
+                        for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                                 iCA != iAt->connAtoms.end(); iCA++)
+                        {
+                            if(allAtoms[*iCA].bondingIdx == 2)
+                            {
+                                l_sp2 = true;
+                                break;
+                            }
+                        }
+                        
+                        if (l_sp2)
+                        {
+                            // Now we can say this atom is in sp2 orbits 
+                            iAt->chiralIdx  =  0;
+                            iAt->bondingIdx =  2;
+                        }
+                    }
+                } 
+            }
+            //std::cout << "Again atom " << iAt->id << " its chiralIdx " 
+            //          << iAt->chiralIdx << std::endl;
+        }
+        
+        // Then N and B atoms
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {   
@@ -3573,6 +3616,8 @@ namespace LIBMOL
                                 break;
                             }
                         }
+                        
+                        
                         if (l_sp2)
                         {
                             // Now we can say this atom is in sp2 orbits 
@@ -3776,7 +3821,7 @@ namespace LIBMOL
         // No need for the third round, those could be defined in 
     
         // Check
-        /*
+        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
@@ -3805,9 +3850,8 @@ namespace LIBMOL
                         << " is not a chiral center" << std::endl;
             }
         } 
-        */
-        
        
+        
     }
     
     void CodClassify::groupOrgAtomsToPlanes()
@@ -8483,6 +8527,7 @@ namespace LIBMOL
     
     void CodClassify::groupCodOrgAngles()
     {
+        /*
         try
         {
             //std::string clibMonDir(std::getenv("CLIBD_MON"));
@@ -8553,7 +8598,7 @@ namespace LIBMOL
         {
             std::cout << e.what() << std::endl;
         }
-        
+        */
     }
     
     void CodClassify::setOrgAngleHeadHashList()
@@ -8672,6 +8717,7 @@ namespace LIBMOL
  
     void CodClassify::setOrgAngleHeadHashList22()
     {
+       
         std::map<ID, std::map<ID, std::map<ID, ID> > > allAngIdx;
         
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
@@ -8754,6 +8800,7 @@ namespace LIBMOL
     
     void CodClassify::groupCodOrgAngles2()
     {
+        /*
         setOrgAngleHeadHashList2();
         time_t tStart, tEnd;
         std::time (&tStart);
@@ -8791,12 +8838,12 @@ namespace LIBMOL
                         ha3 = StrToInt(tBuf[2]);
                         
                         //std::cout << ha1 << std::endl;
-                        /*
+                        
                         for (int i=3; i < (int)tBuf.size(); i++)
                         {
                             tBuf[i] = TrimSpaces(tBuf[i]);
                         }
-                        */
+                        
                         
                         allDictAnglesIdx[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]]
                                 =nLine;
@@ -8879,6 +8926,7 @@ namespace LIBMOL
         tDiff = std::difftime(tEnd,tStart);
         std::cout  << "it takes " << std::setprecision(3) <<tDiff 
                    << " seconds to finish group COD angles " << std::endl;
+        */
     }
     
     void CodClassify::groupCodOrgAngles22()
@@ -8919,15 +8967,10 @@ namespace LIBMOL
                         ha2 = StrToInt(tBuf[1]);
                         ha3 = StrToInt(tBuf[2]);
                         
-                        //std::cout << ha1 << std::endl;
-                        /*
-                        for (int i=3; i < (int)tBuf.size(); i++)
-                        {
-                            tBuf[i] = TrimSpaces(tBuf[i]);
-                        }
-                        */
                         
-                        // Exact match  
+                        
+                        // Exact match 
+                        /*
                         allDictAnglesIdxD[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]]
                         [tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]][tBuf[16]][tBuf[17]][tBuf[18]]
                         =nLine;
@@ -8942,7 +8985,7 @@ namespace LIBMOL
                         }
                         aAng.numCodValues  = StrToInt(tBuf[21]);
                         allDictAnglesD.push_back(aAng);
-                        
+                        */
                         
                         // AxM values, AxC not found 
                         aValueSet aAngS1;
@@ -9668,12 +9711,12 @@ namespace LIBMOL
     }
     
     void CodClassify::searchCodOrgAngles(std::vector<AngleDict>::iterator iAN)
-    {    
-            /*
+    {     
+          /*  
             codClassToAtomAng(allAtoms[iAN->atoms[0]].codClass, allAtoms[iAN->atoms[0]]);
             codClassToAtomAng(allAtoms[iAN->atoms[1]].codClass, allAtoms[iAN->atoms[1]]);
             codClassToAtomAng(allAtoms[iAN->atoms[2]].codClass, allAtoms[iAN->atoms[2]]);
-            */
+            
         
             int ha1, ha2, ha3;
             ID a1NB2, a1NB, a1C, a2NB2, a2NB, a2C,a3NB2, a3NB, a3C;
@@ -10388,7 +10431,8 @@ namespace LIBMOL
                 }
                  
             }
-        
+            
+        */
     }
     
     void CodClassify::searchCodOrgAngles2(std::vector<AngleDict>::iterator iAN)
@@ -10397,7 +10441,7 @@ namespace LIBMOL
             codClassToAtomAng(allAtoms[iAN->atoms[0]].codClass, allAtoms[iAN->atoms[0]]);
             codClassToAtomAng(allAtoms[iAN->atoms[1]].codClass, allAtoms[iAN->atoms[1]]);
             codClassToAtomAng(allAtoms[iAN->atoms[2]].codClass, allAtoms[iAN->atoms[2]]);
-            */
+            
         
             int ha1, ha2, ha3, s2, s3;
             ID a1NB2, a1NB, a1C, a2NB2, a2NB, a2C,a3NB2, a3NB, a3C;
@@ -10667,7 +10711,7 @@ namespace LIBMOL
                                                 std::map<ID, int >::iterator iFind9 =
                                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].find(a3C);
                                                 
-                                                /*
+                                                
                                                 if (iFind9 !=allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].end())
                                                 { 
                                                    std::cout << "Found " << a3C << std::endl;
@@ -10677,7 +10721,7 @@ namespace LIBMOL
                                                     std::cout << "not Found " << a3C << " iFind9 " << std::endl;
                                                   // exit(1);
                                                 }
-                                                */
+                                                
                                                 
                                                 if(iFind9 !=
                                                 allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].end())
@@ -10699,7 +10743,7 @@ namespace LIBMOL
                                                 }
                                                 else // iFind9
                                                 {
-                                                    /*
+                                                    
                                                     std::vector<AngleDict> tDictANs;
                                                     for (std::map<ID, int >::iterator iDictANs =
                                                          allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C][a2C].begin();
@@ -10711,7 +10755,7 @@ namespace LIBMOL
                                                     }
                                                     
                                                     setupTargetAngleUsingMean2(tDictANs, iAN, ha1, ha2, ha3, a1NB2, a2NB2, a3NB2);
-                                                    */
+                                                    
                                                     iAN->value        = 
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].value;
                                                     iAN->sigValue     =
@@ -10726,7 +10770,7 @@ namespace LIBMOL
                                                 // Only two outer atom COD code do not match exactly, can still using 
                                                 // the mean value of bonds in the group 
                                                 // allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C]
-                                                /*
+                                                
                                                 std::vector<AngleDict> tDictANs;
                                                 for (std::map<ID, std::map<ID, int > >::iterator iDictANs1 =
                                                      allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][a1C].begin();
@@ -10742,7 +10786,7 @@ namespace LIBMOL
                                                  }
                                                  
                                                 setupTargetAngleUsingMean2(tDictANs, iAN, ha1, ha2, ha3, a1NB2, a2NB2, a3NB2);
-                                                */
+                                                
                                                 iAN->value        = 
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].value;
                                                 iAN->sigValue     =
@@ -10757,7 +10801,7 @@ namespace LIBMOL
                                             // All three COD classes of component atoms do not match, still try using
                                             // the mean value of atom group
                                             // allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB]
-                                            /*
+                                            
                                             std::vector<AngleDict> tDictANs;
                                             for (std::map<ID, std::map<ID, std::map <ID, int> > >::iterator iDictANs1 =
                                                  allDictAnglesIdx[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB].begin();
@@ -10779,7 +10823,7 @@ namespace LIBMOL
                                             }
                                             
                                             setupTargetAngleUsingMean2(tDictANs, iAN, ha1, ha2, ha3, a1NB2, a2NB2, a3NB2);
-                                            */
+                                            
                                             iAN->value        = 
                                                     allDictAnglesIdx1[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][a1NB][a2NB][a3NB][0].value;
                                             iAN->sigValue     =
@@ -10820,14 +10864,14 @@ namespace LIBMOL
 
                                         setupTargetAngleUsingMean2(tDictANs, iAN, ha1, ha2, ha3, a1NB2, a2NB2, a3NB2);
                                         iAN->levelCodValue = 2;
-                                        /*                                        
+                                                                             
                                         iAN->value        = 
                                                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].value;
                                         iAN->sigValue     =
                                                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].sigValue;
                                         iAN->numCodValues = 
                                                     allDictAnglesIdx2[ha1][ha2][ha3][a1NB2][a2NB2][a3NB2][0].numCodValues;
-                                        */
+                                        
                                     }
                                 }
                                 else // iFind5
@@ -11166,6 +11210,7 @@ namespace LIBMOL
                 }
                  
             }
+             */
     }
     
     void CodClassify::searchCodOrgAngles22(std::vector<AngleDict>::iterator iAN)
@@ -11382,97 +11427,97 @@ namespace LIBMOL
             hashSet.push_back(ha2);
             hashSet.push_back(ha3);
             
-            if(allDictAnglesIdxD.find(ha1) != allDictAnglesIdxD.end() &&
-               allDictAnglesIdxD[ha1].find(ha2) != allDictAnglesIdxD[ha1].end() &&
-               allDictAnglesIdxD[ha1][ha2].find(ha3) != allDictAnglesIdxD[ha1][ha2].end())
+            if(allDictAnglesIdx1D.find(ha1) != allDictAnglesIdx1D.end() &&
+               allDictAnglesIdx1D[ha1].find(ha2) != allDictAnglesIdx1D[ha1].end() &&
+               allDictAnglesIdx1D[ha1][ha2].find(ha3) != allDictAnglesIdx1D[ha1][ha2].end())
             {
                 std::cout << "Find ha1 " << ha1 << std::endl;
                 std::cout << "Find ha2 " << ha2 << std::endl;
                 std::cout << "Find ha3 " << ha3 << std::endl;
                 
-                if(allDictAnglesIdxD[ha1][ha2][ha3].find(R3A) != allDictAnglesIdxD[ha1][ha2][ha3].end())
+                if(allDictAnglesIdx1D[ha1][ha2][ha3].find(R3A) != allDictAnglesIdx1D[ha1][ha2][ha3].end())
                 {
                     // iFind1 R3A matches
                     std::cout << "Found " << R3A << std::endl;
-                    if(allDictAnglesIdxD[ha1][ha2][ha3][R3A].find(a1R) != allDictAnglesIdxD[ha1][ha2][ha3][R3A].end())
+                    if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A].find(a1R) != allDictAnglesIdx1D[ha1][ha2][ha3][R3A].end())
                     {
                         //iFind2 a1R matches
                         std::cout << "Found " << a1R << std::endl;
-                        if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R].find(a2R) 
-                             != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R].end())
+                        if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R].find(a2R) 
+                             != allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R].end())
                         {
                             //iFind3 a2R matches
                             std::cout << "Found " << a2R << std::endl;
-                            if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R].find(a3R) 
-                               != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R].end())
+                            if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R].find(a3R) 
+                               != allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R].end())
                             {
                                 //iFind4 a3R matches
                                 std::cout << "Found " << a3R << std::endl;
-                                if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R].find(a1NB2) 
-                                   != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R].end())
+                                if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R].find(a1NB2) 
+                                   != allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R].end())
                                 {
                                     //iFind5 a1NB2 matches
                                     std::cout << "Found " << a1NB2 << std::endl;
-                                    if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                    if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
                                        [a1NB2].find(a2NB2) 
-                                       != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                       != allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
                                           [a1NB2].end())
                                     {
                                         //iFind6 a2NB2 matches
                                         std::cout << "Found " << a2NB2 << std::endl;
-                                        if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                        if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
                                            [a1NB2][a2NB2].find(a3NB2) 
-                                           != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                           != allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
                                            [a1NB2][a2NB2].end())
                                         {
                                             //iFind7 a3NB2 matches
                                             std::cout << "Found " << a3NB2 << std::endl;
-                                            if(allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                            if(allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
                                                [a1NB2][a2NB2][a3NB2].find(a1NB) 
-                                               != allDictAnglesIdxD[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
+                                               != allDictAnglesIdx1D[ha1][ha2][ha3][R3A][a1R][a2R][a3R]
                                                [a1NB2][a2NB2][a3NB2].end())
                                             {
                                                 //iFind8 a1NB matches
                                                 std::cout << "Found " << a1NB << std::endl;
-                                                if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                if(allDictAnglesIdx1D[ha1][ha2][ha3]
                                                    [R3A][a1R][a2R][a3R]
                                                    [a1NB2][a2NB2][a3NB2]
                                                    [a1NB].find(a2NB) 
-                                                   != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                   != allDictAnglesIdx1D[ha1][ha2][ha3]
                                                    [R3A][a1R][a2R][a3R]
                                                    [a1NB2][a2NB2][a3NB2]
                                                    [a1NB].end())
                                                 {
                                                     //iFind9 a2NB matches
                                                     std::cout << "Found " << a2NB << std::endl;
-                                                    if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                    if(allDictAnglesIdx1D[ha1][ha2][ha3]
                                                        [R3A][a1R][a2R][a3R]
                                                        [a1NB2][a2NB2][a3NB2]
                                                        [a1NB][a2NB].find(a3NB) 
-                                                       != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                       != allDictAnglesIdx1D[ha1][ha2][ha3]
                                                        [R3A][a1R][a2R][a3R]
                                                        [a1NB2][a2NB2][a3NB2]
                                                        [a1NB][a2NB].end())
                                                     {
                                                         //iFind10 a3NB matches
                                                         std::cout << "Found " << a3NB << std::endl;
-                                                        if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                        if(allDictAnglesIdx1D[ha1][ha2][ha3]
                                                            [R3A][a1R][a2R][a3R]
                                                            [a1NB2][a2NB2][a3NB2]
                                                            [a1NB][a2NB][a3NB].find(a1M) 
-                                                           != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                           != allDictAnglesIdx1D[ha1][ha2][ha3]
                                                            [R3A][a1R][a2R][a3R]
                                                            [a1NB2][a2NB2][a3NB2]
                                                            [a1NB][a2NB][a3NB].end())
                                                         {
                                                             // iFind11 a1M matches
                                                             std::cout << "Found " << a1M << std::endl;
-                                                            if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                            if(allDictAnglesIdx1D[ha1][ha2][ha3]
                                                                [R3A][a1R][a2R][a3R]
                                                                [a1NB2][a2NB2][a3NB2]
                                                                [a1NB][a2NB][a3NB]
                                                                [a1M].find(a2M) 
-                                                               != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                               != allDictAnglesIdx1D[ha1][ha2][ha3]
                                                                [R3A][a1R][a2R][a3R]
                                                                [a1NB2][a2NB2][a3NB2]
                                                                [a1NB][a2NB][a3NB]
@@ -11480,12 +11525,12 @@ namespace LIBMOL
                                                             {
                                                                 // iFind12 a2M matches
                                                                 std::cout << "Found " << a2M << std::endl;
-                                                                if(allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                if(allDictAnglesIdx1D[ha1][ha2][ha3]
                                                                    [R3A][a1R][a2R][a3R]
                                                                    [a1NB2][a2NB2][a3NB2]
                                                                    [a1NB][a2NB][a3NB]
                                                                    [a1M][a2M].find(a3M) 
-                                                                   != allDictAnglesIdxD[ha1][ha2][ha3]
+                                                                   != allDictAnglesIdx1D[ha1][ha2][ha3]
                                                                    [R3A][a1R][a2R][a3R]
                                                                    [a1NB2][a2NB2][a3NB2]
                                                                    [a1NB][a2NB][a3NB]
@@ -11493,135 +11538,25 @@ namespace LIBMOL
                                                                 {
                                                                     // iFind13 a3M matches
                                                                     std::cout << "Found " << a3M << std::endl;
-                                                                    if(allDictAnglesIdxD[ha1][ha2][ha3]
-                                                                       [R3A][a1R][a2R][a3R]
-                                                                       [a1NB2][a2NB2][a3NB2]
-                                                                       [a1NB][a2NB][a3NB]
-                                                                       [a1M][a2M][a3M].find(a1C) 
-                                                                       != allDictAnglesIdxD[ha1][ha2][ha3]
-                                                                       [R3A][a1R][a2R][a3R]
-                                                                       [a1NB2][a2NB2][a3NB2]
-                                                                       [a1NB][a2NB][a3NB]
-                                                                       [a1M][a2M][a3M].end())
-                                                                    {
-                                                                        // iFind14 a1C matches
-                                                                        std::cout << "Found " << a1C << std::endl;
-                                                                        if(allDictAnglesIdxD[ha1][ha2][ha3]
-                                                                           [R3A][a1R][a2R][a3R]
-                                                                           [a1NB2][a2NB2][a3NB2]
-                                                                           [a1NB][a2NB][a3NB]
-                                                                           [a1M][a2M][a3M]
-                                                                           [a1C].find(a2C) 
-                                                                           != allDictAnglesIdxD[ha1][ha2][ha3]
-                                                                           [R3A][a1R][a2R][a3R]
-                                                                           [a1NB2][a2NB2][a3NB2]
-                                                                           [a1NB][a2NB][a3NB]
-                                                                           [a1M][a2M][a3M]
-                                                                           [a1C].end())
-                                                                        {
-                                                                            // iFind15 a2C matches
-                                                                            std::cout << "Found " << a2C << std::endl;
-                                                                            if(allDictAnglesIdxD[ha1][ha2][ha3]
-                                                                               [R3A][a1R][a2R][a3R]
-                                                                               [a1NB2][a2NB2][a3NB2]
-                                                                               [a1NB][a2NB][a3NB]
-                                                                               [a1M][a2M][a3M]
-                                                                               [a1C][a2C].find(a3C) 
-                                                                               != allDictAnglesIdxD[ha1][ha2][ha3]
-                                                                               [R3A][a1R][a2R][a3R]
-                                                                               [a1NB2][a2NB2][a3NB2]
-                                                                               [a1NB][a2NB][a3NB]
-                                                                               [a1M][a2M][a3M]
-                                                                               [a1C][a2C].end())
-                                                                            {
-                                                                                // iFind16 a3C matches
-                                                                                // Everything exactly matches
-                                                                                std::cout << "Found " << a3C << std::endl;
-                                                                                std::vector<std::string>    aKeySet;
-                                                                                aKeySet.push_back(R3A);
-                                                                                aKeySet.push_back(a1R);
-                                                                                aKeySet.push_back(a2R);
-                                                                                aKeySet.push_back(a3R);
-                                                                                aKeySet.push_back(a1NB2);
-                                                                                aKeySet.push_back(a2NB2);
-                                                                                aKeySet.push_back(a3NB2);
-                                                                                aKeySet.push_back(a1NB);
-                                                                                aKeySet.push_back(a2NB);
-                                                                                aKeySet.push_back(a3NB);
-                                                                                aKeySet.push_back(a1M);
-                                                                                aKeySet.push_back(a2M);
-                                                                                aKeySet.push_back(a3M);
-                                                                                aKeySet.push_back(a1C);
-                                                                                aKeySet.push_back(a2C);
-                                                                                aKeySet.push_back(a3C);
-                                                                                int aLev =0;
-                                                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
-                                                                                 
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                // iFind16 failed a3C not matches
-                                                                                std::vector<std::string>    aKeySet;
-                                                                                aKeySet.push_back(R3A);
-                                                                                aKeySet.push_back(a1R);
-                                                                                aKeySet.push_back(a2R);
-                                                                                aKeySet.push_back(a3R);
-                                                                                aKeySet.push_back(a1NB2);
-                                                                                aKeySet.push_back(a2NB2);
-                                                                                aKeySet.push_back(a3NB2);
-                                                                                aKeySet.push_back(a1NB);
-                                                                                aKeySet.push_back(a2NB);
-                                                                                aKeySet.push_back(a3NB);
-                                                                                aKeySet.push_back(a1M);
-                                                                                aKeySet.push_back(a2M);
-                                                                                aKeySet.push_back(a3M);
-                                                                                int aLev =1;
-                                                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
-                                                                            }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            // iFind15 failed a2C not matches
-                                                                            std::vector<std::string>    aKeySet;
-                                                                            
-                                                                            aKeySet.push_back(R3A);
-                                                                            aKeySet.push_back(a1R);
-                                                                            aKeySet.push_back(a2R);
-                                                                            aKeySet.push_back(a3R);
-                                                                            aKeySet.push_back(a1NB2);
-                                                                            aKeySet.push_back(a2NB2);
-                                                                            aKeySet.push_back(a3NB2);
-                                                                            aKeySet.push_back(a1NB);
-                                                                            aKeySet.push_back(a2NB);
-                                                                            aKeySet.push_back(a3NB);
-                                                                            aKeySet.push_back(a1M);
-                                                                            aKeySet.push_back(a2M);
-                                                                            aKeySet.push_back(a3M);
-                                                                            int aLev =1;
-                                                                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        // iFind14 failed a1C not matches
-                                                                        std::vector<std::string>    aKeySet;
-                                                                        aKeySet.push_back(R3A);
-                                                                        aKeySet.push_back(a1R);
-                                                                        aKeySet.push_back(a2R);
-                                                                        aKeySet.push_back(a3R);
+                                                                    
+                                                                    // iFind14 failed a1C not matches
+                                                                    std::vector<std::string>    aKeySet;
+                                                                    aKeySet.push_back(R3A);
+                                                                    aKeySet.push_back(a1R);
+                                                                    aKeySet.push_back(a2R);
+                                                                    aKeySet.push_back(a3R);
                                                                         
-                                                                        aKeySet.push_back(a1NB2);
-                                                                        aKeySet.push_back(a2NB2);
-                                                                        aKeySet.push_back(a3NB2);
-                                                                        aKeySet.push_back(a1NB);
-                                                                        aKeySet.push_back(a2NB);
-                                                                        aKeySet.push_back(a3NB);
-                                                                        aKeySet.push_back(a1M);
-                                                                        aKeySet.push_back(a2M);
-                                                                        aKeySet.push_back(a3M);
-                                                                        int aLev =1;
-                                                                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
-                                                                    }
+                                                                    aKeySet.push_back(a1NB2);
+                                                                    aKeySet.push_back(a2NB2);
+                                                                    aKeySet.push_back(a3NB2);
+                                                                    aKeySet.push_back(a1NB);
+                                                                    aKeySet.push_back(a2NB);
+                                                                    aKeySet.push_back(a3NB);
+                                                                    aKeySet.push_back(a1M);
+                                                                    aKeySet.push_back(a2M);
+                                                                    aKeySet.push_back(a3M);
+                                                                    int aLev =1;
+                                                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
                                                                 }
                                                                 else
                                                                 {
@@ -11812,8 +11747,8 @@ namespace LIBMOL
                 {
                     // iFind1 failed and R3A not matches
                     if(R3A !="0" &&
-                       allDictAnglesIdxD[ha1][ha2][ha3].find("0")!=
-                       allDictAnglesIdxD[ha1][ha2][ha3].end())
+                       allDictAnglesIdx1D[ha1][ha2][ha3].find("0")!=
+                       allDictAnglesIdx1D[ha1][ha2][ha3].end())
                     {
                         std::vector<std::string>    aKeySet;
                         aKeySet.push_back("0");
@@ -11899,7 +11834,7 @@ namespace LIBMOL
         {
             std::cout << *iK << std::endl;
         }
-        */
+        
         if (tLev==0)
         {
             int iPos = allDictAnglesIdxD[tHa[0]][tHa[1]][tHa[2]]
@@ -11945,38 +11880,62 @@ namespace LIBMOL
                 iAN->levelCodValue = 1;
             }
         }
-        else if (tLev==1)
+         */
+        if (tLev==1)
         {
-            
-            
             //std::cout << "Angle value : " << allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
             //             [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
             //             [tKeySet[4]][tKeySet[5]][tKeySet[6]]
             //             [tKeySet[7]][tKeySet[8]][tKeySet[9]]
             //             [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].value 
             //             << std::endl;
-           
-            iAN->value = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+            if (allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                                  [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                                  [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                                  [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                                  [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].numCodValues >=5 )
+            {
+                iAN->value = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                            [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                            [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                            [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                            [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].value;
+                iAN->sigValue = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                            [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                            [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                            [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                            [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].sigValue;                                                                                 
+                iAN->numCodValues = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
+                            [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                            [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                            [tKeySet[7]][tKeySet[8]][tKeySet[9]]
+                            [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].numCodValues;
+                iAN->hasCodValue   = true;
+                iAN->levelCodValue = 1;
+            }
+            else
+            {
+                iAN->value = allDictAnglesIdx2D[tHa[0]][tHa[1]][tHa[2]]
                          [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
                          [tKeySet[4]][tKeySet[5]][tKeySet[6]]
-                         [tKeySet[7]][tKeySet[8]][tKeySet[9]]
-                         [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].value;
-            //iAN->sigValue = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
-            //             [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
-            //             [tKeySet[4]][tKeySet[5]][tKeySet[6]]
-            //             [tKeySet[7]][tKeySet[8]][tKeySet[9]]
-            //             [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].sigValue;                                                                                 
-            //iAN->numCodValues = allDictAnglesIdx1D[tHa[0]][tHa[1]][tHa[2]]
-            //             [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
-            //             [tKeySet[4]][tKeySet[5]][tKeySet[6]]
-            //             [tKeySet[7]][tKeySet[8]][tKeySet[9]]
-            //             [tKeySet[10]][tKeySet[11]][tKeySet[12]][0].numCodValues;
-            //iAN->hasCodValue   = true;
-            //iAN->levelCodValue = 1;   
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]][0].value;
+                         
+                iAN->sigValue = allDictAnglesIdx2D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]][0].sigValue;
+                                                                                                          
+                iAN->numCodValues = allDictAnglesIdx2D[tHa[0]][tHa[1]][tHa[2]]
+                         [tKeySet[0]][tKeySet[1]][tKeySet[2]][tKeySet[3]]
+                         [tKeySet[4]][tKeySet[5]][tKeySet[6]]
+                         [tKeySet[7]][tKeySet[8]][tKeySet[9]][0].numCodValues;
+                         
+                iAN->hasCodValue   = false;
+                iAN->levelCodValue = 2; 
+            }
             std::cout << "angle value " << iAN ->value << std::endl;
-            //std::cout << "angle siga " << iAN->sigValue << std::endl;
-            //std::cout << "number of observations  " << iAN->numCodValues << std::endl;
-            
+            std::cout << "angle siga "  << iAN->sigValue << std::endl;
+            std::cout << "number of observations  " << iAN->numCodValues << std::endl;
         }
         else if (tLev==2)
         {
@@ -12085,194 +12044,6 @@ namespace LIBMOL
         
         return aFound;
     }
-    
-    /*
-    void CodClassify::searchOneOrgAngleFromCodUsingSqlite(sqlite3* tCombDB, 
-                                                          std::vector<AngleDict>::iterator iAN)
-    {
-            int ha1, ha2, ha3;
-            ID a1NB2, a1NB, a1C, a2NB2, a2NB, a2C,a3NB2, a3NB, a3C;
-            ID id2, id3;
-            ha1   = allAtoms[iAN->atoms[0]].hashingValue;
-            a1NB2 = allAtoms[iAN->atoms[0]].codNB2Symb;
-            a1NB  = allAtoms[iAN->atoms[0]].codNBSymb;
-            a1C   = allAtoms[iAN->atoms[0]].codClass;
-            
-            std::cout << "Atom1 " <<  allAtoms[iAN->atoms[0]].id 
-                      << " Its Cod class " <<  a1C <<  " and Hashing "
-                      << ha1 <<std::endl;
-            std::cout << " Its codNBSymb " <<  a1NB << " its codNB2Symb " << a1NB2 << std::endl;
-           
-            
-            if ((int)allAtoms[iAN->atoms[1]].hashingValue
-                    <(int)allAtoms[iAN->atoms[2]].hashingValue )
-            {
-                ha2  =allAtoms[iAN->atoms[1]].hashingValue;
-                ha3  =allAtoms[iAN->atoms[2]].hashingValue;
-           
-                a2NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
-                a3NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
-          
-                a2NB = allAtoms[iAN->atoms[1]].codNBSymb;
-                a3NB = allAtoms[iAN->atoms[2]].codNBSymb;
-         
-                a2C  = allAtoms[iAN->atoms[1]].codClass;
-                a3C  = allAtoms[iAN->atoms[2]].codClass;
-                
-                id2  = allAtoms[iAN->atoms[1]].id;
-                id3  = allAtoms[iAN->atoms[2]].id;
-            }
-            else if ((int)allAtoms[iAN->atoms[1]].hashingValue
-                    ==(int)allAtoms[iAN->atoms[2]].hashingValue)
-            {
-                if ((int)allAtoms[iAN->atoms[1]].codClass.size() <=
-                        (int)allAtoms[iAN->atoms[2]].codClass.size())
-                {
-                    ha2  =allAtoms[iAN->atoms[1]].hashingValue;
-                    ha3  =allAtoms[iAN->atoms[2]].hashingValue;
-           
-                    a2NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
-                    a3NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
-          
-                    a2NB = allAtoms[iAN->atoms[1]].codNBSymb;
-                    a3NB = allAtoms[iAN->atoms[2]].codNBSymb;
-         
-                    a2C  = allAtoms[iAN->atoms[1]].codClass;
-                    a3C  = allAtoms[iAN->atoms[2]].codClass;
-                
-                    id2  = allAtoms[iAN->atoms[1]].id;
-                    id3  = allAtoms[iAN->atoms[2]].id;
-                }
-                else
-                {
-                    ha2  =allAtoms[iAN->atoms[2]].hashingValue;
-                    ha3  =allAtoms[iAN->atoms[1]].hashingValue;
-           
-                    a2NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
-                    a3NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
-          
-                    a2NB = allAtoms[iAN->atoms[2]].codNBSymb;
-                    a3NB = allAtoms[iAN->atoms[1]].codNBSymb;
-         
-                    a2C  = allAtoms[iAN->atoms[2]].codClass;
-                    a3C  = allAtoms[iAN->atoms[1]].codClass;
-                
-                    id2  = allAtoms[iAN->atoms[2]].id;
-                    id3  = allAtoms[iAN->atoms[1]].id;
-                }
-            }
-            else
-            {
-                ha2  =allAtoms[iAN->atoms[2]].hashingValue;
-                ha3  =allAtoms[iAN->atoms[1]].hashingValue;
-           
-                a2NB2= allAtoms[iAN->atoms[2]].codNB2Symb;
-                a3NB2= allAtoms[iAN->atoms[1]].codNB2Symb;
-          
-                a2NB = allAtoms[iAN->atoms[2]].codNBSymb;
-                a3NB = allAtoms[iAN->atoms[1]].codNBSymb;
-         
-                a2C  = allAtoms[iAN->atoms[2]].codClass;
-                a3C  = allAtoms[iAN->atoms[1]].codClass;
-                
-                id2  = allAtoms[iAN->atoms[2]].id;
-                id3  = allAtoms[iAN->atoms[1]].id;
-                
-            }
-            
-            
-            std::cout << "Atom2 " <<  id2 
-                      << " Its Cod class " <<  a2C << " and Hashing " << ha2 <<std::endl;
-            std::cout << " Its codNBSymb " <<  a2NB << " its codNB2Symb " << a2NB2 << std::endl;
-            
-            std::cout << "Atom3 " <<  id3 
-                      << " Its Cod class " <<  a3C  << " and Hashing "    << ha3 <<std::endl;
-            std::cout << " Its codNBSymb " <<  a3NB << " its codNB2Symb " << a3NB2 << std::endl;
-            
-            
-            int dLev = 0;
-            
-            std::map<ID, ID>  propNB;
-            propNB["a1NB2"] = a1NB2;
-            propNB["a2NB2"] = a2NB2;
-            propNB["a3NB2"] = a3NB2;
-            propNB["a1NB"]  = a1NB;
-            propNB["a2NB"]  = a2NB;
-            propNB["a3NB"]  = a3NB;
-            propNB["ha1"]   = IntToStr(ha1);
-            propNB["ha2"]   = IntToStr(ha2);
-            propNB["ha3"]   = IntToStr(ha3);
-            
-            // Now query the databases
-        
-            // 1. search for exact match of atom classes.
-            std::string qQue = "SELECT * from angles WHERE atomCen=\'" 
-                              + a1C + "\' and atom1=\'" + a2C
-                              + "\' and atom2=\'" + a3C
-                              + "\';"; // one query statement 
-            // std::cout << "1st qQue is " << qQue << std::endl;
-        
-        
-            std::vector<std::vector<std::string> > qResults;
-        
-            sqlite3Query(tCombDB, qQue.c_str(), qResults);
-            
-            if ((int)qResults.size() !=0)
-            {
-                // find exact match
-                int nVals= StrToInt(qResults[0][14]);
-                if (nVals >=4)
-                {
-                    iAN->valueST      = StrToReal(qResults[0][12]);
-                    iAN->value        = iAN->valueST;
-                    iAN->sigValueST   = StrToReal(qResults[0][13]);
-                    iAN->sigValue     = iAN->sigValueST;
-                    iAN->numCodValues = nVals;
-                }
-                else
-                {
-                    dLev =8;
-                    searchOneOrgAngleUsingSqliteL(tCombDB, iAN, dLev, propNB, a1C); 
-                }
-            }
-            else
-            {
-                dLev = 8;
-                searchOneOrgAngleUsingSqliteL(tCombDB, iAN, dLev, propNB, a1C);
-            }               
-    }
-    
-    bool CodClassify::searchOneOrgAngleUsingSqliteL(sqlite3* tCombDB, 
-                                                    std::vector<AngleDict>::iterator tA, 
-                                                    int& tLev, std::map<ID,ID> tPropNB,
-                                                    std::string  tA1C)
-    {
-        bool iFind = false;
-        std::string tQue;
-        std::vector<std::vector<std::string> > qResults;
-        
-        // set different query strings for different levels of searching
-        if (tLev >0)
-        {
-            setQueStrAn(tQue, tLev, tPropNB, tA1C);
-            sqlite3Query(tCombDB, tQue.c_str(), qResults);
-            if ((int)qResults.size() !=0)
-            { 
-                setOneAngleByMean(qResults, tA);
-                iFind = true;
-            }
-            else
-            {
-               tLev -=1;
-               iFind = searchOneOrgAngleUsingSqliteL(tCombDB,  tA, tLev,
-                                                     tPropNB, tA1C);
-            }
-        }
-          
-        return iFind;
-        
-    }
-    */
     
     void CodClassify::setQueStrAn(std::string& tQue, int tLev, 
                                   std::map<ID,ID> tPropNB, std::string tA1C)
@@ -13388,7 +13159,7 @@ namespace LIBMOL
     
     void CodClassify::setupTargetAngleUsingMean2(std::vector<AngleDict>& tAngles, 
                                                 std::vector<AngleDict>::iterator tAN,
-                                                int tHa1, int tHa2, int tHa3,
+                                                int tHa1, int tHa2, int tHa3, ID tR3A,
                                                 ID tA1NB2, ID tA2NB2, ID tA3NB2)
     {
         REAL tValueSum=0.0, tSqValueSum=0.0,  tMeanSqValue=0.0;
@@ -13404,7 +13175,7 @@ namespace LIBMOL
             tSqValueSum += (iAN->value*(iAN->value)*(iAN->numCodValues));
         }
         
-        if (nTot >=10)
+        if (nTot >=6)
         {
             tMeanValue = tValueSum/nTot;
             tSqMeanValue = (tMeanValue*tMeanValue);
@@ -13425,9 +13196,9 @@ namespace LIBMOL
         }
         else
         {
-            tAN->value        = allDictAnglesIdx2[tHa1][tHa2][tHa3][tA1NB2][tA2NB2][tA3NB2][0].value;
-            tAN->sigValue     = allDictAnglesIdx2[tHa1][tHa2][tHa3][tA1NB2][tA2NB2][tA3NB2][0].sigValue;
-            tAN->numCodValues = allDictAnglesIdx2[tHa1][tHa2][tHa3][tA1NB2][tA2NB2][tA3NB2][0].numCodValues;
+            tAN->value        = allDictAnglesIdx4D[tHa1][tHa2][tHa3][tR3A][tA1NB2][tA2NB2][tA3NB2][0].value;
+            tAN->sigValue     = allDictAnglesIdx4D[tHa1][tHa2][tHa3][tR3A][tA1NB2][tA2NB2][tA3NB2][0].sigValue;
+            tAN->numCodValues = allDictAnglesIdx4D[tHa1][tHa2][tHa3][tR3A][tA1NB2][tA2NB2][tA3NB2][0].numCodValues;
         }
     }
    
@@ -14164,8 +13935,6 @@ namespace LIBMOL
             iCh->valueST = iCh->value;
             iCh->signST  = iCh->sign;
         }
-        
-        
         
     }
     

@@ -27,24 +27,7 @@ namespace LIBMOL
             std::cerr << "You need to setup CCP4 suite first " << std::endl;
             exit(1);
         }
-        /*
-        char * pLibMon = std::getenv("LIBMOL_ROOT");
-        if (pLibMon !=NULL)
-        {
-           
-            if (envVars.find("LIBMOL_ROOT") !=envVars.end())
-            {
-                envVars["LIBMOL_ROOT"].clear();
-            }
-            envVars["LIBMOL_ROOT"].append(pLibMon);
-        }
-        else
-        {
-            
-            std::cerr << "You need to setup env variable $LIBMOL_ROOT first " << std::endl;
-            exit(1);
-        }
-        */
+        
     }
     
     CheckEnvAndGetMode::CheckEnvAndGetMode(int numArg, char** ArgVars) :workMode(0)

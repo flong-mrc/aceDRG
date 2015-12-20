@@ -796,7 +796,7 @@ namespace LIBMOL
             {
                 if ((int)iAt->connAtoms.size()==2)
                 {
-                    iAt->bondingIdx = 2;
+                    iAt->bondingIdx = 3;
                 }
                 else if (iAt->connAtoms.size()==1)
                 {
@@ -847,7 +847,7 @@ namespace LIBMOL
             else if (iAt->chemType.compare("S")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3)
+                if(t_len==4 || t_len==3 || t_len==2)
                 {
                     if (iAt->chiralIdx ==0)
                     {
@@ -1139,7 +1139,7 @@ namespace LIBMOL
         // No need for the third round, those could be defined in 
         // the first round
         // Check
-        /*
+        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
@@ -1168,7 +1168,7 @@ namespace LIBMOL
                         << std::endl;
             }
         } 
-         */  
+        
         
     }
     

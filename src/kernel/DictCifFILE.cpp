@@ -3321,7 +3321,7 @@ namespace LIBMOL
             {
                 if ((int)iAt->connAtoms.size()==2)
                 {
-                    iAt->bondingIdx = 2;
+                    iAt->bondingIdx = 3;
                 }
                 else if (iAt->connAtoms.size()==1)
                 {
@@ -3409,16 +3409,17 @@ namespace LIBMOL
                 {
                     if (iAt->parCharge ==0.0)
                     {
-                        bool l_sp2 = false;
+                        bool l_sp2 = true;
                         for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                                  iCA != iAt->connAtoms.end(); iCA++)
                         {
-                            if(allAtoms[*iCA].bondingIdx == 2)
+                            if(allAtoms[*iCA].bondingIdx != 2)
                             {
-                                l_sp2 = true;
+                                l_sp2 = false;
                                 break;
                             }
                         }
+                        
                         if (l_sp2)
                         {
                             // Now we can say this atom is in sp2 orbits 

@@ -1892,7 +1892,7 @@ namespace LIBMOL
             {
                 if ((int)iAt->connAtoms.size()==2)
                 {
-                    iAt->bondingIdx = 2;
+                    iAt->bondingIdx = 3;
                 }
             }
             else if (iAt->chemType.compare("SI")==0 
