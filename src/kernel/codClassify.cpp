@@ -3446,23 +3446,15 @@ namespace LIBMOL
                     iAt->bondingIdx = 2;
                 } 
             }
-            else if (iAt->chemType.compare("N")==0)
+            else if (iAt->chemType.compare("N")==0 
+                    || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
+                if(t_len==4 || t_len==3)
                 {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    } 
                     iAt->chiralIdx  = 1;
                     iAt->bondingIdx = 3;  
                 }
-                //else if (t_len==3) // temp
-                //{
-                //    iAt->chiralIdx  = -1;
-                //    iAt->bondingIdx =  2;
-                //}
                 else if (t_len ==2)
                 {
                     iAt->chiralIdx  = 0;
@@ -3482,7 +3474,7 @@ namespace LIBMOL
             {
                 if ((int)iAt->connAtoms.size()==2)
                 {
-                    iAt->bondingIdx = 2;
+                    iAt->bondingIdx = 3;
                 }
                 else if (iAt->connAtoms.size()==1)
                 {
@@ -3531,7 +3523,7 @@ namespace LIBMOL
             else if (iAt->chemType.compare("S")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3)
+                if(t_len==4 || t_len==3 || t_len==2)
                 {
                     if (iAt->chiralIdx ==0)
                     {
@@ -3544,7 +3536,55 @@ namespace LIBMOL
         }
         
         // more conditions 
+        // Do oxygen atom first, to see if an Oxygen atom of two connections 
+        // is sp2. The default one in the above step is sp3 
         
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {   
+            int t_len =0;
+            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                    iConn !=iAt->connAtoms.end(); iConn++)
+            {
+                if(!allAtoms[*iConn].isMetal)
+                {
+                    t_len++;
+                }
+            }
+
+            if (iAt->chemType.compare("O")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                
+                if(t_len==2)
+                {
+                    if (iAt->parCharge ==0.0)
+                    {
+                        bool l_sp2 = false;
+                        for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                                 iCA != iAt->connAtoms.end(); iCA++)
+                        {
+                            if(allAtoms[*iCA].bondingIdx == 2)
+                            {
+                                l_sp2 = true;
+                                break;
+                            }
+                        }
+                        
+                        if (l_sp2)
+                        {
+                            // Now we can say this atom is in sp2 orbits 
+                            iAt->chiralIdx  =  0;
+                            iAt->bondingIdx =  2;
+                        }
+                    }
+                } 
+            }
+            //std::cout << "Again atom " << iAt->id << " its chiralIdx " 
+            //          << iAt->chiralIdx << std::endl;
+        }
+        
+        // Then N and B atoms
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {   
@@ -3576,6 +3616,8 @@ namespace LIBMOL
                                 break;
                             }
                         }
+                        
+                        
                         if (l_sp2)
                         {
                             // Now we can say this atom is in sp2 orbits 
@@ -3779,7 +3821,7 @@ namespace LIBMOL
         // No need for the third round, those could be defined in 
     
         // Check
-        /*
+        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
@@ -3808,9 +3850,8 @@ namespace LIBMOL
                         << " is not a chiral center" << std::endl;
             }
         } 
-        */
-        
        
+        
     }
     
     void CodClassify::groupOrgAtomsToPlanes()

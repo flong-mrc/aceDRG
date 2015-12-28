@@ -15,8 +15,8 @@ NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
 CC=gcc
-CCC=/sw/bin/g++-4 -O3
-CXX=/sw/bin/g++-4 -O3
+#CCC=/sw/bin/g++-4 -O3
+#CXX=/sw/bin/g++-4 -O3
 FC=gfortran
 AS=as
 
