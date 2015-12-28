@@ -302,7 +302,44 @@ namespace LIBMOL
         return tIn;
     }
     
-    
+    extern int  checkIfAngleInSameRing(std::vector<AtomDict> & tAtoms,
+                                       std::vector<RingDict> & tRings,
+                                       int tIdxCen, int tIdx1, int tIdx2)
+    {
+        
+        
+        int nInRing = 0;
+        std::vector<std::string> r1, r2;
+        for (std::map<std::string, int>::iterator iM1=tAtoms[tIdx1].ringRep.begin();
+                iM1 !=tAtoms[tIdx1].ringRep.end(); iM1++)
+        {
+            r1.push_back(iM1->first);
+        }
+        for (std::map<std::string, int>::iterator iM2=tAtoms[tIdx2].ringRep.begin();
+                iM2 !=tAtoms[tIdx2].ringRep.end(); iM2++)
+        {
+            r2.push_back(iM2->first);
+        }
+        for (std::map<std::string, int>::iterator iR=tAtoms[tIdxCen].ringRep.begin();
+                iR !=tAtoms[tIdxCen].ringRep.end(); iR++)
+        {
+            if (std::find(r1.begin(), r1.end(), iR->first) != r1.end()
+                &&
+                std::find(r2.begin(), r2.end(), iR->first) !=r2.end())
+            {
+                nInRing = iR->second;
+                std::cout << "Check atoms in an angle : " << std::endl;
+                std::cout << "center atom " << tAtoms[tIdxCen].id <<std::endl;
+                std::cout << "atom2 " << tAtoms[tIdx1].id <<std::endl;
+                std::cout << "atom3 " << tAtoms[tIdx2].id <<std::endl;
+                std::cout << "3 atoms are in ring " << iR->first 
+                          << " of size " << iR->second <<  std::endl; 
+                break;
+            }
+        }
+        
+        return nInRing;
+    }
     
     extern void buildOneRing(std::vector<AtomDict> & tAtoms, 
                              std::vector<AtomDict> sSet, 

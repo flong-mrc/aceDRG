@@ -83,7 +83,7 @@ for aF in glob.glob("./inMmcif/*.cif"):
 print "========================================================="
 print "|  run all examples containing pyranose at ./inPyro     |"
 print "========================================================="
-for aF in glob.glob("./inPyro/*.cif"):
+for aF in glob.glob("./inPyra/*.cif"):
     aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
     if len(aFRoot) >= 3:
         MonoName = aFRoot[-3:]
@@ -91,7 +91,7 @@ for aF in glob.glob("./inPyro/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_fromMmcif -k 10 "%(aF, aFRoot) 
+        cmdL = "acedrg -c %s  -o  %s_inPyra  "%(aF, aFRoot) 
         print cmdL
         os.system(cmdL)
 
