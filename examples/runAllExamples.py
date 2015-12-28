@@ -19,11 +19,14 @@ for aF in glob.glob("./inSmi/*.smiles"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -i %s  -o  %s_fromSmiles "%(aF, aFRoot) 
+        rRoot = "%s_fromSmiles"%aFRoot
+        cmdL = "acedrg -i %s  -o  %s "%(aF, rRoot) 
         print cmdL
         numAllJobs += 1
-        os.system(cmdL)
-        outCif = "%s_fromSmiles.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
@@ -41,11 +44,14 @@ for aF in glob.glob("./inMol/*.mol"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -m %s  -o  %s_fromMol "%(aF, aFRoot) 
+        rRoot = "%s_fromMol"%aFRoot
+        cmdL = "acedrg -m %s  -o  %s_fromMol -p "%(aF, aFRoot) 
         print cmdL
         numAllJobs += 1
-        os.system(cmdL)
-        outCif = "%s_fromMol.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
@@ -63,11 +69,14 @@ for aF in glob.glob("./inMol2/*.mol2"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -g %s  -o  %s_from_SYBYL_Mol2 "%(aF, aFRoot) 
+        rRoot = "%s_SYBYL_Mol2"%aFRoot
+        cmdL = "acedrg -g %s  -o  %s -p "%(aF, rRoot) 
         numAllJobs += 1
         print cmdL
-        os.system(cmdL)
-        outCif = "%s_from_SYBYL_Mol2.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
@@ -85,11 +94,14 @@ for aF in glob.glob("./inMmcifPDB/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_fromMmcifPDB "%(aF, aFRoot) 
+        rRoot = "%s_fromMmcifPDB"%aFRoot
+        cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
         print cmdL
         numAllJobs += 1
-        os.system(cmdL)
-        outCif = "%s_fromMmcifPDB.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
@@ -107,11 +119,14 @@ for aF in glob.glob("./inMmcif/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_fromMmcif "%(aF, aFRoot) 
+        rRoot = "%s_fromMmcif"%aFRoot
+        cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
         numAllJobs += 1
         print cmdL
-        os.system(cmdL)
-        outCif = "%s_fromMmcif.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
@@ -129,9 +144,17 @@ for aF in glob.glob("./inPyraCCD/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_inPyraCCD "%(aF, aFRoot) 
+        rRoot = "%s_inPyraCCD"%aFRoot
+        cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
         print cmdL
-        os.system(cmdL)
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
 
 print "========================================================="
 print "|  run all examples containing pyranose at ./inPyraCCP4 |"
@@ -144,9 +167,17 @@ for aF in glob.glob("./inPyraCCP4/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_inPyraCCP4 "%(aF, aFRoot) 
+        rRoot = "%s_inPyraCCP4"%aFRoot
+        cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
         print cmdL
-        os.system(cmdL)
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+        else:
+            numJobsF   +=1
 
 
 print "========================================================="
@@ -160,10 +191,13 @@ for aF in glob.glob("./inFuns/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s -o  %s_Funs "%(aF, aFRoot) 
+        rRoot = "%s_Funs"%aFRoot
+        cmdL = "acedrg -c %s -o  %s -p "%(aF, rRoot) 
         print cmdL
-        os.system(cmdL)
-        outCif = "%s_Funs.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
@@ -181,11 +215,14 @@ for aF in glob.glob("./inDictProb/*.cif"):
         MonoName = aFRoot
 
     if len(aFRoot) !=0:
-        cmdL = "acedrg -c %s  -o  %s_inDictProb "%(aF, aFRoot) 
+        rRoot = "%s_inDictProb"%aFRoot
+        cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
         print cmdL
         numAllJobs += 1
-        os.system(cmdL)
-        outCif = "%s_inDictProb.cif"%aF
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
         if os.path.isfile(outCif):
             numJobsS   +=1
         else:
