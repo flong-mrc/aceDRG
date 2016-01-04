@@ -2526,6 +2526,7 @@ namespace LIBMOL
         }
         
         // Check
+        /*
         if (tG.nodes.size() !=0)
         {
             for (std::map<int, std::map<ID,ID> >::iterator iN=tG.nodes.begin();
@@ -2544,6 +2545,7 @@ namespace LIBMOL
                 } 
             }
         }
+         */
     }
     
     void isomorGraph::reducedGraph(Graph& tFullG, Graph& tReducedG,
@@ -2848,9 +2850,12 @@ namespace LIBMOL
             }
             tM0.push_back(tN);
         }
+        
+        /*
         std::cout << "Matrix M0 is: " << std::endl;
         printMatrix(tM0);
         std::cout << std::endl;
+        */
         
         int nMax=1;
         for (unsigned i=0; i < tM0.size(); i++)
@@ -2888,7 +2893,7 @@ namespace LIBMOL
         
         if (curRow==tM0.size())
         {
-            std::cout << "None Zero elements in One M are : " << std::endl;
+            //std::cout << "None Zero elements in One M are : " << std::endl;
             
             for (unsigned i=0; i < tM.size(); i++)
             {
@@ -2897,8 +2902,8 @@ namespace LIBMOL
                 {
                     if (tM[i][j]==1)
                     {
-                        std::cout << "None zero element at row " << i 
-                                  << " and col " << j << std::endl;
+                        //std::cout << "None zero element at row " << i 
+                        //          << " and col " << j << std::endl;
                         nNR++;
                     }
                     if (nNR > 1)
@@ -2929,19 +2934,19 @@ namespace LIBMOL
             unsigned iCol=0;
             do 
             {
-                std::cout << "current col " << iCol << std::endl;
-                std::cout << "M0 [" << curRow << "][" << iCol 
-                          << "]=" << tM0[curRow][iCol] << std::endl;
+                //std::cout << "current col " << iCol << std::endl;
+                //std::cout << "M0 [" << curRow << "][" << iCol 
+                //          << "]=" << tM0[curRow][iCol] << std::endl;
                 while(std::find(usedCols.begin(), usedCols.end(),iCol)==usedCols.end()
                       && iCol < tM0[curRow].size() && !tDone)
                 {
-                    std::cout << "current row inside " << curRow << std::endl;
-                    std::cout << "current col inside " << iCol << std::endl;
+                    //std::cout << "current row inside " << curRow << std::endl;
+                    //std::cout << "current col inside " << iCol << std::endl;
                     if (tM0[curRow][iCol]==1)
                     {
                         tM[curRow][iCol] =1;
                         usedCols.push_back(iCol);
-                        std::cout << "tM " << curRow << "  " << iCol << " ==1 " << std::endl;
+                        // std::cout << "tM " << curRow << "  " << iCol << " ==1 " << std::endl;
                         /*
                         std::cout << "Number of used cols " << usedCols.size() << std::endl;
                         for (unsigned iC=0; iC < usedCols.size(); iC++)
@@ -3214,6 +3219,7 @@ namespace LIBMOL
                 }
             }
             outFile.close();
+            
         }
         
     }
