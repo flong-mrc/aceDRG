@@ -19,6 +19,8 @@ import time
 import math
 import select
 
+from rdkit      import rdBase
+
 from rdkit      import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import rdchem
@@ -31,6 +33,7 @@ from rdkit.Chem.Pharm3D import EmbedLib
 if os.name != 'nt':
     import fcntl
 import signal
+
 
 def listComp(a_list, b_list):
 
@@ -133,7 +136,7 @@ class CExeCode :
         
        
         log_size = 0 
-        log_max  = 100000000
+        log_max  = 500000000
         outfile_eof = 0
         if not mode:
             self._nonBlockingFile(outfd_sub)
@@ -755,7 +758,8 @@ class Acedrg(CExeCode ):
         if self.versionInfo.has_key("DATABASE_VERSION"):
             print "| ACEDRG database version:  %s|"%self.versionInfo["DATABASE_VERSION"].ljust(40)
         else:
-            print "| ACEDRG Database version is not available                          |"    
+            print "| ACEDRG Database version is not available                          |"
+        print "| RDKit version:  %s|"%rdBase.rdkitVersion.ljust(50)
         print "=====================================================================" 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15 \
            or self.workMode == 111 or self.workMode==121 or self.workMode ==131 or self.workMode==141 or self.workMode==151 :
@@ -2737,16 +2741,18 @@ class AcedrgRDKit():
         #  Setup conformers for the molecules
         if tNConfId == 1:
             #  20 initail conformers 
-            ttNConfId = 19
             if self.useExistCoords: 
+                ttNConfId = 1
                 confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId, maxAttempts=0, randomSeed=-1, clearConfs=False)
             else:
+                ttNConfId = 20
                 confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId, maxAttempts=0, randomSeed=-1, clearConfs=True)
             nConf = tMol.GetNumConformers()
             #for aId in confIds:
             #    print aId
-            for aId in confIds:
-                aFailure = self.optOneConformer(tMol, aId)
+            if not self.useExistCoords:
+                for aId in confIds:
+                    aFailure = self.optOneConformer(tMol, tMaxIters, tMaxMult, aId)
             #ttNConfId = 20
             #confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId)
             #for aId in confIds:
