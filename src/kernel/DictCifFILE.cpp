@@ -7023,7 +7023,7 @@ namespace LIBMOL
             std::string longName =tMonoRootName.substr(0,3);
             std::string sName =tMonoRootName.substr(0,3);
             
-            StrUpper(longName);
+            //StrUpper(longName);
             
             
             ID ligType = "non-polymer";
