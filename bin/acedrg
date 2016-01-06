@@ -595,6 +595,7 @@ class Acedrg(CExeCode ):
         if len(self.monomRoot) < 3:
             self.monomRoot = "UNL"
 
+
     def setWorkMode(self, t_inputOptionsP = None):
 
         # Sequnence for check the locations of acedrg tables 
@@ -3337,28 +3338,46 @@ class AcedrgRDKit():
                             print "Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
                         print "----------------------------------------------"
 
-                        posCen = aConformer.GetAtomPosition(aAtom.GetIdx())
-                        coordsCen = [float(posCen.x), float(posCen.y), float(posCen.z)] 
-                        pos1 = aConformer.GetAtomPosition(aSetName[0][0].GetIdx())
-                        coords1 = [float(pos1.x), float(pos1.y), float(pos1.z)] 
-                        pos2 = aConformer.GetAtomPosition(aSetName[1][0].GetIdx())
-                        coords2 = [float(pos2.x), float(pos2.y), float(pos2.z)] 
-                        pos3 = aConformer.GetAtomPosition(aSetName[2][0].GetIdx())
-                        coords3 = [float(pos3.x), float(pos3.y), float(pos3.z)] 
-                       
-                        #print "Chiral volume by RDKit", aCVol
-                        cenName = aAtom.GetProp("Name") 
-                        tChemCheck.outChiSign[cenName] = tChemCheck.getChiralVolumeSign(posCen, pos1, pos2, pos3)
-                        #print "chiral outSign by acedrg : ", tChemCheck.outChiSign[cenName]
-                        if len(tChemCheck.outChiSign[cenName]) !=0:                 
+                        aPass = self.checkUncertainChirals(aSetName)
+                        if not aPass:
                             aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
                                          %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0].GetProp("Name"), \
-                                           aSetName[1][0].GetProp("Name"), aSetName[2][0].GetProp("Name"), tChemCheck.outChiSign[cenName]))
+                                           aSetName[1][0].GetProp("Name"), aSetName[2][0].GetProp("Name"), "both"))
                         else:
-                            print "Failed to calculate chiral volume for atom %s "%aAtom.GetProp("Name")
+                            posCen = aConformer.GetAtomPosition(aAtom.GetIdx())
+                            coordsCen = [float(posCen.x), float(posCen.y), float(posCen.z)] 
+                            pos1 = aConformer.GetAtomPosition(aSetName[0][0].GetIdx())
+                            coords1 = [float(pos1.x), float(pos1.y), float(pos1.z)] 
+                            pos2 = aConformer.GetAtomPosition(aSetName[1][0].GetIdx())
+                            coords2 = [float(pos2.x), float(pos2.y), float(pos2.z)] 
+                            pos3 = aConformer.GetAtomPosition(aSetName[2][0].GetIdx())
+                            coords3 = [float(pos3.x), float(pos3.y), float(pos3.z)] 
+                       
+                            #print "Chiral volume by RDKit", aCVol
+                            cenName = aAtom.GetProp("Name") 
+                            tChemCheck.outChiSign[cenName] = tChemCheck.getChiralVolumeSign(posCen, pos1, pos2, pos3)
+                            #print "chiral outSign by acedrg : ", tChemCheck.outChiSign[cenName]
+                            if len(tChemCheck.outChiSign[cenName]) !=0:                 
+                                aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
+                                             %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0].GetProp("Name"), \
+                                               aSetName[1][0].GetProp("Name"), aSetName[2][0].GetProp("Name"), tChemCheck.outChiSign[cenName]))
+                            else:
+                                print "Failed to calculate chiral volume for atom %s "%aAtom.GetProp("Name")
             aMmCif.close()
   
-
+    def checkUncertainChirals(self, tNBAtoms):
+        
+        tPass = True
+        tOneBondOs = 0
+        for aPair in tNBAtoms:
+            if aPair[0].GetSymbol().find("O") !=-1 and len(aPair[0].GetBonds())==1:
+                tOneBondOs +=1 
+        
+        if tOneBondOs > 1 :
+            tPass = False
+   
+        return tPass
+        
     def setupFuncGroupTab(self, tFuncFileName):
 
         try:
@@ -4058,7 +4077,6 @@ class FileTransformer :
         #    aSt+=(self.dataDescriptor[i][1].strip() + "\t")
         #print aSt
         #print "\n"
- 
 
     def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):
 
