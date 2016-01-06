@@ -2858,6 +2858,20 @@ class AcedrgRDKit():
             print "Its total valence ", val
         """
 
+        # Make SMILES before Hs are added 
+        if tMol.HasProp('SmilesIn'):
+            #print "Input SMILES : ", tMol.GetProp("SmilesIn")
+            tMol.SetProp("SmilesOut", tMol.GetProp("SmilesIn"))
+        else:
+            #isomericSmiles   = True
+            #tKekuleSmiles    = True
+            #rootedAtAtom     = -1
+            #canonical        = True
+            #allBondsExplicit = False
+            #allHsExplicit    = False
+            #tMol.SetProp("SmilesOut", Chem.MolToSmiles(aMol, isomericSmiles=False, kekuleSmiles=True, rootedAtAtom=-1, canonical=False, allBondsExplicit=False, allHsExplicit=False))
+            tMol.SetProp("SmilesOut", Chem.MolToSmiles(tMol, isomericSmiles=True, kekuleSmiles=False, canonical=False))
+            #print "Output SMILES ", tMol.GetProp("SmilesOut") 
         aMol = Chem.AddHs(tMol)
  
         allAtoms = aMol.GetAtoms()
@@ -2866,17 +2880,6 @@ class AcedrgRDKit():
 
         # Further: give names to those newly added H atoms
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
-        if aMol.HasProp('SmilesIn'):
-            #print "Input SMILES : ", aMol.GetProp("SmilesIn")
-            aMol.SetProp("SmilesOut", aMol.GetProp("SmilesIn"))
-        else:
-            isomericSmiles   = True
-            kekuleSmiles     = True 
-            rootedAtAtom     = -1
-            canonical        = True
-            allBondsExplicit = False
-            aMol.SetProp("SmilesOut", Chem.MolToSmiles(aMol, isomericSmiles, kekuleSmiles, rootedAtAtom, canonical, allBondsExplicit))
-            #print "Output SMILES ", aMol.GetProp("SmilesOut") 
        
         if self.reSetChirals:
             self.reAssignChirals(aMol) 
@@ -3423,6 +3426,9 @@ class AcedrgRDKit():
                 elif aFuncG.find("AMINO-TER") !=-1:
                     #print "Doing ", aFuncG
                     self.setFormalChargeA_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("CARBOXY-AMINO-GLY") !=-1:
+                    #print "Doing ", aFuncG
+                    self.setFormalChargeGLY(tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("VAR-A-TER") !=-1:
                     #print "Doing ", aFuncG
                     self.setFormalChargeV_A_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
@@ -3535,6 +3541,24 @@ class AcedrgRDKit():
                             #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                             #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                             #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+
+    def setFormalChargeGLY(self, tMol, tFunG, tAtomIdxs, tPH):
+   
+        # This is for GLY only       
+        nNonHAtoms = tMol.GetNumHeavyAtoms()
+        for aSetIdxs in tAtomIdxs:
+            if len(aSetIdxs) == nNonHAtoms:
+                for aIdx in aSetIdxs:
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
          
     def setFormalChargeNH_LYS(self, tMol, tFunG, tAtomIdxs, tPH):
 
