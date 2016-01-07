@@ -7214,7 +7214,10 @@ namespace LIBMOL
                     // difference in comp atom definitions between cod and
                     // dictionary: inner-out1-out2(cod),
                     // atom1-atom2(center)-atom3(dictionary)
-                    
+                    if (iA->sigValue < 1.5)
+                    {
+                        iA->sigValue = 1.5;
+                    }
                     if (tAtoms[iA->atoms[0]].isMetal)
                     {
                         for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
