@@ -222,6 +222,9 @@ namespace LIBMOL
     void AllSystem::resetSystem2(CodClassify & tCodSys)
     {
         
+        std::cout << "Originally the system has " 
+                  << allTorsions.size() << std::endl;
+        
         allAtoms.clear();
         allBonds.clear();
         allAngles.clear();
@@ -231,6 +234,10 @@ namespace LIBMOL
         allRings.clear();
         allRingsV.clear();
         
+        std::cout << "Number of torsions from cod section "
+                  << tCodSys.allTorsions.size() << std::endl;
+        
+        
         AddAtoms(tCodSys.allAtoms);
         AddBonds(tCodSys.allBonds);
         AddAngles(tCodSys.allAngles);
@@ -238,6 +245,9 @@ namespace LIBMOL
         AddChirals(tCodSys.allChirals);
         // AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
+        
+        std::cout << "Now the system has " 
+                  << allTorsions.size() << std::endl;
         
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
@@ -3642,17 +3652,45 @@ namespace LIBMOL
             setAllTorsionsInOneRing(tDone, *iR);
         }   
         
+        /*
+        std::cout << "The torsions in following bonds are set in ring section " 
+                  << std::endl;
+      
+        for (unsigned i=0; i < tDone.size(); i++)
+        {
+            std::cout << "Bond : " << allBonds[tDone[i]].seriNum << std::endl;
+            std::cout << "Its two atoms are : " << std::endl;
+            std::cout << allBonds[tDone[i]].atoms[0] << std::endl;
+            std::cout << allBonds[tDone[i]].atoms[1] << std::endl;
+        }
+        
+        
+        for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor != allTorsions.end(); iTor++)
+        {
+            std::cout << "Torsion angle " << iTor->seriNum << std::endl;
+            std::cout << "Its atoms are : " << std::endl;
+            for (std::vector<int>::iterator iA=iTor->atoms.begin();
+                    iA !=iTor->atoms.end(); iA++)
+            {
+                std::cout << "atom " << allAtoms[*iA].id << std::endl;
+            }
+        }
+        */
+        
         // find all torsion not involved rings
         for (std::vector<BondDict>::iterator iABo= allBonds.begin();
                 iABo != allBonds.end(); iABo++)
         {
             if (std::find(tDone.begin(), tDone.end(), iABo->seriNum)==tDone.end())
             {
+                // std::cout << "Set torsions for current bond " << iABo->seriNum << std::endl;
+                
                 std::vector<int> tPos;
                 for(std::map<ID, int>::iterator iAM=iABo->fullAtoms.begin();
                         iAM !=iABo->fullAtoms.end(); iAM++)
                 {
-                    //std::cout << "atom " << iAM->first << std::endl;
+                    // std::cout << "atom " << iAM->first << std::endl;
                     //std::cout << " connected to " << (int)allAtoms[iAM->second].connAtoms.size()
                     //          << " atoms " << std::endl;
                     if ((int)allAtoms[iAM->second].connAtoms.size() > 1)
@@ -3673,6 +3711,8 @@ namespace LIBMOL
         }
         
         /*
+        std::cout << "Number of torsion angles is " << allTorsions.size() << std::endl;
+        
         std::cout << "All torsions have been setup " << std::endl;
        
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
@@ -3687,6 +3727,8 @@ namespace LIBMOL
             }
         }
         */
+        
+        
     }
     
     void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs, 
@@ -3700,24 +3742,24 @@ namespace LIBMOL
         for (int i=0; i < (int)tR.atoms.size(); i++)
         {
             tAs.push_back(tR.atoms[i].seriNum);
-            // std::cout << tR.atoms[i].seriNum << std::endl;
+            std::cout << tR.atoms[i].seriNum << std::endl;
         }
         
         tLinkA.push_back(tR.atoms[0].seriNum);
         
         int iCur   =tR.atoms[0].seriNum;
         int iLoop  =1;
-        // std::cout << "ring rep " << tR.rep << " size " << (int)tAs.size() << std::endl;
+        //std::cout << "ring rep " << tR.rep << " size " << (int)tAs.size() << std::endl;
        
         
         while ((int)tLinkA.size() < (int)tAs.size()
                && iLoop < (int)tAs.size())
         {   
-            // std::cout << "atom " << allAtoms[iCur].seriNum << std::endl;
+            // std::cout << "atom " << allAtoms[iCur].id << std::endl;
             for (std::vector<int>::iterator iC=allAtoms[iCur].connAtoms.begin();  
                     iC!=allAtoms[iCur].connAtoms.end(); iC++)
             {
-                // std::cout << "connection " << *iC << std::endl;
+                // std::cout << "connection " << allAtoms[*iC].id << std::endl;
                 if(std::find(tAs.begin(), tAs.end(), *iC) !=tAs.end()
                    && std::find(tLinkA.begin(), tLinkA.end(), *iC) ==tLinkA.end())
                 {
@@ -3725,7 +3767,7 @@ namespace LIBMOL
                     int iB=getBond(allBonds, allAtoms[iCur].seriNum, allAtoms[*iC].seriNum);
                     if (iB >=0)
                     {
-                        // std::cout << "find " << *iC << std::endl;
+                        // std::cout << "find " << allAtoms[*iC].id << std::endl;
                         tBos.push_back(iB);
                         tLinkA.push_back(*iC);
                         iCur=*iC;
@@ -3770,6 +3812,7 @@ namespace LIBMOL
         //std::cout << "ring reps : " << tR.rep << std::endl;
         //std::cout << "it has " << (int)tBos.size() << std::endl;
         // Now we have bonds in the ring in sequence
+       
         for (int i=0; i < (int)tBos.size(); i++)
         {
             std::string flip;
@@ -3781,40 +3824,41 @@ namespace LIBMOL
             {
                 flip = "odd";
             }
-            
-            std::vector<int> tPos;
-            for(std::map<ID, int>::iterator iAM=allBonds[tBos[i]].fullAtoms.begin();
-                        iAM !=allBonds[tBos[i]].fullAtoms.end(); iAM++)
+            if (std::find(tBs.begin(), tBs.end(), tBos[i])==tBs.end())
             {
-                //std::cout << "atom " << iAM->first << std::endl;
-                // std::cout << " connected to " << (int)allAtoms[iAM->second].connAtoms.size()
-                //        << " atoms " << std::endl;
-                if ((int)allAtoms[iAM->second].connAtoms.size() > 1)
+                std::vector<int> tPos;
+                for(std::map<ID, int>::iterator iAM=allBonds[tBos[i]].fullAtoms.begin();
+                        iAM !=allBonds[tBos[i]].fullAtoms.end(); iAM++)
                 {
-                    tPos.push_back(iAM->second);
+                    //std::cout << "atom " << iAM->first << std::endl;
+                    // std::cout << " connected to " << (int)allAtoms[iAM->second].connAtoms.size()
+                    //        << " atoms " << std::endl;
+                    if ((int)allAtoms[iAM->second].connAtoms.size() > 1)
+                    {
+                        tPos.push_back(iAM->second);
+                    }
+                }
+                // std::cout << "tPos.size() " << (int)tPos.size() << std::endl;
+                if((int)tPos.size() ==2)
+                { 
+                    //std::cout << "set torsion angles for the bond of atoms "
+                    //          << allAtoms[tPos[0]].id << " and " 
+                    //          << allAtoms[tPos[1]].id 
+                    //          << " with " << flip << std::endl;
+                       
+                    setTorsionFromOneBond(tPos[0], tPos[1], flip);
+                    tBs.push_back(tBos[i]);
                 }
             }
-            // std::cout << "tPos.size() " << (int)tPos.size() << std::endl;
-            if((int)tPos.size() ==2)
-            {    
-                //std::cout << "set torsion angles for the bond of atoms "
-                //          << allAtoms[tPos[0]].id << " and " 
-                //          << allAtoms[tPos[1]].id 
-                //          << " with " << flip << std::endl;
-                       
-                setTorsionFromOneBond(tPos[0], tPos[1], flip);
-                tBs.push_back(tBos[i]);
-            }
         }
-        
     }
     
     void AllSystem::setTorsionIdxFromOneBond(int tIdx1, int tIdx2)
     {
                 
-        std::cout << "For the bond consisting of atoms  " << allAtoms[tIdx1].id 
-                  << " and " << allAtoms[tIdx2].id << std::endl
-                  << "It has following torsion angles: " << std::endl; 
+        //std::cout << "For the bond consisting of atoms  " << allAtoms[tIdx1].id 
+        //          << " and " << allAtoms[tIdx2].id << std::endl
+        //          << "It has following torsion angles: " << std::endl; 
                 
                 
        for (std::vector<int>::iterator iAt1= allAtoms[tIdx1].connAtoms.begin();
@@ -3830,10 +3874,10 @@ namespace LIBMOL
                    aTorsion.atoms.push_back(tIdx1);
                    aTorsion.atoms.push_back(tIdx2);
                    aTorsion.atoms.push_back(*iAt2);
-                   std::cout << "Torsion: " << allAtoms[*iAt1].id 
-                             << ", " << allAtoms[tIdx1].id 
-                             << ", " << allAtoms[tIdx2].id
-                             << ", " << allAtoms[*iAt2].id << std::endl; 
+                   //std::cout << "Torsion: " << allAtoms[*iAt1].id 
+                   //          << ", " << allAtoms[tIdx1].id 
+                   //          << ", " << allAtoms[tIdx2].id
+                   //          << ", " << allAtoms[*iAt2].id << std::endl; 
                                     
                    allTorsions.push_back(aTorsion);
                }

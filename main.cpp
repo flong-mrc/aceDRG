@@ -126,7 +126,6 @@ int main(int argc, char** argv) {
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
                                            
             
-            
             LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
