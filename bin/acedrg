@@ -1696,6 +1696,7 @@ class Acedrg(CExeCode ):
                             tOutCif.write(aL+"\n")
                         for aL in tStrDescriptors["entries"]:
                             tOutCif.write(aL)
+                    """
                     elif tStrDescriptors.has_key("defProps") and tStrDescriptors.has_key("defSmiles"):
                         for aProp in tStrDescriptors["defProps"]:
                             tOutCif.write(aProp+"\n")
@@ -1712,6 +1713,7 @@ class Acedrg(CExeCode ):
                             aSmilen          = len(aSmi)
                         tOutCif.write("%s%s%s%s \"%s\"\n"%(monoId.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00".ljust(6), \
                                     aSmi.ljust(aSmilen)))           
+                    """
                     tOutCif.close()
                         
     def execute(self):
@@ -3322,8 +3324,8 @@ class AcedrgRDKit():
                                 else:
                                     print "Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
 
-                        print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
                         """
+                        print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
                         print "Before sorting "
                         print "----------------------------------------------"
                         for aPair in aSetName:
@@ -3333,10 +3335,12 @@ class AcedrgRDKit():
                         print "After sorting "
                         """
                         aSetName.sort(listCompDes)
+                        """
                         print "----------------------------------------------"
                         for aPair in aSetName:
                             print "Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
                         print "----------------------------------------------"
+                        """
 
                         aPass = self.checkUncertainChirals(aSetName)
                         if not aPass:
