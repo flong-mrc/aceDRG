@@ -1,4 +1,4 @@
-#!/usr/bin/env ccp4-python
+#!/usr/bin/env  ccp4-python
 # Python script
 #
 #
@@ -33,7 +33,6 @@ from rdkit.Chem.Pharm3D import EmbedLib
 if os.name != 'nt':
     import fcntl
 import signal
-
 
 def listComp(a_list, b_list):
 
@@ -271,6 +270,8 @@ class Acedrg(CExeCode ):
         self.inputPara        = {}
         self.inputPara["PH"]  = [False, 0.0]
 
+        self.elemSet          = []
+
         self.workMode         = 0
         self.useExistCoords   = False
 
@@ -297,6 +298,7 @@ class Acedrg(CExeCode ):
         self.runExitCode      = 0 
 
         self.setWorkMode(inputOptionsP)
+       
         self.checkDependency()
         self.checkVersionInfo()
 
@@ -795,7 +797,7 @@ class Acedrg(CExeCode ):
             elif self.workMode==22:
                 print "Input directory where cif files are: %s"%self.inStdCifDir
                 print "Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table")
- 
+
     def runLibmol(self, tIn=None, tIdxMol=-1):
  
         self._cmdline = self.libmol
@@ -1885,12 +1887,11 @@ class Acedrg(CExeCode ):
         else:
             print "Input coordinates will be ignored"
 
-        
         # Stage 1: initiate a mol file for RDKit obj
-        # print self.workMode
+       
         if self.workMode == 11 or self.workMode == 111:
             # The input file is an mmcif file     
-            if os.path.isfile(self.inMmCifName):
+            if os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                 self.fileConv.mmCifReader(self.inMmCifName)
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor) 
@@ -2048,26 +2049,28 @@ class Acedrg(CExeCode ):
         if self.workMode == 12 or self.workMode == 121:
           
             # The input file is  a SMILES file
-            if os.path.isfile(self.inSmiName):
+            if os.path.isfile(self.inSmiName) and self.chemCheck.isOrganic(self.inSmiName, self.workMode):
                 self.rdKit.reSetSmi = True
                 self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)  
          
         if self.workMode == 13 or self.workMode == 131 :
                 
             # The input file is  a mol file
-            if os.path.isfile(self.inMdlName):
-                self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)           
+            if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
+                aTmpMoleFile = os.path.join(self.scrDir, self.baseRoot + "_edited.mol")
+                self.fileConv.CheckElemSymbolsInMolFile(self.inMdlName, aTmpMoleFile)
+                self.rdKit.initMols("mol", aTmpMoleFile, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)           
                         
         if self.workMode == 14 or self.workMode == 141 :
             
             # The input file is a sdf file
-            if os.path.isfile(self.inSdfName):
+            if os.path.isfile(self.inSdfName) and self.chemCheck.isOrganic(self.inSdfName, self.workMode):
                 self.rdKit.initMols("sdf", self.inSdfName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
 
         if self.workMode == 15 or self.workMode == 151 :
             
             # The input file is a mol2 file
-            if os.path.isfile(self.inMol2Name):
+            if os.path.isfile(self.inMol2Name) and self.chemCheck.isOrganic(self.inMol2Name, self.workMode):
                 self.runLibmol(self.inMol2Name)
                 #print self.outRstCifName
                 if not self.runExitCode and os.path.isfile(self.outRstCifName):
@@ -2080,7 +2083,7 @@ class Acedrg(CExeCode ):
                            and os.path.isfile(aIniMolName) :
                             self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingCifMol)    
             else: 
-                print self.inMol2Name, "can not be found for reading "
+                print self.inMol2Name, " can not be found for reading "
                 sys.exit()
 
         if self.workMode in [11, 12, 13, 14, 15]:
@@ -2088,12 +2091,10 @@ class Acedrg(CExeCode ):
         elif self.workMode in [111, 121, 131, 141, 151]:
             self.workMode = 111
 
-        #print "workMode : ", self.workMode
-        print "Ligand ID ", self.monomRoot
-
         if self.workMode == 11 or self.workMode == 111:
             #print len(self.rdKit.molecules)
             if len(self.rdKit.molecules):
+                print "Ligand ID ", self.monomRoot
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
             for iMol in range(len(self.rdKit.molecules)):
                 self.inMmCifName =  os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(iMol) + ".cif")
@@ -2333,9 +2334,9 @@ class AcedrgRDKit():
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
                 aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
-                #print "Molecule name:  ", aMolName
+                print "Molecule name:  ", aMolName
                 # self.reSetChirals     =    True
-                aMolT                 =    Chem.MolFromMolFile(tFileName)
+                aMolT                   =    Chem.MolFromMolFile(tFileName)
                 #aMolT = Chem.AddHs(aMolT1)
             else:
                 print "File %s does not exist "%tFileName
@@ -2787,8 +2788,26 @@ class AcedrgRDKit():
     def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None):
 
         print "A molecule with residue name %s is generated"%tMol.GetProp("ResidueName")
-        nAtoms   =  tMol.GetNumAtoms()
-        print "Number of atoms in this molecule is initially ", nAtoms
+        nAtoms      =  tMol.GetNumAtoms()
+        initAtoms   =  tMol.GetAtoms()
+        # check Atom elements
+        elemList = []
+        for aAtom in initAtoms:
+            elemList.append(aAtom.GetSymbol())
+
+        if not len(elemList) :
+            print "No atoms in from your file, check your file format"
+        elif not tChemCheck.isOrganic1(elemList):
+            print "Your molecule contains METAL or other NON-ORGANIC elements "
+            print "The molecule contains atoms of the following elements "
+            aLine = ""
+            for aElem in elemList:
+                aLine.append(aElem+ "   ")
+            print aLine
+            sys.exit()
+            
+        #print tChemCheck.isOrganic1(elemList)
+        #print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
 
         # Make sure an atom in the molecule has the same charge in the input file. 
@@ -2904,6 +2923,12 @@ class AcedrgRDKit():
                 #    aAtom.SetChiralTag(rdchem.ChiralType.CHI_UNSPECIFIED)
                 #aCT = aAtom.GetChiralTag()
                 #print "Chiral center assigned ", aCT
+    
+        for aAtom in allAtoms:
+            aIdx = aAtom.GetIdx()
+            tChemCheck.checkChiralCenters(aMol,aIdx)
+            #print "Atom ", aAtom.GetProp("Name")
+            #print "Is it a temporal chiral center ", aAtom.HasProp("TmpChiral") 
 
         self.setInitConformersOneMol(aMol, tNumConf)
 
@@ -3180,6 +3205,9 @@ class AcedrgRDKit():
                     #print "Atom ", aAtom.GetProp("Name")
                     #print "Chiral center ? ", aChi
                     nTetraChi +=1
+                elif aAtom.HasProp("TmpChiral") !=0:
+                    nTetraChi +=1
+        
                 aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n" \
                              %(tMonoName, aAtom.GetProp("Name"), aAtom.GetSymbol(),  \
                                aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), pos.x, pos.y, pos.z))
@@ -3252,8 +3280,9 @@ class AcedrgRDKit():
                 chiralIdx = 1
                 for aAtom in allAtoms:      
                     aCT = aAtom.GetChiralTag()
+                    aTmpCT = aAtom.HasProp("TmpChiral")
                     aSetAtomNames = []
-                    if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
+                    if aCT != rdchem.ChiralType.CHI_UNSPECIFIED or aTmpCT !=0 :
                         aCTName = "chir_" + str(chiralIdx)
                         chiralIdx+=1
                         aIdx = aAtom.GetIdx()
@@ -4650,6 +4679,71 @@ class FileTransformer :
             #else:
             #    print "The initial mmcif file does not have a column \"_chem_comp_atom.atom_id\" "
 
+    # Mol files related 
+    def CheckElemSymbolsInMolFile(self, tInFileName, tOutFileName):
+
+        if os.path.isfile(tInFileName):
+            aMolF = open(tInFileName, "r")
+            allMolLs = aMolF.readlines()
+            aMolF.close()
+            
+            aMolSecs = {}
+            iMol = 0
+            aMolSecs[iMol] = {}
+            aMolSecs[iMol]["Sec1"] = []
+            aMolSecs[iMol]["Sec2"] = []
+            aMolSecs[iMol]["Sec3"] = []
+            nOneMolLines = 0
+            nAtoms = 0
+            for aL in allMolLs:
+                if aL.find("$$$$") != -1:
+                    aMolSecs[iMol]["Sec3"].append(aL)
+                    iMol = iMol + 1
+                    aMolSecs[iMol] = {}
+                    aMolSecs[iMol]["Sec1"] = []
+                    aMolSecs[iMol]["Sec2"] = []
+                    aMolSecs[iMol]["Sec3"] = []
+                    nOneMolLines = 0
+                    nAtoms       = 0
+                elif nOneMolLines < 4:
+                    aMolSecs[iMol]["Sec1"].append(aL)
+                    if nOneMolLines ==3:
+                        tN = aL[:3].strip()
+                        if tN.isdigit():
+                            nAtoms = int(tN)
+                        else:
+                            print "Format error is input MOL/SDF file. The count line is : "
+                            print aL 
+                            sys.exit()
+                elif nOneMolLines >= 4:
+                     if nAtoms > 0:
+                         if nOneMolLines >=4 and nOneMolLines < nAtoms:
+                             aSym = aL[30:34].strip()
+                             if len(aSym) !=2:  
+                                 aMolSecs[iMol]["Sec2"].append(aL)
+                             else:
+                                 aSym2 = aSym[0] + aSym[1].lower()
+                                 tL = aL[:30] + " " + aSym2 + " " + aL[34:]
+                                 aMolSecs[iMol]["Sec2"].append(tL)
+                         else: 
+                             aMolSecs[iMol]["Sec3"].append(aL)
+                     else:    
+                            print "Format error is input MOL/SDF file. No count line found  "
+                            sys.exit()
+                nOneMolLines +=1
+
+            if len(aMolSecs[0]["Sec2"]) > 0:
+                # at least there is a molecule in the file.
+                outF = open(tOutFileName, "w")
+                for aMol in sorted(aMolSecs.iterkeys()):
+                    for aL in aMolSecs[aMol]["Sec1"]:
+                        outF.write(aL)
+                    for aL in aMolSecs[aMol]["Sec2"]:
+                        outF.write(aL)
+                    for aL in aMolSecs[aMol]["Sec3"]:
+                        outF.write(aL)
+                outF.close()
+
     def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="UNL", idxConf=0, tDelSign=""):
 
         try:
@@ -4730,8 +4824,8 @@ class ChemCheck():
         self.atomFileType = {}
         self.atomFileType["mmCif"]  = [11, 111]
         self.atomFileType["simils"] = [12, 121]
-        self.atomFileType["mdl"]    = [13, 131]
-        self.atomFileType["mol2"]   = [14, 141]
+        self.atomFileType["mdl"]    = [13, 131, 14, 141]
+        self.atomFileType["mol2"]   = [15, 151]
 
         self.pTable = rdchem.GetPeriodicTable()
 
@@ -4742,17 +4836,42 @@ class ChemCheck():
 
         self.torsions   = []
         self.outChiSign  ={}
+        self.tmpChiralSign = {}
+
+
+    def isOrganicMol(self, tMol):
+
+        pass 
+
+    def isOrganic1(self, tElemList):
+
+        organicOnly = True
+
+        for aElem in tElemList:
+            if not aElem.upper() in self.organicSec:
+                organicOnly = False
+                break;
+
+        return organicOnly 
 
     def isOrganic(self, tInFileName, tTypeIdx):
 
+        organicOnly = True
+
         allAtomElems = []
         self.getAtomElems(tInFileName, tTypeIdx, allAtomElems)
-
-        organicOnly = True
+        
         for aAtomElem in allAtomElems:
             if not aAtomElem in self.organicSec:
                 organicOnly = False
                 break;
+        if not organicOnly :
+            print "The input ligands/molecules contains metal or other heavier atoms "
+            print "Acedrg currently deals with ligands/molecules with following elements only "
+            print "C, N, O, S, P, Cl, F, I, H"
+        if len(allAtomElems) ==0:
+            print "Can not get the element symbols of atoms. Check input file format"
+            organicOnly = False
 
         return organicOnly 
 
@@ -4785,8 +4904,8 @@ class ChemCheck():
   
         if tTypeIdx in self.atomFileType["mmCif"]: 
             self.getAtomElemsFromMmcif(tInFileName, tAtomElems)
-        elif tTypeIdx in self.atomFileType["simils"]: 
-            self.getAtomElemsFromSmiles(tInFileName, tAtomElems)
+        elif tTypeIdx in self.atomFileType["simils"]:
+                self.getAtomElemsFromSmiles(tInFileName, tAtomElems)
         elif tTypeIdx in self.atomFileType["mdl"]: 
             self.getAtomElemsFromMdl(tInFileName, tAtomElems)
         elif tTypeIdx in self.atomFileType["mol2"]: 
@@ -4847,8 +4966,91 @@ class ChemCheck():
             allLines = inFile.readlines()
             inFile.close()
             if len(allLines) > 3 :
-                pass
+                nOneMolLines = 0
+                nAtoms       = 0
+                for aL in allLines:
+                    if aL.find("$$$$") != -1:
+                        nOneMolLines = 0 
+                        nAtoms       = 0
+                    elif nOneMolLines == 3:
+                        tN = aL[:3].strip()
+                        if tN.isdigit():
+                            nAtoms = int(tN)
+                        else:
+                            print "Format error is input MOL/SDF file. The count line is : "
+                            print aL 
+                            sys.exit()
+                    elif nOneMolLines > 3 and nOneMolLines < nAtoms:
+                        aElem = aL[30:34].strip()
+                        if not aElem in tAtomElems:
+                            tAtomElems.append(aL[30:34].strip())  
+                    nOneMolLines += 1
 
+    def getAtomElemsFromSmiles(self, tFileName, tAtomElems):
+
+        if os.path.isfile(tFileName):
+            # SMILES string in a file
+            try:
+                fSmi = open(tFileName, "r")
+            except IOError:
+                print  "% can not be open for reading "%tFileName
+                sys.exit()
+            else:
+                aSmiStr = fSmi.read()
+                aSmiStr = aSmiStr.strip()
+                fSmi.close()
+        else:
+            # SMILES string in from a commandline  
+            aSmiStr = tFileName.strip()
+        if len(aSmiStr):
+            checkMol=Chem.MolFromSmiles(aSmiStr)
+  
+            if checkMol:
+                for aAtom in checkMol.GetAtoms():
+                    aSym = aAtom.GetSymbol().strip()
+                    if len(aSym) and not aSym in tAtomElems:
+                        tAtomElems.append(aSym)
+            else:
+                print "Can not generate a molecule from the input SMILES string!"
+                print "Check your SMILES or report the bug "
+
+    def getAtomElemsFromMol2(self, tFileName, tAtomElems):
+
+        if os.path.isfile(tFileName):
+            checkMol=Chem.MolFromMol2File(tFileName)
+            if checkMol:
+                for aAtom in checkMol.GetAtoms():
+                    aSym = aAtom.GetSymbol().strip()
+                    if len(aSym) and not aSym in tAtomElems:
+                        tAtomElems.append(aSym)
+            else:
+                print "Can not generate a molecule from the input mol2 file!"
+                print "Check your mol2 file or report the bug "
+
+
+    def checkChiralCenters(self, tMol, tIdx):
+   
+        # RDKit misses some chiral centers such as N with 3 bonds.
+        # Need to fix them here. May add other cases later.
+
+        tCenAtm = tMol.GetAtomWithIdx(tIdx)
+
+        aSymb = tCenAtm.GetSymbol().strip()
+        if len(aSymb)==1 and aSymb.find("N") !=-1:
+            aNBSet = tCenAtm.GetNeighbors()
+            if len(aNBSet) == 3:
+                lSP2 = False
+                for aNB in aNBSet:
+                    Hyb = aNB.GetHybridization()
+                    if Hyb == Chem.rdchem.HybridizationType.SP2:
+                        lSP2 = True
+                        break
+
+                if not lSP2:
+                    # TEMP, re-calculated when the coordinates are available
+                    #tCenAtm.SetChiralTag(rdchem.ChiralType.CHI_TETRAHEDRAL_CW)            
+                    tCenAtm.SetProp("TmpChiral", "both")       
+         
     def getChiralVolumeSign(self, cListCen, cList1, cList2, cList3):
 
         vSign = ""
