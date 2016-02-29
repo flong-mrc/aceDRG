@@ -165,10 +165,6 @@ namespace LIBMOL
         ~BondDict();
                 
         std::string bondOrderNumToStr();
-        bool        checkIfInSameRing(std::vector<AtomDict> & tAtoms,
-                                      int tIdx1, int tIdx2);
-        
-        bool        checkIfInSameRing2(std::vector<AtomDict> & tAtoms);
         
         ID                      resName;
         SeriNumber              seriNum;
@@ -183,7 +179,7 @@ namespace LIBMOL
         REAL                    sigValueP;
         REAL                    oriValue;
         
-        int                     nLevel;
+        int                     approxLevel;
         
         bool                    hasMetal;
         bool                    hasCodValue;
@@ -198,6 +194,7 @@ namespace LIBMOL
         
         std::vector<ID>         atomsCodClasses;
         std::vector<int>        atomsHashingCodes;
+        std::map<ID, ID>        atomSPs;
         
         std::vector<ID>         atomsMainRep;
         std::vector<ID>         atomsNBRep;
@@ -238,6 +235,10 @@ namespace LIBMOL
     };
     
     extern int getBond(std::vector<BondDict> & tAllBonds, int tAt1, int tAt2);
+    
+    extern bool checkIfBondInSameRing(std::vector<AtomDict> & tAtoms, 
+                                      int idxA1, int idxA2);
+    
 }
 
 

@@ -130,8 +130,32 @@ namespace LIBMOL
     
     extern void getHydroAtomConnect(std::vector<AtomDict>  &  tAtoms);
     
+    // Two stages for sp hybridization (They will be merged to the same
+    // function once the second one passes tests
+    // 1. Currently used one (originally in codClassify.h and .cpp) 
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms);
+    // 2. Added one
+    extern void modAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms,
+                                               std::vector<BondDict> & tBonds,
+                                               std::vector<AngleDict> & tAngles,
+                                               std::vector<RingDict> & tRings);
     
+    extern void reIndexAtomInRing(std::vector<AtomDict> & tAtoms,
+                                  std::vector<RingDict> & tRings);
+    
+    extern void setAnglesSPSigns(std::vector<AtomDict> & tAtoms,
+                                 std::vector<AngleDict> & tAngles);
+    
+    extern bool confirmPlaneByChiralVol(std::vector<AtomDict> & tAtoms,
+                                        std::vector<AtomDict>::iterator tA);
+    // a function transfer int sp to a string
+    extern std::string strTransSP(int tSP);
+    
+    extern bool checkBridgeStruct(std::vector<AtomDict> & tAtoms,
+                                  std::vector<RingDict> & tRings,
+                                  int                     tAnchIdx);
+    
+    // 
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 
                                 REAL tTolBondOrder);
     extern REAL checkProtonateO(std::vector<AtomDict>::iterator tIA, 

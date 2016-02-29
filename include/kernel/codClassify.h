@@ -92,6 +92,9 @@
 #include "DictCifFile.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
 
 namespace LIBMOL
 {
@@ -342,6 +345,8 @@ namespace LIBMOL
         void setDefaultOrgBonds();
         void setOrgBondHeadHashList();
         void setOrgBondHeadHashList2();
+        void groupHashAndSpAndRingBonds();
+        void groupHashAndSpBonds();
         void groupCodOrgBonds();
         void groupCodOrgBonds2();
         void groupCodOrgBonds3();
@@ -352,7 +357,7 @@ namespace LIBMOL
         void setupTargetMetBondsUsingMean(std::vector<std::map<ID,REAL> > tSkeys,
                                           std::vector<BondDict>::iterator tB);
         void searchCodBonds();
-        
+        void searchBondHashAndSP(std::vector<BondDict>::iterator iB);
         void getCCP4Bonds(std::vector<BondDict>::iterator tB, ID tAtm1, ID tAtm2);
         // TEMP, should replace getCCP4Bonds before committing it
         void getCCP4Bonds2(std::vector<BondDict>::iterator tB, ID tAtm1, ID tAtm2);
@@ -413,6 +418,7 @@ namespace LIBMOL
         void setOrgAngleHeadHashList();
         void setOrgAngleHeadHashList2();
         void setOrgAngleHeadHashList22();
+        void groupHashAndSpAngles();
         void groupCodOrgAngles();
         void groupCodOrgAngles2();
         void groupCodOrgAngles22();
@@ -424,7 +430,8 @@ namespace LIBMOL
                                 std::vector<std::string>  &      tKeySet2,
                                 int                              tLev,
                                 std::vector<AngleDict>::iterator iAN);
-        
+        std::string matchRandCenterA(std::string & tR, std::string tCen, 
+                                     std::map<ID, std::vector<aValueSet> > tDictAngs);
         bool searchCodOrgAnglesCen(std::vector<AngleDict>::iterator iAN, 
                                    int tHa1, int tHal2, int tHa3);
         bool getCCP4Angle(std::vector<AngleDict>::iterator tAN);
@@ -578,18 +585,28 @@ namespace LIBMOL
         
         //DB3 
         std::vector<aValueSet>                    allDictBondsD;
+        
         std::map<int, std::map<int, std::map<ID, std::map<ID,  std::map<ID,
-                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, 
-                 std::map<ID, std::map<ID, int > > > > > > > > > > >allDictBondsIdxD;
+                 std::map<ID, std::map<ID, std::map<ID, std::map<ID, std::map<ID,
+                 std::map<ID, std::map<ID, int > > > > > > > > > > > >allDictBondsIdxD;
         
         
-        std::map<int, std::map<int, std::map<ID,  std::map<ID, 
+        std::map<int, std::map<int, std::map<ID,  std::map<ID, std::map<ID, 
                 std::map<ID,  std::map<ID, std::map<ID, std::map<ID, std::map<ID,  
-                std::vector<aValueSet> > > > > > > > > >allDictBondsIdx1D;
+                std::vector<aValueSet> > > > > > > > > > >allDictBondsIdx1D;
         
         std::map<int, std::map<int, std::map<ID,  std::map<ID, 
-                std::map<ID,  std::map<ID, std::map<ID,   
-                std::vector<aValueSet> > > > > > > >   allDictBondsIdx2D;
+                std::map<ID,  std::map<ID, std::map<ID,  std::map<ID,   
+                std::vector<aValueSet> > > > > > > >  > allDictBondsIdx2D;
+        
+        std::map<ID, std::map<ID, std::map<ID,  std::map<ID,
+                std::vector<aValueSet> > > > >          allENBonds;
+        std::map<int, std::map<int, std::map<ID,  std::map<ID,
+                std::vector<aValueSet> > > > >          allHaAndSpBonds;
+        std::map<int, std::map<int, std::map<ID,
+        std::vector<aValueSet> > > >                    allHaAndSpBonds1D;
+        std::map<int, std::map<int,
+        std::vector<aValueSet> > >                      allHaAndSpBonds2D;
         
         // std::vector<aValueSet>                         allDictAnglesD;
         
@@ -633,10 +650,17 @@ namespace LIBMOL
         std::vector<aValueSet> > > > >                        allDictAnglesIdx5D;
         
         // angles 
-        std::vector<AngleDict>                         allAngles;
-        std::map<int, std::vector<std::vector<int> > > allAnglesIdxs;
+        std::vector<AngleDict>                                allAngles;
+        std::map<int, std::vector<std::vector<int> > >        allAnglesIdxs;
         
-        std::vector<AngleDict>                         allDictAngles;
+        std::vector<AngleDict>                                allDictAngles;
+        
+        std::map<int, std::map<int, std::map<int, 
+        std::map<ID,  std::map<ID,  std::map<ID,  
+        std::map<ID,  std::vector<aValueSet> > > > > > > >    allHaAndSpAngles;
+                 
+        std::map<int, std::map<int, std::map<int, 
+        std::vector<aValueSet> > > >                          allHaAndSpAngles1D;
         /*
         std::map<int, std::map<int, std::map<int, 
         std::map<ID,  std::map<ID,  std::map<ID, 
@@ -780,7 +804,10 @@ namespace LIBMOL
     };
     
     
-    
+    extern void outB_and_A_Levels(FileName tFName, 
+                                  std::vector<AtomDict>  & tAtoms,
+                                  std::vector<BondDict>  & tBonds,
+                                  std::vector<AngleDict> & tAngles);
     
 }
 

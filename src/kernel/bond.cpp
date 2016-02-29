@@ -201,7 +201,7 @@ namespace LIBMOL
             valueP(ZeroReal),
             sigValueP(ZeroReal),
             oriValue(ZeroReal),
-            nLevel(ZeroInt),
+            approxLevel(ZeroInt),
             hasMetal(false),
             hasCodValue(false),
             numCodValues(ZeroInt),
@@ -222,7 +222,7 @@ namespace LIBMOL
             valueP(tBond.valueP),
             sigValueP(tBond.sigValueP),
             oriValue(tBond.oriValue),
-            nLevel(tBond.nLevel),
+            approxLevel(tBond.approxLevel),
             hasMetal(tBond.hasMetal),
             hasCodValue(tBond.hasCodValue),
             numCodValues(tBond.numCodValues),
@@ -252,6 +252,13 @@ namespace LIBMOL
         {
             atomsHashingCodes.push_back(*tA);
         }
+        
+        for (std::map<ID, ID>::const_iterator tA = tBond.atomSPs.begin();
+                tA != tBond.atomSPs.end(); tA++)
+        {
+            atomSPs[tA->first]=tA->second;
+        }
+                
         for (std::vector<ID>::const_iterator tA = tBond.atomsMainRep.begin();
                 tA != tBond.atomsMainRep.end(); tA++)
         {
@@ -295,23 +302,6 @@ namespace LIBMOL
     }
     */
     
-    bool BondDict::checkIfInSameRing(std::vector<AtomDict>& tAtoms, 
-                                     int tIdx1, int tIdx2)
-    {
-        bool lInRing = false;
-        for (std::vector<int>::iterator iR=tAtoms[tIdx1].inRings.begin();
-                iR !=tAtoms[tIdx1].inRings.end(); iR++)
-        {
-            if (std::find(tAtoms[tIdx2].inRings.begin(), tAtoms[tIdx2].inRings.end(), *iR)
-                    !=tAtoms[tIdx2].inRings.end())
-            {
-                lInRing = true;
-                break;
-            }
-        }
-        
-        return lInRing;
-    }
     
     MetBond::MetBond() : resName(NullString),
             seriNum(ZeroInt),
@@ -358,6 +348,25 @@ namespace LIBMOL
         }
         
         return tBo;
+    }
+    
+    extern bool checkIfBondInSameRing(std::vector<AtomDict> & tAtoms, 
+                                      int tIdx1, int tIdx2)
+    {
+        bool lInRing = false;
+        for (std::vector<int>::iterator iR=tAtoms[tIdx1].inRings.begin();
+                iR !=tAtoms[tIdx1].inRings.end(); iR++)
+        {
+            if (std::find(tAtoms[tIdx2].inRings.begin(), tAtoms[tIdx2].inRings.end(), *iR)
+                    !=tAtoms[tIdx2].inRings.end())
+            {
+                lInRing = true;
+                break;
+            }
+           
+        }
+        return lInRing;
+        
     }
     
     

@@ -183,7 +183,7 @@ namespace LIBMOL
             anchorID(NullString),
             anchorPos(ZeroInt),
             isFixed(false),
-            levelCodValue(10),
+            approxLevel(10),
             isInSameRing(ZeroInt)
     {
     }
@@ -202,7 +202,7 @@ namespace LIBMOL
             anchorID(tAngle.anchorID),
             anchorPos(tAngle.anchorPos),
             isFixed(tAngle.isFixed),
-            levelCodValue(tAngle.levelCodValue),
+            approxLevel(tAngle.approxLevel),
             isInSameRing(tAngle.isInSameRing)
     {
            
@@ -237,6 +237,13 @@ namespace LIBMOL
             atomsNBRep.push_back(*iAt);
         }
         
+        
+        for (std::map<ID, ID>::const_iterator iAt=tAngle.atomsSPStats.begin();
+                iAt !=tAngle.atomsSPStats.end(); iAt++)
+        {
+            atomsSPStats[iAt->first] = iAt->second;
+        }
+        
         for (std::vector<REAL>::const_iterator iAt=tAngle.codAngleValues.begin();
                 iAt != tAngle.codAngleValues.end(); iAt++)
         {
@@ -255,7 +262,7 @@ namespace LIBMOL
             anchorID(tAnchID),
             anchorPos(tAnchPos),
             isFixed(false),
-            levelCodValue(10),
+            approxLevel(10),
             isInSameRing(ZeroInt)
     {
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();

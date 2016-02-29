@@ -467,7 +467,7 @@ namespace LIBMOL
         //if (!hasCCP4Type)
         //{
             
-            setAtomsCCP4Type();
+        //    setAtomsCCP4Type();
         //}
        
         
@@ -558,6 +558,10 @@ namespace LIBMOL
         {
             setAtomsCCP4Type();
         }
+        
+        reIndexAtomInRing(allAtoms, allRingsV);
+        
+        modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV);
         
         /*
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
@@ -762,10 +766,11 @@ namespace LIBMOL
                     }
                 }
             }
-            else if (iAt->chemType.compare("N")==0)
+            else if (iAt->chemType.compare("N")==0
+                    || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
+                if(t_len==4 || t_len==3)
                 {
                     //if (iAt->chiralIdx ==0)
                     //{
@@ -810,7 +815,7 @@ namespace LIBMOL
                 }
                 else if (iAt->connAtoms.size()==1)
                 {
-                    iAt->bondingIdx = 1;
+                    iAt->bondingIdx = 2;
                 }
             }
             else if (iAt->chemType.compare("SI")==0 

@@ -100,6 +100,10 @@
 #include "CCP4AtomType.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
