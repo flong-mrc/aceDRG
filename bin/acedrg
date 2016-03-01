@@ -1352,7 +1352,7 @@ class Acedrg(CExeCode ):
                 else:
                     tFValue = -1.0 
                     tFValue = self.getRefmacFValue(self._log_name)
-                    if tFValue > 0.0:
+                    if tFValue >= -0.000001:
                         if len(tRoot) !=0:
                             if not self.refmacXYSList.has_key(tRoot):
                                  self.refmacXYSList[tRoot] = {}
@@ -1402,9 +1402,10 @@ class Acedrg(CExeCode ):
             #print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
             #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
             self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
-            #print "out cif name ", self.outRstCifName
             if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
+                #print "|%s%s|"%("Output LIB : ".ljust(12), self.refmacXYZOUTName.ljust(53))
                 if self.numConformers !=1:
+                    #print "refmac out ", self.refmacXYZOUTName
                     self.getFinalOutputFiles(aFRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacXYZOUTName, self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             else:
                 print "Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn
@@ -1433,7 +1434,7 @@ class Acedrg(CExeCode ):
                         #print "fvalue taken : ", aFva
 
         
-        # print "Fvalue taken from %s is %10.5f"%(tLogName, aFva)     
+        #print "Fvalue taken from %s is %10.5f"%(tLogName, aFva)     
 
         return aFva
         
@@ -1456,7 +1457,7 @@ class Acedrg(CExeCode ):
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
                 print "===================================================================" 
         else:
-            print "Failed to produce %s after final geometrical optimization"%finPdb
+            print "Failed to produce %s after final geometrical optimization"%tInPdb
 
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
 
@@ -2096,6 +2097,7 @@ class Acedrg(CExeCode ):
             if len(self.rdKit.molecules):
                 print "Ligand ID ", self.monomRoot
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
+                self.rdKit.hasCCP4Type = self.fileConv.hasCCP4Type
             for iMol in range(len(self.rdKit.molecules)):
                 self.inMmCifName =  os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(iMol) + ".cif")
                 self.initMmcifMolMap[iMol] = self.inMmCifName
@@ -2217,6 +2219,7 @@ class AcedrgRDKit():
         self.nMaxMult =20
       
         self.useExistCoords  = False
+        self.hasCCP4Type     = False
    
         self.chemCheck = ChemCheck()
 
@@ -3107,8 +3110,6 @@ class AcedrgRDKit():
                 tAllAtoms.append(aAt)
             else:
                 tDelAtomIdxs.append(aAt.GetIdx())
-           
- 
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="UNL", tChiDes=None, tGroupName="non-polymer", tIdxConform=0):
 
@@ -3953,6 +3954,8 @@ class FileTransformer :
 
         self.PdbForMols       = {}
 
+        self.hasCCP4Type      = False
+
     def mmCifReader(self, tFileName):
         """Read a detailed mmicif file to get basic information"""
 
@@ -4222,6 +4225,8 @@ class FileTransformer :
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.partial_charge"]
                     if math.fabs(float(tCharge)) >=0.001:
                         self.inputCharge[aAtom["_chem_comp_atom.atom_id"]] = tCharge
+                if aAtom.has_key("_chem_comp_atom.type_energy"):
+                    self.hasCCP4Type = True
             self.atoms = []
             for aAtom in tAtoms:
                 self.atoms.append(aAtom)

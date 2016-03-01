@@ -423,7 +423,7 @@ namespace LIBMOL
                 setAtomsMetalType();
                 
                 // Check
-                
+                /*
                 std::cout << "There are " << (int)allAtoms.size() 
                           << " atoms in the system. They are " << std::endl;
             
@@ -453,6 +453,7 @@ namespace LIBMOL
                              << "y:   " << iA->coords[1] << std::endl
                              << "z:   " << iA->coords[2] << std::endl;           
                }
+                 */
             }
        }
        
@@ -2218,7 +2219,9 @@ namespace LIBMOL
             
             inFile.close();
             
+            //std::cout << "CCP4 type " << hasCCP4Type << std::endl;
             
+            /*
             std::cout << "The following is the property of the system in the input cif: "
                       << std::endl;
             
@@ -2229,7 +2232,7 @@ namespace LIBMOL
             std::cout << "Number of atoms in the system  " << propComp.numAtoms << std::endl;
             std::cout << "Number of H atoms in the system " << propComp.numH << std::endl;
             std::cout << "The system description level " << propComp.level << std::endl;
-            
+            */
             // Set the bonding properties for all atoms based
             // on their connections
             // If no bonds defined in the cif file. Stop the program at the moment.
@@ -2264,7 +2267,7 @@ namespace LIBMOL
                 setAtomsCCP4Type();
             }
             
-            
+            /*
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
             {
@@ -2306,7 +2309,9 @@ namespace LIBMOL
                 //std::cout << "Its length : "    << iBo->length << std::endl;
                 //std::cout << "Its sigLength : " << iBo->sigLength << std::endl;
                 std::cout << "its order : " << iBo->order << std::endl;
-            }    
+            } 
+            */
+            
         }
         
     }
@@ -2695,7 +2700,7 @@ namespace LIBMOL
                 {
                     hasProps["atom"].insert(std::pair<std::string, int>("enerType",curBlockLine));
                     hasCCP4Type = true;
-                    //std::cout << curBlockLine << std::endl;
+                    // std::cout << curBlockLine << std::endl;
                     //curBlockLine++;
                 }
                 else if(tF1[1].find("charge") !=std::string::npos)

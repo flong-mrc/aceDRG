@@ -622,6 +622,11 @@ namespace LIBMOL
         
         modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV);
         
+        //if (!hasCCP4Type)
+        //{
+        //    setAtomsCCP4Type();
+        //}
+        
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {
@@ -6245,6 +6250,10 @@ namespace LIBMOL
                       << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
                       << std::endl;
             
+            std::vector<int> aHaV;
+            aHaV.push_back(ha1);
+            aHaV.push_back(ha2);
+            
             if (allDictBondsIdxD.find(ha1) != allDictBondsIdxD.end()
                 && allDictBondsIdxD[ha1].find(ha2) != allDictBondsIdxD[ha1].end())
             {
@@ -6391,162 +6400,91 @@ namespace LIBMOL
                                         // not found a1M
                                         aValueSet   tVaS;
                                         setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB]);
-                                        iB->value        =tVaS.value;
-                                        iB->valueST      =iB->value;
-                                        iB->sigValue     =tVaS.sigValue;
-                                        iB->sigValueST   =iB->sigValue;
-                                        iB->numCodValues =tVaS.numCodValues;
-                                        iB->approxLevel  = 1;
+                                        if (tVaS.numCodValues >=4)
+                                        {
+                                            iB->value        =tVaS.value;
+                                            iB->valueST      =iB->value;
+                                            iB->sigValue     =tVaS.sigValue;
+                                            iB->sigValueST   =iB->sigValue;
+                                            iB->numCodValues =tVaS.numCodValues;
+                                            iB->approxLevel  = 1;
+                                        }
+                                        else
+                                        {
+                                            std::vector<ID>  aKV;
+                                            aKV.push_back(hybrComb);
+                                            aKV.push_back(tInR);
+                                            aKV.push_back(a1NB2);
+                                            aKV.push_back(a2NB2);
+                                            aKV.push_back(a1NB);
+                                            levelSearchBonds(aHaV, aKV, 1, iB);
+                                            if (iB->numCodValues < 4)
+                                            {
+                                                aKV.pop_back();
+                                                levelSearchBonds(aHaV, aKV, 2, iB);
+                                            }
+                                        }
                                     }
                                 }
                                 else
                                 {
                                     // not found a2NB
-                                    std::vector<aValueSet> tBs5;
-                                    for (std::map<ID, std::vector<aValueSet> >::iterator iB5
-                                          =allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB].begin();
-                                         iB5 !=allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB].end();
-                                         iB5++)
-                                    {
-                                        for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
-                                                iB6 !=iB5->second.end(); iB6++)
-                                        {
-                                            tBs5.push_back(*iB6);
-                                        }
-                                    }
                                     
-                                    aValueSet   tVaS;
-                                    setValueSet(tVaS, tBs5);
-                                    iB->value        = tVaS.value;
-                                    iB->valueST      = iB->value;
-                                    iB->sigValue     = tVaS.sigValue;
-                                    iB->sigValueST   = iB->sigValue;
-                                    iB->numCodValues = tVaS.numCodValues;
-                                    iB->approxLevel  = 1;
+                                    std::vector<ID>  aKV;
+                                    aKV.push_back(hybrComb);
+                                    aKV.push_back(tInR);
+                                    aKV.push_back(a1NB2);
+                                    aKV.push_back(a2NB2);
+                                    aKV.push_back(a1NB);
+                                    levelSearchBonds(aHaV, aKV, 1, iB);
+                                    
+
+                                    if (iB->numCodValues < 4)
+                                    {
+                                        aKV.pop_back();
+                                        levelSearchBonds(aHaV, aKV, 2, iB);
+                                        if (iB->numCodValues <4)
+                                        {
+                                            aKV.pop_back();
+                                            levelSearchBonds(aHaV, aKV, 3, iB);
+                                        }
+                                    }   
                                 }
                             }
                             else
                             {
                                 // not found a1NB
+                                std::vector<ID>  aKV;
+                                aKV.push_back(hybrComb);
+                                aKV.push_back(tInR);
+                                aKV.push_back(a1NB2);
+                                aKV.push_back(a2NB2);
+                                levelSearchBonds(aHaV, aKV, 2, iB);
                                 
-                                std::vector<aValueSet> tBs4;
-                                
-                                for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB4
-                                          =allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].begin();
-                                         iB4 !=allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].end();
-                                         iB4++)
+                                if (iB->numCodValues < 4)
                                 {
-                                    for (std::map<ID, std::vector<aValueSet> >::iterator iB5=iB4->second.begin();
-                                            iB5 !=iB4->second.end(); iB5++)
+                                    aKV.pop_back();
+                                    levelSearchBonds(aHaV, aKV, 3, iB);
+                                    if (iB->numCodValues <4)
                                     {
-                                        for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
-                                                iB6 !=iB5->second.end(); iB6++)
-                                        {
-                                            tBs4.push_back(*iB6);
-                                            /*
-                                            std::cout << iB4->first << std::endl
-                                                      << iB5->first << std::endl;
-                                            std::cout << "candidate value : " 
-                                                      << iB6->value << std::endl
-                                                      << "Its number " << iB6->numCodValues
-                                                      << std::endl;
-                                             */
-                                        }
+                                        aKV.pop_back();
+                                        levelSearchBonds(aHaV, aKV, 4, iB);
                                     }
-                                }
-                                
-                                aValueSet   tVaS;
-                                setValueSet(tVaS, tBs4);
-                                iB->value        = tVaS.value;
-                                iB->valueST      = iB->value;
-                                iB->sigValue     = tVaS.sigValue;
-                                iB->sigValueST   = iB->sigValue;
-                                iB->numCodValues = tVaS.numCodValues;
-                                iB->approxLevel  = 2;
-                                
+                                }   
                             }  
                         }
                         else
                         {
                             // not found a2NB2
-                            std::vector<aValueSet> tBs3;
-                                
-                            for (std::map<ID, std::map<ID, std::map<ID, 
-                                 std::vector<aValueSet> > > >::iterator iB3
-                                 =allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2].begin();
-                                 iB3 !=allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2].end();
-                                         iB3++)
+                            std::vector<ID>  aKV;
+                            aKV.push_back(hybrComb);
+                            aKV.push_back(tInR);
+                            aKV.push_back(a1NB2);
+                            levelSearchBonds(aHaV, aKV, 3, iB);
+                            if (iB->numCodValues <4)
                             {
-                                for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB4
-                                        =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
-                                {
-                                    for (std::map<ID, std::vector<aValueSet> >::iterator iB5=iB4->second.begin();
-                                        iB5 !=iB4->second.end(); iB5++)
-                                    {
-                                        for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
-                                                iB6 !=iB5->second.end(); iB6++)
-                                        {
-                                            tBs3.push_back(*iB6);
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            aValueSet   tVaS;
-                            setValueSet(tVaS, tBs3);
-                            
-                            if (tVaS.numCodValues > 5 && tVaS.sigValue <0.05)
-                            {
-                                iB->value        =tVaS.value;
-                                iB->valueST      =iB->value;
-                                iB->sigValue     =tVaS.sigValue;
-                                iB->sigValueST   =iB->sigValue;
-                                iB->numCodValues =tVaS.numCodValues;
-                                iB->approxLevel  = 2;
-                            }
-                            else
-                            {
-                                for (std::map<ID, std::map<ID, std::map<ID, 
-                                     std::map<ID, std::vector<aValueSet> > > > >::iterator iB3
-                                     =allDictBondsIdx2D[ha1][ha2][hybrComb][tInR].begin();
-                                     iB3 !=allDictBondsIdx2D[ha1][ha2][hybrComb][tInR].end(); iB3++)
-                                {
-                                    if (iB3->first !=a1NB2)
-                                    {
-                                        for (std::map<ID, std::map<ID, std::map<ID,  
-                                             std::vector<aValueSet> > > >::iterator iB4
-                                             =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
-                                        {
-                                            if (iB4->first == a2NB2)
-                                            {
-                                                for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5=iB4->second.begin();
-                                                        iB5 !=iB4->second.end(); iB5++)
-                                                {
-                                                    for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
-                                                        iB6 !=iB5->second.end(); iB6++)
-                                                    {
-                                                        for(std::vector<aValueSet>::iterator iB7=iB6->second.begin();
-                                                            iB7 !=iB6->second.end(); iB7++)
-                                                        {
-                                                            tBs3.push_back(*iB7);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-                                
-                                setValueSet(tVaS, tBs3);
-                                
-                                iB->value        =tVaS.value;
-                                iB->valueST      =iB->value;
-                                iB->sigValue     =tVaS.sigValue;
-                                iB->sigValueST   =iB->sigValue;
-                                iB->numCodValues =tVaS.numCodValues;
-                                iB->approxLevel  = 3;
-                                
+                                aKV.pop_back();
+                                levelSearchBonds(aHaV, aKV, 4, iB);
                             }
                             
                         }
@@ -6782,6 +6720,169 @@ namespace LIBMOL
                 }
             }
         }
+    }
+    
+    void CodClassify::levelSearchBonds( std::vector<int> &      tKeySet1,
+                               std::vector<std::string>  &      tKeySet2,
+                               int                              tLev,
+                               std::vector<BondDict>::iterator  iB)
+    {
+        if (tLev==1)
+        {
+            // For a2NB 
+            std::vector<aValueSet> tBs5;
+            for (std::map<ID, std::vector<aValueSet> >::iterator iB5
+                 =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]][tKeySet2[4]].begin();
+                 iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]][tKeySet2[4]].end();
+                 iB5++)
+            {
+                for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
+                    iB6 !=iB5->second.end(); iB6++)
+                {
+                    tBs5.push_back(*iB6);
+                }
+            }
+            aValueSet   tVaS;
+            if (tBs5.size() >=4)
+            {
+                setValueSet(tVaS, tBs5);
+                iB->value        = tVaS.value;
+                iB->valueST      = iB->value;
+                iB->sigValue     = tVaS.sigValue;
+                iB->sigValueST   = iB->sigValue;
+                iB->numCodValues = tVaS.numCodValues;
+                iB->approxLevel  = 1;
+            }
+            else
+            {
+                iB->numCodValues = 0;
+            }
+        }
+        else if (tLev==2)
+        {
+            
+            // For a1NB
+            std::vector<aValueSet> tBs5;
+            for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5
+                 =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].begin();
+                 iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].end();
+                 iB5++)
+            {
+                for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
+                    iB6 !=iB5->second.end(); iB6++)
+                {
+                    for (std::vector<aValueSet>::iterator iB7=iB6->second.begin();
+                            iB7 !=iB6->second.end(); iB7++)
+                    {
+                        tBs5.push_back(*iB7);
+                    }
+                }
+            }
+            aValueSet   tVaS;
+            if (tBs5.size() >=4)
+            {
+                setValueSet(tVaS, tBs5);
+                iB->value        = tVaS.value;
+                iB->valueST      = iB->value;
+                iB->sigValue     = tVaS.sigValue;
+                iB->sigValueST   = iB->sigValue;
+                iB->numCodValues = tVaS.numCodValues;
+                iB->approxLevel  = 1;
+            }
+            else
+            {
+                iB->numCodValues = 0;
+            }
+        }
+        else if (tLev==3)
+        {
+            // For a2NB2
+            std::vector<aValueSet> tBs5;
+            
+            for (std::map<ID, std::map<ID, std::map<ID, 
+                 std::vector<aValueSet> > > >::iterator iB5
+                 =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]].begin();
+                 iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]].end();
+                 iB5++)
+            {
+                for(std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB6=
+                      iB5->second.begin(); iB6 !=iB5->second.end(); iB6++)
+                {
+                    for(std::map<ID, std::vector<aValueSet> >::iterator iB7=iB6->second.begin();
+                    iB7 !=iB6->second.end(); iB7++)
+                    {
+                        for (std::vector<aValueSet>::iterator iB8=iB7->second.begin();
+                                iB8 !=iB7->second.end(); iB8++)
+                        {
+                            tBs5.push_back(*iB8);
+                        }
+                    }
+                }
+            }
+            aValueSet   tVaS;
+            if (tBs5.size() >=4)
+            {
+                setValueSet(tVaS, tBs5);
+                iB->value        = tVaS.value;
+                iB->valueST      = iB->value;
+                iB->sigValue     = tVaS.sigValue;
+                iB->sigValueST   = iB->sigValue;
+                iB->numCodValues = tVaS.numCodValues;
+                iB->approxLevel  = 2;
+            }
+            else
+            {
+                iB->numCodValues = 0;
+            }
+        }
+        else if (tLev==4)
+        {
+            
+            // for a1NB2
+            std::vector<aValueSet> tBs5;
+            
+            for (std::map<ID, std::map<ID, std::map<ID, std::map<ID,
+                 std::vector<aValueSet> > > > >::iterator iB5
+                 =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]].begin();
+                 iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]].end();
+                 iB5++)
+            {
+                for (std::map<ID, std::map<ID, std::map<ID, std::vector<aValueSet> > > >::iterator
+                      iB5_1=iB5->second.begin(); iB5_1 !=iB5->second.end(); iB5_1++)
+                {
+                    for(std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB6=
+                        iB5_1->second.begin(); iB6 !=iB5_1->second.end(); iB6++)
+                    {
+                        for(std::map<ID, std::vector<aValueSet> >::iterator iB7=iB6->second.begin();
+                            iB7 !=iB6->second.end(); iB7++)
+                        {
+                            for (std::vector<aValueSet>::iterator iB8=iB7->second.begin();
+                                 iB8 !=iB7->second.end(); iB8++)
+                            {
+                                tBs5.push_back(*iB8);
+                            }
+                        }
+                    }
+                }
+            }
+            aValueSet   tVaS;
+            if (tBs5.size() >=4)
+            {
+                setValueSet(tVaS, tBs5);
+                iB->value        = tVaS.value;
+                iB->valueST      = iB->value;
+                iB->sigValue     = tVaS.sigValue;
+                iB->sigValueST   = iB->sigValue;
+                iB->numCodValues = tVaS.numCodValues;
+                iB->approxLevel  = 2;
+            }
+            else
+            {
+                iB->numCodValues = 0;
+            }
+        }
+         
+        
     }
     
     void CodClassify::getCCP4Bonds(std::vector<BondDict>::iterator tB, 

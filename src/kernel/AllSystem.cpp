@@ -420,36 +420,7 @@ namespace LIBMOL
     void AllSystem::setSysProps()
     {
         // setHydroAtomConnect();
-        /*
-        std::cout << std::endl << "Test protonation " << std::endl;
-        std::cout << "Before protonation, number of atoms is " << allAtoms.size() << std::endl;
-        std::cout << "They are : " << std::endl;
-        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
-                iA !=allAtoms.end(); iA++)
-        {
-            std::cout << iA->id << std::endl;
-        }
         
-        std::vector<int>  addHAtmIdxs;
-        ProtonateFunctionGroupInOneMol(allAtoms, allBonds, addHAtmIdxs);
-        std::cout << "After protonation, number of atoms is " << allAtoms.size() << std::endl;
-        std::cout << "They are : " << std::endl;
-        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
-                iA !=allAtoms.end(); iA++)
-        {
-            std::cout << iA->id << std::endl;
-            std::cout << "with formal charge " << iA->formalCharge << std::endl;
-        }
-        
-        std::cout << "Number of bonds now is " << allBonds.size() << std::endl;
-        std::cout << "They are: " << std::endl;
-        for (std::vector<BondDict>::iterator iB=allBonds.begin();
-                iB != allBonds.end(); iB++)
-        {
-            std::cout << "Bond between atom " << iB->atoms[0]
-                      << " and atom " << iB->atoms[1] << std::endl;
-        }
-        */        
         setAtomsBondingAndChiralCenter();
         
         //setAllAddedHAtomCoords(allAtoms, addHAtmIdxs);
@@ -464,12 +435,6 @@ namespace LIBMOL
            
         ringDetecting();
         
-        //if (!hasCCP4Type)
-        //{
-            
-        //    setAtomsCCP4Type();
-        //}
-       
         
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
@@ -554,16 +519,23 @@ namespace LIBMOL
         
         setAllTorsions2();
         
-        if (!hasCCP4Type)
-        {
-            setAtomsCCP4Type();
-        }
+        
+        
         
         reIndexAtomInRing(allAtoms, allRingsV);
         
         modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV);
         
-        /*
+        //if (!hasCCP4Type)
+        //{
+        //    std::cout << "Need to setup CCP4 types " << std::endl;
+            setAtomsCCP4Type();
+        //}
+        //else
+        //{
+        //    std::cout << "CCP4 types already set " << std::endl;
+        //}
+        
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
         {
@@ -582,7 +554,8 @@ namespace LIBMOL
             }
         
         }
-        
+
+        /*
         for (std::vector<BondDict>::iterator iB=allBonds.begin(); 
                 iB !=allBonds.end(); iB++)
         {
