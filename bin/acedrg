@@ -12,6 +12,7 @@
 #
 
 import os,os.path,sys
+import platform
 import glob,shutil
 import re,string
 from optparse import OptionParser 
@@ -198,9 +199,50 @@ class CExeCode :
     def logModeWin(self, mode = 0, err_str=""):
         """ execute self._cmdline and output to a log file (self._log_name)  
         under Windows system"""
+        logfile = open(self._log_name, 'w')
+        logfile.write("\n============ PROCESS INFORMATION =============\n")
 
-        pass
+        # spawn a sub-process for a job and connect to its input/output(and error)
+        # streams using pipes
 
+        try : 
+            import subprocess
+            subProcess = subprocess.Popen(self._cmdline, shell=True, stdout=logfile)
+            #subProcess.stdin.close()
+            #outfile_sub  = subProcess.stdout
+            #outfd_sub    = outfile_sub.fileno()
+        except ImportError:
+            print "module 'subprocess' has not be found, you use a version of PYTHON below 2.4"
+            print "Import module 'popen2' instead, the calculations will not be affected"
+            print "This should not be happening. Exiting Now."
+            sys.exit()
+            #import popen2
+            #subProcess = popen2.Popen4(self._cmdline)
+            #subProcess.tochild.close()
+            #outfile_sub  = subProcess.fromchild
+            #outfd_sub    = outfile_sub.fileno()
+    
+        self._pid  = subProcess.pid
+        pid_c      = self._pid  + 1
+        p_name = os.path.basename(self._cmdline.strip().split()[0])
+        t__log_name = os.path.basename(self._log_name)
+		
+        self.exitCode = subProcess.wait()
+
+        logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
+        logfile.close()
+
+        #outfile_sub.close()
+
+        if self.exitCode:
+            print "#-----------------------------------------------------------------#"
+            print "The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name
+            print "#-----------------------------------------------------------------#"
+            if not err_str:
+                # if normal runtime errors, stop the program(using log. no err_str)  
+                sys.exit(1)
+                
+        return True
     
     def _nonBlockingFile(self,fd):
         f_flag = fcntl.fcntl(fd, fcntl.F_GETFL,0)
@@ -430,18 +472,21 @@ class Acedrg(CExeCode ):
     def checkDependency(self):
     
         if self.acedrgDir !="" and os.path.isdir(self.acedrgDir):
-            tLibmol = os.path.join(self.acedrgDir, "libexec/libmol")
+            tLibmol = os.path.join(self.acedrgDir, "libexec","libmol")
+            if platform.system()=="Windows": tLibmol += ".exe"
             if glob.glob(tLibmol):
                 self.libmol = tLibmol
 
         if not self.libmol  and os.environ.has_key("CCP4"):
-            tLibmol = os.path.join(os.environ['CCP4'], "libexec/libmol")
+            tLibmol = os.path.join(os.environ['CCP4'], "libexec","libmol")
+            if platform.system()=="Windows": tLibmol += ".exe"
             if glob.glob(tLibmol):
                 self.libmol = tLibmol
 
         if not self.libmol :
             if os.environ.has_key("LIBMOL_ROOT"):
-                tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "libexec/libmol")
+                tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "libexec","libmol")
+                if platform.system()=="Windows": tLibmol += ".exe"
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
                 else:
@@ -454,6 +499,7 @@ class Acedrg(CExeCode ):
                                 
         if os.environ.has_key("CCP4"):
             tRefmac = os.path.join(os.environ['CBIN'], "refmac5")
+            if platform.system()=="Windows": tRefmac += ".exe"
             if not glob.glob(tRefmac):
                 print "refmac5 could not be found"
                 sys.exit()
@@ -461,6 +507,7 @@ class Acedrg(CExeCode ):
                 self.refmac = tRefmac
 
             tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
+            if platform.system()=="Windows": tLibcheck += ".exe"
             if not glob.glob(tLibcheck):
                 print "libcheck could not be found"
                 sys.exit()
@@ -469,10 +516,11 @@ class Acedrg(CExeCode ):
             
             if not self.libmol:
                 tLibmol = os.path.join(os.environ['CCP4'], "libexec", "libmol")
+                if platform.system()=="Windows": tLibmol += ".exe"
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
             if not self.acedrgTables:
-                tAcedrgTables = os.path.join(os.environ['CCP4'], "share/acedrg/tables")
+                tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
                 if glob.glob(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
         else :
@@ -482,7 +530,7 @@ class Acedrg(CExeCode ):
 
         if not self.acedrgTables:
             if os.environ.has_key("LIBMOL_ROOT"):
-                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share/acedrg/tables")
+                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share","acedrg","tables")
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
                 else:
@@ -490,7 +538,7 @@ class Acedrg(CExeCode ):
                     sys.exit()
                                 
         if not self.acedrgTables: 
-            tAcedrgTables = os.path.join(self.acedrgDir, "share/acedrg/tables")
+            tAcedrgTables = os.path.join(self.acedrgDir, "share","acedrg","tables")
             # print tAcedrgTables
             if os.path.isdir(tAcedrgTables):
                 self.acedrgTables = tAcedrgTables
@@ -607,11 +655,11 @@ class Acedrg(CExeCode ):
         # (4) If none of them, program exits.   
         if not t_inputOptionsP.acedrgTables: 
             if self.acedrgDir !="" and os.path.isdir(self.acedrgDir):
-                tAcedrgTables = os.path.join(self.acedrgDir, "share/acedrg/tables")
+                tAcedrgTables = os.path.join(self.acedrgDir, "share","acedrg","tables")
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
             elif  not self.acedrgTables and os.environ.has_key("CCP4"):
-                tAcedrgTables = os.path.join(os.environ['CCP4'], "share/acedrg/tables")
+                tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
                 if glob.glob(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
             else:
@@ -623,7 +671,7 @@ class Acedrg(CExeCode ):
  
         if not self.acedrgTables or not glob.glob(self.acedrgTables):
             if os.environ.has_key("LIBMOL_ROOT"):
-                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share/acedrg/tables")
+                tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share","acedrg","tables")
                 print tAcedrgTables
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
@@ -713,8 +761,12 @@ class Acedrg(CExeCode ):
             self.baseRoot  = os.path.basename(t_inputOptionsP.outRoot)
             tDir = os.path.dirname(t_inputOptionsP.outRoot)
             if tDir:
-                tStrGrp = os.path.abspath(tDir).strip().split("/")
-                tCurDir = "/"
+                if platform.system()=="Windows":
+                    tStrGrp = os.path.abspath(tDir).strip().split("\\")
+                    tCurDir = "\\"
+                else:
+                    tStrGrp = os.path.abspath(tDir).strip().split("/")
+                    tCurDir = "/"
                 for tSub in tStrGrp:
                     tCurDir = os.path.join(tCurDir, tSub)
                     if not os.path.isdir(tCurDir):
@@ -862,7 +914,8 @@ class Acedrg(CExeCode ):
                 self.workMode  == 21
                 tAllBondInMols = []
                 tExcludedCif   = []
-                for aCif in glob.glob(self.inStdCifDir+"/*.cif"):
+                tempCifStr = os.path.join(self.inStdCifDir,"*.cif")
+                for aCif in glob.glob(tempCifStr):
                     tMonomRoot = os.path.basename(aCif).split(".")[0]
                     print "Generate molecules, bonds and angles from ", aCif
                     self._cmdline = self.libmol
@@ -870,7 +923,8 @@ class Acedrg(CExeCode ):
                     self.outBondsAndAnglesName  = os.path.join(self.scrDir, tMonomRoot + "_unique_bond_and_angles.txt")
                     self._log_name = os.path.join(self.scrDir,tMonomRoot + "_cod.log")
                     self._cmdline += " -b %s  "%aCif
-                    self._cmdline += " -m yes -r %s -o %s.cif "%(tMonomRoot, self.scrDir+"/"+tMonomRoot)
+                    tempMonRt = os.path.join(self.scrDir, tMonomRoot)
+                    self._cmdline += " -m yes -r %s -o %s.cif "%(tMonomRoot, tempMonRt)
                     #print self._cmdline
                     self.subExecute()
                     if os.path.isfile(self.outBondsAndAnglesName):
@@ -1211,73 +1265,89 @@ class Acedrg(CExeCode ):
      
         self._cmdline = self.refmac 
         #self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
+        self._cmdline += "  xyzin %s libin %s xyzout %s"%(tPdbIn, tLibIn, tPdbOut)
+		
+        if platform.system()!="Windows": self._cmdline += " <<eof\n"
+		
         if tStage==0:
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
-            self._cmdline += "ncyc 0    \n"
-            self._cmdline += "end       \n"
-            self._cmdline += "eof       \n"
+            if platform.system()=="Windows":
+                self._cmdline = "(ECHO ncyc 0 && ECHO end) | " + self._cmdline 
+            else:
+                self._cmdline += "ncyc 0    \n"
         elif tStage==1:
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
-            self._cmdline += "make hout yes    \n"
-            self._cmdline += "make hydr full \n"
-            self._cmdline += "ncyc 40    \n"
-            self._cmdline += "vdwr 2.0    \n"
-            self._cmdline += "end       \n"
-            self._cmdline += "eof       \n"
-        elif tStage==2: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "mode newe \n"
-            self._cmdline += "make hydr no"
-            self._cmdline += "make news"
-            self._cmdline += "end       \n"
-            self._cmdline += "eof       \n"
-        elif tStage==3: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "make hout yes    \n"
-            self._cmdline += "make hydr full \n"
-            self._cmdline += "ncyc 40    \n"
-            self._cmdline += "end       \n"
-            self._cmdline += "eof       \n"
+            if platform.system()=="Windows":
+                self._cmdline = "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO vdwr 2.0 && ECHO end) | " + self._cmdline
+            else:
+                self._cmdline += "make hout yes    \n"
+                self._cmdline += "make hydr full \n"
+                self._cmdline += "ncyc 40    \n"
+                self._cmdline += "vdwr 2.0    \n"
+        elif tStage==2:
+            if platform.system()=="Windows":
+                self._cmdline += "(ECHO mode newe && ECHO make hydr no && ECHO make news && ECHO end) | " + self._cmdline 
+            else:		
+                self._cmdline += "mode newe \n"
+                self._cmdline += "make hydr no"
+                self._cmdline += "make news"
+        elif tStage==3:
+            if platform.system()=="Windows":
+                self._cmdline += "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO end) | " + self._cmdline 
+            else:		
+                self._cmdline += "make hout yes    \n"
+                self._cmdline += "make hydr full \n"
+                self._cmdline += "ncyc 40    \n"
         else: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "mode newe \n"
+            if platform.system()=="Windows":
+                self._cmdline += "(ECHO mode newe && ECHO end) | " + self._cmdline 
+            else:
+                self._cmdline += "mode newe \n"
+			
+        if platform.system()!="Windows":
             self._cmdline += "end       \n"
             self._cmdline += "eof       \n"
+			
         #print self._cmdline
 
     
     def setRefmacCom2(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
      
-        self._cmdline = self.refmac 
-        #self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
-        if tStage==1:
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
-            self._cmdline += "mode newe \n"
-            self._cmdline += "make hout yes    \n"
-            self._cmdline += "make hydr full \n"
-            self._cmdline += "ncyc 40    \n"
-            self._cmdline += "end       \n"
-	    self._cmdline += "eof       \n"
-        elif tStage==2: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "mode newe \n"
-            self._cmdline += "make hydr no"
-            self._cmdline += "make news"
-            self._cmdline += "end       \n"
-	    self._cmdline += "eof       \n"
-        elif tStage==3: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "make hout yes    \n"
-            self._cmdline += "make hydr full \n"
-            self._cmdline += "ncyc 40    \n"
-            self._cmdline += "end       \n"
-	    self._cmdline += "eof       \n"
-        else: 
-            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut)  
-            self._cmdline += "mode newe \n"
-            self._cmdline += "end       \n"
-	    self._cmdline += "eof       \n"
-        #print self._cmdline
+		self._cmdline = self.refmac 
+		#self._cmdline = "/Users/flong/CCP4/fromSrc/ccp4-src-6.5/ccp4-6.4.9/bin/refmac5" 
+		self._cmdline += "  xyzin %s libin %s xyzout %s"%(tPdbIn, tLibIn, tPdbOut) 
+		if platform.system()!="Windows": self._cmdline += " <<eof\n"
+		
+		if tStage==1:
+			if platform.system()=="Windows":
+				self._cmdline += "(ECHO mode newe && ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO end) | " + self._cmdline 
+			else:
+				self._cmdline += "mode newe \n"
+				self._cmdline += "make hout yes    \n"
+				self._cmdline += "make hydr full \n"
+				self._cmdline += "ncyc 40    \n"
+		elif tStage==2: 
+			if platform.system()=="Windows":
+				self._cmdline += "(ECHO mode newe && ECHO make hydr no && ECHO make news && ECHO end) | " + self._cmdline 
+			else:
+				self._cmdline += "mode newe \n"
+				self._cmdline += "make hydr no"
+				self._cmdline += "make news"
+		elif tStage==3: 
+			if platform.system()=="Windows":
+				self._cmdline += "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO end) | " + self._cmdline 
+			else:
+				self._cmdline += "make hout yes    \n"
+				self._cmdline += "make hydr full \n"
+				self._cmdline += "ncyc 40    \n"
+		else: 
+			if platform.system()=="Windows":
+				self._cmdline += "(ECHO mode newe && ECHO end) | " + self._cmdline 
+			else:
+				self._cmdline += "v \n"
+
+		if platform.system()!="Windows":
+			self._cmdline += "end       \n"
+			self._cmdline += "eof       \n"
+		#print self._cmdline
 
 
     def runRefmac(self, tPdbIn, tLibIn, tStage=2):
@@ -1456,6 +1526,7 @@ class Acedrg(CExeCode ):
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
                 print "===================================================================" 
         else:
+            finPdb = self.outRoot + "_"+ tRoot + ".pdb"
             print "Failed to produce %s after final geometrical optimization"%finPdb
 
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
@@ -2333,7 +2404,10 @@ class AcedrgRDKit():
 
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
-                aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
+                if platform.system()=="Windows":
+                    aMolName = tFileName.strip().split("\\")[-1].strip().split(".")[0]
+                else:
+                    aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
                 print "Molecule name:  ", aMolName
                 # self.reSetChirals     =    True
                 aMolT                   =    Chem.MolFromMolFile(tFileName)
@@ -2344,7 +2418,10 @@ class AcedrgRDKit():
 
         elif tFileType == "mol2" :
             if os.path.isfile(tFileName):
-                aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
+                if platform.system()=="Windows":
+                     aMolName = tFileName.strip().split("\\")[-1].strip().split(".")[0]
+                else:
+                     aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
                 #print "Molecule name:  ", aMolName
                 aMolT     = Chem.MolFromMol2File(tFileName)
                 self.chemCheck.addHs(aMolT)
@@ -2382,7 +2459,10 @@ class AcedrgRDKit():
                     sys.exit()
         elif tFileType == "sdf" :
             if os.path.isfile(tFileName):
-                aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
+                if platform.system()=="Windows":
+                    aMolName = tFileName.strip().split("\\")[-1].strip().split(".")[0]
+                else:
+                    aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
                 #print "Molecule name:  ", aMolName
                 aMolT     = Chem.MolFromMolFile(tFileName)
                 #aMolT = Chem.AddHs(aMolT1)
