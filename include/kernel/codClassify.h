@@ -352,10 +352,23 @@ namespace LIBMOL
         void groupCodOrgBonds3();
         void searchCodOrgBonds(std::vector<BondDict>::iterator iOB);
         void searchCodOrgBonds2(std::vector<BondDict>::iterator iB);
-        void levelSearchBonds( std::vector<int>          &      tKeySet,
+        void levelSearchBonds(std::vector<int>          &      tKeySet1,
+                              std::vector<std::string>  &      tKeySet2,
+                              int                              tLev,
+                              std::vector<BondDict>::iterator  iB);
+        void levelSearchBondsT(std::vector<int>          &      tKeySet1,
                                std::vector<std::string>  &      tKeySet2,
                                int                              tLev,
                                std::vector<BondDict>::iterator iB);
+        void interLevelSearchBonds( std::vector<int>          &      tKeySet1,
+                                    std::vector<std::string>  &      tKeySet2,
+                                    int                              tStartLev,
+                                    std::vector<BondDict>::iterator  iB);
+        void exchangeSearch(std::vector<int>          &      tKeySet1,
+                            std::vector<std::string>  &      tKeySet2,
+                            std::string               &      tSKey,
+                            int                              tLev,
+                            std::vector<BondDict>::iterator iB);
         void groupCodMetBonds();
         void searchCodMetBonds(std::vector<BondDict>::iterator iMB);
         void setupTargetMetBondsUsingMean(std::vector<std::map<ID,REAL> > tSkeys,
