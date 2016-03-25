@@ -297,6 +297,46 @@ namespace LIBMOL
         return (first.key.length() > second.key.length() ?  true : false);
     }
     
+    bool compareNoCaseVecs(const std::vector<std::string> & first, 
+                                  const std::vector<std::string> & second)
+    {
+        unsigned int i=0;
+        while ( (i<first[0].length()) && (i<second[0].length()) )
+        {
+            if (std::toupper(first[0][i])<std::toupper(second[0][i])) return true;
+            else if (std::toupper(first[0][i])>std::toupper(second[0][i])) return false;
+            ++i;
+        }
+
+        if (first[0].length() < second[0].length())
+        {
+             return  true;
+        }
+        else if (first[0].length() > second[0].length())
+        {
+            return false;
+        }
+
+        if (first[1].length() < second[1].length())
+        {
+             return  true;
+        }
+        else if (first[1].length() > second[1].length())
+        {
+            return false;
+        }
+
+        i=0;
+        while ( (i<first[1].length()) && (i<second[1].length()) )
+        {
+            if (std::toupper(first[1][i])<std::toupper(second[1][i])) return true;
+            else if (std::toupper(first[1][i])>std::toupper(second[1][i])) return false;
+            ++i;
+        }
+        
+        return true;
+    }
+    
     void cleanSymbol(std::string & tStr, std::string symb)
     {
         std::size_t found;

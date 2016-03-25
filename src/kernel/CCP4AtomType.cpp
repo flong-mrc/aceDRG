@@ -42,6 +42,24 @@ namespace LIBMOL
         }
     }
     
+    CCP4AtomType::CCP4AtomType(const std::vector<AtomDict>& tAllAtoms, 
+                               const std::vector<RingDict>& tAllRingsV)
+    {
+        for (std::vector<AtomDict>::const_iterator iA=tAllAtoms.begin();
+                iA != tAllAtoms.end(); iA++)
+        {
+            allAtoms.push_back(*iA);
+        }
+        
+        
+        for (std::vector<RingDict>::const_iterator iR=tAllRingsV.begin();
+                 iR !=tAllRingsV.end(); iR++)
+        {
+            allRingsV.push_back(*iR);
+        }
+        
+    }
+    
     CCP4AtomType::~CCP4AtomType()
     {
     }
@@ -483,6 +501,11 @@ namespace LIBMOL
                     {
                         // O in alcohol groups
                         tAtom.ccp4Type = "OH1";
+                    }
+                    else if ((int)tAtom.connHAtoms.size()==2)
+                    {
+                        // O in for example water molecules 
+                        tAtom.ccp4Type = "OH2";
                     }
                     else
                     {

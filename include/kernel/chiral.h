@@ -120,6 +120,10 @@ namespace LIBMOL
         
     };
     
+    extern REAL calChiralVol(std::vector<REAL>  & tV1, 
+                            std::vector<REAL>  & tV2, 
+                            std::vector<REAL>  & tV);
+    
     extern int inChirals(std::vector<ChiralDict> tChirals, 
                          AtomDict & tInAtom);
     

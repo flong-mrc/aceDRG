@@ -114,6 +114,9 @@ namespace LIBMOL
     
     extern bool compareNoCaseClass(const sortLine & tL1, const sortLine & tL2);
     
+    extern bool compareNoCaseVecs(const std::vector<std::string> & first, 
+                                  const std::vector<std::string> & second); 
+    
     extern void cleanSymbol(std::string & tStr, std::string symb);
     
     extern int getKeyWordPos(std::string  tKey, 

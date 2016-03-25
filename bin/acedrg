@@ -1352,7 +1352,7 @@ class Acedrg(CExeCode ):
                 else:
                     tFValue = -1.0 
                     tFValue = self.getRefmacFValue(self._log_name)
-                    if tFValue > 0.0:
+                    if tFValue >= -0.000001:
                         if len(tRoot) !=0:
                             if not self.refmacXYSList.has_key(tRoot):
                                  self.refmacXYSList[tRoot] = {}
@@ -1402,9 +1402,10 @@ class Acedrg(CExeCode ):
             #print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
             #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
             self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
-            #print "out cif name ", self.outRstCifName
             if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
+                #print "|%s%s|"%("Output LIB : ".ljust(12), self.refmacXYZOUTName.ljust(53))
                 if self.numConformers !=1:
+                    #print "refmac out ", self.refmacXYZOUTName
                     self.getFinalOutputFiles(aFRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacXYZOUTName, self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             else:
                 print "Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn
@@ -1433,7 +1434,7 @@ class Acedrg(CExeCode ):
                         #print "fvalue taken : ", aFva
 
         
-        # print "Fvalue taken from %s is %10.5f"%(tLogName, aFva)     
+        #print "Fvalue taken from %s is %10.5f"%(tLogName, aFva)     
 
         return aFva
         
@@ -1456,7 +1457,7 @@ class Acedrg(CExeCode ):
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
                 print "===================================================================" 
         else:
-            print "Failed to produce %s after final geometrical optimization"%finPdb
+            print "Failed to produce %s after final geometrical optimization"%tInPdb
 
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
 
@@ -2096,6 +2097,7 @@ class Acedrg(CExeCode ):
             if len(self.rdKit.molecules):
                 print "Ligand ID ", self.monomRoot
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
+                self.rdKit.hasCCP4Type = self.fileConv.hasCCP4Type
             for iMol in range(len(self.rdKit.molecules)):
                 self.inMmCifName =  os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(iMol) + ".cif")
                 self.initMmcifMolMap[iMol] = self.inMmCifName
@@ -2217,6 +2219,7 @@ class AcedrgRDKit():
         self.nMaxMult =20
       
         self.useExistCoords  = False
+        self.hasCCP4Type     = False
    
         self.chemCheck = ChemCheck()
 
@@ -2334,7 +2337,7 @@ class AcedrgRDKit():
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
                 aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
-                print "Molecule name:  ", aMolName
+                #print "Molecule name:  ", aMolName
                 # self.reSetChirals     =    True
                 aMolT                   =    Chem.MolFromMolFile(tFileName)
                 #aMolT = Chem.AddHs(aMolT1)
@@ -3107,8 +3110,6 @@ class AcedrgRDKit():
                 tAllAtoms.append(aAt)
             else:
                 tDelAtomIdxs.append(aAt.GetIdx())
-           
- 
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="UNL", tChiDes=None, tGroupName="non-polymer", tIdxConform=0):
 
@@ -3284,13 +3285,14 @@ class AcedrgRDKit():
                     aSetAtomNames = []
                     if aCT != rdchem.ChiralType.CHI_UNSPECIFIED or aTmpCT !=0 :
                         aCTName = "chir_" + str(chiralIdx)
+                        print "Atom %s "%aAtom.GetProp("Name")
+                        print "Chiraltype ",  aCT
                         chiralIdx+=1
                         aIdx = aAtom.GetIdx()
                         outSign = ""
                         if aAtom.HasProp('_CIPCode'):
-                            print "Atom %s "%aAtom.GetProp("Name")
-                            #print "Chiraltype ",  aCT
-                            #print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
+                            print "Chiraltype ",  aCT
+                            print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
                             aCVol = EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
                             aCVol = float(aCVol)
                             #if str(aAtom.GetProp("_CIPCode")).strip()=="S":
@@ -3364,18 +3366,17 @@ class AcedrgRDKit():
                         print "After sorting "
                         """
                         aSetName.sort(listCompDes)
-                        """
                         print "----------------------------------------------"
                         for aPair in aSetName:
                             print "Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
                         print "----------------------------------------------"
-                        """
 
                         aPass = self.checkUncertainChirals(aSetName)
                         if not aPass:
                             aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
                                          %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0].GetProp("Name"), \
                                            aSetName[1][0].GetProp("Name"), aSetName[2][0].GetProp("Name"), "both"))
+                            print "Chiral sign : both "
                         else:
                             posCen = aConformer.GetAtomPosition(aAtom.GetIdx())
                             coordsCen = [float(posCen.x), float(posCen.y), float(posCen.z)] 
@@ -3389,7 +3390,7 @@ class AcedrgRDKit():
                             #print "Chiral volume by RDKit", aCVol
                             cenName = aAtom.GetProp("Name") 
                             tChemCheck.outChiSign[cenName] = tChemCheck.getChiralVolumeSign(posCen, pos1, pos2, pos3)
-                            #print "chiral outSign by acedrg : ", tChemCheck.outChiSign[cenName]
+                            print "chiral sign : ", tChemCheck.outChiSign[cenName]
                             if len(tChemCheck.outChiSign[cenName]) !=0:                 
                                 aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
                                              %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0].GetProp("Name"), \
@@ -3402,13 +3403,21 @@ class AcedrgRDKit():
         
         tPass = True
         tOneBondOs = 0
+        tNBRanks   = {}
         for aPair in tNBAtoms:
             if aPair[0].GetSymbol().find("O") !=-1 and len(aPair[0].GetBonds())==1:
                 tOneBondOs +=1 
-        
+            if not tNBRanks.has_key(aPair[1]):
+                tNBRanks[aPair[1]] = []
+            tNBRanks[aPair[1]].append(1)
+
         if tOneBondOs > 1 :
             tPass = False
-   
+        else :
+            for aKey in tNBRanks.keys():
+                if len(tNBRanks[aKey]) > 1:
+                    tPass = False
+
         return tPass
         
     def setupFuncGroupTab(self, tFuncFileName):
@@ -3945,6 +3954,8 @@ class FileTransformer :
 
         self.PdbForMols       = {}
 
+        self.hasCCP4Type      = False
+
     def mmCifReader(self, tFileName):
         """Read a detailed mmicif file to get basic information"""
 
@@ -4214,6 +4225,8 @@ class FileTransformer :
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.partial_charge"]
                     if math.fabs(float(tCharge)) >=0.001:
                         self.inputCharge[aAtom["_chem_comp_atom.atom_id"]] = tCharge
+                if aAtom.has_key("_chem_comp_atom.type_energy"):
+                    self.hasCCP4Type = True
             self.atoms = []
             for aAtom in tAtoms:
                 self.atoms.append(aAtom)

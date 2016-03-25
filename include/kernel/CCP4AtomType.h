@@ -64,6 +64,10 @@ namespace LIBMOL
         CCP4AtomType(const std::vector<AtomDict> & tAllAtoms,
                      const std::map<ID, std::vector<RingDict> > & tAllRings);
         
+        // Another constructor
+        CCP4AtomType(const std::vector<AtomDict> & tAllAtoms,
+                     const std::vector<RingDict> & tAllRingsV);
+        
         // Default destructor
         ~CCP4AtomType();
         
@@ -83,7 +87,7 @@ namespace LIBMOL
         
         std::vector<AtomDict>                    allAtoms;
         std::map<ID, std::vector<RingDict> >     allRings;
-        
+        std::vector<RingDict>                    allRingsV;
     };
     
     class CCP4DictParas

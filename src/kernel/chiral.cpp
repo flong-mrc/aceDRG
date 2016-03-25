@@ -374,6 +374,12 @@ namespace LIBMOL
         }       
     }
     
+    extern REAL calChiralVol(std::vector<REAL>  & tV1, 
+                            std::vector<REAL>  & tV2, 
+                            std::vector<REAL>  & tV3)
+    {
+        return getDet(tV1, tV2, tV3);
+    }
     
     extern int inChirals(std::vector<ChiralDict> tChirals, 
                           AtomDict & tInAtom)

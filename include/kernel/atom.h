@@ -271,6 +271,7 @@ namespace LIBMOL // temp
         int      inChiralIdx;
         int      chiralIdx;
         int      bondingIdx;
+        ID       hybrid;
         bool     isMetal;
         ID       metalGeo;
         REAL     isoB;

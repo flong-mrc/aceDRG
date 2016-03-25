@@ -153,6 +153,11 @@ int main(int argc, char** argv) {
                 LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
                                AJob.IOEntries["monoRootName"], 
                                aTargetSystem.allAtoms);
+                
+                LIBMOL::outB_and_A_Levels(AJob.IOEntries["userOutName"].c_str(),
+                                          aTargetSystem.allAtoms,
+                                          aTargetSystem.allBonds,
+                                          aTargetSystem.allAngles);
                 //}
                 // aTargetSystem.chiralExch();
                 
@@ -425,46 +430,6 @@ int main(int argc, char** argv) {
         //aCodSystem.outPDB(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
         
        
-    }
-    else if (AJob.workMode==31 || AJob.workMode==32 || AJob.workMode==33)
-    {
-        std::cout << "WorkMode: Molecule generation" << std::endl;
-        int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
-        if (AJob.workMode==31)
-        {
-            std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
-            LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
-            if (dataFromCif.RFactorOK)
-            {
-                std::cout << "R factor satisfies the requirement" << std::endl;
-                LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-                aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
-                aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
-            }
-            else
-            {
-                std::cout << "REJECTED STRUCTURE: R factor related " << std::endl; 
-                std::cout << "The data will not be converted to molecules because of : "
-                          << std::endl << "(1) high R factors" << std::endl
-                          << "or " << std::endl << "(2) no R factors in the data"
-                          << std::endl;
-            }
-        }
-        else if (AJob.workMode==32)
-        {
-            
-            std::cout << "Input cif " << AJob.IOEntries["inCifName"] << std::endl;
-            LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-            LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-            aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
-        }
-        else if (AJob.workMode==33)
-        {
-            std::cout << "The directory of input cif files " 
-                      << AJob.IOEntries["inCifNameB"] << std::endl;
-            
-        }
-        
     }
     else if (AJob.workMode == 41)
     {

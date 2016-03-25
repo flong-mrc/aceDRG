@@ -144,7 +144,7 @@ namespace LIBMOL // temp
         int                     anchorPos;
         
         bool                    isFixed;
-        int                     levelCodValue;
+        int                     approxLevel;
         int                     isInSameRing;
         
         std::vector<int>        atoms;
@@ -152,7 +152,7 @@ namespace LIBMOL // temp
         std::vector<ID>         atomsCodClasses;
         std::vector<ID>         atomsNB2Rep;
         std::vector<ID>         atomsNBRep;
-        
+        std::map<ID, ID>        atomsSPStats;
         std::vector<REAL>       codAngleValues;
     };
     

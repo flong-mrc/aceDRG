@@ -277,7 +277,8 @@ for aF in glob.glob("./inProbsCases/*.cif"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
-
+         
+        """
         rRoot = "%s_inProbsCases_T"%aFRoot
         cmdL = "acedrg -c %s  -o  %s_inProbsCases_T  "%(aF, aFRoot) 
         print cmdL
@@ -292,7 +293,8 @@ for aF in glob.glob("./inProbsCases/*.cif"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
-
+        """
+"""
 print "========================================================="
 print "|  run all examples with input small molecule Cif files |"
 print "|  at ./inStdcif to generate molecules and derive       |"
@@ -314,6 +316,7 @@ if os.path.isdir("inStdcif"):
     cmdL = "acedrg -e -d %s -o %s " %("inStdcif", "Summary_inStdcif") 
     print cmdL
     os.system(cmdL)
+"""
 
 print "Total Number of jobs running for dictionary generation ", numAllJobs 
 print "Total Number of job successfully finished", numJobsS 
