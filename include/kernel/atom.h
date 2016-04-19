@@ -292,6 +292,7 @@ namespace LIBMOL // temp
         ID       codNB2Symb;
         ID       codNB3Symb;
         ID       codAtmMain;
+        ID       codNB1NB2_SP;
         
        
         int      hashingValue;

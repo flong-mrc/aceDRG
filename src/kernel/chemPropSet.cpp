@@ -94,6 +94,7 @@ namespace LIBMOL
     
     // Set atom's bonding features (sp, sp2, sp3 and chiral center) based on 
     // the atom's connections.
+   
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms)
     {
   
@@ -267,22 +268,35 @@ namespace LIBMOL
                 {
                     if (iAt->parCharge ==0.0)
                     {
-                        bool l_sp2 = false;
+                        int nH = 0;
                         for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                                  iCA != iAt->connAtoms.end(); iCA++)
                         {
-                            if(tAtoms[*iCA].bondingIdx == 2)
+                            if(tAtoms[*iCA].chemType.compare("H")==0)
                             {
-                                l_sp2 = true;
-                                break;
+                                nH++;
                             }
                         }
                         
-                        if (l_sp2)
+                        if (nH !=1)
                         {
-                            // Now we can say this atom is in sp2 orbits 
-                            iAt->chiralIdx  =  0;
-                            iAt->bondingIdx =  2;
+                            bool l_sp2 = false;
+                            for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                                 iCA != iAt->connAtoms.end(); iCA++)
+                            {
+                                if(tAtoms[*iCA].bondingIdx == 2)
+                                {
+                                    l_sp2 = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (l_sp2)
+                            {
+                                // Now we can say this atom is in sp2 orbits 
+                                iAt->chiralIdx  =  0;
+                                iAt->bondingIdx =  2;
+                            }
                         }
                     }
                 } 
@@ -292,6 +306,13 @@ namespace LIBMOL
         }
         
         // Then N and B atoms
+        std::map<int, int> preBondingIdx;
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            preBondingIdx[iAt->seriNum] = iAt->bondingIdx;
+        }
+        
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {   
@@ -304,7 +325,6 @@ namespace LIBMOL
                     t_len++;
                 }
             }
-
             if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
@@ -313,17 +333,18 @@ namespace LIBMOL
                 {
                     if (iAt->parCharge ==0.0)
                     {
+                        
                         bool l_sp2 = false;
                         for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                                  iCA != iAt->connAtoms.end(); iCA++)
                         {
-                            if(tAtoms[*iCA].bondingIdx == 2)
+                            //if(tAtoms[*iCA].bondingIdx == 2)
+                            if (preBondingIdx[*iCA]==2)
                             {
                                 l_sp2 = true;
                                 break;
                             }
                         }
-                        
                         
                         if (l_sp2)
                         {
@@ -376,157 +397,7 @@ namespace LIBMOL
             
             
         }
-        /*
-        // First round
-        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
-                iAt != tAtoms.end(); iAt++)
-        {
-            int t_len =0;
-            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
-                    iConn !=iAt->connAtoms.end(); iConn++)
-            {
-                if(!tAtoms[*iConn].isMetal)
-                {
-                    t_len++;
-                }
-            }
-            if (iAt->chemType.compare("C")==0)
-            {
-                //int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;
-                }
-                else if (t_len ==3)
-                {
-                    iAt->chiralIdx  = -1;
-                    iAt->bondingIdx = 2;
-                } 
-            }
-            else if (iAt->chemType.compare("N")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;  
-                }
-                //else if (t_len==3) // temp 
-                //{   // should do on the next round when all NB atoms are set
-                //    iAt->chiralIdx  = -1;
-                //    iAt->bondingIdx =  2;
-                // }
-                else if (t_len ==2)
-                {
-                    iAt->chiralIdx  = -1;
-                    iAt->bondingIdx =  2;
-                } 
-            }
-            else if (iAt->chemType.compare("B")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;
-                }
-            }
-            else if (iAt->chemType.compare("SI")==0 
-                    || iAt->chemType.compare("P")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3; 
-                }
-                else if (t_len==3)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 2; 
-                }
-            }
-            else if (iAt->chemType.compare("S")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3; 
-                }
-            }
-        }
-        
-        // more conditions 
-        
-        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
-                iAt != tAtoms.end(); iAt++)
-        {            
-            if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                int t_len =0;
-                for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
-                     iConn !=iAt->connAtoms.end(); iConn++)
-                {
-                    if(!tAtoms[*iConn].isMetal)
-                    {
-                        t_len++;
-                    }
-                }
-                if(t_len==3)
-                {
-                    
-                    bool l_sp2 = false;
-                    for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
-                            iCA != iAt->connAtoms.end(); iCA++)
-                    {
-                        if(tAtoms[*iCA].bondingIdx == 2)
-                        {
-                            l_sp2 = true;
-                        }
-                    }
-                    if (l_sp2)
-                    {
-                        // Now we can say this atom is in sp2 orbits 
-                        iAt->chiralIdx  = -1;
-                        iAt->bondingIdx =  2;
-                    }
-                    else
-                    {
-                        iAt->chiralIdx  =  1;
-                        iAt->bondingIdx =  3;
-                    }
-                } 
-            }
-        }
-        
-        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
-                iA != tAtoms.end(); iA++)
-        {
-            if (iA->chiralIdx ==1)
-            {
-                std::vector<ID> chirRAtms;
-                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
-                        iNB != iA->connAtoms.end(); iNB++)
-                {
-                    std::size_t tFind = tAtoms[*iNB].chemType.find("H");
-                    if (tFind !=std::string::npos)
-                    {
-                        chirRAtms.push_back(tAtoms[*iNB].id);
-                    }
-                }
-                if ((int)chirRAtms.size() >1 && (int)iA->connAtoms.size() <=4)
-                {
-                    iA->chiralIdx = 0;
-                }
-            }
-        }*/
-        
-        
-        // No need for the third round, those could be defined in 
-    
+  
         // Check
         
         std::cout << "Chiral and plane feather for atoms in the system" 
@@ -593,12 +464,13 @@ namespace LIBMOL
                             }
                         }
                     }
-                    else if (tAtoms[*iCo].bondingIdx==2)
-                    {
-                        std::cout << "It is sp2 related " << std::endl;
-                        lAromRs=true;
-                        break;
-                    }
+                    //else if (tAtoms[*iCo].bondingIdx==2)
+                    //{
+                        //std::cout << "Check NB atom " << tAtoms[*iCo].id << std::endl;
+                        //std::cout << "It is sp2 related " << std::endl;
+                        //lAromRs=true;
+                        //break;
+                    //}
                 }
                 
                 // Use nAromRs, =1 will make decision temporarily 
@@ -622,8 +494,8 @@ namespace LIBMOL
                     }
                     else
                     {
-                        iA->chiralIdx  = 0;
-                        iA->bondingIdx = 2;
+                       // iA->chiralIdx  = 0;
+                       // iA->bondingIdx = 2;
                     }
                 }
                 /*
@@ -655,6 +527,100 @@ namespace LIBMOL
                 iB->atomSPs[tAtoms[*iA].id] = tAtoms[*iA].hybrid;
             }
         }   
+    }
+    
+    extern void setAtomsNB1NB2_SP(std::vector<AtomDict> & tAtoms)
+    {
+        // make sure codAtmRoot are there
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            std::vector<ID>  cIDs;
+            StrTokenize(iAt->codClass, cIDs, '(');
+            if (cIDs.size() >0)
+            {
+                iAt->codAtmRoot = TrimSpaces(cIDs[0]);
+            }
+            else
+            {
+                std::cout << "can not find root symbol for atom class "
+                          << iAt->codClass << std::endl;
+                exit(1);
+            }
+        }
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            int aAt_seri = iAt->seriNum;
+            std::vector<ID> aNB1_NB2SP_Set;
+            for (std::vector<int>::iterator iNB1=iAt->connAtoms.begin();
+                    iNB1 != iAt->connAtoms.end(); iNB1++)
+            {
+                ID aNB1_main = tAtoms[*iNB1].codAtmRoot;
+                ID aNB2SpStr="";
+                std::vector<int> aNB2SpSet;
+                for (std::vector<int>::iterator iNB2=tAtoms[*iNB1].connAtoms.begin();
+                        iNB2 != tAtoms[*iNB1].connAtoms.end(); iNB2++)
+                {   
+                    aNB2SpSet.push_back(tAtoms[*iNB2].bondingIdx);
+                }
+                
+                std::sort(aNB2SpSet.begin(), aNB2SpSet.end(), std::greater<int>());
+                for (unsigned i=0; i < aNB2SpSet.size(); i++)
+                {
+                    aNB2SpStr.append(IntToStr(aNB2SpSet[i]));
+                    if (i != aNB2SpSet.size()-1)
+                    {
+                        aNB2SpStr.append("_");
+                    }
+                }
+                aNB1_NB2SP_Set.push_back(aNB1_main + "-"+aNB2SpStr);
+            }
+            std::sort(aNB1_NB2SP_Set.begin(), aNB1_NB2SP_Set.end(), compareNoCase);
+            
+            iAt->codNB1NB2_SP.clear();
+            for (unsigned i=0; i < aNB1_NB2SP_Set.size(); i++)
+            {
+                iAt->codNB1NB2_SP.append(aNB1_NB2SP_Set[i]);
+                if (i != aNB1_NB2SP_Set.size()-1)
+                {
+                    iAt->codNB1NB2_SP.append(":");
+                }
+            }  
+        }   
+    }
+    
+    extern void setBondsAndAngles_NB1NB2_SP(std::vector<AtomDict> & tAtoms,
+                                            std::vector<BondDict> & tBonds,
+                                            std::vector<AngleDict> & tAngles)
+    {
+        for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                iB !=tBonds.end(); iB++)
+        {
+            iB->atomNB1NB2SPs.clear();
+            for (std::vector<int>::iterator iA=iB->atomsIdx.begin();
+                    iA !=iB->atomsIdx.end(); iA++)
+            {
+                //std::cout << "Atom " << tAtoms[*iA].id  
+                //          << "\t" << " hybrid " 
+                //          << tAtoms[*iA].hybrid << std::endl;
+                iB->atomNB1NB2SPs[tAtoms[*iA].id] = tAtoms[*iA].codNB1NB2_SP;
+            }
+        }   
+        
+        for (std::vector<AngleDict>::iterator iAn=tAngles.begin();
+                iAn !=tAngles.end(); iAn++)
+        {
+            iAn->atomsNB1NB2SPStats.clear();
+            // std::cout << "XXXXX angle " << std::endl;
+            for (std::vector<int>::iterator iAt=iAn->atoms.begin();
+                    iAt !=iAn->atoms.end(); iAt++)
+            {
+                //std::cout << "Atom " << tAtoms[*iAt].id  
+                //          << "\t" << " hybrid " << tAtoms[*iAt].hybrid << std::endl;
+                iAn->atomsNB1NB2SPStats[tAtoms[*iAt].id] =  tAtoms[*iAt].codNB1NB2_SP;
+            }
+        }
     }
     
     extern void reIndexAtomInRing(std::vector<AtomDict> & tAtoms,

@@ -140,6 +140,12 @@ namespace LIBMOL
                                                std::vector<AngleDict> & tAngles,
                                                std::vector<RingDict> & tRings);
     
+    extern void setAtomsNB1NB2_SP(std::vector<AtomDict> & tAtoms);
+    
+    extern void setBondsAndAngles_NB1NB2_SP(std::vector<AtomDict> & tAtoms,
+                                            std::vector<BondDict> & tBonds,
+                                            std::vector<AngleDict> & tAngles);
+    
     extern void reIndexAtomInRing(std::vector<AtomDict> & tAtoms,
                                   std::vector<RingDict> & tRings);
     

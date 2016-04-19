@@ -258,7 +258,13 @@ namespace LIBMOL
         {
             atomSPs[tA->first]=tA->second;
         }
-                
+        
+        for (std::map<ID, ID>::const_iterator tA = tBond.atomNB1NB2SPs.begin();
+                tA != tBond.atomNB1NB2SPs.end(); tA++)
+        {
+            atomNB1NB2SPs[tA->first]=tA->second;
+        }
+        
         for (std::vector<ID>::const_iterator tA = tBond.atomsMainRep.begin();
                 tA != tBond.atomsMainRep.end(); tA++)
         {

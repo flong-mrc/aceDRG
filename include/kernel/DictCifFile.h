@@ -73,6 +73,10 @@
 #include "CCP4AtomType.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 #ifndef UTILITY_H
 #include "utility.h"
 #endif
@@ -448,7 +452,8 @@ namespace LIBMOL
         // Chiral-related 
         void getChiralInfo(std::vector<std::string> tF);
         
-        void setAtomsBondingAndChiralCenter();
+        // void setAtomsBondingAndChiralCenter();
+        // using standalone one
         void setAllChirals();
         
         void setDefaultCoordGeos();

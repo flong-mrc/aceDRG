@@ -209,7 +209,7 @@ namespace LIBMOL
                                    ID tChemType);
         int  getNumOxyConnect(std::vector<AtomDict>::iterator iA);
         REAL getTotalOrderOneAtom(std::vector<AtomDict>::iterator iA);
-        void setAtomsBondingAndChiralCenter();
+        // void setAtomsBondingAndChiralCenter();
         void setAtomsCChemType();
         void setAtomsCCP4Type();
         const bool containMetal();

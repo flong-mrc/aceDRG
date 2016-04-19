@@ -310,7 +310,8 @@ namespace LIBMOL
         // Methods related to planarity generation (depending
         // also on if rings have been detected 
         
-        void setAtomsBondingAndChiralCenter();
+        //void setAtomsBondingAndChiralCenter();
+        // use the standalone function in chemPropSet
         
         // Plane-related
         void detectPlaneGroups();
@@ -336,6 +337,7 @@ namespace LIBMOL
         void hashingAtoms2();
         void setAtomsNBSymb(); 
         void setAtomsNBSymb2();
+        // void setAtomsNB1NB2_SP();
         
         // Tree-related 
         void setAtomsMST();
