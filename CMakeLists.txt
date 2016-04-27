@@ -60,7 +60,7 @@ set(CCP4I_DIR ACEDRG_ccp4i)
 set(CCP4I_DEST share/ccp4i)
 
 install(TARGETS libmol DESTINATION libexec)
-install(PROGRAMS bin/acedrg DESTINATION bin)
+install(PROGRAMS bin/acedrg bin/acedrg.bat DESTINATION bin)
 install(DIRECTORY tables DESTINATION share/acedrg/)
 
 install(FILES ${CCP4I_DIR}/scripts/acedrg.script
