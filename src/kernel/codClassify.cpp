@@ -16079,6 +16079,7 @@ namespace LIBMOL
                 }
             }
             
+            
             // Now symbols 
             std::list<std::string> tComps;
             
@@ -16104,31 +16105,33 @@ namespace LIBMOL
             //}
             
             
-            
-            ID all3 = "{";
-            
-            unsigned i=0, aN=tComps.size();
-            
-            for (std::list<std::string>::iterator iID=tComps.begin();
-                    iID !=tComps.end(); iID++)
+            if (tComps.size() !=0)
             {
-                if (i < aN-1)
-                {
-                    all3.append(*iID + ",");
-                }
-                else
-                {
-                    all3.append(*iID);
-                }
-                i++;
-            }
+                ID all3 = "{";
             
-            all3.append("}");
+                unsigned i=0, aN=tComps.size();
+            
+                for (std::list<std::string>::iterator iID=tComps.begin();
+                     iID !=tComps.end(); iID++)
+                {
+                    if (i < aN-1)
+                    {
+                        all3.append(*iID + ",");
+                    }
+                    else
+                    {
+                        all3.append(*iID);
+                    }
+                    i++;
+                }
+                
+                all3.append("}");
         
-            // std::cout << "The special 3NB string is " << all3 << std::endl;
+                // std::cout << "The special 3NB string is " << all3 << std::endl;
             
-            tAt->codClass.append(all3);
+                tAt->codClass.append(all3);
             
+            }
         }
         
     }
