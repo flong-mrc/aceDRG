@@ -650,11 +650,13 @@ namespace LIBMOL
                     StrTokenize(tSecs[0], tRS, '[');
                     if (tRS.size() > 1)
                     {
+                        // std::cout << "atom type " << codClass << std::endl;
+                        // std::cout << "tRS[1] " << tRS[1]  << std::endl;
                         if (tRS[1].find("a") !=std::string::npos)
                         {
                             baseRingProp["aroma"] = "y";
                         }
-                        
+                        // std::cout << "ring prop " << baseRingProp["aroma"] << std::endl;
                         cleanChar(tRS[1], ']');
                         
                         if(tRS[1].find(",") !=std::string::npos)

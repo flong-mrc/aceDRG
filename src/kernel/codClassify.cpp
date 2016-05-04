@@ -528,8 +528,10 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {
+            //std::cout << "Atom ID " << iAt->id << std::endl; 
+            //std::cout << "atom type " << iAt->id << std::endl;
             iAt->setBaseRingProps();
-            
+            //std::cout << "base ring prop " << iAt->baseRingProp["aroma"] << std::endl;
         }
         
         // set ring properties of all bonds and angles
@@ -562,6 +564,8 @@ namespace LIBMOL
         
         setAtomsNB1NB2_SP(allAtoms);
         
+        hashingAtoms2();
+        
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {
@@ -571,10 +575,13 @@ namespace LIBMOL
                       << "Its COD root atom type " << iAt->codAtmRoot << std::endl
                       << "Its acedrg atom type " << iAt->codClass << std::endl
                       << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
+                      << "Its base ring type " << iAt->baseRingProp["aroma"] << std::endl
                       << "Its ccp4 atom type " << iAt->ccp4Type << std::endl
-                      << "Its second NB sp props " << iAt->codNB1NB2_SP << std::endl;    
+                      << "Its second NB sp props " << iAt->codNB1NB2_SP << std::endl
+                      << "Its hashing is " << iAt->hashingValue << std::endl; 
+                    
         }
-                
+            
         for (std::vector<BondDict>::iterator iB = allBonds.begin();
                 iB !=allBonds.end(); iB++)
         {
@@ -618,7 +625,6 @@ namespace LIBMOL
                       << iTor->value << std::endl;
         }
         */
-        
         
     }
     
@@ -859,7 +865,7 @@ namespace LIBMOL
         
         setAtomsNBSymb2();
         
-        hashingAtoms2();
+        // hashingAtoms2();
         
         
         
@@ -4270,7 +4276,7 @@ namespace LIBMOL
         readTablesForHashing2(aDigitKeys, aLinkedHA);
         
         std::vector<int> aPrimTab;
-        // libmolTabDir ="/Applications/ccp4-6.5/share/acedrg/tables_DB3";
+        // libmolTabDir ="/Applications/ccp4-6.5/share/acedrg/tables_DB3"
         initPrimeTab(aPrimTab, libmolTabDir);
         
         
@@ -4308,7 +4314,9 @@ namespace LIBMOL
                     d2 = 2; 
                 }
                 */
-                
+                std::cout << "For atom " << iAt->id << std::endl;
+                std::cout << "atom baseRing aromaticity " << iAt->baseRingProp["aroma"] 
+                          << std::endl;
                 if (iAt->baseRingProp["aroma"].compare("y") ==0)
                 {
                     d1 = 1;
@@ -4357,10 +4365,8 @@ namespace LIBMOL
                 //std::cout << "row " << pPeriodictable->elements[iAt->chemType]["row"] << std::endl;
                 //std::cout << "group "<< pPeriodictable->elements[iAt->chemType]["group"] << std::endl;
                 
-                //std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
-                //          << " d4 " << d4  << " d5 " << d5 << std::endl;
-                
-                
+                std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
+                          << " d4 " << d4  << " d5 " << d5 << std::endl;
                 
                 int aPrim = aPrimTab[d1]*aPrimTab[d2]*aPrimTab[d3]*aPrimTab[d4]*aPrimTab[d5];               
                 
@@ -4368,8 +4374,8 @@ namespace LIBMOL
                 ID  footPrint = IntToStr(d1) + "_" + IntToStr(d2) + "_" + IntToStr(d3) 
                                 + "_" + IntToStr(d4) + "_" + IntToStr(d5);
  
-                //std::cout << "psedoHA " << psedoHA << std::endl;
-                //std::cout << "footPrint " << footPrint << std::endl;
+                std::cout << "psedoHA " << psedoHA << std::endl;
+                std::cout << "footPrint " << footPrint << std::endl;
                 
                 std::map<int, ID>::iterator  dkFinder=aDigitKeys.find(psedoHA);
                 
@@ -4378,6 +4384,7 @@ namespace LIBMOL
                     if (aDigitKeys[psedoHA].compare(footPrint)==0)
                     {
                         iAt->hashingValue = psedoHA;
+                        std::cout << "Ha in sect1 " << iAt->hashingValue << std::endl;
                     }
                     else
                     {
@@ -4414,6 +4421,7 @@ namespace LIBMOL
                                 lCont = false;
                             }
                         }
+                        std::cout << "Ha in sect2 " << iAt->hashingValue << std::endl;
                     }
                 }
                 else
