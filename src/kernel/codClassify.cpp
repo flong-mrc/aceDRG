@@ -4314,9 +4314,9 @@ namespace LIBMOL
                     d2 = 2; 
                 }
                 */
-                std::cout << "For atom " << iAt->id << std::endl;
-                std::cout << "atom baseRing aromaticity " << iAt->baseRingProp["aroma"] 
-                          << std::endl;
+                //std::cout << "For atom " << iAt->id << std::endl;
+                //std::cout << "atom baseRing aromaticity " << iAt->baseRingProp["aroma"] 
+                //          << std::endl;
                 if (iAt->baseRingProp["aroma"].compare("y") ==0)
                 {
                     d1 = 1;
@@ -4365,8 +4365,8 @@ namespace LIBMOL
                 //std::cout << "row " << pPeriodictable->elements[iAt->chemType]["row"] << std::endl;
                 //std::cout << "group "<< pPeriodictable->elements[iAt->chemType]["group"] << std::endl;
                 
-                std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
-                          << " d4 " << d4  << " d5 " << d5 << std::endl;
+                //std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
+                //          << " d4 " << d4  << " d5 " << d5 << std::endl;
                 
                 int aPrim = aPrimTab[d1]*aPrimTab[d2]*aPrimTab[d3]*aPrimTab[d4]*aPrimTab[d5];               
                 
@@ -4374,8 +4374,8 @@ namespace LIBMOL
                 ID  footPrint = IntToStr(d1) + "_" + IntToStr(d2) + "_" + IntToStr(d3) 
                                 + "_" + IntToStr(d4) + "_" + IntToStr(d5);
  
-                std::cout << "psedoHA " << psedoHA << std::endl;
-                std::cout << "footPrint " << footPrint << std::endl;
+                //std::cout << "psedoHA " << psedoHA << std::endl;
+                //std::cout << "footPrint " << footPrint << std::endl;
                 
                 std::map<int, ID>::iterator  dkFinder=aDigitKeys.find(psedoHA);
                 
@@ -5560,6 +5560,9 @@ namespace LIBMOL
             }
             else
             {
+                std::cout << std::endl
+                      << "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+                      << std::endl;
                 std::cout << " search a organic-only bond " << std::endl;
                 
                 searchCodOrgBonds2(iGB);
@@ -5567,6 +5570,9 @@ namespace LIBMOL
             
             std::cout << "The final target bond value is " 
                       << iGB->value << std::endl;
+            std::cout << std::endl
+                      << "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+                      << std::endl;
             if (iGB->value > 0.3)
             {
                 nFind++;
@@ -5939,14 +5945,19 @@ namespace LIBMOL
                 tPair.push_back(iA->second);
             }
             
+            ID id1, id2;
             int ha1, ha2;
             ID a1NB2, a2NB2, a1NB, a2NB, a1M, a2M, a1C, a2C;
             ID a1NB1NB2, a2NB1NB2;
+            bool plusOneLev = false;
+            
             // int as0=-1, as1=-1;
             
             if((int) allAtoms[tPair[0]].hashingValue < 
                    (int) allAtoms[tPair[1]].hashingValue )
             {
+                id1  =allAtoms[tPair[0]].id;
+                id2  =allAtoms[tPair[1]].id;
                 ha1  =allAtoms[tPair[0]].hashingValue;
                 ha2  =allAtoms[tPair[1]].hashingValue;
                 a1NB2= allAtoms[tPair[0]].codNB2Symb;
@@ -5989,6 +6000,8 @@ namespace LIBMOL
                 
                 std::sort(vM.begin(), vM.end(), sortMapkey4);
                 
+                id1       = vM[0].id;
+                id2       = vM[1].id;
                 ha1       = vM[0].ha;
                 ha2       = vM[1].ha;
                 a1NB2     = vM[0].lev2;
@@ -6005,6 +6018,8 @@ namespace LIBMOL
             }
             else
             {
+                id1  =allAtoms[tPair[1]].id;
+                id2  =allAtoms[tPair[0]].id;
                 ha1  =allAtoms[tPair[1]].hashingValue;
                 ha2  =allAtoms[tPair[0]].hashingValue;
                 a1NB2= allAtoms[tPair[1]].codNB2Symb;
@@ -6020,23 +6035,90 @@ namespace LIBMOL
                 //as0 =1;
                 //as1 =0;
             }
+            
+            std::cout << "for target bond of atoms " << id1 << " and "
+                        << id2 <<std::endl;
             // bond-Ring properties
-            ID tInR, tInR1, tInR2;
+            ID tInR, tInR1, tInR2, tInR3, tInR4;
+            
+            ID tOr("O");
+            
+            std::string aChar = iB->order.substr(0, 1);
+            StrUpper(aChar);
+            if (aChar.compare("D")==0)
+            {
+                tOr = "D";
+            }
+            else if (aChar.compare("S")==0)
+            {
+                tOr = "S";
+            }
             
             if (iB->isInSameRing)
             {
-                tInR = "Y";
-                tInR1 = "Y";
-                tInR2 = "N";
                 std::cout << "The bond is within the same ring." << std::endl;
+                std::cout << "Bond order is " << iB->order << std::endl;
+                std::cout << "tOr is " << tOr << std::endl;
+                if (tOr=="D")
+                {
+                    tInR  = "Y:D";
+                    tInR1 = "Y:D";
+                    tInR2 = "N:D";
+                    tInR3 = "Y:O";
+                    tInR4 = "N:O";
+                }
+                else if (tOr=="S")
+                {
+                    tInR  = "Y:S";
+                    tInR1 = "Y:S";
+                    tInR2 = "N:S";
+                    tInR3 = "Y:O";
+                    tInR4 = "N:O";
+                }
+                else
+                {
+                    tInR  = "Y:O";
+                    tInR1 = "Y:O";
+                    tInR2 = "N:O";
+                    tInR3 = "N:O";
+                    tInR4 = "N:O";
+                }
+                std::cout << "tInR is " << tInR << std::endl;
             }
             else
             {
-                tInR  = "N";
-                tInR1 = "N";
-                tInR2 = "Y";
+                
                 std::cout << "The bond is not within the same ring." << std::endl;
+                std::cout << "Bond order is " << iB->order << std::endl;
+                std::cout << "tOr is " << tOr << std::endl;
+                if (tOr=="D")
+                {
+                    tInR  = "N:D";
+                    tInR1 = "N:D";
+                    tInR2 = "Y:D";
+                    tInR3 = "N:O";
+                    tInR4 = "Y:O";
+                }
+                else if (tOr=="S")
+                {
+                    tInR  = "N:S";
+                    tInR1 = "N:S";
+                    tInR2 = "Y:S";
+                    tInR3 = "N:O";
+                    tInR4 = "Y:O";
+                }
+                else
+                {
+                    tInR  = "N:O";
+                    tInR1 = "N:O";
+                    tInR2 = "Y:O";
+                    tInR3 = "Y:O";
+                    tInR4 = "Y:O";
+                }
+                std::cout << "tInR is " << tInR << std::endl;
+                
             }
+            
             
             // bond-sp properties
             ID hybrComb;
@@ -6049,16 +6131,6 @@ namespace LIBMOL
             
             // int dLev = 0;
             
-            std::cout << "for target bond of atoms " <<iB->atoms[0] << " and "
-                        << iB->atoms[1] <<std::endl;
-                       
-            for (std::map<ID, int>::iterator iAt=iB->fullAtoms.begin();
-                        iAt != iB->fullAtoms.end(); iAt++)
-            {
-                std::cout << "chemType : " << allAtoms[iAt->second].chemType << " COD classes : " 
-                          << allAtoms[iAt->second].codClass << std::endl;
-            }
-                
             std::cout << "ha1 " << ha1 << " ha2 " << ha2 << std::endl
                       << "the hybr-combination is " << hybrComb << std::endl
                       << "In or not in the same ring " << tInR << std::endl
@@ -6102,14 +6174,25 @@ namespace LIBMOL
                         tInR = tInR2;
                         std::cout << "Using replaced in-ring prop " << tInR << std::endl;
                     }
+                    else if (allDictBondsIdxD[ha1][ha2][hybrComb].find(tInR3)
+                             != allDictBondsIdxD[ha1][ha2][hybrComb].end())
+                    {
+                        tInR = tInR3;
+                        std::cout << "Using replaced in-ring prop " << tInR << std::endl;
+                    }
+                    else if (allDictBondsIdxD[ha1][ha2][hybrComb].find(tInR4)
+                             != allDictBondsIdxD[ha1][ha2][hybrComb].end())
+                    {
+                        tInR = tInR4;
+                        std::cout << "Using replaced in-ring prop " << tInR << std::endl;
+                    }
                     else
                     {
-                        std::cout << "Acedrg database error for the bond between atoms "
-                                  << iB->atoms[0] << " and " << iB->atoms[1] << std::endl
-                                  << " -- inter- and intra-ring properties unknown! "
-                                  << std::endl;
-                        exit(1);
+                        plusOneLev = true;
                     }
+                    
+                    if (!plusOneLev)
+                    {
                     aKeySet.push_back(tInR);
                     aKeySet.push_back(a1NB2);
                     aKeySet.push_back(a2NB2);
@@ -6142,6 +6225,7 @@ namespace LIBMOL
                                             != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M].end())
                                         {
                                             std::cout << " find " << a2M << std::endl;
+                                            
                                             if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M].find(a1C)
                                             != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M].end())
                                             {
@@ -6234,6 +6318,11 @@ namespace LIBMOL
                         // try to see if a2NB2 exists in dictionary 
                         interLevelSearchBonds(aHaV, aKeySet, 8, iB);
                         
+                    }
+                    }
+                    else
+                    {
+                        interLevelSearchBonds(aHaV, aKeySet, 10, iB);
                     }
                 }
                 else
