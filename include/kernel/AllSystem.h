@@ -187,6 +187,7 @@ namespace LIBMOL
         void AddAngle(const AngleDict                     & tAngle);
         void AddTorsions(const std::vector<TorsionDict>   & tAllTorsions);
         void AddTorsion(const TorsionDict                 & tTorsion);
+        void AddMiniTorsions(const std::vector<TorsionDict>   & tMiniTorsions);
         void AddChirals(const std::vector<ChiralDict>     & tAllChirals);
         void AddChiral(const  ChiralDict                  & tChiral);
         void AddPlanes(const std::vector<PlaneDict>       & tAllPlanes);
@@ -325,7 +326,9 @@ namespace LIBMOL
         std::map<int, std::vector<std::vector<int> > > allAnglesIdxs; 
               
         std::vector<TorsionDict>                 allTorsions;
+        std::vector<TorsionDict>                 miniTorsions;
         std::vector<std::vector<TorsionDict> >   allTorsionSets;
+ 
         std::vector<ChiralDict>                  allChirals;
         std::vector<PlaneDict>                   allPlanes;
         

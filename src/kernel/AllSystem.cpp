@@ -229,6 +229,7 @@ namespace LIBMOL
         allBonds.clear();
         allAngles.clear();
         allTorsions.clear();
+        miniTorsions.clear();
         allChirals.clear();
         allPlanes.clear();
         allRings.clear();
@@ -242,6 +243,7 @@ namespace LIBMOL
         AddBonds(tCodSys.allBonds);
         AddAngles(tCodSys.allAngles);
         AddTorsions(tCodSys.allTorsions);
+        AddMiniTorsions(tCodSys.miniTorsions);
         AddChirals(tCodSys.allChirals);
         // AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
@@ -319,6 +321,15 @@ namespace LIBMOL
         {
             allTorsions.push_back(*iT);        
         }
+    }
+    
+    void AllSystem::AddMiniTorsions(const std::vector<TorsionDict>& tMiniTorsions)
+    {
+        for (std::vector<TorsionDict>::const_iterator iT=tMiniTorsions.begin();
+                iT !=tMiniTorsions.end(); iT++)
+        {
+            miniTorsions.push_back(*iT);
+        }           
     }
     
     void AllSystem::AddTorsion(const TorsionDict& tTorsion)
@@ -399,8 +410,6 @@ namespace LIBMOL
         }
         return true;
     }
-    
-    
     
     int AllSystem::atomPosition(ID tID)
     {
@@ -3010,9 +3019,7 @@ namespace LIBMOL
         else if((bIdx2==0||bIdx2==1) && bIdx1==3)
         {
             SetOneSP1SP3Bond(tIdx2, tIdx1);
-        }
-        
-        
+        }    
     }
      
     void AllSystem::setTorsionFromOneBond(int tIdx1, int tIdx2, std::string tF)

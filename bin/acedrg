@@ -237,6 +237,7 @@ class Acedrg(CExeCode ):
         self.inSmiName        = ""
         self.inMdlName        = ""
         self.inPdbName        = ""
+        self.inLigandPdbName  = ""
         self.inSDFName        = ""
         self.inMol2Name       = ""
         self.outRstCifName    = ""
@@ -298,7 +299,7 @@ class Acedrg(CExeCode ):
         self.runExitCode      = 0 
 
         self.setWorkMode(inputOptionsP)
-       
+        print "workMode is ", self.workMode
         self.checkDependency()
         self.checkVersionInfo()
 
@@ -381,9 +382,9 @@ class Acedrg(CExeCode ):
                                     action="store", type="string", 
                                     help="A name root that users want their output files called(without extension)")
 
-        #self.inputParser.add_option("-p",  "--pdb", dest="inPdbName", metavar="FILE", 
+        #self.inputParser.add_option("-x",  "--pdb", dest="inLigandPdbName", metavar="FILE", 
         #                            action="store", type="string", 
-        #                            help="Input File of PDB format containing atomic coordinates ")
+        #                            help="Input File of PDB format containing coordinates of the ligand")
 
         self.inputParser.add_option("-p",  "--coords", dest="useExistCoords",  
                                     action="store_true",  default=False,
@@ -653,6 +654,9 @@ class Acedrg(CExeCode ):
                 elif t_inputOptionsP.inMol2Name: 
                     self.inMol2Name = t_inputOptionsP.inMol2Name
                     self.workMode    = 15
+                #elif t_inputOptionsP.inLigandPdbName: 
+                #    self.inLigandPdbName = t_inputOptionsP.inLigandPdbName
+                #    self.workMode    = 16
             else:
                 if t_inputOptionsP.inMmCifName:
                     self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -669,6 +673,10 @@ class Acedrg(CExeCode ):
                 elif t_inputOptionsP.inMol2Name: 
                     self.inMol2Name = t_inputOptionsP.inMol2Name
                     self.workMode    = 151
+                #elif t_inputOptionsP.inLigandPdbName: 
+                #    self.inLigandPdbName = t_inputOptionsP.inPdbName
+                #    self.workMode    = 161
+
         elif t_inputOptionsP.molGen:
             if t_inputOptionsP.inStdCifName: 
                 self.inStdCifName = t_inputOptionsP.inStdCifName
@@ -1902,6 +1910,11 @@ class Acedrg(CExeCode ):
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                         self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
                         if os.path.isfile(aIniMolName) :
+                            if len(self.fileConv.chiralPre) !=0:
+                            # Chiral centers defined in the original cif file
+                                self.rdKit.chiralPre =[]
+                                for aChi in self.fileConv.chiralPre:
+                                    self.rdKit.chiralPre.append(aChi) 
                             self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
                                                 self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
                                                 self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
@@ -2087,6 +2100,14 @@ class Acedrg(CExeCode ):
                 print self.inMol2Name, " can not be found for reading "
                 sys.exit()
 
+        if self.workMode == 16 or self.workMode == 161 :
+            
+            # The input file is a pdb file
+            # if os.path.isfile(self.inLigandPdbName) and self.chemCheck.isOrganic(self.inLigandPdbName, self.workMode):
+            if os.path.isfile(self.inLigandPdbName):
+                self.rdKit.initMols("pdb", self.inLigandPdbName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+
+
         if self.workMode in [11, 12, 13, 14, 15]:
             self.workMode = 11
         elif self.workMode in [111, 121, 131, 141, 151]:
@@ -2106,7 +2127,7 @@ class Acedrg(CExeCode ):
                 #else:
                 nConf = self.rdKit.molecules[iMol].GetNumConformers()
                 print "Using coords ", self.rdKit.useExistCoords
-                self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
+                self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre) 
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                         print "The input system contains metal or other heavier element"
@@ -2389,9 +2410,19 @@ class AcedrgRDKit():
                 #print "Molecule name:  ", aMolName
                 aMolT     = Chem.MolFromMolFile(tFileName)
                 #aMolT = Chem.AddHs(aMolT1)
-
             else:
                 print "File %s does not exist "%tFileName
+
+        """
+        elif tFileType == "pdb" :
+            if os.path.isfile(tFileName):
+                aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
+                print "Molecule name:  ", aMolName
+                # Test. H atoms removed as usual. Maybe change that later
+                aMolT     = Chem.MolFromPDBFile(tFileName)
+                if aMolT:
+                    self.removeWater(aMolT)
+        """
 
         if not aMolT:
             print "Molecules can not generated  from file %s ! "%tFileName
@@ -2792,11 +2823,16 @@ class AcedrgRDKit():
 
         print "A molecule with residue name %s is generated"%tMol.GetProp("ResidueName")
         nAtoms      =  tMol.GetNumAtoms()
+        print "Number of atoms in the molecule is ", nAtoms
         initAtoms   =  tMol.GetAtoms()
+
         # check Atom elements
         elemList = []
         for aAtom in initAtoms:
+            #print "Atom's element type ", aAtom.GetSymbol()
             elemList.append(aAtom.GetSymbol())
+  
+        #print "props in the mol ", tMol.GetPropNames()[0] 
 
         if not len(elemList) :
             print "No atoms in from your file, check your file format"
@@ -3248,10 +3284,11 @@ class AcedrgRDKit():
                                  %(tMonoName, name1, name2,  aBond.GetBondType(), \
                                    isAro, bLen, dBlen))
 
-            print "Number of chiral centers is ", nTetraChi
             # chiral center section
             lChiPre = False
+            print " Number of chiral centers get from the comformer ", nTetraChi
             if tChiDes:
+                print "number of chiral center predefined ", len(tChiDes)
                 if len(tChiDes):
                     # The molecule contain chiral centers
                     aMmCif.write("#\n")
@@ -3893,7 +3930,28 @@ class AcedrgRDKit():
                 aTor["hybrid"]   = "others"
 
             tAllTorsions.append(aTor) 
-        
+    
+    """    
+    def removeWater(self, tMol):
+       
+        print "Number of atoms ", tMol.GetNumAtoms() 
+        # Remove water molecules read from the input files (usually pdb format)
+        aEdMol = rdchem.EditableMol(tMol)
+        for aAt in tMol.GetAtoms():
+            if aAt.GetSymbol() =="O":
+                numBs = aAt.GetTotalDegree()
+                numHs = aAt.GetTotalNumHs()
+                if numBs == numHs:
+                    print "Atom's element type ", aAt.GetSymbol()
+                    print "Number of bonds it has ", numBs
+                    print "Number of H  it connects ", numHs
+                    aEdMol.RemoveAtom(aAt.GetIdx())
+                    print "atom ", aAt.GetIdx(), " is removed "
+        tMol = aEdMol.GetMol()
+        print "Number of atoms ", tMol.GetNumAtoms() 
+        sys.exit()              
+    """    
+
 class FileTransformer :
 
     def __init__(self):

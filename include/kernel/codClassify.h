@@ -529,7 +529,9 @@ namespace LIBMOL
         void setOneSetBoronAngles(std::map<int, std::vector<AngleDict> >::iterator tAs);
         void setOneSetCarbonAngles(std::map<int, std::vector<AngleDict> >::iterator tAs);
         
-        // Torsion angles related 
+        // Torsion angles related
+        void setupMiniTorsions();
+        void selectOneTorFromOneBond(ID  tS, std::vector<TorsionDict> & tTors);
         void setupTargetTorsions();
         void fixTorIDs();
         // 
@@ -711,6 +713,7 @@ namespace LIBMOL
         
         
         std::vector<TorsionDict>                            allTorsions;
+        std::vector<TorsionDict>                            miniTorsions;
         std::vector<ChiralDict>                             allChirals;
         std::vector<PlaneDict>                              allPlanes;
         std::map<ID, std::vector<RingDict> >                allRings;

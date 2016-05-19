@@ -562,6 +562,8 @@ namespace LIBMOL
         //    setAtomsCCP4Type();
         //}
         
+        // setupMiniTorsions();
+        
         setAtomsNB1NB2_SP(allAtoms);
         
         hashingAtoms2();
@@ -581,7 +583,8 @@ namespace LIBMOL
                       << "Its hashing is " << iAt->hashingValue << std::endl; 
                     
         }
-            
+        
+        
         for (std::vector<BondDict>::iterator iB = allBonds.begin();
                 iB !=allBonds.end(); iB++)
         {
@@ -596,6 +599,7 @@ namespace LIBMOL
                 std::cout << "It is not in the same ring" << std::endl;
             }
         }
+        
         
         for (std::vector<AngleDict>::iterator iA=allAngles.begin(); 
                 iA !=allAngles.end(); iA++)
@@ -14331,6 +14335,373 @@ namespace LIBMOL
         }
         
     }
+    
+    void CodClassify::setupMiniTorsions()
+    {
+        std::map<ID, std::vector<TorsionDict> >  TorsionSetOneBond;
+        
+        for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor !=allTorsions.end(); iTor++)
+        {
+            if (iTor->atoms.size() ==4)
+            {
+                int idxB = getBond(allBonds, iTor->atoms[1], iTor->atoms[2]);
+                if (idxB > -1)
+                {
+                    //std::cout << "Get bond of atom " << allAtoms[allBonds[idxB].atomsIdx[0]].id
+                    //          << " and " << allAtoms[allBonds[idxB].atomsIdx[1]].id << std::endl;
+                    StrUpper(allBonds[idxB].order);
+                    // std::cout << "Bond order " << allBonds[idxB].order << std::endl;
+                    // std::cout << "in the same ring " << allBonds[idxB].isInSameRing
+                    //           << std::endl;
+                    //if (!((allBonds[idxB].order.find("DOUB") !=std::string::npos
+                    //      || allBonds[idxB].order.find("AROM") !=std::string::npos)
+                    //    && allBonds[idxB].isInSameRing))
+                    //{
+                       
+                        std::vector<int> tIdxB;
+                        tIdxB.push_back(iTor->atoms[1]);
+                        tIdxB.push_back(iTor->atoms[2]);
+                        std::sort(tIdxB.begin(), tIdxB.end());
+                
+                        ID tLab = IntToStr(tIdxB[0]) + "_" + IntToStr(tIdxB[1]);
+                        //std::cout << "Bond of atoms " << allAtoms[iTor->atoms[1]].id
+                        //          << " and " << allAtoms[iTor->atoms[2]].id << std::endl;
+                        //std::cout << "torsion lab " << tLab << std::endl;
+                        //std::cout << "torsion " << iTor->seriNum 
+                        //          << " is included " << std::endl;
+                        TorsionSetOneBond[tLab].push_back(*iTor);
+                        
+                    // }
+                }
+                else
+                {
+                    std::cout << "Error in Setup Torsion section: "
+                              << "Can not find the bond between atom "
+                              << allAtoms[iTor->atoms[1]].id  << " and " 
+                              << allAtoms[iTor->atoms[2]].id << std::endl;
+                }
+                
+                
+            }
+        }
+        
+        for (std::map<ID, std::vector<TorsionDict> >::iterator iTorsB=TorsionSetOneBond.begin();
+                iTorsB !=TorsionSetOneBond.end(); iTorsB++)
+        {
+            
+            selectOneTorFromOneBond(iTorsB->first, iTorsB->second);
+        }
+        
+        std::cout << "Total number of torsions is " << allTorsions.size() 
+                  << std::endl;
+        
+        std::cout << "Number of torsions in the mini-set " 
+                  << miniTorsions.size() << std::endl;
+        
+        for (std::vector<TorsionDict>::iterator iTor = miniTorsions.begin();
+                iTor != miniTorsions.end(); iTor++)
+        {
+            std::cout << "The torsion selected for the bond of atom "
+                      << allAtoms[iTor->atoms[1]].id << " and "
+                      << allAtoms[iTor->atoms[2]].id << std::endl
+                      << " is " << iTor->value << std::endl;
+            std::cout << "The other two atoms are atom " 
+                      << allAtoms[iTor->atoms[0]].id
+                      << " and " << allAtoms[iTor->atoms[3]].id
+                      << std::endl;
+        }
+    }
+    
+    void CodClassify::selectOneTorFromOneBond(ID tS, std::vector<TorsionDict> & tTors)
+    {
+        bool lDone = false;
+        
+        if (tTors.size() >0)
+        {
+            std::vector<ID> tLabs;
+            StrTokenize(tS, tLabs, '_');
+                      
+            if (tLabs.size()==2)
+            {
+                int idx1 = StrToInt(tLabs[0]);
+                int idx2 = StrToInt(tLabs[1]);
+                // std::cout << "torsion lab " << tS << std::endl;
+                // std::cout << "Select torsion angles for the bond of atoms "
+                //          << allAtoms[idx1].id << " and " << allAtoms[idx2].id 
+                //          << std::endl;
+                
+                std::vector<int> idxR1, idxNonH1, idxH1, idxR2, idxNonH2, idxH2;
+                
+                for(std::vector<TorsionDict>::iterator iTor=tTors.begin();
+                        iTor !=tTors.end(); iTor++)
+                {
+                    for (int i=1; i < 3; i++)
+                    {
+                        if (iTor->atoms[i]==idx1)
+                        {
+                            for (std::vector<int>::iterator iConn=allAtoms[idx1].connAtoms.begin();
+                                   iConn != allAtoms[idx1].connAtoms.end(); iConn++)
+                            {
+                                if ( *iConn != idx2)
+                                {
+                                    if (allAtoms[*iConn].inRings.size() !=0)
+                                    {
+                                        idxR1.push_back(*iConn);
+                                    }
+                                    else if (allAtoms[*iConn].chemType !="H")
+                                    {
+                                        idxNonH1.push_back(*iConn);
+                                    }
+                                    else
+                                    {
+                                        idxH1.push_back(*iConn);
+                                    }
+                                }
+                            }
+                        }
+                        else if (iTor->atoms[i]==idx2)
+                        {
+                            for (std::vector<int>::iterator iConn=allAtoms[idx2].connAtoms.begin();
+                                 iConn != allAtoms[idx2].connAtoms.end(); iConn++)
+                            {
+                                if ( *iConn != idx1)
+                                {
+                                    if (allAtoms[*iConn].inRings.size() !=0)
+                                    {
+                                        idxR2.push_back(*iConn);
+                                    }
+                                    else if (allAtoms[*iConn].chemType.find("H")
+                                             ==std::string::npos)
+                                    {
+                                        idxNonH2.push_back(*iConn);
+                                    }
+                                    else
+                                    {
+                                        idxH2.push_back(*iConn);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //std::cout << "atom  " << allAtoms[idx1].id 
+                //          << " connects to " << std::endl;
+                //std::cout << "ring atoms " << idxR1.size() << std::endl
+                //          << "non-H atoms (excluded above) " << idxNonH1.size() << std::endl
+                //          << "H atoms " << idxH1.size() << std::endl;
+                //std::cout << "atom  " << allAtoms[idx2].id 
+                //          << " connects to " << std::endl;
+                //std::cout << "ring atoms " << idxR2.size() << std::endl
+                //          << "non-H atoms (excluded above) " << idxNonH2.size() << std::endl
+                //          << "H atoms " << idxH2.size() << std::endl;
+                // Now select the torsion angles 
+                // 1. atoms of Non-ring, non-H first 
+                if (idxNonH1.size() !=0 && idxNonH2.size() !=0)
+                {
+                    int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxNonH2[0]);                        
+                    if (tIdxT !=-1 )
+                    {
+                        miniTorsions.push_back(allTorsions[tIdxT]);
+                        lDone = true;
+                    }
+                    else
+                    {
+                        std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxNonH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl;   
+                    }
+                }
+                else if (idxNonH1.size() !=0 && idxNonH2.size() ==0)
+                {
+                    
+                    if (idxR2.size() !=0)
+                    {   
+                        int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxR2[0]);
+                        
+                        if (tIdxT !=-1 )
+                        {
+                           miniTorsions.push_back(allTorsions[tIdxT]);
+                           lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxNonH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxR2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else if (idxH2.size() !=0)
+                    {
+                        int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxH2[0]);                        
+                        if (tIdxT !=-1 )
+                        {
+                            miniTorsions.push_back(allTorsions[tIdxT]);
+                            lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxNonH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxH2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                }
+                else if (idxNonH1.size() ==0 && idxNonH2.size() !=0)
+                {
+                    
+                    if (idxR1.size() !=0)
+                    {
+                        
+                        int tIdxT= getTorsion(allTorsions, idxR1[0], idx1, idx2, idxNonH2[0]);
+                        
+                        if (tIdxT !=-1 )
+                        {
+                           miniTorsions.push_back(allTorsions[tIdxT]);
+                           lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxR1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else if (idxH1.size() !=0)
+                    {
+                        int tIdxT= getTorsion(allTorsions, idxH1[0], idx1, idx2, idxNonH2[0]);                        
+                        if (tIdxT !=-1 )
+                        {
+                            miniTorsions.push_back(allTorsions[tIdxT]);
+                            lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else
+                    {
+                        std::cout << "can not find the first atom of the torsion "
+                                      << " of atoms:  "  << std::endl 
+                                      << allAtoms[idx1].id << ", and "
+                                      << allAtoms[idx2].id 
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl;
+                    }
+                }
+                else if (idxR1.size() !=0 || idxR2.size() !=0)
+                {
+                    if (idxR1.size() !=0 && idxR2.size() !=0)
+                    {
+                        int tIdxT= getTorsion(allTorsions, idxR1[0], idx1, idx2, idxR2[0]);
+                        
+                        if (tIdxT !=-1 )
+                        {
+                           miniTorsions.push_back(allTorsions[tIdxT]);
+                           lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxR1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxR2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else if (idxR1.size() !=0 && idxR2.size()==0)
+                    {
+                        if (idxH2.size() !=0)
+                        {
+                            int tIdxT= getTorsion(allTorsions, idxR1[0], idx1, idx2, idxH2[0]);                        
+                            if (tIdxT !=-1 )
+                            {
+                                miniTorsions.push_back(allTorsions[tIdxT]);
+                                lDone = true;
+                            }
+                            else
+                            {
+                                std::cout << "Error: can not find the torsion of atoms: "
+                                          << allAtoms[idxR1[0]].id << ", " 
+                                          << allAtoms[idx1].id << ", "
+                                          << allAtoms[idx2].id << ", and "
+                                          << allAtoms[idxH2[0]].id 
+                                          << std::endl; 
+                            }
+                        }
+                        else   
+                        {
+                            std::cout << "can not find the fourth atom of the torsion "
+                                      << std::endl << " consisting of atoms: "
+                                      << allAtoms[idxR1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", and "
+                                      << allAtoms[idx2].id << std::endl;             
+                        }
+                    }
+                    else if (idxR2.size() !=0 && idxR1.size()==0)
+                    {
+                        
+                        if (idxH1.size() !=0)
+                        {
+                            int tIdxT= getTorsion(allTorsions, idxH1[0], idx1, idx2, idxR2[0]);                        
+                            if (tIdxT !=-1 )
+                            {
+                                miniTorsions.push_back(allTorsions[tIdxT]);
+                                lDone = true;
+                            }
+                            else
+                            {
+                                std::cout << "Error: can not find the torsion of atoms: "
+                                          << allAtoms[idxH1[0]].id << ", " 
+                                          << allAtoms[idx1].id << ", "
+                                          << allAtoms[idx2].id << ", and "
+                                          << allAtoms[idxR2[0]].id 
+                                          << std::endl; 
+                            }
+                        }
+                        else   
+                        {
+                            std::cout << "can not find the fourth atom of the torsion "
+                                      << std::endl << " consisting of " 
+                                      << allAtoms[idxR2[0]].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idx1].id << std::endl;             
+                        }
+                    }
+                }
+                else 
+                {
+                    
+                    std::cout << "Both atom " 
+                              << allAtoms[idx1].id  
+                              << ", and " << allAtoms[idx2].id 
+                              << " connect to H atoms only. Check the input structure ! "
+                              << std::endl;
+                    exit(1);  
+                }
+            }
+        } 
+    }
+    
     void CodClassify::setupTargetTorsions()
     {
         // search COD for torsion angle values, no needed at the moments.
@@ -14383,6 +14754,8 @@ namespace LIBMOL
         // setupTargetTorsions();
         
         fixTorIDs();
+        
+        setupMiniTorsions();
         
         // Chiral centers have been setup when atoms are read in from an
         // a input cif file
