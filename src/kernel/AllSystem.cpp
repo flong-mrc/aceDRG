@@ -533,7 +533,7 @@ namespace LIBMOL
         
         reIndexAtomInRing(allAtoms, allRingsV);
         
-        modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV);
+        modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
         
         //if (!hasCCP4Type)
         //{

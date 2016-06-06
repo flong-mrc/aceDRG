@@ -433,7 +433,8 @@ namespace LIBMOL
     extern void modAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms,
                                                std::vector<BondDict> & tBonds, 
                                                std::vector<AngleDict> & tAngles,
-                                               std::vector<RingDict>  & tRings)
+                                               std::vector<RingDict>  & tRings,
+                                               int                      tMode)
     {
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
@@ -496,6 +497,25 @@ namespace LIBMOL
                     {
                        // iA->chiralIdx  = 0;
                        // iA->bondingIdx = 2;
+                    }
+                }
+                else
+                {
+                    
+                    if (tMode==1)
+                    {
+                        if (confirmPlaneByChiralVol(tAtoms, iA))
+                        {
+                            iA->chiralIdx  = 5; // New value 
+                            iA->bondingIdx = 2; // still keep it sp2, will use together
+                                            // with chiralIdx
+                            //std::cout << "inside 2 " << std::endl;
+                        }
+                        else
+                        {
+                            iA->chiralIdx  = 5;
+                            iA->bondingIdx = 3;
+                        }
                     }
                 }
                 /*

@@ -253,6 +253,32 @@ for aF in glob.glob("./inDictProb/*.cif"):
             failNames.append(rRoot)
 
 print "=============================================================="
+print "|  run all examples with input PDB files at ./inCoordPDBs    |"
+print "=============================================================="
+for aF in glob.glob("./inCoordPDBs/*.pdb"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+    else:
+        MonoName = aFRoot
+
+    if len(aFRoot) !=0:
+        rRoot = "%s_inCoordPDBs"%aFRoot
+        cmdL = "acedrg -x %s  -o  %s "%(aF, rRoot) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
+ 
+print "=============================================================="
 print "|  run all examples with input mmCif files at ./inProbsCases |"
 print "=============================================================="
 for aF in glob.glob("./inProbsCases/*.cif"):

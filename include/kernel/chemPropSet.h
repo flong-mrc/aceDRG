@@ -134,11 +134,14 @@ namespace LIBMOL
     // function once the second one passes tests
     // 1. Currently used one (originally in codClassify.h and .cpp) 
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms);
-    // 2. Added one
+    // 2. For modAtomsBondingAndChiralCenter
+    // tMode 0 : not use coordinates (in dictionary generation stage) 
+    // tMode 1 : definitely have reliable coordinates (in DB molecule generation stage)
     extern void modAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms,
                                                std::vector<BondDict> & tBonds,
                                                std::vector<AngleDict> & tAngles,
-                                               std::vector<RingDict> & tRings);
+                                               std::vector<RingDict> & tRings,
+                                               int                     tMode);
     
     extern void setAtomsNB1NB2_SP(std::vector<AtomDict> & tAtoms);
     

@@ -1025,7 +1025,7 @@ namespace LIBMOL
         // std::cout << "Number of bonds is " << tMol.allBonds << std::endl;
         // Modify and setup atom's sp features
         std::cout << "Modifying sp properties " << std::endl;
-        modAtomsBondingAndChiralCenter(tMol.atoms, tMol.allBonds, tMol.angles, tMol.rings);
+        modAtomsBondingAndChiralCenter(tMol.atoms, tMol.allBonds, tMol.angles, tMol.rings, 1);
         
         setAtomsNB1NB2_SP(tMol.atoms);
         
