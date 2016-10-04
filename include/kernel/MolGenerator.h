@@ -90,7 +90,8 @@ namespace LIBMOL
                      int        tNBDepth=1);
         
         MolGenerator(const DictCifFile &  tCifObj,
-                     int        tNBDepth=1);                                 
+                     int        tNBDepth=1);  
+        
         // Destructor
         ~MolGenerator();
         
@@ -182,6 +183,8 @@ namespace LIBMOL
         // Validate all molecules 
         void buildAndValidMols(PeriodicTable & tPTab,
                            std::vector<CrystInfo>::iterator  iCryst);
+        bool checEquiMoles(std::vector<Molecule> & tSetMols,
+                           Molecule & tMol);
         void checkAtomElementID(std::vector<AtomDict> & tAtoms);
         bool colidAtom(AtomDict               & tAtom,
                        std::vector<AtomDict>  &  tRefAtoms);
@@ -193,6 +196,7 @@ namespace LIBMOL
         bool connMetal2ndNB(std::vector<int>      & tIdxs, 
                        std::vector<AtomDict> & tAtoms);
         
+        bool checkAsmAtomsInMol(Molecule  & tMol, std::string  & tErrInfo);
         bool checkAtomOcp(Molecule  & tMol, std::string  & tErrInfo);
         bool validateBonds(std::vector<BondDict>::iterator tBo, 
                            std::string & tErrInfo,
@@ -201,6 +205,8 @@ namespace LIBMOL
                            Molecule    & tMol,
                            std::string & tErrInfo,
                            PeriodicTable & tPTab);
+        bool validateBondValueSame(Molecule    & tMol,
+                                   std::string & tErrInfo);
         bool validateBondValueDiff(Molecule    & tMol,
                                    std::string & tErrInfo);
         bool validateBondValueDiffStruct(std::vector<Molecule> & tMols,
@@ -212,6 +218,7 @@ namespace LIBMOL
         bool validateMolecule(Molecule    & tMol, PeriodicTable & tPTab,
                               std::string & tErrInfo);
         
+        void setAtomNFormalCharge(Molecule & tMol);
         void getAtomTypeMols();
         void getAtomTypeOneMol(Molecule    & tMol);
         void getAtomTypeOneMolNew(Molecule & tMol);
@@ -219,15 +226,31 @@ namespace LIBMOL
         void getOverallBondAndAngles();
         void getOverallBondAndAnglesNew();
         
-        void outTableMols(std::ofstream & tMolTabs, Molecule & tMol);
+        void outTableMols(std::ofstream & tMolTabs, 
+                          Molecule & tMol);
         void outTableBAndA(FileName tBAndAFName);
+        void setTableSpAndChirals(Molecule & tMol, 
+                                  std::map<std::string, std::map<std::string,
+                                  std::map<std::string, std::map<std::string,
+                                  REAL> > > > & tAtomSpAndChMap);
+        
         void outTables(FileName tOutName);
+        void outMsg(FileName tOutName);
+        
+        
+        void contMetal2NB(int & tNB, int & tNA);
         
         void execute(FileName tOutName);
         
         std::string                     aLibmolTabDir;
+        bool                            lColid;
+        std::vector<std::string>        allMsg;
+        std::map<int, std::string>      validedMolMsg;
+        std::map<int, std::string>      errMolMsg;
         
         std::vector<CCP4DictParas>      ccp4DictParas;
+        
+        
         std::vector<AtomDict>           initAtoms;
         std::vector<AtomDict>           allAtoms;       // these are all atoms (including symmetrically generated atoms)
                                                         // in a unit cell
@@ -242,6 +265,10 @@ namespace LIBMOL
         std::map<unsigned, std::vector<int> >  moleculesInCell;
         std::map<unsigned, std::vector<int> >  moleculesInCryst;
         
+        std::map<int, std::vector<int> >        bondsMetal2NB;
+        std::map<int, std::vector<int> >        anglesMetal2NB;
+        std::vector<int>                        noContriMols;
+        
         
     private :
         
@@ -249,12 +276,8 @@ namespace LIBMOL
         std::map<std::string, std::map<std::string, REAL> > shortLenList;
                 
     };
-    
-    
-    
+       
 }
-
-
 
 
 #endif	/* MOLGENERATOR_H */

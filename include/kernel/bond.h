@@ -168,6 +168,7 @@ namespace LIBMOL
         
         ID                      resName;
         SeriNumber              seriNum;
+        int                     molIdx;
         
         std::string             order;
         REAL                    orderN;
@@ -196,6 +197,7 @@ namespace LIBMOL
         std::vector<int>        atomsHashingCodes;
         std::map<ID, ID>        atomSPs;
         std::map<ID, ID>        atomNB1NB2SPs;
+        std::map<ID, ID>        atomNB2ExtraEls;
         
         std::vector<ID>         atomsMainRep;
         std::vector<ID>         atomsNBRep;
@@ -239,6 +241,9 @@ namespace LIBMOL
     
     extern bool checkIfBondInSameRing(std::vector<AtomDict> & tAtoms, 
                                       int idxA1, int idxA2);
+    
+    
+    
     
 }
 

@@ -81,7 +81,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:S:T:X:Y:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:S:T:X:Y:Z:")) != -1)
         {
             switch (c)
             {
@@ -126,8 +126,6 @@ namespace LIBMOL
                     break;
                 case 'o':
                     IOEntries["userOutName"] = optarg;
-                    // std::cout << "Output res file should be : " 
-                    //          << IOEntries["userOutName"] << std::endl;
                     break;
                 case 'p':
                     IOEntries["inPdbName"] = optarg;
@@ -201,7 +199,9 @@ namespace LIBMOL
                     std::cout << "The file containing atom type set B is "
                               << IOEntries["Type1"] << std::endl;
                     break;
-                    
+                case 'Z':
+                    IOEntries["HUMO"] = optarg;
+                    break;    
                 case '?':
                     if (std::isprint(optopt))
                     {
@@ -344,7 +344,12 @@ namespace LIBMOL
         {
             workMode = 900;
         }
-        else if ( IOEntries.find("inCifName")!=IOEntries.end())
+        else if (IOEntries.find("HUMO")!=IOEntries.end() &&
+                 IOEntries.find("inCifName")!=IOEntries.end())
+        {
+            workMode =910;
+        }
+        else if ( IOEntries.find("inCifName")!=IOEntries.end() )
         {
             if (!IOEntries["inCifName"].empty())
             {
@@ -556,6 +561,11 @@ namespace LIBMOL
                     << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
                     << "The output atom type file(txt) : " << IOEntries["AtomTypeOutName"]
                     << std::endl;
+        }
+        else if (workMode==910)
+        {
+            std::cout << "The Mode for HUMO applications is activated "
+                      << std::endl;
         }
                   
         std::cout << "||========================================================================||"

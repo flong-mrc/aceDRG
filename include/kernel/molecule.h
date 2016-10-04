@@ -88,6 +88,8 @@ namespace LIBMOL
         Molecule(const Molecule & aMol);
         // Destructor
         ~Molecule();
+        
+        void setFormula();
              
         std::vector<AtomDict>            atoms;
         std::vector<BondDict>            bonds;
@@ -103,9 +105,10 @@ namespace LIBMOL
         
         int                              seriNum;
         ID                               id;
+        ID                               formula; 
         REAL                             atomCovRadMax; 
         bool                             hasCoords;
-        
+        bool                             validated;        
     };
 }
 

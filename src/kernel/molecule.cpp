@@ -12,13 +12,17 @@ namespace LIBMOL
 {
     Molecule::Molecule() : seriNum(-1),
             id(NullString),
-            hasCoords(true)
+            formula(NullString), 
+            hasCoords(true),
+            validated(true)
     {
     }
     
     Molecule::Molecule(const Molecule & tMol) : seriNum(tMol.seriNum),
             id(tMol.id),
-            hasCoords(tMol.hasCoords)
+            formula(tMol.formula),
+            hasCoords(tMol.hasCoords),
+            validated(tMol.validated)
     {
         for(std::vector<AtomDict>::const_iterator iA=tMol.atoms.begin();
                 iA !=tMol.atoms.end(); iA++)
@@ -87,6 +91,100 @@ namespace LIBMOL
     
     Molecule::~Molecule()
     {
+        
+    }
+    
+    void Molecule::setFormula()
+    {
+        std::map<ID, int> fmap;
+        
+        for (std::vector<AtomDict>::iterator iAt=atoms.begin();
+                iAt != atoms.end(); iAt++)
+        {
+            if (iAt->formalCharge==0.0)
+            {
+                if (fmap.find(iAt->chemType) == fmap.end())
+                {
+                    fmap[iAt->chemType] = 1;
+                }
+                else
+                {
+                    fmap[iAt->chemType]++;
+                }
+            }
+            else
+            {
+                ID tReal, tInt, tKey;
+                tReal = RealToStr(iAt->formalCharge);
+                
+                
+                if (tReal.find('.') !=tReal.npos)
+                {
+                    std::vector<ID> tBuf;
+                    StrTokenize(tReal, tBuf, '.');
+                    if (tBuf.size()!=0)
+                    {
+                        if(tBuf[0] !="0")
+                        {
+                            tInt = tBuf[0];
+                        }
+                    }
+                    
+                    if (tInt.size() !=0)
+                    {
+                        tKey = iAt->chemType + "[" + tInt + "]";
+                    }
+                    else
+                    {
+                        tKey = iAt->chemType;
+                    }    
+                }
+                else if (tReal.size() !=0)
+                {
+                    if (tReal.substr(0,1).find("0") == std::string::npos)
+                    {
+                        tKey = iAt->chemType + "[" + tReal+ "]";
+                    }
+                    else
+                    {
+                        tKey = iAt->chemType;
+                    }  
+                }
+                else
+                {
+                    tKey = iAt->chemType;
+                }
+                
+                if (fmap.find(tKey) == fmap.end())
+                {
+                    fmap[tKey] = 1;
+                }
+                else
+                {
+                    fmap[tKey]++;
+                } 
+            }
+        }
+        
+        std::list<std::string> tAllIds;
+                            
+        for (std::map<ID, int>::iterator iM=fmap.begin();
+                iM != fmap.end(); iM++)
+        {
+            ID aID = "{" + iM->first + IntToStr(iM->second) + "}";
+            
+            tAllIds.push_back(aID);
+                               
+        }
+        
+        tAllIds.sort(compareNoCase);
+                            
+        formula = "";
+        for (std::list<std::string>::iterator iAI =tAllIds.begin();
+                iAI != tAllIds.end(); iAI++)
+        {
+            formula.append(*iAI);
+        }
         
     }
 }

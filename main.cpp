@@ -451,20 +451,57 @@ int main(int argc, char** argv) {
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
-            if (dataFromCif.RFactorOK)
+            //std::cout << "Number of crystal in the system is " 
+            //          << dataFromCif.allCryst.size() << std::endl;
+            
+            if (dataFromCif.notPowder && dataFromCif.resolOK
+                && dataFromCif.RFactorOK && dataFromCif.colidOK 
+                && !dataFromCif.lErr)
             {
+                std::cout << "The structure is from single crystallographic x-ray "
+                          << std::endl;
                 std::cout << "R factor satisfies the requirement" << std::endl;
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
+                
                 aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
                 aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
             }
             else
             {
-                std::cout << "REJECTED STRUCTURE: R factor related " << std::endl; 
-                std::cout << "The data will not be converted to molecules because of : "
-                          << std::endl << "(1) high R factors" << std::endl
-                          << "or " << std::endl << "(2) no R factors in the data"
-                          << std::endl;
+                if(dataFromCif.errMsg.size() !=0)
+                {
+                    LIBMOL::writeMsgFile(AJob.IOEntries["userOutName"],
+                                         dataFromCif.errMsg);
+                }
+                
+                if (!dataFromCif.notPowder)
+                {
+                    std::cout << "REJECTED STRUCTURE: Powder Diffraction  " 
+                              << std::endl; 
+                }
+                else if (!dataFromCif.resolOK)
+                {
+                    std::cout << "REJECTED STRUCTURE: Problems in Resolution or Low resolutions " 
+                              << std::endl; 
+                }
+                else if ( !dataFromCif.RFactorOK)
+                {
+                    std::cout << "REJECTED STRUCTURE: R factor related " << std::endl; 
+                    std::cout << "The data will not be converted to molecules because of : "
+                              << std::endl << "(1) high R factors" << std::endl
+                              << "or " << std::endl << "(2) no R factors in the data"
+                              << std::endl;
+                }
+                else if (!dataFromCif.colidOK)
+                {
+                    std::cout << "REJECTED STRUCTURE: Too many atoms have less than 1.0 occp " 
+                              << std::endl; 
+                }
+                else
+                {
+                    std::cout << "Check ! the structure has not been converted to " 
+                              << "molecules because of unknown reasons !" << std::endl; 
+                }
             }
         }
         else if (AJob.workMode==32)
@@ -743,6 +780,26 @@ int main(int argc, char** argv) {
             }
         }
     }
+    else if (AJob.workMode == 910)
+    {
+        // Hukel MO applications
+        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
+        LIBMOL::HuckelMOSuite  aMoTool;
+        aMoTool.setWorkMode(2);
+        aMoTool.execute(dataFromCif.allAtoms, dataFromCif.allBonds);
+        
+        
+        if(AJob.IOEntries.find("userOutName") 
+             == AJob.IOEntries.end())
+        {
+            AJob.IOEntries["userOutName"] = "Libmol_atoms_bonds.txt";
+        }
+        aMoTool.outBoAndChList(AJob.IOEntries["userOutName"].c_str(),
+                               dataFromCif.allAtoms, dataFromCif.allBonds);    
+            
+        
+    }
+    
     
     return 0;
     

@@ -8,7 +8,7 @@
 #     CCP4 Program Suite Licence Agreement as a CCP4 Library.
 #
 #====================================================================
-## The date of last modification: 08/06/2015
+## The date of last modification: 21/07/2016
 #
 
 import os,os.path,sys
@@ -280,6 +280,8 @@ class Acedrg(CExeCode ):
         self.molGen           = False
         self.repCrds          = False
 
+        self.HMO              = False
+        
         self.testMode         = False
 
         self.versionInfo       = {}
@@ -402,6 +404,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input path that stores all bond and angle tables (if no input, default CCP4 location will be used)")
+
+        self.inputParser.add_option("-u",  "--hmo", dest="HMO",  
+                                    action="store_true",  default=False,
+                                    help="Calculate bond-orders and charges using HMO ")
 
         self.inputParser.add_option("-v",  "--ver", dest="versionInfo",  
                                     action="store_true",  default=False,
@@ -638,7 +644,8 @@ class Acedrg(CExeCode ):
         #        print "Bond and angle tables required could not be found "
         #        sys.exit()
 
-        if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut: 
+        if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
+           and not t_inputOptionsP.HMO: 
             if not t_inputOptionsP.noGeoOpt:
                 if t_inputOptionsP.inMmCifName:
                     self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -709,6 +716,22 @@ class Acedrg(CExeCode ):
                 self.inMmCifName = t_inputOptionsP.inMmCifName
                 self.inPdbName = t_inputOptionsP.inPdbName
                 self.workMode     = 41
+        elif t_inputOptionsP.HMO :
+            if t_inputOptionsP.inMmCifName:
+                self.inMmCifName = t_inputOptionsP.inMmCifName
+                self.workMode    = 51            
+            elif t_inputOptionsP.inSmiName: 
+                self.inSmiName = t_inputOptionsP.inSmiName
+                self.workMode    = 52            
+            elif t_inputOptionsP.inMdlName: 
+                self.inMdlName = t_inputOptionsP.inMdlName
+                self.workMode    = 53
+            elif t_inputOptionsP.inSdfName: 
+                self.inSdfName = t_inputOptionsP.inSdfName
+                self.workMode    = 54
+            elif t_inputOptionsP.inMol2Name: 
+                self.inMol2Name = t_inputOptionsP.inMol2Name
+                self.workMode    = 55
 
         if t_inputOptionsP.testMode :
             self.testMode = True
@@ -761,7 +784,6 @@ class Acedrg(CExeCode ):
                     self.inSmiName = tName
                     print tName
 
-         
     def printJobs(self):
 
         print "=====================================================================" 
@@ -813,6 +835,11 @@ class Acedrg(CExeCode ):
                 print "Input directory where cif files are: %s"%self.inStdCifDir
                 print "Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table")
 
+        if self.workMode in [51, 52, 53, 54, 55] :
+            print "=====================================================================" 
+            print "| Your job is to calculate bond-orders and charges using HMO.      |"
+            print "=====================================================================" 
+
     def runLibmol(self, tIn=None, tIdxMol=-1):
  
         self._cmdline = self.libmol
@@ -834,6 +861,8 @@ class Acedrg(CExeCode ):
             else:
                 self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")   
                 self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_cod.pdb")
+        if self.workMode == 51:
+            self.outRstCifName   =  self.baseRoot + "_bondOrder.list"
         if self.workMode == 11 or self.workMode == 12 or self.workMode==16\
            or self.workMode == 111 or self.workMode == 121 or self.workMode==161:
             if tIn:
@@ -926,6 +955,11 @@ class Acedrg(CExeCode ):
             #print self._cmdline
             self.subExecute()
 
+        if self.workMode == 51 :
+
+            self._cmdline += " -Z yes -c %s -o %s "%(self.inMmCifName, self.outRstCifName)
+            #print self._cmdline
+            self.subExecute()
         if self.workMode ==900:
             self._cmdline += " -T yes -X %s -Y %s"%(self.libmolAT1, self.libmolAT2)
             self._cmdline += " -o %s "%self.libmolMatched
@@ -1236,8 +1270,11 @@ class Acedrg(CExeCode ):
             #tCom.close()
             #self.cmdline = "%s  xyzin %s libout %s < %s > %s"%(self.refmac, tPdbIn,  tPdbOut, tComName, tLog) 
             #print self.cmdline
-            self._cmdline += "  xyzin %s libout %s <<eof\n"%(tPdbIn, tPdbOut) 
+            self._cmdline += "  xyzin %s libin %s xyzout %s <<eof\n"%(tPdbIn, tLibIn, tPdbOut) 
             self._cmdline += "ligand    \n"
+            self._cmdline += "ncyc 40   \n"
+            self._cmdline += "make hout yes    \n"
+            self._cmdline += "make hydr full \n"
             self._cmdline += "end       \n"
             self._cmdline += "eof       \n"
         elif tStage==1:
@@ -1315,13 +1352,13 @@ class Acedrg(CExeCode ):
     def runRefmac(self, tPdbIn, tLibIn, tRoot, tStage=2):
       
         #print "| Stage  %d        |"%tStage
+        #self._log_name    = os.path.join(self.scrDir, tRoot + "_refmac_stage_"+ str(tStage) + ".log")
+        #if tStage ==0:
+        #    self._log_name    = os.path.join(self.scrDir, "init_cif.log")
+        #    self.refmacXYZOUTName = os.path.join(self.scrDir, tRoot+ "_init" + ".cif")
+        #else:
         self._log_name    = os.path.join(self.scrDir, tRoot + "_refmac_stage_"+ str(tStage) + ".log")
-        if tStage ==0:
-            self._log_name    = os.path.join(self.scrDir, "init_cif.log")
-            self.refmacXYZOUTName = os.path.join(self.scrDir, tRoot+ "_init" + ".cif")
-        else:
-            self._log_name    = os.path.join(self.scrDir, tRoot + "_refmac_stage_"+ str(tStage) + ".log")
-            self.refmacXYZOUTName = os.path.join(self.scrDir, tRoot+ "_refmac_stage_"+ str(tStage) + ".pdb")
+        self.refmacXYZOUTName = os.path.join(self.scrDir, tRoot+ "_refmac_stage_"+ str(tStage) + ".pdb")
         self.setRefmacCom1(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
         self.subExecute()
 
@@ -1370,13 +1407,13 @@ class Acedrg(CExeCode ):
         # Geometrical optimization
         if os.path.isfile(tPdbIn) and os.path.isfile(tCifLibIn):
             if os.path.getsize(tPdbIn) > 100 and os.path.getsize(tCifLibIn) > 50:
-                #stageNow = 0
+                stageNow = 0
                 #self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
                 #tPdbIn1 = self.refmacXYZOUTName 
                 tPdbIn1 = tPdbIn 
-                stageNow = 1
+                #stageNow = 1
                 self.runRefmac(tPdbIn1, tCifLibIn, tRoot, stageNow)
-                self.refmacXYZOUTName
+                #self.refmacXYZOUTName
                 if not os.path.isfile(self.refmacXYZOUTName):
                     print "Failed to produce the coordinates for input file %s in optimization"%tPdbIn 
                 else:
@@ -1754,7 +1791,6 @@ class Acedrg(CExeCode ):
     def execute(self):
         
         self.printJobs()
-       
         if self.workMode == 11 or self.workMode == 111:
 
             # Stage 1: dictionary generation using a mmcif file 
@@ -1913,7 +1949,7 @@ class Acedrg(CExeCode ):
     def executeWithRDKit(self):
         
         self.printJobs()
-       
+      
         self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print "One of output conformers will using input coordinates as initial ones"
@@ -2084,14 +2120,26 @@ class Acedrg(CExeCode ):
                                                 self.numConformers, 0, self.fileConv.nameMapingCifMol,\
                                                 self.fileConv.inputCharge) 
                     
-        if self.workMode == 12 or self.workMode == 121:
+        if self.workMode==51 : 
+            aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+            if os.path.isfile(self.inMmCifName):
+                aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName)
+                if os.path.isfile(aIniMolName) :
+                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
+                                         self.numConformers, 0, self.fileConv.nameMapingCifMol,\
+                                         self.fileConv.inputCharge) 
+                    
+        if self.workMode == 12 or self.workMode == 121 or self.workMode==52 :
           
             # The input file is  a SMILES file
             if os.path.isfile(self.inSmiName) and self.chemCheck.isOrganic(self.inSmiName, self.workMode):
                 self.rdKit.reSetSmi = True
-                self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)  
+                self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+                if len(self.rdKit.monoName) !=0:
+                    self.monomRoot = self.rdKit.monoName  
          
-        if self.workMode == 13 or self.workMode == 131 :
+        if self.workMode == 13 or self.workMode == 131 or self.workMode==53:
                 
             # The input file is  a mol file
             if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
@@ -2099,13 +2147,13 @@ class Acedrg(CExeCode ):
                 self.fileConv.CheckElemSymbolsInMolFile(self.inMdlName, aTmpMoleFile)
                 self.rdKit.initMols("mol", aTmpMoleFile, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)           
                         
-        if self.workMode == 14 or self.workMode == 141 :
+        if self.workMode == 14 or self.workMode == 141 or self.workMode==54 :
             
             # The input file is a sdf file
             if os.path.isfile(self.inSdfName) and self.chemCheck.isOrganic(self.inSdfName, self.workMode):
                 self.rdKit.initMols("sdf", self.inSdfName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
 
-        if self.workMode == 15 or self.workMode == 151 :
+        if self.workMode == 15 or self.workMode == 151 or self.workMode==55 :
             
             # The input file is a mol2 file
             if os.path.isfile(self.inMol2Name) and self.chemCheck.isOrganic(self.inMol2Name, self.workMode):
@@ -2178,7 +2226,9 @@ class Acedrg(CExeCode ):
             self.workMode = 11
         elif self.workMode in [111, 121, 131, 141, 151]:
             self.workMode = 111
-        if self.workMode == 11 or self.workMode == 111:
+        if self.workMode in [51, 52, 53, 54, 55]:
+            self.workMode = 51
+        if self.workMode in [11,  111, 51]:
             #print len(self.rdKit.molecules)
             if len(self.rdKit.molecules):
                 print "Ligand ID ", self.monomRoot
@@ -2190,8 +2240,9 @@ class Acedrg(CExeCode ):
                 #if self.monomRoot.upper() in self.chemCheck.aminoAcids:
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, "L-peptide")
                 #else:
-                nConf = self.rdKit.molecules[iMol].GetNumConformers()
-                print "Using coords ", self.rdKit.useExistCoords
+                if self.workMode in [11,  111]:
+                    nConf = self.rdKit.molecules[iMol].GetNumConformers()
+                    print "Using coords ", self.rdKit.useExistCoords
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
@@ -2316,6 +2367,7 @@ class Acedrg(CExeCode ):
             else:
                 print "acedrg failed to generate a dictionary file"       
 
+
     def printExitInfo(self):
 
         print "Error: check log file at %s"%self._log_name
@@ -2352,6 +2404,9 @@ class AcedrgRDKit():
         self.repSign          = ""
         self.reSetSmi         = False
         self.reSetChirals     = False
+
+        self.monoName         = ""
+        self.longName         = ""
 
     def setRepSign(self):
 
@@ -2391,13 +2446,15 @@ class AcedrgRDKit():
                     lInUT=True
                     self.smiMod +=aStr
                 elif lInUT:
-                    if aStr.find("N") !=-1 or aStr.find("B") !=-1:
+                    if aStr.find("N") !=-1 :
                         unitTmp +=aStr
                         lBr  =True
                     elif lBr:
                         if aStr.find("@") !=-1:
                             unitTmp +=aStr
                         elif aStr.find("H") !=-1:
+                            unitTmp +=aStr
+                        elif aStr.isdigit() :
                             unitTmp +=aStr
                         elif aStr.find("+") !=-1 or aStr.find("+") !=-1:    # stop and put everything back
                             if len(unitTmp) !=0:
@@ -2452,7 +2509,6 @@ class AcedrgRDKit():
     def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tMode=0, tNameMap=None, tChargeList=None):
 
         aMolT = None
-
         if tFileType == "mol" :
             if os.path.isfile(tFileName):
                 aMolName = tFileName.strip().split("/")[-1].strip().split(".")[0]
@@ -2483,18 +2539,31 @@ class AcedrgRDKit():
                     print  "% can not be open for reading "%tFileName
                     sys.exit()
                 else:
-                    aSmiStr = fSmi.read()
-                    aSmiStr = aSmiStr.strip()
+                    aSmiStrT = fSmi.read()
+                    strGrp = aSmiStrT.strip().split()
+                    if len(strGrp) > 0:
+                        aSmiStr = strGrp[0].strip()
+                        if len(strGrp) > 1:
+                            strGrp[1] = strGrp[1].strip()
+                            if len(strGrp[1]) == 3:
+                                self.monoName = strGrp[1]
+                            else:
+                                self.longName = strGrp[1]
+     
+                    else:
+                        print "SMILES string formation error "
+                        sys.exit()
+                        
             else:
                 # SMILES string in from a commandline  
                 aSmiStr = tFileName.strip()
             if len(aSmiStr):
                 self.smiOrig = aSmiStr
                 print self.smiOrig
-
                 if self.reSetSmi:
                     self.modifySmiTmp()
-                    aMolT     = Chem.MolFromSmiles(self.smiMod)
+                    self.smiMod = self.smiMod.strip()
+                    aMolT     = Chem.MolFromSmiles(self.smiMod.strip())
                 else:
                     aMolT     = Chem.MolFromSmiles(self.smiOrig)
                 if aMolT:
@@ -2919,7 +2988,6 @@ class AcedrgRDKit():
         nAtoms      =  tMol.GetNumAtoms()
         #print "Number of atoms in the molecule is ", nAtoms
         initAtoms   =  tMol.GetAtoms()
-
         # check Atom elements
         elemList = []
         for aAtom in initAtoms:
@@ -2943,46 +3011,8 @@ class AcedrgRDKit():
         #print tChemCheck.isOrganic1(elemList)
         #print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
-
-        # Make sure an atom in the molecule has the same charge in the input file. 
-        # RDKit sometimes change it when initiating the molecule
-        if tChargeList:
-            for aAtom in tMol.GetAtoms():
-                name  = aAtom.GetProp("Name")
-                if tChargeList.has_key(name): 
-                    aAtom.SetFormalCharge(int(tChargeList[name]))
-                else:
-                    aAtom.SetFormalCharge(0)
-        """            
-        # Check
-        print "\nBefore setup formal charges in the molecule"
-        allAtoms = tMol.GetAtoms()
-        for aAtom in tMol.GetAtoms():
-            idxA  = aAtom.GetIdx()
-            elemA = aAtom.GetSymbol()
-            name  = aAtom.GetProp("Name") 
-            charge = aAtom.GetFormalCharge()
-            val    = aAtom.GetTotalValence()
-            print "For atom of index ", idxA
-            print "Its element symbol  ", elemA
-            print "Its name ", name
-            print "Its formal charge ", charge
-            print "Its total valence ", val
-            print "It is in the following bonds: "
-            aSetBonds = aAtom.GetBonds()
-            for aB in aSetBonds:
-                print "Bond ", aB.GetIdx()
-                print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
-        print "==========================================="
-        """            
-    
-        if tPH[0] :
-            self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
-        else:
-            self.setAllFormalChargeFuncGroupAtoms(tMol)
-
-        """            
+      
+        """
         print "Before Sanitize the molecule"
         print "Number of all atoms in this molecule is ", tMol.GetNumAtoms()
         for aAtom in tMol.GetAtoms():
@@ -2996,29 +3026,75 @@ class AcedrgRDKit():
             print "Its name ", name
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """            
+        """
 
         Chem.SanitizeMol(tMol)
-
-        """
+        # Make sure an atom in the molecule has the same charge in the input file. 
+        # RDKit sometimes change it when initiating the molecule
+        if tChargeList:
+            for aAtom in tMol.GetAtoms():
+                name  = aAtom.GetProp("Name")
+                if tChargeList.has_key(name): 
+                    aAtom.SetFormalCharge(int(tChargeList[name]))
+                else:
+                    aAtom.SetFormalCharge(0)
+        # Check
+        print "==========================================="
+        print "\nBefore setup formal charges in the molecule"
+        allAtoms = tMol.GetAtoms()
         for aAtom in tMol.GetAtoms():
             idxA  = aAtom.GetIdx()
             elemA = aAtom.GetSymbol()
             name  = aAtom.GetProp("Name") 
+            exHs    = aAtom.GetNumExplicitHs()
+            imHs    = aAtom.GetNumImplicitHs()
             charge = aAtom.GetFormalCharge()
             val    = aAtom.GetTotalValence()
-            print "For atom of index ", idxA
+            print "\nFor atom of index ", idxA
             print "Its element symbol  ", elemA
             print "Its name ", name
+            print "Its explicit Hs ", exHs
+            print "Its mplicit Hs ", imHs
             print "Its formal charge ", charge
             print "Its total valence ", val
-        """
+            #print "It is in the following bonds: "
+            #aSetBonds = aAtom.GetBonds()
+            #for aB in aSetBonds:
+            #    print "Bond ", aB.GetIdx()
+            #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+            #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+        print "==========================================="
+
+        if tPH[0] :
+            self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
+        else:
+            self.setAllFormalChargeFuncGroupAtoms(tMol)
+        
+        print "\nAfter setup formal charges in the molecule"
+        for aAtom in tMol.GetAtoms():
+            idxA   = aAtom.GetIdx()
+            elemA  = aAtom.GetSymbol()
+            name   = aAtom.GetProp("Name") 
+            Hs     = aAtom.GetNumExplicitHs()
+            imHs   = aAtom.GetNumImplicitHs()
+            charge = aAtom.GetFormalCharge()
+            val    = aAtom.GetTotalValence()
+            print "\nFor atom of index ", idxA
+            print "Its element symbol  ", elemA
+            print "Its name ", name
+            print "Its explicit Hs ", Hs
+            print "Its mplicit Hs ", imHs
+            print "Its formal charge ", charge
+            print "Its total valence ", val
+        print "==========================================="
+        tMol.UpdatePropertyCache()
+        aMol = Chem.AddHs(tMol)
 
         # Make SMILES before Hs are added 
         if tMol.HasProp('SmilesIn'):
             #print "Input SMILES : ", tMol.GetProp("SmilesIn")
             tMol.SetProp("SmilesOut", tMol.GetProp("SmilesIn"))
-        else:
+        #else:
             #isomericSmiles   = True
             #tKekuleSmiles    = True
             #rootedAtAtom     = -1
@@ -3026,9 +3102,8 @@ class AcedrgRDKit():
             #allBondsExplicit = False
             #allHsExplicit    = False
             #tMol.SetProp("SmilesOut", Chem.MolToSmiles(aMol, isomericSmiles=False, kekuleSmiles=True, rootedAtAtom=-1, canonical=False, allBondsExplicit=False, allHsExplicit=False))
-            tMol.SetProp("SmilesOut", Chem.MolToSmiles(tMol, isomericSmiles=True, kekuleSmiles=False, canonical=False))
+            #tMol.SetProp("SmilesOut", Chem.MolToSmiles(tMol, isomericSmiles=True, kekuleSmiles=False, canonical=False))
             #print "Output SMILES ", tMol.GetProp("SmilesOut") 
-        aMol = Chem.AddHs(tMol)
  
         allAtoms = aMol.GetAtoms()
         #print "After sanitize the molecule"
@@ -3088,6 +3163,7 @@ class AcedrgRDKit():
             allAtoms = aMol.GetAtoms()
             #print "Number of atom is ", len(allAtoms)
             rdmolops.AssignStereochemistry(aMol, cleanIt=False, force=False, flagPossibleStereoCenters=True)
+            """
             for i in range (len(conformers)):
                 print "----------------------------------------------------"
                 print "| In conformer %d                                  |"%i
@@ -3116,6 +3192,7 @@ class AcedrgRDKit():
                         print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
                         print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
                 #print "******************************"
+            """
 
     def reAssignChirals(self, tMol):
 
@@ -3288,7 +3365,7 @@ class AcedrgRDKit():
             aMmCif.write("_chem_comp_atom.atom_id\n")
             aMmCif.write("_chem_comp_atom.type_symbol\n")
             aMmCif.write("_chem_comp_atom.type_energy\n")
-            aMmCif.write("_chem_comp_atom.partial_charge\n")
+            aMmCif.write("_chem_comp_atom.charge\n")
             aMmCif.write("_chem_comp_atom.x\n")
             aMmCif.write("_chem_comp_atom.y\n")
             aMmCif.write("_chem_comp_atom.z\n")
@@ -3325,6 +3402,13 @@ class AcedrgRDKit():
                 name2 = atom2.GetProp("Name")
                 idx2  = atom2.GetIdx()
                 symb2 = atom2.GetSymbol()
+
+                bType = ""
+                if aBond.HasProp("SpecialBond"):
+                    bType = aBond.GetProp("SpecialBond")
+                else:
+                    bType = aBond.GetBondType()
+
                 isAro = "n"
                 if aBond.GetIsAromatic():
                     isAr  = "y" 
@@ -3333,13 +3417,13 @@ class AcedrgRDKit():
                         bLen  = rdMolTransforms.GetBondLength(aConformer, idx1, idx2)
                         dBlen = 0.20
                         aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
-                                     %(tMonoName, name1, name2,  aBond.GetBondType(), \
+                                     %(tMonoName, name1, name2,  bType, \
                                        isAro, bLen, dBlen))
                 else:
                     bLen  = rdMolTransforms.GetBondLength(aConformer, idx1, idx2)
                     dBlen = 0.20
                     aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
-                                 %(tMonoName, name1, name2,  aBond.GetBondType(), \
+                                 %(tMonoName, name1, name2,  bType, \
                                    isAro, bLen, dBlen))
 
             # chiral center section
@@ -3569,59 +3653,74 @@ class AcedrgRDKit():
         self.getAllFuncGroupAtoms(tMol)
         if len (self.funcGroups):
             for aFuncG in self.funcGroups.keys():
-                #print "check ", aFuncG 
+                # print "check ", aFuncG 
                 if aFuncG.find("CARBOXY-AMINO-TERS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeC_A_T(tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-TER")!=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeC_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-ASP")!=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeC_ASP(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("AMINO-TER") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeA_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-AMINO-GLY") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeGLY(tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("VAR-A-TER") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeV_A_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-LYS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeNH_LYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-HIS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeNH_HIS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("NH-PRO") !=-1:
+                    print "Doing ", aFuncG
+                    self.setFormalChargeNH_PRO(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-ARG") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeNH_ARG(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SH-CYS") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeSH_CYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-TYR") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeBZ_TYR(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-NH") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeBZ_NH(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-NHA") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeBZ_NHA(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SO3") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeSO3(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SO4") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargeSO4(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO4") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     self.setFormalChargePO4(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO3R") !=-1:
-                    #print "Doing ", aFuncG
+                    print "Doing ", aFuncG
                     #print self.funcGroups[aFuncG] 
                     self.setFormalChargePO3R(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("PO3N") !=-1:
+                    print "Doing ", aFuncG
+                    #print self.funcGroups[aFuncG] 
+                    self.setFormalChargePO3N(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("NITROMETHANE0") !=-1:
+                    print "Doing ", aFuncG
+                    #print self.funcGroups[aFuncG] 
+                    self.setFormalChargeNITROMETHANE(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                elif aFuncG.find("NITROMETHANE1") !=-1:
+                    print "Doing ", aFuncG
+                    #print self.funcGroups[aFuncG] 
+                    self.setFormalChargeC_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
 
     def setFormalChargeC_T(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3632,10 +3731,12 @@ class AcedrgRDKit():
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
+                            and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==0:     
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
-                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
      
 
     def setFormalChargeC_A_T(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -3645,15 +3746,18 @@ class AcedrgRDKit():
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==0: 
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
-                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
-                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
          
     def setFormalChargeC_ASP(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3666,11 +3770,15 @@ class AcedrgRDKit():
                 #print aSetIdxs
                 for aIdx in aSetIdxs:
                     #print "Atom : ", tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                    #print "exH  : ", tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()
+                    #print "imH  : ", tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs()
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
+                            and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==0:  
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
-                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
      
     def setFormalChargeA_T(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3681,6 +3789,7 @@ class AcedrgRDKit():
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:    # implicit H included in the count
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                             #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                             #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                             # print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
@@ -3706,15 +3815,18 @@ class AcedrgRDKit():
             if len(aSetIdxs) == nNonHAtoms:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
+                            and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==0: 
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
-                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
-                            #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
-                            #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
          
     def setFormalChargeNH_LYS(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3727,6 +3839,7 @@ class AcedrgRDKit():
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N" \
                         and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==1:
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                        tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                         #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                         #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                         #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
@@ -3736,7 +3849,7 @@ class AcedrgRDKit():
         tPka = self.funcGroupTab[tFunG][1]
         #print "Pka ", tPka
         #print "PH  ", tPH
-        if tPH <= tPka +2 :
+        if tPH <= tPka  :
             lNSet = False
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
@@ -3753,12 +3866,13 @@ class AcedrgRDKit():
                             len(tMol.GetAtomWithIdx(aIdx).GetBonds())==2 and \
                             tMol.GetAtomWithIdx(aIdx).GetTotalNumHs()==0) :
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                         else:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(0)      # only one N has positive charge
                             #print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                             #   tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                         #print "Its total valence is ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
-        elif tPH > tPka + 2 :
+        elif tPH > tPka :
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
@@ -3767,9 +3881,37 @@ class AcedrgRDKit():
                         print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
                         print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
                         print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
-                        if tMol.GetAtomWithIdx(aIdx).GetFormalCharge() > 0:    # implicit H included in the count
+                        if tMol.GetAtomWithIdx(aIdx).GetFormalCharge() > 0\
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==0:    
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(0)       # de-protonation
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
          
+    def setFormalChargeNH_PRO(self, tMol, tFunG, tAtomIdxs, tPH):
+
+        tPka = self.funcGroupTab[tFunG][1]
+        #print "Pka ", tPka
+        #print "PH  ", tPH
+        if tPH <= tPka  :
+            lNSet = False
+            for aSetIdxs in tAtomIdxs:
+                for aIdx in aSetIdxs:
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        #print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        #print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        #print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        #print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
+                        #print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 :
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :      
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
+
+
     def setFormalChargeNH_ARG(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
@@ -3780,20 +3922,19 @@ class AcedrgRDKit():
                 nC =0
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
+                        print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() == 1     \
                            and tMol.GetAtomWithIdx(aIdx).GetTotalValence()==3 \
-                           and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==1 \
-                           and tMol.GetAtomWithIdx(aIdx).GetFormalCharge()== 1:
-                               nC+=1
-                               break
-                if nC==0:
-                    for aIdx in aSetIdxs:
-                        if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
-                            if tMol.GetAtomWithIdx(aIdx).GetTotalValence() !=3 \
-                               and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==1 :
-                                tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1) 
-                                break   
-         
+                           and len(tMol.GetAtomWithIdx(aIdx).GetBonds())==1:
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache() 
+                            print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
+                            break   
+                             
     def setFormalChargeSH_CYS(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
@@ -3818,8 +3959,10 @@ class AcedrgRDKit():
                 if nH==2 :  # need to deprotonation for One of Os  
                     for aIdx in aSetIdxs:
                         if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                            if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0:      # implicit H included in the count
+                            if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
+                               and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :      
                                 tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                                tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                                 break
 
     def setFormalChargeSO4(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -3836,8 +3979,10 @@ class AcedrgRDKit():
                 if nH==2 :  # need to deprotonation for One of Os  
                     for aIdx in aSetIdxs:
                         if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                            if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0:      # implicit H included in the count
+                            if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
+                               and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :
                                 tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                                tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
 
     def setFormalChargeBZ_TYR(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3848,8 +3993,10 @@ class AcedrgRDKit():
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:      # implicit H included in the count
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
 
     def setFormalChargeBZ_NH(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3860,6 +4007,7 @@ class AcedrgRDKit():
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
                         if len(tMol.GetAtomWithIdx(aIdx).GetBonds())==3: 
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
 
     def setFormalChargeBZ_NHA(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3871,6 +4019,7 @@ class AcedrgRDKit():
                         if len(tMol.GetAtomWithIdx(aIdx).GetBonds())==2 \
                            and tMol.GetAtomWithIdx(aIdx).GetTotalValence()==3: 
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                            tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
 
     def setFormalChargePO4(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3880,12 +4029,16 @@ class AcedrgRDKit():
             nH =0
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
-                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O" and tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0 :
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O" and\
+                       tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
+                       and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :
                         # need to deprotonation for the O atom 
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                        tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
 
     def setFormalChargePO3R(self, tMol, tFunG, tAtomIdxs, tPH):
         tPka = self.funcGroupTab[tFunG][1]
+        tIdxOs = []
         # Should exclude PO4
         for aSetIdxs in tAtomIdxs:
             nO=0
@@ -3893,23 +4046,102 @@ class AcedrgRDKit():
             for aIdx in aSetIdxs:
                 #print "atom %s : "%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
                 if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
+                    tIdxOs.append(aIdx)
                     nO+=1
             if nO==3:
                 if tPH > tPka :
-                # Put charge -1 to all 3 singly bonded Os 
-                    for aIdx in aSetIdxs:
-                        if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O" : #and tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0 :
-                            #print "\nHere are details of O: "           
-                            #print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
-                            #print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
-                            #print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
-                            #print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs()
-                            #print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors()) 
-                            if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0 :
-                                # need to deprotonation for the O atom 
-                                tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
-                                print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
-
+                    # Put charge -1 to 2 singly  bonded Os 
+                    for aIdx in tIdxOs:
+                        print "\nHere are details of O: "           
+                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs()
+                        print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors()) 
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :
+                            # need to deprotonation for the O atom 
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
+                        self.setOxyBondDeloc(tMol, aIdx)  
+            tIdxOs = []
+                                
+    def setFormalChargePO3N(self, tMol, tFunG, tAtomIdxs, tPH):
+        tPka = self.funcGroupTab[tFunG][1]
+        tIdxOs = []
+        # Should exclude PO4
+        for aSetIdxs in tAtomIdxs:
+            nO=0
+            #print ""
+            for aIdx in aSetIdxs:
+                #print "atom %s : "%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
+                    tIdxOs.append(aIdx)
+                    nO+=1
+            if nO==3:
+                if tPH > tPka :
+                    # Put charge -1 to 3 singly  bonded Os 
+                    for aIdx in tIdxOs:
+                        # check and de-protonate O if needed
+                        self.deProtonationO(tMol, aIdx)
+                        
+            tIdxOs = []
+                                
+    def setFormalChargeNITROMETHANE(self, tMol, tFunG, tAtomIdxs, tPH):
+   
+        tPka = self.funcGroupTab[tFunG][1]
+        if tPH < tPka :
+            lDeP = False
+            for aSetIdxs in tAtomIdxs:
+                idxN = -1
+                for aIdx in aSetIdxs:
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        idxN = aIdx 
+                for aIdx in aSetIdxs:
+                    if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
+                        print "\nHere are details of O: "
+                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        if tMol.GetAtomWithIdx(aIdx).GetFormalCharge() !=1:
+                            tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
+                        tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                        print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()  
+                    elif tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
+                        if not lDeP:
+                            # check and de-protonate O if needed
+                            self.deProtonationO(tMol, aIdx)
+                            lDeP = True
+                        else: 
+                            aBond = tMol.GetBondBetweenAtoms(idxN, aIdx)           
+                            aBond.SetBondType(rdchem.BondType.DOUBLE)
+                            tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
+                            self.setOxyBondDeloc(tMol, aIdx)
+                           
+    def deProtonationO(self, tMol, tIdx):
+        print "\nHere are details of O: "           
+        print "atom %s :"%tMol.GetAtomWithIdx(tIdx).GetProp("Name")
+        print "total Val ", tMol.GetAtomWithIdx(tIdx).GetTotalValence()
+        print "number of bonds ", len(tMol.GetAtomWithIdx(tIdx).GetBonds())
+        print "num of H ", tMol.GetAtomWithIdx(tIdx).GetTotalNumHs()
+        print "num of neighbor ", len(tMol.GetAtomWithIdx(tIdx).GetNeighbors()) 
+        if tMol.GetAtomWithIdx(tIdx).GetTotalNumHs() != 0\
+            and tMol.GetAtomWithIdx(tIdx).GetNumExplicitHs()==0 :
+            tMol.GetAtomWithIdx(tIdx).SetFormalCharge(-1)
+            tMol.GetAtomWithIdx(tIdx).SetNoImplicit(True)
+            print "Its formal charge ", tMol.GetAtomWithIdx(tIdx).GetFormalCharge()
+            self.setOxyBondDeloc(tMol, tIdx)  
+     
+    def setOxyBondDeloc(self, tMol, tIdxO):
+  
+        oBonds = tMol.GetAtomWithIdx(tIdxO).GetBonds()
+        for aBond in oBonds:
+            tSet = []
+            tSet.append(aBond.GetBeginAtom().GetSymbol())
+            tSet.append(aBond.GetEndAtom().GetSymbol())
+            if not ("O" in tSet and "H" in tSet):
+                aBond.SetProp("SpecialBond", "DELOC")
          
     def assignTorsions(self, tMol, tAllTorsions):
 
@@ -4022,6 +4254,8 @@ class FileTransformer :
         self.bonds           = []
         self.chirals         = []
         self.chiralPre       = []
+
+        self.group           =""
 
         self.atomTypeMaps    = {}
         self.atomTypeMaps["atomTypes"]    = {}
@@ -4224,20 +4458,22 @@ class FileTransformer :
                     strGrp = aL.strip().split()
                     if len(strGrp) == 1:
                         colIdx.append(strGrp[0])
+        """
         # Check
-        #print "Two  colum format :"
-        #for i in sorted(self.dataDescriptor.iterkeys()):
-        #    print "%s%s"%(self.dataDescriptor[i][0].ljust(60), self.dataDescriptor[i][1].ljust(40))
-        #print "\n"
+        print "Two  colum format :"
+        for i in sorted(self.dataDescriptor.iterkeys()):
+            print "%s%s"%(self.dataDescriptor[i][0].ljust(60), self.dataDescriptor[i][1].ljust(40))
+        print "\n"
 
-        #print "Multple  colum format :"
-        #for i in sorted(self.dataDescriptor.iterkeys()):
-        #    print self.dataDescriptor[i][0]
-        #aSt = ""
-        #for i in sorted(self.dataDescriptor.iterkeys()):
-        #    aSt+=(self.dataDescriptor[i][1].strip() + "\t")
-        #print aSt
-        #print "\n"
+        print "Multple  colum format :"
+        for i in sorted(self.dataDescriptor.iterkeys()):
+            print self.dataDescriptor[i][0]
+        aSt = ""
+        for i in sorted(self.dataDescriptor.iterkeys()):
+            aSt+=(self.dataDescriptor[i][1].strip() + "\t")
+        print aSt
+        print "\n" 
+        """
 
     def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):
 
@@ -4275,10 +4511,11 @@ class FileTransformer :
         self.ccp4DataDes.append(aLine)
 
         # set a SMILES string here from the molecule
-        aSmi             = tMol.GetProp("SmilesOut")
-        aLine = "%s%s%s%s\"%s\"\n"%(tMonomRoot.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00".ljust(6), \
-                                    aSmi)                                    
-        self.strDescriptors["defSmiles"].append(aLine)
+        if tMol.HasProp("SmilesOut"):
+            aSmi             = tMol.GetProp("SmilesOut")
+            aLine = "%s%s%s%s\"%s\"\n"%(tMonomRoot.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00".ljust(6), \
+                                        aSmi)                                    
+            self.strDescriptors["defSmiles"].append(aLine)
 
         # Check
         #for aL in self.ccp4DataDes:
@@ -4700,7 +4937,8 @@ class FileTransformer :
             eee ="0"
             # Ignore all of the coordinates
             mapIdNum = {}
-
+            chargeAtomList = []
+            idxAtom = 1
             nAtm =1
             for aAtom in self.atoms:
                 if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal"):
@@ -4749,22 +4987,50 @@ class FileTransformer :
                     print "Input file bug: no atom_id for atoms!"
                     sys.exit()
                     
-                md ="0"
-                charge = "0"
+                md =" 0 "
+               
+                # formal charges
+ 
+                chargeMap = {}
+                chargeMap[0]   = 0
+                chargeMap[1]   = 3
+                chargeMap[2]   = 2
+                chargeMap[3]   = 1
+                chargeMap[-1]  = 5
+                chargeMap[-2]  = 6
+                chargeMap[-3]  = 7
+
+                chargeMap["doublet radical"]  = 4
+                
+                charge = " 0 "
                 if aAtom.has_key("_chem_comp_atom.charge"):
-                    charge = aAtom["_chem_comp_atom.charge"]
+                    print "The charge is ", aAtom["_chem_comp_atom.charge"]
+                    print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
+                    if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
+                        aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
+                    nCharge = int(aAtom["_chem_comp_atom.charge"])
+                    print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
+                    #print " converted to charge symbol ", chargeMap[nCharge] 
+                    if nCharge in chargeMap.keys():
+                        charge  = " %d "%chargeMap[nCharge]
+                    if nCharge !=0:
+                        chargeAtomList.append([idxAtom, nCharge])       
+
                 cha ="0"
                 if aAtom.has_key("_chem_comp_atom.pdbx_stereo_config"):
                     if aAtom["_chem_comp_atom.pdbx_stereo_config"].find("S") !=-1:
                         cha = "1"
                     elif aAtom["_chem_comp_atom.pdbx_stereo_config"].find("R") !=-1:
                         cha = "2"
+
                 tOutFile.write("%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
                                                                      id.ljust(3), md.rjust(2), charge.rjust(3), \
                                                                      cha.rjust(3), hhh.rjust(3), bbb.rjust(3), \
                                                                      vvv.rjust(3), HHH.rjust(3), rrr.rjust(3), \
                                                                      iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
                                                                      eee.rjust(3)))
+                idxAtom +=1
+
             # Bond block
            
             self.DelocBondConvertor()
@@ -4799,9 +5065,13 @@ class FileTransformer :
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
             
-        
+            if len(chargeAtomList) != 0:
+                aL = "M CHG  %d "%len(chargeAtomList)
+                for aPair in chargeAtomList:
+                    aL += " %d  %d "%(aPair[0], aPair[1])
+                tOutFile.write(aL + "\n")          
+   
             tOutFile.write("M  END\n")
-        
             #if len(self.nameMapingCifMol.keys()) !=0:
             #    for idxA in sorted(self.nameMapingCifMol.iterkeys()):
             #        print "atom %d  has the name %s "%(idxA, self.nameMapingCifMol[idxA])
@@ -5061,12 +5331,12 @@ class ChemCheck():
     def __init__( self):
 
         self.organicSec = ["AT", "At", "at", "B", "b", "BR", "Br", "br", "C", "c", "CL", "Cl", "cl", 
-                   "F", "f", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "Se", "se"]
+                   "F", "f", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "SE", "Se", "se"]
         self.atomFileType = {}
-        self.atomFileType["mmCif"]  = [11, 111, 16, 161]
-        self.atomFileType["simils"] = [12, 121]
-        self.atomFileType["mdl"]    = [13, 131, 14, 141]
-        self.atomFileType["mol2"]   = [15, 151]
+        self.atomFileType["mmCif"]  = [11, 111, 16, 161, 51]
+        self.atomFileType["simils"] = [12, 121, 52]
+        self.atomFileType["mdl"]    = [13, 131, 14, 141, 53, 54]
+        self.atomFileType["mol2"]   = [15, 151, 55]
 
         self.pTable = rdchem.GetPeriodicTable()
 
@@ -5142,7 +5412,6 @@ class ChemCheck():
         print "Number of atom after is ", aMolT.GetNumAtoms()
         
     def getAtomElems(self, tInFileName, tTypeIdx, tAtomElems):
-  
         if tTypeIdx in self.atomFileType["mmCif"]: 
             self.getAtomElemsFromMmcif(tInFileName, tAtomElems)
         elif tTypeIdx in self.atomFileType["simils"]:
@@ -5238,7 +5507,12 @@ class ChemCheck():
                 sys.exit()
             else:
                 aSmiStr = fSmi.read()
-                aSmiStr = aSmiStr.strip()
+                tSmiStr = aSmiStr.strip().split()
+                if len(tSmiStr) >0 :
+                    aSmiStr = tSmiStr[0].strip()
+                else:
+                    print "String format error"
+                    sys.exit()    
                 fSmi.close()
         else:
             # SMILES string in from a commandline  

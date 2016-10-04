@@ -3,6 +3,7 @@
  * Author: flong
  *
  * Created on April 4, 2012, 5:48 PM
+ * Last modified July 27, 2016
  */
 
 #ifndef CODCLASSIFY_H
@@ -354,6 +355,7 @@ namespace LIBMOL
         void groupCodOrgBonds3();
         void searchCodOrgBonds(std::vector<BondDict>::iterator iOB);
         void searchCodOrgBonds2(std::vector<BondDict>::iterator iB);
+        void searchCodOrgBonds2_2(std::vector<BondDict>::iterator iB);
         void levelSearchBonds(std::vector<int>          &      tKeySet1,
                               std::vector<std::string>  &      tKeySet2,
                               int                              tLev,
@@ -442,6 +444,7 @@ namespace LIBMOL
         void groupCodOrgAngles2();
         void groupCodOrgAngles22();
         
+        
         void searchCodOrgAngles(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles2(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles22(std::vector<AngleDict>::iterator iAN);
@@ -449,6 +452,11 @@ namespace LIBMOL
                                 std::vector<std::string>  &      tKeySet2,
                                 int                              tLev,
                                 std::vector<AngleDict>::iterator iAN);
+        void levelSearchAnglesENG( std::vector<int>          &      tKeySet,
+                                   std::vector<std::string>  &      tKeySet2,
+                                   int                              tLev,
+                                   std::vector<AngleDict>::iterator iAN);
+        
         std::string matchRandCenterA(std::string & tR, std::string tCen, 
                                      std::map<ID, std::vector<aValueSet> > tDictAngs);
         bool searchCodOrgAnglesCen(std::vector<AngleDict>::iterator iAN, 

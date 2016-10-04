@@ -544,6 +544,8 @@ namespace LIBMOL
         //{
         //    std::cout << "CCP4 types already set " << std::endl;
         //}
+            
+        setAllAtomEXcessElectrons(allAtoms);
         
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
@@ -561,9 +563,12 @@ namespace LIBMOL
             {
                 std::cout << allAtoms[*iSer].id << std::endl;
             }
-        
         }
-
+        
+        int tSum = sumExElectrons(allAtoms);
+        std::cout << "Sum of number of excess electrons is " 
+                  << tSum << std::endl;
+        
         /*
         for (std::vector<BondDict>::iterator iB=allBonds.begin(); 
                 iB !=allBonds.end(); iB++)
@@ -803,7 +808,7 @@ namespace LIBMOL
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                      "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                      "Sc", "sc", "Y",  "y",
-                     "B", "b", "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
+                     "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
                      "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
                      "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
                      "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
@@ -816,7 +821,7 @@ namespace LIBMOL
                      "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
                      "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         
-        MetalTable.assign(metals, metals+123);
+        MetalTable.assign(metals, metals+121);
         
                 
         //std::cout << "Metal Elements :" << std::endl;

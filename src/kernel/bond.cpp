@@ -192,6 +192,7 @@ namespace LIBMOL
     // simplified version of bond 
     BondDict::BondDict(): resName(NullString),
             seriNum(ZeroInt),
+            molIdx(ZeroInt),
             order(NullString),
             orderN(ZeroReal),
             value(ZeroReal),
@@ -213,6 +214,7 @@ namespace LIBMOL
     
     BondDict::BondDict(const BondDict& tBond): resName(tBond.resName),
             seriNum(tBond.seriNum),
+            molIdx(tBond.molIdx),
             order(tBond.order),
             orderN(tBond.orderN),
             value(tBond.value),
@@ -263,6 +265,12 @@ namespace LIBMOL
                 tA != tBond.atomNB1NB2SPs.end(); tA++)
         {
             atomNB1NB2SPs[tA->first]=tA->second;
+        }
+        
+        for (std::map<ID, ID>::const_iterator tA = tBond.atomNB2ExtraEls.begin();
+                tA != tBond.atomNB2ExtraEls.end(); tA++)
+        {
+            atomNB2ExtraEls[tA->first]=tA->second;
         }
         
         for (std::vector<ID>::const_iterator tA = tBond.atomsMainRep.begin();
@@ -374,6 +382,5 @@ namespace LIBMOL
         return lInRing;
         
     }
-    
     
 }

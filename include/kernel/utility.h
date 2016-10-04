@@ -125,6 +125,9 @@ namespace LIBMOL
     // File checking related functions, Unix/Linux/MacOs not Windows
     extern int isFileExist(FileName aF);
     
+    extern void writeMsgFile(std::string & tRootName,
+                          std::vector<std::string> & tMsg);
+    
     // trigonometrical functions
     extern REAL degreeToRadians(REAL tDeg);
     extern REAL RadiansToDegree(REAL tRad);
@@ -140,6 +143,10 @@ namespace LIBMOL
     extern bool outVectAbsDiff(std::vector<REAL>  & tVect,
                               REAL  tVal, REAL tErr);
     
+    extern void diffVects(std::vector<REAL> & tV1,
+                          std::vector<REAL> & tV2,
+                          std::vector<REAL> & tVOut);
+    
     extern void getFracReal(REAL tR1, REAL & tFrac, REAL tTar);
     
     extern REAL lengthV(std::vector<REAL> & tV1);
@@ -147,6 +154,8 @@ namespace LIBMOL
     extern REAL distanceV(std::vector<REAL> & tV1, std::vector<REAL> & tV2);
     
     extern void normalizeV(std::vector<REAL> & tV);
+    
+    extern void scaleV(std::vector<REAL> & tV);
     
     extern REAL dotP(std::vector<REAL> & tV1, std::vector<REAL> & tV2);
     
@@ -156,9 +165,21 @@ namespace LIBMOL
     
     extern REAL getAngle2V(std::vector<REAL> & tV1, std::vector<REAL> & tV2);
     
+    extern void transAng(REAL & tAng);
+    
+    extern REAL getAng3V(std::vector<REAL>  & tV1,
+                         std::vector<REAL>  & tV2,
+                         std::vector<REAL>  & tV3);
+    
+    extern bool checkPlaneAng3V(std::vector<REAL>  & tV1,
+                                    std::vector<REAL>  & tV2,
+                                    std::vector<REAL>  & tV3,
+                                    REAL                 tCri);
+    
     extern REAL getTorsion3V(std::vector<REAL> & tV1, 
                              std::vector<REAL> & tV2,
                              std::vector<REAL> & tV3);
+    
     
     extern REAL getDet(std::vector<REAL> & tV1, 
                        std::vector<REAL> & tV2,

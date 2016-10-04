@@ -169,7 +169,10 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
                             iNB !=iAt->connAtoms.end(); iNB++)
                     {
-                        aPL.atoms[tAtoms[*iNB].id]=tAtoms[*iNB].seriNum;
+                        if (iAt->connAtoms.size() !=4)
+                        {
+                            aPL.atoms[tAtoms[*iNB].id]=tAtoms[*iNB].seriNum;
+                        }
                     }
                 }
                 
@@ -180,6 +183,7 @@ namespace LIBMOL
         // Other small planes are determined via torsion angles.
         
         // Check
+        /*
         if (tPlanes.size() !=0)
         {
             std::cout << "There are " << tPlanes.size() 
@@ -196,6 +200,7 @@ namespace LIBMOL
                 }
             }
         }
+         */
     }
     
     extern void setAllOtherPlanes(std::vector<RingDict>     & tRings,
