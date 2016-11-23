@@ -102,6 +102,8 @@ namespace LIBMOL
     extern bool compareNoCase3 (std::string first, std::string second);
     extern bool sortStrByLen(std::string first, std::string second);
     
+    extern bool desSortIntMapValues(const sortIntMap & a, const sortIntMap & b);
+    
     extern bool desSortMapKey(const sortMap& a ,const sortMap& b);
     
     extern bool desSortMapKey1(const sortMap& a ,const sortMap& b);

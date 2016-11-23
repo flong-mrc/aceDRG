@@ -295,8 +295,12 @@ namespace LIBMOL
             numPi(ZeroInt),
             isCChemTypeSet(false),
             isInPreCell(false),
+            chiralChecked(false),
+            isInAromRing(false),
+            isInSP2Ring(false),
             sId(NullString),
             symmOp(NullString),
+            fromOrig(-1),
             sMolType(NullString),
             treeBond(ZeroReal),
             treeAngle(ZeroReal),
@@ -361,8 +365,11 @@ namespace LIBMOL
             isCChemTypeSet(tAtom.isCChemTypeSet),
             isInPreCell(tAtom.isInPreCell),
             chiralChecked(tAtom.chiralChecked),
+            isInAromRing(tAtom.isInAromRing),
+            isInSP2Ring(tAtom.isInSP2Ring),
             sId(tAtom.sId),
             symmOp(tAtom.symmOp),
+            fromOrig(tAtom.fromOrig),
             sMolType(tAtom.sMolType),
             treeBond(tAtom.treeBond),
             treeAngle(tAtom.treeAngle),
@@ -764,6 +771,7 @@ namespace LIBMOL
             if (iAt->seriNum==tSeri && iAt->id.compare(tId)==0)
             {
                 lFind = iAt->seriNum;
+                break;
             }
         }
         

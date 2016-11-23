@@ -137,7 +137,7 @@ namespace LIBMOL
             allHydroAtoms.push_back(*iH);
         }
         
-        setupSystem();
+        setupSystem2();
                    
     }
     
@@ -931,11 +931,12 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                iAt !=  allAtoms.end(); iAt++)
         {
-            setSpecial3NBSymb(iAt);
+            setSpecial3NBSymb2(iAt);
             //std::cout << "Now atom " << iAt->id << std::endl 
             //          << "class is " << iAt->codClass << std::endl; 
         }
         
+        setAtomsNBSymb2();
         
     }
     
@@ -6430,7 +6431,7 @@ namespace LIBMOL
             ID a1NB2, a2NB2, a1NB, a2NB, a1M, a2M, a1C, a2C;
             ID a1NB1NB2, a2NB1NB2;
             
-            bool plusOneLev = false;
+            // bool plusOneLev = false;
             
             // int as0=-1, as1=-1;
             

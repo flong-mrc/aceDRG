@@ -359,6 +359,7 @@ namespace LIBMOL
         
         bool                       hasCoords;
         bool                       hasH;
+        bool                       hasMetal;
         bool                       notPowder;
         bool                       resolOK;
         bool                       RFactorOK;
@@ -553,6 +554,7 @@ namespace LIBMOL
         bool                       isPeptide;
         bool                       isDRna;
         
+        
         std::map<ID, std::vector<std::string> >             allCifKeys;
         
         std::map<std::string, std::map<std::string, int> >  hasProps;
@@ -642,6 +644,9 @@ namespace LIBMOL
     extern void outAtomTypesAndConnections(FileName tFName,
                                            std::vector<LIBMOL::AtomDict>& tAtoms,
                                            std::vector<LIBMOL::BondDict>& tBonds);
+    
+    extern void outMetalAtomInfo(FileName tFName,
+                                 GenCifFile  & tCifObj);
 }
 
 

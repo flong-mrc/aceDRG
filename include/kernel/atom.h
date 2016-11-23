@@ -305,10 +305,13 @@ namespace LIBMOL // temp
         bool     isCChemTypeSet;
         bool     isInPreCell;
         bool     chiralChecked;
+        bool     isInAromRing;
+        bool     isInSP2Ring;
         
         // symmetry-related 
         ID       sId;
         ID       symmOp;
+        int      fromOrig;
         // int      bondingIdx;
         /* meaning of curBondingIdx
          * 0      undetermined  

@@ -329,7 +329,10 @@ class Acedrg(CExeCode ):
             a file containing a SMILES string  to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
             acedrg -i your_SMILES_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
         (3) Input a MOL file to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
-            acedrg -m your_mol_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n"
+            acedrg -m your_mol_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
+        (4) Input a MOL2 file to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
+            acedrg -g your_mol_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n"
+
         """
         (4) Input a small molecule CIF file to get two files describing your molecules, atom types, \n\
             bond lengths and angles (text format)\n\
@@ -694,7 +697,7 @@ class Acedrg(CExeCode ):
                 self.workMode     = 21
             elif t_inputOptionsP.inStdCifDir: 
                 self.inStdCifDir = t_inputOptionsP.inStdCifDir
-                self.workMode     = 22
+                self.workMode    = 22
         elif t_inputOptionsP.typeOut:
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -897,8 +900,9 @@ class Acedrg(CExeCode ):
             self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
 
             self._cmdline += " -b %s  "%self.inStdCifName
-            self._cmdline += " -m yes -r %s -o %s "%(self.monomRoot, self.outRstCifName)
-            #print self.cmdline
+            self._cmdline += " -m yes -r %s -o %s "%(self.monomRoot, self.outRoot)
+            #print self._cmdline
+            #print "self.outRoot ", self.outRoot 
             self.subExecute()
 
         if self.workMode == 22 :
@@ -2158,7 +2162,7 @@ class Acedrg(CExeCode ):
             # The input file is a mol2 file
             if os.path.isfile(self.inMol2Name) and self.chemCheck.isOrganic(self.inMol2Name, self.workMode):
                 self.runLibmol(self.inMol2Name)
-                #print self.outRstCifName
+                print self.outRstCifName
                 if not self.runExitCode and os.path.isfile(self.outRstCifName):
                     aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                     if os.path.isfile(self.outRstCifName):
@@ -4272,6 +4276,7 @@ class FileTransformer :
         self.bondTypeMmcifToMol["3"]    = "3"
         self.bondTypeMmcifToMol["AROM"] = "4"
         self.bondTypeMmcifToMol["AR"]   = "4"
+        self.bondTypeMmcifToMol["AM"]   = "1"
         self.bondTypeMmcifToMol["DELO"] = "1"
         self.bondTypeMmcifToMol["ANY"]  = "8"
      
@@ -5529,6 +5534,7 @@ class ChemCheck():
                 print "Can not generate a molecule from the input SMILES string!"
                 print "Check your SMILES or report the bug "
 
+    """
     def getAtomElemsFromMol2(self, tFileName, tAtomElems):
 
         if os.path.isfile(tFileName):
@@ -5541,8 +5547,37 @@ class ChemCheck():
             else:
                 print "Can not generate a molecule from the input mol2 file!"
                 print "Check your mol2 file or report the bug "
+    """
 
+    def getAtomElemsFromMol2(self, tFileName, tAtomElems):
 
+        if os.path.isfile(tFileName):
+            fM = open(tFileName, "r")
+            allLs = fM.readlines()
+            fM.close()
+         
+            lAtom = False
+            for aL in allLs:
+                if len(aL) > 0 and aL[0] != "#":
+                    if lAtom :
+                        strGrp = aL.strip().split()
+                        if len(strGrp) >= 6:
+                            aElem = ""
+                            for aC in strGrp[1].strip():
+                                if aC.isalpha() and not aC.isdigit(): 
+                                    aElem = aElem + aC 
+                                else:
+                                    break
+                            if len(aElem) and not aElem in tAtomElems:
+                                tAtomElems.append(aElem)
+                    elif aL.find("@<TRIPOS>ATOM") !=-1:
+                        lAtom = True
+                    elif aL.find("@<") !=-1 and aL.find("@<TRIPOS>ATOM") ==-1:
+                        lAtom = False
+        else: 
+            print "%s can not be found for reading "%tFileName
+                    
+        
     def checkChiralCenters(self, tMol, tIdx):
    
         # RDKit misses some chiral centers such as N with 3 bonds.

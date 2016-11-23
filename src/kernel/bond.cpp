@@ -364,6 +364,65 @@ namespace LIBMOL
         return tBo;
     }
     
+    extern void modifyBondOrder(std::vector<BondDict> & tAllBonds,
+                                std::vector<AtomDict> & tAllAtoms,
+                                int tAt1, int tAt2, int tOrder)
+    {
+        int idxB = getBond(tAllBonds, tAt1, tAt2);
+        if (idxB !=-1)
+        {
+            tAllBonds[idxB].orderN += (tOrder);
+        }
+        else
+        {
+            std::cout << "It does not exist for the bond between atom "
+                      << tAllAtoms[tAt1].id << " with serial number " 
+                      << tAllAtoms[tAt1].seriNum 
+                      << " and atom " << tAllAtoms[tAt2].id
+                      << " with serial number " 
+                      << tAllAtoms[tAt2].seriNum
+                      << std::endl;
+            exit(1);
+        }
+    }
+    
+
+    extern void modifyOneDelocBond(std::vector<BondDict> & tBonds,
+                                   std::vector<AtomDict>   & tAtoms,
+                                   int tIdx1, int tIdx2)
+    {
+        int idxB = getBond(tBonds, tIdx1, tIdx2);
+        if (idxB !=-1)
+        {
+            tBonds[idxB].order = "DELOC";
+        }
+        else
+        {
+            std::cout << "It does not exist for the bond between atom "
+                      << tAtoms[tIdx1].id << " with serial number " 
+                      << tAtoms[tIdx1].seriNum 
+                      << " and atom " << tAtoms[tIdx2].id
+                      << " with serial number " 
+                      << tAtoms[tIdx2].seriNum
+                      << std::endl;
+            exit(1);
+        }
+    }
+    
+    extern void setOrderStrforBonds(std::vector<BondDict> & tBonds)
+    {
+        for (std::vector<BondDict>::iterator iBo=tBonds.begin();
+                iBo != tBonds.end(); iBo++)
+        {
+            ID tStr = iBo->order;
+            StrUpper(tStr);
+            if (tStr.find("DELOC")==std::string::npos)
+            {
+                OrderToStr(iBo->orderN, iBo->order);
+            }
+        }
+    }
+    
     extern bool checkIfBondInSameRing(std::vector<AtomDict> & tAtoms, 
                                       int tIdx1, int tIdx2)
     {

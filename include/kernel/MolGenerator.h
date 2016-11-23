@@ -95,6 +95,9 @@ namespace LIBMOL
         // Destructor
         ~MolGenerator();
         
+        // Check if metal atoms exist in the assym unit
+        void checkMetal(std::vector<ID> & tMeTab);
+        
         // Generate a "molecule"(not normal sense) using a set of atoms and 
         // a set of symmetry operators
       
@@ -128,7 +131,6 @@ namespace LIBMOL
                                    & tMoleculesInCell);
         void deleteNonASUAtomCellMols(std::map<unsigned, std::vector<int> >  
                                       & tMoleculesInCell);
-        
         
         bool inBonds(int tIdx1, int tIdx2, 
                      std::vector<BondDict> & tBonds);
@@ -187,9 +189,10 @@ namespace LIBMOL
                            Molecule & tMol);
         void checkAtomElementID(std::vector<AtomDict> & tAtoms);
         bool colidAtom(AtomDict               & tAtom,
-                       std::vector<AtomDict>  &  tRefAtoms);
+                       std::vector<AtomDict>  &  tRefAtoms, 
+                       int tMode);
         bool colidAtom(std::vector<REAL>               & tFrcX,
-                       std::vector<AtomDict>  &  tRefAtoms);
+                       std::vector<AtomDict>  &  tRefAtoms, int tMode);
         bool isASUAtomInMol(std::map<unsigned, std::vector<int> >::iterator tMol);
         bool connMetal(std::vector<int>      & tIdxs, 
                        std::vector<AtomDict> & tAtoms);
@@ -218,6 +221,11 @@ namespace LIBMOL
         bool validateMolecule(Molecule    & tMol, PeriodicTable & tPTab,
                               std::string & tErrInfo);
         
+        void checkInfMols(std::vector<Molecule> & aSetInfMols,
+                          std::vector<Molecule> & aSetFinMols);
+        
+        bool checkOneMolInf(std::vector<Molecule>::iterator tMol);
+        
         void setAtomNFormalCharge(Molecule & tMol);
         void getAtomTypeMols();
         void getAtomTypeOneMol(Molecule    & tMol);
@@ -234,16 +242,34 @@ namespace LIBMOL
                                   std::map<std::string, std::map<std::string,
                                   REAL> > > > & tAtomSpAndChMap);
         
-        void outTables(FileName tOutName);
-        void outMsg(FileName tOutName);
+        void outTables(FileName tOutName, 
+                         std::vector<Molecule> & tFinMols,
+                         std::vector<Molecule> & tInfMols);
         
+        void outMsg(FileName tOutName);
+        void getOutFileRoot(FileName tOutName, Name & tRootName);
+        void outMolsInfo(std::ofstream & tMolTabs,
+                         std::vector<Molecule> & tFinMols,
+                         std::vector<Molecule> & tInfMols);
         
         void contMetal2NB(int & tNB, int & tNA);
         
+        // Metal Atom studies
+        void buildMetalAtomCoordMap(std::vector<CrystInfo>::iterator tCryst);
+        int  getNumOrgNB(std::vector<AtomDict> & tAtoms, 
+                         int  tIdx, 
+                         std::vector<std::string> & tOrgTab);
+        void outMetalAtomCoordInfo( FileName tOutName);
+        void outMetalTables(FileName tOutName);
+        
         void execute(FileName tOutName);
+        void executeMet(FileName tOutName);
+        
         
         std::string                     aLibmolTabDir;
         bool                            lColid;
+        bool                            lHasMetal;
+        
         std::vector<std::string>        allMsg;
         std::map<int, std::string>      validedMolMsg;
         std::map<int, std::string>      errMolMsg;
@@ -261,14 +287,21 @@ namespace LIBMOL
         
         std::vector<BondDict>           bonds;
         std::vector<AngleDict>          angles;
+   
         
-        std::map<unsigned, std::vector<int> >  moleculesInCell;
-        std::map<unsigned, std::vector<int> >  moleculesInCryst;
+        std::map<unsigned, std::vector<int> >   moleculesInCell;
+        std::map<unsigned, std::vector<int> >   moleculesInCryst;
         
         std::map<int, std::vector<int> >        bondsMetal2NB;
         std::map<int, std::vector<int> >        anglesMetal2NB;
         std::vector<int>                        noContriMols;
-        
+   
+        // Metal atom studies 
+        std::map<int, std::vector<int> >        connMapMetalAtoms;
+        std::map<int, std::map<int, REAL> >     metalRelatedBonds;
+        std::map<int, std::map<int, std::map<int, REAL> > > 
+                                                metalRelatedAngles;
+                 
         
     private :
         

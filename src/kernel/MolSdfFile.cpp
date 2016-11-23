@@ -626,6 +626,7 @@ namespace LIBMOL
         }
         
         reNameHAtoms(tIdxMol);
+        std::cout << "Here  " << std::endl;
     }
     
     void MolSdfFile::setHAtomCoordsMols(int tIdxMol)
@@ -1001,29 +1002,50 @@ namespace LIBMOL
                 
                 if (tRecord.size() !=0)
                 {
-                    if (tRecord.find("@") !=std::string::npos)
+                    if (tRecord[0] !='#')
                     {
-                        setBlock(tRecord);
-                    }
-                    else
-                    {
-                        if (mol2Dict["ATOM"])
+                        if (tRecord.find("@") !=std::string::npos)
                         {
-                            getAtomInfo(tRecord);
+                            setBlock(tRecord);
                         }
-                        else if (mol2Dict["BOND"])
+                        else
                         {
-                            getBondInfo(tRecord);
+                            if (mol2Dict["ATOM"])
+                            {
+                                getAtomInfo(tRecord);
+                            }
+                            else if (mol2Dict["BOND"])
+                            {
+                                getBondInfo(tRecord);
+                            }
                         }
-                        //else if(mol2Dict["CRYSIN"])
-                        //{
-                        //    getCrysInfo(tRecord);
-                        //}
                     }
                 }
             }
             inFile.close();
             
+            rings.clear();
+            ringTools aRingTool;
+            
+            int nMaxRing = 7;
+            std::map<ID, std::vector<RingDict> >     tRings;
+            aRingTool.detectRingFromAtoms(atoms, tRings, 2, nMaxRing);
+            
+            if (tRings.size() !=0)
+            {
+                for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator 
+                     iR1=tRings.begin();
+                     iR1 !=tRings.end(); iR1++)
+                {
+                    for (std::vector<RingDict>::iterator iR11=iR1->second.begin();
+                         iR11 !=iR1->second.end(); iR11++)
+                    {
+                        rings.push_back(*iR11);
+                    }
+                }
+            }
+            std::cout << "The system contain " << rings.size() << " rings" << std::endl;
+            kekulizeRings(atoms, bonds, rings);
             
             addAllHAtoms();
             setAtomsBondingAndChiralCenter(atoms);
@@ -1031,9 +1053,9 @@ namespace LIBMOL
             
             if (atoms.size() !=0)
             {
-                std::cout << "The system contains " << atoms.size() << std::endl
-                      << "Including " << extraHAtoms.size() << " H atoms " 
-                      << std::endl;
+                std::cout << std::endl 
+                          << "The system contains " << atoms.size() 
+                          << " atoms" << std::endl;
                 
                 for (std::vector<AtomDict>::iterator iAt=atoms.begin();
                         iAt != atoms.end(); iAt++)
@@ -1075,6 +1097,7 @@ namespace LIBMOL
                       std::cout << ", which consists of atom, "
                                 << iBo->atoms[0] << " and "
                                 << iBo->atoms[1] << std::endl;
+                      std::cout << "Bond order " << iBo->order << std::endl;
                     }
                     else
                     {
@@ -1090,7 +1113,6 @@ namespace LIBMOL
             } 
             
         }
-        
         
     }
     
@@ -1222,6 +1244,8 @@ namespace LIBMOL
             aBond.atomsIdx.push_back(StrToInt(tStrs[2])-1);
             aBond.order   = TrimSpaces(tStrs[3]);
             aBond.orderN  = StrToOrder2(aBond.order);
+            //std::cout << "Bond order " << aBond.order << std::endl;
+            //std::cout << " order value " << aBond.orderN << std::endl;
             
             int i=0;
             for (std::vector<AtomDict>::iterator iAt=atoms.begin();

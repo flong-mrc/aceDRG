@@ -99,6 +99,7 @@ namespace LIBMOL
         void setAtmsLink(std::vector<AtomDict> tAllAtoms);
         void setRingAtmsLinks();
         void setPlaneProp();
+        void setBondIdxs(std::vector<BondDict> & tBonds, int & tStartIdx);
         
         bool                                     isPlanar;
         bool                                     isAromatic;
@@ -110,6 +111,7 @@ namespace LIBMOL
         std::map<int, std::map<ID, int> >        atomsLink; 
         std::map<int, std::vector<int> >         ringAtomLink;
         std::map<ID, REAL>                       sugarTors;
+        std::vector<int>                         bondIdxs;
               
     };
     
@@ -160,10 +162,15 @@ namespace LIBMOL
     extern void TestAromaticity(std::vector<RingDict>  & tAllRings,
                                 std::vector<AtomDict>  & tAtoms);
     
+    extern bool checkAllARBondsInOneRing( std::vector<BondDict> & tBonds,
+                                          RingDict               & tRing);
+    
     extern void setAromaticBonds(std::vector<RingDict>  & tRings,
                                  std::vector<BondDict>  & tBonds);
     
     extern void detectRingsInAtoms(std::vector<AtomDict> & tAtoms);
+    
+    extern bool detectAllSp2AtomRing(RingDict               & tRing);
     
     // Sugar rings
     

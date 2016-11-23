@@ -277,6 +277,7 @@ namespace LIBMOL
         void getAtomInfo(std::string tLine);
         void getBondInfo(std::string tLine);
         void getCrysInfo(std::string tLine);
+        void getRingInfo();
         
         
         void setAtomsCCP4Type();
@@ -313,6 +314,7 @@ namespace LIBMOL
         std::vector<AtomDict>   extraHAtoms;
         std::vector<BondDict>   bonds;
         std::vector<ChiralDict> chirals;
+        std::vector<RingDict>   rings;
 
         std::ofstream           outFile;
         std::ifstream           inFile;

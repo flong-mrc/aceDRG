@@ -193,7 +193,7 @@ namespace LIBMOL
         
         CodClassify(const std::vector<AtomDict> & tAtoms);
         
-        // 
+        
         CodClassify(const std::vector<AtomDict>                 & tAtoms,
                     const std::vector<int>                      & tHAtomIdx, 
                     const std::vector<BondDict>                 & tBonds,
@@ -582,7 +582,7 @@ namespace LIBMOL
         int                                      wSize;
         std::string                              libmolTabDir;
         
-        PeriodicTable            *               pPeriodictable;
+        PeriodicTable *                          pPeriodictable;
         
         
         std::vector<AtomDict>                    allAtoms;

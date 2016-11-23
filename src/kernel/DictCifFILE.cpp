@@ -15,6 +15,7 @@ namespace LIBMOL
             lErr(false),
             hasCoords(false),
             hasH(false),
+            hasMetal(false),
             notPowder(true),
             resolOK(true),
             RFactorOK(false),
@@ -32,6 +33,7 @@ namespace LIBMOL
                            lErr(false),
                            hasCoords(false),
                            hasH(false),
+                           hasMetal(false),
                            notPowder(true),
                            resolOK(true),
                            RFactorOK(false),
@@ -70,6 +72,7 @@ namespace LIBMOL
                            lErr(false),
                            hasCoords(false),
                            hasH(false),
+                           hasMetal(false),
                            notPowder(true),
                            resolOK(true),
                            RFactorOK(false),
@@ -375,7 +378,8 @@ namespace LIBMOL
             */
             
             // 
-            if ((int)tBlocs.size()!=0 && RFactorOK )
+            //if ((int)tBlocs.size()!=0 && RFactorOK )
+            if ((int)tBlocs.size()!=0)
             {
                 
                 std::map<std::string, std::string>   rowProps;
@@ -390,7 +394,6 @@ namespace LIBMOL
                     {
                         getPropsToMaps(iBs, rowProps, colProps, idxB);
                     }
-                    
                 }
                  
                 
@@ -670,6 +673,13 @@ namespace LIBMOL
                      iA !=allAtoms.end(); iA++)
         {
             iA->isMetal = isMetal(allMetals, iA->chemType);
+            if (iA->isMetal)
+            {
+                if (!hasMetal)
+                {
+                    hasMetal = true;
+                }
+            }
         }
         
     }
@@ -736,15 +746,19 @@ namespace LIBMOL
             {
                 if (tBuf[0].find("_") !=std::string::npos)
                 { 
+                    
                     if (lLab) 
                     {
-                        tColProps[tIdxB]["lab"].push_back(tBuf[0]);
+                        tColProps[tIdxB]["lab"].push_back(TrimSpaces(tBuf[0]));
+                        
                     }
                     else
                     {
+                        
                         lLab=true;
                         tIdxB++;
-                        tColProps[tIdxB]["lab"].push_back(tBuf[0]);
+                        tColProps[tIdxB]["lab"].push_back(TrimSpaces(tBuf[0]));
+                        
                     }
                 }
                 else
@@ -754,6 +768,7 @@ namespace LIBMOL
                         lLab  = false;
                     }
                     tColProps[tIdxB]["cont"].push_back((*iBl));   
+                    
                 }
                 
             }
@@ -791,11 +806,20 @@ namespace LIBMOL
         {
             if (!lSymOps)
             {
+                /*
+                for (std::vector<std::string>::iterator 
+                     iM=iBl->second["lab"].begin(); 
+                     iM != iBl->second["lab"].end(); iM++)
+                {
+                    std::cout << "print lab " << *iM << std::endl;
+                }
+                */
                 int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
                                             iBl->second["lab"]);
                 if (aPos ==-1)
                 {
-                    aPos=getKeyWordPos("_space_group_symop_operation_xyz", 
+                                      
+                    aPos=getKeyWordPos("_space_group_symop_operation_xyz",
                                             iBl->second["lab"]);
                 }
                 if (aPos !=-1)
@@ -803,7 +827,7 @@ namespace LIBMOL
                     lSymOps=true;
                     getCifSymOps(iBl->second);
                 }
-                
+               
             }
             
             
@@ -1541,6 +1565,11 @@ namespace LIBMOL
         
         int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
                                tOnePropGroup["lab"]);
+        if(aPos==-1)
+        {
+            aPos=getKeyWordPos("_space_group_symop_operation_xyz",
+                               tOnePropGroup["lab"]);
+        }
         std::cout << "symm opt pos " << aPos << std::endl;
         
         if(aPos !=-1)
@@ -1891,6 +1920,10 @@ namespace LIBMOL
                   
                 }
             }
+            
+            // Convert element symbols in cif from low cases to the proper ones 
+            // (like 7037562.cif)
+            
         }
         
     }
@@ -2620,7 +2653,7 @@ namespace LIBMOL
             */
            
         }
-       
+        
     }
     
     void DictCifFile::setupSystem3Secs(std::ifstream & tInCif)
@@ -6163,7 +6196,7 @@ namespace LIBMOL
            // std::cout << "number of tV2 " << (int)tV2.size() << std::endl;
             
             REAL perValue = 360.0/tPer;
-            REAL iniValue;
+            REAL iniValue = 0.0;
             
             int n = 0;
             
@@ -7754,11 +7787,33 @@ namespace LIBMOL
                              << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[1]].seriNum]
                              << std::endl;
                 }
-                outTempF.close();
-                
-            }
-            
+                outTempF.close();  
+            } 
         }
+    }
+    
+    extern void outMetalAtomInfo(FileName tFName,
+                                 GenCifFile  & tCifObj)
+    {
+        std::ofstream outMF(tFName);
+        
+        outMF << "Is the structure not from Power diff : " << tCifObj.notPowder << std::endl;
+        outMF << "Resolution OK : " << tCifObj.resolOK << std::endl;
+        outMF << "R factors OK : " << tCifObj.RFactorOK << std::endl;
+        outMF << "Occp OK : " << tCifObj.colidOK << std::endl;
+        outMF << "The following are metal atoms in the file " << std::endl;
+        for (std::vector<AtomDict>::iterator iAt=tCifObj.allAtoms.begin();
+                iAt != tCifObj.allAtoms.end(); iAt++)
+        {
+            if (iAt->isMetal)
+            {
+                outMF << "Atom : " << iAt->id << " : " 
+                      << iAt->chemType << std::endl;
+            }
+        }
+        
+        outMF.close();        
+              
     }
     
 }

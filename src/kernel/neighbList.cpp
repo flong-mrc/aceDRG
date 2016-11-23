@@ -1171,12 +1171,14 @@ namespace LIBMOL
     
     void NeighbListDict::putAtomsAndResiduesInCell(std::vector<AtomDict> & aAtomList)
     {   
-        // std::cout << "Number of atoms is " << aAtomList.size() << std::endl;
+        //std::cout << "Number of atoms is " << aAtomList.size() << std::endl;
         
         for (std::vector<AtomDict>::iterator iT=aAtomList.begin();
                 iT != aAtomList.end(); iT++)
         {
-            // std::cout << "Atom " << iT->id << std::endl;
+            //std::cout << "Atom " << iT->id 
+            //          << " of serial number " << iT->seriNum 
+            //          << std::endl;
             std::vector<int> tIdx;
             for (int i1 = 0; i1 < (int)iT->coords.size(); i1++)
             {
@@ -1215,11 +1217,11 @@ namespace LIBMOL
                 
                 // The atom has been added into the cell.
                 // check if the residue is already in the residue list.
-                // std::cout << "atom serial number " << iT->getSeriNum()
-                //           << std::endl;
+                //std::cout << "atom serial number " << iT->seriNum
+                //          << std::endl;
                 // std::cout << "Cell index " << allCells[aIdx].index[0]
-                //        << "," << allCells[aIdx].index[1]
-                //        << "," << allCells[aIdx].index[2] << std::endl;
+                //           << "," << allCells[aIdx].index[1]
+                //           << "," << allCells[aIdx].index[2] << std::endl;
                 // ResidueID tResID;
                 // tResID.resName = TrimSpaces(iT->getResName());
                 // tResID.seqNum  = iT->getSeqNum();
@@ -1282,7 +1284,7 @@ namespace LIBMOL
                 iC1 !=allCells.end(); iC1++)
         {
             // check the same cell
-            // std::cout << "Cell " << iC1->index[0] << " "
+            //std::cout << "Cell " << iC1->index[0] << " "
             //          << iC1->index[1] << " "
             //          << iC1->index[2] << std::endl;
             // std::cout << "Number of atoms in this cell is "
@@ -1292,7 +1294,7 @@ namespace LIBMOL
             {
                 if ((int)iC1->atomsInCell.size() >1)
                 {
-                    // std::cout << "atoms from own cell " << std::endl;
+                    //std::cout << "atoms from own cell " << std::endl;
                     buildAtomNeighListfromAPairCell(aAtomList, tL, (*iC1), (*iC1));
                 }
                 // check other cells 
@@ -1310,14 +1312,14 @@ namespace LIBMOL
                     int i3 = (*iI)[2];
                     int aId = (itsNumCell[1]*i1+i2)*itsNumCell[2] + i3;
                     NBCellDict tC2 = allCells[aId];
-                    // std::cout << "Cell " << tC2.index[0] << " "
+                    //std::cout << "Cell " << tC2.index[0] << " "
                     //          << tC2.index[1] << " "
                     //          << tC2.index[2] << std::endl;
                     //std::cout << "Number of atoms in this NB cell: "
                     //          << tC2.atomsInCell.size() << std::endl;
                     if ((int)tC2.atomsInCell.size() >0 and aId0 < aId )
                     {
-                        // std::cout << "atoms from inter-cells " << std::endl;
+                        //std::cout << "atoms from inter-cells " << std::endl;
                         buildAtomNeighListfromAPairCell(aAtomList, tL, (*iC1), tC2);
                     }
                 }
@@ -1340,20 +1342,38 @@ namespace LIBMOL
         for (std::vector<int>::iterator iA1=tCell1.atomsInCell.begin();
                     iA1!=tCell1.atomsInCell.end(); iA1++)
         {
-            
-            // std::cout << "1 Build NBList for atom " << *iA1 << std::endl;
+            /*
+            if (*iA1==1)
+            {
+            std::cout << "1 Build NBList for atom " 
+                      << aAtomList[*iA1].id
+                      << " of " << *iA1 << std::endl;
+            }
+             */
             for (std::vector<int>::iterator iA2 = tCell2.atomsInCell.begin();
                         iA2 != tCell2.atomsInCell.end(); iA2++)
             {
+                
                 REAL tD = distanceV(aAtomList[*iA1].coords, aAtomList[*iA2].coords);
+                /*
+                if(*iA1==1)
+                {
+                    std::cout << "r=" << tD << " for atom " 
+                              << aAtomList[*iA2].id 
+                              << " of " << aAtomList[*iA2].seriNum << std::endl; 
+                                      
+                }
+                 */
                 if ( tD <=tL && tD >= 0.0005)
                 {
                     if (std::find(aAtomList[*iA1].neighbAtoms.begin(),
                         aAtomList[*iA1].neighbAtoms.end(), *iA2) ==aAtomList[*iA1].neighbAtoms.end())
                     {
                         aAtomList[*iA1].neighbAtoms.push_back((*iA2));
-                        // std::cout << "atom " << aAtomList[*iA2].id
-                        //           << " has been added to the list" << std::endl;
+                        
+                        //std::cout << "atom " << aAtomList[*iA2].id
+                        //          << " has been added to the list" << std::endl;
+                       
                     }
                     if (std::find(aAtomList[*iA2].neighbAtoms.begin(),
                         aAtomList[*iA2].neighbAtoms.end(), *iA1) ==aAtomList[*iA2].neighbAtoms.end())

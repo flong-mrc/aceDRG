@@ -241,6 +241,10 @@ namespace LIBMOL
         return (int)first.size() > (int)second.size();
     }
     
+    bool desSortIntMapValues(const sortIntMap & a, const sortIntMap & b)
+    {
+        return a.value > b.value;
+    }
     
     bool desSortMapKey(const sortMap& a ,const sortMap & b)
     {
@@ -437,20 +441,15 @@ namespace LIBMOL
     {
         bool aCri = false;
         
-        if(tVect.size() ==0)
+        
+        for (std::vector<REAL>::iterator iV=tVect.begin();
+                iV !=tVect.end(); iV++)
         {
-            aCri  = true;
-        }
-        else
-        {
-            for (std::vector<REAL>::iterator iV=tVect.begin();
-                   iV !=tVect.end(); iV++)
+            if (fabs(*iV-tVal) <tErr)
             {
-                if (fabs(*iV-tVal) <tErr)
-                {
-                    aCri = true;
-                }
+                aCri = true;
             }
+                
         }
         
         return aCri;
@@ -2068,7 +2067,12 @@ namespace LIBMOL
         else if (aStr.find("AROM") !=std::string::npos || aStr.find("AR") !=std::string::npos)
         {
             //tOrder = 4.0;
-            tOrder = 1.5;
+            tOrder = 1.0;
+        }
+        else if (aStr.find("AM") !=std::string::npos)
+        {
+            // amide bond
+            tOrder = 1.0;
         }
         else if (aStr.find("DELO") !=std::string::npos)
         {

@@ -13,8 +13,12 @@ namespace LIBMOL
     Molecule::Molecule() : seriNum(-1),
             id(NullString),
             formula(NullString), 
+            sumExcessElecs(ZeroInt),
+            sumCharges(ZeroInt),
             hasCoords(true),
-            validated(true)
+            validated(true), 
+            isInf(false),
+            stateChanged(false)
     {
     }
     
@@ -22,7 +26,11 @@ namespace LIBMOL
             id(tMol.id),
             formula(tMol.formula),
             hasCoords(tMol.hasCoords),
-            validated(tMol.validated)
+            sumExcessElecs(tMol.sumExcessElecs),
+            sumCharges(tMol.sumCharges),
+            validated(tMol.validated),
+            isInf(tMol.isInf),
+            stateChanged(tMol.stateChanged)
     {
         for(std::vector<AtomDict>::const_iterator iA=tMol.atoms.begin();
                 iA !=tMol.atoms.end(); iA++)
@@ -184,7 +192,39 @@ namespace LIBMOL
                 iAI != tAllIds.end(); iAI++)
         {
             formula.append(*iAI);
+        }  
+    }
+    
+    void Molecule::calcSumExcessElecs()
+    {
+        sumExcessElecs = sumExElectrons(atoms);
+    }
+    
+    void Molecule::calcSumCharges()
+    {
+        sumCharges = 0;
+        
+        // Unify charges and formal-charges on atoms
+        for (std::vector<AtomDict>::iterator iAt=atoms.begin();
+                iAt != atoms.end(); iAt++)
+        {
+            if (iAt->formalCharge !=0.0)
+            {
+                iAt->charge = iAt->formalCharge;
+            }
+            else
+            {
+                if (iAt->charge !=0)
+                {
+                    iAt->formalCharge = iAt->charge;
+                }
+            }
         }
         
+        for (std::vector<AtomDict>::iterator iAt=atoms.begin();
+                iAt != atoms.end(); iAt++)
+        {
+            sumCharges +=(iAt->formalCharge);
+        }
     }
 }

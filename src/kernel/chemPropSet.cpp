@@ -122,6 +122,7 @@ namespace LIBMOL
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms)
     {
   
+       
         
         // First round
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
@@ -438,15 +439,15 @@ namespace LIBMOL
                                                std::vector<RingDict>  & tRings,
                                                int                      tMode)
     {
-        REAL angCri = 10.0;
+        REAL angCri = 15.0;
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
         {
             if((iA->chemType.compare("N")==0 || iA->chemType.compare("B")==0) 
                   && (iA->connAtoms.size() == 3))
             {
-                std::cout << "Check " << iA->id << " now " << std::endl;
-                std::cout << "Its initial sp is " << iA->bondingIdx << std::endl;
+                //std::cout << "Check " << iA->id << " now " << std::endl;
+                //std::cout << "Its initial sp is " << iA->bondingIdx << std::endl;
                 bool lAromRs = false;
                 for (std::vector<int>::iterator iCo=iA->connAtoms.begin();
                         iCo !=iA->connAtoms.end(); iCo++)
@@ -569,7 +570,7 @@ namespace LIBMOL
                     iA->bondingIdx = 3;
                 }
                  */
-                std::cout << "Here Its hybridization is sp" << iA->bondingIdx << std::endl; 
+                // std::cout << "Here Its hybridization is sp" << iA->bondingIdx << std::endl; 
             }
             
             iA->hybrid = strTransSP(iA->bondingIdx);
@@ -677,7 +678,7 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
-            int aAt_seri = iAt->seriNum;
+            // int aAt_seri = iAt->seriNum;
             std::vector<ID> aNB1_NB2SP_Set;
             for (std::vector<int>::iterator iNB1=iAt->connAtoms.begin();
                     iNB1 != iAt->connAtoms.end(); iNB1++)
@@ -1027,7 +1028,7 @@ namespace LIBMOL
         
         REAL Order  = getTotalBondOrder(tBonds, tAtoms, tIA);
         REAL Diff1  = Order -tIA->formalCharge;
-        std::cout << "For atom " << tIA->id << std::endl;
+        // std::cout << "For atom " << tIA->id << std::endl;
         std::cout << "Total bond order is " << Order << std::endl;
         std::cout << "formal charge is " << tIA->formalCharge << std::endl;
         
@@ -1053,9 +1054,9 @@ namespace LIBMOL
         {
             REAL Diff2  = (REAL)iM->second
                            -Diff1;
-            std::cout << "Val " << iM->second << " Diff1 " << Diff1 << std::endl;
+            //std::cout << "Val " << iM->second << " Diff1 " << Diff1 << std::endl;
             
-            std::cout <<" diff2 is " << Diff2 << std::endl;
+            //std::cout <<" Diff2 is " << Diff2 << std::endl;
             if (fabs(Diff2) <0.000001)
             {
                 return 0.0;
@@ -1066,6 +1067,7 @@ namespace LIBMOL
                 if (minD >8)
                 {
                     std::cout << "Bond order or valance error " << std::endl;
+                    std::cout << "minD " << minD << std::endl;
                     exit(1);
                 }
             }
@@ -1439,18 +1441,18 @@ namespace LIBMOL
                                   std::vector<AtomDict>::iterator tIA)
     {
         REAL tVal = 0.0;
-        //std::cout << "see atom " << tIA->id << std::endl;
+        std::cout << "Check  atom " << tIA->id << std::endl;
         
-        //std::cout << "It connected " << tIA->connAtoms.size() << " atoms " << std::endl;
+        std::cout << "It connected " << tIA->connAtoms.size() << " atoms " << std::endl;
         
         for (std::vector<int>::iterator iNB=tIA->connAtoms.begin();
                     iNB !=tIA->connAtoms.end(); iNB++)
         {  
-            //std::cout << "connected atom " << *iNB << std::endl;
+            std::cout << "connected atom " << *iNB << std::endl;
             REAL aOrd = getBondOrder(tBonds, tIA->seriNum, *iNB);
-            //std::cout << "bond order between atom " << tIA->seriNum+1 
-            //          << " and " << tAtoms[*iNB].seriNum+1
-            //          << " is " << aOrd << std::endl;
+            std::cout << "bond order between atom " << tAtoms[tIA->seriNum].id 
+                      << " and " << tAtoms[*iNB].id 
+                      << " is " << aOrd << std::endl;
             if (aOrd >0)
             {
                 tVal +=aOrd;
@@ -1470,6 +1472,144 @@ namespace LIBMOL
         
         return tVal;
     }
+    
+    extern void modifyBondOrderAR(std::vector<BondDict> & tBonds,
+                                  std::vector<AtomDict>  & tAtoms,
+                                  int  tIdxB1, int tIdxB2,
+                                  int tAtCen, int tAt1, int tAt2,
+                                  PeriodicTable & tTab)
+    {
+        REAL Val = (REAL)tTab.elements[tAtoms[tAtCen].chemType]["val"];
+        ID aBO1 = tBonds[tIdxB1].order;
+        ID aBO2 = tBonds[tIdxB2].order;
+        std::cout << "Modify bond-order for ring atom " 
+                  << tAtoms[tAtCen].id << std::endl;
+        std::cout << "Old order1 " << aBO1 << " for atoms " << tBonds[tIdxB1].atoms[0]
+                  << " and " << tBonds[tIdxB1].atoms[1] << std::endl;
+        std::cout << "Old order2 " << aBO2 << " for atoms " << tBonds[tIdxB2].atoms[0]
+                  << " and " << tBonds[tIdxB2].atoms[1] << std::endl;
+        
+        StrUpper(aBO1);
+        StrUpper(aBO2);
+        
+        REAL tDoneV = getFixedBondOrder(tBonds, tAtoms, tAtCen);
+        REAL allowed = Val+ tAtoms[tAtCen].formalCharge -tDoneV;
+        std::cout << "Allowed " << allowed << std::endl;
+        
+        if (aBO1.find("AR") !=aBO1.npos && aBO2.find("AR")==aBO2.npos)
+        {
+            if (aBO2.find("1") !=aBO2.npos 
+                || aBO2.find("SIN") != aBO2.npos)
+            {
+                if (allowed >=2.0)
+                {
+                    tBonds[tIdxB1].order = "DOUBLE";
+                    tBonds[tIdxB1].orderN = 2.0;
+                }
+                else
+                {
+                    tBonds[tIdxB1].order = "SINGLE";
+                    tBonds[tIdxB1].orderN = 1.0;
+                }
+            }
+            else if (aBO2.find("2") !=aBO2.npos 
+                || aBO2.find("DOUB") != aBO2.npos)
+            {
+                tBonds[tIdxB1].order = "SINGLE";
+                tBonds[tIdxB1].orderN = 1.0;
+            }
+        }
+        else if (aBO2.find("AR") !=aBO2.npos && aBO1.find("AR")==aBO1.npos)
+        {
+            if (aBO1.find("1") !=aBO1.npos 
+                || aBO1.find("SIN") != aBO1.npos)
+            {
+                if (allowed >=2.0)
+                {
+                    std::cout << "HERE" << std::endl;
+                    tBonds[tIdxB2].order = "DOUBLE";
+                    tBonds[tIdxB2].orderN = 2.0;
+                }
+                else
+                {
+                    
+                    tBonds[tIdxB2].order = "SINGLE";
+                    tBonds[tIdxB2].orderN = 1.0;
+                }
+            }
+            else if (aBO1.find("2") !=aBO1.npos 
+                || aBO1.find("DOUB") != aBO1.npos)
+            {
+                
+                tBonds[tIdxB2].order = "SINGLE";
+                tBonds[tIdxB2].orderN = 1.0;
+            }
+        }
+        else if (aBO1.find("AR") !=aBO1.npos && aBO2.find("AR") !=aBO2.npos)
+        {
+            // can assign both ways 
+            tBonds[tIdxB1].order = "SINGLE";
+            tBonds[tIdxB1].orderN = 1.0;
+            if (allowed >=2.0)
+            {
+                tBonds[tIdxB2].order = "DOUBLE";
+                tBonds[tIdxB2].orderN = 2.0;
+            }
+            else
+            {
+                tBonds[tIdxB2].order = "SINGLE";
+                tBonds[tIdxB2].orderN = 1.0;
+            }
+              
+        }
+        
+        std::cout << "New Order1 " << tBonds[tIdxB1].order
+                  << " and value " << tBonds[tIdxB1].orderN << std::endl;
+        std::cout << "New Order2 " << tBonds[tIdxB2].order
+                  << " and value " << tBonds[tIdxB2].orderN << std::endl;
+    }
+    
+    
+    extern REAL getFixedBondOrder(std::vector<BondDict>   & tBonds, 
+                                   std::vector<AtomDict>   & tAtoms,
+                                   int                       tAtmIdx)
+    {
+        REAL tVal = 0.0;
+        std::cout << "Check valence decided for atom " << tAtoms[tAtmIdx].id << std::endl;
+        
+        std::cout << "It connected " << tAtoms[tAtmIdx].connAtoms.size() << " atoms " << std::endl;
+        
+        for (std::vector<int>::iterator iNB=tAtoms[tAtmIdx].connAtoms.begin();
+                    iNB !=tAtoms[tAtmIdx].connAtoms.end(); iNB++)
+        {  
+            std::cout << "connected atom " << tAtoms[*iNB].id << std::endl;
+            int idxB = getBond(tBonds, tAtoms[tAtmIdx].seriNum, *iNB);
+            if (idxB !=-1)
+            {
+                if (tBonds[idxB].order.find("AR") ==tBonds[idxB].order.npos)
+                {
+                    std::cout << "bond order between atom " << tAtoms[tAtmIdx].id 
+                              << " and " << tAtoms[*iNB].id 
+                              << " is " <<  tBonds[idxB].orderN << std::endl;
+                    tVal +=tBonds[idxB].orderN;
+                    std::cout << "total order now " << tVal << std::endl;
+                    
+                }
+            }
+            else
+            {
+                std::cout << "Can not find the bond between atoms " 
+                          <<  tAtoms[tAtmIdx].id
+                          << " and " << tAtoms[*iNB].id 
+                          << std::endl;
+                std::cout << "Some thing is wrong in the Bond list " << std::endl;
+                exit(1);
+            }
+        }
+        
+        return tVal;
+    }
+    
     
     
     
@@ -1569,7 +1709,118 @@ namespace LIBMOL
         }
     }
     
-    
+    extern void kekulizeRings(std::vector<AtomDict> & tAtoms,
+                               std::vector<BondDict> & tBonds,
+                               std::vector<RingDict> & tRings)
+    {
+        PeriodicTable aPTab;
+        
+        if (tRings.size() > 0)
+        {
+            std::vector<int> doneList;
+            std::map<int, int> startAtIdxInRing;
+            
+            // new starting 
+            for (unsigned i=0; i < tRings.size(); i++)
+            {
+                
+                std::cout << "\nFor ring " << tRings[i].rep << std::endl;
+                tRings[i].setRingAtmsLinks();
+                startAtIdxInRing[i] =0;
+                tRings[i].setBondIdxs(tBonds, startAtIdxInRing[i]);
+                std::cout << " Is ring " << i << " AR ? " 
+                          << checkAllARBondsInOneRing(tBonds, tRings[i]) << std::endl;
+                
+                if (checkAllARBondsInOneRing(tBonds, tRings[i]))
+                {
+                    std::cout << "\nkekulize this ring "  << std::endl;
+                    kekulizeOneRing(tAtoms, tBonds, tRings[i], startAtIdxInRing[i], aPTab);
+                    doneList.push_back(i);
+                    std::cout << std::endl;
+                }
+            }
+            
+            for (unsigned i=0; i < tRings.size(); i++)
+            {
+                
+                if (std::find(doneList.begin(), doneList.end(), i)
+                        ==doneList.end())
+                {
+                    std::cout << "Ring " << i << std::endl;
+                    std::cout << "\nkekulize ring " << tRings[i].rep << std::endl;
+                            
+                    if (startAtIdxInRing[i] !=-1)
+                    {
+                        kekulizeOneRing(tAtoms, tBonds, tRings[i], 
+                                        startAtIdxInRing[i], aPTab);
+                    }
+                    doneList.push_back(i);
+                    std::cout << std::endl;
+                }
+            }
+            
+            
+            
+            
+        }
+    }
+     
+    extern void kekulizeOneRing(std::vector<AtomDict> & tAtoms,
+                                std::vector<BondDict> & tBonds,
+                                RingDict & tRing, int tStartIdx,
+                                PeriodicTable & tTab)
+    {
+       
+        int initIdx=-1;
+        std::vector<int> atomIdxs;
+        for (unsigned i=0; i < tRing.atoms.size(); i++)
+        {
+            atomIdxs.push_back(tRing.atoms[i].seriNum);
+            if (tRing.atoms[i].seriNum == tStartIdx)
+            {
+                initIdx=i;
+            }
+        }
+        
+        if (initIdx==-1)
+        {
+            initIdx =0;
+        }
+        
+        // Start from one ring atom atomIdxs[0]
+        
+        int curIdx = atomIdxs[initIdx];
+        int linkIdx1 = tRing.ringAtomLink[curIdx][0];
+        int linkIdx2 = tRing.ringAtomLink[curIdx][1];
+        int finIdx= curIdx;
+        int idxBo1=getBond(tBonds, curIdx, linkIdx1);
+        if (idxBo1 ==-1)
+        {
+            std::cout << "Bug: Can not find the bond between atoms "
+                      << tAtoms[curIdx].id << " and " 
+                      << tAtoms[linkIdx1].id << std::endl;
+            exit(1);
+        }
+        
+        do
+        {    
+            int idxBo2= getBond(tBonds, curIdx, linkIdx2);
+            modifyBondOrderAR(tBonds, tAtoms, idxBo1, idxBo2, 
+                              curIdx, linkIdx1, linkIdx2, tTab);
+            linkIdx1 = curIdx;
+            curIdx = linkIdx2;
+            idxBo1 = idxBo2;
+            if (tRing.ringAtomLink[curIdx][0]==linkIdx1)
+            {
+                linkIdx2 = tRing.ringAtomLink[curIdx][1];
+            }
+            else
+            {
+                linkIdx2 = tRing.ringAtomLink[curIdx][0];
+            }
+        }while(curIdx !=finIdx);
+        
+    }
     
     // Set Coordinates for added H atoms
     
@@ -1929,11 +2180,14 @@ namespace LIBMOL
         orgElemValMap["AT"].push_back(1);
         
         
+        
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
             ID aElm = iAt->chemType;
             StrUpper(aElm);
+            std::cout << "Atom " << iAt->seriNum << " of " << iAt->id
+                      << " is  a " << iAt->chemType << " atom " << std::endl;
             
             if (std::find(orgTab.begin(), orgTab.end(), aElm) != orgTab.end())
             {
@@ -1949,6 +2203,7 @@ namespace LIBMOL
                         orgNB++;
                     }
                 }
+                
                 int nExEls = orgElemValMap[aElm][0] + iAt->formalCharge - orgNB;
                 if (nExEls < 0)
                 {
@@ -1964,7 +2219,6 @@ namespace LIBMOL
                         i++;
                     }
                 }
-            
             
                 if (nExEls < 0)
                 {
@@ -1988,14 +2242,227 @@ namespace LIBMOL
                     iAt->excessElec = nExEls;
                 }
             
-                //std::cout << "For atom " << iAt->id << " : " << std::endl
-                //          << "it connects " << iAt->connAtoms.size() 
-                //          << " atom(s) " << std::endl
-                //          << "its formal charge is " << iAt->formalCharge << std::endl 
-                //          << "its number of EX electrons is " << iAt->excessElec 
-                //          << std::endl;
+                std::cout << "For atom " << iAt->id << " : " << std::endl
+                          << "it connects " << iAt->connAtoms.size() 
+                          << " atom(s) " << std::endl
+                          << "its formal charge is " << iAt->formalCharge << std::endl 
+                          << "its number of EX electrons is " << iAt->excessElec 
+                          << std::endl;
             }   
-        }   
+        }  
+    }
+    
+    extern void setAllAtomEXcessElectrons2(std::vector<AtomDict> & tAtoms)
+    {
+        // Temporarily. should use the Periodic table object created before.
+        
+        std::vector<std::string> orgTab;
+        initOrgTable(orgTab);
+        
+        std::map<ID, std::vector<int> > orgElemValMap;
+        orgElemValMap["C"].push_back(4);
+        orgElemValMap["N"].push_back(3);
+        orgElemValMap["N"].push_back(5);
+        orgElemValMap["O"].push_back(2);
+        orgElemValMap["N"].push_back(3);
+        orgElemValMap["S"].push_back(2);
+        orgElemValMap["S"].push_back(4);
+        orgElemValMap["S"].push_back(6);
+        orgElemValMap["P"].push_back(5);
+        orgElemValMap["SE"].push_back(2);
+        orgElemValMap["SE"].push_back(4);
+        orgElemValMap["SE"].push_back(6);
+        orgElemValMap["B"].push_back(3);
+        
+        orgElemValMap["H"].push_back(1);
+        orgElemValMap["F"].push_back(1);
+        orgElemValMap["CL"].push_back(1);
+        orgElemValMap["BR"].push_back(1);
+        orgElemValMap["I"].push_back(1);
+        orgElemValMap["AT"].push_back(1);
+        
+        
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            ID aElm = iAt->chemType;
+            StrUpper(aElm);
+            std::cout << "Atom " << iAt->seriNum << " of " << iAt->id
+                      << " is  a " << iAt->chemType << " atom " << std::endl;
+            
+            if (std::find(orgTab.begin(), orgTab.end(), aElm) != orgTab.end())
+            {
+                int valSize = (int)orgElemValMap[aElm].size();
+                int orgNB =0;
+                for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                            iNB != iAt->connAtoms.end(); iNB++)
+                {   
+                    ID aNBElm = tAtoms[*iNB].chemType;
+                    StrUpper(aNBElm);
+                    if(std::find(orgTab.begin(), orgTab.end(), aNBElm) != orgTab.end())
+                    {
+                        orgNB++;
+                    }
+                }
+                
+                int nExEls;
+                if (aElm.compare("N")==0 && orgNB==3)
+                {
+                    if (iAt->isInAromRing || iAt->isInSP2Ring)
+                    {
+                        nExEls = 2;
+                    }
+                    else
+                    {
+                        nExEls = 0;
+                    }
+                }
+                else
+                {
+                    nExEls = orgElemValMap[aElm][0] + iAt->formalCharge - orgNB;
+                }
+                
+                if (nExEls < 0)
+                {
+                    int i = 1;
+                
+                    while (i < valSize)
+                    {
+                        nExEls = orgElemValMap[aElm][i] + iAt->formalCharge - iAt->connAtoms.size();
+                        if (nExEls >=0)
+                        {
+                            break;
+                        }
+                        i++;
+                    }
+                }
+            
+                if (nExEls < 0)
+                {
+                    std::cout << "Error : the number of connections to Atom "
+                              << iAt->id << ": "
+                              << iAt->connAtoms.size() << " is larger than the valence "
+                              << orgElemValMap[aElm][valSize-1] << " permits." 
+                              << std::endl << "The formal charge is  "
+                              << iAt->formalCharge
+                              << std::endl;
+                    std::cout << "Atom " << iAt->id << " has following connections: "
+                              << std::endl;
+                    for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                            iNB != iAt->connAtoms.end(); iNB++)
+                    {
+                        std::cout << tAtoms[*iNB].id << std::endl;
+                    }
+                }
+                else
+                {
+                    iAt->excessElec = nExEls;
+                }
+            
+                std::cout << "For atom " << iAt->id << " : " << std::endl
+                          << "it connects " << iAt->connAtoms.size() 
+                          << " atom(s) " << std::endl
+                          << "its formal charge is " << iAt->formalCharge << std::endl 
+                          << "its number of EX electrons is " << iAt->excessElec 
+                          << std::endl;
+            }   
+        }  
+    }
+    
+    
+    extern void setAtomRingProps(std::vector<AtomDict> & tAtoms,
+                                 std::vector<RingDict> & tRings)
+    {
+        ringTools aRingTool;
+        std::map<ID, std::vector<RingDict> >   tmpRings;
+        int nMaxRing = 7;
+        aRingTool.detectRingFromAtoms(tAtoms, tmpRings, 2, nMaxRing);    
+        
+        tRings.clear();
+        
+        for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=tmpRings.begin();
+                    iR1 !=tmpRings.end(); iR1++)
+        {
+            //std::cout << "(2)Ring representation " << iR1->first << std::endl;
+            for (std::vector<RingDict>::iterator iR11=iR1->second.begin();
+                        iR11 !=iR1->second.end(); iR11++)
+            {
+                tRings.push_back(*iR11);
+                
+            }
+        }
+
+        reIndexAtomInRing(tAtoms, tRings);
+        
+    }
+    
+    extern void setInitBondOrdersViaExtraElecs (std::vector<AtomDict> & tAtoms,
+                                                std::vector<BondDict> & tBonds)
+    {
+        // First round. 
+        // 1. Find the extra-electrons on each atoms
+        // 2. assign all bonds of order 1
+        
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            for (std::vector<int>::iterator iCo=iAt->connAtoms.begin();
+                    iCo !=iAt->connAtoms.end(); iCo++)
+            {
+                if (iAt->seriNum < *iCo)
+                {
+                    int idxB = getBond(tBonds, iAt->seriNum, *iCo);
+                    if (idxB != -1)
+                    {
+                        tBonds[idxB].orderN = 1;
+                    }
+                    else
+                    {
+                        std::cout << "It does not exist for the bond between atom "
+                                << iAt->id << " with serial number " 
+                                << iAt->seriNum
+                                << " and atom " << tAtoms[*iCo].id
+                                << " with serial number " << tAtoms[*iCo].seriNum
+                                << std::endl;
+                        exit(1);
+                    }
+                }
+            }
+        }
+        
+        // Second round, for those connected atoms both with extra-elecs:
+        // doing, 
+        // 1. reduce extra number by one for each atoms 
+        // 2. increase bond order by one for each bonds
+        // at the same time, starting from singly connected atoms
+        
+        // for singly connected atoms
+        /*
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            if (iAt->excessElec > 0 && iAt->connAtoms.size()==1)
+            {
+                if (iAt->excessElec <= tAtoms[iAt->connAtoms[0]].excessElec)
+                {
+                    tAtoms[iAt->connAtoms[0]].excessElec -=(iAt->excessElec);
+                    modifyBondOrder(tBonds, tAtoms, iAt->seriNum,
+                                    iAt->connAtoms[0], iAt->excessElec);
+                    iAt->excessElec =0;
+                }
+                else if (iAt->excessElec > tAtoms[iAt->connAtoms[0]].excessElec
+                         && tAtoms[iAt->connAtoms[0]].excessElec !=0)
+                {
+                    iAt->excessElec -=(tAtoms[iAt->connAtoms[0]].excessElec);
+                    modifyBondOrder(tBonds, tAtoms, iAt->seriNum,
+                                    iAt->connAtoms[0],
+                                    tAtoms[iAt->connAtoms[0]].excessElec);
+                    tAtoms[iAt->connAtoms[0]].excessElec = 0;
+                }
+            }
+        }
+         */
     }
     
     extern int  sumExElectrons(std::vector<AtomDict> & tAtoms)
@@ -2010,6 +2477,7 @@ namespace LIBMOL
         
         return sumExElec; 
     }
+    
     extern void checkStereoOneMol(std::vector<Molecule>::iterator tMol,
                                   FileName tPdbIn)
     {
@@ -2666,7 +3134,7 @@ namespace LIBMOL
      
     }
     
-    HuckelMOSuite::HuckelMOSuite()
+    HuckelMOSuite::HuckelMOSuite():lUpdate(false)
     {
         // Default values, allow an input table to change them 
         orgAlphas["C"]  = -11.2;
@@ -2705,10 +3173,13 @@ namespace LIBMOL
         {
             //Pick up pi electrons and fragment the system 
             initiaExElecs(tAtoms);
+            
             PickOddAtoms(tAtoms);
+            
             if (withExAtomIdxs.size() > 0)
             {
                 partitionSysToSubGraphs(tAtoms);
+                exit(1);
                 MOSolver(tAtoms);
             }
             else
@@ -2735,6 +3206,46 @@ namespace LIBMOL
                       << std::endl << "and all  bonds are set " << std::endl;
         }
     }
+        
+    void HuckelMOSuite::execute2(std::vector<AtomDict>& tAtoms, 
+                                 std::vector<BondDict>& tBonds,
+                                 std::vector<RingDict> & tRings)
+    {
+        // bool lCharge = false;
+        // 
+        //if (!tSetupAtoms)
+        //{
+        //    std::vector<RingDict>    aSetRings;
+        //    setAtomRingProps(tAtoms, aSetRings);
+        //}
+        //else
+        //{
+            // all properties such sp and ring info for atoms are setup in 
+            // previous steps
+        if (workMode==2)
+        {
+            withExAtomIdxs.clear();
+            zeroExAtomIdxs.clear();
+            lUpdate = false;
+            setBondOrderInSys2(tAtoms, tBonds, tRings);
+            if (withExAtomIdxs.size() > 0)
+            {
+                partitionSysToSubGraphs(tAtoms);
+                if (allSubGraphs.size() > 0)
+                {
+                    checkChargeInSubGraphs(tAtoms);
+                }
+                MOSolver(tAtoms);
+                BondTrans(tBonds);
+            }
+            else
+            {
+                std::cout << "No MO calculations are needed. "  << std::endl
+                          << "All  bond-orders are set as well" << std::endl;
+            }
+        }
+        
+    }
     
     void HuckelMOSuite::initiaExElecs(std::vector<AtomDict>& tAtoms)
     {
@@ -2757,15 +3268,54 @@ namespace LIBMOL
         }
         
         // Check 
-        /*
+        
         std::cout << "Now those atoms are considered to be with pi electrons " 
                   << std::endl;
         for (std::vector<int>::iterator iAt=withExAtomIdxs.begin();
                 iAt != withExAtomIdxs.end(); iAt++)
         {
-            std::cout << "Atom " << tAtoms[*iAt].id << std::endl;
+            std::cout << "Atom " << tAtoms[*iAt].id
+                      << " of serial number " 
+                      << tAtoms[*iAt].seriNum << std::endl;
         }
-         */
+          
+    }
+    
+    void HuckelMOSuite::initiaExElecs2(std::vector<AtomDict>& tAtoms)
+    {
+        // Initialization 
+        setAllAtomEXcessElectrons2(tAtoms);
+        
+        //Pick up pi electrons at the first stage 
+        for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            std::cout << "Atom " << iAt->id << "   " << iAt->seriNum 
+                      << "     " << iAt->excessElec << std::endl;
+            if (iAt->excessElec !=0)
+            {
+                withExAtomIdxs.push_back(iAt->seriNum);
+            }
+            else
+            {
+                zeroExAtomIdxs.push_back(iAt->seriNum);
+            }
+        }
+        
+        // Check 
+        
+        std::cout << "Now those atoms are considered to be with pi electrons " 
+                  << std::endl;
+        for (std::vector<int>::iterator iAt=withExAtomIdxs.begin();
+                iAt != withExAtomIdxs.end(); iAt++)
+        {
+            std::cout << "Atom " << tAtoms[*iAt].id
+                      << " of serial number " 
+                      << tAtoms[*iAt].seriNum << std::endl;
+        }
+        
+        
+        
     }
     
     void HuckelMOSuite::PickPiElectrons(std::vector<AtomDict>& tAtoms)
@@ -2840,7 +3390,7 @@ namespace LIBMOL
         
         
         // Check 
-        /*
+        
         if (withExAtomIdxs.size()==0)
         {
             std::cout << "No atoms are considered to have free pi electrons"
@@ -2857,15 +3407,17 @@ namespace LIBMOL
                 std::cout << "Atom " << tAtoms[*iAt].id << std::endl;
             }
         }
-        */
+       
         std::cout << "Those are bonds excluded. " 
                   << std::endl;
+        
         for (std::map<int, int>::iterator iAt=oddAtomIdxs.begin();
                 iAt != oddAtomIdxs.end(); iAt++)
         {
             std::cout << "Bond between atom " << tAtoms[iAt->first].id 
                       << " and atom " << tAtoms[iAt->second].id << std::endl;
-        }   
+        }  
+        
     }
     
     void HuckelMOSuite::setInitBondOrder(std::vector<AtomDict>             & tAtoms, 
@@ -2877,7 +3429,15 @@ namespace LIBMOL
         
         tCBondIdx.clear();
         tDelConn.clear();
-        
+        std::cout << "Number of all bonds in the molecule " 
+                  << tBonds.size() << std::endl;
+        std::cout << "Those bonds are : " << std::endl;
+        for (std::vector<BondDict>::iterator iBo=tBonds.begin();
+                iBo != tBonds.end(); iBo++)
+        {
+            std::cout << "Between atom " << iBo->atomsIdx[0]
+                      << " and " << iBo->atomsIdx[1] << std::endl;
+        }
         // Dealt with the singly connected atoms first
         for (std::vector<int>::iterator iZA=zeroExAtomIdxs.begin();
                 iZA !=zeroExAtomIdxs.end(); iZA++)
@@ -2886,6 +3446,9 @@ namespace LIBMOL
             if (tAtoms[*iZA].connAtoms.size()==1)
             {
                 int idxB = getBond(tBonds, *iZA, tAtoms[*iZA].connAtoms[0]);
+                std::cout << "Bond idx " << idxB << std::endl;
+                if (idxB !=-1)
+                {
                 if (tAtoms[*iZA].chemType.compare("H")==0
                     || tAtoms[*iZA].chemType.compare("F")==0
                     || tAtoms[*iZA].chemType.compare("CL")==0
@@ -2984,21 +3547,29 @@ namespace LIBMOL
                 std::cout << "Atom " << tAtoms[*iZA].id 
                           << " has remain val " 
                           << tRemainVal[tAtoms[*iZA].seriNum] << std::endl;
+                }
+                else
+                {
+                    std::cout << "Could not find bond between atoms " 
+                              << *iZA << " and " << tAtoms[*iZA].connAtoms[0]
+                              << std::endl;
+                }
             }
         }
        
         std::cout << "First step " << std::endl;
-        std::cout << tCBondIdx.size() << "are decided bonds: " << std::endl;
+        std::cout << "Number of Bonds with bond-orders decided " 
+                  << tCBondIdx.size() << std::endl;
+        /*
         for (std::vector<int>::iterator iB=tCBondIdx.begin(); 
                 iB !=tCBondIdx.end(); iB++)
         {
             std::cout << "Bond idx " << *iB << " which is between atom " 
-                      << tBonds[*iB].atoms[0] << " and "
-                      << tBonds[*iB].atoms[1] << std::endl;
+                      << tAtoms[tBonds[*iB].atomsIdx[0]].id << " and "
+                      << tAtoms[tBonds[*iB].atomsIdx[1]].id << std::endl;
             
         }
-        
-        
+        */
         // 2. Deal with definite single bonds
         for (std::vector<int>::iterator iZA=zeroExAtomIdxs.begin();
                 iZA !=zeroExAtomIdxs.end(); iZA++)
@@ -3046,7 +3617,6 @@ namespace LIBMOL
             }
         }
         
-        
         std::cout << "After second step " << std::endl;
         for (std::map<int, int>::iterator iZA=tRemainVal.begin();
                 iZA !=tRemainVal.end(); iZA++)
@@ -3058,6 +3628,7 @@ namespace LIBMOL
                           << iZA->second << std::endl;
             }
         }
+        
         std::cout << "Total number of bonds " << tBonds.size() << std::endl;
         std::cout << tCBondIdx.size() << "are decided bonds: " << std::endl;
         for (std::vector<int>::iterator iB=tCBondIdx.begin(); 
@@ -3146,6 +3717,7 @@ namespace LIBMOL
         
         std::cout << "Total number of bonds set " << tCBondIdx.size()
                   << std::endl;
+        
         std::cout << "total number of atoms with free pi electrons is "
                   << withExAtomIdxs.size() << std::endl;
         
@@ -3308,11 +3880,328 @@ namespace LIBMOL
          
         std::map<int, std::vector<int> > delConns;
         setInitBondOrder(tAtoms, tBonds, cBonds, delConns, atomCurVals);
+        
+    }
+    
+    void HuckelMOSuite::setBondOrderInSys2(std::vector<AtomDict> & tAtoms,
+                                           std::vector<BondDict> & tBonds,
+                                           std::vector<RingDict> & tRings)
+    {   
        
+        
+        for (unsigned i=0; i < tRings.size(); i++)
+        {
+            if (detectAllSp2AtomRing(tRings[i]))
+            {
+                for (unsigned j=0; j < tRings[i].atoms.size(); j++)
+                {
+                    tRings[i].atoms[j].isInSP2Ring = true;
+                    int aSeri = getAtom(tRings[i].atoms[j].id,
+                                        tRings[i].atoms[j].seriNum,
+                                        tAtoms);
+                    if (aSeri != -1)
+                    {
+                        tAtoms[aSeri].isInSP2Ring = true;
+                    }
+                    else
+                    {
+                        std::cout << "Can not find the atom with ID "
+                                  << tRings[i].atoms[j].id << " and serial number "
+                                  << tRings[i].atoms[j].seriNum << std::endl;
+                        exit(1);
+                    }
+                }
+            }
+        }
+        
+        
+        initiaExElecs2(tAtoms);
+        
+        setInitBondOrdersViaExtraElecs(tAtoms, tBonds);
+        
+        modBondOrderViaAnnEXOneConn(tAtoms, tBonds);
+        
+        int nDone;
+        do 
+        {
+            nDone =0;
+            
+            modBondOrderViaAnnEXOneLoop(tAtoms, tBonds, nDone); 
+                              
+            std::cout << "nDone in this round : " 
+                      << nDone << std::endl;
+            
+        }while (nDone !=0);
+        
+        std::cout << "Number of atoms with free pi electrons are "
+                  << withExAtomIdxs.size() << std::endl;
+        
+    }
+    
+    void HuckelMOSuite::modBondOrderViaAnnEXOneConn(std::vector<AtomDict>& tAtoms, 
+                                             std::vector<BondDict>& tBonds)
+    {
+        // This function is similar to "iniBondOrder..." 
+        std::vector<int> tmpIdx;
+        std::vector<ID> plusE;
+        plusE.push_back("C");
+        plusE.push_back("N");
+        plusE.push_back("B");
+        plusE.push_back("P");
+        plusE.push_back("S");
+        plusE.push_back("SE");
+        
+        
+        for (std::vector<int>::iterator iIdx=withExAtomIdxs.begin();
+                iIdx != withExAtomIdxs.end(); iIdx++)
+        {
+            // dynamical process 
+            if (std::find(zeroExAtomIdxs.begin(), zeroExAtomIdxs.end(), *iIdx)
+                     == zeroExAtomIdxs.end())
+            {
+                if (!tAtoms[*iIdx].isInAromRing && !tAtoms[*iIdx].isInSP2Ring)
+                {
+                    if (tAtoms[*iIdx].connAtoms.size()==1)
+                    {
+                        int nNB = tAtoms[*iIdx].connAtoms[0];
+                        if (tAtoms[nNB].excessElec !=0)
+                        {
+                            if (tAtoms[*iIdx].excessElec 
+                                <= tAtoms[nNB].excessElec)
+                            {
+                                tAtoms[nNB].excessElec -=(tAtoms[*iIdx].excessElec);
+                                modifyBondOrder(tBonds, tAtoms, tAtoms[*iIdx].seriNum,
+                                    nNB, tAtoms[*iIdx].excessElec);
+                                tAtoms[*iIdx].excessElec =0;
+                            }
+                            else
+                            {
+                                tAtoms[*iIdx].excessElec -=(tAtoms[nNB].excessElec);
+                                modifyBondOrder(tBonds, tAtoms, tAtoms[*iIdx].seriNum,
+                                    nNB, tAtoms[nNB].excessElec);
+                                tAtoms[nNB].excessElec =0;
+                            }
+                        }
+                        else
+                        {
+                            // Isolated atom with excess electrons
+                            if(std::find(plusE.begin(), plusE.end(), 
+                                      tAtoms[*iIdx].chemType) != plusE.end())
+                            {
+                                REAL tmpCharge = tAtoms[*iIdx].formalCharge;
+                                tAtoms[*iIdx].formalCharge 
+                                        =  tAtoms[*iIdx].excessElec;
+                                if (tmpCharge != tAtoms[*iIdx].formalCharge)
+                                {
+                                    lUpdate = true;
+                                }
+                                tAtoms[*iIdx].excessElec = 0;
+                            }
+                            else if (tAtoms[*iIdx].chemType.compare("O")==0)
+                            {
+                                tAtoms[*iIdx].formalCharge 
+                                        =  -tAtoms[*iIdx].excessElec;
+                                tAtoms[*iIdx].excessElec = 0;
+                            }
+                            else
+                            {
+                                std::cout << "Can not find the element type "
+                                          << tAtoms[*iIdx].chemType 
+                                          << " in the elememt list (for excess elecs)"
+                                          << std::endl;
+                                exit(1);
+                            }
+                        }
+                        
+                        if (tAtoms[*iIdx].excessElec ==0 
+                            && std::find(zeroExAtomIdxs.begin(), 
+                               zeroExAtomIdxs.end(), *iIdx)== zeroExAtomIdxs.end())
+                        {
+                            zeroExAtomIdxs.push_back(*iIdx);
+                        }
+                        if (tAtoms[nNB].excessElec ==0 &&
+                            std::find(zeroExAtomIdxs.begin(), 
+                               zeroExAtomIdxs.end(), nNB)== zeroExAtomIdxs.end())
+                        {
+                            zeroExAtomIdxs.push_back(nNB);
+                        }
+                    }
+                }
+            }
+            
+            if (tAtoms[*iIdx].excessElec !=0)
+            {
+                tmpIdx.push_back(*iIdx);
+            }
+        }
+        
+        withExAtomIdxs.clear();
+        for (std::vector<int>::iterator iIdx=tmpIdx.begin();
+                iIdx != tmpIdx.end(); iIdx++)
+        {
+            withExAtomIdxs.push_back(*iIdx);
+        }
+        
+        checkIsoExAtoms(tAtoms);
+        
+    }
+    
+    void HuckelMOSuite::modBondOrderViaAnnEXOneLoop(
+                                          std::vector<AtomDict>& tAtoms, 
+                                          std::vector<BondDict>& tBonds, 
+                                          int& tNOpr)
+    {
+        std::vector<int> tmpIdx;
+        for (std::vector<int>::iterator iIdx=withExAtomIdxs.begin();
+                iIdx != withExAtomIdxs.end(); iIdx++)
+        {
+            // dynamical process 
+            if (std::find(zeroExAtomIdxs.begin(), zeroExAtomIdxs.end(), *iIdx)
+                     == zeroExAtomIdxs.end())
+            {
+                if (!tAtoms[*iIdx].isInAromRing && !tAtoms[*iIdx].isInSP2Ring)
+                {
+                    std::vector<int> nonZeroNBs;
+                    for (std::vector<int>::iterator iNB=tAtoms[*iIdx].connAtoms.begin();
+                            iNB != tAtoms[*iIdx].connAtoms.end(); iNB++)
+                    {
+                        if (tAtoms[*iNB].excessElec !=0)
+                        {
+                            nonZeroNBs.push_back(*iNB);
+                        }
+                    }
+                    if (nonZeroNBs.size()==1)
+                    {
+                        int nNB = nonZeroNBs[0];
+                        
+                        if (tAtoms[*iIdx].excessElec 
+                            <= tAtoms[nNB].excessElec)
+                        {
+                            tAtoms[nNB].excessElec -=(tAtoms[*iIdx].excessElec);
+                            modifyBondOrder(tBonds, tAtoms, tAtoms[*iIdx].seriNum,
+                                            nNB, tAtoms[*iIdx].excessElec);
+                            tAtoms[*iIdx].excessElec =0;
+                        }
+                        else
+                        {
+                            tAtoms[*iIdx].excessElec -=(tAtoms[nNB].excessElec);
+                            modifyBondOrder(tBonds, tAtoms, tAtoms[*iIdx].seriNum,
+                                            nNB, tAtoms[nNB].excessElec);
+                            tAtoms[nNB].excessElec =0;
+                        }
+                       
+                        tNOpr++;
+                        
+                        if (tAtoms[*iIdx].excessElec ==0 
+                            && std::find(zeroExAtomIdxs.begin(), 
+                               zeroExAtomIdxs.end(), *iIdx)== zeroExAtomIdxs.end())
+                        {
+                            zeroExAtomIdxs.push_back(*iIdx);
+                        }
+                        if (tAtoms[nNB].excessElec ==0 &&
+                            std::find(zeroExAtomIdxs.begin(), 
+                               zeroExAtomIdxs.end(), nNB)== zeroExAtomIdxs.end())
+                        {
+                            zeroExAtomIdxs.push_back(nNB);
+                        }
+                    }
+                }
+            }
+            
+            if (tAtoms[*iIdx].excessElec !=0)
+            {
+                tmpIdx.push_back(*iIdx);
+            }
+        }
+        
+        withExAtomIdxs.clear();
+        for (std::vector<int>::iterator iIdx=tmpIdx.begin();
+                iIdx != tmpIdx.end(); iIdx++)
+        {
+            withExAtomIdxs.push_back(*iIdx);
+        }
+        
+        checkIsoExAtoms(tAtoms);
+     
+    }
+    
+    void HuckelMOSuite::checkIsoExAtoms(std::vector<AtomDict> & tAtoms)
+    {
+        std::vector<ID> plusE;
+        plusE.push_back("C");
+        plusE.push_back("N");
+        plusE.push_back("B");
+        plusE.push_back("P");
+        plusE.push_back("S");
+        plusE.push_back("SE");
+        std::vector<int> tmpIdx;
+        
+        for (std::vector<int>::iterator iIdx=withExAtomIdxs.begin();
+                iIdx != withExAtomIdxs.end(); iIdx++)
+        {
+            if (!tAtoms[*iIdx].isInAromRing && !tAtoms[*iIdx].isInSP2Ring)
+            {
+                bool lIso = true;
+                for (std::vector<int>::iterator iCo=tAtoms[*iIdx].connAtoms.begin();
+                          iCo != tAtoms[*iIdx].connAtoms.end(); iCo++)
+                {
+                    if (tAtoms[*iCo].excessElec !=0)
+                    {
+                        lIso=false;
+                        break;
+                    }
+                }
+            
+                if (lIso)
+                {
+                    if (std::find(plusE.begin(), plusE.end(),tAtoms[*iIdx].chemType)
+                          != plusE.end())
+                    {
+                        checkUpdate(tAtoms[*iIdx].formalCharge, 
+                                    tAtoms[*iIdx].excessElec);
+                        tAtoms[*iIdx].formalCharge = tAtoms[*iIdx].excessElec;
+                        tAtoms[*iIdx].excessElec   =0;
+                                
+                    }
+                    else if (tAtoms[*iIdx].chemType.compare("O")==0)
+                    {
+                        int aE = -tAtoms[*iIdx].excessElec;
+                        checkUpdate(tAtoms[*iIdx].formalCharge, 
+                                    aE);
+                        tAtoms[*iIdx].formalCharge = -tAtoms[*iIdx].excessElec;
+                        tAtoms[*iIdx].excessElec   =0;
+                    }
+                }
+            }
+            
+            if (tAtoms[*iIdx].excessElec ==0)
+            {
+                if(std::find(zeroExAtomIdxs.begin(), 
+                   zeroExAtomIdxs.end(), *iIdx)== zeroExAtomIdxs.end())
+                {
+                    zeroExAtomIdxs.push_back(*iIdx);
+                }
+            }
+            else
+            {
+                tmpIdx.push_back(*iIdx);
+            }
+        }
+        
+        withExAtomIdxs.clear();
+        
+        for (std::vector<int>::iterator iIdx=tmpIdx.begin();
+                iIdx != tmpIdx.end(); iIdx++)
+        {
+           withExAtomIdxs.push_back(*iIdx);
+        }
+        
     }
     
     void HuckelMOSuite::partitionSysToSubGraphs(std::vector<AtomDict>& tAtoms)
     {
+        allSubGraphs.clear();
+        
         std::cout << "input number of atoms to the graph partition is " 
                   << withExAtomIdxs.size() << std::endl;
         
@@ -3339,6 +4228,13 @@ namespace LIBMOL
         {
             classNum[i]=classNum[classNum[i]];    
         }    
+        /*
+        std::cout << "class size " << classNum.size() << std::endl;
+        for (unsigned i=0; i < classNum.size(); i++)
+        {
+            std::cout << "classNum[" << i << "] = " <<  classNum[i] << std::endl;
+        }
+        */
         
         std::map<int, std::vector<int> > tAllSubSys;
         
@@ -3377,7 +4273,195 @@ namespace LIBMOL
                 std::cout << "Atom " << tAtoms[*iAt].id << std::endl;
             }
         }
-          
+    }
+    
+    void HuckelMOSuite::checkChargeInSubGraphs(std::vector<AtomDict>& tAtoms)
+    {
+        std::cout << "Assigned charges to atoms in subgraphs " << std::endl;
+        for (std::map<int, std::vector<int> >::iterator iCla=allSubGraphs.begin();
+                iCla !=allSubGraphs.end(); iCla++)
+        {
+            std::cout << "Check subgraph " << iCla->first << std::endl;
+            if (sumExElecsInSubGraph(tAtoms, iCla->second)%2 !=0)
+            {
+                
+                assignChargesInSubGraph(tAtoms, iCla->second);
+            }
+        }
+    }
+    
+    int HuckelMOSuite::sumExElecsInSubGraph(std::vector<AtomDict>& tAtoms, 
+                                             std::vector<int>& tGraph)
+    {
+        int aSum = 0;
+        for (std::vector<int>::iterator iIdx=tGraph.begin();
+                iIdx != tGraph.end(); iIdx++)
+        {
+            aSum+=(tAtoms[*iIdx].excessElec);
+        }
+        std::cout << "The sum of excess electrons is " << aSum << std::endl;
+        return aSum;
+    }
+    
+    void HuckelMOSuite::assignChargesInSubGraph(std::vector<AtomDict>& tAtoms, 
+                                                std::vector<int>& tGraph)
+    {
+        std::map<ID, std::vector<int> >    nonCAtoms;
+        std::vector<int>                   CAtoms;
+        
+        for (std::vector<int>::iterator iIdx=tGraph.begin();
+                iIdx != tGraph.end(); iIdx++)
+        {
+            if (tAtoms[*iIdx].chemType.compare("C") !=0)
+            {
+                nonCAtoms[tAtoms[*iIdx].chemType].push_back(*iIdx);
+            }
+            else
+            {
+                CAtoms.push_back(*iIdx);
+            }
+        }
+        
+        bool lSet = false;
+        if (nonCAtoms.size() !=0)
+        {
+            if (nonCAtoms.find("N") != nonCAtoms.end())
+            {
+                assignChargeOneInSubGraph(tAtoms, nonCAtoms["N"], lSet);
+            }
+            
+            // awkward in the following, any better way ?
+            // Are those functions different ? S, SE maybe, O definite (Negative)
+            if (!lSet)
+            {
+                if (nonCAtoms.find("B") != nonCAtoms.end())
+                {
+                    assignChargeOneInSubGraph(tAtoms, nonCAtoms["B"], lSet);
+                }
+            }
+            
+            if (!lSet)
+            {
+                if (nonCAtoms.find("S") != nonCAtoms.end())
+                {
+                    assignChargeOneInSubGraph(tAtoms, nonCAtoms["S"], lSet);
+                }
+            }
+            
+            if (!lSet)
+            {
+                if (nonCAtoms.find("SE") != nonCAtoms.end())
+                {
+                    assignChargeOneInSubGraph(tAtoms, nonCAtoms["SE"], lSet);
+                }
+            }
+        }
+    }
+    
+    void HuckelMOSuite::assignChargeOneInSubGraph(std::vector<AtomDict>& tAtoms, 
+                                                  std::vector<int>& tIdxNs,
+                                                  bool & tL)
+    {
+        std::vector<sortIntMap> tNAtomConns;
+        for (std::vector<int>::iterator iIdx=tIdxNs.begin();
+                iIdx !=tIdxNs.end(); iIdx++)
+        {
+            sortIntMap aPair;
+            aPair.key = *iIdx;
+            aPair.value = (int)tAtoms[*iIdx].connAtoms.size();
+            tNAtomConns.push_back(aPair);
+        }
+        if (tNAtomConns.size() > 1)
+        {
+            std::sort(tNAtomConns.begin(), tNAtomConns.end(), desSortIntMapValues);
+        }
+        
+        if (tNAtomConns[0].value > 1)
+        {
+            
+            if (tAtoms[tNAtomConns[0].key].excessElec > 0)
+            {
+                tAtoms[tNAtomConns[0].key].formalCharge = 1.0;
+                tAtoms[tNAtomConns[0].key].excessElec--;
+                tL = true;
+            }
+        }
+    }
+    
+    
+    void HuckelMOSuite::setEquivAtoms(std::vector<AtomDict>& tAtoms, 
+                                      std::vector<BondDict>& tBonds)
+    {
+        // Set up equivalent atoms using the atom's codTypes, 
+        // then modify bond-order properties 
+        std::map<ID, std::vector<int> >    atomTypeMap;
+        for (unsigned i=0; i < tAtoms.size(); i++)
+        {
+            atomTypeMap[tAtoms[i].codClass].push_back(i);
+        }
+        
+        for (std::map<ID, std::vector<int> >::iterator iM=atomTypeMap.begin();
+                iM != atomTypeMap.end(); iM++)
+        {
+            if (iM->second.size() > 1)
+            {
+                // This atom-type is taken by more than one atom.
+                // They are treated as equiv.
+                modDelocBondsByEquivAtoms(tAtoms, tBonds, iM->second);
+            }
+        }
+    }
+    
+    void HuckelMOSuite::modDelocBondsByEquivAtoms(std::vector<AtomDict>& tAtoms, 
+                                                  std::vector<BondDict>& tBonds, 
+                                                  std::vector<int>&      tIdxs)
+    {
+        std::vector<std::vector<int> > delocPairs;
+        for (unsigned i =0; i < tIdxs.size(); i++)
+        {
+            for (unsigned j=i+1; j < tIdxs.size(); j++)
+            {
+                if (std::find(tAtoms[tIdxs[i]].connAtoms.begin(),
+                              tAtoms[tIdxs[i]].connAtoms.end(), tIdxs[j])
+                         == tAtoms[tIdxs[i]].connAtoms.end())
+                {
+                    // atoms tIdxs[i] and tIdxs[j] are not connected each other.
+                    // but they may connect the same atoms
+                    for (std::vector<int>::iterator iCo
+                         =tAtoms[tIdxs[j]].connAtoms.begin();
+                         iCo != tAtoms[tIdxs[j]].connAtoms.end(); iCo++)
+                    {
+                        if (std::find(tAtoms[tIdxs[i]].connAtoms.begin(),
+                            tAtoms[tIdxs[i]].connAtoms.end(), *iCo)
+                            != tAtoms[tIdxs[i]].connAtoms.end())
+                        {
+                            // They connect to one common atom
+                            // Further check if they are not H 
+                            // and one of the them has a charge
+                            if (tAtoms[tIdxs[i]].chemType.compare("H") !=0
+                                && (tAtoms[tIdxs[i]].formalCharge !=0
+                                    || tAtoms[tIdxs[j]].formalCharge !=0))
+                            {
+                                std::vector<int> tPair;
+                                tPair.push_back(tIdxs[i]);
+                                tPair.push_back(tIdxs[j]);
+                                delocPairs.push_back(tPair);
+                                break;
+                            }
+                        }
+                    }   
+                }
+            }
+        }
+        
+        if (delocPairs.size() > 0)
+        {
+            for (unsigned i=0; i < delocPairs.size(); i++)
+            {
+                modifyOneDelocBond(tBonds, tAtoms, delocPairs[i][0],
+                                   delocPairs[i][1]);
+            }
+        }
     }
     
     void HuckelMOSuite::setHMatrix(std::vector<AtomDict> & tAtoms,
@@ -3465,6 +4549,8 @@ namespace LIBMOL
                                             std::vector<AtomDict>  & tAtoms,
                                             std::vector<int> & tSubGraph)
     {
+        BondOrderFromMO.clear();
+        
         int nMaxOccp = tNOrbs/2;
         
         for (unsigned i=0; i < tNOrbs; i++)
@@ -3489,7 +4575,7 @@ namespace LIBMOL
                         }
                         // double occupied orbitals 
                         BondOrderFromMO[idx1][idx2] = BondOrderFromMO[idx1][idx2]*2.0;
-                        
+                        //std::cout << "idx Pair " << idx1 << "   " << idx2 << std::endl;
                         std::cout << "Bond order between atom " << tAtoms[idx1].id
                                   << " and " << tAtoms[idx2].id <<  " is "
                                   << BondOrderFromMO[idx1][idx2] << std::endl;
@@ -3503,7 +4589,6 @@ namespace LIBMOL
     
     void HuckelMOSuite::MOSolver(std::vector<AtomDict>& tAtoms)
     {
-        
         
         if (allSubGraphs.size() !=0)
         {
@@ -3572,9 +4657,12 @@ namespace LIBMOL
                         iM2 != iM1->second.end(); iM2++)
                 {
                     int idxB = getBond(tBonds, iM1->first, iM2->first);
+                    // std::cout << "idxB is " <<  idxB << std::endl;
                     if (idxB >0 && idxB < tBonds.size())
                     {
-                        tBonds[idxB].orderN = iM2->second;
+                        tBonds[idxB].orderN +=(iM2->second);
+                        std::cout << "Bond " << idxB 
+                                  << " has order " << iM2->second << std::endl;
                     }
                     else
                     {
@@ -3584,8 +4672,9 @@ namespace LIBMOL
                     }
                 }
             }
-        }
+        }    
     }
+    
     void HuckelMOSuite::outBoAndChList(FileName tFName, 
                                        std::vector<AtomDict>  & tAtoms,
                                        std::vector<BondDict>  & tBonds)
@@ -3608,21 +4697,35 @@ namespace LIBMOL
                            << std::setw(6) << iA->formalCharge << std::endl; 
                 }       
                 
+                setOrderStrforBonds(tBonds);
+                
                 outFBA << "loop_" << std::endl
                        << "_chem_comp_bond.atom_id_1" << std::endl
                        << "_chem_comp_bond.atom_id_2" << std::endl
-                       << "_chem_comp_bond.type" << std::endl;
+                       << "_chem_comp_bond.type_value" << std::endl
+                       << "_chem_comp_bond.type" <<  std::endl;
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
                 {
                     outFBA << std::setw(12)  << iB->atoms[0]  
                            << std::setw(12)  << iB->atoms[1]  
-                           << std::setw(12)  << iB->orderN << std::endl; 
+                           << std::setw(12)  << iB->orderN 
+                           << std::setw(12)  << iB->order
+                           << std::endl; 
                 }
                 
             }
         }
         
+    }
+    
+    void HuckelMOSuite::checkUpdate(REAL& tPreV, int & tProV)
+    {
+        REAL tmpProV = (REAL)tProV;
+        if (fabs(tmpProV-tPreV) < 0.0001)
+        {
+            lUpdate = true;
+        }
     }
     
 }

@@ -134,25 +134,9 @@ int main(int argc, char** argv) {
                                                             AJob.IOEntries["monoRootName"], 
                                                             AJob.IOEntries["libMolTabDir"]);
                 
-                //aTargetSystem.setupAllTargetValuesFromCOD(AJob.IOEntries["userOutName"].c_str(), 
-                //                                           AJob.IOEntries["monoRootName"], 
-                //                                           AJob.IOEntries["libMolTabDir"]);
-                /*
-                LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                 AJob.IOEntries["monoRootName"], 
-                                 aTargetSystem.propComp,
-                                 aTargetSystem.allAtoms,
-                                 // aTargetSystem.allHAtomIdx,
-                                 aTargetSystem.allBonds,
-                                 aTargetSystem.allAngles,
-                                 aTargetSystem.allTorsions,
-                                 aTargetSystem.allRings,
-                                 aTargetSystem.allPlanes,
-                                 aTargetSystem.allChirals);
-                */
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                 AJob.IOEntries["monoRootName"], 
-                                 aTargetSystem.propComp,
+                                  AJob.IOEntries["monoRootName"], 
+                                  aTargetSystem.propComp,
                                  aTargetSystem.allAtoms,
                                  // aTargetSystem.allHAtomIdx,
                                  aTargetSystem.allBonds,
@@ -170,56 +154,6 @@ int main(int argc, char** argv) {
                                           aTargetSystem.allAtoms,
                                           aTargetSystem.allBonds,
                                           aTargetSystem.allAngles);
-                //}
-                // aTargetSystem.chiralExch();
-                
-                /*
-                if ( !aTargetSystem.containMetal()) 
-                {
-                    // coordinate generator works only for a system of "organic" atoms. Tempo!
-                    GO::FindGlobMin  aGlobMinSystem(aTargetSystem, 
-                                                    AJob.IOEntries["userOutName"].c_str(),
-                                                    AJob.IOEntries["monoRootName"]);           
-                    aGlobMinSystem.Driver();
-                    
-                
-                    LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                     AJob.IOEntries["monoRootName"], 
-                                     aGlobMinSystem.allAtoms,
-                                     aTargetSystem.allHAtomIdx,
-                                     aGlobMinSystem.allBonds,
-                                     aGlobMinSystem.allAngles,
-                                     aGlobMinSystem.allTorsions,
-                                     aGlobMinSystem.allRings,
-                                     aGlobMinSystem.allPlanes,
-                                     aGlobMinSystem.allChirals);
-            
-                    LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                                   AJob.IOEntries["monoRootName"], 
-                                   aGlobMinSystem.allAtoms);
-                }
-                else
-                {
-                    LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                     AJob.IOEntries["monoRootName"], 
-                                     aTargetSystem.allAtoms,
-                                     aTargetSystem.allHAtomIdx,
-                                     aTargetSystem.allBonds,
-                                     aTargetSystem.allAngles,
-                                     aTargetSystem.allTorsions,
-                                     aTargetSystem.allRings,
-                                     aTargetSystem.allPlanes,
-                                     aTargetSystem.allChirals);
-            
-                    LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                                   AJob.IOEntries["monoRootName"], 
-                                   aTargetSystem.allAtoms);
-                    std::cout << "The system contain metal atoms." << std::endl
-                              << "Restraint cif is the only output. "
-                              << "No atom coordinates will be generated at the momemt. " << std::endl
-                              << "They will be available soon. " << std::endl;
-                }
-                */
             }
             else
             {
@@ -276,90 +210,7 @@ int main(int argc, char** argv) {
                         LIBMOL::outPDB(tOutName.c_str(),
                                 AJob.IOEntries["monoRootName"], 
                                 aTargetSystem.allAtoms);
-                        
-                        
-                        // aTargetSystem.chiralExch();
-                        
-                        /*
-                        if ( !aTargetSystem.containMetal()) 
-                        {
-                             
-                            // coordinate generator works only for a system of "organic" atoms. Tempo!
-                            GO::FindGlobMin  aGlobMinSystem(aTargetSystem, 
-                                                            tOutName.c_str(),
-                                                            AJob.IOEntries["monoRootName"]);  
-            
-                            aGlobMinSystem.Driver();
-            
-                            if (aGlobMinSystem.lGlob)
-                            {
-                                //aGlobMinSystem.PreIdealization();
-                            
-                                LIBMOL::outMMCif(tOutName.c_str(),
-                                                 AJob.IOEntries["monoRootName"], 
-                                                 aGlobMinSystem.allAtoms,
-                                                 // aTargetSystem.allHAtomIdx,
-                                                 aGlobMinSystem.allBonds,
-                                                 aGlobMinSystem.allAngles,
-                                                 aGlobMinSystem.allTorsions,
-                                                 aGlobMinSystem.allRings,
-                                                 aGlobMinSystem.allPlanes,
-                                                 aGlobMinSystem.allChirals);
-            
-                                LIBMOL::outPDB(tOutName.c_str(),
-                                               AJob.IOEntries["monoRootName"], 
-                                               aGlobMinSystem.allAtoms);
-                            
-                                
-                            }
-                            else
-                            {
-                                std::cout << "Using initial coords " << std::endl;
-                                LIBMOL::outMMCif(tOutName.c_str(),
-                                             AJob.IOEntries["monoRootName"], 
-                                             aTargetSystem.allAtoms,
-                                             // aTargetSystem.allHAtomIdx,
-                                             aTargetSystem.allBonds,
-                                             aTargetSystem.allAngles,
-                                             aTargetSystem.allTorsions,
-                                             aTargetSystem.allRings,
-                                             aTargetSystem.allPlanes,
-                                             aTargetSystem.allChirals);
-                            
-                                LIBMOL::outPDB(tOutName.c_str(),
-                                               AJob.IOEntries["monoRootName"], 
-                                               aTargetSystem.allAtoms);
-                            }
-                           
-                        }
-                        else
-                        {
-                            LIBMOL::outMMCif(tOutName.c_str(),
-                                             AJob.IOEntries["monoRootName"], 
-                                             aTargetSystem.allAtoms,
-                                             // aTargetSystem.allHAtomIdx,
-                                             aTargetSystem.allBonds,
-                                             aTargetSystem.allAngles,
-                                             aTargetSystem.allTorsions,
-                                             aTargetSystem.allRings,
-                                             aTargetSystem.allPlanes,
-                                             aTargetSystem.allChirals);
-                            
-                            LIBMOL::outPDB(tOutName.c_str(),
-                                           AJob.IOEntries["monoRootName"], 
-                                           aTargetSystem.allAtoms);
-                    
-                            std::cout << "The system contain metal atoms." << std::endl
-                                      << "Restraint cif is the only output. "
-                                      << "No atom coordinates will be generated at the momemt. " << std::endl
-                                      << "They will be available soon. " << std::endl;
-                        }
-                         */
-                        
                     }
-                    
-                    
-                    
                     i++;
                 }
             }
@@ -388,37 +239,6 @@ int main(int argc, char** argv) {
                                      aTargetSystem.allRings,
                                      aTargetSystem.allPlanes,
                                      aTargetSystem.allChirals);
-                
-                
-                /*
-                if ( (int)aTargetSystem.allAtoms.size() > 0)
-                {   
-                    aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
-                                                              AJob.IOEntries["monoRootName"], 
-                                                              AJob.IOEntries["libMolTabDir"]);
-               
-                    LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                     AJob.IOEntries["monoRootName"], 
-                                     aTargetSystem.propComp,
-                                     aTargetSystem.allAtoms,
-                                     // aTargetSystem.allHAtomIdx,
-                                     aTargetSystem.allBonds,
-                                     aTargetSystem.allAngles,
-                                     aTargetSystem.allTorsions,
-                                     aTargetSystem.allRings,
-                                     aTargetSystem.allPlanes,
-                                     aTargetSystem.allChirals);
-            
-                    LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                                   AJob.IOEntries["monoRootName"], 
-                                   aTargetSystem.allAtoms);
-                }
-                else
-                {
-                    std::cout << "The input MOl2 file " << AJob.IOEntries["inCifName"] 
-                              << " contains NO atoms! check the file " << std::endl;
-                }
-                */
             }
                  
         }
@@ -434,20 +254,15 @@ int main(int argc, char** argv) {
         LIBMOL::outMMCif3Secs(tOutName.c_str(), AJob.IOEntries["monoRootName"],
                       dataFromCif.allAtoms, dataFromCif.allUnchangedBlocks);
                          
-        // dataFromCif
-        //LIBMOL::CodClassify  aCodSystem(dataFromCif);
-        //aCodSystem.getAnglesFromPDB(AJob.IOEntries["inPdbName"]);
-        //Temp for outRestraintCif2
-        //aCodSystem.outRestraintCif2(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
-        //aCodSystem.outPDB(AJob.IOEntries["userOutName"].c_str(), AJob.IOEntries["monoRootName"]);
-        
        
     }
-    else if (AJob.workMode==31 || AJob.workMode==32 || AJob.workMode==33)
+    else if (AJob.workMode==31 || AJob.workMode==311 || AJob.workMode ==312
+             || AJob.workMode==32 || AJob.workMode==33)
     {
-        std::cout << "WorkMode: Molecule generation" << std::endl;
+        // std::cout << "WorkMode: Molecule generation" << std::endl;
         int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
-        if (AJob.workMode==31)
+        
+        if (AJob.workMode==31 || AJob.workMode==311)
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
@@ -464,7 +279,10 @@ int main(int argc, char** argv) {
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
                 
                 aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
-                aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+                if (AJob.workMode==31 || AJob.workMode==311)
+                {
+                    aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+                }
             }
             else
             {
@@ -504,6 +322,48 @@ int main(int argc, char** argv) {
                 }
             }
         }
+        else if (AJob.workMode ==312)
+        {
+            //std::cout << "WorkMode: Molecule generation" << std::endl;
+            int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
+            std::cout << "Studies related metal atoms " << std::endl;
+            std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
+            LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
+            
+            if (dataFromCif.hasMetal)
+            {
+                std::cout << "The system contain metal atoms " << std::endl;
+                std::cout << "Those metal atoms are : " << std::endl;
+                for (std::vector<LIBMOL::AtomDict>::iterator iAt=dataFromCif.allAtoms.begin();
+                        iAt != dataFromCif.allAtoms.end(); iAt++)
+                {
+                    if (iAt->isMetal)
+                    {
+                        std::cout << "Atom " << iAt->id << " of element " 
+                                  << iAt->chemType << std::endl;
+                    }
+                }
+                
+                LIBMOL::outMetalAtomInfo(AJob.IOEntries["userOutName"].c_str(),
+                                         dataFromCif);
+                
+                
+            }
+            
+            if (dataFromCif.notPowder && dataFromCif.resolOK
+                && dataFromCif.RFactorOK && dataFromCif.colidOK 
+                && !dataFromCif.lErr)
+            {
+                std::cout << "The structure is from single crystallographic x-ray "
+                          << std::endl;
+                std::cout << "R factor satisfies the requirement" << std::endl;
+                LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
+                
+                aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
+                aMolCreator.executeMet(AJob.IOEntries["userOutName"].c_str());
+            }
+            
+        }
         else if (AJob.workMode==32)
         {
             
@@ -516,7 +376,6 @@ int main(int argc, char** argv) {
         {
             std::cout << "The directory of input cif files " 
                       << AJob.IOEntries["inCifNameB"] << std::endl;
-            
         }
         
     }
@@ -543,133 +402,6 @@ int main(int argc, char** argv) {
             LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
                                                aCodSystem.allAtoms,
                                                aCodSystem.allBonds);
-            /*
-             std::vector<LIBMOL::AtomDict>  tmpAtomSet;
-            for (std::vector<LIBMOL::AtomDict>::iterator iAt=aCodSystem.allAtoms.begin();
-                    iAt !=aCodSystem.allAtoms.end(); iAt++)
-            {
-                tmpAtomSet.push_back(*iAt);
-            }
-           
-            std::cout <<  "There are " << aCodSystem.allRings.size() << " rings. They are: "
-                      << std::endl;
-            
-            for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=aCodSystem.allRings.begin();
-                    iR1 !=aCodSystem.allRings.end(); iR1++)
-            {
-                std::cout << "Ring representation " << iR1->first << std::endl;
-                for (std::vector<LIBMOL::RingDict>::iterator iR11=iR1->second.begin();
-                        iR11 !=iR1->second.end(); iR11++)
-                {
-                    std::cout << "The ring consists of atoms: " << std::endl;
-                    for (std::vector<LIBMOL::AtomDict>::iterator iAt1=iR11->atoms.begin();
-                            iAt1 !=iR11->atoms.end(); iAt1++)
-                    {
-                        std::cout << iAt1->id << std::endl;
-                    }
-                }
-                
-                std::cout << std::endl;
-                
-            }
-            
-            LIBMOL::CodClassify  aCodSystem2(aTargetSystem.allAtoms);
-            aCodSystem2.setAtomsBondingAndChiralCenter();
-            aCodSystem2.codAtomClassifyNew2(2);
-            
-            std::cout << "Different symbol system now: " << std::endl;
-            for (unsigned i=0; i < aCodSystem.allAtoms.size(); i++)
-            {
-                if (aCodSystem.allAtoms[i].codClass.compare(tmpAtomSet[i].codClass)
-                        !=0)
-                {
-                    std::cout << "Atom " << aCodSystem.allAtoms[i].id 
-                              << " new Cod type " << aCodSystem2.allAtoms[i].codClass
-                              << " old Cod type " << tmpAtomSet[i].codClass 
-                              << std::endl;
-                }
-            }
-            
-            LIBMOL::ringTools aRingTool;
-            aTargetSystem.allRings.clear();
-            int nMaxRing = 7, nDep=2;
-            aRingTool.detectRingFromAtoms(aTargetSystem.allAtoms,
-                                          aTargetSystem.allRings, nDep, nMaxRing);
-            
-            aTargetSystem.allRingsV.clear();
-            
-            
-            std::cout <<  "(2) Different tool. There are " 
-                      << aTargetSystem.allRings.size() << " rings. They are: "
-                      << std::endl;
-            
-            for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=aTargetSystem.allRings.begin();
-                    iR1 !=aTargetSystem.allRings.end(); iR1++)
-            {
-                
-                std::cout << "(2)Ring representation " << iR1->first << std::endl;
-                for (std::vector<LIBMOL::RingDict>::iterator iR11=iR1->second.begin();
-                        iR11 !=iR1->second.end(); iR11++)
-                {
-                    aTargetSystem.allRingsV.push_back(*iR11);
-                    std::cout << "The ring consists of atoms: " << std::endl;
-                    for (std::vector<LIBMOL::AtomDict>::iterator iAt1=iR11->atoms.begin();
-                            iAt1 !=iR11->atoms.end(); iAt1++)
-                    {
-                        std::cout << iAt1->id << std::endl;
-                    }
-                }
-                
-                std::cout << std::endl;
-                
-            }
-            
-            if (aTargetSystem.allRingsV.size())
-            {
-                LIBMOL::checkAndSetupPlanes(aTargetSystem.allRingsV, aTargetSystem.allPlanes, aTargetSystem.allAtoms);
-            }
-            
-           
-            
-            aRingTool.setAtomsRingRepreS(aTargetSystem.allAtoms,
-                                         aTargetSystem.allRingsV);
-            
-            
-            
-            
-            LIBMOL::outCodAndCcp4AtomTypes(AJob.IOEntries["userOutName"].c_str(),
-                                   aCodSystem.allAtoms);
-            LIBMOL::CCP4AtomType  aCPP4TypeTool(aCodSystem.allAtoms, aCodSystem.allRings);
-            aCPP4TypeTool.setAllAtomsCCP4Type();
-            for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
-            {
-                if (aCPP4TypeTool.allAtoms[i].ccp4Type.compare(aCodSystem.allAtoms[i].ccp4Type) !=0)
-                {
-                    std::cout << aCodSystem.allAtoms[i].id << "    " 
-                              << aCPP4TypeTool.allAtoms[i].ccp4Type
-                              << "     " << aCodSystem.allAtoms[i].ccp4Type << std::endl;
-                }
-            }
-            
-          
-            if (aCodSystem.allRings.size() != 0)
-            {
-                std::vector<LIBMOL::RingDict> aRingSys;
-                for (std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> >::iterator iMR=
-                        aCodSystem.allRings.begin(); iMR !=aCodSystem.allRings.end(); iMR++)
-                {
-                    for (std::vector<LIBMOL::RingDict>::iterator iR=iMR->second.begin();
-                            iR !=iMR->second.end(); iR++)
-                    {
-                        aRingSys.push_back(*iR);
-                    }
-                }
-                
-                // LIBMOL::TestAromaticity(aRingSys, aCodSystem.allAtoms);
-                LIBMOL::checkAndSetupPlanes(aRingSys, aCodSystem.allPlanes, aCodSystem.allAtoms);
-                
-            }
-            */
         }
     }
     else if (AJob.workMode == 43)
@@ -699,17 +431,6 @@ int main(int argc, char** argv) {
                                             aTargetSystem.allRings,
                                             AJob.IOEntries["libMolTabDir"], 2);
             
-            //std::string aPN = AJob.IOEntries["userOutName"] + "_" + LIBMOL::IntToStr(i+1);
-            //std::cout << "A PDB for molecule " << i+1 << " is generated. Its name " 
-            //          << aPN << std::endl;
-            
-            //LIBMOL::outPDB(aPN.c_str(),
-            //               AJob.IOEntries["monoRootName"], 
-            //               aCodSystem.allAtoms);
-            
-            //LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
-            //                                   aCodSystem.allAtoms,
-            //                                   aCodSystem.allBonds);
             
             LIBMOL::accumInfoMols(aMolFile.allMols[i].comments[0],
                                   aCodSystem.allAtoms,
@@ -719,21 +440,7 @@ int main(int argc, char** argv) {
                                   allBondLines, 
                                   allAngleLines);
         }
-        // Check 
-        /*
-        for (std::map<std::string,std::vector<std::string> >::iterator iAt=allAtomTypes.begin();
-                    iAt != allAtomTypes.end(); iAt++)
-        {
-            std::cout << "Atom type : " << iAt->first << "  appears "
-                      << iAt->second.size() << " times " << std::endl;
-        }
-            
-        for (std::vector<std::string>::iterator iB=allBondLines.begin();
-              iB != allBondLines.end(); iB++)
-        {
-            std::cout << *iB;
-        }
-         */
+        
         std::string  aAtName = AJob.IOEntries["userOutName"] + "_atomType.txt";
         std::ofstream outAtomTypes(aAtName.c_str());
         for (std::map<std::string,std::vector<std::string> >::iterator iAt=allAtomTypes.begin();
@@ -784,19 +491,24 @@ int main(int argc, char** argv) {
     {
         // Hukel MO applications
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
+        LIBMOL::CodClassify aClassifiedSys(dataFromCif, AJob.IOEntries["libMolTabDir"]);
+        
         LIBMOL::HuckelMOSuite  aMoTool;
         aMoTool.setWorkMode(2);
-        aMoTool.execute(dataFromCif.allAtoms, dataFromCif.allBonds);
-        
-        
+        //aMoTool.execute(dataFromCif.allAtoms, dataFromCif.allBonds);
+        aMoTool.execute2(aClassifiedSys.allAtoms, aClassifiedSys.allBonds, 
+                         aClassifiedSys.allRingsV);   
         if(AJob.IOEntries.find("userOutName") 
              == AJob.IOEntries.end())
         {
             AJob.IOEntries["userOutName"] = "Libmol_atoms_bonds.txt";
         }
         aMoTool.outBoAndChList(AJob.IOEntries["userOutName"].c_str(),
-                               dataFromCif.allAtoms, dataFromCif.allBonds);    
-            
+                               aClassifiedSys.allAtoms, aClassifiedSys.allBonds);    
+        
+    }
+    else if (AJob.workMode==920)
+    {
         
     }
     

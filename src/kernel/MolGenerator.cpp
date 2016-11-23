@@ -13,14 +13,18 @@
 namespace LIBMOL {
 
     MolGenerator::MolGenerator() : myNBDepth(1),
-            lColid(false)
+            lColid(false),
+            lHasMetal(false)
     {
     }
 
-    MolGenerator::MolGenerator(const GenCifFile& tCifObj, int tNBDepth) {
+    MolGenerator::MolGenerator(const GenCifFile& tCifObj, int tNBDepth) 
+    {
 
         myNBDepth = tNBDepth;
         lColid    = false;
+        lHasMetal = false;
+        
         // std::cout << "myNBDepth " << myNBDepth << std::endl;
 
         // std::cout << "Number of crystals " << tCifObj.allCryst.size() << std::endl;
@@ -57,21 +61,39 @@ namespace LIBMOL {
 
     }
 
-    MolGenerator::~MolGenerator() {
+    MolGenerator::~MolGenerator() 
+    {
     }
 
+    void MolGenerator::checkMetal(std::vector<ID>& tMeTab)
+    {
+        lHasMetal = false;
+        
+        for (std::vector<AtomDict>::iterator iAt=initAtoms.begin();
+                iAt != initAtoms.end(); iAt++)
+        {
+            if (isMetal(tMeTab, iAt->chemType))
+            {
+                lHasMetal = true;
+                break;
+            }
+        }
+    }
+    
     void MolGenerator::execute(FileName tOutName) 
     {
-
         CCP4DictParas tCCP4EnergParas;
         ccp4DictParas.push_back(tCCP4EnergParas);
         PeriodicTable aPTable;
+        
+        
         // std::cout << "number of crystal " << allCryst.size() << std::endl;
         std::cout << "number of atom read in " << std::endl;
        
         if (initAtoms.size() > 1) {
             for (std::vector<CrystInfo>::iterator iCryst = allCryst.begin();
-                    iCryst != allCryst.end(); iCryst++) {
+                    iCryst != allCryst.end(); iCryst++) 
+            {
                 for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
                         iA != initAtoms.end(); iA++) {
                     //FractToOrtho(iA->fracCoords, iA->coords, iCryst->itsCell->a,
@@ -92,28 +114,60 @@ namespace LIBMOL {
                 std::cout << "Number of atoms read from the input file "
                         << initAtoms.size() << std::endl;
 
-
                 symmAtomGen(iCryst, aPTable);
 
                 std::cout << "number of atoms in a center unit cell "
                         << allAtoms.size() << std::endl;
-
+                
+              
                 if (!lColid)
                 {
                     buildRefAtoms(iCryst);
-
+               
                     // getUniqueBonds(aPTable);
                     getUniqueAtomLinks(aPTable, iCryst);
-
+                       
                     getMolByEqClassInCell();
-
+   
                     buildAndValidMols(aPTable, iCryst);
 
                     // getAtomTypeMols();
-
+                        
+                    std::vector<Molecule> aSetOfFiniteMols, aSetOfInfMols;
+                    checkInfMols(aSetOfInfMols, aSetOfFiniteMols);
+                    
+                    allMolecules.clear();
+                    for (std::vector<Molecule>::iterator iMol
+                            =aSetOfFiniteMols.begin();
+                         iMol != aSetOfFiniteMols.end(); iMol++)
+                    {
+                        allMolecules.push_back(*iMol);
+                    }
+                    
+                    HuckelMOSuite  aMoTool;
+                    aMoTool.setWorkMode(2);
+                    for (std::vector<Molecule>::iterator iMol
+                             =allMolecules.begin(); 
+                             iMol != allMolecules.end(); iMol++)
+                    {
+                        std::cout << std::endl 
+                                  << "Huckel MO related section for molecules "
+                                  << iMol->seriNum << std::endl;
+                                
+                     
+                        aMoTool.execute2(iMol->atoms, iMol->allBonds, iMol->rings);
+                        /*
+                        for (std::vector<BondDict>::iterator iBo=iMol->allBonds.begin();
+                                iBo !=iMol->allBonds.end(); iBo++)
+                        {
+                            std::cout << "Now bond " << iBo->seriNum 
+                                      << " has order " << iBo->orderN << std::endl;
+                        }
+                         */
+                    }  
+                    
                     getOverallBondAndAnglesNew();
-
-                    outTables(tOutName);
+                    outTables(tOutName, allMolecules, aSetOfInfMols);
                 }
                 else
                 {
@@ -123,8 +177,74 @@ namespace LIBMOL {
         }
     }
 
+    void MolGenerator::executeMet(FileName tOutName)
+    {
+        if (initAtoms.size() > 0)
+        {
+            CCP4DictParas tCCP4EnergParas;
+            ccp4DictParas.push_back(tCCP4EnergParas);
+            PeriodicTable aPTable;
+    
+            std::vector<ID> allMetals;    
+            initMetalTab(allMetals);
+            checkMetal(allMetals);
+            
+            if (lHasMetal)
+            {
+                for (std::vector<CrystInfo>::iterator iCryst = allCryst.begin();
+                    iCryst != allCryst.end(); iCryst++) 
+                {
+                    for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
+                         iA != initAtoms.end(); iA++) 
+                    {
+                        iA->sId = "555";
+                        allAtoms.push_back(*iA);
+                        refAtoms.push_back(*iA);
+                        // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
+                    }
+                
+                    //outPDB("initAtoms.pdb", "UNL", initAtoms);
+
+                    std::cout << "Number of atoms read from the input file "
+                              << initAtoms.size() << std::endl;
+
+                    symmAtomGen(iCryst, aPTable);
+
+                    std::cout << "number of atoms in a center unit cell "
+                              << allAtoms.size() << std::endl;
+                    
+                    if (!lColid)
+                    {
+                        buildRefAtoms(iCryst);
+               
+                        // getUniqueBonds(aPTable);
+                        getUniqueAtomLinks(aPTable, iCryst);
+                        
+                        // No molecules will be generated 
+                        buildMetalAtomCoordMap(iCryst);
+                        
+                        outMetalAtomCoordInfo(tOutName);
+                    }
+                
+                }
+            }
+            else
+            {
+                std::cout << "No metal atoms in the assym unit "
+                          << std::endl;
+            }
+            
+        }
+              
+        
+        
+        
+    }
+    
+    
     void MolGenerator::symmAtomGen(std::vector<CrystInfo>::iterator tCrys,
-            PeriodicTable & tPTable) {
+            PeriodicTable & tPTable) 
+    {
         for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
                 iA != initAtoms.end(); iA++) {
             // int tDictMult = iA->symmMult;
@@ -137,7 +257,9 @@ namespace LIBMOL {
                 }
             }
         }
-
+        std::cout << "number of atoms in Assym " << initAtoms.size() << std::endl;
+        std::cout << "number of ops " << tCrys->itsSpaceGroup->sgOp.size() << std::endl;
+        std::cout << "number of atoms in the unit cell " << allAtoms.size() << std::endl;
 
     }
 
@@ -186,13 +308,15 @@ namespace LIBMOL {
         }
          */
 
-        if (!colidAtom(endFracCoords, allAtoms)) {
+        if (!colidAtom(endFracCoords, allAtoms, 0)) 
+        {
             //std::cout << "The symmetrically generated atom should be included in the unit cell "
             //          << std::endl;
 
             AtomDict tAtom(*tCurAtom);
             tAtom.isInPreCell = false;
             tAtom.symmOp = tOp->first;
+            tAtom.fromOrig = tCurAtom->seriNum;
             tAtom.coords.clear();
             tAtom.fracCoords.clear();
             //std::cout << tAtom.id << std::endl;
@@ -209,7 +333,7 @@ namespace LIBMOL {
 
             tAtom.seriNum = (int) allAtoms.size();
             packAtomIntoCell(tAtom);
-            if (!colidAtom(tAtom, allAtoms)) {
+            if (!colidAtom(tAtom, allAtoms, 0)) {
                 tAtom.sId = "555";
                 allAtoms.push_back(tAtom);
                 refAtoms.push_back(tAtom);
@@ -256,7 +380,7 @@ namespace LIBMOL {
 
         getFracReal(tCM, fraCell, aShell);
 
-        std::cout << "fraCell " << fraCell << std::endl;
+        // std::cout << "fraCell " << fraCell << std::endl;
 
 
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
@@ -272,27 +396,29 @@ namespace LIBMOL {
                             tFx.push_back(iA->fracCoords[2] + k);
 
                             // Take a zone surround the center cell 
-                            REAL tRange1 = -fraCell, tRange2 = 1 + fraCell;
+                            //REAL tRange1 = -fraCell, tRange2 = 1 + fraCell;
                             //REAL tRange1 = -0.8, tRange2 = 1.8;
-                            if ((tFx[0] > tRange1 && tFx[0] <= tRange2)
-                                    && (tFx[1] > tRange1 && tFx[1] <= tRange2)
-                                    && (tFx[2] > tRange1 && tFx[2] <= tRange2)
-                                    && !colidAtom(tFx, refAtoms)) {
+                            //if ((tFx[0] > tRange1 && tFx[0] <= tRange2)
+                            //        && (tFx[1] > tRange1 && tFx[1] <= tRange2)
+                            //        && (tFx[2] > tRange1 && tFx[2] <= tRange2)
+                            //        && !colidAtom(tFx, refAtoms, 0)) {
+                            if (!colidAtom(tFx, refAtoms, 0))
+                            {
                                 AtomDict aAtom(*iA);
                                 aAtom.isInPreCell = false;
 
                                 aAtom.sId = IntToStr(5 + i) + IntToStr(5 + j) + IntToStr(5 + k);
-                                ;
                                 aAtom.symmOp = iA->symmOp;
                                 aAtom.seriNum = (int) refAtoms.size();
-
+                                aAtom.fromOrig = iA->seriNum;
+                                
+                                aAtom.fracCoords[0] = tFx[0];
+                                aAtom.fracCoords[1] = tFx[1];
+                                aAtom.fracCoords[2] = tFx[2];
                                 //FractToOrtho(aAtom.fracCoords, aAtom.coords, 
                                 //             iCryst->itsCell->a, iCryst->itsCell->b, 
                                 //             iCryst->itsCell->c, iCryst->itsCell->alpha,
                                 //             iCryst->itsCell->beta, iCryst->itsCell->gamma);
-                                aAtom.fracCoords[0] = tFx[0];
-                                aAtom.fracCoords[1] = tFx[1];
-                                aAtom.fracCoords[2] = tFx[2];
                                 refAtoms.push_back(aAtom);
                             }
                         }
@@ -302,23 +428,34 @@ namespace LIBMOL {
             }
         }
 
-
         swithAtoms(iCryst);
-
+        
+        std::cout << "total number of atoms in system  " 
+                  << allAtoms.size() <<  std::endl;
+        
         /*
-        for (std::vector<AtomDict>::iterator iRA=allAtoms.begin();
-                iRA != allAtoms.end(); iRA++)
+        for (std::vector<AtomDict>::iterator iRA1=allAtoms.begin();
+                iRA1 != allAtoms.end(); iRA1++)
         {
-            if (iRA->sId=="555" )
+            if (iRA1->id == "Mo1" && iRA1->seriNum==0 )
             {
-                std::cout << "For atom " << iRA->id << " and ref ID " << iRA->sId  
-                          << " : " << std::endl;
-                std::cout << "x = " << iRA->coords[0] << std::endl
-                          << "y = " << iRA->coords[1] << std::endl
-                          << "z = " << iRA->coords[2] << std::endl;
+                for (std::vector<AtomDict>::iterator iRA2=allAtoms.begin();
+                     iRA2 != allAtoms.end(); iRA2++)
+                {
+                    if (iRA2->id == "Mo1")
+                    {
+                        // packAtomIntoCell(*iRA2);
+                        REAL rD = getBondLenFromFracCoords(iRA1->fracCoords, 
+                                                           iRA2->fracCoords,
+                        iCryst->itsCell->a, iCryst->itsCell->b,
+                        iCryst->itsCell->c, iCryst->itsCell->alpha,
+                        iCryst->itsCell->beta, iCryst->itsCell->gamma);
+                        //std::cout << "Dist is " << rD << std::endl; 
+                    }
+                }
             }
         }
-         */
+        */
     }
 
     void MolGenerator::addOneSetRefAtoms(AtomDict & tCurAtom,
@@ -364,7 +501,6 @@ namespace LIBMOL {
             allAtoms.push_back(*iAt);
         }
         refAtoms.clear();
-
 
 
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
@@ -444,7 +580,8 @@ namespace LIBMOL {
 
     // get atom connections within an unit cell
 
-    void MolGenerator::setUniqueAtomLinks(PeriodicTable & tPTab) {
+    void MolGenerator::setUniqueAtomLinks(PeriodicTable & tPTab) 
+    {
         REAL covalent_sensitivity = 0.20;
 
         for (unsigned i = 0; i < allAtoms.size(); i++) {
@@ -644,12 +781,12 @@ namespace LIBMOL {
 
         REAL covalent_sensitivity = 0.15;
         REAL covalent_sensitivity1 = 0.15;
-        REAL covalent_sensitivity2 = 0.22;
+        REAL covalent_sensitivity2 = 0.25;
         REAL covalent_sensitivity3 = 0.30;
         REAL covalent_sensitivity4 = 0.60;
 
         NeighbListDict tNBListOfSystem;
-
+                
         int aDim = 3;
         int aMode = 0;
         LIBMOL::REAL tCellL = 3.5;
@@ -657,7 +794,7 @@ namespace LIBMOL {
 
         tNBListOfSystem.building(allAtoms, aDim, tCellL, tCellShell, aMode);
 
-
+        
         // std::cout << "NB list for allAtoms set " << std::endl;   
 
 
@@ -667,23 +804,20 @@ namespace LIBMOL {
         {
             if (iAt->isInPreCell)
             {
-                //std::cout << "atom "<< iAt->id << "(serial number " 
-                //          << iAt->seriNum  <<") has " << iAt->neighbAtoms.size() 
-                //          << " NB atoms " << std::endl;
+                std::cout << "atom "<< iAt->id << "(serial number " 
+                          << iAt->seriNum  <<") has " << iAt->neighbAtoms.size() 
+                          << " NB atoms " << std::endl;
                 
-                if (iAt->id =="C22")
-                {
+                
                     for (std::vector<int>::iterator iNB=iAt->neighbAtoms.begin();
                             iNB != iAt->neighbAtoms.end(); iNB++)
                     {
                         std::cout << "NB atom " << allAtoms[*iNB].id << std::endl;
                     }
-                }
                 
             }
         }
-         */
-
+        */
 
         // std::vector<std::string>   existBondID;
         // int j=0;
@@ -691,21 +825,19 @@ namespace LIBMOL {
             //if (allAtoms[i].sId=="555")
             //{
             //j++;
-            //std::cout << "Look for bonds to atom " << allAtoms[i].id 
-            //          << "(serial number  " << allAtoms[i].seriNum
-            //          << ") " << std::endl;
-            //std::cout << "Its has " << allAtoms[i].neighbAtoms.size() 
-            //          << " neighbor atoms. " <<std::endl;
+            std::cout << "Look for bonds to atom " << allAtoms[i].id 
+                      << "(serial number  " << allAtoms[i].seriNum
+                      << ") " << std::endl;
+            std::cout << "Its has " << allAtoms[i].neighbAtoms.size() 
+                      << " neighbor atoms. " <<std::endl;
             for (std::vector<int>::iterator iNB = allAtoms[i].neighbAtoms.begin();
                     iNB != allAtoms[i].neighbAtoms.end(); iNB++) {
-                // REAL rD = distanceV(refAtoms[i].coords, refAtoms[(*iNB)].coords);
-                //std::cout << "NB Atom " << refAtoms[(*iNB)].id << " its sID " 
-                //          << refAtoms[(*iNB)].sId << std::endl;
+                
                 REAL rD = getBondLenFromFracCoords(allAtoms[i].fracCoords, allAtoms[(*iNB)].fracCoords,
                         tCryst->itsCell->a, tCryst->itsCell->b,
                         tCryst->itsCell->c, tCryst->itsCell->alpha,
                         tCryst->itsCell->beta, tCryst->itsCell->gamma);
-
+                
                 std::vector<REAL> bondRange;
 
                 if ((allAtoms[i].chemType == "H" && allAtoms[*iNB].chemType == "O")
@@ -732,11 +864,11 @@ namespace LIBMOL {
                         bondRange);
 
 
-
-                //std::cout << "Range between " << bondRange[0]
-                //          << " and " << bondRange[1] << std::endl;
-                //std::cout << "Distance between " << allAtoms[i].id << " and "
-                //          << allAtoms[*iNB].id << " is " << rD << std::endl;
+                std::cout << "Distance between " << allAtoms[i].id << " and "
+                          << allAtoms[*iNB].id << " is " << rD << std::endl;
+                std::cout << "Range between " << bondRange[0]
+                          << " and " << bondRange[1] << std::endl;
+                
 
 
 
@@ -864,13 +996,17 @@ namespace LIBMOL {
                 tMol.bonds.push_back(*iB);
             } else if (!inVectABS(aV, iB->value, 0.00000001)) {
                 tMol.bonds.push_back(*iB);
-            } else {
+            } 
+            /* symm generated bonds should be the same
+            else 
+            {
                 std::cout << "bond length duplicated "
-                        << iB->value << std::endl
-                        << "Between atoms "
-                        << tMol.atoms[iB->atomsIdx[0]].id << " and "
-                        << tMol.atoms[iB->atomsIdx[1]].id << std::endl;
+                          << iB->value << std::endl
+                          << "Between atoms "
+                          << tMol.atoms[iB->atomsIdx[0]].id << " and "
+                          << tMol.atoms[iB->atomsIdx[1]].id << std::endl;
             }
+             */
             aV.push_back(iB->value);
         }
 
@@ -893,6 +1029,7 @@ namespace LIBMOL {
                             tCryst->itsCell->beta, tCryst->itsCell->gamma);
                     
                     BondDict aBond;
+                    aBond.seriNum = tMol.allBonds.size();
                     aBond.atomsIdx.push_back(iAt->seriNum);
                     aBond.atomsIdx.push_back(*iCo);
                     aBond.atoms.push_back(iAt->id);
@@ -1001,7 +1138,8 @@ namespace LIBMOL {
         REAL comp1 = 0.0, comp2 = 0.0;
 
         if (tPTab.elemProps.find(tAtm1.chemType) != tPTab.elemProps.end()
-                && tPTab.elemProps.find(tAtm2.chemType) != tPTab.elemProps.end()) {
+                && tPTab.elemProps.find(tAtm2.chemType) != tPTab.elemProps.end()) 
+        {
             if (tAtm1.formalCharge != 0 && tAtm2.formalCharge != 0) {
 
                 if (tAtm1.formalCharge > 0 && tAtm2.formalCharge < 0) {
@@ -1030,24 +1168,33 @@ namespace LIBMOL {
                     comp1 = tPTab.elemProps[tAtm1.chemType]["cova"];
                     comp2 = tPTab.elemProps[tAtm2.chemType]["cova"];
                 }
-            } else if (tAtm1.isMetal && tAtm2.isMetal) {
+            } 
+            else if (tAtm1.isMetal && tAtm2.isMetal) 
+            {
                 if (tPTab.elemProps[tAtm1.chemType].find("ionM+")
                         != tPTab.elemProps[tAtm1.chemType].end()
                         && tPTab.elemProps[tAtm2.chemType].find("ionM-")
-                        != tPTab.elemProps[tAtm2.chemType].end()) {
+                        != tPTab.elemProps[tAtm2.chemType].end()) 
+                {
                     comp1 = tPTab.elemProps[tAtm1.chemType]["ionM+"];
                     comp2 = tPTab.elemProps[tAtm2.chemType]["ionM-"];
-                } else if (tPTab.elemProps[tAtm2.chemType].find("ionM+")
+                } 
+                else if (tPTab.elemProps[tAtm2.chemType].find("ionM+")
                         != tPTab.elemProps[tAtm2.chemType].end()
                         && tPTab.elemProps[tAtm1.chemType].find("ionM-")
-                        != tPTab.elemProps[tAtm1.chemType].end()) {
+                        != tPTab.elemProps[tAtm1.chemType].end()) 
+                {
                     comp1 = tPTab.elemProps[tAtm1.chemType]["ionM-"];
                     comp2 = tPTab.elemProps[tAtm2.chemType]["ionM+"];
-                } else {
+                } 
+                else 
+                {
                     comp1 = tPTab.elemProps[tAtm1.chemType]["cova"];
                     comp2 = tPTab.elemProps[tAtm2.chemType]["cova"];
                 }
-            } else {
+            } 
+            else 
+            {
                 comp1 = tPTab.elemProps[tAtm1.chemType]["cova"];
                 //std::cout << "atom 1 " << tAtm1.chemType << std::endl;
                 //std::cout << "inside comp1 " << comp1 << std::endl;
@@ -1625,8 +1772,9 @@ namespace LIBMOL {
 
                 std::cout << "The number of atoms in molecule " << aMol.seriNum
                         << " is " << aMol.atoms.size() << std::endl;
-
-
+               
+                
+                
                 //   << "They are : " << std::endl;
                 /*
                 for (std::vector<AtomDict>::iterator iAt=aMol.atoms.begin();
@@ -1653,84 +1801,56 @@ namespace LIBMOL {
                 }
                
                 */
-                //if (checEquiMoles(aMol))
-                //{
+                
                     
-                    //getAtomTypeOneMol(aMol);
-                    getAtomTypeOneMolNew(aMol);
-
-                    // getUniqueBondsMols(aMol, tCryst);
-                    getAllBondsInOneMol(aMol, tCryst);
+                //getAtomTypeOneMol(aMol);
+                getAtomTypeOneMolNew(aMol);
                     
-                    /*
-                    for (std::vector<AngleDict>::iterator iAn=angles.begin();
-                           iAn !=angles.end(); iAn++)
-                     {
-                        if (iAn->atoms.size() == 3)
-                     {
-                     if ( (std::find(iMol->second.begin(), iMol->second.end(), iAn->atoms[0])
-                           !=iMol->second.end())  &&
-                          (std::find(iMol->second.begin(), iMol->second.end(), iAn->atoms[1])
-                           !=iMol->second.end())  && 
-                          (std::find(iMol->second.begin(), iMol->second.end(), iAn->atoms[2])
-                           !=iMol->second.end()) )
-                     {
-                         aMol.angles.push_back(*iAn);
-                     }
-                     }
-                     }
-                     */
+                    
+                // getUniqueBondsMols(aMol, tCryst);
+                getAllBondsInOneMol(aMol, tCryst);
+                    
 
-                    // tmpMols.push_back(aMol);
+                std::string aMolErrInfo;
+                bool aPass = validateMolecule(aMol, tPTab, aMolErrInfo);
 
-                    std::string aMolErrInfo;
-                    bool aPass = validateMolecule(aMol, tPTab, aMolErrInfo);
-
-                    if (aPass && aMol.bonds.size() > 0) 
-                    {
-                        //getAtomTypeOneMol(aMol);
-                        getUniqAngleMols(aMol, tCryst);
-                        setAnglesSPSigns(aMol.atoms, aMol.angles);
-                        // Change the molecule serial number 
-                        allMolecules.push_back(aMol);
-                        std::string aMsg;
-                        aMsg = "Molecule " + IntToStr(aMol.seriNum) + " is included.\n"
-                                + "It contains " + IntToStr(aMol.atoms.size())
-                                + " atoms\n";
-                        validedMolMsg[aMol.seriNum] = aMsg;
-
-                        std::cout << "Molecule " << aMol.seriNum << " is included "
-                                  << std::endl << "It contains " << aMol.atoms.size()
-                                  << " atoms" << std::endl;
-                    } 
-                    else 
-                    {
-                        std::string aMsg = aMolErrInfo + "\n"
-                                  + "Molecule " + IntToStr(aMol.seriNum)
-                                  + " is rejected\n";
-                        errMolMsg[aMol.seriNum] = aMsg;
-
-                        std::cout << aMolErrInfo << std::endl;
-                        std::cout << "Molecule " << aMol.seriNum
-                                  << " is rejected " << std::endl;
-                    }
-                //}
-                /*
-                else
+                if (aPass && aMol.bonds.size() > 0) 
                 {
-                    std::cout << "The mol " << aMol.seriNum << " is not unique mol."
-                              << std::endl
-                              << "its formula " << aMol.formula << std::endl;
-                    
+                    //getAtomTypeOneMol(aMol);
+                    getUniqAngleMols(aMol, tCryst);
+                    setAnglesSPSigns(aMol.atoms, aMol.angles);
+                    // Change the molecule serial number 
+                    allMolecules.push_back(aMol);
+                    std::string aMsg;
+                    aMsg = "Molecule " + IntToStr(aMol.seriNum) + " is included.\n"
+                            + "It contains " + IntToStr(aMol.atoms.size())
+                            + " atoms\n";
+                    validedMolMsg[aMol.seriNum] = aMsg;
+
+                    std::cout << "Molecule " << aMol.seriNum << " is included "
+                              << std::endl << "It contains " << aMol.atoms.size()
+                              << " atoms" << std::endl;
+                } 
+                else 
+                {
+                    std::string aMsg = aMolErrInfo + "\n"
+                            + "Molecule " + IntToStr(aMol.seriNum)
+                            + " is rejected\n";
+                    errMolMsg[aMol.seriNum] = aMsg;
+
+                    std::cout << aMolErrInfo << std::endl;
+                    std::cout << "Molecule " << aMol.seriNum
+                              << " is rejected " << std::endl;
                 }
-                 */
             }
         }
         
         std::cout << "Number of molecules in allMolecules after validation "
-                << allMolecules.size() << std::endl;
-        std::cout << "Total number of atoms in Asy cell covered " << allAsy << std::endl;
+                  << allMolecules.size() << std::endl;
+        std::cout << "Total number of atoms in Asy cell covered " 
+                  << allAsy << std::endl;
         std::cout << "Final check, whole structure " << std::endl;
+        
         std::string errInfoStr;
         bool tOkStruct = validateBondValueDiffStruct(allMolecules, errInfoStr);
         if (!tOkStruct)
@@ -1738,6 +1858,7 @@ namespace LIBMOL {
             allMolecules.clear();
             std::cout <<  errInfoStr << std::endl;
         }
+        
     }
 
     bool MolGenerator::checEquiMoles(std::vector<Molecule> & tSetMols,
@@ -2051,7 +2172,7 @@ namespace LIBMOL {
     }
 
     bool MolGenerator::colidAtom(AtomDict& tAtom,
-            std::vector<AtomDict>& tRefAtoms) 
+            std::vector<AtomDict>& tRefAtoms, int tMode) 
     {
         for (std::vector<AtomDict>::iterator iAt = tRefAtoms.begin();
                 iAt != tRefAtoms.end(); iAt++) {
@@ -2059,10 +2180,13 @@ namespace LIBMOL {
             REAL db = fabs(tAtom.fracCoords[1] - iAt->fracCoords[1]);
             REAL dc = fabs(tAtom.fracCoords[2] - iAt->fracCoords[2]);
             if (da < 0.01 && db < 0.01 && dc < 0.01) {
-                allMsg.push_back("REJECTED STRUCTURE:  atom collisions.");
-                allMsg.push_back("Atom " + tAtom.id + " has collision during symmgen \n");
-                std::cout << "Atom " << tAtom.id   << " has collision during symmgen \n";
-                lColid = true;
+                if (tMode == 1)
+                {
+                    allMsg.push_back("REJECTED STRUCTURE:  atom collisions.");
+                    allMsg.push_back("Atom " + tAtom.id + " has collision during symmgen \n");
+                    std::cout << "Atom " << tAtom.id   << " has collision during symmgen \n";
+                    lColid = true;
+                }
                 return true;
             }
         }
@@ -2070,17 +2194,22 @@ namespace LIBMOL {
     }
 
     bool MolGenerator::colidAtom(std::vector<REAL> & tFracX,
-            std::vector<AtomDict>& tRefAtoms) {
+            std::vector<AtomDict>& tRefAtoms,int tMode) 
+    {
         for (std::vector<AtomDict>::iterator iAt = tRefAtoms.begin();
                 iAt != tRefAtoms.end(); iAt++) {
             REAL da = fabs(tFracX[0] - iAt->fracCoords[0]);
             REAL db = fabs(tFracX[1] - iAt->fracCoords[1]);
             REAL dc = fabs(tFracX[2] - iAt->fracCoords[2]);
-            if (da < 0.005 && db < 0.005 && dc < 0.005) {
-                allMsg.push_back("REJECTED STRUCTURE:  atom collisions.");
-                allMsg.push_back("Atom " + iAt->id + " has collision during symmgen \n");
-                std::cout << "Atom " << iAt->id   << " has collision during symmgen \n";
-                lColid = true;
+            if (da < 0.005 && db < 0.005 && dc < 0.005) 
+            {
+                if (tMode==1)
+                {
+                    allMsg.push_back("REJECTED STRUCTURE:  atom collisions.");
+                    allMsg.push_back("Atom " + iAt->id + " has collision during symmgen \n");
+                    std::cout << "Atom " << iAt->id   << " has collision during symmgen \n";
+                    lColid = true;
+                }
                 return true;
             }
         }
@@ -2649,17 +2778,18 @@ namespace LIBMOL {
          */
     }
 
-    void MolGenerator::getAtomTypeOneMolNew(Molecule& tMol) {
-        std::cout << "Number of atoms in this molecule is "
-                << tMol.atoms.size() << std::endl;
+    void MolGenerator::getAtomTypeOneMolNew(Molecule& tMol) 
+    {
+        //std::cout << "Number of atoms in this molecule is "
+        //        << tMol.atoms.size() << std::endl;
 
         CodClassify aCodSys(tMol.atoms);
 
         setAtomsBondingAndChiralCenter(aCodSys.allAtoms);
-
+       
+        
         aCodSys.codAtomClassifyNew3(2);
-
-
+        
         /*
         for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();
                 iAt !=aCodSys.allAtoms.end(); iAt++)
@@ -2685,7 +2815,6 @@ namespace LIBMOL {
             tMol.atoms.push_back(*iAt);
         }
 
-
         /*
         for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin();
                  iAt !=tMol.atoms.end(); iAt++)
@@ -2701,7 +2830,7 @@ namespace LIBMOL {
                 
         }
          */
-
+        tMol.rings.clear();
         for (std::vector<RingDict>::iterator iR = aCodSys.allRingsV.begin();
                 iR != aCodSys.allRingsV.end(); iR++) {
             tMol.rings.push_back(*iR);
@@ -2731,6 +2860,8 @@ namespace LIBMOL {
 
             idxR++;
         }
+
+        
 
         // check 
         /*
@@ -2884,21 +3015,23 @@ namespace LIBMOL {
             //          << " bonds " << std::endl;
 
             int nVB = 0, nPB = 0;
-            for (std::vector<BondDict>::iterator iBo = iMol->bonds.begin();
-                    iBo != iMol->bonds.end(); iBo++) {
+            for (std::vector<BondDict>::iterator iBo = iMol->allBonds.begin();
+                    iBo != iMol->allBonds.end(); iBo++) {
                 if (iMol->atoms[iBo->atomsIdx[0]].isInPreCell
                         || iMol->atoms[iBo->atomsIdx[1]].isInPreCell) {
                     nVB++;
                     std::vector<int> aIdxSet;
                     aIdxSet.push_back(iBo->atomsIdx[0]);
                     aIdxSet.push_back(iBo->atomsIdx[1]);
-
-                    //std::cout << "Check a bond " << std::endl;
-                    //std::cout << "atom 1 "       << iMol->atoms[iBo->atomsIdx[0]].id
-                    //          << " with type "   << iMol->atoms[iBo->atomsIdx[0]].codClass
-                    //          << std::endl 
-                    //          << "atom 2 " << iMol->atoms[iBo->atomsIdx[1]].id
-                    //          << " with type " << iMol->atoms[iBo->atomsIdx[1]].codClass;
+                    /*
+                    std::cout << "Check a bond " << std::endl;
+                    std::cout << "atom 1 "       << iMol->atoms[iBo->atomsIdx[0]].id
+                              << " with type "   << iMol->atoms[iBo->atomsIdx[0]].codClass
+                              << std::endl 
+                              << "atom 2 " << iMol->atoms[iBo->atomsIdx[1]].id
+                              << " with type " << iMol->atoms[iBo->atomsIdx[1]].codClass
+                              << std::endl << "OrderN " << iBo->orderN << std::endl;
+                     */
                     if (!connMetal2ndNB(aIdxSet, iMol->atoms)) {
                         //std::cout << "bond contains no metal up to the 2NB " << std::endl;
                         std::vector<sortMap3> tVec;
@@ -3009,21 +3142,51 @@ namespace LIBMOL {
             
             // std::cout << "Total number of unique angles are " << angles.size() << std::endl;
         }
+        
         std::cout << "Total Number of unique bonds are " << bonds.size() << std::endl;
+        /*
+        for (std::vector<BondDict>::iterator iBo=bonds.begin();
+                iBo !=bonds.end(); iBo++)
+        {
+            std::cout << "Order N is " << iBo->orderN << std::endl;
+        }
+         */
         std::cout << "Total number of unique angles are " << angles.size() << std::endl;
     }
 
     void MolGenerator::outTableMols(std::ofstream & tMolTabs,
                                     Molecule & tMol) 
     {
-        if (tMol.atoms.size() > 0) {
+        if (tMol.atoms.size() > 0) 
+        {
+            tMol.calcSumExcessElecs();
+            tMol.calcSumCharges();
+            
             tMolTabs << "data_mol_" << IntToStr(tMol.seriNum)
                     << std::endl;
-
+            tMolTabs << "loop_" << std::endl
+                     << "is_infinite_molecule " << "\t";
+            if (tMol.isInf)
+            {
+                tMolTabs << "yes";
+            }
+            else
+            {
+                tMolTabs << "no";
+            }
+            tMolTabs << std::endl;
+            tMolTabs << "total_number_of_atoms\t" 
+                     << tMol.atoms.size() << std::endl;
+            tMolTabs << "total_number_of_excess_electrons\t" << tMol.sumExcessElecs
+                     << std::endl;
+            tMolTabs << "total_number_of_charges\t" << tMol.sumCharges
+                     << std::endl;
+            
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_atom.serial_number" << std::endl
                     << "_chem_comp_atom.atom_id " << std::endl
                     << "_chem_comp_atom.element_symbol" << std::endl
+                    << "_chem_comp_atom.formal_charge" << std::endl
                     << "_chem_comp_atom.hybr" << std::endl
                     << "_chem_comp_atom.nb1_nb2_sp" << std::endl
                     << "_chem_comp_atom.extraEls" << std::endl
@@ -3034,8 +3197,9 @@ namespace LIBMOL {
                     iAt != tMol.atoms.end(); iAt++) {
 
                 tMolTabs << std::setw(6) << iAt->seriNum + 1
-                        << std::setw(10) << iAt->id
-                        << std::setw(5) << iAt->chemType << "    "
+                        << std::setw(6) << iAt->id
+                        << std::setw(4) << iAt->chemType 
+                        << std::setw(6) << iAt->formalCharge  
                         << std::setw(10) << iAt->hybrid << "    "
                         << std::setw(iAt->codNB1NB2_SP.size() + 4) << iAt->codNB1NB2_SP << "    "
                         << std::setw(5) << iAt->excessElec << "    "
@@ -3048,7 +3212,7 @@ namespace LIBMOL {
             std::cout << "There is no atoms in the molecule" << std::endl;
         }
 
-        if (tMol.bonds.size() > 0) {
+        if (tMol.allBonds.size() > 0) {
             std::cout << std::endl;
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_bond.bond_serial_number" << std::endl
@@ -3057,10 +3221,11 @@ namespace LIBMOL {
                     << "_chem_comp_bond.atom1_id" << std::endl
                     << "_chem_comp_bond.atom2_id" << std::endl
                     << "_chem_comp_bond.value_dist" << std::endl
-                    << "_chem_comp_bond.is_in_same_ring" << std::endl;
+                    << "_chem_comp_bond.is_in_same_ring" << std::endl
+                    << "_chem_comp_bond.order" << std::endl;
             int nBo = 1;
-            for (std::vector<BondDict>::iterator iBo = tMol.bonds.begin();
-                    iBo != tMol.bonds.end(); iBo++) {
+            for (std::vector<BondDict>::iterator iBo = tMol.allBonds.begin();
+                    iBo != tMol.allBonds.end(); iBo++) {
                 std::vector<int> aIdxSet;
                 aIdxSet.push_back(iBo->atomsIdx[0]);
                 aIdxSet.push_back(iBo->atomsIdx[1]);
@@ -3078,7 +3243,8 @@ namespace LIBMOL {
                             << std::setw(4) << tMol.atoms[iBo->atomsIdx[0]].chemType
                             << std::setw(4) << tMol.atoms[iBo->atomsIdx[1]].chemType
                             << std::setw(10) << iBo->value
-                            << std::setw(6) << tStr << std::endl;
+                            << std::setw(6) << tStr 
+                            << std::setw(10) << iBo->orderN << std::endl;
                     nBo++;
                 }
 
@@ -3135,7 +3301,7 @@ namespace LIBMOL {
     }
 
     void MolGenerator::outTableBAndA(FileName tBAndAFName) {
-        std::cout << tBAndAFName << std::endl;
+        // std::cout << tBAndAFName << std::endl;
 
 
         std::ofstream aBAndAF(tBAndAFName);
@@ -3144,7 +3310,8 @@ namespace LIBMOL {
                 aBAndAF << "Atom1_COD_type        Atom2_COD_type      Atom1_id       Atom2_id       "
                         << "Atom1_sp       Atom2_sp    atom1_NB1NB2_sp    atom2_NB1NB2_sp   "
                         << "atom1_NB2_extraEls       atom2_NB2_extraEls    "
-                        << "Bond_length       BondInRing   Idx_of_Mol" << std::endl;
+                        << "Bond_length       BondInRing    " 
+                        << "BondOrder         Idx_of_Mol" << std::endl;
                 for (std::vector<BondDict>::iterator iBo = bonds.begin();
                         iBo != bonds.end(); iBo++) {
 
@@ -3167,6 +3334,7 @@ namespace LIBMOL {
                                 << iBo->atomNB2ExtraEls[iBo->atoms[1]] << "\t"
                                 << iBo->value << "\t"
                                 << tStr << "\t" 
+                                << iBo->orderN << "\t"
                                 << iBo->molIdx << std::endl;
                     }
                 }
@@ -3310,19 +3478,23 @@ namespace LIBMOL {
 
     }
 
-    void MolGenerator::outTables(FileName tOutName) 
+    void MolGenerator::outTables(FileName tOutName, 
+                                 std::vector<Molecule> & tFinMols,
+                                 std::vector<Molecule> & tInfMols) 
     {
         int aNB = 0, aNA = 0;
         contMetal2NB(aNB, aNA);
+        
         std::cout << "Bonds with metals at the secondary NB " << aNB << std::endl;
         std::cout << "Angles with metals at the secondary NB " << aNB << std::endl;
         Name aFName(tOutName);
-
+        // std::cout << "Output root is " << aFName << std::endl;
         std::vector<std::string> nameComps;
         StrTokenize(aFName, nameComps, '.');
         Name rootFName;
-
-        for (unsigned jF = 0; jF < nameComps.size() - 1; jF++) {
+        
+        
+        for (unsigned jF = 0; jF < nameComps.size(); jF++) {
             rootFName.append(nameComps[jF]);
         }
         if (rootFName.size() == 0) {
@@ -3384,17 +3556,7 @@ namespace LIBMOL {
             std::ofstream aMolTable(allMolsFName.c_str());
             if (aMolTable.is_open()) 
             {
-                std::vector<Molecule> aSetUniqMols;
-                
-                for (unsigned iMol = 0; iMol < allMolecules.size(); iMol++) 
-                {
-                  if (checEquiMoles(aSetUniqMols, allMolecules[iMol]))
-                  {
-                      outTableMols(aMolTable, allMolecules[iMol]);
-                      aSetUniqMols.push_back(allMolecules[iMol]);
-                     
-                  }
-                }
+                outMolsInfo(aMolTable, tFinMols, tInfMols);
             } 
             else 
             {
@@ -3449,7 +3611,7 @@ namespace LIBMOL {
         StrTokenize(aFName, nameComps, '.');
         Name rootFName;
 
-        for (unsigned jF = 0; jF < nameComps.size() - 1; jF++) 
+        for (unsigned jF = 0; jF < nameComps.size(); jF++) 
         {
             rootFName.append(nameComps[jF]);
         }
@@ -3470,7 +3632,322 @@ namespace LIBMOL {
                 msg << *iS;
             }
         }
-        msg.close();
+        msg.close();   
+    }
+    
+    void MolGenerator::getOutFileRoot(FileName tOutName, Name & tRootName)
+    {
+        Name aFName(tOutName);
+
+        std::vector<std::string> nameComps;
+        StrTokenize(aFName, nameComps, '.');
+
+        for (unsigned jF = 0; jF < nameComps.size() - 1; jF++) 
+        {
+            tRootName.append(nameComps[jF]);
+        }
+        if (tRootName.size() == 0) 
+        {
+            tRootName.append("Current");
+        }   
+    }
+    
+    void MolGenerator::outMolsInfo(std::ofstream & tMolTabs,
+                                   std::vector<Molecule>& tFinMols, 
+                                   std::vector<Molecule>& tInfMols)
+    {
+        
+        
+        if (tMolTabs.is_open()) 
+        {
+            
+             tMolTabs<< "loop_" << std::endl
+                 << "num_finite_mols\t"   << tFinMols.size() << std::endl
+                 << "num_infinite_mols\t" << tInfMols.size() << std::endl;
+                
+            
+            if (tFinMols.size() >0)
+            {
+                for (unsigned i=0; i < tFinMols.size(); i++)
+                {
+                    outTableMols(tMolTabs, tFinMols[i]);
+                }          
+            } 
+            
+            if (tInfMols.size() >0)
+            {
+                for (unsigned i=0; i < tInfMols.size(); i++)
+                {
+                    outTableMols(tMolTabs, tInfMols[i]);
+                }          
+            }
+            tMolTabs.close();
+        }      
+    }
+    
+    void MolGenerator::checkInfMols(std::vector<Molecule> & aSetInfMols,
+                                    std::vector<Molecule> & aSetFinMols)
+    {
+        std::vector<Molecule> aSetUniqMols;
+                
+        for (unsigned iMol = 0; iMol < allMolecules.size(); iMol++) 
+        {
+            if (checEquiMoles(aSetUniqMols, allMolecules[iMol]))
+            {
+                aSetUniqMols.push_back(allMolecules[iMol]);
+                     
+            }
+        }
+        
+        if (aSetUniqMols.size() !=0)
+        {
+            for (std::vector<Molecule>::iterator iMol=aSetUniqMols.begin();
+                    iMol !=aSetUniqMols.end(); iMol++ )
+            {
+                if (!checkOneMolInf(iMol))
+                {
+                    aSetFinMols.push_back(*iMol);
+                }
+                else
+                {
+                    iMol->isInf = true;
+                    aSetInfMols.push_back(*iMol);
+                }
+            } 
+        }
         
     }
+    
+    bool MolGenerator::checkOneMolInf(std::vector<Molecule>::iterator tMol)
+    {
+        bool aInfMol = false;
+        // Two criteria are used. Both should be satisfied
+        if (allCryst.size()  !=0)
+        {
+            if (allCryst[0].itsSpaceGroup !=NullPoint)
+            {
+                int maxMolAtms = initAtoms.size() *
+                                 allCryst[0].itsSpaceGroup->sgOp.size();
+                if (tMol->atoms.size() > maxMolAtms)
+                {
+                    aInfMol = true;
+                }
+            }
+        }
+        
+        if (!aInfMol)
+        {
+            for (unsigned i=0; i < tMol->atoms.size(); i++)
+            {
+                // Check if a molecule containing both an atom and its 
+                // translation copy.  
+                // 3 conditions:
+                // 1) One atom's seriNum equals to the other's fromOrig
+                // 2) They belong to the same symm operator
+                // 3) They are from different unit cell (sId different)
+                for (unsigned j=i+1; j < tMol->atoms.size(); j++)
+                {
+                    if (tMol->atoms[i].seriNum == tMol->atoms[j].fromOrig
+                        && tMol->atoms[i].symmOp == tMol->atoms[j].symmOp
+                        && tMol->atoms[i].sId !=tMol->atoms[i].sId)
+                    {
+                        aInfMol = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return aInfMol;
+    }
+    
+    void MolGenerator::buildMetalAtomCoordMap(
+                                std::vector<CrystInfo>::iterator tCryst)
+    {
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            if (iAt->isInPreCell && iAt->isMetal)
+            {
+                std::cout << "Atom "  << iAt->id << " connects to "
+                          << iAt->connAtoms.size() 
+                          << " atoms " << std::endl;
+                for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                        iNB != iAt->connAtoms.end(); iNB++)
+                {
+                   connMapMetalAtoms[iAt->seriNum].push_back(*iNB);
+                   std::cout << "neighbor atom " << allAtoms[*iNB].id 
+                             << " of " << allAtoms[*iNB].seriNum << std::endl;
+                   REAL rD = getBondLenFromFracCoords(iAt->fracCoords, 
+                            allAtoms[*iNB].fracCoords,
+                            tCryst->itsCell->a, tCryst->itsCell->b,
+                            tCryst->itsCell->c, tCryst->itsCell->alpha,
+                            tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                   std::cout << "Distance " << rD << std::endl;
+                   metalRelatedBonds[iAt->seriNum][*iNB] = rD;
+                   for (std::vector<int>::iterator iNB2=iAt->connAtoms.begin();
+                        iNB2 != iAt->connAtoms.end(); iNB2++)
+                   {
+                       if (*iNB2 > *iNB)
+                       {
+                            std::cout << " the other NB " << allAtoms[*iNB2].id
+                                      << " of serial " << allAtoms[*iNB2].seriNum
+                                      << std::endl;
+                           
+                            REAL rA = getAngleValueFromFracCoords(*iAt,
+                                      allAtoms[*iNB], allAtoms[*iNB2],
+                            tCryst->itsCell->a, tCryst->itsCell->b,
+                            tCryst->itsCell->c, tCryst->itsCell->alpha,
+                            tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                            std::cout << "Angle " << rA*PID180 << std::endl;
+                            metalRelatedAngles[iAt->seriNum][*iNB][*iNB2]=rA*PID180;
+                       }
+                   }
+                }
+            }
+        }
+    }
+    
+    int MolGenerator::getNumOrgNB(std::vector<AtomDict>& tAtoms, 
+            int  tIdx, std::vector<std::string> & tOrgTab)
+    {
+        int nOrg =0;
+        for (std::vector<int>::iterator iCo=tAtoms[tIdx].connAtoms.begin();
+                iCo != tAtoms[tIdx].connAtoms.end(); iCo++)
+        {
+            if (isOrganc(tOrgTab, tAtoms[*iCo].chemType))
+            {
+                nOrg++;
+            }
+        }
+        
+        return nOrg;
+    }
+    
+    void MolGenerator::outMetalAtomCoordInfo(FileName tOutName)
+    {
+        std::vector<std::string> aOrgTab;
+        initOrgTable(aOrgTab);
+        
+        Name aFName(tOutName);
+        // std::cout << "Output root is " << aFName << std::endl;
+        std::vector<std::string> nameComps;
+        StrTokenize(aFName, nameComps, '.');
+        Name rootFName;
+        
+        
+        for (unsigned jF = 0; jF < nameComps.size(); jF++) 
+        {
+            rootFName.append(nameComps[jF]);
+        }
+        
+        if (rootFName.size() == 0) 
+        {
+            rootFName.append("Current");
+        }
+        
+        if (allMsg.size())
+        {
+            
+        }
+       
+        if (connMapMetalAtoms.size() !=0)
+        {
+            std::vector<REAL> uniqBV, uniqAV;
+            
+            Name bondAndAngleFName(rootFName);
+            bondAndAngleFName.append("_unique_bond_and_angles.txt");
+            std::ofstream aBAndAF(bondAndAngleFName.c_str());
+            if(aBAndAF.is_open())
+            {
+                aBAndAF << "Element1\tElement2\t"
+                        <<"AtomName1\tAtomName2\t"
+                        <<"CoordinationNum1\tCoordinationNum1OrganicOnly\t"
+                        <<"CoordinationNumber2\t"
+                        << "BondLength" << std::endl;
+                for (std::map<int, std::vector<int> >::iterator 
+                               iM=connMapMetalAtoms.begin();
+                               iM !=connMapMetalAtoms.end(); iM++)
+                {
+                    const int nOrgConns = getNumOrgNB(allAtoms, iM->first, aOrgTab);
+                    
+                    for (std::vector<int>::iterator iP=iM->second.begin();
+                          iP !=iM->second.end(); iP++)
+                    {
+                        bool lDo = false;
+                        std::cout << "Bond : atom " << allAtoms[iM->first].id 
+                                  << " and " <<  allAtoms[*iP].id 
+                                  << " value " << metalRelatedBonds[iM->first][*iP]
+                                  << std::endl;
+                       
+                        if (!inVectABS(uniqBV, metalRelatedBonds[iM->first][*iP], 
+                                       0.00001))
+                        {
+                                lDo = true;
+                        }
+                       
+                        
+                        if (lDo)
+                        {
+                            aBAndAF << allAtoms[iM->first].chemType << "\t"
+                                    << allAtoms[*iP].chemType << "\t"
+                                    << allAtoms[iM->first].id << "\t"
+                                    << allAtoms[*iP].id << "\t"
+                                    << iM->second.size() << "\t"
+                                    << nOrgConns << "\t"
+                                    << allAtoms[*iP].connAtoms.size() << "\t"
+                                    << metalRelatedBonds[iM->first][*iP] << std::endl;
+                            uniqBV.push_back(metalRelatedBonds[iM->first][*iP]);                 
+                        }
+                    }
+                }
+            
+                if (metalRelatedAngles.size() > 0)
+                {
+                    aBAndAF <<"ElementCenter\tElement1\tElement2\t"
+                            <<"AtomNameCenter\tAtomName1\t"
+                            << "AtomName2\tCoordinationNumber\t"
+                            << "BondAngle" << std::endl;
+                
+                    for (std::map<int, std::map<int, std::map<int, REAL> > >::iterator
+                             iMA=metalRelatedAngles.begin(); 
+                             iMA != metalRelatedAngles.end(); iMA++)
+                    {
+                        for (std::map<int, std::map<int, REAL> >::iterator 
+                             iNB1=iMA->second.begin(); iNB1!=iMA->second.end();
+                             iNB1++)
+                        {
+                            for (std::map<int, REAL>::iterator 
+                                 iNB2=iNB1->second.begin(); 
+                                 iNB2 != iNB1->second.end(); iNB2++)
+                            {
+                                if (!inVectABS(uniqAV, 
+                                    metalRelatedAngles[iMA->first][iNB1->first][iNB2->first], 
+                                    0.00001))
+                                {
+                                    aBAndAF << allAtoms[iMA->first].chemType  << "\t"
+                                            << allAtoms[iNB1->first].chemType << "\t"
+                                            << allAtoms[iNB2->first].chemType << "\t"
+                                            << allAtoms[iMA->first].id  << "\t"
+                                            << allAtoms[iNB1->first].id << "\t"
+                                            << allAtoms[iNB2->first].id << "\t"
+                                            << connMapMetalAtoms[iMA->first].size() << "\t"
+                                            << metalRelatedAngles[iMA->first]
+                                                             [iNB1->first][iNB2->first]
+                                            << std::endl;
+                                    
+                                    uniqAV.push_back(metalRelatedAngles[iMA->first]
+                                                             [iNB1->first][iNB2->first]);    
+                                }
+                            }
+                        }
+                    }
+                }
+             
+                aBAndAF.close();    
+            }
+        }
+            
+    }
+    
+    
 }
