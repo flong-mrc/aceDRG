@@ -7084,7 +7084,7 @@ namespace LIBMOL
                          std::vector<LIBMOL::BondDict>& tBonds, 
                          std::vector<LIBMOL::AngleDict>& tAngs, 
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
-                         std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> > & tRings, 
+                         std::vector<LIBMOL::RingDict> & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs)
     {
@@ -7138,18 +7138,15 @@ namespace LIBMOL
             
             ID ligType = "non-polymer";
             
-            for (std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> >::iterator iRG=tRings.begin();
-                    iRG != tRings.end(); iRG++)
-            {
-                for (std::vector<LIBMOL::RingDict>::iterator iR=iRG->second.begin();
-                        iR !=iRG->second.end(); iR++)
+            for (std::vector<LIBMOL::RingDict>::iterator iR=tRings.begin();
+                    iR != tRings.end(); iR++)
+            {   
+                if (iR->isSugar.compare("pyranose")==0)
                 {
-                    if (iR->isSugar.compare("pyranose")==0)
-                    {
-                        ligType = "pyranose";
-                        break;
-                    }
+                    ligType = "pyranose";
+                    break;
                 }
+             
             }
             
             std::vector<ID>  aAATab;
@@ -7255,6 +7252,9 @@ namespace LIBMOL
             
             if (tBonds.size() >0)
             {
+                // newly added 
+                //kekulizeRings(tAtoms, tBonds, tRings);
+                
                 // Bond sections 
                 outRestrF << "loop_" << std::endl
                           << "_chem_comp_bond.comp_id" << std::endl

@@ -3766,7 +3766,7 @@ namespace LIBMOL {
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {
-            if (iAt->isInPreCell && iAt->isMetal)
+            if (iAt->isInPreCell && iAt->isMetal && checkNBAtomOccp(iAt))
             {
                 std::cout << "Atom "  << iAt->id << " connects to "
                           << iAt->connAtoms.size() 
@@ -3805,6 +3805,23 @@ namespace LIBMOL {
                 }
             }
         }
+    }
+    
+    bool MolGenerator::checkNBAtomOccp(std::vector<AtomDict>::iterator tAtm)
+    {
+        bool aRe= true;
+        for (std::vector<int>::iterator lCo=tAtm->connAtoms.begin();
+                lCo != tAtm->connAtoms.end(); lCo++)
+        {
+            if (allAtoms[*lCo].ocp <=0.99)
+            {
+                aRe = false;
+                break;
+            }
+        }
+        
+        return aRe;
+        
     }
     
     int MolGenerator::getNumOrgNB(std::vector<AtomDict>& tAtoms, 

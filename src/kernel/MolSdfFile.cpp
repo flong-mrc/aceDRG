@@ -1044,6 +1044,7 @@ namespace LIBMOL
                     }
                 }
             }
+            
             std::cout << "The system contain " << rings.size() << " rings" << std::endl;
             kekulizeRings(atoms, bonds, rings);
             

@@ -238,7 +238,6 @@ namespace LIBMOL
         std::cout << "Number of torsions from cod section "
                   << tCodSys.allTorsions.size() << std::endl;
         
-        
         AddAtoms(tCodSys.allAtoms);
         AddBonds(tCodSys.allBonds);
         AddAngles(tCodSys.allAngles);
@@ -4113,19 +4112,6 @@ namespace LIBMOL
        
        aCodSystem.setupAllTargetValues();
        
-      
-      /* 
-       outMMCif(tOutName.c_str(),
-                tMonoName, 
-                aCodSystem.allAtoms,
-                aCodSystem.allHAtomIdx,
-                aCodSystem.allBonds,
-                aCodSystem.allAngles,
-                aCodSystem.allTorsions,
-                aCodSystem.allRings,
-                aCodSystem.allPlanes,
-                aCodSystem.allChirals);
-       */
        //resetSystem(aCodSystem);
        resetSystem2(aCodSystem);
        /*

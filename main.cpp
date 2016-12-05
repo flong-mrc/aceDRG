@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
                                  aTargetSystem.allBonds,
                                  aTargetSystem.allAngles,
                                  aTargetSystem.miniTorsions,
-                                 aTargetSystem.allRings,
+                                 aTargetSystem.allRingsV,
                                  aTargetSystem.allPlanes,
                                  aTargetSystem.allChirals);
                  
@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
                                                  aTargetSystem.allBonds,
                                                  aTargetSystem.allAngles,
                                                  aTargetSystem.allTorsions,
-                                                 aTargetSystem.allRings,
+                                                 aTargetSystem.allRingsV,
                                                  aTargetSystem.allPlanes,
                                                  aTargetSystem.allChirals);
                         
@@ -236,7 +236,7 @@ int main(int argc, char** argv) {
                                      aTargetSystem.allBonds,
                                      aTargetSystem.allAngles,
                                      aTargetSystem.allTorsions,
-                                     aTargetSystem.allRings,
+                                     aTargetSystem.allRingsV,
                                      aTargetSystem.allPlanes,
                                      aTargetSystem.allChirals);
             }

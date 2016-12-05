@@ -1480,6 +1480,8 @@ namespace LIBMOL
                                   PeriodicTable & tTab)
     {
         REAL Val = (REAL)tTab.elements[tAtoms[tAtCen].chemType]["val"];
+        //std::cout << "idxB1 " << tIdxB1 << std::endl;
+        //std::cout << "idxB2 " << tIdxB2 << std::endl;
         ID aBO1 = tBonds[tIdxB1].order;
         ID aBO2 = tBonds[tIdxB2].order;
         std::cout << "Modify bond-order for ring atom " 

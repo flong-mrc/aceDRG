@@ -626,7 +626,7 @@ namespace LIBMOL
                          std::vector<LIBMOL::BondDict>& tBonds, 
                          std::vector<LIBMOL::AngleDict>& tAngs, 
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
-                         std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> > & tRings, 
+                         std::vector<LIBMOL::RingDict> & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs);
     

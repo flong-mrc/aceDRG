@@ -844,7 +844,7 @@ class Acedrg(CExeCode ):
             print "=====================================================================" 
 
     def runLibmol(self, tIn=None, tIdxMol=-1):
- 
+        print "workMode ", self.workMode
         self._cmdline = self.libmol
         if tIdxMol !=-1: 
             self._log_name       = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.log")
@@ -938,16 +938,22 @@ class Acedrg(CExeCode ):
             #print "===================================================================" 
             #print "| Generate atom types of Acedrg style                             |"
             #print "===================================================================" 
-            if self.workMode == 31 or self.workMode == 32:
+            if self.workMode == 31 or self.workMode == 32 or self.workMode==33:
                 if tIn:
                     inFileName    = tIn
                 else:
                     inFileName    = self.inMmCifName
-                if tIdxMol !=-1:  
-                    aStr = "1"
-                else:
-                    aStr = "2"
-                self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
+                if self.workMode == 31 or self.workMode == 32:
+                    if tIdxMol !=-1:  
+                        aStr = "1"
+                    else:
+                        aStr = "2"
+                    self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
+                elif self.workMode == 33:
+                    print "===================================================================" 
+                    print "| Generate atom types of Acedrg style                             |"
+                    print "===================================================================" 
+                    self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
                 #print self._cmdline
                 self.subExecute()
@@ -2098,6 +2104,7 @@ class Acedrg(CExeCode ):
                             self.libmolAT1     = os.path.join(self.scrDir, "atomTypes_1.txt")
                             self.libmolAT2     = os.path.join(self.scrDir, "atomTypes_2.txt")
                             self.libmolMatched = os.path.join(self.scrDir, "matchedType.txt")
+
                             if os.path.isfile(self.libmolAT1) and os.path.isfile(self.libmolAT2):
                                  self.workMode = 900
                                  self.runLibmol()
@@ -2350,8 +2357,15 @@ class Acedrg(CExeCode ):
             
         if self.workMode == 33:
             print "work mode ", self.workMode
-            if os.path.isfile(self.inMdlName):
-                self.runLibmol()    
+            if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
+                self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+                tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
+                if len(self.rdKit.molecules)==1:
+                    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tMolMmcifName, self.chemCheck, self.monomRoot)
+                    print "Number of molecules ", len(self.rdKit.molecules)
+                    self.runLibmol(tMolMmcifName)
+                else:
+                    print "Do not process atom-types of multiple molecules at the same time, do nothing"
 
         if self.workMode == 34:
             print "work mode ", self.workMode
@@ -2632,38 +2646,100 @@ class AcedrgRDKit():
   
         else:
             if tStage ==0:
+                # for non-H atoms
                 for aAtom in tMol.GetAtoms():
-                    aAtom.SetProp("Name", tNameMap[aAtom.GetIdx()]) 
+                    if aAtom.GetSymbol() != "H":
+                        aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()]) 
             elif tStage ==1:
                 if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
                     self.setNamesForHAtomsInMol_PP(tMol, tChemCheck)
                 else:
-                    self.setNamesForHAtomsInMol(tMol, tChemCheck)
+                    self.setNamesForHAtomsInMol(tMol, tNameMap, tChemCheck)
          
 
-    def setNamesForHAtomsInMol(self, tMol, tChemCheck):
+    def setNamesForHAtomsInMol(self, tMol, tNameMap, tChemCheck):
       
-        tIdxHs = {}
-        tIdxHs = []
-        
-        for aAtom in tMol.GetAtoms():
+        #tIdxHs = {}
+        #tIdxHs = []
+        HConns  = {}
+        allAtoms = tMol.GetAtoms()
+        nh = 0
+        for aAtom in allAtoms:
             if aAtom.GetSymbol() =="H":
-                tIdxHs.append(aAtom.GetIdx())
+                nh +=1
+                idxH = aAtom.GetIdx()
+                aSetBonds = aAtom.GetBonds()
+                idxB  = -1
+                idxE  = -1
+                idxC  = -1
+                aSetBonds = aAtom.GetBonds()
+                if len(aSetBonds)==1: 
+                    idxB = aSetBonds[0].GetBeginAtomIdx()
+                    idxE = aSetBonds[0].GetEndAtomIdx()
+                    if idxH == idxB:
+                        idxC = idxE
+                    elif idxH==idxE: 
+                        idxC = idxB
+                    if idxE !=-1 :
+                        nonH_Id = tNameMap["nonH"][idxC] 
+                        if not HConns.has_key(nonH_Id):
+                            HConns[nonH_Id] = []
+                        HConns[nonH_Id].append(idxH)     
+                else:
+                    print "One H atom connect more than one atoms, check"
+                    sys.exit()
 
-        if len(tIdxHs) !=0:
+        if len(HConns.keys()) !=0:   
+            nH =0
+            for aKey in tNameMap["H"].keys():
+                nH +=(len(tNameMap["H"]))
+            for aK in HConns.keys():
+                c1 =  len(HConns[aK])
+                if tNameMap["H"].has_key(aK):
+                    c2 = len(tNameMap["H"][aK])
+                    if c1 == c2:
+                        for i in range(c1):
+                            tMol.GetAtomWithIdx(HConns[aK][i]).SetProp("Name",tNameMap["H"][aK][i])
+                    elif c1 < c2:
+                        for i in range(c1):
+                            tMol.GetAtomWithIdx(HConns[aK][i]).SetProp("Name",tNameMap["H"][aK][i])
+                    elif c1 > c2:
+                        for i in range(c2):
+                            tMol.GetAtomWithIdx(HConns[aK][i]).SetProp("Name",tNameMap["H"][aK][i])
+                        cDiff = c1 - c2
+                        for j in range(cDiff): 
+                            tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name","H"+ str(nH+1))
+                            nH+=1
+                            
+
+
+
+
+        for aAtom in allAtoms:
+            if aAtom.GetSymbol() =="H":
+                print "\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name")
+                print "It is in the following bonds: "
+                aSetBonds = aAtom.GetBonds()
+                for aB in aSetBonds:
+                    print "Bond ", aB.GetIdx()
+                    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+
+        #if len(tIdxHs) !=0:
             
-            hNameDone = [] 
-            nH = 1
-            for aIdxH in tIdxHs:
-                aHName = "H" + str(nH)
-                if aHName in hNameDone:
-                    nH += 1
-                    aHName = "H" + str(nH)
-                tMol.GetAtomWithIdx(aIdxH).SetProp("Name", aHName)
-                nH += 1
-                    
-
-          
+        #    hNameDone = [] 
+        #    nH = 1
+        #    for aIdxH in tIdxHs:
+        #        aHName = "H" + str(nH)
+        #        if aHName in hNameDone:
+        #            nH += 1
+        #            aHName = "H" + str(nH)
+        #        tMol.GetAtomWithIdx(aIdxH).SetProp("Name", aHName)
+        #        print "not matched name ", tMol.GetAtomWithIdx(aIdxH).GetProp("Name")
+        #        print "should be name ", tNameMap[tMol.GetAtomWithIdx(aIdxH).GetIdx()]
+        #       
+        #        nH += 1
+            
     def setNamesForHAtomsInMol_PP(self, tMol, tChemCheck):
       
         tIdxHs = {}
@@ -3042,6 +3118,7 @@ class AcedrgRDKit():
                     aAtom.SetFormalCharge(int(tChargeList[name]))
                 else:
                     aAtom.SetFormalCharge(0)
+        """
         # Check
         print "==========================================="
         print "\nBefore setup formal charges in the molecule"
@@ -3061,19 +3138,21 @@ class AcedrgRDKit():
             print "Its mplicit Hs ", imHs
             print "Its formal charge ", charge
             print "Its total valence ", val
-            #print "It is in the following bonds: "
-            #aSetBonds = aAtom.GetBonds()
-            #for aB in aSetBonds:
-            #    print "Bond ", aB.GetIdx()
-            #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-            #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+            print "It is in the following bonds: "
+            aSetBonds = aAtom.GetBonds()
+            for aB in aSetBonds:
+                print "Bond ", aB.GetIdx()
+                print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
         print "==========================================="
+        """
 
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
         else:
             self.setAllFormalChargeFuncGroupAtoms(tMol)
         
+        """
         print "\nAfter setup formal charges in the molecule"
         for aAtom in tMol.GetAtoms():
             idxA   = aAtom.GetIdx()
@@ -3091,6 +3170,7 @@ class AcedrgRDKit():
             print "Its formal charge ", charge
             print "Its total valence ", val
         print "==========================================="
+        """
         tMol.UpdatePropertyCache()
         aMol = Chem.AddHs(tMol)
 
@@ -3115,9 +3195,9 @@ class AcedrgRDKit():
 
         # Further: give names to those newly added H atoms
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
-       
         if self.reSetChirals:
             self.reAssignChirals(aMol) 
+            """
             for aAtom in allAtoms:
                 print "******************************"
                 idxA  = aAtom.GetIdx()
@@ -3136,6 +3216,7 @@ class AcedrgRDKit():
                 #    aAtom.SetChiralTag(rdchem.ChiralType.CHI_UNSPECIFIED)
                 #aCT = aAtom.GetChiralTag()
                 #print "Chiral center assigned ", aCT
+            """
     
         for aAtom in allAtoms:
             aIdx = aAtom.GetIdx()
@@ -3167,7 +3248,6 @@ class AcedrgRDKit():
             allAtoms = aMol.GetAtoms()
             #print "Number of atom is ", len(allAtoms)
             rdmolops.AssignStereochemistry(aMol, cleanIt=False, force=False, flagPossibleStereoCenters=True)
-            """
             for i in range (len(conformers)):
                 print "----------------------------------------------------"
                 print "| In conformer %d                                  |"%i
@@ -3196,7 +3276,6 @@ class AcedrgRDKit():
                         print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
                         print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
                 #print "******************************"
-            """
 
     def reAssignChirals(self, tMol):
 
@@ -3383,7 +3462,7 @@ class AcedrgRDKit():
                     nTetraChi +=1
                 elif aAtom.HasProp("TmpChiral") !=0:
                     nTetraChi +=1
-        
+                
                 aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n" \
                              %(tMonoName, aAtom.GetProp("Name"), aAtom.GetSymbol(),  \
                                aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), pos.x, pos.y, pos.z))
@@ -3396,7 +3475,7 @@ class AcedrgRDKit():
             aMmCif.write("_chem_comp_bond.aromatic\n")
             aMmCif.write("_chem_comp_bond.value_dist\n")
             aMmCif.write("_chem_comp_bond.value_dist_esd\n")
-            print "N Bonds ", len(allBonds)
+            #print "N Bonds ", len(allBonds)
             for aBond in allBonds:
                 atom1 = aBond.GetBeginAtom()
                 name1 = atom1.GetProp("Name")
@@ -3408,6 +3487,7 @@ class AcedrgRDKit():
                 symb2 = atom2.GetSymbol()
 
                 bType = ""
+                #print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
                 if aBond.HasProp("SpecialBond"):
                     bType = aBond.GetProp("SpecialBond")
                 else:
@@ -4301,6 +4381,11 @@ class FileTransformer :
 
         self.nameMapingCifMol = {}             # e.g. self.nameMapingCifMol[1]   = name 
                                                # where 1 : atom serial number   name : atom name
+        self.nameMapingCifMol = {}            
+        self.nameMapingCifMol["nonH"] = {}            
+        self.nameMapingCifMol["H"]    = {}            
+                                             
+
         self.nameMapingPDBMol = {}             # e.g. self.nameMapingPDBMol[1]   = name 
                                                # where 1 : atom serial number   name : atom name
         self.connInPDB        = {}
@@ -4598,6 +4683,12 @@ class FileTransformer :
                     aStr +="%s"%aChiral[colIdx[i]].ljust(8)
                 self.chiralPre.append(aStr)
 
+        if len(colIdx):
+            if tProp =="atom":
+                for aAtom in self.atoms:
+                    for i in range(len(colIdx)):
+                        if colIdx[i].find("chem_comp_atom.atom_id") != -1:
+                            print "Prop %s is %s "%(colIdx[i], aAtom[colIdx[i]].ljust(8))
         """
         # Check
         if len(self.inputCharge) !=0:
@@ -4633,7 +4724,6 @@ class FileTransformer :
                     print aProp
                 for aEn in self.strDescriptors["entries"]:
                     print aEn.strip()
-
         """
 
     def getCCP4MmCifMap(self):
@@ -4931,6 +5021,50 @@ class FileTransformer :
                                                          " ".rjust(3), " ".rjust(3), " ".rjust(3), \
                                                          " ".rjust(3), "999".rjust(3), "V2000".rjust(6)))
             # Atom block
+
+            # Re-arrange atoms: non-H atoms first, followed by H atoms
+            print "Befor re-arrange, number of atoms is : ", len(self.atoms) 
+            tNonHAtoms = []
+            tHAtoms    = []
+            for aAtom in self.atoms:
+                id = ""
+                if aAtom.has_key("_chem_comp_atom.type_symbol"):
+                    tId = aAtom["_chem_comp_atom.type_symbol"].strip()
+                    if len(tId) ==1:
+                        id = tId.strip().upper()
+                    elif len(tId) > 1:
+                        id = tId[0].upper() + tId[1:].strip().lower()
+                else:
+                    print "Input file bug: no type_symbol for atoms!"
+                    sys.exit()
+                aAtom["type_symbol_in_mol"] = id
+                if id != "H":
+                    tNonHAtoms.append(aAtom)
+                else :
+                   tHAtoms.append(aAtom)
+                
+            self.atoms = []
+            nAtm =0
+            for aAtom in tNonHAtoms:
+                self.atoms.append(aAtom)
+                self.nameMapingCifMol["nonH"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                nAtm +=1
+            for aAtom in tHAtoms:
+                self.atoms.append(aAtom)
+
+            # Set up atom seq match for bond section
+            mapIdNum = {}
+            nAtm =1
+            for aAtom in self.atoms:
+                if aAtom.has_key("_chem_comp_atom.atom_id"):
+                    mapIdNum[aAtom["_chem_comp_atom.atom_id"]] = nAtm
+                    nAtm +=1
+                    print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
+                else:
+                    print "Input file bug: no atom_id for atoms!"
+                    sys.exit()
+    
+            # Now write out atom section in the Mol file
             hhh ="0"
             bbb ="0"
             vvv ="0"
@@ -4941,11 +5075,10 @@ class FileTransformer :
             nnn ="0"
             eee ="0"
             # Ignore all of the coordinates
-            mapIdNum = {}
             chargeAtomList = []
             idxAtom = 1
-            nAtm =1
             for aAtom in self.atoms:
+                print "Atom ", aAtom["_chem_comp_atom.atom_id"], " with serial number ", idxAtom
                 if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal"):
                     x = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
                 elif aAtom.has_key("_chem_comp_atom.model_Cartn_x"):
@@ -4973,24 +5106,7 @@ class FileTransformer :
                 else:
                     z = "0.0000"
 
-                id = ""
-                if aAtom.has_key("_chem_comp_atom.type_symbol"):
-                    tId = aAtom["_chem_comp_atom.type_symbol"].strip()
-                    if len(tId) ==1:
-                        id = tId.strip().upper()
-                    elif len(tId) > 1:
-                        id = tId[0].upper() + tId[1:].strip().lower()
-                else:
-                    print "Input file bug: no type_symbol for atoms!"
-                    sys.exit()
-                if aAtom.has_key("_chem_comp_atom.atom_id"):
-                    mapIdNum[aAtom["_chem_comp_atom.atom_id"]] = nAtm
-                    self.nameMapingCifMol[nAtm-1] = aAtom["_chem_comp_atom.atom_id"]
-                    nAtm +=1
-                    print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
-                else:
-                    print "Input file bug: no atom_id for atoms!"
-                    sys.exit()
+                id = aAtom["type_symbol_in_mol"]
                     
                 md =" 0 "
                
@@ -5010,7 +5126,7 @@ class FileTransformer :
                 charge = " 0 "
                 if aAtom.has_key("_chem_comp_atom.charge"):
                     print "The charge is ", aAtom["_chem_comp_atom.charge"]
-                    print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
+                    #print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
                     if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
                     nCharge = int(aAtom["_chem_comp_atom.charge"])
@@ -5045,8 +5161,14 @@ class FileTransformer :
             rrr ="0"
             ccc ="0"
             for aBond in self.bonds:
-                a1 = str(mapIdNum[aBond["_chem_comp_bond.atom_id_1"]])
-                a2 = str(mapIdNum[aBond["_chem_comp_bond.atom_id_2"]])
+                id1 = aBond["_chem_comp_bond.atom_id_1"]
+                n1 = mapIdNum[id1]
+                id2 = aBond["_chem_comp_bond.atom_id_2"]
+                n2 = mapIdNum[id2]
+                print "id1 %s n1 %d "%(id1, n1)
+                print "id2 %s n2 %d "%(id2, n2)
+                a1 = str(n1)
+                a2 = str(n2)
                 b4 = ""
                 bt = ""
                 if aBond.has_key("_chem_comp_bond.value_order") or  aBond.has_key("_chem_comp_bond.type"):         # mmcif in PDB or ccp4 monolib 
@@ -5065,11 +5187,29 @@ class FileTransformer :
                     sys.exit()
                 aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                        sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                print "The bond between %s  and %s  is : "%(aBond["_chem_comp_bond.atom_id_1"], aBond["_chem_comp_bond.atom_id_2"])
+                print "The bond between %s of serial number %s and %s of serial number %s is : "\
+                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2)
                 print aBL
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
-            
+
+                elem1 = self.atoms[n1-1]["type_symbol_in_mol"]
+                id1   = self.atoms[n1-1]["_chem_comp_atom.atom_id"]
+                elem2 = self.atoms[n2-1]["type_symbol_in_mol"]
+                id2   = self.atoms[n2-1]["_chem_comp_atom.atom_id"]
+                print "id1 %s elem1 %s "%(id1, elem1)
+                print "id2 %s elem2 %s "%(id2, elem2)
+                if elem1 == "H":
+                    if not self.nameMapingCifMol["H"].has_key(id2):
+                        self.nameMapingCifMol["H"][id2] = [] 
+                    self.nameMapingCifMol["H"][id2].append(id1)
+                    print "H atom %s is bonding to %s "%(id1, id2)
+                if elem2 == "H":
+                    if not self.nameMapingCifMol["H"].has_key(id1):
+                        self.nameMapingCifMol["H"][id1] = [] 
+                    self.nameMapingCifMol["H"][id1].append(id2)
+                    print "H atom %s is bonding to %s "%(id2, id1)
+                   
             if len(chargeAtomList) != 0:
                 aL = "M CHG  %d "%len(chargeAtomList)
                 for aPair in chargeAtomList:
@@ -5077,12 +5217,7 @@ class FileTransformer :
                 tOutFile.write(aL + "\n")          
    
             tOutFile.write("M  END\n")
-            #if len(self.nameMapingCifMol.keys()) !=0:
-            #    for idxA in sorted(self.nameMapingCifMol.iterkeys()):
-            #        print "atom %d  has the name %s "%(idxA, self.nameMapingCifMol[idxA])
-            #else:
-            #    print "The initial mmcif file does not have a column \"_chem_comp_atom.atom_id\" "
-
+          
     # Mol files related 
     def CheckElemSymbolsInMolFile(self, tInFileName, tOutFileName):
 
@@ -5340,7 +5475,7 @@ class ChemCheck():
         self.atomFileType = {}
         self.atomFileType["mmCif"]  = [11, 111, 16, 161, 51]
         self.atomFileType["simils"] = [12, 121, 52]
-        self.atomFileType["mdl"]    = [13, 131, 14, 141, 53, 54]
+        self.atomFileType["mdl"]    = [13, 131, 14, 141, 33, 53, 54]
         self.atomFileType["mol2"]   = [15, 151, 55]
 
         self.pTable = rdchem.GetPeriodicTable()
