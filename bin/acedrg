@@ -2167,18 +2167,19 @@ class Acedrg(CExeCode ):
         if self.workMode == 15 or self.workMode == 151 or self.workMode==55 :
             
             # The input file is a mol2 file
-            if os.path.isfile(self.inMol2Name) and self.chemCheck.isOrganic(self.inMol2Name, self.workMode):
-                self.runLibmol(self.inMol2Name)
-                print self.outRstCifName
-                if not self.runExitCode and os.path.isfile(self.outRstCifName):
-                    aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
-                    if os.path.isfile(self.outRstCifName):
+            if os.path.isfile(self.inMol2Name):
+                if self.chemCheck.isOrganic(self.inMol2Name, self.workMode):
+                    self.runLibmol(self.inMol2Name)
+                    print self.outRstCifName
+                    if not self.runExitCode and os.path.isfile(self.outRstCifName):
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
-                        #print aIniMolName
-                        self.fileConv.MmCifToMolFile(self.outRstCifName, aIniMolName)
-                        if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \
-                           and os.path.isfile(aIniMolName) :
-                            self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingCifMol)    
+                        if os.path.isfile(self.outRstCifName):
+                            aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                            #print aIniMolName
+                            self.fileConv.MmCifToMolFile(self.outRstCifName, aIniMolName)
+                            if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \
+                               and os.path.isfile(aIniMolName) :
+                                self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingCifMol)    
             else: 
                 print self.inMol2Name, " can not be found for reading "
                 sys.exit()
@@ -2718,12 +2719,12 @@ class AcedrgRDKit():
         for aAtom in allAtoms:
             if aAtom.GetSymbol() =="H":
                 print "\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name")
-                print "It is in the following bonds: "
-                aSetBonds = aAtom.GetBonds()
-                for aB in aSetBonds:
-                    print "Bond ", aB.GetIdx()
-                    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+                #print "It is in the following bonds: "
+                #aSetBonds = aAtom.GetBonds()
+                #for aB in aSetBonds:
+                #    print "Bond ", aB.GetIdx()
+                #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
 
         #if len(tIdxHs) !=0:
             
@@ -3366,7 +3367,7 @@ class AcedrgRDKit():
                 tDelAtomIdxs.append(aAt.GetIdx())
 
     def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="UNL", tChiDes=None, tGroupName="non-polymer", tIdxConform=0):
-
+        
         # A simplified mmcif file contains:
         # (1) Header section      
         # (2) Description of atoms in the molecule
@@ -3462,7 +3463,8 @@ class AcedrgRDKit():
                     nTetraChi +=1
                 elif aAtom.HasProp("TmpChiral") !=0:
                     nTetraChi +=1
-                
+                print "atom name ", aAtom.GetProp("Name")
+                print "atom symbol ", aAtom.GetSymbol()
                 aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n" \
                              %(tMonoName, aAtom.GetProp("Name"), aAtom.GetSymbol(),  \
                                aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), pos.x, pos.y, pos.z))
@@ -5694,21 +5696,29 @@ class ChemCheck():
             lAtom = False
             for aL in allLs:
                 if len(aL) > 0 and aL[0] != "#":
-                    if lAtom :
+                    if aL.find("@<") !=-1 and aL.find("@<TRIPOS>ATOM") ==-1:
+                        lAtom = False
+                    elif lAtom :
                         strGrp = aL.strip().split()
                         if len(strGrp) >= 6:
                             aElem = ""
+                            iPos =0
                             for aC in strGrp[1].strip():
                                 if aC.isalpha() and not aC.isdigit(): 
-                                    aElem = aElem + aC 
+                                    if iPos ==0:
+                                        aElem = aElem + aC 
+                                    else:
+                                        if aC.lower() == aC:
+                                            aElem = aElem + aC 
+                                        else:
+                                            break
                                 else:
                                     break
+                                iPos +=1
                             if len(aElem) and not aElem in tAtomElems:
                                 tAtomElems.append(aElem)
                     elif aL.find("@<TRIPOS>ATOM") !=-1:
                         lAtom = True
-                    elif aL.find("@<") !=-1 and aL.find("@<TRIPOS>ATOM") ==-1:
-                        lAtom = False
         else: 
             print "%s can not be found for reading "%tFileName
                     

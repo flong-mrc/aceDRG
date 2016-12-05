@@ -7235,11 +7235,12 @@ namespace LIBMOL
                     
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
+                    
                     outRestrF << longName
                               << std::setw(12) << iA->id 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
-                              << std::setw(8) << tCharge 
+                              << std::setw(10) << tCharge 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
                               << iA->coords[0] 
                               << std::setw(12) << std::setprecision(3) << std::fixed 

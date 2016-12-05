@@ -251,7 +251,7 @@ for aF in glob.glob("./inDictProb/*.cif"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
-
+"""
 print "=============================================================="
 print "|  run all examples with input PDB files at ./inCoordPDBs    |"
 print "=============================================================="
@@ -277,6 +277,7 @@ for aF in glob.glob("./inCoordPDBs/*.pdb"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
+"""
  
 print "=============================================================="
 print "|  run all examples with input mmCif files at ./inProbsCases |"
