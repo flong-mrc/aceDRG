@@ -307,11 +307,13 @@ namespace LIBMOL // temp
         bool     chiralChecked;
         bool     isInAromRing;
         bool     isInSP2Ring;
+        bool     fromCalc;
         
         // symmetry-related 
         ID       sId;
         ID       symmOp;
         int      fromOrig;
+       
         // int      bondingIdx;
         /* meaning of curBondingIdx
          * 0      undetermined  

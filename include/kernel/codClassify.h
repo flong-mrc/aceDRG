@@ -190,7 +190,6 @@ namespace LIBMOL
         // Default constructor
         CodClassify();
             
-        
         CodClassify(const std::vector<AtomDict> & tAtoms);
         
         

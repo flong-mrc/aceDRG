@@ -103,8 +103,15 @@ namespace LIBMOL
       
         void symmAtomGen(std::vector<CrystInfo>::iterator    tCrys,
                          PeriodicTable & tPTab);
+        void symmAtomGen2(std::vector<CrystInfo>::iterator    tCrys,
+                         PeriodicTable & tPTab);
+        
         
         void getOneSymmAtom(std::vector<AtomDict>::iterator        tCurAtom,
+                            std::map<std::string, std::vector<std::vector<REAL> > >::iterator tOp,
+                            std::vector<CrystInfo>::iterator   tCrys, 
+                            PeriodicTable & tPTab);
+        void getOneSymmAtom2(std::vector<AtomDict>::iterator        tCurAtom,
                             std::map<std::string, std::vector<std::vector<REAL> > >::iterator tOp,
                             std::vector<CrystInfo>::iterator   tCrys, 
                             PeriodicTable & tPTab);
@@ -124,6 +131,7 @@ namespace LIBMOL
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         void setUniqueAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
+        void checkAtomLinks();
         
         void getMolByEqClassInCell();
         void getMolByEqClassInCrys();

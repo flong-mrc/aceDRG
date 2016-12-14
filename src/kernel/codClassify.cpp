@@ -923,7 +923,6 @@ namespace LIBMOL
         {
             allAtoms[i].codClass = "";
             setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
-            
             //std::cout << std::endl << "Here For atom " << allAtoms[i].id << std::endl 
             //          << "class is " << allAtoms[i].codClass << std::endl;            
         }
@@ -3069,7 +3068,210 @@ namespace LIBMOL
             //std::cout << "Its COD class is : " << tAtom.codClass 
             //          << std::endl <<std::endl;
         }
-        
+    }
+    
+    void CodClassify::setAtomCodClassNameNew3(AtomDict & tAtom,
+                                              AtomDict & tOriAtom,
+                                              int tLev)
+    {   
+        if (tLev==1)
+        {
+            tAtom.codClass = "";
+            tAtom.codClass.append(tAtom.chemType);
+            // outRingSecNew(tAtom);
+            outRingSecNew(allAtoms[tAtom.fromOrig]);
+            std::string tStr;
+            std::list<std::string> tStrList, tStrList1;
+            std::map<ID, int> comps;
+            
+            //tStrList.push_back(tAtom.chemType);
+            
+            //std::cout << "Id list size " << (int) tStrList.size() << std::endl;
+            // just get immediate neighbor atom ID
+            //for (std::vector<int>::iterator tNBAtom=tAtom.connAtoms.begin();
+            //        tNBAtom != tAtom.connAtoms.end(); tNBAtom++)
+            for (std::vector<int>::iterator tNBAtom=allAtoms[tAtom.fromOrig].connAtoms.begin();
+                    tNBAtom != allAtoms[tAtom.fromOrig].connAtoms.end(); tNBAtom++)   
+            {
+                if(allAtoms[*tNBAtom].seriNum != tOriAtom.seriNum)
+                {
+                    // tStrList.push_back(allAtoms[*tNBAtom].chemType);
+                    std::string t2NBType;
+                    t2NBType.append(allAtoms[*tNBAtom].chemType);
+                    outRingSecNew2(t2NBType, allAtoms[*tNBAtom]);
+                    if(comps.find(t2NBType) != comps.end())
+                    {
+                        comps[t2NBType] += 1;
+                    }
+                    else
+                    {
+                        comps[t2NBType] = 1; 
+                    }
+                }
+            }
+            
+            sortMap  tCMap;
+            std::vector<sortMap> tCVec;
+            
+            for (std::map<ID, int>::iterator tM=comps.begin();
+                   tM !=comps.end(); tM++)
+            {
+                tCMap.key = tM->first;
+                tCMap.val = tM->second;
+                tCVec.push_back(tCMap);
+            }
+            
+            std::sort(tCVec.begin(),tCVec.end(), desSortMapKey);
+            
+            for (std::vector<sortMap>::iterator iMa=tCVec.begin();
+                    iMa !=tCVec.end(); iMa++)
+            {
+                std::string s1, s2;
+                s1 = iMa->key + IntToStr(iMa->val);
+                for (int i=0; i < iMa->val; i++)
+                {
+                    s2.append(iMa->key);
+                }
+                if ((int)s1.size() < (int)s2.size())
+                {
+                    tStrList.push_back(s1);
+                }
+                else
+                {
+                    tStrList.push_back(s2);
+                }
+            }
+            
+            /*
+            for (std::map<ID, int>::iterator iMa=comps.begin();
+                    iMa !=comps.end(); iMa++)
+            {
+                std::string s1, s2;
+                s1 = iMa->first + IntToStr(iMa->second);
+                for (int i=0; i < iMa->second; i++)
+                {
+                    s2.append(iMa->first);
+                }
+                if ((int)s1.size() < (int)s2.size())
+                {
+                    tStrList.push_back(s1);
+                }
+                else
+                {
+                    tStrList.push_back(s2);
+                }
+            }
+            */
+            
+            // tStrList.sort(compareNoCase2);
+            // std::cout << "sort Id list size " << (int) tStrList.size() << std::endl;
+            for (std::list<std::string>::iterator iL = tStrList.begin();
+                    iL != tStrList.end(); iL++)
+            {
+                tStr.append(*iL);
+            }
+            
+            //std::cout << "the final str size " << (int) tStr.size() << std::endl;
+            tAtom.nbRep.push_back(tStr);
+            tAtom.codClass.append(tStr);
+        }
+        else if(tLev==2)
+        {
+            tAtom.codClass = "";
+            tAtom.codClass.append(tAtom.chemType);
+            outRingSecNew(tAtom);
+            //std::cout << "Atom " << tAtom.id << " its COD ring section " 
+            //          <<  tAtom.codClass << std::endl;
+            
+            int lowLev = tLev - 1;
+            std::map<std::string, std::vector<int> > tIdMap;
+            for (std::vector<int>::iterator tNBA=tAtom.connAtoms.begin();
+                    tNBA != tAtom.connAtoms.end(); tNBA++)
+            {
+                AtomDict aNBAtom(allAtoms[*tNBA]);
+                setAtomCodClassNameNew2(aNBAtom, tOriAtom, lowLev);
+                /*
+                std::list<std::string> tStrList;
+                std::string tStr(allAtoms[*tNBA].chemType);
+                tStr.append(outRingSecStr(allAtoms[*tNBA]));
+                
+                for (std::vector<int>::iterator tNNBA=allAtoms[*tNBA].connAtoms.begin();
+                        tNNBA != allAtoms[*tNBA].connAtoms.end(); tNNBA++)
+                {
+                    if(allAtoms[*tNNBA].id.compare(tAtom.id) !=0)
+                    {
+                        tStrList.push_front(allAtoms[*tNNBA].chemType);
+                    }
+                }
+                tStrList.sort(compareNoCase);
+                for (std::list<std::string>::iterator iSL=tStrList.begin();
+                        iSL != tStrList.end(); iSL++)
+                {
+                    tStr.append(*iSL);
+                }
+                */
+                
+                if(tIdMap.find(aNBAtom.codClass) !=tIdMap.end())
+                {
+                    tIdMap[aNBAtom.codClass][0]++;
+                    
+                }
+                else
+                {
+                    tIdMap[aNBAtom.codClass].push_back(1);
+                    tIdMap[aNBAtom.codClass].push_back((int)aNBAtom.connAtoms.size());
+                }
+                 
+            }
+            
+            //sortMap  tSMap;
+            //std::vector<sortMap> tVec;
+            
+            
+            std::vector<sortMap2> tVec;
+            
+            for (std::map<std::string, std::vector<int> >::iterator tM=tIdMap.begin();
+                   tM !=tIdMap.end(); tM++)
+            {
+                struct sortMap2  tSMap2;
+                tSMap2.key = tM->first;
+                tSMap2.val = tM->second[0];
+                tSMap2.nNB = tM->second[1];
+                tVec.push_back(tSMap2);
+            }
+            
+            std::sort(tVec.begin(),tVec.end(), desSortMapKey2);
+            
+            // check
+            /*
+            if (tAtom.id == "B4")
+            {
+               std::cout << "After sorting " << std::endl;
+               for (std::vector<sortMap>::iterator iV=tVec.begin();
+                    iV != tVec.end(); iV++)
+               {
+                    std::cout << " key: " << iV->key << " value : "
+                          << iV->val << std::endl;
+               }
+            }
+            */
+            for(std::vector<sortMap2>::iterator iV=tVec.begin();
+                    iV !=tVec.end(); iV++)
+            {
+                if (iV->val ==1)
+                {
+                    tAtom.codClass.append("("+iV->key+")");
+                }
+                else
+                {
+                    tAtom.codClass.append("(" + iV->key + ")" + IntToStr(iV->val));
+                }
+            }
+            
+            //std::cout<<"For atom " << tAtom.id << " : " << std::endl;
+            //std::cout << "Its COD class is : " << tAtom.codClass 
+            //          << std::endl <<std::endl;
+        }
     }
     
     

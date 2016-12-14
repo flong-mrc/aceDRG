@@ -3463,8 +3463,6 @@ class AcedrgRDKit():
                     nTetraChi +=1
                 elif aAtom.HasProp("TmpChiral") !=0:
                     nTetraChi +=1
-                print "atom name ", aAtom.GetProp("Name")
-                print "atom symbol ", aAtom.GetSymbol()
                 aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n" \
                              %(tMonoName, aAtom.GetProp("Name"), aAtom.GetSymbol(),  \
                                aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), pos.x, pos.y, pos.z))
@@ -5167,8 +5165,8 @@ class FileTransformer :
                 n1 = mapIdNum[id1]
                 id2 = aBond["_chem_comp_bond.atom_id_2"]
                 n2 = mapIdNum[id2]
-                print "id1 %s n1 %d "%(id1, n1)
-                print "id2 %s n2 %d "%(id2, n2)
+                #print "id1 %s n1 %d "%(id1, n1)
+                #print "id2 %s n2 %d "%(id2, n2)
                 a1 = str(n1)
                 a2 = str(n2)
                 b4 = ""
@@ -5189,9 +5187,9 @@ class FileTransformer :
                     sys.exit()
                 aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                        sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                print "The bond between %s of serial number %s and %s of serial number %s is : "\
-                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2)
-                print aBL
+                #print "The bond between %s of serial number %s and %s of serial number %s is : "\
+                #      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2)
+                #print aBL
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
 
@@ -5199,8 +5197,8 @@ class FileTransformer :
                 id1   = self.atoms[n1-1]["_chem_comp_atom.atom_id"]
                 elem2 = self.atoms[n2-1]["type_symbol_in_mol"]
                 id2   = self.atoms[n2-1]["_chem_comp_atom.atom_id"]
-                print "id1 %s elem1 %s "%(id1, elem1)
-                print "id2 %s elem2 %s "%(id2, elem2)
+                #print "id1 %s elem1 %s "%(id1, elem1)
+                #print "id2 %s elem2 %s "%(id2, elem2)
                 if elem1 == "H":
                     if not self.nameMapingCifMol["H"].has_key(id2):
                         self.nameMapingCifMol["H"][id2] = [] 

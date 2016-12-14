@@ -193,6 +193,7 @@ namespace LIBMOL
         void setupSystem();
         void setupSystem2();
         void checkPowder(std::vector<std::string> & tLines);
+        void checkCalcAtoms();
         void getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines,
                             std::map<std::string, std::string>  & tRowProps,
                             std::map<int, std::map<ID, std::vector<std::string> > > & tColProps,
@@ -214,7 +215,8 @@ namespace LIBMOL
         void getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
         void getAtomInfoFromLine(std::vector<std::string> & tStrs,
                                  int tP1, int tP2, int tP3, 
-                                 int tP4, int tP5, int tPOcp);
+                                 int tP4, int tP5, int tPOcp,
+                                 int tPCalc);
         
         void getCifAtomOxiInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
         void getAtomOxiInfoFromLine(std::vector<std::string> & tStrs,
@@ -363,7 +365,8 @@ namespace LIBMOL
         bool                       notPowder;
         bool                       resolOK;
         bool                       RFactorOK;
-        bool                       colidOK;    // check before molecule generated 
+        bool                       colidOK;    // check before molecule generated
+        bool                       hasHeavyCalcAtoms;
         
     private:
             

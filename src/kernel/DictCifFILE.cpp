@@ -20,6 +20,7 @@ namespace LIBMOL
             resolOK(true),
             RFactorOK(false),
             colidOK(true),
+            hasHeavyCalcAtoms(false),
             itsCurAtomSeriNum(ZeroInt),
             itsCurAtom(NullPoint),
             itsCurBlock(""),
@@ -38,6 +39,7 @@ namespace LIBMOL
                            resolOK(true),
                            RFactorOK(false),
                            colidOK(true),
+                           hasHeavyCalcAtoms(false),
                            itsCurAtomSeriNum(ZeroInt),  
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
@@ -77,6 +79,7 @@ namespace LIBMOL
                            resolOK(true),
                            RFactorOK(false),
                            colidOK(true),
+                           hasHeavyCalcAtoms(false),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurCryst(NullPoint)
@@ -458,7 +461,8 @@ namespace LIBMOL
                     checkNonHAtomOccp();
                     setAtomsMetalType();
                     setAtomOxiType();
-                
+                    
+                    checkCalcAtoms();
                 
                      // Check
                 
@@ -481,6 +485,18 @@ namespace LIBMOL
                         {
                             std::cout << " No " << std::endl;
                         }
+                        
+                        std::cout << "Is that atom from calculations ? ";
+                        if (iA->fromCalc)
+                        {
+                            std::cout <<  "Yes" << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << "No, it is determined from experimental data "
+                                      << std::endl;
+                        }
+                        
                         std::cout << "Its form charge " << iA->formalCharge << std::endl;
                         std::cout << "Its occupancy " << iA->ocp << std::endl;
                         std::cout << "Its coordinates (fractional) " << std::endl
@@ -492,14 +508,13 @@ namespace LIBMOL
                                   << "y:   " << iA->coords[1] << std::endl
                                   << "z:   " << iA->coords[2] << std::endl;  
                    
-                        std::cout << "Is that atom in read-in unit ? " 
-                                  << iA->isInPreCell << std::endl;
+                        //std::cout << "Is that atom in read-in unit ? " 
+                        //          << iA->isInPreCell << std::endl;
                    
                     }
                 }
             }
        }
-       
     }
     
     void GenCifFile::checkPowder(std::vector<std::string>& tLines)
@@ -519,10 +534,40 @@ namespace LIBMOL
                     break;
                 }
             }
-        }
-        
-        
+        }  
     }
+    
+    void GenCifFile::checkCalcAtoms()
+    {
+        if (allAtoms.size() >0)
+        {
+            std::vector<int> idxsCAt;
+            for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+            {
+                if (iAt->fromCalc && iAt->chemType !="H")
+                {
+                    hasHeavyCalcAtoms = true;
+                    //std::cout << iAt->id << " iAt->fromCalc " 
+                    //          << iAt->fromCalc << std::endl;
+                    idxsCAt.push_back(iAt->seriNum);
+                }
+            }
+            
+            //std::cout << "The system hasHeavyCalcAtoms? "
+            //          << hasHeavyCalcAtoms << std::endl;
+            if (idxsCAt.size() !=0)
+            {
+                for (unsigned i=0; i < idxsCAt.size(); i++)
+                {
+                    errMsg.push_back("Reject structures : \n");
+                    errMsg.push_back("Atom " + allAtoms[idxsCAt[i]].id 
+                                     + " is from calculations\n" );
+                }
+            }
+        } 
+    }
+    
     void GenCifFile::checkAtomElementID()
     {
         PeriodicTable aPTab;
@@ -1880,7 +1925,7 @@ namespace LIBMOL
     
     void GenCifFile::getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup)
     {
-        int pos1, pos2, pos3, pos4, pos5, posOcp;
+        int pos1, pos2, pos3, pos4, pos5, posOcp, posCalc;
         pos1 = getKeyWordPos("_atom_site_type_symbol", 
                                tOnePropGroup["lab"]);
         pos2 = getKeyWordPos("_atom_site_label", tOnePropGroup["lab"]);
@@ -1892,6 +1937,9 @@ namespace LIBMOL
                                tOnePropGroup["lab"]);
         
         posOcp = getKeyWordPos("_atom_site_occupancy", tOnePropGroup["lab"]);
+        
+        posCalc = getKeyWordPos("_atom_site_calc_flag", tOnePropGroup["lab"]);
+        
         if ((pos1 !=-1 || pos2 != -1) && pos3 !=-1
              && pos4 !=-1 && pos5 !=-1)
         {
@@ -1903,7 +1951,7 @@ namespace LIBMOL
                 StrTokenize((*iAtm), tBuf);
                 if (tBuf.size()==tOnePropGroup["lab"].size())
                 {
-                    getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp);
+                    getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp, posCalc);
                 }
                 else
                 {
@@ -1930,7 +1978,7 @@ namespace LIBMOL
    
     void GenCifFile::getAtomInfoFromLine(std::vector<std::string> & tStrs,
                                          int tP1, int tP2, int tP3, 
-                                         int tP4, int tP5, int tPOcp)
+                                         int tP4, int tP5, int tPOcp, int tPCalc)
     {
         if (itsCurAtom !=NullPoint)
         {
@@ -1939,6 +1987,7 @@ namespace LIBMOL
         }
         itsCurAtom = new AtomDict();
         itsCurAtom->seriNum = itsCurAtomSeriNum;
+        itsCurAtom->fromOrig = itsCurAtom->seriNum;
         itsCurAtom->isInPreCell = true;
         itsCurAtomSeriNum ++;
 
@@ -2063,6 +2112,22 @@ namespace LIBMOL
                               << sOcp << std::endl;
                 }
             }
+            
+            if (tPCalc > -1 && tPCalc < (int)tStrs.size())
+            {
+                std::string sCalc = TrimSpaces(tStrs[tPCalc]);
+                if (sCalc.find("c") != std::string::npos)
+                {
+                    itsCurAtom->fromCalc = true;
+                }
+                else
+                {
+                    itsCurAtom->fromCalc = false;
+                }
+                
+            }
+            
+            
         }    
         
         //std::cout << "Its occupancy is : " 
@@ -7233,6 +7298,14 @@ namespace LIBMOL
                         tCharge = iA->formalCharge;
                     }
                     
+                    std::string strCharge = TrimSpaces(RealToStr(tCharge));
+                    if (strCharge.find(".") !=strCharge.npos)
+                    {
+                        std::vector<std::string> tVec;
+                        StrTokenize(strCharge, tVec, '.');
+                        strCharge = tVec[0];
+                    }
+                    
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
                     
@@ -7240,7 +7313,7 @@ namespace LIBMOL
                               << std::setw(12) << iA->id 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
-                              << std::setw(10) << tCharge 
+                              << std::setw(8) << strCharge 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
                               << iA->coords[0] 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
@@ -7272,9 +7345,12 @@ namespace LIBMOL
                           iB !=tBonds.end(); iB++)
                 {
                     std::string tAr;
-                    if (iB->isAromatic)
+                    
+                    
+                    StrLower(iB->order);
+                    
+                    if (iB->order.find("arom") !=iB->order.npos)
                     {
-                        iB->order = "aromatic";
                         tAr       = "y";
                     }
                     else

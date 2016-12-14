@@ -47,10 +47,18 @@ namespace LIBMOL
         elements["H"]["val"]     = 1;
         elemProps["H"]["vdw"]    = 1.20;
         elemProps["H"]["cova"]   = 0.23;
-        elemProps["H"]["vdw"]    = 1.20;
-        elemProps["H"]["cova"]   = 0.23; 
         elemProps["H"]["ionM-"]   = 0.23;
-        elemProps["H"]["ionM+"]   = 0.23; 
+        elemProps["H"]["ionM+"]   = 0.23;
+        
+        elements["D"]["row"]     = 1;
+        elements["D"]["group"]   = 1;
+        elements["D"]["matType"] = 1;
+        elements["D"]["atomNum"] = 1;
+        elements["D"]["val"]     = 1;
+        elemProps["D"]["vdw"]    = 1.20;
+        elemProps["D"]["cova"]   = 0.23; 
+        elemProps["D"]["ionM-"]   = 0.23;
+        elemProps["D"]["ionM+"]   = 0.23; 
         
         // Organic set or Non-metal
         elements["C"]["row"]     = 2;

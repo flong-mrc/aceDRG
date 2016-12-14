@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
         // std::cout << "WorkMode: Molecule generation" << std::endl;
         int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
         
-        if (AJob.workMode==31 || AJob.workMode==311)
+        if (AJob.workMode==31 || AJob.workMode==311 || AJob.workMode ==312)
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
@@ -271,7 +271,8 @@ int main(int argc, char** argv) {
             
             if (dataFromCif.notPowder && dataFromCif.resolOK
                 && dataFromCif.RFactorOK && dataFromCif.colidOK 
-                && !dataFromCif.lErr)
+                // && !dataFromCif.lErr)
+                && !dataFromCif.hasHeavyCalcAtoms && !dataFromCif.lErr)
             {
                 std::cout << "The structure is from single crystallographic x-ray "
                           << std::endl;
@@ -279,9 +280,44 @@ int main(int argc, char** argv) {
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
                 
                 aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
+                
                 if (AJob.workMode==31 || AJob.workMode==311)
                 {
                     aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+                }
+                else if (AJob.workMode ==312)
+                {
+                    std::cout << "Studies related metal atoms " << std::endl;
+                    std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
+                    
+                    if (dataFromCif.hasMetal)
+                    {
+                        std::cout << "The system contain metal atoms " << std::endl;
+                        std::cout << "Those metal atoms are : " << std::endl;
+                        for (std::vector<LIBMOL::AtomDict>::iterator iAt=dataFromCif.allAtoms.begin();
+                             iAt != dataFromCif.allAtoms.end(); iAt++)
+                        {
+                            if (iAt->isMetal)
+                            {
+                                std::cout << "Atom " << iAt->id << " of element " 
+                                          << iAt->chemType << std::endl;
+                            }
+                        }
+                
+                        LIBMOL::outMetalAtomInfo(AJob.IOEntries["userOutName"].c_str(),
+                                        dataFromCif);
+                        std::cout << "The structure is from single crystallographic x-ray "
+                          << std::endl;
+                        std::cout << "R factor satisfies the requirement" << std::endl;
+                
+                        aMolCreator.executeMet(AJob.IOEntries["userOutName"].c_str());
+                    }
+                    else
+                    {
+                        dataFromCif.errMsg.push_back("The system contains no metal atoms \n");
+                        LIBMOL::writeMsgFile(AJob.IOEntries["userOutName"],
+                                         dataFromCif.errMsg);
+                    }
                 }
             }
             else
@@ -315,54 +351,18 @@ int main(int argc, char** argv) {
                     std::cout << "REJECTED STRUCTURE: Too many atoms have less than 1.0 occp " 
                               << std::endl; 
                 }
+                else if (dataFromCif.hasHeavyCalcAtoms)
+                {
+                    std::cout << "REJECTED STRUCTURE: the system contains non-H atoms that"
+                              << " are obtained from theoretical calculations " 
+                              << std::endl;
+                }
                 else
                 {
                     std::cout << "Check ! the structure has not been converted to " 
                               << "molecules because of unknown reasons !" << std::endl; 
                 }
             }
-        }
-        else if (AJob.workMode ==312)
-        {
-            //std::cout << "WorkMode: Molecule generation" << std::endl;
-            int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
-            std::cout << "Studies related metal atoms " << std::endl;
-            std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
-            LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
-            
-            if (dataFromCif.hasMetal)
-            {
-                std::cout << "The system contain metal atoms " << std::endl;
-                std::cout << "Those metal atoms are : " << std::endl;
-                for (std::vector<LIBMOL::AtomDict>::iterator iAt=dataFromCif.allAtoms.begin();
-                        iAt != dataFromCif.allAtoms.end(); iAt++)
-                {
-                    if (iAt->isMetal)
-                    {
-                        std::cout << "Atom " << iAt->id << " of element " 
-                                  << iAt->chemType << std::endl;
-                    }
-                }
-                
-                LIBMOL::outMetalAtomInfo(AJob.IOEntries["userOutName"].c_str(),
-                                         dataFromCif);
-                
-                
-            }
-            
-            if (dataFromCif.notPowder && dataFromCif.resolOK
-                && dataFromCif.RFactorOK && dataFromCif.colidOK 
-                && !dataFromCif.lErr)
-            {
-                std::cout << "The structure is from single crystallographic x-ray "
-                          << std::endl;
-                std::cout << "R factor satisfies the requirement" << std::endl;
-                LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-                
-                aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
-                aMolCreator.executeMet(AJob.IOEntries["userOutName"].c_str());
-            }
-            
         }
         else if (AJob.workMode==32)
         {
