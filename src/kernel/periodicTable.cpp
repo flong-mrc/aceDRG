@@ -46,7 +46,7 @@ namespace LIBMOL
         elements["H"]["atomNum"] = 1;
         elements["H"]["val"]     = 1;
         elemProps["H"]["vdw"]    = 1.20;
-        elemProps["H"]["cova"]   = 0.23;
+        elemProps["H"]["cova"]   = 0.32;
         elemProps["H"]["ionM-"]   = 0.23;
         elemProps["H"]["ionM+"]   = 0.23;
         
@@ -56,7 +56,7 @@ namespace LIBMOL
         elements["D"]["atomNum"] = 1;
         elements["D"]["val"]     = 1;
         elemProps["D"]["vdw"]    = 1.20;
-        elemProps["D"]["cova"]   = 0.23; 
+        elemProps["D"]["cova"]   = 0.32; 
         elemProps["D"]["ionM-"]   = 0.23;
         elemProps["D"]["ionM+"]   = 0.23; 
         
@@ -124,7 +124,18 @@ namespace LIBMOL
         elemProps["Se"]["cova"]    = 1.22;
         elemProps["Se"]["ionM-"]   = 1.84;
         elemProps["Se"]["ionM+"]   = 0.64;
+        
         //elemProps["Se6+"]["cova"]   = 0.56;
+        elements["B"]["row"]        = 2;
+        elements["B"]["group"]      = 13;
+        elements["B"]["matType"]    = 7;
+        elements["B"]["atomNum"]    = 5;
+        elements["B"]["val"]        = 3;
+        //elements["B"]["vdw"]        = 1.85;
+        //elements["B"]["cova"]       = 0.83;
+        elemProps["B"]["vdw"]       = 1.85;
+        elemProps["B"]["cova"]      = 0.83;
+        elemProps["B"]["ionM+"]     = 0.41;
         
         
         // Halogens
@@ -876,17 +887,7 @@ namespace LIBMOL
         elemProps["Bi"]["ionM+"]    = 1.17;
         // Semimetallics
         
-        elements["B"]["row"]        = 2;
-        elements["B"]["group"]      = 13;
-        elements["B"]["matType"]    = 7;
-        elements["B"]["atomNum"]    = 5;
-        elements["B"]["val"]        = 3;
-        //elements["B"]["vdw"]        = 1.85;
-        //elements["B"]["cova"]       = 0.83;
-        elemProps["B"]["vdw"]       = 1.85;
-        elemProps["B"]["cova"]      = 0.83;
-        elemProps["B"]["ionM+"]     = 0.41;
-        
+
         elements["Si"]["row"]       = 3;
         elements["Si"]["group"]     = 14;
         elements["Si"]["matType"]   = 7;
