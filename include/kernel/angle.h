@@ -153,6 +153,7 @@ namespace LIBMOL // temp
         std::vector<ID>         atomsNB2Rep;
         std::vector<ID>         atomsNBRep;
         std::map<ID, ID>        atomsSPStats;
+        std::map<ID, ID>        atomsNB1NB2SPStats;
         std::vector<REAL>       codAngleValues;
     };
     

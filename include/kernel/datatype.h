@@ -80,11 +80,18 @@ typedef  std::string urnID;        // turn ID
 enum FileType {MMCIF, CIF, MOL, SDF, PDB};
 
 // May be better using template here
-class sortMap
+class sortIntMap
 {
-  public:
-        std::string key;
-        int val;
+    public:
+        
+        int  key;       // serial number e.g.
+        int  value;     // number of connections e.g.
+};
+
+struct sortMap
+{
+    std::string key;
+    int val;
 };
 
 struct sortMap2

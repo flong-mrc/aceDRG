@@ -258,6 +258,7 @@ namespace LIBMOL // temp
         int  atomPosition(std::vector<AtomDict> & tAtoms);
         
         // These are from Dictionary cif file
+        
         int      seriNum;
         ID       resName;
         ID       id; 
@@ -277,6 +278,8 @@ namespace LIBMOL // temp
         REAL     isoB;
         REAL     ocp;
         int      symmMult;
+        int      excessElec;
+        
         
         
         // These are CCP4 related 
@@ -292,7 +295,8 @@ namespace LIBMOL // temp
         ID       codNB2Symb;
         ID       codNB3Symb;
         ID       codAtmMain;
-        
+        ID       codNB1NB2_SP;
+        ID       codNB1NB2_ExElec;
        
         int      hashingValue;
         bool     coordExist;
@@ -301,10 +305,15 @@ namespace LIBMOL // temp
         bool     isCChemTypeSet;
         bool     isInPreCell;
         bool     chiralChecked;
+        bool     isInAromRing;
+        bool     isInSP2Ring;
+        bool     fromCalc;
         
         // symmetry-related 
         ID       sId;
         ID       symmOp;
+        int      fromOrig;
+       
         // int      bondingIdx;
         /* meaning of curBondingIdx
          * 0      undetermined  
@@ -318,7 +327,8 @@ namespace LIBMOL // temp
          * 0      undetermined
          * 1      chiral center
          */
-        
+         // atom type in small molecule cif
+        ID    sMolType;
         
         std::vector<ID> codClassV;
         

@@ -3,6 +3,7 @@
  * Author: flong
  *
  * Created on April 4, 2012, 5:48 PM
+ * Last modified July 27, 2016
  */
 
 #ifndef CODCLASSIFY_H
@@ -189,10 +190,9 @@ namespace LIBMOL
         // Default constructor
         CodClassify();
             
-        
         CodClassify(const std::vector<AtomDict> & tAtoms);
         
-        // 
+        
         CodClassify(const std::vector<AtomDict>                 & tAtoms,
                     const std::vector<int>                      & tHAtomIdx, 
                     const std::vector<BondDict>                 & tBonds,
@@ -310,7 +310,8 @@ namespace LIBMOL
         // Methods related to planarity generation (depending
         // also on if rings have been detected 
         
-        void setAtomsBondingAndChiralCenter();
+        //void setAtomsBondingAndChiralCenter();
+        // use the standalone function in chemPropSet
         
         // Plane-related
         void detectPlaneGroups();
@@ -336,6 +337,7 @@ namespace LIBMOL
         void hashingAtoms2();
         void setAtomsNBSymb(); 
         void setAtomsNBSymb2();
+        // void setAtomsNB1NB2_SP();
         
         // Tree-related 
         void setAtomsMST();
@@ -352,6 +354,7 @@ namespace LIBMOL
         void groupCodOrgBonds3();
         void searchCodOrgBonds(std::vector<BondDict>::iterator iOB);
         void searchCodOrgBonds2(std::vector<BondDict>::iterator iB);
+        void searchCodOrgBonds2_2(std::vector<BondDict>::iterator iB);
         void levelSearchBonds(std::vector<int>          &      tKeySet1,
                               std::vector<std::string>  &      tKeySet2,
                               int                              tLev,
@@ -440,6 +443,7 @@ namespace LIBMOL
         void groupCodOrgAngles2();
         void groupCodOrgAngles22();
         
+        
         void searchCodOrgAngles(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles2(std::vector<AngleDict>::iterator iAN);
         void searchCodOrgAngles22(std::vector<AngleDict>::iterator iAN);
@@ -447,6 +451,11 @@ namespace LIBMOL
                                 std::vector<std::string>  &      tKeySet2,
                                 int                              tLev,
                                 std::vector<AngleDict>::iterator iAN);
+        void levelSearchAnglesENG( std::vector<int>          &      tKeySet,
+                                   std::vector<std::string>  &      tKeySet2,
+                                   int                              tLev,
+                                   std::vector<AngleDict>::iterator iAN);
+        
         std::string matchRandCenterA(std::string & tR, std::string tCen, 
                                      std::map<ID, std::vector<aValueSet> > tDictAngs);
         bool searchCodOrgAnglesCen(std::vector<AngleDict>::iterator iAN, 
@@ -527,7 +536,9 @@ namespace LIBMOL
         void setOneSetBoronAngles(std::map<int, std::vector<AngleDict> >::iterator tAs);
         void setOneSetCarbonAngles(std::map<int, std::vector<AngleDict> >::iterator tAs);
         
-        // Torsion angles related 
+        // Torsion angles related
+        void setupMiniTorsions();
+        void selectOneTorFromOneBond(ID  tS, std::vector<TorsionDict> & tTors);
         void setupTargetTorsions();
         void fixTorIDs();
         // 
@@ -570,7 +581,7 @@ namespace LIBMOL
         int                                      wSize;
         std::string                              libmolTabDir;
         
-        PeriodicTable            *               pPeriodictable;
+        PeriodicTable *                          pPeriodictable;
         
         
         std::vector<AtomDict>                    allAtoms;
@@ -709,6 +720,7 @@ namespace LIBMOL
         
         
         std::vector<TorsionDict>                            allTorsions;
+        std::vector<TorsionDict>                            miniTorsions;
         std::vector<ChiralDict>                             allChirals;
         std::vector<PlaneDict>                              allPlanes;
         std::map<ID, std::vector<RingDict> >                allRings;

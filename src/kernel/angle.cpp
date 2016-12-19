@@ -244,6 +244,12 @@ namespace LIBMOL
             atomsSPStats[iAt->first] = iAt->second;
         }
         
+        for (std::map<ID, ID>::const_iterator iAt=tAngle.atomsNB1NB2SPStats.begin();
+                iAt !=tAngle.atomsNB1NB2SPStats.end(); iAt++)
+        {
+            atomsNB1NB2SPStats[iAt->first] = iAt->second;
+        }
+        
         for (std::vector<REAL>::const_iterator iAt=tAngle.codAngleValues.begin();
                 iAt != tAngle.codAngleValues.end(); iAt++)
         {

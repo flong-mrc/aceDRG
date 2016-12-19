@@ -277,6 +277,7 @@ namespace LIBMOL
             isoB(ZeroReal),
             ocp(1.0),
             symmMult(1),
+            excessElec(0),
             ccp4Type(NullString),
             cChemType(NullString),
             codClass(NullString),
@@ -287,13 +288,21 @@ namespace LIBMOL
             codNB2Symb(NullString),
             codNB3Symb(NullString),
             codAtmMain(NullString),
+            codNB1NB2_SP(NullString),
+            codNB1NB2_ExElec(NullString),
             hashingValue(ZeroInt),
             coordExist(false),
             numPi(ZeroInt),
             isCChemTypeSet(false),
             isInPreCell(false),
+            chiralChecked(false),
+            isInAromRing(false),
+            isInSP2Ring(false),
+            fromCalc(false),
             sId(NullString),
             symmOp(NullString),
+            fromOrig(-1),
+            sMolType(NullString),
             treeBond(ZeroReal),
             treeAngle(ZeroReal),
             treeTorsion(ZeroReal)
@@ -338,6 +347,7 @@ namespace LIBMOL
             isoB(tAtom.isoB),
             ocp(tAtom.ocp),
             symmMult(tAtom.symmMult),
+            excessElec(tAtom.excessElec),
             ccp4Type(tAtom.ccp4Type),
             cChemType(tAtom.cChemType),
             codClass(tAtom.codClass),
@@ -348,14 +358,21 @@ namespace LIBMOL
             codNB2Symb(tAtom.codNB2Symb),
             codNB3Symb(tAtom.codNB3Symb),
             codAtmMain(tAtom.codAtmMain),
+            codNB1NB2_SP(tAtom.codNB1NB2_SP),
+            codNB1NB2_ExElec(tAtom.codNB1NB2_ExElec),
             hashingValue(tAtom.hashingValue),
             coordExist(tAtom.coordExist),
             numPi(tAtom.numPi),
             isCChemTypeSet(tAtom.isCChemTypeSet),
             isInPreCell(tAtom.isInPreCell),
             chiralChecked(tAtom.chiralChecked),
+            isInAromRing(tAtom.isInAromRing),
+            isInSP2Ring(tAtom.isInSP2Ring),
+            fromCalc(tAtom.fromCalc),
             sId(tAtom.sId),
             symmOp(tAtom.symmOp),
+            fromOrig(tAtom.fromOrig),
+            sMolType(tAtom.sMolType),
             treeBond(tAtom.treeBond),
             treeAngle(tAtom.treeAngle),
             treeTorsion(tAtom.treeTorsion)
@@ -648,11 +665,13 @@ namespace LIBMOL
                     StrTokenize(tSecs[0], tRS, '[');
                     if (tRS.size() > 1)
                     {
+                        // std::cout << "atom type " << codClass << std::endl;
+                        // std::cout << "tRS[1] " << tRS[1]  << std::endl;
                         if (tRS[1].find("a") !=std::string::npos)
                         {
                             baseRingProp["aroma"] = "y";
                         }
-                        
+                        // std::cout << "ring prop " << baseRingProp["aroma"] << std::endl;
                         cleanChar(tRS[1], ']');
                         
                         if(tRS[1].find(",") !=std::string::npos)
@@ -754,6 +773,7 @@ namespace LIBMOL
             if (iAt->seriNum==tSeri && iAt->id.compare(tId)==0)
             {
                 lFind = iAt->seriNum;
+                break;
             }
         }
         

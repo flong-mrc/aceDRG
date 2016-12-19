@@ -381,6 +381,31 @@ namespace LIBMOL
         return getDet(tV1, tV2, tV3);
     }
     
+    
+    extern REAL calNormalizedChiralVol(std::vector<REAL>  & tV1, 
+                                       std::vector<REAL>  & tV2, 
+                                       std::vector<REAL>  & tV3)
+    {
+        
+        REAL tV = getDet(tV1, tV2, tV3);
+        std::cout << "Original Vol " << tV << std::endl;
+        REAL tL1 = lengthV(tV1);
+        REAL tL2 = lengthV(tV2);
+        REAL tL3 = lengthV(tV3);
+        
+        REAL tVS  = tL1*tL2*tL3;
+        std::cout << "Max vol " << tVS << std::endl;
+        if (fabs(tVS) > 0.0000001)
+        {
+            tV = tV/tVS;
+        }
+        
+        std::cout << "Normalized Vol " << tV << std::endl;
+        
+        return tV;
+        
+    }
+    
     extern int inChirals(std::vector<ChiralDict> tChirals, 
                           AtomDict & tInAtom)
     {

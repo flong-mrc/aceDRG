@@ -80,16 +80,16 @@
 #include "CCP4AtomType.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 #ifndef UTILITY_H
 #include "utility.h"
 #endif
 
 #ifndef TRANSCOORD_H
 #include "TransCoord.h"
-#endif
-
-#ifndef CHEMPROPSET_H
-#include "chemPropSet.h"
 #endif
 
 #ifndef CRYSTINFO_H
@@ -113,7 +113,7 @@ namespace LIBMOL
     class Chiral;
     class ChiralDict;
     class Ring;
-    class RinDict;
+    class RingDict;
     
     class Molecule;
     
@@ -178,7 +178,7 @@ namespace LIBMOL
                           int tIdx1, int tIdx2);
         */
         int  getNumOxyConnect(int tIdxMol, std::vector<AtomDict>::iterator iA);
-        void setAtomsBondingAndChiralCenter(int tIdxMol);
+        void setAtomsBondingAndChiralCenterMol(int tIdxMol);
         void setChiral(int tIdxMol);
 
         ID                      molName;
@@ -277,6 +277,7 @@ namespace LIBMOL
         void getAtomInfo(std::string tLine);
         void getBondInfo(std::string tLine);
         void getCrysInfo(std::string tLine);
+        void getRingInfo();
         
         
         void setAtomsCCP4Type();
@@ -295,7 +296,7 @@ namespace LIBMOL
         */
         
         int  getNumOxyConnect(std::vector<AtomDict>::iterator iA);
-        void setAtomsBondingAndChiralCenter();
+        // void setAtomsBondingAndChiralCenter();
         void setChiral();
 
         void iniDict();    
@@ -313,6 +314,7 @@ namespace LIBMOL
         std::vector<AtomDict>   extraHAtoms;
         std::vector<BondDict>   bonds;
         std::vector<ChiralDict> chirals;
+        std::vector<RingDict>   rings;
 
         std::ofstream           outFile;
         std::ifstream           inFile;

@@ -53,6 +53,10 @@
 #include "utility.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
@@ -88,6 +92,10 @@ namespace LIBMOL
         Molecule(const Molecule & aMol);
         // Destructor
         ~Molecule();
+        
+        void setFormula();
+        void calcSumExcessElecs();
+        void calcSumCharges();
              
         std::vector<AtomDict>            atoms;
         std::vector<BondDict>            bonds;
@@ -103,9 +111,14 @@ namespace LIBMOL
         
         int                              seriNum;
         ID                               id;
+        ID                               formula;
+        int                              sumExcessElecs;
+        int                              sumCharges;
         REAL                             atomCovRadMax; 
         bool                             hasCoords;
-        
+        bool                             validated;   
+        bool                             isInf;
+        bool                             stateChanged;
     };
 }
 

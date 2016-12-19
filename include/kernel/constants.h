@@ -40,7 +40,7 @@ static const int DIM3D = 3; // may not need it
 
 // Sone default constants
 #define VDWCONST       0.000    // use carbon-carbon value
-#define RTHRESHOLD     0.15     // used to check small molecule cif 
+#define RTHRESHOLD     0.10     // used to check small molecule cif 
 
 // Process related constants
 

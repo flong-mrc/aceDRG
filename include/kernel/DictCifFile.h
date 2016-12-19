@@ -1,4 +1,4 @@
-/* 
+ /* 
  * File:   CIFFile.h
  * Author: flong
  *
@@ -73,6 +73,10 @@
 #include "CCP4AtomType.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 #ifndef UTILITY_H
 #include "utility.h"
 #endif
@@ -107,6 +111,10 @@
 #include "chemPropSet.h"
 #endif
 
+#ifndef MOLECULE_H
+#include "molecule.h"
+#endif
+
 namespace LIBMOL
 {
     class Atom;
@@ -132,6 +140,8 @@ namespace LIBMOL
     
     class PeriodicTable;
     class CCP4AtomType;
+    
+    class Molecule;
     
     struct DictCifHead {
         Name   libName;
@@ -182,6 +192,8 @@ namespace LIBMOL
         
         void setupSystem();
         void setupSystem2();
+        void checkPowder(std::vector<std::string> & tLines);
+        void checkCalcAtoms();
         void getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines,
                             std::map<std::string, std::string>  & tRowProps,
                             std::map<int, std::map<ID, std::vector<std::string> > > & tColProps,
@@ -203,7 +215,12 @@ namespace LIBMOL
         void getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
         void getAtomInfoFromLine(std::vector<std::string> & tStrs,
                                  int tP1, int tP2, int tP3, 
-                                 int tP4, int tP5, int tPOcp);
+                                 int tP4, int tP5, int tPOcp,
+                                 int tPCalc);
+        
+        void getCifAtomOxiInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
+        void getAtomOxiInfoFromLine(std::vector<std::string> & tStrs,
+                                 int tPosType, int tPosOxi);
         
         void setFlags(std::map<std::string, bool> & tL,
                       std::string tS);
@@ -217,6 +234,7 @@ namespace LIBMOL
         // Atoms related 
         void getAtomInfo(std::vector<std::string> tF);
         void checkAtomElementID();
+        void checkNonHAtomOccp();
         void setAtomsCCP4Type();
         int  atomPosition(ID tID);
         void setAtomsPartialCharges();
@@ -240,6 +258,8 @@ namespace LIBMOL
         void setAtomsCChemType();
         
         void setAtomsMetalType();
+        
+        void setAtomOxiType();
         
         void addMissHydroAtoms();
         
@@ -300,6 +320,8 @@ namespace LIBMOL
         
         int                        curBlockLine;
         
+        bool                       lErr;
+        
         std::vector<CrystInfo>                              allCryst;
         
         std::map<ID, std::vector<std::string> >             allCifKeys;
@@ -329,15 +351,22 @@ namespace LIBMOL
         
         std::vector<int>           allHydroAtoms;
         
+        std::map<ID, REAL>         typeChargeMap;
         std::vector<ID>            MetalTable;
         
+        std::vector<ID>            errMsg;
         
         std::ofstream              outFile;
         std::ifstream              inFile;
         
         bool                       hasCoords;
         bool                       hasH;
+        bool                       hasMetal;
+        bool                       notPowder;
+        bool                       resolOK;
         bool                       RFactorOK;
+        bool                       colidOK;    // check before molecule generated
+        bool                       hasHeavyCalcAtoms;
         
     private:
             
@@ -448,7 +477,8 @@ namespace LIBMOL
         // Chiral-related 
         void getChiralInfo(std::vector<std::string> tF);
         
-        void setAtomsBondingAndChiralCenter();
+        // void setAtomsBondingAndChiralCenter();
+        // using standalone one
         void setAllChirals();
         
         void setDefaultCoordGeos();
@@ -524,6 +554,9 @@ namespace LIBMOL
 
         int                        curBlockLine;
         
+        bool                       isPeptide;
+        bool                       isDRna;
+        
         
         std::map<ID, std::vector<std::string> >             allCifKeys;
         
@@ -596,9 +629,13 @@ namespace LIBMOL
                          std::vector<LIBMOL::BondDict>& tBonds, 
                          std::vector<LIBMOL::AngleDict>& tAngs, 
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
-                         std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> > & tRings, 
+                         std::vector<LIBMOL::RingDict> & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs);
+    
+    extern void outMMCifFromOneMol(FileName tFName, 
+                                   ID tMonoRootName,
+                                   Molecule & tMol);
     
     extern int getHAtomNum(std::vector<LIBMOL::AtomDict>& tAtoms);
 
@@ -610,6 +647,9 @@ namespace LIBMOL
     extern void outAtomTypesAndConnections(FileName tFName,
                                            std::vector<LIBMOL::AtomDict>& tAtoms,
                                            std::vector<LIBMOL::BondDict>& tBonds);
+    
+    extern void outMetalAtomInfo(FileName tFName,
+                                 GenCifFile  & tCifObj);
 }
 
 

@@ -24,6 +24,8 @@
 #include "residue.h"
 #endif
 
+
+
 namespace LIBMOL
 {
     class Atom;
@@ -168,8 +170,10 @@ namespace LIBMOL
         
         ID                      resName;
         SeriNumber              seriNum;
+        int                     molIdx;
         
         std::string             order;
+        int                     orderK;
         REAL                    orderN;
         REAL                    value;
         REAL                    sigValue;
@@ -195,6 +199,8 @@ namespace LIBMOL
         std::vector<ID>         atomsCodClasses;
         std::vector<int>        atomsHashingCodes;
         std::map<ID, ID>        atomSPs;
+        std::map<ID, ID>        atomNB1NB2SPs;
+        std::map<ID, ID>        atomNB2ExtraEls;
         
         std::vector<ID>         atomsMainRep;
         std::vector<ID>         atomsNBRep;
@@ -236,8 +242,21 @@ namespace LIBMOL
     
     extern int getBond(std::vector<BondDict> & tAllBonds, int tAt1, int tAt2);
     
+    extern void modifyBondOrder(std::vector<BondDict> & tAllBonds,
+                                 std::vector<AtomDict> & tAllAtoms,
+                                 int tAt1, int tAt2, int tOrder);
+    
+    
+    extern void modifyOneDelocBond(std::vector<BondDict> & tBonds,
+                                 std::vector<AtomDict>   & tAtoms,
+                                 int tIdx1, int tIdx2);
+    extern void setOrderStrforBonds(std::vector<BondDict> & tBonds);
+    
     extern bool checkIfBondInSameRing(std::vector<AtomDict> & tAtoms, 
                                       int idxA1, int idxA2);
+    
+    
+    
     
 }
 

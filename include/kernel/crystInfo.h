@@ -84,6 +84,29 @@ namespace LIBMOL
         
     };
     
+    class Resolution
+    {
+    public :
+        // Default constructor
+        Resolution();
+        
+        // Copy constructor
+        Resolution(const Resolution & tResol);
+        
+        // Destructor 
+        ~Resolution();
+        
+        void setResol();
+        
+        REAL                          resolLimit;
+        REAL                          dMax;
+        REAL                          thetaMax;
+        REAL                          wavLen;
+        bool                          lSet;
+        
+        
+        
+    };
     
      /* Class crystInfo contains variables and function that describe the 
      * crystal symmetrical properties.
@@ -112,6 +135,7 @@ namespace LIBMOL
         
         Cell                 *    itsCell;
         SpaceGroupMember     *    itsSpaceGroup;
+        Resolution           *    itsResolution;
 
     };
     

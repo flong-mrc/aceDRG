@@ -192,7 +192,9 @@ namespace LIBMOL
     // simplified version of bond 
     BondDict::BondDict(): resName(NullString),
             seriNum(ZeroInt),
+            molIdx(ZeroInt),
             order(NullString),
+            orderK(ZeroInt),
             orderN(ZeroReal),
             value(ZeroReal),
             sigValue(0.02),
@@ -213,7 +215,9 @@ namespace LIBMOL
     
     BondDict::BondDict(const BondDict& tBond): resName(tBond.resName),
             seriNum(tBond.seriNum),
+            molIdx(tBond.molIdx),
             order(tBond.order),
+            orderK(tBond.orderK), 
             orderN(tBond.orderN),
             value(tBond.value),
             sigValue(tBond.sigValue),
@@ -258,7 +262,19 @@ namespace LIBMOL
         {
             atomSPs[tA->first]=tA->second;
         }
-                
+        
+        for (std::map<ID, ID>::const_iterator tA = tBond.atomNB1NB2SPs.begin();
+                tA != tBond.atomNB1NB2SPs.end(); tA++)
+        {
+            atomNB1NB2SPs[tA->first]=tA->second;
+        }
+        
+        for (std::map<ID, ID>::const_iterator tA = tBond.atomNB2ExtraEls.begin();
+                tA != tBond.atomNB2ExtraEls.end(); tA++)
+        {
+            atomNB2ExtraEls[tA->first]=tA->second;
+        }
+        
         for (std::vector<ID>::const_iterator tA = tBond.atomsMainRep.begin();
                 tA != tBond.atomsMainRep.end(); tA++)
         {
@@ -350,6 +366,65 @@ namespace LIBMOL
         return tBo;
     }
     
+    extern void modifyBondOrder(std::vector<BondDict> & tAllBonds,
+                                std::vector<AtomDict> & tAllAtoms,
+                                int tAt1, int tAt2, int tOrder)
+    {
+        int idxB = getBond(tAllBonds, tAt1, tAt2);
+        if (idxB !=-1)
+        {
+            tAllBonds[idxB].orderN += (tOrder);
+        }
+        else
+        {
+            std::cout << "It does not exist for the bond between atom "
+                      << tAllAtoms[tAt1].id << " with serial number " 
+                      << tAllAtoms[tAt1].seriNum 
+                      << " and atom " << tAllAtoms[tAt2].id
+                      << " with serial number " 
+                      << tAllAtoms[tAt2].seriNum
+                      << std::endl;
+            exit(1);
+        }
+    }
+    
+
+    extern void modifyOneDelocBond(std::vector<BondDict> & tBonds,
+                                   std::vector<AtomDict>   & tAtoms,
+                                   int tIdx1, int tIdx2)
+    {
+        int idxB = getBond(tBonds, tIdx1, tIdx2);
+        if (idxB !=-1)
+        {
+            tBonds[idxB].order = "DELOC";
+        }
+        else
+        {
+            std::cout << "It does not exist for the bond between atom "
+                      << tAtoms[tIdx1].id << " with serial number " 
+                      << tAtoms[tIdx1].seriNum 
+                      << " and atom " << tAtoms[tIdx2].id
+                      << " with serial number " 
+                      << tAtoms[tIdx2].seriNum
+                      << std::endl;
+            exit(1);
+        }
+    }
+    
+    extern void setOrderStrforBonds(std::vector<BondDict> & tBonds)
+    {
+        for (std::vector<BondDict>::iterator iBo=tBonds.begin();
+                iBo != tBonds.end(); iBo++)
+        {
+            ID tStr = iBo->order;
+            StrUpper(tStr);
+            if (tStr.find("DELOC")==std::string::npos)
+            {
+                OrderToStr(iBo->orderN, iBo->order);
+            }
+        }
+    }
+    
     extern bool checkIfBondInSameRing(std::vector<AtomDict> & tAtoms, 
                                       int tIdx1, int tIdx2)
     {
@@ -368,6 +443,5 @@ namespace LIBMOL
         return lInRing;
         
     }
-    
     
 }

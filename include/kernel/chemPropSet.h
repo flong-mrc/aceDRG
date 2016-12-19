@@ -130,15 +130,31 @@ namespace LIBMOL
     
     extern void getHydroAtomConnect(std::vector<AtomDict>  &  tAtoms);
     
+    extern void mdChiralByClasses(std::vector<AtomDict>::iterator iAt,
+                                  std::vector<AtomDict>     &     tAtoms);
     // Two stages for sp hybridization (They will be merged to the same
     // function once the second one passes tests
     // 1. Currently used one (originally in codClassify.h and .cpp) 
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms);
-    // 2. Added one
+    // 2. For modAtomsBondingAndChiralCenter
+    // tMode 0 : not use coordinates (in dictionary generation stage) 
+    // tMode 1 : definitely have reliable coordinates (in DB molecule generation stage)
     extern void modAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms,
                                                std::vector<BondDict> & tBonds,
                                                std::vector<AngleDict> & tAngles,
-                                               std::vector<RingDict> & tRings);
+                                               std::vector<RingDict> & tRings,
+                                               int                     tMode);
+    
+    extern void setAtomsNB1NB2_SP(std::vector<AtomDict> & tAtoms);
+    extern void setAtomsNB1NB2_exElectrons(std::vector<AtomDict> & tAtoms);
+    
+    extern void setBondsAndAngles_NB1NB2_SP(std::vector<AtomDict> & tAtoms,
+                                            std::vector<BondDict> & tBonds,
+                                            std::vector<AngleDict> & tAngles);
+    
+    extern void setBondsAndAngles_NB1NB2_EE(std::vector<AtomDict> & tAtoms,
+                                            std::vector<BondDict> & tBonds,
+                                            std::vector<AngleDict> & tAngles);
     
     extern void reIndexAtomInRing(std::vector<AtomDict> & tAtoms,
                                   std::vector<RingDict> & tRings);
@@ -148,6 +164,11 @@ namespace LIBMOL
     
     extern bool confirmPlaneByChiralVol(std::vector<AtomDict> & tAtoms,
                                         std::vector<AtomDict>::iterator tA);
+    
+    extern bool confirmPlaneByAngle(std::vector<AtomDict> & tAtoms,
+                                    std::vector<AtomDict>::iterator tA,
+                                    REAL                    tCri);
+    
     // a function transfer int sp to a string
     extern std::string strTransSP(int tSP);
     
@@ -244,6 +265,16 @@ namespace LIBMOL
                                    std::vector<AtomDict>   & tAtoms,
                                    std::vector<AtomDict>::iterator tIA);
     
+    extern void modifyBondOrderAR(std::vector<BondDict> & tBonds,
+                                  std::vector<AtomDict>  & tAtoms,
+                                  int  tIdxB1, int tIdxB2,
+                                  int tAtCen, int tAt1, int tAt2,
+                                  PeriodicTable & tTab);
+    
+    extern REAL  getFixedBondOrder(std::vector<BondDict>   & tBonds, 
+                                    std::vector<AtomDict>   & tAtoms,
+                                    int                       tAtmIdx);
+    
     extern REAL  getBondOrder(Molecule   & tMol,
                               int tIdx1, int tIdx2);
     
@@ -256,6 +287,14 @@ namespace LIBMOL
     extern void  setAllBondOrders(std::vector<AtomDict> & tAtoms,
                                  std::vector<BondDict> & tBonds);
     
+    extern void  kekulizeRings(std::vector<AtomDict> & tAtoms,
+                               std::vector<BondDict> & tBonds,
+                               std::vector<RingDict> & tRings);
+    extern void  kekulizeOneRing(std::vector<AtomDict> & tAtoms,
+                                 std::vector<BondDict> & tBonds,
+                                 RingDict & tRing, int tStartIdx,
+                                 PeriodicTable & tTab);
+    
     extern void  setOneHAtomCoords();
     
     extern void  setOneHAtomCoordsSP3(std::vector<AtomDict> & tAtoms,
@@ -265,21 +304,123 @@ namespace LIBMOL
     extern void  setOneHAtomCoordsSP(std::vector<AtomDict> & tAtoms,
                                      std::vector<AtomDict>::iterator tIA);
     
+    extern void setAllAtomEXcessElectrons(std::vector<AtomDict> & tAtoms);
+    extern void setAllAtomEXcessElectrons2(std::vector<AtomDict> & tAtoms);
+                
+    extern void setAtomRingProps(std::vector<AtomDict> & tAtoms,
+                                 std::vector<RingDict> & tRings);
+    
+    extern void setInitBondOrdersViaExtraElecs(std::vector<AtomDict> & tAtoms,
+                                               std::vector<BondDict> & tBonds);
+                
+    extern int  sumExElectrons(std::vector<AtomDict> & tAtoms);
+    
+    
     // atom and bond stereo  
     extern void checkAllStereo(FileName tMdlIn, FileName tPdbIn,
                                FileName tPdbOut);
     extern void checkStereoOneMol(std::vector<Molecule>::iterator tMol,
                                   FileName tPdbOut);
     
-    
     // Check aromatic stability of extended ring systems.
     // using it to decide planes in the systems(molecules or monomers)
-    
-    
     
     extern void setAromPlanes(std::vector<AtomDict> & tAtoms,
                               std::vector<RingDict> & tRings,
                               std::vector<PlaneDict> & tPlans);
+    
+    class HuckelMOSuite
+    {
+    public :
+        
+        HuckelMOSuite();
+        ~HuckelMOSuite();
+        
+        void setWorkMode(int tMode);
+        void execute(std::vector<AtomDict> & tAtoms, 
+                     std::vector<BondDict> & tBonds);
+        void execute2(std::vector<AtomDict> & tAtoms, 
+                      std::vector<BondDict> & tBonds,
+                      std::vector<RingDict> & tRings);
+        
+        void initiaExElecs(std::vector<AtomDict> & tAtoms);
+        void initiaExElecs2(std::vector<AtomDict> & tAtoms);
+        void PickPiElectrons(std::vector<AtomDict> & tAtoms);
+        void PickOddAtoms(std::vector<AtomDict> & tAtoms);
+        
+        void setInitBondOrder(std::vector<AtomDict> & tAtoms,
+                              std::vector<BondDict> & tBonds,
+                              std::vector<int>      & tCBondIdx,
+                              std::map<int, std::vector<int> > & tDelConn,
+                              std::map<int, int>    & tRemainval);
+        void setProBondOrdersOneLoop(int & nDone, std::vector<AtomDict> & tAtoms, 
+                                     std::vector<BondDict> & tBonds, 
+                                     std::vector<int> & tCBondIdx, 
+                                     std::map<int, std::vector<int> > & remainConns, 
+                                     std::map<int, std::vector<int> > & tDelConn, 
+                                     std::map<int, int>   &  tRemainVal);
+        void setBondOrderInSys(std::vector<AtomDict> & tAtoms,
+                               std::vector<BondDict> & tBonds);
+        void setBondOrderInSys2(std::vector<AtomDict> & tAtoms,
+                                std::vector<BondDict> & tBonds,
+                                std::vector<RingDict> & tRings);
+        
+        void modBondOrderViaAnnEXOneConn(std::vector<AtomDict> & tAtoms,
+                                         std::vector<BondDict> & tBonds);
+        void modBondOrderViaAnnEXOneLoop(std::vector<AtomDict> & tAtoms,
+                                         std::vector<BondDict> & tBonds,
+                                         int                   &  tNOpr);
+        void checkIsoExAtoms(std::vector<AtomDict> & tAtoms);
+        
+        void partitionSysToSubGraphs(std::vector<AtomDict>  & tAtoms);
+        
+        void checkChargeInSubGraphs(std::vector<AtomDict>  & tAtoms);
+        int  sumExElecsInSubGraph(std::vector<AtomDict>  & tAtoms, 
+                                  std::vector<int>       & tGraph);
+        void assignChargesInSubGraph(std::vector<AtomDict>  & tAtoms, 
+                                  std::vector<int>       & tGraph);
+        void assignChargeOneInSubGraph(std::vector<AtomDict>  & tAtoms, 
+                                       std::vector<int>       & tIdxNs,
+                                       bool                   & tL);
+        void setEquivAtoms(std::vector<AtomDict> & tAtoms,
+                           std::vector<BondDict> & tBonds);
+        void modDelocBondsByEquivAtoms(std::vector<AtomDict> & tAtoms,
+                                       std::vector<BondDict> & tBonds,
+                                       std::vector<int>      & tIdxs);
+        
+        void setHMatrix(std::vector<AtomDict>  & tAtoms, REAL ** tH,
+                        std::vector<int> & tSubGraph);
+        void getBondOrderFromOrb(int tNOrbs, REAL ** tEigenVect,
+                                 std::vector<AtomDict>  & tAtoms,
+                                 std::vector<int> & tSubGraph);
+        void MOSolver(std::vector<AtomDict>  & tAtoms);
+        void BondTrans(std::vector<BondDict> & tBonds);
+        
+        void outBoAndChList(FileName                 tFName, 
+                            std::vector<AtomDict>  & tAtoms,
+                            std::vector<BondDict>  & tBonds);
+        
+        void checkUpdate(REAL & tPreV, int & tProV);
+        
+        bool                                   lUpdate;
+        
+        std::map<int, std::map<int, REAL> >    BondOrderFromMO;
+        
+        std::map<ID, REAL>                     orgAlphas;
+        std::map<ID, REAL>                     orgBetas;
+        
+        std::vector<int>                       zeroExAtomIdxs;
+        std::vector<int>                       withExAtomIdxs;
+        std::map<int, int>                     oddAtomIdxs;
+        std::map<int, std::vector<int> >       allSubGraphs;
+        
+        
+    private:
+        
+        int                                    workMode;
+        
+    };
+    
     
     
 }

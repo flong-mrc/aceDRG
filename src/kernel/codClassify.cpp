@@ -14,6 +14,7 @@ namespace LIBMOL
                                libmolTabDir("")
     {    
         pPeriodictable = new PeriodicTable();
+
     }
     
     
@@ -77,7 +78,7 @@ namespace LIBMOL
                                                          
     {
         libmolTabDir = tLibmolTabDir;
-        
+       
         pPeriodictable = new PeriodicTable();
         
         for (std::vector<AtomDict>::const_iterator iA=tCifObj.allAtoms.begin();
@@ -136,9 +137,8 @@ namespace LIBMOL
             allHydroAtoms.push_back(*iH);
         }
         
-        setupSystem();
-        
-                
+        setupSystem2();
+                   
     }
     
     CodClassify::CodClassify(const std::vector<Molecule>& tMols,
@@ -164,7 +164,7 @@ namespace LIBMOL
     }
     
     CodClassify::CodClassify(const AllSystem& tAllSys):wSize(1000),
-                                                       libmolTabDir("")
+                             libmolTabDir("")
     {
         pPeriodictable = new PeriodicTable();
         
@@ -392,74 +392,6 @@ namespace LIBMOL
         
     }
     
-    /*
-    void CodClassify::setupSystem()
-    {
-        
-        int cLev = 2;      // should be a constant from an input file
-        
-       
-        codAtomClassify(cLev);
-        
-        setAtomsBondingAndChiralCenter();
-        
-        getCCP4BondAndAngles();
-        
-        // std::vector<RingDict>          tmpRings;
-        // std::vector<std::vector<int> > tmpAtoms;
-        
-        if (allRings.size() !=0)
-        {
-            for (std::map<ID, std::vector<RingDict> >::iterator iMr=allRings.begin();
-                    iMr !=allRings.end(); iMr++)
-            {
-                for(std::vector<RingDict>::iterator iR=iMr->second.begin();
-                        iR !=iMr->second.end(); iR++)
-                {
-                    // tmpRings.push_back(*iR);
-                    
-                    iR->setPlaneProp();
-                    
-                    
-                    std::string PL("No");
-                    if (iR->isPlanar)
-                    {
-                        PL = "Yes";
-                    }
-                    
-                    std::cout << "Is ring, " << iMr->first << ", a planar ring? "
-                              <<  PL << std::endl;
-                   
-                }
-            }
-        }
-        
-        
-        mergePlaneRings(tmpRings, tmpAtoms);
-        
-        std::cout << "Number of merged atom rings " 
-                  << tmpAtoms.size() << std::endl;
-        
-        for (std::vector<std::vector<int> >::iterator iR=tmpAtoms.begin();
-                iR !=tmpAtoms.end(); iR++)
-        {
-            std::cout << "Atoms in a merged ring : " << std::endl;
-            for (std::vector<int>::iterator iAt=iR->begin();
-                    iAt !=iR->end(); iAt++)
-            {
-                std::cout << allAtoms[*iAt].id << std::endl;
-            }
-        }
-         
-        exit(0);
-        
-        
-        // detectPlaneGroups();
-        
-        // initTargetAngles();
-    }
-    */
-    
     void CodClassify::setupSystem()
     {
         
@@ -470,7 +402,7 @@ namespace LIBMOL
         
         // codAtomClassifyNew2(cLev);
         
-        setAtomsBondingAndChiralCenter();
+        setAtomsBondingAndChiralCenter(allAtoms);
         
         getCCP4BondAndAngles();
         
@@ -548,7 +480,7 @@ namespace LIBMOL
         
         codAtomClassifyNew2(cLev);
         
-        setAtomsBondingAndChiralCenter();
+        setAtomsBondingAndChiralCenter(allAtoms);
         
         getCCP4BondAndAngles();
         
@@ -595,8 +527,10 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
         {
+            //std::cout << "Atom ID " << iAt->id << std::endl; 
+            //std::cout << "atom type " << iAt->id << std::endl;
             iAt->setBaseRingProps();
-            
+            //std::cout << "base ring prop " << iAt->baseRingProp["aroma"] << std::endl;
         }
         
         // set ring properties of all bonds and angles
@@ -620,12 +554,21 @@ namespace LIBMOL
         
         
         
-        modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV);
+        modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
         
         //if (!hasCCP4Type)
         //{
         //    setAtomsCCP4Type();
         //}
+        
+        // setupMiniTorsions();
+        
+        setAtomsNB1NB2_SP(allAtoms);
+        
+        setAtomsNB1NB2_exElectrons(allAtoms);
+        
+        hashingAtoms2();
+        
         
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
@@ -636,10 +579,16 @@ namespace LIBMOL
                       << "Its COD root atom type " << iAt->codAtmRoot << std::endl
                       << "Its acedrg atom type " << iAt->codClass << std::endl
                       << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
-                      << "Its ccp4 atom type " << iAt->ccp4Type 
-                      << std::endl;    
+                      << "Its base ring type " << iAt->baseRingProp["aroma"] << std::endl
+                      << "Its ccp4 atom type " << iAt->ccp4Type << std::endl
+                      << "Its second NB sp props " << iAt->codNB1NB2_SP << std::endl
+                      << "Its number of extra-electrons is " << iAt->excessElec << std::endl
+                      << "Its second NB extra-electron sign is " << iAt->codNB1NB2_ExElec << std::endl
+                      << "Its hashing is " << iAt->hashingValue << std::endl; 
+                    
         }
         
+        /*
         for (std::vector<BondDict>::iterator iB = allBonds.begin();
                 iB !=allBonds.end(); iB++)
         {
@@ -654,6 +603,7 @@ namespace LIBMOL
                 std::cout << "It is not in the same ring" << std::endl;
             }
         }
+        
         
         for (std::vector<AngleDict>::iterator iA=allAngles.begin(); 
                 iA !=allAngles.end(); iA++)
@@ -670,8 +620,8 @@ namespace LIBMOL
                 std::cout << "It is not in the same ring" << std::endl;
             }
         }
-      
-        /*
+        
+       
         std::cout << "Torsion angles are : " << std::endl;
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
                 iTor !=allTorsions.end(); iTor++)
@@ -918,12 +868,12 @@ namespace LIBMOL
         {
            setSpecial3NBSymb2(iAt);
            //std::cout << "Now atom " << iAt->id << std::endl 
-           //          << "class is " << iAt->codClass << std::endl; 
+            //         << "class is " << iAt->codClass << std::endl; 
         }
         
         setAtomsNBSymb2();
         
-        hashingAtoms2();
+        // hashingAtoms2();
         
         
         
@@ -973,19 +923,19 @@ namespace LIBMOL
         {
             allAtoms[i].codClass = "";
             setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
-            
-            std::cout << std::endl << "For atom " << allAtoms[i].id << std::endl 
-                      << "class is " << allAtoms[i].codClass << std::endl;            
+            //std::cout << std::endl << "Here For atom " << allAtoms[i].id << std::endl 
+            //          << "class is " << allAtoms[i].codClass << std::endl;            
         }
         
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                iAt !=  allAtoms.end(); iAt++)
         {
-            setSpecial3NBSymb(iAt);
-            std::cout << "Now atom " << iAt->id << std::endl 
-                      << "class is " << iAt->codClass << std::endl; 
+            setSpecial3NBSymb2(iAt);
+            //std::cout << "Now atom " << iAt->id << std::endl 
+            //          << "class is " << iAt->codClass << std::endl; 
         }
         
+        setAtomsNBSymb2();
         
     }
     
@@ -1281,7 +1231,7 @@ namespace LIBMOL
             
             
             // Now Set all level of atom hierarchical symbols
-            
+            /*
             if (atmStrs.size() < 2)
             {
                 std::cout << tAt.id << " has atom class symbol: "
@@ -1289,6 +1239,7 @@ namespace LIBMOL
                           << std::endl;
                 exit(1);
             }
+             */
             
             
             //std::cout << "Atom itself " << tAt.codAtmRoot << std::endl;
@@ -3117,7 +3068,210 @@ namespace LIBMOL
             //std::cout << "Its COD class is : " << tAtom.codClass 
             //          << std::endl <<std::endl;
         }
-        
+    }
+    
+    void CodClassify::setAtomCodClassNameNew3(AtomDict & tAtom,
+                                              AtomDict & tOriAtom,
+                                              int tLev)
+    {   
+        if (tLev==1)
+        {
+            tAtom.codClass = "";
+            tAtom.codClass.append(tAtom.chemType);
+            // outRingSecNew(tAtom);
+            outRingSecNew(allAtoms[tAtom.fromOrig]);
+            std::string tStr;
+            std::list<std::string> tStrList, tStrList1;
+            std::map<ID, int> comps;
+            
+            //tStrList.push_back(tAtom.chemType);
+            
+            //std::cout << "Id list size " << (int) tStrList.size() << std::endl;
+            // just get immediate neighbor atom ID
+            //for (std::vector<int>::iterator tNBAtom=tAtom.connAtoms.begin();
+            //        tNBAtom != tAtom.connAtoms.end(); tNBAtom++)
+            for (std::vector<int>::iterator tNBAtom=allAtoms[tAtom.fromOrig].connAtoms.begin();
+                    tNBAtom != allAtoms[tAtom.fromOrig].connAtoms.end(); tNBAtom++)   
+            {
+                if(allAtoms[*tNBAtom].seriNum != tOriAtom.seriNum)
+                {
+                    // tStrList.push_back(allAtoms[*tNBAtom].chemType);
+                    std::string t2NBType;
+                    t2NBType.append(allAtoms[*tNBAtom].chemType);
+                    outRingSecNew2(t2NBType, allAtoms[*tNBAtom]);
+                    if(comps.find(t2NBType) != comps.end())
+                    {
+                        comps[t2NBType] += 1;
+                    }
+                    else
+                    {
+                        comps[t2NBType] = 1; 
+                    }
+                }
+            }
+            
+            sortMap  tCMap;
+            std::vector<sortMap> tCVec;
+            
+            for (std::map<ID, int>::iterator tM=comps.begin();
+                   tM !=comps.end(); tM++)
+            {
+                tCMap.key = tM->first;
+                tCMap.val = tM->second;
+                tCVec.push_back(tCMap);
+            }
+            
+            std::sort(tCVec.begin(),tCVec.end(), desSortMapKey);
+            
+            for (std::vector<sortMap>::iterator iMa=tCVec.begin();
+                    iMa !=tCVec.end(); iMa++)
+            {
+                std::string s1, s2;
+                s1 = iMa->key + IntToStr(iMa->val);
+                for (int i=0; i < iMa->val; i++)
+                {
+                    s2.append(iMa->key);
+                }
+                if ((int)s1.size() < (int)s2.size())
+                {
+                    tStrList.push_back(s1);
+                }
+                else
+                {
+                    tStrList.push_back(s2);
+                }
+            }
+            
+            /*
+            for (std::map<ID, int>::iterator iMa=comps.begin();
+                    iMa !=comps.end(); iMa++)
+            {
+                std::string s1, s2;
+                s1 = iMa->first + IntToStr(iMa->second);
+                for (int i=0; i < iMa->second; i++)
+                {
+                    s2.append(iMa->first);
+                }
+                if ((int)s1.size() < (int)s2.size())
+                {
+                    tStrList.push_back(s1);
+                }
+                else
+                {
+                    tStrList.push_back(s2);
+                }
+            }
+            */
+            
+            // tStrList.sort(compareNoCase2);
+            // std::cout << "sort Id list size " << (int) tStrList.size() << std::endl;
+            for (std::list<std::string>::iterator iL = tStrList.begin();
+                    iL != tStrList.end(); iL++)
+            {
+                tStr.append(*iL);
+            }
+            
+            //std::cout << "the final str size " << (int) tStr.size() << std::endl;
+            tAtom.nbRep.push_back(tStr);
+            tAtom.codClass.append(tStr);
+        }
+        else if(tLev==2)
+        {
+            tAtom.codClass = "";
+            tAtom.codClass.append(tAtom.chemType);
+            outRingSecNew(tAtom);
+            //std::cout << "Atom " << tAtom.id << " its COD ring section " 
+            //          <<  tAtom.codClass << std::endl;
+            
+            int lowLev = tLev - 1;
+            std::map<std::string, std::vector<int> > tIdMap;
+            for (std::vector<int>::iterator tNBA=tAtom.connAtoms.begin();
+                    tNBA != tAtom.connAtoms.end(); tNBA++)
+            {
+                AtomDict aNBAtom(allAtoms[*tNBA]);
+                setAtomCodClassNameNew2(aNBAtom, tOriAtom, lowLev);
+                /*
+                std::list<std::string> tStrList;
+                std::string tStr(allAtoms[*tNBA].chemType);
+                tStr.append(outRingSecStr(allAtoms[*tNBA]));
+                
+                for (std::vector<int>::iterator tNNBA=allAtoms[*tNBA].connAtoms.begin();
+                        tNNBA != allAtoms[*tNBA].connAtoms.end(); tNNBA++)
+                {
+                    if(allAtoms[*tNNBA].id.compare(tAtom.id) !=0)
+                    {
+                        tStrList.push_front(allAtoms[*tNNBA].chemType);
+                    }
+                }
+                tStrList.sort(compareNoCase);
+                for (std::list<std::string>::iterator iSL=tStrList.begin();
+                        iSL != tStrList.end(); iSL++)
+                {
+                    tStr.append(*iSL);
+                }
+                */
+                
+                if(tIdMap.find(aNBAtom.codClass) !=tIdMap.end())
+                {
+                    tIdMap[aNBAtom.codClass][0]++;
+                    
+                }
+                else
+                {
+                    tIdMap[aNBAtom.codClass].push_back(1);
+                    tIdMap[aNBAtom.codClass].push_back((int)aNBAtom.connAtoms.size());
+                }
+                 
+            }
+            
+            //sortMap  tSMap;
+            //std::vector<sortMap> tVec;
+            
+            
+            std::vector<sortMap2> tVec;
+            
+            for (std::map<std::string, std::vector<int> >::iterator tM=tIdMap.begin();
+                   tM !=tIdMap.end(); tM++)
+            {
+                struct sortMap2  tSMap2;
+                tSMap2.key = tM->first;
+                tSMap2.val = tM->second[0];
+                tSMap2.nNB = tM->second[1];
+                tVec.push_back(tSMap2);
+            }
+            
+            std::sort(tVec.begin(),tVec.end(), desSortMapKey2);
+            
+            // check
+            /*
+            if (tAtom.id == "B4")
+            {
+               std::cout << "After sorting " << std::endl;
+               for (std::vector<sortMap>::iterator iV=tVec.begin();
+                    iV != tVec.end(); iV++)
+               {
+                    std::cout << " key: " << iV->key << " value : "
+                          << iV->val << std::endl;
+               }
+            }
+            */
+            for(std::vector<sortMap2>::iterator iV=tVec.begin();
+                    iV !=tVec.end(); iV++)
+            {
+                if (iV->val ==1)
+                {
+                    tAtom.codClass.append("("+iV->key+")");
+                }
+                else
+                {
+                    tAtom.codClass.append("(" + iV->key + ")" + IntToStr(iV->val));
+                }
+            }
+            
+            //std::cout<<"For atom " << tAtom.id << " : " << std::endl;
+            //std::cout << "Its COD class is : " << tAtom.codClass 
+            //          << std::endl <<std::endl;
+        }
     }
     
     
@@ -3452,7 +3606,7 @@ namespace LIBMOL
             std::cout<<std::endl;
         }
     }
-    
+    /*
     void CodClassify::setAtomsBondingAndChiralCenter()
     {
   
@@ -3585,6 +3739,12 @@ namespace LIBMOL
         // more conditions 
         // Do oxygen atom first, to see if an Oxygen atom of two connections 
         // is sp2. The default one in the above step is sp3 
+        std::map<int, int> preBondingIdx;
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            preBondingIdx[iAt->seriNum] = iAt->bondingIdx;
+        }
         
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++)
@@ -3657,7 +3817,7 @@ namespace LIBMOL
                         for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                                  iCA != iAt->connAtoms.end(); iCA++)
                         {
-                            if(allAtoms[*iCA].bondingIdx == 2)
+                            if(preBondingIdx[*iCA] == 2)
                             {
                                 l_sp2 = true;
                                 break;
@@ -3712,157 +3872,8 @@ namespace LIBMOL
                 {
                     iA->chiralIdx = 0;
                 }
-            }
-            
-            
+            } 
         }
-        /*
-        // First round
-        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
-                iAt != allAtoms.end(); iAt++)
-        {
-            int t_len =0;
-            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
-                    iConn !=iAt->connAtoms.end(); iConn++)
-            {
-                if(!allAtoms[*iConn].isMetal)
-                {
-                    t_len++;
-                }
-            }
-            if (iAt->chemType.compare("C")==0)
-            {
-                //int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;
-                }
-                else if (t_len ==3)
-                {
-                    iAt->chiralIdx  = -1;
-                    iAt->bondingIdx = 2;
-                } 
-            }
-            else if (iAt->chemType.compare("N")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;  
-                }
-                //else if (t_len==3) // temp 
-                //{   // should do on the next round when all NB atoms are set
-                //    iAt->chiralIdx  = -1;
-                //    iAt->bondingIdx =  2;
-                // }
-                else if (t_len ==2)
-                {
-                    iAt->chiralIdx  = -1;
-                    iAt->bondingIdx =  2;
-                } 
-            }
-            else if (iAt->chemType.compare("B")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;
-                }
-            }
-            else if (iAt->chemType.compare("SI")==0 
-                    || iAt->chemType.compare("P")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3; 
-                }
-                else if (t_len==3)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 2; 
-                }
-            }
-            else if (iAt->chemType.compare("S")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3; 
-                }
-            }
-        }
-        
-        // more conditions 
-        
-        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
-                iAt != allAtoms.end(); iAt++)
-        {            
-            if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                int t_len =0;
-                for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
-                     iConn !=iAt->connAtoms.end(); iConn++)
-                {
-                    if(!allAtoms[*iConn].isMetal)
-                    {
-                        t_len++;
-                    }
-                }
-                if(t_len==3)
-                {
-                    
-                    bool l_sp2 = false;
-                    for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
-                            iCA != iAt->connAtoms.end(); iCA++)
-                    {
-                        if(allAtoms[*iCA].bondingIdx == 2)
-                        {
-                            l_sp2 = true;
-                        }
-                    }
-                    if (l_sp2)
-                    {
-                        // Now we can say this atom is in sp2 orbits 
-                        iAt->chiralIdx  = -1;
-                        iAt->bondingIdx =  2;
-                    }
-                    else
-                    {
-                        iAt->chiralIdx  =  1;
-                        iAt->bondingIdx =  3;
-                    }
-                } 
-            }
-        }
-        
-        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-                iA != allAtoms.end(); iA++)
-        {
-            if (iA->chiralIdx ==1)
-            {
-                std::vector<ID> chirRAtms;
-                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
-                        iNB != iA->connAtoms.end(); iNB++)
-                {
-                    std::size_t tFind = allAtoms[*iNB].chemType.find("H");
-                    if (tFind !=std::string::npos)
-                    {
-                        chirRAtms.push_back(allAtoms[*iNB].id);
-                    }
-                }
-                if ((int)chirRAtms.size() >1 && (int)iA->connAtoms.size() <=4)
-                {
-                    iA->chiralIdx = 0;
-                }
-            }
-        }*/
         
         
         // No need for the third round, those could be defined in 
@@ -3900,6 +3911,7 @@ namespace LIBMOL
        
         
     }
+    */
     
     void CodClassify::groupOrgAtomsToPlanes()
     {
@@ -3912,8 +3924,8 @@ namespace LIBMOL
         mergeLargePLGroups(smalPls);
         
     }
+   
     
-
     void CodClassify::setSmallestPLs(std::vector<PlaneDict>& tSmaPls)
     {
         
@@ -4475,7 +4487,7 @@ namespace LIBMOL
         readTablesForHashing2(aDigitKeys, aLinkedHA);
         
         std::vector<int> aPrimTab;
-        // libmolTabDir ="/Applications/ccp4-6.5/share/acedrg/tables_DB3";
+        // libmolTabDir ="/Applications/ccp4-6.5/share/acedrg/tables_DB3"
         initPrimeTab(aPrimTab, libmolTabDir);
         
         
@@ -4513,7 +4525,9 @@ namespace LIBMOL
                     d2 = 2; 
                 }
                 */
-                
+                //std::cout << "For atom " << iAt->id << std::endl;
+                //std::cout << "atom baseRing aromaticity " << iAt->baseRingProp["aroma"] 
+                //          << std::endl;
                 if (iAt->baseRingProp["aroma"].compare("y") ==0)
                 {
                     d1 = 1;
@@ -4565,8 +4579,6 @@ namespace LIBMOL
                 //std::cout << " d1 " << d1 << " d2 " << d2 << " d3 " << d3 
                 //          << " d4 " << d4  << " d5 " << d5 << std::endl;
                 
-                
-                
                 int aPrim = aPrimTab[d1]*aPrimTab[d2]*aPrimTab[d3]*aPrimTab[d4]*aPrimTab[d5];               
                 
                 int psedoHA   = aPrim%wSize;
@@ -4583,6 +4595,7 @@ namespace LIBMOL
                     if (aDigitKeys[psedoHA].compare(footPrint)==0)
                     {
                         iAt->hashingValue = psedoHA;
+                        //std::cout << "Ha in sect1 " << iAt->hashingValue << std::endl;
                     }
                     else
                     {
@@ -4619,6 +4632,7 @@ namespace LIBMOL
                                 lCont = false;
                             }
                         }
+                        //std::cout << "Ha in sect2 " << iAt->hashingValue << std::endl;
                     }
                 }
                 else
@@ -4736,13 +4750,55 @@ namespace LIBMOL
             //std::cout << iAt->codClass   << std::endl;
             //std::cout << iAt->codNBSymb  << std::endl;
             //std::cout << iAt->codNB2Symb << std::endl;
+        }      
+    }
+    /*
+    void CodClassify::setAtomsNB1NB2_SP()
+    {
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            int aAt_seri = iAt->seriNum;
+            std::vector<ID> aNB1_NB2SP_Set;
+            for (std::vector<int>::iterator iNB1=iAt->connAtoms.begin();
+                    iNB1 != iAt->connAtoms.end(); iNB1++)
+            {
+                ID aNB1_main = allAtoms[*iNB1].codAtmRoot;
+                ID aNB2SpStr="";
+                std::vector<int> aNB2SpSet;
+                for (std::vector<int>::iterator iNB2=allAtoms[*iNB1].connAtoms.begin();
+                        iNB2 != allAtoms[*iNB1].connAtoms.end(); iNB2++)
+                {   
+                    aNB2SpSet.push_back(allAtoms[*iNB2].bondingIdx);
+                }
+                
+                std::sort(aNB2SpSet.begin(), aNB2SpSet.end(), std::greater<int>());
+                for (unsigned i=0; i < aNB2SpSet.size(); i++)
+                {
+                    aNB2SpStr.append(IntToStr(aNB2SpSet[i]));
+                    if (i != aNB2SpSet.size()-1)
+                    {
+                        aNB2SpStr.append("_");
+                    }
+                }
+                aNB1_NB2SP_Set.push_back(aNB1_main + "-"+aNB2SpStr);
+            }
+            std::sort(aNB1_NB2SP_Set.begin(), aNB1_NB2SP_Set.end(), compareNoCase);
+            
+            iAt->codNB1NB2_SP.clear();
+            for (unsigned i=0; i < aNB1_NB2SP_Set.size(); i++)
+            {
+                iAt->codNB1NB2_SP.append(aNB1_NB2SP_Set[i]);
+                if (i != aNB1_NB2SP_Set.size()-1)
+                {
+                    iAt->codNB1NB2_SP.append(":");
+                }
+            }  
         }
-          
-       
         
     }
     
-    
+    */
     
     // Initiate  a set of dummy atoms for the atom tree 
     // and torsion angle calculations
@@ -5519,6 +5575,7 @@ namespace LIBMOL
                             
                             allDictBondsIdx2D[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]]
                                               [tBuf[6]][tBuf[7]].push_back(tB);
+                            
                             /*
                             aValueSet tV2;
                             tV2.value    = StrToReal(tBuf[14]);
@@ -5715,13 +5772,19 @@ namespace LIBMOL
             }
             else
             {
+                std::cout << std::endl
+                      << "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+                      << std::endl;
                 std::cout << " search a organic-only bond " << std::endl;
                 
-                searchCodOrgBonds2(iGB);
+                searchCodOrgBonds2_2(iGB);
             }
             
             std::cout << "The final target bond value is " 
                       << iGB->value << std::endl;
+            std::cout << std::endl
+                      << "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+                      << std::endl;
             if (iGB->value > 0.3)
             {
                 nFind++;
@@ -6094,19 +6157,27 @@ namespace LIBMOL
                 tPair.push_back(iA->second);
             }
             
+            ID id1, id2;
             int ha1, ha2;
             ID a1NB2, a2NB2, a1NB, a2NB, a1M, a2M, a1C, a2C;
+            ID a1NB1NB2, a2NB1NB2;
+            bool plusOneLev = false;
+            
             // int as0=-1, as1=-1;
             
             if((int) allAtoms[tPair[0]].hashingValue < 
                    (int) allAtoms[tPair[1]].hashingValue )
             {
+                id1  =allAtoms[tPair[0]].id;
+                id2  =allAtoms[tPair[1]].id;
                 ha1  =allAtoms[tPair[0]].hashingValue;
                 ha2  =allAtoms[tPair[1]].hashingValue;
                 a1NB2= allAtoms[tPair[0]].codNB2Symb;
                 a2NB2= allAtoms[tPair[1]].codNB2Symb;
                 a1NB = allAtoms[tPair[0]].codNBSymb;
                 a2NB = allAtoms[tPair[1]].codNBSymb;
+                a1NB1NB2 = allAtoms[tPair[0]].codNB1NB2_SP;
+                a2NB1NB2 = allAtoms[tPair[1]].codNB1NB2_SP;
                 a1M  = allAtoms[tPair[0]].codAtmMain;
                 a2M  = allAtoms[tPair[1]].codAtmMain;
                 a1C  = allAtoms[tPair[0]].codClass;
@@ -6122,13 +6193,15 @@ namespace LIBMOL
                 sortMap4   m1, m2;
                 
                 m1.id    = allAtoms[tPair[0]].id;
-                m2.id    = allAtoms[tPair[0]].id;
+                m2.id    = allAtoms[tPair[1]].id;
                 m1.ha    =(int)allAtoms[tPair[0]].hashingValue;
                 m2.ha    =(int)allAtoms[tPair[1]].hashingValue;
                 m1.lev2  = allAtoms[tPair[0]].codNB2Symb;
                 m2.lev2  = allAtoms[tPair[1]].codNB2Symb;
-                m1.lev3  = allAtoms[tPair[0]].codNBSymb;
-                m2.lev3  = allAtoms[tPair[1]].codNBSymb;
+                //m1.lev3  = allAtoms[tPair[0]].codNBSymb;
+                //m2.lev3  = allAtoms[tPair[1]].codNBSymb;
+                m1.lev3  = allAtoms[tPair[0]].codNB1NB2_SP;
+                m2.lev3  = allAtoms[tPair[1]].codNB1NB2_SP;
                 m1.key   = allAtoms[tPair[0]].codAtmMain;
                 m2.key   = allAtoms[tPair[1]].codAtmMain;
                 m1.lev4  = allAtoms[tPair[0]].codClass;
@@ -6139,59 +6212,34 @@ namespace LIBMOL
                 
                 std::sort(vM.begin(), vM.end(), sortMapkey4);
                 
-                ha1    = vM[0].ha;
-                ha2    = vM[1].ha;
-                a1NB2  = vM[0].lev2;
-                a2NB2  = vM[1].lev2;
-                a1NB   = vM[0].lev3;
-                a2NB   = vM[1].lev3;
-                a1M    = vM[0].key;
-                a2M    = vM[1].key;
-                a1C    = vM[0].lev4;
-                a2C    = vM[1].lev4;
+                id1       = vM[0].id;
+                id2       = vM[1].id;
+                ha1       = vM[0].ha;
+                ha2       = vM[1].ha;
+                a1NB2     = vM[0].lev2;
+                a2NB2     = vM[1].lev2;
+                a1NB1NB2  = vM[0].lev3;
+                a2NB1NB2  = vM[1].lev3;
+                //a1NB   = vM[0].lev3;
+                //a2NB   = vM[1].lev3;
+                a1M       = vM[0].key;
+                a2M       = vM[1].key;
+                a1C       = vM[0].lev4;
+                a2C       = vM[1].lev4;
                 
-                //as0 =0;
-                //as1 =1;
-                
-                
-                /*
-                if((int)allAtoms[tPair[0]].codClass.size() <= 
-                   (int)allAtoms[tPair[1]].codClass.size())
-                {
-                    ha1  =allAtoms[tPair[0]].hashingValue;
-                    ha2  =allAtoms[tPair[1]].hashingValue;
-                    a1NB2= allAtoms[tPair[0]].codNB2Symb;
-                    a2NB2= allAtoms[tPair[1]].codNB2Symb;
-                    a1NB = allAtoms[tPair[0]].codNBSymb;
-                    a2NB = allAtoms[tPair[1]].codNBSymb;
-                    a1C  = allAtoms[tPair[0]].codClass;
-                    a2C  = allAtoms[tPair[1]].codClass;
-                    as0=0;
-                    as1=1;
-                }
-                else
-                {
-                    ha1  =allAtoms[tPair[1]].hashingValue;
-                    ha2  =allAtoms[tPair[0]].hashingValue;
-                    a1NB2= allAtoms[tPair[1]].codNB2Symb;
-                    a2NB2= allAtoms[tPair[0]].codNB2Symb;
-                    a1NB = allAtoms[tPair[1]].codNBSymb;
-                    a2NB = allAtoms[tPair[0]].codNBSymb;
-                    a1C  = allAtoms[tPair[1]].codClass;
-                    a2C  = allAtoms[tPair[0]].codClass;
-                    as0 =1;
-                    as1 =0;
-                }
-                 */
             }
             else
             {
+                id1  =allAtoms[tPair[1]].id;
+                id2  =allAtoms[tPair[0]].id;
                 ha1  =allAtoms[tPair[1]].hashingValue;
                 ha2  =allAtoms[tPair[0]].hashingValue;
                 a1NB2= allAtoms[tPair[1]].codNB2Symb;
                 a2NB2= allAtoms[tPair[0]].codNB2Symb;
-                a1NB = allAtoms[tPair[1]].codNBSymb;
-                a2NB = allAtoms[tPair[0]].codNBSymb;
+                //a1NB = allAtoms[tPair[1]].codNBSymb;
+                //a2NB = allAtoms[tPair[0]].codNBSymb;
+                a1NB1NB2 = allAtoms[tPair[1]].codNB1NB2_SP;
+                a2NB1NB2 = allAtoms[tPair[0]].codNB1NB2_SP;
                 a1M  = allAtoms[tPair[1]].codAtmMain;
                 a2M  = allAtoms[tPair[0]].codAtmMain;
                 a1C  = allAtoms[tPair[1]].codClass;
@@ -6199,23 +6247,90 @@ namespace LIBMOL
                 //as0 =1;
                 //as1 =0;
             }
+            
+            std::cout << "for target bond of atoms " << id1 << " and "
+                        << id2 <<std::endl;
             // bond-Ring properties
-            ID tInR, tInR1, tInR2;
+            ID tInR, tInR1, tInR2, tInR3, tInR4;
+            
+            ID tOr("O");
+            
+            std::string aChar = iB->order.substr(0, 2);
+            StrUpper(aChar);
+            if (aChar.compare("D")==0)
+            {
+                tOr = "D";
+            }
+            else if (aChar.compare("S")==0)
+            {
+                tOr = "S";
+            }
             
             if (iB->isInSameRing)
             {
-                tInR = "Y";
-                tInR1 = "Y";
-                tInR2 = "N";
                 std::cout << "The bond is within the same ring." << std::endl;
+                std::cout << "Bond order is " << iB->order << std::endl;
+                std::cout << "tOr is " << tOr << std::endl;
+                if (tOr=="D")
+                {
+                    tInR  = "Y:D";
+                    tInR1 = "Y:D";
+                    tInR2 = "N:D";
+                    tInR3 = "Y:O";
+                    tInR4 = "N:O";
+                }
+                else if (tOr=="S")
+                {
+                    tInR  = "Y:S";
+                    tInR1 = "Y:S";
+                    tInR2 = "N:S";
+                    tInR3 = "Y:O";
+                    tInR4 = "N:O";
+                }
+                else
+                {
+                    tInR  = "Y:O";
+                    tInR1 = "Y:O";
+                    tInR2 = "N:O";
+                    tInR3 = "N:O";
+                    tInR4 = "N:O";
+                }
+                std::cout << "tInR is " << tInR << std::endl;
             }
             else
             {
-                tInR  = "N";
-                tInR1 = "N";
-                tInR2 = "Y";
+                
                 std::cout << "The bond is not within the same ring." << std::endl;
+                std::cout << "Bond order is " << iB->order << std::endl;
+                std::cout << "tOr is " << tOr << std::endl;
+                if (tOr=="D")
+                {
+                    tInR  = "N:D";
+                    tInR1 = "N:D";
+                    tInR2 = "Y:D";
+                    tInR3 = "N:O";
+                    tInR4 = "Y:O";
+                }
+                else if (tOr=="S")
+                {
+                    tInR  = "N:S";
+                    tInR1 = "N:S";
+                    tInR2 = "Y:S";
+                    tInR3 = "N:O";
+                    tInR4 = "Y:O";
+                }
+                else
+                {
+                    tInR  = "N:O";
+                    tInR1 = "N:O";
+                    tInR2 = "Y:O";
+                    tInR3 = "Y:O";
+                    tInR4 = "Y:O";
+                }
+                std::cout << "tInR is " << tInR << std::endl;
+                
             }
+            
             
             // bond-sp properties
             ID hybrComb;
@@ -6228,21 +6343,13 @@ namespace LIBMOL
             
             // int dLev = 0;
             
-            std::cout << "for target bond of atoms " <<iB->atoms[0] << " and "
-                        << iB->atoms[1] <<std::endl;
-                       
-            for (std::map<ID, int>::iterator iAt=iB->fullAtoms.begin();
-                        iAt != iB->fullAtoms.end(); iAt++)
-            {
-                std::cout << "chemType : " << allAtoms[iAt->second].chemType << " COD classes : " 
-                          << allAtoms[iAt->second].codClass << std::endl;
-            }
-                
             std::cout << "ha1 " << ha1 << " ha2 " << ha2 << std::endl
                       << "the hybr-combination is " << hybrComb << std::endl
                       << "In or not in the same ring " << tInR << std::endl
                       << " a1NB2 " << a1NB2 << " a2NB2 " << a2NB2  << std::endl
-                      << " a1NB "  << a1NB  << " a2NB " << a2NB << std::endl
+                      // << " a1NB "  << a1NB  << " a2NB " << a2NB << std::endl
+                      << " a1NB1NB2 " << a1NB1NB2 
+                      << " a2NB1NB2 " << a2NB1NB2 << std::endl
                       << " a1M " << a1M     << " a2M "  << a2M <<  std::endl
                       << " a1C "   << a1C   << " a2C "  << a2C << std::endl;
             
@@ -6279,19 +6386,30 @@ namespace LIBMOL
                         tInR = tInR2;
                         std::cout << "Using replaced in-ring prop " << tInR << std::endl;
                     }
+                    else if (allDictBondsIdxD[ha1][ha2][hybrComb].find(tInR3)
+                             != allDictBondsIdxD[ha1][ha2][hybrComb].end())
+                    {
+                        tInR = tInR3;
+                        std::cout << "Using replaced in-ring prop " << tInR << std::endl;
+                    }
+                    else if (allDictBondsIdxD[ha1][ha2][hybrComb].find(tInR4)
+                             != allDictBondsIdxD[ha1][ha2][hybrComb].end())
+                    {
+                        tInR = tInR4;
+                        std::cout << "Using replaced in-ring prop " << tInR << std::endl;
+                    }
                     else
                     {
-                        std::cout << "Acedrg database error for the bond between atoms "
-                                  << iB->atoms[0] << " and " << iB->atoms[1] << std::endl
-                                  << " -- inter- and intra-ring properties unknown! "
-                                  << std::endl;
-                        exit(1);
+                        plusOneLev = true;
                     }
+                    
+                    if (!plusOneLev)
+                    {
                     aKeySet.push_back(tInR);
                     aKeySet.push_back(a1NB2);
                     aKeySet.push_back(a2NB2);
-                    aKeySet.push_back(a1NB);
-                    aKeySet.push_back(a2NB);
+                    aKeySet.push_back(a1NB1NB2);
+                    aKeySet.push_back(a2NB1NB2);
                     aKeySet.push_back(a1M);
                     aKeySet.push_back(a2M);
                     aKeySet.push_back(a1C);
@@ -6303,31 +6421,32 @@ namespace LIBMOL
                                 != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2].end())
                         {
                             std::cout << "find " << a2NB2 << std::endl;
-                            if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].find(a1NB)
+                            if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].find(a1NB1NB2)
                                 != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].end())
                             {
-                                std::cout << " find " << a1NB << std::endl;
-                                if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB].find(a2NB)
-                                    != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB].end())
+                                std::cout << " find " << a1NB1NB2 << std::endl;
+                                if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2].find(a2NB1NB2)
+                                    != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2].end())
                                 {
-                                    std::cout << " find " << a2NB << std::endl;
-                                    if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB].find(a1M)
-                                        != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB].end())
+                                    std::cout << " find " << a2NB1NB2 << std::endl;
+                                    if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2].find(a1M)
+                                        != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2].end())
                                     {
                                         std::cout << " find " << a1M << std::endl;
-                                        if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M].find(a2M)
-                                            != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M].end())
+                                        if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M].find(a2M)
+                                            != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M].end())
                                         {
                                             std::cout << " find " << a2M << std::endl;
-                                            if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M].find(a1C)
-                                            != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M].end())
+                                            
+                                            if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M].find(a1C)
+                                            != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M].end())
                                             {
                                                 std::cout << " find " << a1C << std::endl;
-                                                if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][a1C].find(a2C)
-                                                    != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][a1C].end())
+                                                if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C].find(a2C)
+                                                    != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C].end())
                                                 {
                                                     std::cout << " find " << a2C << std::endl;
-                                                    int tIdx = allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][a1C][a2C];
+                                                    int tIdx = allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C][a2C];
                                                     std::cout << "Found exact matches of atom cod-classes " << std::endl;
                                                     if (allDictBondsD[tIdx].numCodValues >=4)
                                                     {
@@ -6340,13 +6459,7 @@ namespace LIBMOL
                                                     else
                                                     {
                                                         interLevelSearchBonds(aHaV, aKeySet, 0, iB);
-                                                        /*
-                                                        iB->hasCodValue = true;
-                                                        iB->value    = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].value;
-                                                        iB->sigValue = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].sigValue;
-                                                        iB->numCodValues = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].numCodValues;
-                                                        iB->approxLevel  =  0;
-                                                         */
+                                                        
                                                     }
                                                 }
                                                 else
@@ -6354,18 +6467,18 @@ namespace LIBMOL
                                                     // not found a2C
                                                     interLevelSearchBonds(aHaV, aKeySet, 0, iB);
                                                     /**/
-                                                    if (allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].numCodValues >=4)
+                                                    if (allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].numCodValues >=4)
                                                     {
                                                         iB->hasCodValue = true;
-                                                        iB->value    = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].value;
-                                                        iB->sigValue = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].sigValue;
-                                                        iB->numCodValues = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].numCodValues;
+                                                        iB->value    = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].value;
+                                                        iB->sigValue = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].sigValue;
+                                                        iB->numCodValues = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].numCodValues;
                                                         iB->approxLevel   =   0;
                                                     }
                                                     else
                                                     {
                                                         aValueSet   tVaS;
-                                                        setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB]);
+                                                        setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2]);
                                                         iB->value        =tVaS.value;
                                                         iB->valueST      =iB->value;
                                                         iB->sigValue     =tVaS.sigValue;
@@ -6379,174 +6492,36 @@ namespace LIBMOL
                                             {
                                                 // not found a1C
                                                 interLevelSearchBonds(aHaV, aKeySet, 0, iB);
-                                                /*
-                                                if (allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].numCodValues >=4)
-                                                {
-                                                    iB->hasCodValue = true;
-                                                    iB->value    = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].value;
-                                                    iB->sigValue = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].sigValue;
-                                                    iB->numCodValues = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB][a1M][a2M][0].numCodValues;
-                                                    iB->approxLevel  =  0;
-                                                }
-                                                else
-                                                {
-                                                    aValueSet   tVaS;
-                                                    setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB]);
-                                                    iB->value        =tVaS.value;
-                                                    iB->valueST      =iB->value;
-                                                    iB->sigValue     =tVaS.sigValue;
-                                                    iB->sigValueST   =iB->sigValue;
-                                                    iB->numCodValues =tVaS.numCodValues;
-                                                    iB->approxLevel  =  1;
-                                                } 
-                                                 */  
                                             }
                                         }
                                         else
                                         {
                                             // not found a2M
                                             interLevelSearchBonds(aHaV, aKeySet, 1, iB);
-                                            /*
-                                            std::vector<ID>  aKV;
-                                            aKV.push_back(hybrComb);
-                                            aKV.push_back(tInR);
-                                            aKV.push_back(a1NB2);
-                                            aKV.push_back(a2NB2);
-                                            aKV.push_back(a1NB);
-                                            aKV.push_back(a2NB);
-                                            aKV.push_back(a1M);
-                                            levelSearchBonds(aHaV, aKV, 0, iB);
-                                            
-                                            if (iB->numCodValues < 4 )
-                                            {
-                                                aValueSet   tVaS;
-                                                setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB]);
-                                                if (tVaS.numCodValues >=4)
-                                                {
-                                                    iB->value        =tVaS.value;
-                                                    iB->valueST      =iB->value;
-                                                    iB->sigValue     =tVaS.sigValue;
-                                                    iB->sigValueST   =iB->sigValue;
-                                                    iB->numCodValues =tVaS.numCodValues;
-                                                    iB->approxLevel  = 1;
-                                                }
-                                                else
-                                                {
-                                                    aKV.pop_back();
-                                                    aKV.pop_back();
-                                                    levelSearchBonds(aHaV, aKV, 1, iB);
-                                                }
-                                                
-                                            }
-                                             */
                                         }
                                     }
                                     else
                                     {
                                         // not found a1M
                                         interLevelSearchBonds(aHaV, aKeySet, 2, iB);
-                                        /*
-                                        aValueSet   tVaS;
-                                        setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB][a2NB]);
-                                        if (tVaS.numCodValues >=4)
-                                        {
-                                            iB->value        =tVaS.value;
-                                            iB->valueST      =iB->value;
-                                            iB->sigValue     =tVaS.sigValue;
-                                            iB->sigValueST   =iB->sigValue;
-                                            iB->numCodValues =tVaS.numCodValues;
-                                            iB->approxLevel  = 1;
-                                        }
-                                        else
-                                        {
-                                            std::vector<ID>  aKV;
-                                            aKV.push_back(hybrComb);
-                                            aKV.push_back(tInR);
-                                            aKV.push_back(a1NB2);
-                                            aKV.push_back(a2NB2);
-                                            aKV.push_back(a1NB);
-                                            levelSearchBonds(aHaV, aKV, 1, iB);
-                                            if (iB->numCodValues < 4)
-                                            {
-                                                aKV.pop_back();
-                                                levelSearchBonds(aHaV, aKV, 2, iB);
-                                            }
-                                        }
-                                         */
                                     }
                                 }
                                 else
                                 {
                                     // not found a2NB
                                     interLevelSearchBonds(aHaV, aKeySet, 4, iB);
-                                    /*
-                                    std::vector<ID>  aKV;
-                                    aKV.push_back(hybrComb);
-                                    aKV.push_back(tInR);
-                                    aKV.push_back(a1NB2);
-                                    aKV.push_back(a2NB2);
-                                    aKV.push_back(a1NB);
-                                    levelSearchBonds(aHaV, aKV, 4, iB);
-                                    
-
-                                    if (iB->numCodValues < 4)
-                                    {
-                                        aKV.pop_back();
-                                        exchangeSearch(aHaV, aKV, a2NB, 1, iB);
-                                        if (iB->numCodValues < 4)
-                                        {
-                                            levelSearchBonds(aHaV, aKV, 2, iB);
-                                            if (iB->numCodValues <4)
-                                            {
-                                                aKV.pop_back();
-                                                levelSearchBonds(aHaV, aKV, 3, iB);
-                                            }
-                                        }
-                                    } 
-                                     */  
                                 }
                             }
                             else
                             {
                                 // not found a1NB
                                 interLevelSearchBonds(aHaV, aKeySet, 5, iB);
-                                /*
-                                std::vector<ID>  aKV;
-                                aKV.push_back(hybrComb);
-                                aKV.push_back(tInR);
-                                aKV.push_back(a1NB2);
-                                aKV.push_back(a2NB2);
-                                levelSearchBonds(aHaV, aKV, 2, iB);
-                                
-                                if (iB->numCodValues < 4)
-                                {
-                                    aKV.pop_back();
-                                    levelSearchBonds(aHaV, aKV, 3, iB);
-                                    if (iB->numCodValues <4)
-                                    {
-                                        aKV.pop_back();
-                                        levelSearchBonds(aHaV, aKV, 4, iB);
-                                    }
-                                }   
-                                 */
                             }  
                         }
                         else
                         {
                             // not found a2NB2
                             interLevelSearchBonds(aHaV, aKeySet, 7, iB);
-                            /*
-                            std::vector<ID>  aKV;
-                            aKV.push_back(hybrComb);
-                            aKV.push_back(tInR);
-                            aKV.push_back(a1NB2);
-                            levelSearchBonds(aHaV, aKV, 3, iB);
-                            if (iB->numCodValues <4)
-                            {
-                                aKV.pop_back();
-                                levelSearchBonds(aHaV, aKV, 4, iB);
-                            }
-                            */
                         }
                     }
                     else
@@ -6554,89 +6529,19 @@ namespace LIBMOL
                         // not found a1NB2 
                         // try to see if a2NB2 exists in dictionary 
                         interLevelSearchBonds(aHaV, aKeySet, 8, iB);
-                        /*
-                        std::vector<aValueSet> tBs3;
                         
-                        for (std::map<ID, std::map<ID, std::map<ID, 
-                             std::map<ID, std::vector<aValueSet> > > > >::iterator iB3
-                             =allDictBondsIdx2D[ha1][ha2][hybrComb][tInR].begin();
-                             iB3 !=allDictBondsIdx2D[ha1][ha2][hybrComb][tInR].end(); iB3++)
-                        {
-                            for (std::map<ID, std::map<ID, std::map<ID,  
-                                 std::vector<aValueSet> > > >::iterator iB4
-                                 =iB3->second.begin(); iB4 !=iB3->second.end(); iB4++)
-                            {
-                                if (iB4->first == a2NB2)
-                                { 
-                                    for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5=iB4->second.begin();
-                                         iB5 !=iB4->second.end(); iB5++)
-                                    {
-                                        for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
-                                            iB6 !=iB5->second.end(); iB6++)
-                                        {
-                                            for(std::vector<aValueSet>::iterator iB7=iB6->second.begin();
-                                                iB7 !=iB6->second.end(); iB7++)
-                                            {
-                                                tBs3.push_back(*iB7);
-                                            }
-                                        }      
-                                    }
-                                }
-                            }
-                        }
-                        aValueSet   tVaS;
-                        if (tBs3.size() >= 4)
-                        {
-                            setValueSet(tVaS, tBs3);   
-                            iB->value        =tVaS.value;
-                            iB->valueST      =iB->value;
-                            iB->sigValue     =tVaS.sigValue;
-                            iB->sigValueST   =iB->sigValue;
-                            iB->numCodValues =tVaS.numCodValues;
-                            iB->approxLevel  = 2;
-                        }
-                        else
-                        {
-                            if (allHaAndSpBonds[ha1][ha2][hybrComb][tInR].size() >0)
-                            {
-                                // allHaAndSpBonds[ha1][ha2][hybrComb][tInR] contains 
-                                // multiple COD values in one entry 
-                                setValueSet(tVaS, allHaAndSpBonds[ha1][ha2][hybrComb][tInR]);
-                                iB->value        =tVaS.value;
-                                iB->valueST      =iB->value;
-                                iB->sigValue     =tVaS.sigValue;
-                                iB->sigValueST   =iB->sigValue;
-                                iB->numCodValues =tVaS.numCodValues;
-                                iB->approxLevel  = 3;
-                            }
-                            else
-                            {
-                                setValueSet(tVaS, allHaAndSpBonds1D[ha1][ha2][hybrComb]);
-                                iB->value        =tVaS.value;
-                                iB->valueST      =iB->value;
-                                iB->sigValue     =tVaS.sigValue;
-                                iB->sigValueST   =iB->sigValue;
-                                iB->numCodValues =tVaS.numCodValues;
-                                iB->approxLevel  = 4;
-                            }
-                        }
-                         */
+                    }
+                    }
+                    else
+                    {
+                        interLevelSearchBonds(aHaV, aKeySet, 10, iB);
                     }
                 }
                 else
                 {
                     // not found hybridization 
                     interLevelSearchBonds(aHaV, aKeySet, 11, iB);
-                    /*
-                    aValueSet   tVaS;
-                    setValueSet(tVaS, allHaAndSpBonds2D[ha1][ha2]);
-                    iB->value        =tVaS.value;
-                    iB->valueST      =iB->value;
-                    iB->sigValue     =tVaS.sigValue;
-                    iB->sigValueST   =iB->sigValue;
-                    iB->numCodValues =tVaS.numCodValues;
-                    iB->approxLevel  = 5;
-                     */
+                    
                 }
             }
             else
@@ -6711,18 +6616,406 @@ namespace LIBMOL
                 
             }
             
+    }
+
+
+    void CodClassify::searchCodOrgBonds2_2(std::vector<BondDict>::iterator iB)
+    {   
+            std::vector<int> tPair;
+            for (std::map<ID, int>::iterator iA=iB->fullAtoms.begin();
+                    iA !=iB->fullAtoms.end(); iA++)
+            {
+                tPair.push_back(iA->second);
+            }
             
-            //std::cout << "The bond value is now " << iB->value << std::endl;
-            //if (iB->hasCodValue)
-            //{
-            //    std::cout << "It have exact matches to COD atoms " << std::endl;
-            //}
-            //else
-            //{
-            //    std::cout << "The bond value is generated by " << std::endl
-            //              << "either averaging or shortest distance to COD"
-            //              << std::endl;
-            //}
+            ID id1, id2;
+            int ha1, ha2;
+            ID a1NB2, a2NB2, a1NB, a2NB, a1M, a2M, a1C, a2C;
+            ID a1NB1NB2, a2NB1NB2;
+            
+            // bool plusOneLev = false;
+            
+            // int as0=-1, as1=-1;
+            
+            if((int) allAtoms[tPair[0]].hashingValue < 
+                   (int) allAtoms[tPair[1]].hashingValue )
+            {
+                id1  =allAtoms[tPair[0]].id;
+                id2  =allAtoms[tPair[1]].id;
+                ha1  =allAtoms[tPair[0]].hashingValue;
+                ha2  =allAtoms[tPair[1]].hashingValue;
+                a1NB2= allAtoms[tPair[0]].codNB2Symb;
+                a2NB2= allAtoms[tPair[1]].codNB2Symb;
+                //a1NB1NB2 = allAtoms[tPair[0]].codNBSymb;
+                //a2NB1NB2 = allAtoms[tPair[1]].codNBSymb;
+                //a1NB1NB2 = allAtoms[tPair[0]].codNB1NB2_SP;
+                //a2NB1NB2 = allAtoms[tPair[1]].codNB1NB2_SP;
+                a1NB1NB2  = allAtoms[tPair[0]].codNB1NB2_ExElec;
+                a2NB1NB2  = allAtoms[tPair[1]].codNB1NB2_ExElec;
+                a1M  = allAtoms[tPair[0]].codAtmMain;
+                a2M  = allAtoms[tPair[1]].codAtmMain;
+                a1C  = allAtoms[tPair[0]].codClass;
+                a2C  = allAtoms[tPair[1]].codClass;
+                //as0 =0;
+                //as1 =1;
+            }
+            else if ((int) allAtoms[tPair[0]].hashingValue == 
+                   (int) allAtoms[tPair[1]].hashingValue)
+            {
+                std::vector<sortMap4> vM;
+                
+                sortMap4   m1, m2;
+                
+                m1.id    = allAtoms[tPair[0]].id;
+                m2.id    = allAtoms[tPair[1]].id;
+                m1.ha    =(int)allAtoms[tPair[0]].hashingValue;
+                m2.ha    =(int)allAtoms[tPair[1]].hashingValue;
+                m1.lev2  = allAtoms[tPair[0]].codNB2Symb;
+                m2.lev2  = allAtoms[tPair[1]].codNB2Symb;
+                //m1.lev3  = allAtoms[tPair[0]].codNBSymb;
+                //m2.lev3  = allAtoms[tPair[1]].codNBSymb;
+                //m1.lev3  = allAtoms[tPair[0]].codNB1NB2_SP;
+                //m2.lev3  = allAtoms[tPair[1]].codNB1NB2_SP;
+                m1.lev3  = allAtoms[tPair[0]].codNB1NB2_ExElec;
+                m2.lev3  = allAtoms[tPair[1]].codNB1NB2_ExElec;
+                m1.key   = allAtoms[tPair[0]].codAtmMain;
+                m2.key   = allAtoms[tPair[1]].codAtmMain;
+                m1.lev4  = allAtoms[tPair[0]].codClass;
+                m2.lev4  = allAtoms[tPair[1]].codClass;
+                
+                vM.push_back(m1);
+                vM.push_back(m2);
+                
+                std::sort(vM.begin(), vM.end(), sortMapkey4);
+                
+                id1       = vM[0].id;
+                id2       = vM[1].id;
+                ha1       = vM[0].ha;
+                ha2       = vM[1].ha;
+                a1NB2     = vM[0].lev2;
+                a2NB2     = vM[1].lev2;
+                a1NB1NB2  = vM[0].lev3;
+                a2NB1NB2  = vM[1].lev3;
+                //a1NB   = vM[0].lev3;
+                //a2NB   = vM[1].lev3;
+                a1M       = vM[0].key;
+                a2M       = vM[1].key;
+                a1C       = vM[0].lev4;
+                a2C       = vM[1].lev4;
+                
+            }
+            else
+            {
+                id1  =allAtoms[tPair[1]].id;
+                id2  =allAtoms[tPair[0]].id;
+                ha1  =allAtoms[tPair[1]].hashingValue;
+                ha2  =allAtoms[tPair[0]].hashingValue;
+                a1NB2= allAtoms[tPair[1]].codNB2Symb;
+                a2NB2= allAtoms[tPair[0]].codNB2Symb;
+                //a1NB1NB2 = allAtoms[tPair[1]].codNBSymb;
+                //a2NB1NB2 = allAtoms[tPair[0]].codNBSymb;
+                //a1NB1NB2 = allAtoms[tPair[1]].codNB1NB2_SP;
+                //a2NB1NB2 = allAtoms[tPair[0]].codNB1NB2_SP;
+                a1NB1NB2  = allAtoms[tPair[1]].codNB1NB2_ExElec;
+                a2NB1NB2  = allAtoms[tPair[0]].codNB1NB2_ExElec;
+                a1M  = allAtoms[tPair[1]].codAtmMain;
+                a2M  = allAtoms[tPair[0]].codAtmMain;
+                a1C  = allAtoms[tPair[1]].codClass;
+                a2C  = allAtoms[tPair[0]].codClass;
+                //as0 =1;
+                //as1 =0;
+            }
+            
+            std::cout << "for target bond of atoms " << id1 << " and "
+                        << id2 <<std::endl;
+            // bond-Ring properties
+            ID tInR, tInR1, tInR2;
+            
+            if (iB->isInSameRing)
+            {
+                std::cout << "The bond is within the same ring." << std::endl;
+                tInR  = "Y";
+                tInR1 = "Y";
+                tInR2 = "N";
+            }
+            else
+            {
+                
+                std::cout << "The bond is not within the same ring." << std::endl;
+                std::cout << "Bond order is " << iB->order << std::endl;
+                tInR  = "N";
+                tInR1  = "N";
+                tInR2 = "Y";
+            }
+            
+            
+            // bond-sp properties
+            ID hybrComb;
+            std::vector<ID>  hybrList;
+            hybrList.push_back(allAtoms[tPair[0]].hybrid);
+            hybrList.push_back(allAtoms[tPair[1]].hybrid);
+            std::sort(hybrList.begin(), hybrList.end()); 
+            hybrComb = hybrList[0] + "_" + hybrList[1];
+            
+            
+            // int dLev = 0;
+            
+            std::cout << "ha1 " << ha1 << " ha2 " << ha2 << std::endl
+                      << "the hybr-combination is " << hybrComb << std::endl
+                      << "In or not in the same ring " << tInR << std::endl
+                      << " a1NB2 " << a1NB2 << " a2NB2 " << a2NB2  << std::endl
+                      // << " a1NB "  << a1NB  << " a2NB " << a2NB << std::endl
+                      << " a1NB1NB2 " << a1NB1NB2 
+                      << " a2NB1NB2 " << a2NB1NB2 << std::endl
+                      << " a1M " << a1M     << " a2M "  << a2M <<  std::endl
+                      << " a1C "   << a1C   << " a2C "  << a2C << std::endl;
+            
+            std::cout << "atom 1 " << allAtoms[tPair[0]].ccp4Type
+                      << "  atom 2 " << allAtoms[tPair[1]].ccp4Type
+                      << std::endl;
+            
+            std::vector<int> aHaV;
+            aHaV.push_back(ha1);
+            aHaV.push_back(ha2);
+            
+            std::vector<std::string> aKeySet;
+            aKeySet.push_back(hybrComb);
+            
+            
+            if (allDictBondsIdxD.find(ha1) != allDictBondsIdxD.end()
+                && allDictBondsIdxD[ha1].find(ha2) != allDictBondsIdxD[ha1].end())
+            {
+                std::cout << "Found all hashing codes " << std::endl;
+                
+                if ( allDictBondsIdxD[ha1][ha2].find(hybrComb) !=allDictBondsIdxD[ha1][ha2].end())
+                {
+                    std::cout << "Found hybr-combination " << hybrComb << std::endl;
+                    // inter- and intra-ring properties  
+                    if (allDictBondsIdxD[ha1][ha2][hybrComb].find(tInR1)
+                         != allDictBondsIdxD[ha1][ha2][hybrComb].end())
+                    {
+                        tInR = tInR1;
+                        std::cout << "Find in-ring prop " << tInR << std::endl;
+                    }
+                    else if (allDictBondsIdxD[ha1][ha2][hybrComb].find(tInR2)
+                             != allDictBondsIdxD[ha1][ha2][hybrComb].end())
+                    {
+                        tInR = tInR2;
+                        std::cout << "Using replaced in-ring prop " << tInR << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "A DB problem: should have either Y or N entry or both in this layer " << std::endl;
+                        std::cout << "Please report error ! " << std::endl;
+                        exit(1);
+                    }
+                    
+                    aKeySet.push_back(tInR);
+                    aKeySet.push_back(a1NB2);
+                    aKeySet.push_back(a2NB2);
+                    aKeySet.push_back(a1NB1NB2);
+                    aKeySet.push_back(a2NB1NB2);
+                    aKeySet.push_back(a1M);
+                    aKeySet.push_back(a2M);
+                    aKeySet.push_back(a1C);
+                    aKeySet.push_back(a2C);
+                    if ( allDictBondsIdxD[ha1][ha2][hybrComb][tInR].find(a1NB2) !=allDictBondsIdxD[ha1][ha2][hybrComb][tInR].end())
+                    {
+                        std::cout << "find " << a1NB2 << std::endl;
+                        if ( allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2].find(a2NB2)
+                                != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2].end())
+                        {
+                            std::cout << "find " << a2NB2 << std::endl;
+                            if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].find(a1NB1NB2)
+                                != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2].end())
+                            {
+                                std::cout << " find " << a1NB1NB2 << std::endl;
+                                if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2].find(a2NB1NB2)
+                                    != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2].end())
+                                {
+                                    std::cout << " find " << a2NB1NB2 << std::endl;
+                                    if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2].find(a1M)
+                                        != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2].end())
+                                    {
+                                        std::cout << " find " << a1M << std::endl;
+                                        if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M].find(a2M)
+                                            != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M].end())
+                                        {
+                                            std::cout << " find " << a2M << std::endl;
+                                            
+                                            if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M].find(a1C)
+                                            != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M].end())
+                                            {
+                                                std::cout << " find " << a1C << std::endl;
+                                                if (allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C].find(a2C)
+                                                    != allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C].end())
+                                                {
+                                                    std::cout << " find " << a2C << std::endl;
+                                                    int tIdx = allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C][a2C];
+                                                    std::cout << "Found exact matches of atom cod-classes " << std::endl;
+                                                    if (allDictBondsD[tIdx].numCodValues >=4)
+                                                    {
+                                                        iB->hasCodValue = true;
+                                                        iB->value    = allDictBondsD[tIdx].value;
+                                                        iB->sigValue = allDictBondsD[tIdx].sigValue;  
+                                                        iB->numCodValues = allDictBondsD[tIdx].numCodValues;
+                                                        iB->approxLevel   =  0;
+                                                    }
+                                                    else
+                                                    {
+                                                        interLevelSearchBonds(aHaV, aKeySet, 0, iB);
+                                                        
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    // not found a2C
+                                                    interLevelSearchBonds(aHaV, aKeySet, 0, iB);
+                                                    /**/
+                                                    if (allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].numCodValues >=4)
+                                                    {
+                                                        iB->hasCodValue = true;
+                                                        iB->value    = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].value;
+                                                        iB->sigValue = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].sigValue;
+                                                        iB->numCodValues = allDictBondsIdx1D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][0].numCodValues;
+                                                        iB->approxLevel   =   0;
+                                                    }
+                                                    else
+                                                    {
+                                                        aValueSet   tVaS;
+                                                        setValueSet(tVaS, allDictBondsIdx2D[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2]);
+                                                        iB->value        =tVaS.value;
+                                                        iB->valueST      =iB->value;
+                                                        iB->sigValue     =tVaS.sigValue;
+                                                        iB->sigValueST   =iB->sigValue;
+                                                        iB->numCodValues =tVaS.numCodValues;
+                                                        iB->approxLevel  = 1;
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                // not found a1C
+                                                interLevelSearchBonds(aHaV, aKeySet, 0, iB);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // not found a2M
+                                            interLevelSearchBonds(aHaV, aKeySet, 1, iB);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // not found a1M
+                                        interLevelSearchBonds(aHaV, aKeySet, 2, iB);
+                                    }
+                                }
+                                else
+                                {
+                                    // not found a2NB
+                                    interLevelSearchBonds(aHaV, aKeySet, 4, iB);
+                                }
+                            }
+                            else
+                            {
+                                // not found a1NB
+                                interLevelSearchBonds(aHaV, aKeySet, 5, iB);
+                            }  
+                        }
+                        else
+                        {
+                            // not found a2NB2
+                            interLevelSearchBonds(aHaV, aKeySet, 7, iB);
+                        }
+                    }
+                    else
+                    {
+                        // not found a1NB2 
+                        // try to see if a2NB2 exists in dictionary 
+                        interLevelSearchBonds(aHaV, aKeySet, 8, iB);
+                        
+                    }
+                }
+                else
+                {
+                    // not found hybridization 
+                    interLevelSearchBonds(aHaV, aKeySet, 11, iB);
+                    
+                }
+            }
+            else
+            {
+                searchBondHashAndSP(iB);
+                std::cout << "New energ lib value " << std::endl;
+                std::cout << "Bond  length : " << iB->value << std::endl
+                          << "Sigma value : " << iB->sigValue << std::endl
+                          << "number of observations : " << iB->numCodValues << std::endl;
+                
+                if (iB->value==0.0 || iB->numCodValues==0)
+                {          
+                    if (ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                    && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                    !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+                    {
+                        // Without hash code matching for those combination of two atoms. try CCP4 type matching
+                        // It is very unlikely we have ccp4 type matching when hash code matching failed.
+                        std::cout << "usingCCP4 1 " << std::endl;
+                        if(ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(allAtoms[tPair[1]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end())
+                        {
+                            getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, allAtoms[tPair[1]].ccp4Type);
+                        }
+                        iB->approxLevel = 6;
+                    }
+                    else if (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                             && (ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(allAtoms[tPair[0]].ccp4Type)
+                                !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
+                    {
+                        // Without hash code matching for those combination of two atoms. try CCP4 type matching
+                        // It is very unlikely we have ccp4 type matching when hash code matching failed.
+                        std::cout << "usingCCP4 2 " << std::endl;
+                        getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, allAtoms[tPair[0]].ccp4Type);
+                        iB->approxLevel = 6;
+                    }
+                    else if ((ccp4BondsA.find(allAtoms[tPair[0]].ccp4Type) !=ccp4BondsA.end() 
+                              && (ccp4BondsA[allAtoms[tPair[0]].ccp4Type].find(".")
+                                !=ccp4BondsA[allAtoms[tPair[0]].ccp4Type].end()))
+                              && (ccp4BondsA.find(allAtoms[tPair[1]].ccp4Type) !=ccp4BondsA.end() 
+                                   && ccp4BondsA[allAtoms[tPair[1]].ccp4Type].find(".")
+                                      !=ccp4BondsA[allAtoms[tPair[1]].ccp4Type].end()))
+                    {
+                        std::cout << "usingCCP4 3" <<  std::endl;
+                        
+                        REAL aM1=0.0, aM2=0.0;
+                        getCCP4Bonds(iB, allAtoms[tPair[0]].ccp4Type, ".");
+                        aM1 = iB->value;
+                        getCCP4Bonds(iB, allAtoms[tPair[1]].ccp4Type, ".");
+                        aM2 = iB->value;
+                        
+                        iB->value        = 0.5*(aM1+aM2);
+                        iB->sigValue     = 0.02;
+                        iB->numCodValues = 0;
+                        iB->approxLevel = 6;
+                    }
+                    else
+                    {
+                        std::cout << "Could not find the basic bond classes in Cod and CCP4-energy-type" << std::endl
+                                  << "for the dictionary bond of atoms " <<iB->atoms[0] << " and "
+                                  << iB->atoms[1] <<std::endl;
+                
+                        for (std::map<ID, int>::iterator iAt=iB->fullAtoms.begin();
+                             iAt != iB->fullAtoms.end(); iAt++)
+                        {
+                            std::cout << "chemType : " << allAtoms[iAt->second].chemType << " atom COD classes : " 
+                                      << allAtoms[iAt->second].codClass << std::endl;
+                        }
+                        exit(1);
+                    }
+                }
+                
+            }
+            
     }
     
     void CodClassify::searchBondHashAndSP(std::vector<BondDict>::iterator iB)
@@ -7011,18 +7304,31 @@ namespace LIBMOL
         else if (tLev==6)
         {
             // For both a1NB and a2NB not found  
+            //std::cout << "Found keys are: " << std::endl
+            //          << tKeySet1[0] << std::endl
+            //          << tKeySet1[1] << std::endl
+            //          << tKeySet2[0] << std::endl
+            //          << tKeySet2[1] << std::endl
+            //          << tKeySet2[2] << std::endl   
+            //          << tKeySet2[3] << std::endl;
             std::vector<aValueSet> tBs5;
             for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5
                  =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].begin();
                  iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].end();
                  iB5++)
             {
+                
                 for(std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
                     iB6 !=iB5->second.end(); iB6++)
-                {
+                { 
+                    
+                    //std::cout << "The first ID " << iB5->first << std::endl;
+                    //std::cout << "the second  ID " << iB6->first << std::endl;
                     for (std::vector<aValueSet>::iterator iB7=iB6->second.begin();
                             iB7 !=iB6->second.end(); iB7++)
                     {
+                        //std::cout << "bond values " << iB7->value << std::endl;
+                        //std::cout << "observation " << iB7->numCodValues << std::endl;
                         tBs5.push_back(*iB7);
                     }
                 }
@@ -7402,6 +7708,7 @@ namespace LIBMOL
             levelSearchBondsT(tKeySet1, tKeySet2, aLev, iB);
             if (iB->numCodValues >=4)
             {
+                std::cout << "The end search level is " << aLev << std::endl;
                 break;
             }
             aLev++;
@@ -12337,7 +12644,7 @@ namespace LIBMOL
                                                                     aKeySet.push_back(a2M);
                                                                     aKeySet.push_back(a3M);
                                                                     int aLev =1;
-                                                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                    levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                                                 }
                                                                 else
                                                                 {
@@ -12356,7 +12663,7 @@ namespace LIBMOL
                                                                     aKeySet.push_back(a3NB);
                                                                         
                                                                     int aLev =2;
-                                                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                    levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                                                 }
                                                             }
                                                             else
@@ -12376,7 +12683,7 @@ namespace LIBMOL
                                                                 aKeySet.push_back(a3NB);
                                                                         
                                                                 int aLev =2;
-                                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                                levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                                             }
                                                         }
                                                         else
@@ -12396,7 +12703,7 @@ namespace LIBMOL
                                                             aKeySet.push_back(a3NB);
                                                                         
                                                             int aLev =2;
-                                                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                            levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                                         }
                                                     }
                                                     else
@@ -12413,7 +12720,7 @@ namespace LIBMOL
                                                         aKeySet.push_back(a3NB2);
                                                         
                                                         int aLev =3;
-                                                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                        levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                                     }
                                                 }
                                                 else
@@ -12430,7 +12737,7 @@ namespace LIBMOL
                                                     aKeySet.push_back(a3NB2);
                                                     
                                                     int aLev =3;
-                                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                    levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                                 }
                                             }
                                             else
@@ -12447,7 +12754,7 @@ namespace LIBMOL
                                                 aKeySet.push_back(a3NB2);
                                                 
                                                 int aLev =3;
-                                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                                levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                             }
                                         }
                                         else
@@ -12460,7 +12767,7 @@ namespace LIBMOL
                                             aKeySet.push_back(a3R);
                                             
                                             int aLev =4;
-                                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                            levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                         }
                                     }
                                     else
@@ -12473,7 +12780,7 @@ namespace LIBMOL
                                         aKeySet.push_back(a3R);
                                         
                                         int aLev =4;
-                                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                        levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                     }
                                 }
                                 else
@@ -12486,7 +12793,7 @@ namespace LIBMOL
                                     aKeySet.push_back(a3R);
                                             
                                     int aLev =4;
-                                    levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                    levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                 }  
                             }
                             else
@@ -12497,7 +12804,7 @@ namespace LIBMOL
                                 aKeySet.push_back(a1R);
                                 
                                 int aLev =5;
-                                levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                                levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                                 
                             }
                         
@@ -12509,7 +12816,7 @@ namespace LIBMOL
                             aKeySet.push_back(R3A);
                                 
                             int aLev =5;
-                            levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                            levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                             
                         }
                     }
@@ -12520,7 +12827,7 @@ namespace LIBMOL
                         aKeySet.push_back(R3A);
                                 
                         int aLev =5;
-                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                        levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                         
                     }
                 }
@@ -12534,7 +12841,7 @@ namespace LIBMOL
                         std::vector<std::string>    aKeySet;
                         aKeySet.push_back(aSmiRSP);
                         int aLev =5;
-                        levelSearchAngles(hashSet, aKeySet, aLev, iAN);
+                        levelSearchAnglesENG(hashSet, aKeySet, aLev, iAN);
                     }
                     else
                     {
@@ -12588,7 +12895,6 @@ namespace LIBMOL
                 
                     exit(1);
                 }
-                 
             }
             if (allAtoms[iAN->atoms[0]].bondingIdx==1 
                 && (iAN-> approxLevel >=1 && (iAN->numCodValues < 5||iAN->sigValue >= 3.0)) && !lDef)
@@ -12604,10 +12910,7 @@ namespace LIBMOL
             if (iAN->sigValue < 1.5)
             {
                 iAN->sigValue = 1.5;
-            }
-
-            
-                 
+            }           
     }
     
     void CodClassify::levelSearchAngles(std::vector<int>          &      tHa,
@@ -12801,6 +13104,47 @@ namespace LIBMOL
         std::cout << "Angle siga "  << iAN->sigValue << std::endl;
         std::cout << "Number of observations  " << iAN->numCodValues << std::endl;
         std::cout << "Approximation level " << iAN->approxLevel << std::endl;
+    }
+    
+    void CodClassify::levelSearchAnglesENG(std::vector<int>          &      tKeySet,
+                                   std::vector<std::string>  &      tKeySet2,
+                                   int                              tLev,
+                                   std::vector<AngleDict>::iterator iAN)
+    {
+       
+        
+        do 
+        {
+            levelSearchAngles(tKeySet, tKeySet2, tLev, iAN);
+            tLev++;
+        }while(iAN->numCodValues < 5 
+               && tLev < 6);
+        
+        if (iAN->numCodValues < 5)
+        {
+            if (allAtoms[iAN->atoms[0]].bondingIdx <4)
+            {
+                // std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
+                iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                iAN->sigValue      = 3.0;
+                iAN->numCodValues  = 0;
+                iAN-> approxLevel = 6;
+            }
+            else
+            {
+                std::cout << "Could not find COD angle value and even default angle value."
+                          <<std::endl << "The atoms in the target angle are: " << std::endl
+                          << "The inner atom "   << allAtoms[iAN->atoms[0]].id << std::endl
+                          << "Its COD class is " << allAtoms[iAN->atoms[0]].codClass << std::endl
+                          << "The outer atom 1 " << allAtoms[iAN->atoms[1]].id << std::endl
+                          << "Its COD class is " << allAtoms[iAN->atoms[1]].codClass << std::endl
+                          << "The outer atom 2 "  << allAtoms[iAN->atoms[2]].id << std::endl
+                          << "Its COD class is " << allAtoms[iAN->atoms[2]].codClass << std::endl;
+                
+                exit(1);
+            }
+
+        }     
     }
     
     std::string CodClassify::matchRandCenterA(std::string & tR, std::string tCenSP,
@@ -14650,6 +14994,373 @@ namespace LIBMOL
         }
         
     }
+    
+    void CodClassify::setupMiniTorsions()
+    {
+        std::map<ID, std::vector<TorsionDict> >  TorsionSetOneBond;
+        
+        for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor !=allTorsions.end(); iTor++)
+        {
+            if (iTor->atoms.size() ==4)
+            {
+                int idxB = getBond(allBonds, iTor->atoms[1], iTor->atoms[2]);
+                if (idxB > -1)
+                {
+                    //std::cout << "Get bond of atom " << allAtoms[allBonds[idxB].atomsIdx[0]].id
+                    //          << " and " << allAtoms[allBonds[idxB].atomsIdx[1]].id << std::endl;
+                    StrUpper(allBonds[idxB].order);
+                    // std::cout << "Bond order " << allBonds[idxB].order << std::endl;
+                    // std::cout << "in the same ring " << allBonds[idxB].isInSameRing
+                    //           << std::endl;
+                    //if (!((allBonds[idxB].order.find("DOUB") !=std::string::npos
+                    //      || allBonds[idxB].order.find("AROM") !=std::string::npos)
+                    //    && allBonds[idxB].isInSameRing))
+                    //{
+                       
+                        std::vector<int> tIdxB;
+                        tIdxB.push_back(iTor->atoms[1]);
+                        tIdxB.push_back(iTor->atoms[2]);
+                        std::sort(tIdxB.begin(), tIdxB.end());
+                
+                        ID tLab = IntToStr(tIdxB[0]) + "_" + IntToStr(tIdxB[1]);
+                        //std::cout << "Bond of atoms " << allAtoms[iTor->atoms[1]].id
+                        //          << " and " << allAtoms[iTor->atoms[2]].id << std::endl;
+                        //std::cout << "torsion lab " << tLab << std::endl;
+                        //std::cout << "torsion " << iTor->seriNum 
+                        //          << " is included " << std::endl;
+                        TorsionSetOneBond[tLab].push_back(*iTor);
+                        
+                    // }
+                }
+                else
+                {
+                    std::cout << "Error in Setup Torsion section: "
+                              << "Can not find the bond between atom "
+                              << allAtoms[iTor->atoms[1]].id  << " and " 
+                              << allAtoms[iTor->atoms[2]].id << std::endl;
+                }
+                
+                
+            }
+        }
+        
+        for (std::map<ID, std::vector<TorsionDict> >::iterator iTorsB=TorsionSetOneBond.begin();
+                iTorsB !=TorsionSetOneBond.end(); iTorsB++)
+        {
+            
+            selectOneTorFromOneBond(iTorsB->first, iTorsB->second);
+        }
+        
+        std::cout << "Total number of torsions is " << allTorsions.size() 
+                  << std::endl;
+        
+        std::cout << "Number of torsions in the mini-set " 
+                  << miniTorsions.size() << std::endl;
+        
+        for (std::vector<TorsionDict>::iterator iTor = miniTorsions.begin();
+                iTor != miniTorsions.end(); iTor++)
+        {
+            std::cout << "The torsion selected for the bond of atom "
+                      << allAtoms[iTor->atoms[1]].id << " and "
+                      << allAtoms[iTor->atoms[2]].id << std::endl
+                      << " is " << iTor->value << std::endl;
+            std::cout << "The other two atoms are atom " 
+                      << allAtoms[iTor->atoms[0]].id
+                      << " and " << allAtoms[iTor->atoms[3]].id
+                      << std::endl;
+        }
+    }
+    
+    void CodClassify::selectOneTorFromOneBond(ID tS, std::vector<TorsionDict> & tTors)
+    {
+        bool lDone = false;
+        
+        if (tTors.size() >0)
+        {
+            std::vector<ID> tLabs;
+            StrTokenize(tS, tLabs, '_');
+                      
+            if (tLabs.size()==2)
+            {
+                int idx1 = StrToInt(tLabs[0]);
+                int idx2 = StrToInt(tLabs[1]);
+                // std::cout << "torsion lab " << tS << std::endl;
+                // std::cout << "Select torsion angles for the bond of atoms "
+                //          << allAtoms[idx1].id << " and " << allAtoms[idx2].id 
+                //          << std::endl;
+                
+                std::vector<int> idxR1, idxNonH1, idxH1, idxR2, idxNonH2, idxH2;
+                
+                for(std::vector<TorsionDict>::iterator iTor=tTors.begin();
+                        iTor !=tTors.end(); iTor++)
+                {
+                    for (int i=1; i < 3; i++)
+                    {
+                        if (iTor->atoms[i]==idx1)
+                        {
+                            for (std::vector<int>::iterator iConn=allAtoms[idx1].connAtoms.begin();
+                                   iConn != allAtoms[idx1].connAtoms.end(); iConn++)
+                            {
+                                if ( *iConn != idx2)
+                                {
+                                    if (allAtoms[*iConn].inRings.size() !=0)
+                                    {
+                                        idxR1.push_back(*iConn);
+                                    }
+                                    else if (allAtoms[*iConn].chemType !="H")
+                                    {
+                                        idxNonH1.push_back(*iConn);
+                                    }
+                                    else
+                                    {
+                                        idxH1.push_back(*iConn);
+                                    }
+                                }
+                            }
+                        }
+                        else if (iTor->atoms[i]==idx2)
+                        {
+                            for (std::vector<int>::iterator iConn=allAtoms[idx2].connAtoms.begin();
+                                 iConn != allAtoms[idx2].connAtoms.end(); iConn++)
+                            {
+                                if ( *iConn != idx1)
+                                {
+                                    if (allAtoms[*iConn].inRings.size() !=0)
+                                    {
+                                        idxR2.push_back(*iConn);
+                                    }
+                                    else if (allAtoms[*iConn].chemType.find("H")
+                                             ==std::string::npos)
+                                    {
+                                        idxNonH2.push_back(*iConn);
+                                    }
+                                    else
+                                    {
+                                        idxH2.push_back(*iConn);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //std::cout << "atom  " << allAtoms[idx1].id 
+                //          << " connects to " << std::endl;
+                //std::cout << "ring atoms " << idxR1.size() << std::endl
+                //          << "non-H atoms (excluded above) " << idxNonH1.size() << std::endl
+                //          << "H atoms " << idxH1.size() << std::endl;
+                //std::cout << "atom  " << allAtoms[idx2].id 
+                //          << " connects to " << std::endl;
+                //std::cout << "ring atoms " << idxR2.size() << std::endl
+                //          << "non-H atoms (excluded above) " << idxNonH2.size() << std::endl
+                //          << "H atoms " << idxH2.size() << std::endl;
+                // Now select the torsion angles 
+                // 1. atoms of Non-ring, non-H first 
+                if (idxNonH1.size() !=0 && idxNonH2.size() !=0)
+                {
+                    int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxNonH2[0]);                        
+                    if (tIdxT !=-1 )
+                    {
+                        miniTorsions.push_back(allTorsions[tIdxT]);
+                        lDone = true;
+                    }
+                    else
+                    {
+                        std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxNonH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl;   
+                    }
+                }
+                else if (idxNonH1.size() !=0 && idxNonH2.size() ==0)
+                {
+                    
+                    if (idxR2.size() !=0)
+                    {   
+                        int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxR2[0]);
+                        
+                        if (tIdxT !=-1 )
+                        {
+                           miniTorsions.push_back(allTorsions[tIdxT]);
+                           lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxNonH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxR2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else if (idxH2.size() !=0)
+                    {
+                        int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxH2[0]);                        
+                        if (tIdxT !=-1 )
+                        {
+                            miniTorsions.push_back(allTorsions[tIdxT]);
+                            lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxNonH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxH2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                }
+                else if (idxNonH1.size() ==0 && idxNonH2.size() !=0)
+                {
+                    
+                    if (idxR1.size() !=0)
+                    {
+                        
+                        int tIdxT= getTorsion(allTorsions, idxR1[0], idx1, idx2, idxNonH2[0]);
+                        
+                        if (tIdxT !=-1 )
+                        {
+                           miniTorsions.push_back(allTorsions[tIdxT]);
+                           lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxR1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else if (idxH1.size() !=0)
+                    {
+                        int tIdxT= getTorsion(allTorsions, idxH1[0], idx1, idx2, idxNonH2[0]);                        
+                        if (tIdxT !=-1 )
+                        {
+                            miniTorsions.push_back(allTorsions[tIdxT]);
+                            lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxH1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else
+                    {
+                        std::cout << "can not find the first atom of the torsion "
+                                      << " of atoms:  "  << std::endl 
+                                      << allAtoms[idx1].id << ", and "
+                                      << allAtoms[idx2].id 
+                                      << allAtoms[idxNonH2[0]].id 
+                                      << std::endl;
+                    }
+                }
+                else if (idxR1.size() !=0 || idxR2.size() !=0)
+                {
+                    if (idxR1.size() !=0 && idxR2.size() !=0)
+                    {
+                        int tIdxT= getTorsion(allTorsions, idxR1[0], idx1, idx2, idxR2[0]);
+                        
+                        if (tIdxT !=-1 )
+                        {
+                           miniTorsions.push_back(allTorsions[tIdxT]);
+                           lDone = true;
+                        }
+                        else
+                        {
+                            std::cout << "Error: can not find the torsion of atoms: "
+                                      << allAtoms[idxR1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idxR2[0]].id 
+                                      << std::endl; 
+                        }   
+                    }
+                    else if (idxR1.size() !=0 && idxR2.size()==0)
+                    {
+                        if (idxH2.size() !=0)
+                        {
+                            int tIdxT= getTorsion(allTorsions, idxR1[0], idx1, idx2, idxH2[0]);                        
+                            if (tIdxT !=-1 )
+                            {
+                                miniTorsions.push_back(allTorsions[tIdxT]);
+                                lDone = true;
+                            }
+                            else
+                            {
+                                std::cout << "Error: can not find the torsion of atoms: "
+                                          << allAtoms[idxR1[0]].id << ", " 
+                                          << allAtoms[idx1].id << ", "
+                                          << allAtoms[idx2].id << ", and "
+                                          << allAtoms[idxH2[0]].id 
+                                          << std::endl; 
+                            }
+                        }
+                        else   
+                        {
+                            std::cout << "can not find the fourth atom of the torsion "
+                                      << std::endl << " consisting of atoms: "
+                                      << allAtoms[idxR1[0]].id << ", " 
+                                      << allAtoms[idx1].id << ", and "
+                                      << allAtoms[idx2].id << std::endl;             
+                        }
+                    }
+                    else if (idxR2.size() !=0 && idxR1.size()==0)
+                    {
+                        
+                        if (idxH1.size() !=0)
+                        {
+                            int tIdxT= getTorsion(allTorsions, idxH1[0], idx1, idx2, idxR2[0]);                        
+                            if (tIdxT !=-1 )
+                            {
+                                miniTorsions.push_back(allTorsions[tIdxT]);
+                                lDone = true;
+                            }
+                            else
+                            {
+                                std::cout << "Error: can not find the torsion of atoms: "
+                                          << allAtoms[idxH1[0]].id << ", " 
+                                          << allAtoms[idx1].id << ", "
+                                          << allAtoms[idx2].id << ", and "
+                                          << allAtoms[idxR2[0]].id 
+                                          << std::endl; 
+                            }
+                        }
+                        else   
+                        {
+                            std::cout << "can not find the fourth atom of the torsion "
+                                      << std::endl << " consisting of " 
+                                      << allAtoms[idxR2[0]].id << ", "
+                                      << allAtoms[idx2].id << ", and "
+                                      << allAtoms[idx1].id << std::endl;             
+                        }
+                    }
+                }
+                else 
+                {
+                    
+                    std::cout << "Both atom " 
+                              << allAtoms[idx1].id  
+                              << ", and " << allAtoms[idx2].id 
+                              << " connect to H atoms only. Check the input structure ! "
+                              << std::endl;
+                    exit(1);  
+                }
+            }
+        } 
+    }
+    
     void CodClassify::setupTargetTorsions()
     {
         // search COD for torsion angle values, no needed at the moments.
@@ -14702,6 +15413,8 @@ namespace LIBMOL
         // setupTargetTorsions();
         
         fixTorIDs();
+        
+        setupMiniTorsions();
         
         // Chiral centers have been setup when atoms are read in from an
         // a input cif file
@@ -16417,7 +17130,7 @@ namespace LIBMOL
             
             all3.append("}");
         
-            std::cout << "The special 3 NB string is " << all3 << std::endl;
+            // std::cout << "The special 3 NB string is " << all3 << std::endl;
             
             tAt->codClass.append(all3);
             
@@ -16495,6 +17208,7 @@ namespace LIBMOL
                 }
             }
             
+            
             // Now symbols 
             std::list<std::string> tComps;
             
@@ -16520,31 +17234,33 @@ namespace LIBMOL
             //}
             
             
-            
-            ID all3 = "{";
-            
-            unsigned i=0, aN=tComps.size();
-            
-            for (std::list<std::string>::iterator iID=tComps.begin();
-                    iID !=tComps.end(); iID++)
+            if (tComps.size() !=0)
             {
-                if (i < aN-1)
-                {
-                    all3.append(*iID + ",");
-                }
-                else
-                {
-                    all3.append(*iID);
-                }
-                i++;
-            }
+                ID all3 = "{";
             
-            all3.append("}");
+                unsigned i=0, aN=tComps.size();
+            
+                for (std::list<std::string>::iterator iID=tComps.begin();
+                     iID !=tComps.end(); iID++)
+                {
+                    if (i < aN-1)
+                    {
+                        all3.append(*iID + ",");
+                    }
+                    else
+                    {
+                        all3.append(*iID);
+                    }
+                    i++;
+                }
+                
+                all3.append("}");
         
-            // std::cout << "The special 3NB string is " << all3 << std::endl;
+                // std::cout << "The special 3NB string is " << all3 << std::endl;
             
-            tAt->codClass.append(all3);
+                tAt->codClass.append(all3);
             
+            }
         }
         
     }

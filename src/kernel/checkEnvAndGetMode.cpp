@@ -81,7 +81,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:O:S:T:X:Y:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:M:O:S:T:X:Y:Z:")) != -1)
         {
             switch (c)
             {
@@ -126,8 +126,7 @@ namespace LIBMOL
                     break;
                 case 'o':
                     IOEntries["userOutName"] = optarg;
-                    // std::cout << "Output res file should be : " 
-                    //          << IOEntries["userOutName"] << std::endl;
+                    // std::cout << "output root input " << optarg << std::endl;
                     break;
                 case 'p':
                     IOEntries["inPdbName"] = optarg;
@@ -174,6 +173,11 @@ namespace LIBMOL
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
+                case 'M':
+                    IOEntries["MetalEnable"] = optarg;
+                    //std::cout << "COD atom types are output to : " 
+                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    break;
                 case 'O':
                     IOEntries["NoGeoOpt"] = optarg;
                     StrLower(IOEntries["NoGeoOpt"]);
@@ -201,7 +205,9 @@ namespace LIBMOL
                     std::cout << "The file containing atom type set B is "
                               << IOEntries["Type1"] << std::endl;
                     break;
-                    
+                case 'Z':
+                    IOEntries["HUMO"] = optarg;
+                    break;    
                 case '?':
                     if (std::isprint(optopt))
                     {
@@ -305,7 +311,7 @@ namespace LIBMOL
                     break; 
                 case 'o':
                     IOEntries["userOutName"] = optarg;
-                    IOEntries["outCifName"]  =  optarg; // should be that
+                    //IOEntries["outCifName"]  =  optarg; // should be that
                     break; 
                 case 'r':
                     IOEntries["monoRootName"] = optarg;
@@ -344,7 +350,29 @@ namespace LIBMOL
         {
             workMode = 900;
         }
-        else if ( IOEntries.find("inCifName")!=IOEntries.end())
+        else if (IOEntries.find("HUMO")!=IOEntries.end())
+        {
+            if (IOEntries.find("inCifName")!=IOEntries.end())
+            {
+                workMode = 910;
+            }
+            else if (IOEntries.find("inCifNameB")!=IOEntries.end())
+            {
+                workMode = 311;
+            }
+        }
+        else if (IOEntries.find("MetalEnable")!=IOEntries.end())
+        {
+            if (IOEntries.find("inCifName")!=IOEntries.end())
+            {
+                workMode = 912;
+            }
+            else if (IOEntries.find("inCifNameB")!=IOEntries.end())
+            {
+                workMode = 312;
+            }
+        }
+        else if ( IOEntries.find("inCifName")!=IOEntries.end() )
         {
             if (!IOEntries["inCifName"].empty())
             {
@@ -529,7 +557,8 @@ namespace LIBMOL
             std::cout << "The current job is coordinate transform in the dictionary file " 
                       << std::endl;
         }
-        else if (workMode==31 || workMode==32)
+        else if (workMode==31 || workMode==311 
+                 || workMode==312 || workMode==32)
         {
             std::cout << "Your job is to deduce values of bond and bond-angle"
                       << " and build molecules from your input cif file "
@@ -538,6 +567,16 @@ namespace LIBMOL
                       << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
                       << "The output dictionary file(cif) : " << IOEntries["userOutName"]
                       << std::endl;
+            if (workMode==311)
+            {
+                std::cout << "Huckel's MO will be used in the calculations to "
+                          << "decide aromaticity in bonds " << std::endl;
+            }
+            else if (workMode == 312)
+            {
+                std::cout << "The job will handle with atoms of metal elements"
+                          << std::endl;
+            }
         }   
         else if (workMode==41)
         {
@@ -556,6 +595,11 @@ namespace LIBMOL
                     << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
                     << "The output atom type file(txt) : " << IOEntries["AtomTypeOutName"]
                     << std::endl;
+        }
+        else if (workMode==910)
+        {
+            std::cout << "The Mode for HUMO applications is activated "
+                      << std::endl;
         }
                   
         std::cout << "||========================================================================||"

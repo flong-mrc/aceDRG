@@ -241,6 +241,10 @@ namespace LIBMOL
         return (int)first.size() > (int)second.size();
     }
     
+    bool desSortIntMapValues(const sortIntMap & a, const sortIntMap & b)
+    {
+        return a.value > b.value;
+    }
     
     bool desSortMapKey(const sortMap& a ,const sortMap & b)
     {
@@ -375,6 +379,35 @@ namespace LIBMOL
         return 1 ;
     }
     
+    extern void writeMsgFile(std::string & tRootName,
+                          std::vector<std::string> & tMsg)
+    {
+        Name aFName(tRootName.c_str());
+         
+        std::vector<std::string> nameComps;
+        StrTokenize(aFName, nameComps, '.');
+        Name rootFName;
+        
+        for (unsigned jF=0; jF < nameComps.size()-1; jF++)
+        {
+            rootFName.append(nameComps[jF]);
+        }
+        if (rootFName.size() ==0)
+        {
+            rootFName.append("Current");
+        }
+        
+        Name msgFName(rootFName);
+        msgFName.append("_msg.txt");
+        std::ofstream msg(msgFName.c_str());
+        for (std::vector<std::string>::iterator iM=tMsg.begin();
+                iM !=tMsg.end(); iM++)
+        {
+            msg << *iM;
+        }
+        msg.close();
+    }
+    
     // trigonometrical functions
     extern REAL degreeToRadians(REAL tDeg)
     {
@@ -406,16 +439,20 @@ namespace LIBMOL
     extern bool inVectABS(std::vector<REAL> & tVect,
                        REAL tVal, REAL tErr)
     {
+        bool aCri = false;
+        
+        
         for (std::vector<REAL>::iterator iV=tVect.begin();
                 iV !=tVect.end(); iV++)
         {
             if (fabs(*iV-tVal) <tErr)
             {
-                return true;
+                aCri = true;
             }
+                
         }
         
-        return false;
+        return aCri;
     }
     
     extern bool outVectAbsDiff(std::vector<REAL> & tVect,
@@ -457,6 +494,21 @@ namespace LIBMOL
         }
     }
     
+    
+    extern void diffVects(std::vector<REAL> & tV1,
+                          std::vector<REAL> & tV2,
+                          std::vector<REAL> & tVOut)
+    {
+        if (tV1.size()==tV2.size())
+        {
+            for (unsigned i=0; i < tV1.size(); i++)
+            {
+                tVOut.push_back(tV2[i]-tV1[i]);   
+            }
+        }
+    }
+    
+    
     extern REAL lengthV(std::vector<REAL> & tV1)
     {
         REAL tBuf = 0.0;
@@ -482,8 +534,22 @@ namespace LIBMOL
         
         return  std::sqrt(tBuf);
     }
-    
+   
     extern void normalizeV(std::vector<REAL> & tV)
+    {
+        REAL aLen =lengthV(tV);
+        
+        if (aLen > 1.0e-6)
+        {
+            for(int i=0; i < (int)tV.size(); i++)
+            {
+                tV[i]=tV[i]/aLen;
+            }
+        }
+  
+    }
+        
+    extern void scaleV(std::vector<REAL> & tV)
     {
         REAL tMax=0.0;
         for (int i=0; i < (int)tV.size(); i++)
@@ -555,6 +621,66 @@ namespace LIBMOL
         tMOD = dotP(tV1, tV2);
         
         return acos(tMOD/(tMOD1*tMOD2));
+    }
+    
+    extern void transAng(REAL & tAng)
+    {
+        REAL tmpAng =0.0;
+        
+        if (tAng > 90.0)
+        {
+            tmpAng = 180.0-tAng;
+        }
+        else if (tAng < -90.0)
+        {
+            tmpAng = 180.0+tAng;
+        }
+        else 
+        {
+            tmpAng = fabs(tAng);
+        }
+        
+        tAng = tmpAng;
+        
+    }
+    
+    extern REAL getAng3V(std::vector<REAL>  & tV1,
+                         std::vector<REAL>  & tV2,
+                         std::vector<REAL>  & tV3)
+    {
+        std::vector<REAL> tV23;
+        crossP2V(tV2, tV3, tV23);
+        
+        REAL tAngP = getAngle2V(tV1, tV23)*PID180;
+        tAngP      = fabs(tAngP);
+        if (tAngP > 90.0)
+        {
+            tAngP = 180.0-tAngP;
+        }
+        
+        
+        REAL tAng = 0.0;
+        tAng = fabs(90.0-tAngP);
+        std::cout << "The angle is " << tAng << std::endl;
+        return tAng;
+        
+    }
+    
+    extern bool checkPlaneAng3V(std::vector<REAL>  & tV1,
+                                std::vector<REAL>  & tV2,
+                                std::vector<REAL>  & tV3,
+                                REAL                 tCri)
+    {
+        bool lP = false;
+        
+        REAL tDiff = getAng3V(tV1, tV2, tV3);
+
+        if (tDiff <= tCri)
+        {
+            lP = true;
+        }
+        
+        return lP;
     }
     
     extern REAL getTorsion3V(std::vector<REAL> & tV1, std::vector<REAL> & tV2,
@@ -963,6 +1089,8 @@ namespace LIBMOL
         
         }
     }
+    
+    
     
     // Normalization of the matrix, A, and its associate
     // vector b, where A*X=b.
@@ -1811,7 +1939,7 @@ namespace LIBMOL
                        "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
                        "Sn", "sn", "Pb", "pb", "Bi", "bi", "Pu", "pu", "Nd", "nd", "Ce", "ce",
                        "La", "la","Pr", "pr", "Pm", "pm", "Sm", "sm", "Eu", "eu", "Gd", "gd", 
-                       "Tb", "tb", "Dy", "dy", "Ho", "ho", "Er", "er", "Tm", "tm", "Yb", "yb"
+                       "Tb", "tb", "Dy", "dy", "Ho", "ho", "Er", "er", "Tm", "tm", "Yb", "yb",
                        "Lu", "lu", "Ac", "ac", "Th", "th", "Pa", "pa", "U", "u", "Np", "np",
                        "Am", "am", "Cm", "cm", "Bk", "bk", "Cf", "cf", "Es", "es", "Fm", "fm",
                        "Md", "md", "No", "no", "Lr", "lr"};
@@ -1939,7 +2067,12 @@ namespace LIBMOL
         else if (aStr.find("AROM") !=std::string::npos || aStr.find("AR") !=std::string::npos)
         {
             //tOrder = 4.0;
-            tOrder = 1.5;
+            tOrder = 1.0;
+        }
+        else if (aStr.find("AM") !=std::string::npos)
+        {
+            // amide bond
+            tOrder = 1.0;
         }
         else if (aStr.find("DELO") !=std::string::npos)
         {

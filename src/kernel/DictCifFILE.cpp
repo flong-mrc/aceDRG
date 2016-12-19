@@ -12,9 +12,15 @@ namespace LIBMOL
 {
     
     GenCifFile::GenCifFile() : curBlockLine(ZeroInt),
+            lErr(false),
             hasCoords(false),
             hasH(false),
+            hasMetal(false),
+            notPowder(true),
+            resolOK(true),
             RFactorOK(false),
+            colidOK(true),
+            hasHeavyCalcAtoms(false),
             itsCurAtomSeriNum(ZeroInt),
             itsCurAtom(NullPoint),
             itsCurBlock(""),
@@ -25,9 +31,15 @@ namespace LIBMOL
     GenCifFile::GenCifFile(Name tFname, 
                            std::ios_base::openmode tOpenMode) :
                            curBlockLine(ZeroInt),
+                           lErr(false),
                            hasCoords(false),
                            hasH(false),
+                           hasMetal(false),
+                           notPowder(true),
+                           resolOK(true),
                            RFactorOK(false),
+                           colidOK(true),
+                           hasHeavyCalcAtoms(false),
                            itsCurAtomSeriNum(ZeroInt),  
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
@@ -46,7 +58,8 @@ namespace LIBMOL
             else
             {
                 std::cout << tFname << " Can not be opened for reading " << std::endl;
-                exit(1);
+                errMsg.push_back("Cif file Can not be opened for reading ");
+                lErr = true;
             }
         }
         else
@@ -58,9 +71,15 @@ namespace LIBMOL
     GenCifFile::GenCifFile(FileName                tFname,
                            std::ios::openmode      tOpenMode=std::ios::in ) :
                            curBlockLine(ZeroInt),
+                           lErr(false),
                            hasCoords(false),
                            hasH(false),
+                           hasMetal(false),
+                           notPowder(true),
+                           resolOK(true),
                            RFactorOK(false),
+                           colidOK(true),
+                           hasHeavyCalcAtoms(false),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurCryst(NullPoint)
@@ -121,12 +140,14 @@ namespace LIBMOL
             itsCurBlock = "";
             std::string tRecord="";
             
+            std::vector<std::string>     tAllLines;
             std::vector<std::string>     tBlocLines;
             
             while(!inFile.eof())
             {   
                 std::getline(inFile, tRecord);
                 tRecord = TrimSpaces(tRecord);
+                tAllLines.push_back(tRecord);
                 // std::cout <<  tRecord << std::endl;
                 std::vector<std::string> tBuf;
                 std::vector<std::string> tBuf_t;
@@ -156,6 +177,8 @@ namespace LIBMOL
                 tBlocLines.clear();
             }
             inFile.close();
+            
+            
             
             std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
 
@@ -219,6 +242,7 @@ namespace LIBMOL
                           << "z:   " << iA->coords[2] << std::endl;           
             }
         }
+        
     } 
     
     void GenCifFile::setupSystem2()
@@ -230,6 +254,7 @@ namespace LIBMOL
             itsCurBlock = "";
             std::string tRecord="";
             
+            std::vector<std::string>     tAllLines;
             std::vector<std::string>     tBlocLines;
             REAL tROK1 = -1.0;
             REAL tROK2 = -1.0;
@@ -237,6 +262,7 @@ namespace LIBMOL
             {   
                 std::getline(inFile, tRecord);
                 tRecord = TrimSpaces(tRecord);
+                tAllLines.push_back(tRecord);
                 // std::cout <<  tRecord << std::endl;
                 std::vector<std::string> tBuf;
                 std::vector<std::string> tBuf_t;
@@ -326,9 +352,19 @@ namespace LIBMOL
                 }
             }
             
+            if (!RFactorOK)
+            {
+                errMsg.push_back("R FACTOR IS TWO HIGH\n");
+            }
             
             inFile.close();
             
+            checkPowder(tAllLines);
+            
+            if (!notPowder)
+            {
+                return ;
+            }
             // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
             
             /*
@@ -345,7 +381,8 @@ namespace LIBMOL
             */
             
             // 
-            if ((int)tBlocs.size()!=0 && RFactorOK )
+            //if ((int)tBlocs.size()!=0 && RFactorOK )
+            if ((int)tBlocs.size()!=0)
             {
                 
                 std::map<std::string, std::string>   rowProps;
@@ -360,7 +397,6 @@ namespace LIBMOL
                     {
                         getPropsToMaps(iBs, rowProps, colProps, idxB);
                     }
-                    
                 }
                  
                 
@@ -403,60 +439,133 @@ namespace LIBMOL
                 
                 // Now select what we need from the input cif file.
                 selectPropsToMaps(rowProps, colProps);
-                checkAtomElementID();
                 
-                // check if the assigned atom element types are right ones
-                PeriodicTable aPTab;
-                for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-                     iA !=allAtoms.end(); iA++)
+                if (!lErr)
                 {
-                    if (!assignElementType(aPTab, iA->chemType, iA))
+                    checkAtomElementID();
+                
+                
+                    // check if the assigned atom element types are right ones
+                    PeriodicTable aPTab;
+                    for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                        iA !=allAtoms.end(); iA++)
                     {
-                        std::cout << "Warn: atom " << iA->id << " has element type "
-                                  << iA->chemType << " which is not in the Periodic Table"
-                                  << std::endl;
+                        if (!assignElementType(aPTab, iA->chemType, iA))
+                        {
+                            std::cout << "Warn: atom " << iA->id << " has element type "
+                                      << iA->chemType << " which is not in the Periodic Table"
+                                      << std::endl;
+                        }
+                    }
+                
+                    checkNonHAtomOccp();
+                    setAtomsMetalType();
+                    setAtomOxiType();
+                    
+                    checkCalcAtoms();
+                
+                     // Check
+                
+                    std::cout << "There are " << (int)allAtoms.size() 
+                              << " atoms in the system. They are " << std::endl;
+            
+                    for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                          iA !=allAtoms.end(); iA++)
+                    {
+                        std::cout << "Atom " << iA->id << std::endl
+                                  << " serial Number " << iA->seriNum << std::endl
+                                  << "Its type symbol " << iA->chemType << std::endl
+                                  << "Is it metal ";
+                   
+                        if (iA->isMetal)
+                        {
+                            std::cout << " Yes " << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << " No " << std::endl;
+                        }
+                        
+                        std::cout << "Is that atom from calculations ? ";
+                        if (iA->fromCalc)
+                        {
+                            std::cout <<  "Yes" << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << "No, it is determined from experimental data "
+                                      << std::endl;
+                        }
+                        
+                        std::cout << "Its form charge " << iA->formalCharge << std::endl;
+                        std::cout << "Its occupancy " << iA->ocp << std::endl;
+                        std::cout << "Its coordinates (fractional) " << std::endl
+                                  << "x:   " << iA->fracCoords[0] << std::endl
+                                  << "y:   " << iA->fracCoords[1] << std::endl
+                                  << "z:   " << iA->fracCoords[2] << std::endl
+                                  << "Its coordinates  " << std::endl
+                                  << "x:   " << iA->coords[0] << std::endl
+                                  << "y:   " << iA->coords[1] << std::endl
+                                  << "z:   " << iA->coords[2] << std::endl;  
+                   
+                        //std::cout << "Is that atom in read-in unit ? " 
+                        //          << iA->isInPreCell << std::endl;
+                   
                     }
                 }
-                
-                
-                
-                setAtomsMetalType();
-                
-                // Check
-                /*
-                std::cout << "There are " << (int)allAtoms.size() 
-                          << " atoms in the system. They are " << std::endl;
-            
-               for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-                     iA !=allAtoms.end(); iA++)
-               {
-                   std::cout << "Atom " << iA->id << std::endl
-                             << " serial Number " << iA->seriNum << std::endl
-                             << "Its type symbol " << iA->chemType << std::endl
-                             << "Is it metal ";
-                   if (iA->isMetal)
-                   {
-                       std::cout << " Yes " << std::endl;
-                   }
-                   else
-                   {
-                       std::cout << " No " << std::endl;
-                   }
-                   std::cout << "Its form charge " << iA->formalCharge << std::endl;
-                   std::cout << "Its occupancy " << iA->ocp << std::endl;
-                   std::cout << "Its coordinates (fractional) " << std::endl
-                             << "x:   " << iA->fracCoords[0] << std::endl
-                             << "y:   " << iA->fracCoords[1] << std::endl
-                             << "z:   " << iA->fracCoords[2] << std::endl
-                             << "Its coordinates  " << std::endl
-                             << "x:   " << iA->coords[0] << std::endl
-                             << "y:   " << iA->coords[1] << std::endl
-                             << "z:   " << iA->coords[2] << std::endl;           
-               }
-                 */
             }
        }
-       
+    }
+    
+    void GenCifFile::checkPowder(std::vector<std::string>& tLines)
+    {
+        if(tLines.size() !=0)
+        {
+            for (std::vector<std::string>::iterator iL=tLines.begin();
+                    iL != tLines.end(); iL++)
+            {
+                StrLower(*iL);
+                // std::cout << *iL << std::endl;
+                if (iL->find("#")==iL->npos && (iL->find("powder") !=iL->npos
+                       || iL->find("_ph_") !=iL->npos))
+                {
+                    notPowder = false;
+                    errMsg.push_back("POWDER DIFFRACTIONS DETECTED\n");
+                    break;
+                }
+            }
+        }  
+    }
+    
+    void GenCifFile::checkCalcAtoms()
+    {
+        if (allAtoms.size() >0)
+        {
+            std::vector<int> idxsCAt;
+            for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+            {
+                if (iAt->fromCalc && iAt->chemType !="H")
+                {
+                    hasHeavyCalcAtoms = true;
+                    //std::cout << iAt->id << " iAt->fromCalc " 
+                    //          << iAt->fromCalc << std::endl;
+                    idxsCAt.push_back(iAt->seriNum);
+                }
+            }
+            
+            //std::cout << "The system hasHeavyCalcAtoms? "
+            //          << hasHeavyCalcAtoms << std::endl;
+            if (idxsCAt.size() !=0)
+            {
+                for (unsigned i=0; i < idxsCAt.size(); i++)
+                {
+                    errMsg.push_back("Reject structures : \n");
+                    errMsg.push_back("Atom " + allAtoms[idxsCAt[i]].id 
+                                     + " is from calculations\n" );
+                }
+            }
+        } 
     }
     
     void GenCifFile::checkAtomElementID()
@@ -466,8 +575,10 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
+            
+            //std::cout << "Atom id " << iAt->id << std::endl;
+            //std::cout << "Atom element symbol " << iAt->chemType << std::endl;
             /*
-            std::cout << "Atom id " << iAt->id << std::endl;
             if (iAt->chemType.empty())
             {
                 std::cout << "empty " << iAt->chemType.empty() << std::endl;
@@ -477,7 +588,8 @@ namespace LIBMOL
             {
                 std::cout << "Not find " << std::endl;
             }
-             */
+            */
+            
             if (iAt->chemType.empty() || ((iAt->chemType.size() < 4) &&
                 aPTab.elements.find(iAt->chemType) == aPTab.elements.end()))
                      
@@ -509,6 +621,11 @@ namespace LIBMOL
                             iAt->chemType=iAt->id;
                             tFind = true;
                         }
+                        else if(iAt->id.compare(".")==0)
+                        {
+                            iAt->chemType = "Po";
+                            tFind  = true;
+                        }
                     }
                     
                 }
@@ -517,7 +634,8 @@ namespace LIBMOL
                 {
                     std::cout << "Atom " << iAt->id << "'s element type could not be handled with in this program "
                               << std::endl;
-                    exit(1);
+                    std::string aSL = "Atom " + iAt->id + "'s element type could not be handled with in this program \n";
+                    errMsg.push_back(aSL);
                 }
             }
             else if (iAt->chemType.size() >2)
@@ -567,16 +685,46 @@ namespace LIBMOL
         }
     }
     
+    
+    void GenCifFile::checkNonHAtomOccp()
+    {
+        float nAll = (float)allAtoms.size(), nColid=0.0;
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                     iA !=allAtoms.end(); iA++)
+        {
+            if (iA->chemType.find("H")==std::string::npos)
+            {
+                if (iA->ocp < 0.99)
+                {
+                    nColid+=1.0;
+                }
+            }
+        }
+        
+        if (nColid/nAll >0.5*nAll)
+        {
+            errMsg.push_back("HIGHLY COLLIDED STRUCUTRE \n");
+            colidOK = false;
+        }
+    }
+    
     void GenCifFile::setAtomsMetalType()
     {
         std::vector<ID>  allMetals;
         
         initMetalTab(allMetals);
-        
+  
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                      iA !=allAtoms.end(); iA++)
         {
             iA->isMetal = isMetal(allMetals, iA->chemType);
+            if (iA->isMetal)
+            {
+                if (!hasMetal)
+                {
+                    hasMetal = true;
+                }
+            }
         }
         
     }
@@ -587,13 +735,15 @@ namespace LIBMOL
                                     int & tIdxB)
     {
         bool lLab=false;
-        
+        // std::cout << "A block has been read " << std::endl;
         for (std::vector<std::string>::iterator iBl=tOneBlockLines->begin();
                                iBl != tOneBlockLines->end(); iBl++)
         {
             (*iBl) = TrimSpaces((*iBl));
-            // std::cout << (*iBl) << std::endl;
+            //std::cout << "The lines is : " 
+            //          << (*iBl) << std::endl;
             std::vector<std::string> tBuf0, tBuf;
+            
             if (iBl->find('\'') != std::string::npos && iBl->substr(0,1).compare("_")==0)
             {
                 StrTokenize(*iBl, tBuf0, '\'');
@@ -632,6 +782,7 @@ namespace LIBMOL
             }
             else
             {
+                
                 StrTokenize(*iBl, tBuf);
             }
             
@@ -640,15 +791,19 @@ namespace LIBMOL
             {
                 if (tBuf[0].find("_") !=std::string::npos)
                 { 
+                    
                     if (lLab) 
                     {
-                        tColProps[tIdxB]["lab"].push_back(tBuf[0]);
+                        tColProps[tIdxB]["lab"].push_back(TrimSpaces(tBuf[0]));
+                        
                     }
                     else
                     {
+                        
                         lLab=true;
                         tIdxB++;
-                        tColProps[tIdxB]["lab"].push_back(tBuf[0]);
+                        tColProps[tIdxB]["lab"].push_back(TrimSpaces(tBuf[0]));
+                        
                     }
                 }
                 else
@@ -658,6 +813,7 @@ namespace LIBMOL
                         lLab  = false;
                     }
                     tColProps[tIdxB]["cont"].push_back((*iBl));   
+                    
                 }
                 
             }
@@ -666,7 +822,7 @@ namespace LIBMOL
                 tRowProps[TrimSpaces(tBuf[0])] = TrimSpaces(tBuf[1]);
                 
             }
-            else if (tBuf.size() > 1 && tBuf[0].find("_") ==std::string::npos)
+            else if (tBuf.size() > 1 && tBuf[0][0] !='_')
             {
                 // if(tBuf.size()==tColProps[tIdxB]["lab"].size())
                 //{
@@ -674,7 +830,10 @@ namespace LIBMOL
                     {
                         lLab  = false;
                     }
+                    //std::cout << "the firs label is " << tColProps[tIdxB]["lab"][0]
+                    //           << std::endl;
                     tColProps[tIdxB]["cont"].push_back((*iBl));
+                    //std::cout << "cont line: " << *iBl << std::endl;
                 // }
             }
         } 
@@ -686,58 +845,80 @@ namespace LIBMOL
         
         getCifCrystInfo(tRowProps, tColProps);
       
-        bool lSymOps=false, lAtms=false;
+        bool lSymOps=false, lAtms=false, lTypes=false;
         for (std::map<int,std::map<ID,std::vector<std::string> > >::iterator 
               iBl=tColProps.begin(); iBl != tColProps.end(); iBl++)
         {
             if (!lSymOps)
             {
+                /*
+                for (std::vector<std::string>::iterator 
+                     iM=iBl->second["lab"].begin(); 
+                     iM != iBl->second["lab"].end(); iM++)
+                {
+                    std::cout << "print lab " << *iM << std::endl;
+                }
+                */
                 int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
                                             iBl->second["lab"]);
+                if (aPos ==-1)
+                {
+                                      
+                    aPos=getKeyWordPos("_space_group_symop_operation_xyz",
+                                            iBl->second["lab"]);
+                }
                 if (aPos !=-1)
                 {
                     lSymOps=true;
                     getCifSymOps(iBl->second);
                 }
-                
+               
             }
+            
             
             if(!lAtms)
             {
+                
                 if (getKeyWordPos("_atom_site_type_symbol", iBl->second["lab"]) !=-1
                     || getKeyWordPos("_atom_site_label", iBl->second["lab"]) !=-1)
                 {
+                    
                     lAtms = true;
                     getCifAtomInfo(iBl->second);
                 }
-                else
+            }
+          
+            
+            if(!lTypes)
+            {
+                if (getKeyWordPos("_atom_type_symbol", iBl->second["lab"]) !=-1)
                 {
-                    
+                    lTypes = true;
+                    getCifAtomOxiInfo(iBl->second);
                 }
             }
-            
         }
         
         if (itsCurCryst !=NullPoint)
         {
             
             allCryst.push_back(*itsCurCryst);
+            // std::cout << "number of crystal : " << allCryst.size() << std::endl;
         }
         else
         {
             std::cout << "No crystal " << std::endl;
-            exit(1);
+            errMsg.push_back("No crystal ");
+            lErr = true;   
         }
         
         if (!lSymOps)
         {
             std::cout << "No symmetry operators, can not generator molecules "
                       << std::endl;
-            exit(1);
+            errMsg.push_back("No symmetry operators, can not generator molecules \n");
+            lErr = true;
         }
-        
-        
-        
     }
     void GenCifFile::initAllCifKeys()
     {
@@ -784,6 +965,8 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "No space group number in line " << *iBl << std::endl;
+                    lErr = true;
+                    errMsg.push_back("No space group number in line");
                     exit(1);
                 }
             }
@@ -797,8 +980,9 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "Wrong Line format for the lattice in line " << *iBl << std::endl;
-                    exit(1);
+                    std::cout << "Wrong Line format for the lattice in line" << *iBl << std::endl;
+                    errMsg.push_back("Wrong Line format for the lattice in line");
+                    lErr=true;
                 }
             }
             else if (iBl->find("_symmetry_space_group_name_Hall") !=std::string::npos)
@@ -823,7 +1007,8 @@ namespace LIBMOL
                 {
                     std::cout << "Wrong Line format for the line contain '_symmetry_space_group_name_Hall' " 
                               << *iBl << std::endl;
-                    exit(1);
+                    errMsg.push_back("Wrong Line format for the line contain '_symmetry_space_group_name_Hall' ");
+                    lErr = true;
                 }
                 
             }
@@ -848,7 +1033,9 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "Wrong Line format for xHM symbol in line " << *iBl << std::endl;
-                    exit(1);
+                    errMsg.push_back("Wrong Line format for xHM symbol in line\n");
+                    lErr = true;
+              
                 }
             }
             else if (iBl->find("_cell_length_a") !=std::string::npos)
@@ -872,7 +1059,8 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "No cell parameter a in line " << *iBl << std::endl;
-                    exit(1);
+                    errMsg.push_back("No cell parameter a in line \n");
+                    lErr = true;
                 }
             }
             else if (iBl->find("_cell_length_b") !=std::string::npos)
@@ -895,7 +1083,8 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "No space cell parameter b in line " << *iBl << std::endl;
-                    exit(1);
+                    errMsg.push_back("No cell parameter b in line \n");
+                    lErr = true;
                 }
             }
             else if (iBl->find("_cell_length_c") !=std::string::npos)
@@ -916,9 +1105,10 @@ namespace LIBMOL
                     }
                 }
                 else
-                {
+                {errMsg.push_back("No cell parameter c in line \n");
+                    lErr = true;
                     std::cout << "No cell parameter c in line " << *iBl << std::endl;
-                    exit(1);
+                    
                 }
             }
             else if (iBl->find("_cell_angle_alpha") !=std::string::npos)
@@ -942,7 +1132,8 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "No cell parameter alpha in line " << *iBl << std::endl;
-                    exit(1);
+                    errMsg.push_back("No cell parameter alpha in line \n");
+                    lErr = false;
                 }
             }
             else if (iBl->find("_cell_angle_beta") !=std::string::npos)
@@ -966,7 +1157,9 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "No cell parameter beta in line " << *iBl << std::endl;
-                    exit(1);
+                    
+                    errMsg.push_back("No cell parameter beta in line \n");
+                    lErr = true;
                 }
             }
             else if (iBl->find("_cell_angle_gamma") !=std::string::npos)
@@ -990,7 +1183,8 @@ namespace LIBMOL
                 else
                 {
                     std::cout << "No cell parameter gamma in line " << *iBl << std::endl;
-                    exit(1);
+                    errMsg.push_back("No cell parameter gamma in line \n");
+                    lErr = true;
                 }
             }
             else if (iBl->find("_cell_volume") !=std::string::npos)
@@ -1012,8 +1206,9 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "No cell parameter c in line " << *iBl << std::endl;
-                    exit(1);
+                    std::cout << "No cell volume in line " << *iBl << std::endl;
+                    errMsg.push_back("No cell volume in line \n");
+                    lErr = true;
                 }
             }
         }
@@ -1093,6 +1288,14 @@ namespace LIBMOL
             itsCurCryst->itsCell  = new Cell();
         }
         
+        
+        
+        if(itsCurCryst->itsResolution==NullPoint)
+        {
+            itsCurCryst->itsResolution = new Resolution();
+        }
+        
+        
         // Space group related 
         
         
@@ -1121,7 +1324,8 @@ namespace LIBMOL
         else
         {
             std::cout << "No cell length a in the input cif file " << std::endl;
-            exit(1);
+            errMsg.push_back("No cell length a in the input cif file\n");
+            lErr = true;
         }
         
         if (tRowProps.find("_cell_length_b") !=tRowProps.end())
@@ -1131,7 +1335,8 @@ namespace LIBMOL
         else
         {
             std::cout << "No cell length b in the input cif file " << std::endl;
-            exit(1);
+            errMsg.push_back("No cell length b in the input cif file\n");
+            lErr = true;
         }
         
         if (tRowProps.find("_cell_length_c") !=tRowProps.end())
@@ -1141,7 +1346,8 @@ namespace LIBMOL
         else
         {
             std::cout << "No cell length c in the input cif file " << std::endl;
-            exit(1);
+            errMsg.push_back("No cell length c in the input cif file\n");
+            lErr = true;
         }
         
         if (tRowProps.find("_cell_angle_alpha") !=tRowProps.end())
@@ -1161,7 +1367,8 @@ namespace LIBMOL
         else
         {
             std::cout << "No cell angle alpha in the input cif file " << std::endl;
-            exit(1);
+            errMsg.push_back("No cell angle alpha in the input cif file\n");
+            lErr = true;
         }
         
         if (tRowProps.find("_cell_angle_beta") !=tRowProps.end())
@@ -1181,7 +1388,8 @@ namespace LIBMOL
         else
         {
             std::cout << "No cell angle beta in the input cif file " << std::endl;
-            exit(1);
+            errMsg.push_back("No cell angle beta in the input cif file\n");
+            lErr = true;
         }
         
         if (tRowProps.find("_cell_angle_gamma") !=tRowProps.end())
@@ -1200,7 +1408,8 @@ namespace LIBMOL
         else
         {
             std::cout << "No cell angle gamma in the input cif file " << std::endl;
-            exit(1);
+            errMsg.push_back("No cell angle gamma in the input cif file\n");
+            lErr = true;
         }
         
         if (tRowProps.find("_cell_volume") !=tRowProps.end())
@@ -1214,6 +1423,64 @@ namespace LIBMOL
             else
             {
                 itsCurCryst->itsCell->vol =StrToReal(tRowProps["_cell_volume"]);
+            }
+        }
+        /*
+        for (std::map<ID, ID>::iterator iM=tRowProps.begin();
+                iM != tRowProps.end(); iM++)
+        {
+            std::cout << "Property  " << iM->first 
+                      << " : Value " << iM->second << std::endl;
+        }
+       */
+        
+        // Resolution related properties 
+        if (tRowProps.find("_diffrn_reflns_theta_max") ==tRowProps.end())
+        {
+            // No way to decide the resolution
+            resolOK = false;
+            errMsg.push_back("UNDEFINITED RESOLUTION: no theta_max to decide the resolution of data\n");
+        }
+        else if(tRowProps.find("_diffrn_radiation_wavelength")==tRowProps.end())
+        {
+            // No way to decide the resolution
+            resolOK = false;
+            errMsg.push_back("UNDEFINITED RESOLUTION: no X-ray wave length to decide the resolution of data\n");
+        }
+        else
+        {
+            if (tRowProps.find("_diffrn_radiation_wavelength") !=tRowProps.end())
+            {
+                //std::cout << "_diffrn_radiation_wavelength : " << tRowProps["_diffrn_radiation_wavelength"] << std::endl;
+                itsCurCryst->itsResolution->wavLen = StrToReal(tRowProps["_diffrn_radiation_wavelength"]);
+            }
+        
+            if (tRowProps.find("_diffrn_reflns_theta_max") !=tRowProps.end())
+            {
+                itsCurCryst->itsResolution->thetaMax = StrToReal(tRowProps["_diffrn_reflns_theta_max"]);
+            }
+        
+            if (itsCurCryst->itsResolution->wavLen >0.0 
+                   && fabs(itsCurCryst->itsResolution->thetaMax) > 1.0 )
+            {
+                itsCurCryst->itsResolution->setResol();
+                if (itsCurCryst->itsResolution->dMax  
+                     > itsCurCryst->itsResolution->resolLimit)
+                {
+                    resolOK = false;
+                    ID aErr= "LOW RESOLUTION: Resolution " 
+                             + RealToStr(itsCurCryst->itsResolution->dMax)
+                             + " is lower than threshold " 
+                             + RealToStr(itsCurCryst->itsResolution->resolLimit) 
+                             + "\n";
+                    errMsg.push_back(aErr);
+                }
+            }
+            else
+            {
+                resolOK = false;
+                ID aErr= "UNDEFINITED RESOLUTION: Theta_max or x-ray wavelength is wrong\n";
+                errMsg.push_back(aErr);
             }
         }
         
@@ -1264,8 +1531,27 @@ namespace LIBMOL
                 std::cout << "Crystal lattice " << itsCurCryst->itsCell->lattice << std::endl;
             }
         }
-
         
+        if (itsCurCryst->itsResolution)
+        {
+            
+            if (itsCurCryst->itsResolution->lSet)
+            {
+                std::cout << "Information about the resolution. " << std::endl;
+                std::cout << "THe x-ray wavelength is " 
+                          <<  itsCurCryst->itsResolution->wavLen << std::endl
+                          << "The max theta is " 
+                          << itsCurCryst->itsResolution->thetaMax << std::endl
+                          << "The resolution is " 
+                          << itsCurCryst->itsResolution->dMax << std::endl;   
+            }
+            else
+            {
+                std::cout << "No validated information on the resolution in the cif file"
+                          << std::endl;
+            }
+        }
+         
     }
     
     void GenCifFile::getCifSymOps(std::vector<std::vector<std::string> >::iterator iBs)
@@ -1324,6 +1610,11 @@ namespace LIBMOL
         
         int aPos=getKeyWordPos("_symmetry_equiv_pos_as_xyz", 
                                tOnePropGroup["lab"]);
+        if(aPos==-1)
+        {
+            aPos=getKeyWordPos("_space_group_symop_operation_xyz",
+                               tOnePropGroup["lab"]);
+        }
         std::cout << "symm opt pos " << aPos << std::endl;
         
         if(aPos !=-1)
@@ -1496,14 +1787,14 @@ namespace LIBMOL
                     }
                     //std::cout << "Its U_iso : " << itsCurAtom->isoB << std::endl;
                 }
-                if (hasProps["atom"].find("parCharge") != hasProps["atom"].end())
-                {
-                    itsCurAtom->existProps["parChange"] = hasProps["atom"]["parCharge"];
-                    itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["parChange"]]);
-                    //std::cout << "Its partialCharge :" 
-                    //        << itsCurAtom->parCharge
-                    //        << std::endl;
-                }
+                //if (hasProps["atom"].find("parCharge") != hasProps["atom"].end())
+                //{
+                //    itsCurAtom->existProps["parChange"] = hasProps["atom"]["parCharge"];
+                //    itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["parChange"]]);
+                //    //std::cout << "Its partialCharge :" 
+                //    //        << itsCurAtom->parCharge
+                //    //        << std::endl;
+                //}
                 if (hasProps["atom"].find("ocp") != hasProps["atom"].end())
                 {
                     itsCurAtom->existProps["ocp"] = hasProps["atom"]["ocp"];
@@ -1634,7 +1925,7 @@ namespace LIBMOL
     
     void GenCifFile::getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup)
     {
-        int pos1, pos2, pos3, pos4, pos5, posOcp;
+        int pos1, pos2, pos3, pos4, pos5, posOcp, posCalc;
         pos1 = getKeyWordPos("_atom_site_type_symbol", 
                                tOnePropGroup["lab"]);
         pos2 = getKeyWordPos("_atom_site_label", tOnePropGroup["lab"]);
@@ -1646,6 +1937,9 @@ namespace LIBMOL
                                tOnePropGroup["lab"]);
         
         posOcp = getKeyWordPos("_atom_site_occupancy", tOnePropGroup["lab"]);
+        
+        posCalc = getKeyWordPos("_atom_site_calc_flag", tOnePropGroup["lab"]);
+        
         if ((pos1 !=-1 || pos2 != -1) && pos3 !=-1
              && pos4 !=-1 && pos5 !=-1)
         {
@@ -1657,7 +1951,7 @@ namespace LIBMOL
                 StrTokenize((*iAtm), tBuf);
                 if (tBuf.size()==tOnePropGroup["lab"].size())
                 {
-                    getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp);
+                    getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp, posCalc);
                 }
                 else
                 {
@@ -1669,16 +1963,22 @@ namespace LIBMOL
                     {
                         std::cout << (*iLab) << std::endl;
                     }
-                    exit(1);
+                    errMsg.push_back("Line is not consistent with the following tags of this loop_\n");
+                    lErr = true;
+                  
                 }
             }
+            
+            // Convert element symbols in cif from low cases to the proper ones 
+            // (like 7037562.cif)
+            
         }
         
     }
    
     void GenCifFile::getAtomInfoFromLine(std::vector<std::string> & tStrs,
                                          int tP1, int tP2, int tP3, 
-                                         int tP4, int tP5, int tPOcp)
+                                         int tP4, int tP5, int tPOcp, int tPCalc)
     {
         if (itsCurAtom !=NullPoint)
         {
@@ -1687,12 +1987,15 @@ namespace LIBMOL
         }
         itsCurAtom = new AtomDict();
         itsCurAtom->seriNum = itsCurAtomSeriNum;
+        itsCurAtom->fromOrig = itsCurAtom->seriNum;
         itsCurAtom->isInPreCell = true;
         itsCurAtomSeriNum ++;
 
         if (tP1 !=-1)
         {
-            itsCurAtom->chemType = TrimSpaces(tStrs[tP1]);
+            ID tS1 = TrimSpaces(tStrs[tP1]);
+            itsCurAtom->sMolType = tS1;
+            itsCurAtom->chemType = tS1;
         }
         //std::cout << "Its chemType : " << itsCurAtom->chemType << std::endl;
         
@@ -1722,6 +2025,8 @@ namespace LIBMOL
             else
             {
                 std::cout << "the string for coordinate x is " << tSX << std::endl;
+                errMsg.push_back("the string for coordinate x is wrong\n");
+                lErr = true; 
             }
         }    
         //std::cout << "Its (fractional) coord x : " 
@@ -1745,7 +2050,9 @@ namespace LIBMOL
             else
             {
                 std::cout << "the string for coordinate y is " << tSY << std::endl;
-                exit(1);
+                errMsg.push_back("the string for coordinate y is wrong\n");
+                lErr = true; 
+              
             }
         }    
         //std::cout << "Its (fractional) coord y : " 
@@ -1769,7 +2076,8 @@ namespace LIBMOL
             else
             {
                 std::cout << "the string for coordinate z is " << tSZ << std::endl;
-                exit(1);
+                errMsg.push_back("the string for coordinate z is wrong\n");
+                lErr = true;      
             }
         }    
         // std::cout << "Its (fractional) coord z : " 
@@ -1804,6 +2112,22 @@ namespace LIBMOL
                               << sOcp << std::endl;
                 }
             }
+            
+            if (tPCalc > -1 && tPCalc < (int)tStrs.size())
+            {
+                std::string sCalc = TrimSpaces(tStrs[tPCalc]);
+                if (sCalc.find("c") != std::string::npos)
+                {
+                    itsCurAtom->fromCalc = true;
+                }
+                else
+                {
+                    itsCurAtom->fromCalc = false;
+                }
+                
+            }
+            
+            
         }    
         
         //std::cout << "Its occupancy is : " 
@@ -1821,12 +2145,76 @@ namespace LIBMOL
         itsCurAtom = NULL;
         
     }
-    /*
-    void GenCifFile::getCifAtomInfo(std::vector<std::vector<std::string> >::iterator iBs)
+    
+    void GenCifFile::getCifAtomOxiInfo(std::map<ID,std::vector<std::string> >& tOnePropGroup)
     {
+        int posType, posOxi;
+        posType = getKeyWordPos("_atom_type_symbol", 
+                               tOnePropGroup["lab"]);
+        posOxi  = getKeyWordPos("_atom_type_oxidation_number", 
+                                tOnePropGroup["lab"]);
+        if (posType !=-1 && posOxi !=-1)
+        {
+            // All required properties are there 
+            for (std::vector<std::string>::iterator iAtm=tOnePropGroup["cont"].begin();
+                    iAtm!=tOnePropGroup["cont"].end(); iAtm++)
+            {
+                std::vector<std::string> tBuf;
+                StrTokenize((*iAtm), tBuf);
+                if (tBuf.size()==tOnePropGroup["lab"].size() 
+                    && posType < tBuf.size() && posOxi < tBuf.size())
+                {
+                    getAtomOxiInfoFromLine(tBuf, posType, posOxi);
+                }
+                else
+                {
+                    std::cout << "Line: " << (*iAtm) << std::endl 
+                             << " is not consistent with the following tags of this loop_ " 
+                             << std::endl;
+                    for (std::vector<std::string>::iterator iLab=tOnePropGroup["lab"].begin();
+                    iLab!=tOnePropGroup["lab"].end(); iLab++)
+                    {
+                        std::cout << (*iLab) << std::endl;
+                    }
+                    errMsg.push_back("Line: is not consistent with the following tags of this loop_ "); 
+                }
+            }
+        }
         
     }
-     */
+    
+    void GenCifFile::getAtomOxiInfoFromLine(std::vector<std::string>& tStrs, 
+                                            int tPosType, int tPosOxi)
+    {
+        if (tStrs[tPosOxi].find("?") ==std::string::npos)
+        {
+            typeChargeMap[tStrs[tPosType]] = StrToReal(tStrs[tPosOxi]);
+        }
+    }
+    
+    void GenCifFile::setAtomOxiType()
+    {
+        if (allAtoms.size() !=0 && typeChargeMap.size() !=0)
+        {
+            if (allAtoms[0].sMolType != NullString)
+            {
+                for (std::vector<AtomDict>::iterator iAt= allAtoms.begin();
+                        iAt != allAtoms.end(); iAt++)
+                {
+                    if (typeChargeMap.find(iAt->sMolType) != typeChargeMap.end())
+                    {
+                        iAt->formalCharge = typeChargeMap[iAt->sMolType];
+                    }
+                    else   
+                    {
+                        std::cout << "Check atom " << iAt->id 
+                                  << " atom_site_type_symbol " << std::endl; 
+                    }
+                }
+            }
+        }
+    }
+    
     
     // ################################## another class for cif files of CCP4 
     // dictionary 
@@ -1834,6 +2222,8 @@ namespace LIBMOL
     
     
     DictCifFile::DictCifFile() : curBlockLine(ZeroInt),
+            isPeptide(false),
+            isDRna(false),
             hasConnect(false),
             hasCoords(false),
             hasH(false),
@@ -1853,6 +2243,8 @@ namespace LIBMOL
     DictCifFile::DictCifFile(Name tFname, 
                              std::ios_base::openmode tOpenMode) :
                              curBlockLine(ZeroInt),
+                             isPeptide(false),
+                             isDRna(false),
                              hasConnect(false),
                              hasCoords(false),
                              hasH(false),
@@ -1899,6 +2291,8 @@ namespace LIBMOL
     DictCifFile::DictCifFile(FileName                tFname,
                              std::ios::openmode      tOpenMode=std::ios::in ) :
                              curBlockLine(ZeroInt),
+                             isPeptide(false),
+                             isDRna(false),
                              hasConnect(false),
                              hasCoords(false),
                              hasH(false),
@@ -1931,7 +2325,6 @@ namespace LIBMOL
                 itsCurAngle   = new AngleDict();
                 itsCurTorsion = new TorsionDict();
                 itsCurChiral  = new ChiralDict();
-            
                 setupSystem();
             }
             else
@@ -1952,6 +2345,8 @@ namespace LIBMOL
     DictCifFile::DictCifFile(FileName                tCifName,
                              FileName                tPdbName) :
                              curBlockLine(ZeroInt),
+                             isPeptide(false),
+                             isDRna(false),
                              hasConnect(false),
                              hasCoords(false),
                              hasH(false),
@@ -1971,12 +2366,11 @@ namespace LIBMOL
         
         if (aInCif.is_open())
         {
-            std::cout << "Here " << std::endl;
-            exit(1);
+            
             itsCurAtom    = new AtomDict();
             setupSystem3Secs(aInCif);  
             aInCif.close();
-            exit(1);
+          
             
             DictPDBFile aInPdb(tPdbName, std::ios::in);
             transCoordsPdbToCif(aInPdb);
@@ -2221,7 +2615,7 @@ namespace LIBMOL
             
             //std::cout << "CCP4 type " << hasCCP4Type << std::endl;
             
-            /*
+            
             std::cout << "The following is the property of the system in the input cif: "
                       << std::endl;
             
@@ -2231,8 +2625,19 @@ namespace LIBMOL
             std::cout << "The system group " << propComp.group << std::endl;
             std::cout << "Number of atoms in the system  " << propComp.numAtoms << std::endl;
             std::cout << "Number of H atoms in the system " << propComp.numH << std::endl;
-            std::cout << "The system description level " << propComp.level << std::endl;
-            */
+            std::cout << " Is it a peptide ? ";
+            if (isPeptide)
+            {
+                std::cout << " Yes " << std::endl;
+            }
+            else
+            {
+                std::cout << " No " << std::endl;   
+            }
+            
+            
+            // std::cout << "The system description level " << propComp.level << std::endl;
+            
             // Set the bonding properties for all atoms based
             // on their connections
             // If no bonds defined in the cif file. Stop the program at the moment.
@@ -2240,22 +2645,22 @@ namespace LIBMOL
             {
                 std::cout << "There is no bond defined in the cif file. Program stopped"
                         << std::endl;
-                exit(1);
+               
             }
             
             
-                
+            
             setHydroAtomConnect();
             // addMissHydroAtoms();
             
-            setAtomsBondingAndChiralCenter();
+            setAtomsBondingAndChiralCenter(allAtoms);
             
             // setAllAngles();
             
             setAtomsCChemType();
             
             setAtomsMetalType();
-            
+           
             setAtomsVDWRadius();
             
             setAtomsPartialCharges();
@@ -2311,7 +2716,7 @@ namespace LIBMOL
                 std::cout << "its order : " << iBo->order << std::endl;
             } 
             */
-            
+           
         }
         
     }
@@ -2545,6 +2950,11 @@ namespace LIBMOL
                         hasProps["compoundInfo"].insert(std::pair<std::string, int>("name",curBlockLine) );
                         curBlockLine++;
                     }
+                    else if(tF1[1].find("type") !=std::string::npos)
+                    {
+                        hasProps["compoundInfo"].insert(std::pair<std::string, int>("type",curBlockLine) );
+                        curBlockLine++;
+                    }
                     else if(tF1[1].find("group") !=std::string::npos)
                     {
                         hasProps["compoundInfo"].insert(std::pair<std::string, int>("group",curBlockLine) );
@@ -2617,10 +3027,35 @@ namespace LIBMOL
                         propComp.name = TrimSpaces(tF4[hasProps["compoundInfo"]["name"]]);
                         std::cout << "Compound name " << propComp.name  << std::endl;
                     }
+                    if (hasProps["compoundInfo"].find("type") != hasProps["compoundInfo"].end())
+                    {
+                        propComp.group = TrimSpaces(tF4[hasProps["compoundInfo"]["type"]]);
+                        std::cout << "Compound type " << propComp.group  << std::endl;
+                        StrUpper(propComp.group);
+                        if (propComp.group.find("PEPTIDE") !=std::string::npos)
+                        {
+                            isPeptide = true;
+                        }
+                        else if (propComp.group.find("DNA") !=std::string::npos
+                                 || propComp.group.find("RNA") !=std::string::npos)
+                        {
+                            isDRna = true;
+                        }
+                    }
                     if (hasProps["compoundInfo"].find("group") != hasProps["compoundInfo"].end())
                     {
                         propComp.group = TrimSpaces(tF4[hasProps["compoundInfo"]["group"]]);
                         std::cout << "Compound group " << propComp.group  << std::endl;
+                        StrUpper(propComp.group);
+                        if (propComp.group.find("PEPTIDE") !=std::string::npos)
+                        {
+                            isPeptide = true;
+                        }
+                        else if (propComp.group.find("DNA") !=std::string::npos
+                                 || propComp.group.find("RNA") !=std::string::npos)
+                        {
+                            isDRna = true;
+                        }
                     }
                     if (hasProps["compoundInfo"].find("number_atoms_all") != hasProps["compoundInfo"].end())
                     {
@@ -2703,9 +3138,10 @@ namespace LIBMOL
                     // std::cout << curBlockLine << std::endl;
                     //curBlockLine++;
                 }
-                else if(tF1[1].find("charge") !=std::string::npos)
+                else if(tF1[1].find("charge") !=std::string::npos 
+                        && tF1[1].find("partial") == std::string::npos)
                 {
-                    hasProps["atom"].insert(std::pair<std::string, int>("parCharge",curBlockLine));
+                    hasProps["atom"].insert(std::pair<std::string, int>("charge",curBlockLine));
                     //std::cout << curBlockLine << std::endl;
                     //curBlockLine++;
                 }
@@ -2812,6 +3248,17 @@ namespace LIBMOL
                 itsCurAtom->existProps["parChange"] = hasProps["atom"]["parCharge"];
                 
                 itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["parChange"]]);
+                // partial charge and formal charge are same in mmcif files in ccp4 monomer lib 
+                itsCurAtom->formalCharge = itsCurAtom->parCharge;
+                //std::cout << "Its partialCharge :" 
+                //        << itsCurAtom->parCharge
+                //        << std::endl;
+            }
+            if (hasProps["atom"].find("charge") != hasProps["atom"].end())
+            {
+                itsCurAtom->existProps["charge"] = hasProps["atom"]["charge"];
+                
+                itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["charge"]]);
                 // partial charge and formal charge are same in mmcif files in ccp4 monomer lib 
                 itsCurAtom->formalCharge = itsCurAtom->parCharge;
                 //std::cout << "Its partialCharge :" 
@@ -3257,286 +3704,7 @@ namespace LIBMOL
         }
     }
     
-    void DictCifFile::setAtomsBondingAndChiralCenter()
-    {
-        // First round
-        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
-                iAt != allAtoms.end(); iAt++)
-        {
-            int t_len =0;
-            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
-                    iConn !=iAt->connAtoms.end(); iConn++)
-            {
-                if(!allAtoms[*iConn].isMetal)
-                {
-                    t_len++;
-                }
-            }
 
-            if (iAt->chemType.compare("C")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    }
-                    iAt->bondingIdx = 3;
-                }
-                else if (t_len ==3)
-                {
-                    iAt->chiralIdx  = 0;
-                    iAt->bondingIdx = 2;
-                } 
-            }
-            else if (iAt->chemType.compare("N")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    } 
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;  
-                }
-                //else if (t_len==3) // temp
-                //{
-                //    iAt->chiralIdx  = -1;
-                //    iAt->bondingIdx =  2;
-                //}
-                else if (t_len ==2)
-                {
-                    iAt->chiralIdx  = 0;
-                    iAt->bondingIdx = 2;
-                } 
-            }
-            else if (iAt->chemType.compare("B")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    iAt->chiralIdx  = 1;
-                    iAt->bondingIdx = 3;
-                }
-            }
-            else if (iAt->chemType.compare("O")==0)
-            {
-                if ((int)iAt->connAtoms.size()==2)
-                {
-                    iAt->bondingIdx = 3;
-                }
-                else if (iAt->connAtoms.size()==1)
-                {
-                    iAt->bondingIdx = 1;
-                }
-                
-            }
-            else if (iAt->chemType.compare("SI")==0 
-                    || iAt->chemType.compare("P")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4)
-                {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        std::vector<ID> atps;
-                        for (std::vector<int>::iterator iNA=iAt->connAtoms.begin();
-                                iNA !=iAt->connAtoms.end(); iNA++)
-                        {
-                            if (std::find(atps.begin(), atps.end(), allAtoms[*iNA].chemType)==atps.end())
-                            {
-                                atps.push_back(allAtoms[*iNA].chemType);
-                            }
-                        }
-                        if ((int)atps.size() >2)
-                        {
-                            iAt->chiralIdx  = 2;
-                        }
-                        else
-                        {
-                            iAt->chiralIdx =0;
-                        }
-                    }
-                   
-                    iAt->bondingIdx = 3; 
-                }
-                else if (t_len==3)
-                {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    }
-                    
-                    iAt->bondingIdx = 2; 
-                }
-            }
-            else if (iAt->chemType.compare("S")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3)
-                {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    }
-                    iAt->bondingIdx = 3; 
-                }
-                else if (t_len==2)
-                {
-                    iAt->bondingIdx = 2;
-                }
-            }
-        }
-        
-        // more conditions 
-        
-        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
-                iAt != allAtoms.end(); iAt++)
-        {   
-            int t_len =0;
-            for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
-                    iConn !=iAt->connAtoms.end(); iConn++)
-            {
-                if(!allAtoms[*iConn].isMetal)
-                {
-                    t_len++;
-                }
-            }
-
-            if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0)
-            {
-                // int t_len = (int)iAt->connAtoms.size();
-                unsigned  n_sp1 = 0;
-                if(t_len==3)
-                {
-                    if (iAt->parCharge ==0.0)
-                    {
-                        bool l_sp2 = true;
-                        for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
-                                 iCA != iAt->connAtoms.end(); iCA++)
-                        {
-                            if(allAtoms[*iCA].bondingIdx != 2)
-                            {
-                                l_sp2 = false;
-                                break;
-                            }
-                        }
-                        
-                        if (l_sp2)
-                        {
-                            // Now we can say this atom is in sp2 orbits 
-                            iAt->chiralIdx  =  0;
-                            iAt->bondingIdx =  2;
-                        }
-                        else
-                        {
-                            if (iAt->chiralIdx ==0)
-                            {
-                                iAt->chiralIdx  = 2;
-                            }
-                            
-                            iAt->bondingIdx =  3;
-                        }
-                    }
-                    else if (iAt->parCharge ==1.0)
-                    {
-                        iAt->chiralIdx  =  0;
-                        iAt->bondingIdx =  2;
-                    }
-                } 
-            }
-        }
-        
-        // Further check if a chiral center is a real one
-        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-                iA != allAtoms.end(); iA++)
-        {
-            if (iA->chiralIdx !=0)
-            {
-                // std::cout << "Atom " << iA->id << std::endl;
-                        
-                std::vector<ID> chirRAtms;
-                for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
-                        iNB != iA->connAtoms.end(); iNB++)
-                {
-                    //std::cout << "NB atom " <<allAtoms[*iNB].chemType << std::endl;
-                    std::size_t tFind = allAtoms[*iNB].chemType.find("H");
-                    if (tFind !=std::string::npos)
-                    {
-                        chirRAtms.push_back(allAtoms[*iNB].id);
-                    }
-                }
-                // std::cout << "H atom " << (int)chirRAtms.size() << std::endl;
-                if ((int)chirRAtms.size() >1 && (int)iA->connAtoms.size() <=4 )
-                {
-                    iA->chiralIdx = 0;
-                }
-                //std::cout << "its chiral idx " << iA->chiralIdx << std::endl;
-            }
-        }
-        
-        // No need for the third round, those could be defined in 
-        // the first round
-        // Check
-        /*
-        std::cout << "Chiral and plane feather for atoms in the system" 
-                  << std::endl;
-        
-        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
-                iAt != allAtoms.end(); iAt++)
-        {
-            std::cout << "Atom " << iAt->id << " with " 
-                    << (int)iAt->connAtoms.size() << " connected." 
-                    << std::endl;
-            if (iAt->bondingIdx == 1)
-            {
-                std::cout << "Atom " << iAt->id << " may be in lines " 
-                        << std::endl;
-            }
-            else if (iAt->bondingIdx == 2)
-            {
-                std::cout << "Atom " << iAt->id << " may be in planes " 
-                        << std::endl;
-            }
-            else if (iAt->bondingIdx == 3)
-            {
-                std::cout << "Atom " << iAt->id << " is at a tetrahedra center " 
-                        << std::endl;
-            }
-            else 
-            {
-                std::cout << "Atom " << iAt->id << " is no hybrid"
-                        << std::endl;
-            }
-            
-            if (iAt->chiralIdx==1)
-            {
-                std::cout << "Atom " << iAt->id << " may be in a positive chiral center "
-                        << std::endl;
-            }
-            else if (iAt->chiralIdx==-1)
-            {
-                std::cout << "Atom " << iAt->id << " may be in a negative chiral center "
-                        << std::endl;
-            }
-            else if (iAt->chiralIdx==2)
-            {
-                std::cout << "Atom " << iAt->id 
-                        << " may be in a chiral center but the volume sign undefined "
-                        << std::endl;
-            }
-            else if (iAt->chiralIdx==0)
-            {
-                std::cout << "Atom " << iAt->id 
-                        << " is not a chiral center" << std::endl;
-            }
-        }
-         */
-    }
-    
     void DictCifFile::setAtomsCChemType()
     {
         
@@ -3571,7 +3739,7 @@ namespace LIBMOL
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                      "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                      "Sc", "sc", "Y",  "y",
-                     "B", "b", "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
+                     "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
                      "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
                      "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
                      "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
@@ -3584,7 +3752,7 @@ namespace LIBMOL
                      "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
                      "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         
-        MetalTable.assign(metals, metals+123);
+        MetalTable.assign(metals, metals+121);
         /*
         std::cout << "Metal Elements :" << std::endl;
         for (std::vector<ID>::iterator iM =MetalTable.begin();
@@ -3594,15 +3762,18 @@ namespace LIBMOL
         }
         */
         
+        
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA != allAtoms.end(); iA++)
         { 
+              
             std::vector<ID>::iterator iFind = std::find(MetalTable.begin(), 
                                                         MetalTable.end(), iA->chemType);
             if (iFind !=MetalTable.end())
             {
                 iA->isMetal = true;
-                std::cout <<iA->id << " is a metal atom." << std::endl;
+                std::cout <<iA->id  << " of element " << iA->chemType 
+                          << " is a metal atom." << std::endl;
                 
                 int cn = (int)iA->connAtoms.size();
                 ID  ct = iA->chemType;
@@ -3635,7 +3806,6 @@ namespace LIBMOL
                           << iA->metalGeo << std::endl;
             }
         }
-        
     }
     
     void DictCifFile::addMissHydroAtoms()
@@ -6091,7 +6261,7 @@ namespace LIBMOL
            // std::cout << "number of tV2 " << (int)tV2.size() << std::endl;
             
             REAL perValue = 360.0/tPer;
-            REAL iniValue;
+            REAL iniValue = 0.0;
             
             int n = 0;
             
@@ -6979,7 +7149,7 @@ namespace LIBMOL
                          std::vector<LIBMOL::BondDict>& tBonds, 
                          std::vector<LIBMOL::AngleDict>& tAngs, 
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
-                         std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> > & tRings, 
+                         std::vector<LIBMOL::RingDict> & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs)
     {
@@ -7033,18 +7203,15 @@ namespace LIBMOL
             
             ID ligType = "non-polymer";
             
-            for (std::map<LIBMOL::ID, std::vector<LIBMOL::RingDict> >::iterator iRG=tRings.begin();
-                    iRG != tRings.end(); iRG++)
-            {
-                for (std::vector<LIBMOL::RingDict>::iterator iR=iRG->second.begin();
-                        iR !=iRG->second.end(); iR++)
+            for (std::vector<LIBMOL::RingDict>::iterator iR=tRings.begin();
+                    iR != tRings.end(); iR++)
+            {   
+                if (iR->isSugar.compare("pyranose")==0)
                 {
-                    if (iR->isSugar.compare("pyranose")==0)
-                    {
-                        ligType = "pyranose";
-                        break;
-                    }
+                    ligType = "pyranose";
+                    break;
                 }
+             
             }
             
             std::vector<ID>  aAATab;
@@ -7122,22 +7289,31 @@ namespace LIBMOL
                     //double r2 =  (double) rand()/RAND_MAX;
                     //double r3 =  (double) rand()/RAND_MAX;
                     REAL tCharge =0.0;
-                    if (iA->parCharge !=0.0)
+                    if (iA->charge !=0.0)
                     {
-                        tCharge = iA->parCharge;
+                        tCharge = iA->charge;
                     }
                     else if (iA->formalCharge !=0.0)
                     {
                         tCharge = iA->formalCharge;
                     }
                     
+                    std::string strCharge = TrimSpaces(RealToStr(tCharge));
+                    if (strCharge.find(".") !=strCharge.npos)
+                    {
+                        std::vector<std::string> tVec;
+                        StrTokenize(strCharge, tVec, '.');
+                        strCharge = tVec[0];
+                    }
+                    
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
+                    
                     outRestrF << longName
                               << std::setw(12) << iA->id 
                               << std::setw(6) << iA->chemType 
                               << std::setw(6) << iA->ccp4Type 
-                              << std::setw(8) << tCharge 
+                              << std::setw(8) << strCharge 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
                               << iA->coords[0] 
                               << std::setw(12) << std::setprecision(3) << std::fixed 
@@ -7150,6 +7326,9 @@ namespace LIBMOL
             
             if (tBonds.size() >0)
             {
+                // newly added 
+                //kekulizeRings(tAtoms, tBonds, tRings);
+                
                 // Bond sections 
                 outRestrF << "loop_" << std::endl
                           << "_chem_comp_bond.comp_id" << std::endl
@@ -7166,9 +7345,12 @@ namespace LIBMOL
                           iB !=tBonds.end(); iB++)
                 {
                     std::string tAr;
-                    if (iB->isAromatic)
+                    
+                    
+                    StrLower(iB->order);
+                    
+                    if (iB->order.find("arom") !=iB->order.npos)
                     {
-                        iB->order = "aromatic";
                         tAr       = "y";
                     }
                     else
@@ -7303,24 +7485,25 @@ namespace LIBMOL
             }
             
             //  For chiral centers
-            bool l_ch = false;
-            if ((int)tChs.size() !=0)
-            {
-                l_ch = true;
-            }
-            else
-            {
-                for (int i_ch =0; i_ch < (int)tAtoms.size(); i_ch++)
-                {
-                    if (tAtoms[i_ch].chiralIdx ==1)
-                    {
-                        l_ch = true;
-                        break;
-                    }
-                }
-            }
+            //bool l_ch = false;
+            //if ((int)tChs.size() !=0)
+            //{
+            //    l_ch = true;
+            //}
+            //else
+            //{
+            //    for (int i_ch =0; i_ch < (int)tAtoms.size(); i_ch++)
+            //    {
+            //        if (tAtoms[i_ch].chiralIdx  > 0)
+            //        {
+            //            l_ch = true;
+            //            break;
+            //        }
+            //    }
+            //}
             
-            if (l_ch)
+            //if (l_ch)
+            if(tChs.size() !=0)
             {
                 outRestrF << "loop_" << std::endl
                           << "_chem_comp_chir.comp_id" << std::endl
@@ -7459,9 +7642,90 @@ namespace LIBMOL
                 }
             }
             outRestrF.close();
+        }    
+    }
+    
+    extern void outMMCifFromOneMol(FileName tFName, 
+                                   ID tMonoRootName,
+                                   Molecule & tMol)
+    {
+        std::ofstream outRestrF(tFName);
+        
+        if(outRestrF.is_open())
+        {
+            ID rName;
+            if (tMonoRootName.size() > 3)
+            {
+                rName = tMonoRootName.substr(0,3);
+            }
+            else
+            {
+                rName = tMonoRootName;
+            }
+            
+            // 1. Global section 
+            outRestrF << "global_" << std::endl
+                    << "_lib_name         ?" << std::endl
+                    << "_lib_version      ?" << std::endl
+                    << "_lib_update       ?" << std::endl;
+            
+            if (tMol.atoms.size() !=0)
+            {
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_atom.comp_id" << std::endl 
+                          << "_chem_comp_atom.atom_id" << std::endl  
+                          << "_chem_comp_atom.type_symbol" << std::endl 
+                          << "_chem_comp_atom.charge" << std::endl    
+                          << "_chem_comp_atom.model_Cartn_x" << std::endl 
+                          << "_chem_comp_atom.model_Cartn_y" << std::endl 
+                          << "_chem_comp_atom.model_Cartn_z" << std::endl;
+                
+                for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin();
+                        iAt !=tMol.atoms.end(); iAt++)
+                {
+                    StrUpper(iAt->chemType);
+                    StrUpper(iAt->ccp4Type);
+                    outRestrF << std::setw(8)<< rName
+                              << std::setw(6) << iAt->id 
+                              << std::setw(6) << iAt->chemType 
+                              << std::setw(6) << iAt->ccp4Type 
+                              << std::setw(8) << iAt->formalCharge 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iAt->coords[0] 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iAt->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iAt->coords[2] << std::endl;
+                }
+                
+                std::cout << "#" << std::endl;
+                
+                if (tMol.bonds.size() !=0)
+                {
+                    outRestrF << "loop_" << std::endl
+                              << "_chem_comp_bond.comp_id" << std::endl 
+                              << "_chem_comp_bond.atom_id_1" << std::endl 
+                              << "_chem_comp_bond.atom_id_2" << std::endl 
+                              << "_chem_comp_bond.value_order" << std::endl
+                              << "_chem_comp_bond.value_dist" << std::endl;
+                    
+                    for (std::vector<BondDict>::iterator iBo=tMol.bonds.begin();
+                            iBo != tMol.bonds.end(); iBo++)
+                    {
+                        outRestrF << std::setw(8)<< rName
+                                  << std::setw(6) << iBo->atoms[0] 
+                                  << std::setw(6) << iBo->atoms[1] 
+                                  << std::setw(6) << iBo->order 
+                                  << std::setw(12) << std::setprecision(6) << std::fixed 
+                                  << iBo->value << std::endl;
+                    }
+                }
+                
+                std::cout << "# ------------------------------------------------------" 
+                          << std::endl;
+                
+            }
         }
-        
-        
     }
     
     extern int getHAtomNum(std::vector<LIBMOL::AtomDict>& tAtoms)
@@ -7600,11 +7864,33 @@ namespace LIBMOL
                              << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[1]].seriNum]
                              << std::endl;
                 }
-                outTempF.close();
-                
-            }
-            
+                outTempF.close();  
+            } 
         }
+    }
+    
+    extern void outMetalAtomInfo(FileName tFName,
+                                 GenCifFile  & tCifObj)
+    {
+        std::ofstream outMF(tFName);
+        
+        outMF << "Is the structure not from Power diff : " << tCifObj.notPowder << std::endl;
+        outMF << "Resolution OK : " << tCifObj.resolOK << std::endl;
+        outMF << "R factors OK : " << tCifObj.RFactorOK << std::endl;
+        outMF << "Occp OK : " << tCifObj.colidOK << std::endl;
+        outMF << "The following are metal atoms in the file " << std::endl;
+        for (std::vector<AtomDict>::iterator iAt=tCifObj.allAtoms.begin();
+                iAt != tCifObj.allAtoms.end(); iAt++)
+        {
+            if (iAt->isMetal)
+            {
+                outMF << "Atom : " << iAt->id << " : " 
+                      << iAt->chemType << std::endl;
+            }
+        }
+        
+        outMF.close();        
+              
     }
     
 }
