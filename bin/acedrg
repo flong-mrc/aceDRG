@@ -2761,7 +2761,16 @@ class AcedrgRDKit():
         #for aKey in HConns.keys():
         #    print "Atom ", aKey, " bonds to ", len(HConns[aKey]), " H atoms "
 
-        if len(HConns.keys()) !=0:   
+        if len(HConns.keys()) !=0:  
+            # Check if total numbers of H atoms are different between the original mol and current mol  
+            # Names for H atoms in the original file
+            origHNames =[]
+            for aNonH in HConns.keys():
+                c3 = len(tNameMap["H"][aNonH])
+                for i in range(c3):
+                    origHNames.append(tNameMap["H"][aNonH][i])
+            numOrigH = len(origHNames)
+            nExtra = numOrigH + 1
             for aK in HConns.keys():
                 c1 =  len(HConns[aK])
                 if tNameMap["H"].has_key(aK):
@@ -2788,9 +2797,16 @@ class AcedrgRDKit():
                             hRootId = "H" + tRootId[1:]
                                  
                         cDiff = c1 - c2
-                        for j in range(cDiff): 
-                            tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",hRootId + str(c2+ j+1))
-                            #print "An added H is named as ", tMol.GetAtomWithIdx(HConns[aK][c2+j]).GetProp("Name")
+                        for j in range(cDiff):
+                            tHName = hRootId + str(c2+ j+1)
+                            if not tHName in origHNames: 
+                                tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",tHName)
+                                print "An added H is named as ", tMol.GetAtomWithIdx(HConns[aK][c2+j]).GetProp("Name")
+                            else:
+                                tHName = hRootId + str(nExtra)
+                                tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",tHName)
+                                nExtra +=1
+        
                 else:
                     hRootId = "H" + aK
                     for i in range(c1):
@@ -3174,19 +3190,19 @@ class AcedrgRDKit():
         #print "Number of atoms in this molecule is initially ", nAtoms
         self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
       
-        print "Before Sanitize the molecule"
-        print "Number of all atoms in this molecule is ", tMol.GetNumAtoms()
+        #print "Before Sanitize the molecule"
+        #print "Number of all atoms in this molecule is ", tMol.GetNumAtoms()
         for aAtom in tMol.GetAtoms():
             idxA  = aAtom.GetIdx()
             elemA = aAtom.GetSymbol()
             name  = aAtom.GetProp("Name") 
             charge = aAtom.GetFormalCharge()
             val    = aAtom.GetTotalValence()
-            print "For atom of index ", idxA
-            print "Its element symbol  ", elemA
-            print "Its name ", name
-            print "Its formal charge ", charge
-            print "Its total valence ", val
+            #print "For atom of index ", idxA
+            #print "Its element symbol  ", elemA
+            #print "Its name ", name
+            #print "Its formal charge ", charge
+            #print "Its total valence ", val
 
         Chem.SanitizeMol(tMol)
         # Make sure an atom in the molecule has the same charge in the input file. 
@@ -3329,33 +3345,34 @@ class AcedrgRDKit():
             #print "Number of atom is ", len(allAtoms)
             rdmolops.AssignStereochemistry(aMol, cleanIt=False, force=False, flagPossibleStereoCenters=True)
             for i in range (len(conformers)):
-                print "----------------------------------------------------"
-                print "| In conformer %d                                  |"%i
-                print "----------------------------------------------------"
                 aConf = conformers[i]
-                for aAtom in allAtoms:
-                    print "******************************"
-                    idxA  = aAtom.GetIdx()
-                    elemA = aAtom.GetSymbol()
-                    name  = aAtom.GetProp("Name") 
-                    charge = aAtom.GetFormalCharge()
-                    print "For atom of index ", idxA
-                    print "Its element symbol  ", elemA
-                    print "Its name ", name
-                    print "Its formal charge ", charge
-                    pos = aConf.GetAtomPosition(idxA)
-                    if elemA.find("H") ==-1:
-                        print "the coordinates are:"
-                        print "X : %7.4f."%pos.x
-                        print "Y : %7.4f"%pos.y
-                        print "Z : %7.4f"%pos.z
-                    aSetBonds = aAtom.GetBonds()
-                    print "It is in the following bonds: "
-                    for aB in aSetBonds:
-                        print "Bond ", aB.GetIdx()
-                        print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                        print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
-                #print "******************************"
+                if i==0:
+                    print "----------------------------------------------------"
+                    print "| In conformer %d                                  |"%(i+1)
+                    print "----------------------------------------------------"
+                    for aAtom in allAtoms:
+                        print "******************************"
+                        idxA  = aAtom.GetIdx()
+                        elemA = aAtom.GetSymbol()
+                        name  = aAtom.GetProp("Name") 
+                        charge = aAtom.GetFormalCharge()
+                        print "For atom of index ", idxA
+                        print "Its element symbol  ", elemA
+                        print "Its name ", name
+                        print "Its formal charge ", charge
+                        pos = aConf.GetAtomPosition(idxA)
+                        if elemA.find("H") ==-1:
+                            print "the coordinates are:"
+                            print "X : %7.4f."%pos.x
+                            print "Y : %7.4f"%pos.y
+                            print "Z : %7.4f"%pos.z
+                        aSetBonds = aAtom.GetBonds()
+                        print "It is in the following bonds: "
+                        for aB in aSetBonds:
+                            print "Bond ", aB.GetIdx()
+                            print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+                            print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+                    #print "******************************"
 
     def reAssignChirals(self, tMol):
 
