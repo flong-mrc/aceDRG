@@ -2766,9 +2766,10 @@ class AcedrgRDKit():
             # Names for H atoms in the original file
             origHNames =[]
             for aNonH in HConns.keys():
-                c3 = len(tNameMap["H"][aNonH])
-                for i in range(c3):
-                    origHNames.append(tNameMap["H"][aNonH][i])
+                if  tNameMap["H"].has_key(aNonH):
+                    c3 = len(tNameMap["H"][aNonH])
+                    for i in range(c3):
+                        origHNames.append(tNameMap["H"][aNonH][i])
             numOrigH = len(origHNames)
             nExtra = numOrigH + 1
             for aK in HConns.keys():
@@ -2804,8 +2805,14 @@ class AcedrgRDKit():
                                 print "An added H is named as ", tMol.GetAtomWithIdx(HConns[aK][c2+j]).GetProp("Name")
                             else:
                                 tHName = hRootId + str(nExtra)
-                                tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",tHName)
-                                nExtra +=1
+                                while True:
+                                    if not tHName in origHNames:
+                                        tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",tHName)
+                                        nExtra +=1
+                                        break
+                                    else:
+                                        nExtra +=1
+                                        tHName = hRootId + str(nExtra)
         
                 else:
                     hRootId = "H" + aK
