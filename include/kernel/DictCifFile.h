@@ -633,6 +633,18 @@ namespace LIBMOL
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
                          std::vector<LIBMOL::ChiralDict>& tChs);
     
+    extern void outMMCif2(FileName tFName, 
+                         ID tMonoRootName,
+                         ChemComp  &         tPropComp,
+                         std::vector<LIBMOL::AtomDict>& tAtoms,
+                         // std::vector<int>    & tHydroAtoms,
+                         std::vector<LIBMOL::BondDict>& tBonds, 
+                         std::vector<LIBMOL::AngleDict>& tAngs, 
+                         std::vector<LIBMOL::TorsionDict>& tTorsions, 
+                         std::vector<LIBMOL::RingDict> & tRings, 
+                         std::vector<LIBMOL::PlaneDict>& tPlas, 
+                         std::vector<LIBMOL::ChiralDict>& tChs);
+    
     extern void outMMCifFromOneMol(FileName tFName, 
                                    ID tMonoRootName,
                                    Molecule & tMol);

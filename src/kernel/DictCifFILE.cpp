@@ -7154,6 +7154,519 @@ namespace LIBMOL
                          std::vector<LIBMOL::ChiralDict>& tChs)
     {
         
+        // newly added 
+        if(tAtoms.size()> 0 && tBonds.size() > 0)
+        {
+            std::cout << "Kekulize the system " << std::endl;
+            KekulizeMol aKTool;
+            aKTool.execute(tAtoms, 
+                           tBonds,
+                           tRings);
+            std::cout << "Kekulize done " << std::endl;
+        }
+        
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            // std::cout << iA->id << std::endl;
+            if (iA->id.find("\'") !=std::string::npos)
+            {
+                iA->id = "\"" + iA->id + "\"";
+            }
+            // std::cout << iA->id << std::endl;
+        }
+        
+        // std::cout << "Print Pos " << std::endl;
+        // Open a temp file for writing 
+        std::vector<std::string> aSetStrs;
+        StrTokenize(tFName, aSetStrs, '.');
+        //std::string outTempFName;
+        //for (unsigned i=0; i < aSetStrs.size()-1; i++ )
+        //{
+        //    outTempFName+=aSetStrs[i];
+        //}
+        //outTempFName +="_ac.txt";
+        //std::cout << "output AandC file name : " << outTempFName << std::endl;
+        
+        std::ofstream outRestrF(tFName);
+        
+        if(outRestrF.is_open())
+        {
+            
+            srand((unsigned)std::time( NULL ));
+            // Temp 
+            // 1. Global section 
+            outRestrF << "global_" << std::endl
+                    << "_lib_name         ?" << std::endl
+                    << "_lib_version      ?" << std::endl
+                    << "_lib_update       ?" << std::endl;
+        
+            
+            
+            // 'LIST OF MONOMERS' section
+            
+            
+            std::string longName =tMonoRootName.substr(0,3);
+            std::string sName =tMonoRootName.substr(0,3);
+            
+            //StrUpper(longName);
+            
+            
+            ID ligType = "non-polymer";
+            
+            for (std::vector<LIBMOL::RingDict>::iterator iR=tRings.begin();
+                    iR != tRings.end(); iR++)
+            {   
+                if (iR->isSugar.compare("pyranose")==0)
+                {
+                    ligType = "pyranose";
+                    break;
+                }
+             
+            }
+            
+            std::vector<ID>  aAATab;
+            initAminoAcidTab(aAATab);
+            if (isAminoAcid(aAATab, longName) && longName.find("PRO")==std::string::npos)
+            {
+                ligType = "L-peptide";
+            }
+            
+   
+            int nH = getHAtomNum(tAtoms);
+            
+            
+            outRestrF << "# ------------------------------------------------" << std::endl
+                    << "#" << std::endl
+                    << "# ---   LIST OF MONOMERS ---" << std::endl
+                    << "#" << std::endl
+                    << "data_comp_list" << std::endl
+                    << "loop_" << std::endl
+                    << "_chem_comp.id" << std::endl
+                    << "_chem_comp.three_letter_code" << std::endl
+                    << "_chem_comp.name" << std::endl
+                    << "_chem_comp.group" << std::endl
+                    << "_chem_comp.number_atoms_all" << std::endl
+                    << "_chem_comp.number_atoms_nh"  << std::endl
+                    << "_chem_comp.desc_level" << std::endl;
+            
+            //if (tPropComp.id !=NullString)
+            //{
+            //    outRestrF << tPropComp.id  <<"\t"<< tPropComp.code << "\t" 
+            //              << tPropComp.name << "\t" << tPropComp.group << "\t" 
+            //              << tPropComp.numAtoms << "\t" 
+            //              << tPropComp.numH << "\t."
+                          // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
+            //              << std::endl;
+                
+            //}
+            //else
+            //{
+            
+            
+            outRestrF << longName <<"\t"<< sName << "\t" << "'.\t\t'\t"
+                      << ligType << "\t" << (int)tAtoms.size() << "\t" 
+                      << (int)tAtoms.size()- nH << "\t."
+                          // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
+                      << std::endl;
+            
+            outRestrF <<"# ------------------------------------------------------" << std::endl
+                      <<"# ------------------------------------------------------" << std::endl
+                      <<"#" << std::endl
+                      <<"# --- DESCRIPTION OF MONOMERS ---" << std::endl
+                      <<"#" << std::endl
+                      <<"data_comp_" << longName << std::endl
+                      <<"#" << std::endl; 
+        
+            if (tAtoms.size() >0)
+            {
+                // atom info section           
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_atom.comp_id" << std::endl
+                          << "_chem_comp_atom.atom_id" << std::endl
+                          << "_chem_comp_atom.type_symbol" << std::endl
+                          << "_chem_comp_atom.type_energy" << std::endl
+                          << "_chem_comp_atom.charge" << std::endl
+                          << "_chem_comp_atom.x" << std::endl
+                          << "_chem_comp_atom.y" << std::endl
+                          << "_chem_comp_atom.z" << std::endl;
+                
+                
+                
+                for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
+                        iA != tAtoms.end(); iA++)
+                {
+                    //double r1 =  (double) rand()/RAND_MAX;
+                    //double r2 =  (double) rand()/RAND_MAX;
+                    //double r3 =  (double) rand()/RAND_MAX;
+                    REAL tCharge =0.0;
+                    if (iA->charge !=0.0)
+                    {
+                        tCharge = iA->charge;
+                    }
+                    else if (iA->formalCharge !=0.0)
+                    {
+                        tCharge = iA->formalCharge;
+                    }
+                    
+                    std::string strCharge = TrimSpaces(RealToStr(tCharge));
+                    if (strCharge.find(".") !=strCharge.npos)
+                    {
+                        std::vector<std::string> tVec;
+                        StrTokenize(strCharge, tVec, '.');
+                        strCharge = tVec[0];
+                    }
+                    
+                    StrUpper(iA->chemType);
+                    StrUpper(iA->ccp4Type);
+                    
+                    outRestrF << longName
+                              << std::setw(12) << iA->id 
+                              << std::setw(6) << iA->chemType 
+                              << std::setw(6) << iA->ccp4Type 
+                              << std::setw(8) << strCharge 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[0] 
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed 
+                              << iA->coords[2] << std::endl;
+                    
+                }
+            }
+            
+            if (tBonds.size() >0)
+            {   
+                // Bond sections 
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_bond.comp_id" << std::endl
+                          << "_chem_comp_bond.atom_id_1" << std::endl
+                          << "_chem_comp_bond.atom_id_2" << std::endl
+                          << "_chem_comp_bond.type" << std::endl
+                          << "_chem_comp_bond.aromatic"  << std::endl
+                          << "_chem_comp_bond.value_dist"<< std::endl
+                          << "_chem_comp_bond.value_dist_esd" << std::endl;
+                          // << "_chem_comp_bond.exact_cod_dist" << std::endl;
+               
+                
+                for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                          iB !=tBonds.end(); iB++)
+                {
+                    std::string tAr;
+                    
+                    
+                    StrLower(iB->order);
+                    
+                    if (iB->order.find("arom") !=iB->order.npos)
+                    {
+                        tAr       = "y";
+                    }
+                    else
+                    {
+                        unifyStrForOrder(iB->order);
+                        tAr = "n";
+                    }
+                                       
+                    outRestrF <<  longName
+                              << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
+                              << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
+                              << std::setw(12)  << iB->orderNK 
+                              << std::setw(8)   << tAr
+                              << std::setw(10)  << std::setprecision(3)
+                              << iB->value 
+                              << std::setw(8) << std::setprecision(3)
+                              << iB->sigValue << std::endl;
+                    
+                    //   if(iB->hasCodValue)
+                    //   {
+                    //       outRestrF << "Yes " << std::endl;
+                    //   }
+                    //   else
+                    //   {
+                    //       outRestrF << "No "  << std::endl;
+                    //   }
+                }
+            }
+           
+            if (tAngs.size() > 0)
+            {
+                // Angle section
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_angle.comp_id"   << std::endl
+                          << "_chem_comp_angle.atom_id_1" << std::endl
+                          << "_chem_comp_angle.atom_id_2" << std::endl
+                          << "_chem_comp_angle.atom_id_3" << std::endl
+                          << "_chem_comp_angle.value_angle"     << std::endl
+                          << "_chem_comp_angle.value_angle_esd" << std::endl;
+                          //  << "_chem_comp_angle.exact_cod_dist"  << std::endl;
+                
+                for (std::vector<AngleDict>::iterator iA=tAngs.begin();
+                          iA != tAngs.end(); iA++)
+                {
+                    //for (std::vector<int>::iterator iAt=iA->atoms.begin();
+                    //        iAt !=iA->atoms.end(); iAt++)
+                    //{
+                    // difference in comp atom definitions between cod and
+                    // dictionary: inner-out1-out2(cod),
+                    // atom1-atom2(center)-atom3(dictionary)
+                    if (iA->sigValue < 1.5)
+                    {
+                        iA->sigValue = 1.5;
+                    }
+                    if (tAtoms[iA->atoms[0]].isMetal)
+                    {
+                        for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
+                                iCA !=iA->codAngleValues.end(); iCA++)
+                        {
+                            outRestrF << tMonoRootName.substr(0,3) << std::setw(12)
+                                      << tAtoms[iA->atoms[1]].id << std::setw(12)
+                                      << tAtoms[iA->atoms[0]].id << std::setw(12)
+                                      << tAtoms[iA->atoms[2]].id << std::setw(12) << std::setprecision(3) <<  *iCA << "    "
+                                      << std::setw(8) << std::setprecision(2) << iA->sigValue << std::endl;
+                        }
+                    }
+                    else
+                    {
+                        outRestrF << longName 
+                                  << std::setw(12) << tAtoms[iA->atoms[1]].id
+                                  << std::setw(12) << tAtoms[iA->atoms[0]].id 
+                                  << std::setw(12) << tAtoms[iA->atoms[2]].id;
+                        outRestrF << std::setw(12) << std::setprecision(3) <<  iA->value
+                                  << std::setw(8) << std::setprecision(2) << iA->sigValue 
+                                  << std::endl;
+                    }
+                    /*
+                    if(iA->hasCodValue)
+                     {
+                       outRestrF << "Yes " << std::endl;
+                     }
+                     else
+                     {
+                       outRestrF << "No "  << std::endl;
+                     }
+                     */
+                }
+            }
+        
+            // Torsion section 
+            if((int)tTorsions.size() !=0)
+            {
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_tor.comp_id"         << std::endl
+                          << "_chem_comp_tor.id"              << std::endl
+                          << "_chem_comp_tor.atom_id_1"       << std::endl
+                          << "_chem_comp_tor.atom_id_2"       << std::endl
+                          << "_chem_comp_tor.atom_id_3"       << std::endl
+                          << "_chem_comp_tor.atom_id_4"       << std::endl
+                          << "_chem_comp_tor.value_angle"     << std::endl
+                          << "_chem_comp_tor.value_angle_esd" << std::endl
+                          << "_chem_comp_tor.period"          << std::endl;
+            
+                int idxTor = 1;
+                //std::cout << "number of torsions " << (int)allTorsions.size() << std::endl;
+            
+                for (std::vector<TorsionDict>::iterator iT=tTorsions.begin();
+                        iT !=tTorsions.end(); iT++)
+                {
+                    //std::string idxTorStr=IntToStr(idxTor);
+                    //idxTorStr = "tor_" + idxTorStr;
+                    // std::cout << "Torsion angle " << idxTor 
+                    //          << " It contains " << (int)iT->atoms.size() << std::endl;
+                          
+                    //std::cout << iT->atoms[0] << std::endl
+                    //          << iT->atoms[1] << std::endl
+                    //          << iT->atoms[2] << std::endl
+                    //          << iT->atoms[3] << std::endl;
+                
+                    outRestrF << longName 
+                              << std::setw(22) << iT->id
+                              << std::setw(12)  << tAtoms[iT->atoms[0]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[1]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[2]].id 
+                              << std::setw(12)  << tAtoms[iT->atoms[3]].id 
+                              << std::setw(12) << std::setprecision(3) << iT->value  
+                              << std::setw(8)  << "10.00" 
+                              << std::setw(6)  << iT->period << std::endl;
+                    idxTor++;        
+                }
+                
+            }
+            
+            //  For chiral centers
+            //bool l_ch = false;
+            //if ((int)tChs.size() !=0)
+            //{
+            //    l_ch = true;
+            //}
+            //else
+            //{
+            //    for (int i_ch =0; i_ch < (int)tAtoms.size(); i_ch++)
+            //    {
+            //        if (tAtoms[i_ch].chiralIdx  > 0)
+            //        {
+            //            l_ch = true;
+            //            break;
+            //        }
+            //    }
+            //}
+            
+            //if (l_ch)
+            if(tChs.size() !=0)
+            {
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_chir.comp_id" << std::endl
+                          << "_chem_comp_chir.id" << std::endl
+                          << "_chem_comp_chir.atom_id_centre" << std::endl
+                          << "_chem_comp_chir.atom_id_1" << std::endl
+                          << "_chem_comp_chir.atom_id_2" << std::endl
+                          << "_chem_comp_chir.atom_id_3" << std::endl
+                          << "_chem_comp_chir.volume_sign" << std::endl;
+                
+                // First the input chirals
+                std::vector<ID>   inputChiralID;
+                for (std::vector<ChiralDict>::iterator iCh = tChs.begin();
+                        iCh != tChs.end(); iCh++)
+                {
+                   
+                        inputChiralID.push_back(iCh->archID);
+                        outRestrF << longName << "    " 
+                                  << iCh->id  << "    ";
+                        int numCh=0;
+                        for (std::vector<int>::iterator iAt=iCh->atoms.begin();
+                               iAt != iCh->atoms.end(); iAt++)
+                        {
+                            if (numCh < 4)
+                            {
+                                outRestrF << tAtoms[*iAt].id << "    ";
+                                numCh++;
+                            }
+                        }
+                        outRestrF << iCh->sign << std::endl;
+                   
+                }
+                // New chiral that are not in the input list 
+                /*
+                int idxC =(int)inputChiralID.size();
+                for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                          iA !=tAtoms.end(); iA++)
+                {
+                 
+                    if (iA->chiralIdx == 1)
+                    {
+                        std::vector<ID>::iterator tFind;
+                        tFind = std::find(inputChiralID.begin(), inputChiralID.end(), iA->id); 
+                        if (tFind ==inputChiralID.end() && iA->chemType !="P")
+                        {
+                            std::vector<ID> chirAtms;
+                            std::vector<ID> HAtms;
+                            for (std::vector<int>::iterator iNB=iA->connAtoms.begin();
+                                 iNB != iA->connAtoms.end(); iNB++)
+                            {
+                                
+                                if (tAtoms[*iNB].chemType !="H")
+                                {
+                                    chirAtms.push_back(tAtoms[*iNB].id);
+                                }
+                                else
+                                {
+                                    HAtms.push_back(tAtoms[*iNB].id);
+                                }
+                            }
+                            
+                            int nH= (int)HAtms.size();
+                            while((int)chirAtms.size() <3 && nH>0 )
+                            {
+                                int tPos = (int)HAtms.size() - nH; 
+                                chirAtms.push_back(HAtms[tPos]);
+                                nH--;
+                            }
+                        
+                            if ((int)chirAtms.size() >=3)
+                            {
+                                std::string idxStr=IntToStr(idxC);
+                                if (idxC <10)
+                                {
+                                    idxStr = "chir_0" + idxStr;
+                                }
+                                else
+                                {
+                                    idxStr = "chir_" + idxStr;
+                                }
+                                
+                                // Not let H in as possible
+                                  
+                                outRestrF << longName 
+                                          << std::setw(10) << idxStr 
+                                          << std::setw(10)  << iA->id;
+                       
+                                outRestrF << std::setw(10) << chirAtms[0] << "    ";
+                                outRestrF << std::setw(10) << chirAtms[1] << "    ";
+                                outRestrF << std::setw(10) << chirAtms[2] << "    ";
+                                outRestrF << std::setw(12) << "BOTH" << std::endl;
+                                idxC++;
+                            }
+                        }
+                    }
+                }
+                */
+            }
+            
+            // Planar group section
+            if ((int)tPlas.size() >0)
+            {
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_plane_atom.comp_id"  << std::endl
+                          << "_chem_comp_plane_atom.plane_id" << std::endl
+                          << "_chem_comp_plane_atom.atom_id"  << std::endl
+                          << "_chem_comp_plane_atom.dist_esd" << std::endl;
+                int idxP = 1;
+                for (std::vector<PlaneDict>::iterator iP=tPlas.begin();
+                        iP !=tPlas.end(); iP++)
+                {
+                    if (iP->atoms.size() > 3)
+                    {
+                        
+                        std::string idxPStr = IntToStr(idxP);
+                        idxPStr = "plan-" + idxPStr;
+                        for(std::map<ID, int>::iterator iAt=iP->atoms.begin();
+                                iAt != iP->atoms.end(); iAt++)
+                        {
+                            std::string tID;
+                            if (iAt->first.find("\'") !=std::string::npos)
+                            {
+                                tID = "\"" + iAt->first + "\"";
+                            }
+                            else
+                            {
+                                tID = iAt->first;
+                            }
+                            outRestrF << longName
+                                      << std::setw(10) << idxPStr
+                                      << std::setw(12)  << tID
+                                      << std::setw(8)  << "0.020" << std::endl;
+                        }
+                        idxP++;
+                    }
+                }
+            }
+            outRestrF.close();
+        }    
+    }
+    
+    
+    extern void outMMCif2(FileName tFName, 
+                         ID tMonoRootName,
+                         ChemComp  &         tPropComp,
+                         std::vector<LIBMOL::AtomDict>& tAtoms,
+                         // std::vector<int>    & tHydroAtoms,
+                         std::vector<LIBMOL::BondDict>& tBonds, 
+                         std::vector<LIBMOL::AngleDict>& tAngs, 
+                         std::vector<LIBMOL::TorsionDict>& tTorsions, 
+                         std::vector<LIBMOL::RingDict> & tRings, 
+                         std::vector<LIBMOL::PlaneDict>& tPlas, 
+                         std::vector<LIBMOL::ChiralDict>& tChs)
+    {
+        
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
         {
@@ -7327,7 +7840,7 @@ namespace LIBMOL
             if (tBonds.size() >0)
             {
                 // newly added 
-                //kekulizeRings(tAtoms, tBonds, tRings);
+                
                 
                 // Bond sections 
                 outRestrF << "loop_" << std::endl

@@ -329,6 +329,10 @@ namespace LIBMOL
                               std::vector<RingDict> & tRings,
                               std::vector<PlaneDict> & tPlans);
     
+    extern void outBoAndChList(FileName tFName, 
+                               std::vector<AtomDict>  & tAtoms,
+                               std::vector<BondDict>  & tBonds);
+    
     class HuckelMOSuite
     {
     public :
@@ -421,7 +425,116 @@ namespace LIBMOL
         
     };
     
-    
+    class KekulizeMol
+    {
+        
+    public :
+        
+        // Default constructor
+        KekulizeMol();
+        // Default destructor 
+        ~KekulizeMol();
+        
+        void execute(std::vector<AtomDict> & tAtoms, 
+                     std::vector<BondDict> & tBonds,
+                     std::vector<RingDict> & tRings);
+        
+        void setAllAtomEXcessElectrons(std::vector<AtomDict> & tAtoms);
+        int  getOneNBAtomExContri(std::vector<AtomDict> & tAtoms,
+                                  int tIdxAtm, int iIdxNB);
+        void initiaExElecs(std::vector<AtomDict> & tAtoms);
+        
+        void setInitBondOrdersViaExtraElecs(std::vector<AtomDict> & tAtoms,
+                                            std::vector<BondDict> & tBonds);
+        
+        void PickOddAtoms(std::vector<AtomDict> & tAtoms);
+        
+        void setInitBondOrder(std::vector<AtomDict> & tAtoms,
+                              std::vector<BondDict> & tBonds,
+                              std::vector<int>      & tCBondIdx,
+                              std::map<int, std::vector<int> > & tDelConn,
+                              std::map<int, int>    & tRemainval);
+        
+        void setProBondOrdersOneLoop(int & nDone, std::vector<AtomDict> & tAtoms, 
+                                     std::vector<BondDict> & tBonds, 
+                                     std::vector<int> & tCBondIdx, 
+                                     std::map<int, std::vector<int> > & remainConns, 
+                                     std::map<int, std::vector<int> > & tDelConn, 
+                                     std::map<int, int>   &  tRemainVal);
+        
+        void setBondOrderInSys(std::vector<AtomDict> & tAtoms,
+                                std::vector<BondDict> & tBonds,
+                                std::vector<RingDict> & tRings);
+        
+        void modBondOrderViaAnnEXOneConn(std::vector<AtomDict> & tAtoms,
+                                         std::vector<BondDict> & tBonds);
+        void modBondOrderViaAnnEXOneLoop(std::vector<AtomDict> & tAtoms,
+                                         std::vector<BondDict> & tBonds,
+                                         int                   &  tNOpr);
+        void checkIsoExAtoms(std::vector<AtomDict> & tAtoms);
+        
+        void checkUpdate(REAL & tPreV, int & tProV);
+        
+        void partitionSysToSubGraphs(std::vector<AtomDict>  & tAtoms);
+        
+        void checkChargeInSubGraphs(std::vector<AtomDict>  & tAtoms);
+        
+        int  sumExElecsInSubGraph(std::vector<AtomDict>  & tAtoms, 
+                                  std::vector<int>       & tGraph);
+        
+        void assignChargesInSubGraph(std::vector<AtomDict>  & tAtoms, 
+                                  std::vector<int>       & tGraph);
+        
+        void assignChargeOneInSubGraph(std::vector<AtomDict>  & tAtoms, 
+                                       std::vector<int>       & tIdxNs,
+                                       bool                   & tL);
+        
+        void fromSubGraphsToRings(std::vector<AtomDict>  & tAtoms,
+                                  std::vector<RingDict> & tRings,
+                                  std::vector<int> & tUndecidedRingIdxs, 
+                                  std::map<int, std::vector<int> > & tNonRingAtomIdxs);
+        void checkOneRingInSubgraphs
+                        (int  tOneRingIdx,
+                        std::vector<int> & tOneRingAtomIdxs,
+                        std::vector<int> & tUndecidedRingIdxs, 
+                        std::map<int, std::vector<int> > & tNonRingAtomIdxs);
+        
+        void kekulizeRings(std::vector<AtomDict> & tAtoms,
+                           std::vector<BondDict> & tBonds,
+                           std::vector<RingDict> & tRings,
+                           std::vector<int> & tUndecidedRingIdxs);
+        void kekulizeOneRing(std::vector<AtomDict> & tAtoms,
+                                std::vector<BondDict> & tBonds,
+                                RingDict & tRing,
+                                PeriodicTable & tTab);
+        void modifyBondOrderInOneRing(std::vector<BondDict> & tBonds,
+                                      std::vector<AtomDict>  & tAtoms,
+                                      int  tIdxB1, int tIdxB2,
+                                      int tAtCen, int tAt1, int tAt2,
+                                      PeriodicTable & tTab);
+        
+        REAL getFixedBondOrder(std::vector<BondDict>   & tBonds, 
+                               std::vector<AtomDict>   & tAtoms,
+                               int                       tAtmIdx);
+        
+        void setEquivAtoms(std::vector<AtomDict> & tAtoms,
+                           std::vector<BondDict> & tBonds);
+        
+        void modDelocBondsByEquivAtoms(std::vector<AtomDict> & tAtoms,
+                                       std::vector<BondDict> & tBonds,
+                                       std::vector<int>      & tIdxs);
+        
+        
+        bool                                   lUpdate;
+        
+        std::vector<int>                       zeroExAtomIdxs;
+        std::vector<int>                       withExAtomIdxs;
+        std::map<int, int>                     oddAtomIdxs;
+        std::map<int, std::vector<int> >       allSubGraphs;
+        
+    private:
+        
+    };
     
 }
 

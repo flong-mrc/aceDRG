@@ -81,7 +81,7 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:M:O:S:T:X:Y:Z:")) != -1)
+        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:M:O:S:T:U:X:Y:Z:")) != -1)
         {
             switch (c)
             {
@@ -190,11 +190,16 @@ namespace LIBMOL
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
                 case 'T':
-                    IOEntries["TestMode"] = optarg;
-                    StrLower(IOEntries["TestMode"]);
+                    IOEntries["GraphTests"] = optarg;
+                    StrLower(IOEntries["GraphTests"]);
                     //std::cout << "COD atom types are output to : " 
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
-                    break;   
+                    break;  
+                case 'U':
+                    IOEntries["TempTests"] = optarg;
+                    std::cout << "You are in temporally test mode "
+                              << IOEntries["TempTests"] << std::endl;
+                    break;
                 case 'X':
                     IOEntries["Type1"] = optarg;
                     std::cout << "The file containing atom type set A is "
@@ -345,8 +350,19 @@ namespace LIBMOL
     }
     void CheckEnvAndGetMode::SetWorkMode()
     {
-        
-        if (IOEntries.find("TestMode") !=IOEntries.end())
+        if (IOEntries.find("TempTests") !=IOEntries.end())
+        {
+            
+            if (IOEntries.find("inCifName")!=IOEntries.end())
+            {
+                workMode = 1001;
+            }
+            else
+            {
+                workMode = 1000;
+            }
+        }
+        else if (IOEntries.find("GraphTests") !=IOEntries.end())
         {
             workMode = 900;
         }
