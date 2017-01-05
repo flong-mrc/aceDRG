@@ -247,8 +247,8 @@ namespace LIBMOL
         // AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
         
-        std::cout << "Now the system has " 
-                  << allTorsions.size() << std::endl;
+        //std::cout << "Now the system has " 
+        //          << allTorsions.size() << std::endl;
         
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
@@ -267,7 +267,13 @@ namespace LIBMOL
         checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
         
         setAromaticBonds(allRingsV, allBonds);
-        
+        /*
+        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
+                        iA != allAtoms.end(); iA++)
+        {
+            std::cout << "Atom " << iA->id << " of " << iA->seriNum << std::endl;
+        }
+         */
     }
     
     void AllSystem::AddAtom(const AtomDict & tAtom)

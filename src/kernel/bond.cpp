@@ -196,6 +196,7 @@ namespace LIBMOL
             order(NullString),
             orderK(ZeroInt),
             orderN(ZeroReal),
+            orderNK(NullString),
             value(ZeroReal),
             sigValue(0.02),
             valueST(ZeroReal),
@@ -209,7 +210,8 @@ namespace LIBMOL
             numCodValues(ZeroInt),
             numCodValuesP(ZeroInt),
             isInSameRing(false),
-            isAromatic(false)
+            isAromatic(false),
+            ked(false)
     {
     }
     
@@ -219,6 +221,7 @@ namespace LIBMOL
             order(tBond.order),
             orderK(tBond.orderK), 
             orderN(tBond.orderN),
+            orderNK(tBond.orderNK),
             value(tBond.value),
             sigValue(tBond.sigValue),
             valueST(tBond.valueST),
@@ -232,7 +235,8 @@ namespace LIBMOL
             numCodValues(tBond.numCodValues),
             numCodValuesP(tBond.numCodValuesP),
             isInSameRing(tBond.isInSameRing),
-            isAromatic(tBond.isAromatic)
+            isAromatic(tBond.isAromatic),
+            ked(tBond.ked)
     {
         for (std::vector<ID>::const_iterator tA = tBond.atoms.begin();
                 tA != tBond.atoms.end(); tA++)
@@ -388,7 +392,30 @@ namespace LIBMOL
         }
     }
     
-
+    extern void modifyBondOrderStr(BondDict & tBond,
+                                   REAL       tOrder)
+    {
+        if(tOrder == 1.0)
+        {
+            tBond.orderNK = "SINGLE";
+        }
+        else if (tOrder==2.0)
+        {
+            tBond.orderNK = "DOUBLE";
+        }
+        else if(tOrder ==3.0)
+        {
+            tBond.orderNK = "TRIBLE";
+        }
+        else
+        {
+            tBond.orderNK = "SINGLE";
+            std::cout << "Weird bond order " << tOrder 
+                      << " ? Please check " << std::endl;
+        }
+    }
+    
+    
     extern void modifyOneDelocBond(std::vector<BondDict> & tBonds,
                                    std::vector<AtomDict>   & tAtoms,
                                    int tIdx1, int tIdx2)

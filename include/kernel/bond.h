@@ -175,6 +175,7 @@ namespace LIBMOL
         std::string             order;
         int                     orderK;
         REAL                    orderN;
+        std::string             orderNK;
         REAL                    value;
         REAL                    sigValue;
         REAL                    valueST;
@@ -191,6 +192,7 @@ namespace LIBMOL
         int                     numCodValuesP;
         bool                    isInSameRing;
         bool                    isAromatic;
+        bool                    ked;          // if it is kekulized by acedrg 
         
         std::map<ID, int>       fullAtoms; // for atoms from SMILE, ID is chemType
         std::vector<ID>         atoms;
@@ -245,6 +247,9 @@ namespace LIBMOL
     extern void modifyBondOrder(std::vector<BondDict> & tAllBonds,
                                  std::vector<AtomDict> & tAllAtoms,
                                  int tAt1, int tAt2, int tOrder);
+    
+    extern void modifyBondOrderStr(BondDict & tBond,
+                                   REAL       tOrder);
     
     
     extern void modifyOneDelocBond(std::vector<BondDict> & tBonds,

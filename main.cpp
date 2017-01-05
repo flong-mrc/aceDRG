@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
             {
                 LIBMOL::AllSystem   aTargetSystem(dataFromMol2, AJob.IOEntries["libMolTabDir"]);
                 
-                LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
+                LIBMOL::outMMCif2(AJob.IOEntries["userOutName"].c_str(),
                                      AJob.IOEntries["monoRootName"], 
                                      aTargetSystem.propComp,
                                      aTargetSystem.allAtoms,
@@ -507,9 +507,26 @@ int main(int argc, char** argv) {
                                aClassifiedSys.allAtoms, aClassifiedSys.allBonds);    
         
     }
-    else if (AJob.workMode==920)
+    else if (AJob.workMode == 1001)
     {
         
+        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
+                                               
+        LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
+        
+        std::cout << "number of rings " << aTargetSystem.allRingsV.size() << std::endl;
+        
+        if ( (int)aTargetSystem.allAtoms.size() > 0)
+        {
+            LIBMOL::KekulizeMol aKTool;
+            aKTool.execute(aTargetSystem.allAtoms, 
+                           aTargetSystem.allBonds,
+                           aTargetSystem.allRingsV);
+            
+            LIBMOL::outBoAndChList(AJob.IOEntries["userOutName"].c_str(),
+                                   aTargetSystem.allAtoms, 
+                                   aTargetSystem.allBonds);
+        }
     }
     
     
