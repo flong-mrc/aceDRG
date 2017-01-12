@@ -7370,7 +7370,8 @@ namespace LIBMOL
                     outRestrF <<  longName
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
-                              << std::setw(12)  << iB->orderNK 
+                              // << std::setw(12)  << iB->orderNK 
+                              << std::setw(12)  << iB->order
                               << std::setw(8)   << tAr
                               << std::setw(10)  << std::setprecision(3)
                               << iB->value 

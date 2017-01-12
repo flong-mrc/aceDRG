@@ -265,6 +265,7 @@ namespace LIBMOL
         // Metal Atom studies where molecules will not be generated
         void buildMetalAtomCoordMap(std::vector<CrystInfo>::iterator tCryst);
         bool checkNBAtomOccp(std::vector<AtomDict>::iterator tAtm);
+        bool checkNBAtomOccp(AtomDict  & tAtm);
         int  getNumOrgNB(std::vector<AtomDict> & tAtoms, 
                          int  tIdx, 
                          std::vector<std::string> & tOrgTab);
