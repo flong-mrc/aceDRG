@@ -127,6 +127,7 @@ int main(int argc, char** argv) {
                                            
             
             LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
+            
         
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   

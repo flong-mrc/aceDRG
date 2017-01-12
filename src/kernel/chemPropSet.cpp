@@ -590,7 +590,8 @@ namespace LIBMOL
                 //          << tAtoms[*iA].hybrid << std::endl;
                 iB->atomSPs[tAtoms[*iA].id] = tAtoms[*iA].hybrid;
             }
-        }   
+        }  
+        
     }
     
     extern void setAtomsNB1NB2_SP(std::vector<AtomDict> & tAtoms)

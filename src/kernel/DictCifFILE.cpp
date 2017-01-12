@@ -2613,6 +2613,8 @@ namespace LIBMOL
             
             inFile.close();
             
+          
+            
             //std::cout << "CCP4 type " << hasCCP4Type << std::endl;
             
             
@@ -2649,7 +2651,6 @@ namespace LIBMOL
             }
             
             
-            
             setHydroAtomConnect();
             // addMissHydroAtoms();
             
@@ -2671,6 +2672,7 @@ namespace LIBMOL
             {
                 setAtomsCCP4Type();
             }
+            
             
             /*
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
@@ -3463,7 +3465,8 @@ namespace LIBMOL
             
             if (hasProps["bond"].find("order") != hasProps["bond"].end())
             {
-                itsCurBond->order  = tF[hasProps["bond"]["order"]];
+                itsCurBond->order   = tF[hasProps["bond"]["order"]];
+                itsCurBond->orderNI = itsCurBond->order;
                 itsCurBond->orderN = StrToOrder(itsCurBond->order);
             }
             
@@ -4883,7 +4886,8 @@ namespace LIBMOL
             allAngles.push_back(*itsCurAngle);
             delete itsCurAngle;
             itsCurAngle = NULL;
-        }   
+        } 
+        
     }
     
    // setAllAngles() may not needed in the future
@@ -7366,12 +7370,21 @@ namespace LIBMOL
                         unifyStrForOrder(iB->order);
                         tAr = "n";
                     }
-                                       
+                    
+                    std::string outOrder;
+                    if (iB->orderNI.size() !=0)
+                    {
+                        outOrder = iB->orderNI;
+                    }
+                    else
+                    {
+                        outOrder = iB->order;
+                    }
                     outRestrF <<  longName
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
-                              // << std::setw(12)  << iB->orderNK 
-                              << std::setw(12)  << iB->order
+                              //<< std::setw(12)  << iB->orderNK 
+                              << std::setw(12)  << outOrder
                               << std::setw(8)   << tAr
                               << std::setw(10)  << std::setprecision(3)
                               << iB->value 

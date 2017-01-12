@@ -468,6 +468,7 @@ namespace LIBMOL
             iA->inRings.clear();
         }
         
+            
         for (int i=0; i < (int)allRingsV.size(); i++)
         {
             for (std::vector<AtomDict>::iterator iA=allRingsV[i].atoms.begin();
@@ -529,16 +530,13 @@ namespace LIBMOL
               
         detectPlaneGroups(); 
        
-        
-        
+       
         setAllTorsions2();
-        
-        
-        
         
         reIndexAtomInRing(allAtoms, allRingsV);
         
         modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
+         
         
         //if (!hasCCP4Type)
         //{
@@ -549,7 +547,7 @@ namespace LIBMOL
         //{
         //    std::cout << "CCP4 types already set " << std::endl;
         //}
-            
+           
         setAllAtomEXcessElectrons(allAtoms);
         
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
@@ -569,7 +567,7 @@ namespace LIBMOL
                 std::cout << allAtoms[*iSer].id << std::endl;
             }
         }
-        
+       
         int tSum = sumExElectrons(allAtoms);
         std::cout << "Sum of number of excess electrons is " 
                   << tSum << std::endl;

@@ -3212,6 +3212,7 @@ class AcedrgRDKit():
             #print "Its total valence ", val
 
         Chem.SanitizeMol(tMol)
+        Chem.Kekulize(tMol)
         # Make sure an atom in the molecule has the same charge in the input file. 
         # RDKit sometimes change it when initiating the molecule
         if tChargeList:
@@ -3590,7 +3591,7 @@ class AcedrgRDKit():
                 symb2 = atom2.GetSymbol()
 
                 bType = ""
-                #print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
+                print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
                 if aBond.HasProp("SpecialBond"):
                     bType = aBond.GetProp("SpecialBond")
                 else:
