@@ -17141,8 +17141,8 @@ namespace LIBMOL
     void CodClassify::setSpecial3NBSymb2(std::vector<AtomDict>::iterator tAt)
     {
         
-        //std::cout << "For atom " << tAt->id 
-        //          << " of serial number " << tAt->seriNum << " : " << std::endl;
+        std::cout << "For atom " << tAt->id 
+                  << " of serial number " << tAt->seriNum << " : " << std::endl;
         
         std::vector<int> serNumNB123;
         std::map<std::string, int>   NB3Props;
