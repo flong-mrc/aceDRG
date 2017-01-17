@@ -330,4 +330,51 @@ namespace LIBMOL
         return tAng;
     }
     
+    extern REAL getAngleValueFromFracCoords(AtomDict & tAtCen,
+                                            AtomDict & tAt1,
+                                            AtomDict & tAt2,
+                                            REAL a, REAL b, REAL c,
+                                  REAL alpha, REAL beta, REAL gamma) 
+    {
+
+
+        if (tAtCen.fracCoords.size() == 3 && tAtCen.fracCoords.size() == tAt1.fracCoords.size()
+                && tAtCen.fracCoords.size() == tAt2.fracCoords.size()) {
+            std::vector<REAL> tV1, tV2;
+            for (unsigned i = 0; i < 3; i++) {
+                tV1.push_back(tAt1.fracCoords[i] - tAtCen.fracCoords[i]);
+                tV2.push_back(tAt2.fracCoords[i] - tAtCen.fracCoords[i]);
+            }
+
+            REAL lenTv1 = getBondLenFromFracCoords(tAtCen.fracCoords, tAt1.fracCoords,
+                    a, b, c, alpha, beta, gamma);
+            REAL lenTv2 = getBondLenFromFracCoords(tAtCen.fracCoords, tAt2.fracCoords,
+                    a, b, c, alpha, beta, gamma);
+            //std::cout << "lenTv1 " << lenTv1 << std::endl;
+            //std::cout << "lenTv2 " << lenTv2 << std::endl;
+
+            if (lenTv1 > 0.000001 && lenTv2 > 0.000001) {
+                REAL coF = (a * a * tV1[0] * tV2[0] + b * b * tV1[1] * tV2[1] + c * c * tV1[2] * tV2[2]
+                        + b * c * (tV1[1] * tV2[2] + tV1[2] * tV2[1]) * cos(alpha * PI180)
+                        + c * a * (tV1[2] * tV2[0] + tV1[0] * tV2[2]) * cos(beta * PI180)
+                        + a * b * (tV1[0] * tV2[1] + tV1[1] * tV2[0]) * cos(gamma * PI180)) / (lenTv1 * lenTv2);
+
+                //std::cout << "coF " << coF << std::endl;
+                // The float point error : ABS might > 1.0 or < -1.0
+                if (coF >= 1.0) {
+                    coF -= 0.0000000001;
+                } else if (coF <= -1.0) {
+                    coF += 0.0000000001;
+                }
+                return acos(coF);
+            } else {
+                std::cout << "There is at least one pair of atoms overlapped " << std::endl;
+                return 0.0;
+            }
+        } else {
+            std::cout << "Error: check atom coordinate dimensions " << std::endl;
+            return 0.0;
+        }
+
+    }
 }

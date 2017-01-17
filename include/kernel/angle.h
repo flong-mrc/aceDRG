@@ -160,6 +160,12 @@ namespace LIBMOL // temp
     extern int getAngle(std::vector<AngleDict> & tAllAngles,
                         int cAt, int tAt1, int tAt2);
     
+    extern REAL getAngleValueFromFracCoords(AtomDict  & tAtCen,
+                                            AtomDict  & tAt1, 
+                                            AtomDict  & tAt2,
+                                            REAL a, REAL b, REAL c, 
+                                            REAL alpha, REAL beta, REAL gamma);
+    
 }
 
 #endif	/* ANGLE_H */

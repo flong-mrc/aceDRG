@@ -4554,7 +4554,7 @@ class FileTransformer :
                     print "==============================="
             """
 
-  
+
     def parseOneMmCifBlk(self, tBlk):
 
         if len(tBlk):
@@ -4722,11 +4722,11 @@ class FileTransformer :
         iStrD = 0
         for aL in tBlk:
             strGrp = aL.strip().split()
-            if len(strGrp) == 1 and strGrp[0].find(";")==-1:
+            if len(strGrp) == 1 and aL[0].find("_") !=-1 and strGrp[0].find(";")==-1:
                 colIdx.append(strGrp[0])
             else:
                 if aL.find("\"") !=-1:
-                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
+                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" or tProp =="strDescriptor" : 
                         strGrp1 = aL.strip().split("\"")
                         strGrp  = []
                         for aStrC in strGrp1:
@@ -4754,6 +4754,11 @@ class FileTransformer :
                         if not self.strDescriptors.has_key("entries"):
                             self.strDescriptors["entries"] = []
                         self.strDescriptors["entries"].append(aL)
+                else :
+                     if not self.strDescriptors.has_key("entries"):
+                         self.strDescriptors["entries"] = []
+                     self.strDescriptors["entries"].append(aL)
+
     
         if tProp =="atom":
             tAtoms = []

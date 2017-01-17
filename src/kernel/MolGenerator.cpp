@@ -177,12 +177,14 @@ namespace LIBMOL {
             initMetalTab(allMetals);
             checkMetal(allMetals);
 
-            if (lHasMetal) {
+            if (lHasMetal) 
+            {
                 for (std::vector<CrystInfo>::iterator iCryst = allCryst.begin();
                         iCryst != allCryst.end(); iCryst++) 
                 {
                     for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
-                            iA != initAtoms.end(); iA++) {
+                            iA != initAtoms.end(); iA++) 
+                    {
                         iA->sId = "555";
                         allAtoms.push_back(*iA);
                         refAtoms.push_back(*iA);
@@ -200,7 +202,6 @@ namespace LIBMOL {
                     std::cout << "number of atoms in a center unit cell "
                             << allAtoms.size() << std::endl;
                    
-                    
                     if (!lColid) 
                     {
                         
@@ -208,11 +209,14 @@ namespace LIBMOL {
 
                         // getUniqueBonds(aPTable);
                         getUniqueAtomLinks(aPTable, iCryst);
-
-                        // No molecules will be generated 
+                        // No molecules will be generated
+                        /*
                         buildMetalAtomCoordMap(iCryst);
-
                         outMetalAtomCoordInfo(tOutName);
+                        */
+                        // Try the new method related the new class "Metalcluster"
+                        buildMetalClusters(iCryst);
+                        outMetalClusterInfo(tOutName);
 
                     }
                 }
@@ -3795,6 +3799,63 @@ namespace LIBMOL {
         return aInfMol;
     }
 
+    void MolGenerator::buildMetalClusters(
+                              std::vector<CrystInfo>::iterator tCryst)
+    {
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++) 
+        {
+            if (iAt->isInPreCell && iAt->isMetal && checkNBAtomOccp(iAt)) 
+            {
+                bool lMC=true;
+                metalCluster aMC;
+                
+                aMC.metSeril = iAt->seriNum;
+                
+                std::cout << "A Metal cluster is found at atom " 
+                          << iAt->id << " of serial number " 
+                          << iAt->seriNum << std::endl;
+                
+                std::cout << "It connects to " << iAt->connAtoms.size()
+                          << " atoms " << std::endl;
+                
+                for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                        iNB != iAt->connAtoms.end(); iNB++) 
+                {
+                    if (checkNBAtomOccp(allAtoms[*iNB])
+                        && allAtoms[*iNB].chemType.compare("H") !=0
+                        && allAtoms[*iNB].chemType.compare("D") !=0)
+                    {
+                        aMC.ligandSerilSet.push_back(*iNB);
+                        
+                        for (std::vector<int>::iterator 
+                             iNB2=allAtoms[*iNB].connAtoms.begin();
+                             iNB2 !=allAtoms[*iNB].connAtoms.end(); iNB2++)
+                        {
+                            if(*iNB2 !=iAt->seriNum)
+                            {
+                                aMC.ligandNBs[*iNB].push_back(*iNB2);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        lMC = false;
+                        break;
+                    }
+                   
+                }
+                
+                if (lMC)
+                {
+                    aMC.setMetClusterFormu(allAtoms);
+                    aMC.buildBondAndAngleMap(allAtoms, tCryst);
+                    allMetalClusters.push_back(aMC);
+                }
+            }
+        }
+    }
+    
     void MolGenerator::buildMetalAtomCoordMap(
             std::vector<CrystInfo>::iterator tCryst) 
     {
@@ -4023,6 +4084,47 @@ namespace LIBMOL {
         }
 
     }
+    
+    void MolGenerator::outMetalClusterInfo(FileName tOutName)
+    {
+        std::vector<std::string> aOrgTab;
+        initOrgTable(aOrgTab);
 
+        Name aFName(tOutName);
+        // std::cout << "Output root is " << aFName << std::endl;
+        std::vector<std::string> nameComps;
+        StrTokenize(aFName, nameComps, '.');
+        Name rootFName;
+
+        for (unsigned jF = 0; jF < nameComps.size(); jF++) {
+            rootFName.append(nameComps[jF]);
+        }
+
+        if (rootFName.size() == 0) {
+            rootFName.append("Current");
+        }
+
+        if (allMsg.size()) 
+        {
+        }
+        
+        if (allMetalClusters.size() !=0)
+        {
+            Name bondAndAngleFName(rootFName);
+            bondAndAngleFName.append("_unique_bond_and_angles.txt");
+            std::ofstream aBAndAF(bondAndAngleFName.c_str());
+            if (aBAndAF.is_open()) 
+            {
+                aBAndAF << "MetalElement\tLigandElement2\t"
+                        << "AtomName1\tAtomName2\t"
+                        << "CoordinationNum1\tCoordinationNum1OrganicOnly\t"
+                        << "CoordinationNumber2\t"
+                        << "BondLength" << std::endl;
+                
+            }
+        }
+        
+    }
+    
 
 }

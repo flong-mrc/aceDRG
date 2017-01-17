@@ -2550,6 +2550,32 @@ namespace LIBMOL
         
     }
     
+    extern REAL getBondLenFromFracCoords(std::vector<REAL>& tCoord1,
+                                         std::vector<REAL>& tCoord2,
+                                         REAL a, REAL b, REAL c,
+                                         REAL alpha, REAL beta, REAL gamma) 
+    {
+        if (tCoord1.size() == tCoord2.size() && tCoord1.size() == 3) {
+            std::vector<REAL> deltX;
+            for (unsigned i = 0; i < 3; i++) {
+                deltX.push_back((tCoord2[i] - tCoord1[i]));
+            }
+            
+            return sqrt(a * a * deltX[0] * deltX[0] + b * b * deltX[1] * deltX[1] 
+                        + c * c * deltX[2] * deltX[2]
+                        + 2 * b * c * deltX[1] * deltX[2] * cos(alpha * PI180)
+                        + 2 * c * a * deltX[2] * deltX[0] * cos(beta * PI180)
+                        + 2 * a * b * deltX[0] * deltX[1] * cos(gamma * PI180));
+            
+        } 
+        else 
+        {
+            std::cout << "Error: dim of atom 1 coords " << tCoord1.size() << std::endl;
+            std::cout << "Error: dim of atom 2 coords " << tCoord2.size() << std::endl;
+            return -1.0;
+        }
+    }
+    
     // executing external program using command line arguments
     // a simple version 
     extern void cmdExecute(std::string & tCom)

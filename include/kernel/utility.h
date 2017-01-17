@@ -329,6 +329,11 @@ namespace LIBMOL
                              REAL a,     REAL b,    REAL c,
                              REAL alpha, REAL beta, REAL gamma);
     
+    extern REAL getBondLenFromFracCoords(std::vector<REAL> & tCoord1, 
+                                         std::vector<REAL> & tCoord2,
+                                         REAL a, REAL b, REAL c, 
+                                         REAL alpha, REAL beta, REAL gamma);
+    
     // Function dealt with environment variables and scripts
     // executing external program using command line arguments
     extern void cmdExecute(std::string & tCom);
