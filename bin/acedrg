@@ -4252,7 +4252,7 @@ class AcedrgRDKit():
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                             print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
-                        self.setOxyBondDeloc(tMol, aIdx)  
+                        #self.setOxyBondDeloc(tMol, aIdx)  
             tIdxOs = []
                                 
     def setFormalChargePO3N(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -4305,7 +4305,7 @@ class AcedrgRDKit():
                             aBond = tMol.GetBondBetweenAtoms(idxN, aIdx)           
                             aBond.SetBondType(rdchem.BondType.DOUBLE)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
-                            self.setOxyBondDeloc(tMol, aIdx)
+                            #self.setOxyBondDeloc(tMol, aIdx)
                            
     def deProtonationO(self, tMol, tIdx):
         print "\nHere are details of O: "           
@@ -4319,7 +4319,7 @@ class AcedrgRDKit():
             tMol.GetAtomWithIdx(tIdx).SetFormalCharge(-1)
             tMol.GetAtomWithIdx(tIdx).SetNoImplicit(True)
             print "Its formal charge ", tMol.GetAtomWithIdx(tIdx).GetFormalCharge()
-            self.setOxyBondDeloc(tMol, tIdx)  
+            #self.setOxyBondDeloc(tMol, tIdx)  
      
     def setOxyBondDeloc(self, tMol, tIdxO):
   

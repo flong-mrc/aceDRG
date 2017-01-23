@@ -176,8 +176,8 @@ namespace LIBMOL
         if ((int)tAtom.connAtoms.size() == 1)   
         {
             int i = tAtom.connAtoms[0];
-            std::cout << "NB atom id " << allAtoms[i].id << std::endl;
-            std::cout << "NB atom element type " << allAtoms[i].chemType << std::endl;
+            //std::cout << "NB atom id " << allAtoms[i].id << std::endl;
+            //std::cout << "NB atom element type " << allAtoms[i].chemType << std::endl;
             if (allAtoms[i].chemType.compare("S")==0)
             {
                 tAtom.ccp4Type="HSH1";
@@ -474,8 +474,8 @@ namespace LIBMOL
             if (tAtom.bondingIdx==2)
             {
                 // SP2 bonding
-                std::cout << "O atom " << " charge " << tAtom.parCharge << std::endl
-                          << "connections " << tAtom.connAtoms.size() << std::endl;
+                //std::cout << "O atom " << " charge " << tAtom.parCharge << std::endl
+                //          << "connections " << tAtom.connAtoms.size() << std::endl;
                 if (tAtom.parCharge)
                 { 
                     if(lP)

@@ -131,7 +131,7 @@ namespace LIBMOL
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         void setUniqueAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        void checkAtomLinks();
+        void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
         
         void getMolByEqClassInCell();
         void getMolByEqClassInCrys();

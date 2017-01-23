@@ -266,6 +266,7 @@ namespace LIBMOL
             charge(ZeroReal),
             parCharge(ZeroReal),
             formalCharge(ZeroReal),
+            formalChargeI(ZeroInt),
             radius(VDWCONST),
             ionRadius(VDWCONST),
             inChiralIdx(ZeroInt),
@@ -336,6 +337,7 @@ namespace LIBMOL
             charge(tAtom.charge),
             parCharge(tAtom.parCharge),
             formalCharge(tAtom.formalCharge),
+            formalChargeI(tAtom.formalChargeI),
             radius(tAtom.radius),
             ionRadius(tAtom.ionRadius),
             inChiralIdx(tAtom.inChiralIdx),
@@ -419,6 +421,12 @@ namespace LIBMOL
                 iB != tAtom.inBonds.end(); iB++)
         {
             inBonds.push_back((*iB));
+        }
+        
+        for (std::vector<REAL>::const_iterator iBL=tAtom.bondLengths.begin();
+                iBL != tAtom.bondLengths.end(); iBL++)
+        {
+            bondLengths.push_back(*iBL);
         }
         
         for (std::vector<AngleDict>::const_iterator iA=tAtom.inAngles.begin();
@@ -768,7 +776,7 @@ namespace LIBMOL
     {   
     }
    
-    metalCluster::metalCluster(const metalCluster& tMC):metSeril(tMC.metSeril),
+    metalCluster::metalCluster(const metalCluster & tMC):metSeril(tMC.metSeril),
                                                         formu(tMC.formu),
                                                         coordGeoID(tMC.coordGeoID)
     {
@@ -783,11 +791,48 @@ namespace LIBMOL
                   iLF!=tMC.ligandNBs.end(); iLF++)
         {
             for (std::vector<int>::const_iterator iOneLF=iLF->second.begin();
-                    iOneLF !=iLF->second.end(); iLF++)
+                    iOneLF !=iLF->second.end(); iOneLF++)
             {
                 ligandNBs[iLF->first].push_back(*iOneLF);
             }
         }
+        
+        for (std::map<int, std::string >::const_iterator 
+                iFo=tMC.ligandForma.begin();
+                iFo != tMC.ligandForma.end(); iFo++)
+        {
+            ligandForma[iFo->first] = iFo->second;
+        }
+        
+        for (std::map<int, std::map<int, REAL> >::const_iterator 
+                iBM=tMC.uniqBondsMap.begin();
+                iBM != tMC.uniqBondsMap.end(); iBM++)
+        {
+            for (std::map<int, REAL>::const_iterator iBV=iBM->second.begin(); 
+                    iBV !=iBM->second.end(); iBV++)
+            {
+                uniqBondsMap[iBM->first][iBV->first] = iBV->second;
+            }
+        }
+        
+        for (std::map<int, std::map<int, std::map<int, REAL> > >::const_iterator 
+                iAngM=tMC.uniqAngsMap.begin(); iAngM !=tMC.uniqAngsMap.end();
+                iAngM++)
+        {
+            for (std::map<int, std::map<int, REAL> >::const_iterator 
+                    iAng1=iAngM->second.begin(); 
+                    iAng1 != iAngM->second.end(); iAng1++)
+            {
+                for (std::map<int, REAL>::const_iterator 
+                      iAng2=iAng1->second.begin();
+                      iAng2 !=iAng1->second.end(); iAng2++)
+                {
+                    uniqAngsMap[iAngM->first][iAng1->first][iAng2->first]
+                           = iAng2->second;
+                }
+            }
+        }
+        
     }
     
     metalCluster::~metalCluster()
@@ -799,12 +844,15 @@ namespace LIBMOL
     {
         // The metal cluster formula.
         formu = setOneAtomFormu(tAtoms, metSeril);
+        std::cout << "Metal cluster formular " << formu << std::endl;
         
         // Formula for each ligand atoms
         for (std::vector<int>::iterator iL=ligandSerilSet.begin();
                 iL !=ligandSerilSet.end(); iL++)
         {
             ligandForma[*iL]= setOneAtomFormu(tAtoms, *iL);
+            std::cout << "NB for ligand atom " << tAtoms[*iL].id 
+                      << " is " << ligandForma[*iL] << std::endl;
         }
     }
     
@@ -874,48 +922,58 @@ namespace LIBMOL
     void metalCluster::buildBondAndAngleMap(std::vector<AtomDict> & tAtoms,
                                        std::vector<CrystInfo>::iterator tCryst)
     {
-        std::vector<REAL>  bVList;
+        std::cout << "Build the metal cluster centered at atom "
+                  << tAtoms[metSeril].id << " of serial number "
+                  << tAtoms[metSeril].seriNum << std::endl;
+        std::vector<REAL>  bVList, aVList;
         
         for (std::vector<int>::iterator iNB = ligandSerilSet.begin();
                     iNB != ligandSerilSet.end(); iNB++) 
         {
             
-            std::cout << "neighbor atom " << tAtoms[*iNB].id
-                      << " of " << tAtoms[*iNB].seriNum << std::endl;
+            
             REAL rD = getBondLenFromFracCoords(tAtoms[metSeril].fracCoords,
                                                tAtoms[*iNB].fracCoords,
                                 tCryst->itsCell->a, tCryst->itsCell->b,
                                 tCryst->itsCell->c, tCryst->itsCell->alpha,
                                 tCryst->itsCell->beta, tCryst->itsCell->gamma);
-            std::cout << "Distance " << rD << std::endl;
-            if (std::find(bVList.begin(), bVList.end(), rD)
-                          ==bVList.end())
+            
+            if (!inVectABS(bVList,  rD, 0.00001))
             {
-                uniqBondsMap[tAtoms[metSeril].seriNum][*iNB] = rD;
+                std::cout << "neighbor atom " << tAtoms[*iNB].id
+                      << " of serial number " << tAtoms[*iNB].seriNum << std::endl;
+                std::cout << "Distance " << rD << std::endl;
+                // filter the exact same bond values caused by the symm atoms 
+                uniqBondsMap[metSeril][*iNB] = rD;
+                bVList.push_back(rD);
             }
             
-            for (std::vector<int>::iterator iNB2 = ligandNBs[*iNB].begin();
-                                iNB2 != ligandNBs[*iNB].end(); iNB2++) 
+            for (std::vector<int>::iterator iNB2 = ligandSerilSet.begin();
+                                iNB2 != ligandSerilSet.end(); iNB2++) 
             {
-                if (*iNB2 > *iNB &&
-                    std::find(ligandSerilSet.begin(), ligandSerilSet.end(),
-                              *iNB2) !=ligandSerilSet.end()) 
-                {
-                                
-                    std::cout   << " the other NB " << tAtoms[*iNB2].id
-                                << " of serial " << tAtoms[*iNB2].seriNum
-                                << std::endl;
+                if (*iNB2 > *iNB) 
+                {         
+                    //std::cout   << " the other NB " << tAtoms[*iNB2].id
+                    //            << " of serial " << tAtoms[*iNB2].seriNum
+                    //            << std::endl;
 
                     REAL rA = getAngleValueFromFracCoords(tAtoms[metSeril],
                                         tAtoms[*iNB], tAtoms[*iNB2],
                                         tCryst->itsCell->a, tCryst->itsCell->b,
                                         tCryst->itsCell->c, tCryst->itsCell->alpha,
                                         tCryst->itsCell->beta, tCryst->itsCell->gamma);
-                    std::cout << "Angle " << rA * PID180 << std::endl;
-                    uniqAngsMap[metSeril][*iNB][*iNB2] = rA*PID180;
+                    // std::cout << "Angle " << rA * PID180 << std::endl;
+                    REAL tRA = rA*PID180;
+                    if (!inVectAllABS(aVList, tRA, 0.0001))
+                    {
+                        uniqAngsMap[metSeril][*iNB][*iNB2] = tRA;
+                        aVList.push_back(tRA);
+                    }
                 }
             }
         }
+        std::cout << "The whole cluster is done." << std::endl;
+        
     }
     
     extern int getAtom(std::string              tId,

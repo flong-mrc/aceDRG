@@ -141,7 +141,7 @@ namespace LIBMOL
             */
             int t_len = (int)iAt->connAtoms.size();
             //std::cout << "Atom " << iAt->id << std::endl
-            //        <<  " connect to  " << t_len << std::endl;
+            //          <<  " connect to  " << t_len << std::endl;
             if (iAt->chemType.compare("C")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
@@ -4906,7 +4906,7 @@ namespace LIBMOL
                 }
                 else
                 {
-                    nExEls = orgElemValMap[aElm][0] + iAt->formalCharge - orgNB;
+                    nExEls = orgElemValMap[aElm][0] + iAt->formalChargeI - orgNB;
                 }
                 
                 if (nExEls < 0)
@@ -4915,7 +4915,7 @@ namespace LIBMOL
                 
                     while (i < valSize)
                     {
-                        nExEls = orgElemValMap[aElm][i] + iAt->formalCharge - iAt->connAtoms.size();
+                        nExEls = orgElemValMap[aElm][i] + iAt->formalChargeI - iAt->connAtoms.size();
                         if (nExEls >=0)
                         {
                             break;
@@ -4931,7 +4931,7 @@ namespace LIBMOL
                               << iAt->connAtoms.size() << " is larger than the valence "
                               << orgElemValMap[aElm][valSize-1] << " permits." 
                               << std::endl << "The formal charge is  "
-                              << iAt->formalCharge
+                              << iAt->formalChargeI
                               << std::endl;
                     std::cout << "Atom " << iAt->id << " has following connections: "
                               << std::endl;
@@ -4971,7 +4971,7 @@ namespace LIBMOL
             std::cout << "For atom " << iAt->id << " : " << std::endl
                           << "it connects " << iAt->connAtoms.size() 
                           << " atom(s) " << std::endl
-                          << "its formal charge is " << iAt->formalCharge << std::endl 
+                          << "its formal charge is " << iAt->formalChargeI << std::endl 
                           << "its number of EX electrons is " << iAt->excessElec 
                           << std::endl;
         }
@@ -5205,18 +5205,18 @@ namespace LIBMOL
         //std::cout << "idxB1 " << tIdxB1 << std::endl;
         //std::cout << "idxB2 " << tIdxB2 << std::endl;
         
-        std::cout << "Modify bond-order for ring atom " 
-                  << tAtoms[tAtCen].id << std::endl;
-        std::cout << "Old order1 " <<  tBonds[tIdxB1].orderN 
-                  << " for atoms " << tBonds[tIdxB1].atoms[0]
-                  << " and " << tBonds[tIdxB1].atoms[1] << std::endl;
-        std::cout << "Old order2 " <<  tBonds[tIdxB2].orderN
-                  << " for atoms " << tBonds[tIdxB2].atoms[0]
-                  << " and " << tBonds[tIdxB2].atoms[1] << std::endl;
+        //std::cout << "Modify bond-order for ring atom " 
+        //          << tAtoms[tAtCen].id << std::endl;
+        //std::cout << "Old order1 " <<  tBonds[tIdxB1].orderN 
+        //          << " for atoms " << tBonds[tIdxB1].atoms[0]
+        //          << " and " << tBonds[tIdxB1].atoms[1] << std::endl;
+        //std::cout << "Old order2 " <<  tBonds[tIdxB2].orderN
+        //          << " for atoms " << tBonds[tIdxB2].atoms[0]
+        //          << " and " << tBonds[tIdxB2].atoms[1] << std::endl;
         
         REAL tDoneV = getFixedBondOrder(tBonds, tAtoms, tAtCen);
-        REAL allowed = Val+ tAtoms[tAtCen].formalCharge -tDoneV;
-        std::cout << "Allowed " << allowed << std::endl;
+        REAL allowed = Val+ tAtoms[tAtCen].formalChargeI -tDoneV;
+        // std::cout << "Allowed " << allowed << std::endl;
         
         if (!tBonds[tIdxB1].ked && tBonds[tIdxB2].ked)
         {
@@ -5254,8 +5254,8 @@ namespace LIBMOL
             tBonds[tIdxB2].ked = true;
         }
         
-        std::cout << "New order1 " <<  tBonds[tIdxB1].orderN <<std::endl;        
-        std::cout << "New order2 " <<  tBonds[tIdxB2].orderN << std::endl;
+        //std::cout << "New order1 " <<  tBonds[tIdxB1].orderN <<std::endl;        
+        //std::cout << "New order2 " <<  tBonds[tIdxB2].orderN << std::endl;
                   
     }
     
@@ -5329,18 +5329,18 @@ namespace LIBMOL
                     if (std::find(plusE.begin(), plusE.end(),tAtoms[*iIdx].chemType)
                           != plusE.end())
                     {
-                        checkUpdate(tAtoms[*iIdx].formalCharge, 
-                                    tAtoms[*iIdx].excessElec);
-                        tAtoms[*iIdx].formalCharge = tAtoms[*iIdx].excessElec;
+                        //checkUpdate(tAtoms[*iIdx].formalChargeI, 
+                        //            tAtoms[*iIdx].excessElec);
+                        tAtoms[*iIdx].formalChargeI = tAtoms[*iIdx].excessElec;
                         tAtoms[*iIdx].excessElec   =0;
                                 
                     }
                     else if (tAtoms[*iIdx].chemType.compare("O")==0)
                     {
                         int aE = -tAtoms[*iIdx].excessElec;
-                        checkUpdate(tAtoms[*iIdx].formalCharge, 
-                                    aE);
-                        tAtoms[*iIdx].formalCharge = -tAtoms[*iIdx].excessElec;
+                        //checkUpdate(tAtoms[*iIdx].formalChargeI, 
+                        //            aE);
+                        tAtoms[*iIdx].formalChargeI = -tAtoms[*iIdx].excessElec;
                         tAtoms[*iIdx].excessElec   =0;
                     }
                 }
@@ -5419,10 +5419,10 @@ namespace LIBMOL
                             if(std::find(plusE.begin(), plusE.end(), 
                                       tAtoms[*iIdx].chemType) != plusE.end())
                             {
-                                REAL tmpCharge = tAtoms[*iIdx].formalCharge;
-                                tAtoms[*iIdx].formalCharge 
+                                REAL tmpCharge = tAtoms[*iIdx].formalChargeI;
+                                tAtoms[*iIdx].formalChargeI 
                                         =  tAtoms[*iIdx].excessElec;
-                                if (tmpCharge != tAtoms[*iIdx].formalCharge)
+                                if (tmpCharge != tAtoms[*iIdx].formalChargeI)
                                 {
                                     lUpdate = true;
                                 }
@@ -5430,7 +5430,7 @@ namespace LIBMOL
                             }
                             else if (tAtoms[*iIdx].chemType.compare("O")==0)
                             {
-                                tAtoms[*iIdx].formalCharge 
+                                tAtoms[*iIdx].formalChargeI 
                                         =  -tAtoms[*iIdx].excessElec;
                                 tAtoms[*iIdx].excessElec = 0;
                             }
@@ -5825,7 +5825,7 @@ namespace LIBMOL
             
             if (tAtoms[tNAtomConns[0].key].excessElec > 0)
             {
-                tAtoms[tNAtomConns[0].key].formalCharge = 1.0;
+                tAtoms[tNAtomConns[0].key].formalChargeI = 1.0;
                 tAtoms[tNAtomConns[0].key].excessElec--;
                 tL = true;
             }

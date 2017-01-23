@@ -448,12 +448,31 @@ namespace LIBMOL
             if (fabs(*iV-tVal) <tErr)
             {
                 aCri = true;
+            }   
+        }
+        
+        return aCri;
+    }
+    
+    extern bool inVectAllABS(std::vector<REAL> & tVect,
+                       REAL tVal, REAL tErr)
+    {
+        bool aCri = false;
+        
+        
+        for (std::vector<REAL>::iterator iV=tVect.begin();
+                iV !=tVect.end(); iV++)
+        {
+            if (fabs(fabs(*iV)-fabs(tVal)) <tErr)
+            {
+                aCri = true;
             }
                 
         }
         
         return aCri;
     }
+    
     
     extern bool outVectAbsDiff(std::vector<REAL> & tVect,
                               REAL tVal, REAL tErr)

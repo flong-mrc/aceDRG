@@ -271,6 +271,7 @@ namespace LIBMOL // temp
         REAL     charge;
         REAL     parCharge;
         REAL     formalCharge;
+        int      formalChargeI;
         REAL     radius;
         REAL     ionRadius;
         int      inChiralIdx;
@@ -350,6 +351,7 @@ namespace LIBMOL // temp
         std::vector<int>           connHAtoms; // H atoms connected to this atom
         std::vector<int>           neighbAtoms;
         std::vector<int>           inBonds;
+        std::vector<REAL>          bondLengths;
         std::vector<AngleDict>     inAngles;
         std::vector<int>           inRings; 
         std::vector<int>           inChirals;
@@ -363,6 +365,8 @@ namespace LIBMOL // temp
         REAL                       treeBond;
         REAL                       treeAngle;
         REAL                       treeTorsion;
+        
+        
         
                                             // element 1: immediate neighbor 
                                             // element 2: include neighbor of 
@@ -399,6 +403,7 @@ namespace LIBMOL // temp
                                                              // of the acedrg style
         std::map<int, std::map<int, REAL> >                     uniqBondsMap;
         std::map<int, std::map<int, std::map<int, REAL> > >     uniqAngsMap;
+        
         
         
     };

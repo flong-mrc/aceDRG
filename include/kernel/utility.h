@@ -141,6 +141,8 @@ namespace LIBMOL
                        REAL tVal, REAL tErr);
     extern bool inVectABS(std::vector<REAL>  & tVect,
                           REAL  tVal, REAL tErr);
+    extern bool inVectAllABS(std::vector<REAL>  & tVect,
+                          REAL  tVal, REAL tErr);
     
     extern bool outVectAbsDiff(std::vector<REAL>  & tVect,
                               REAL  tVal, REAL tErr);
