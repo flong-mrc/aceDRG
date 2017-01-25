@@ -131,7 +131,7 @@ namespace LIBMOL
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         void setUniqueAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        void checkAtomLinks();
+        void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
         
         void getMolByEqClassInCell();
         void getMolByEqClassInCrys();
@@ -263,13 +263,15 @@ namespace LIBMOL
         void contMetal2NB(int & tNB, int & tNA);
         
         // Metal Atom studies where molecules will not be generated
+        void buildMetalClusters(std::vector<CrystInfo>::iterator tCryst);
         void buildMetalAtomCoordMap(std::vector<CrystInfo>::iterator tCryst);
         bool checkNBAtomOccp(std::vector<AtomDict>::iterator tAtm);
         bool checkNBAtomOccp(AtomDict  & tAtm);
         int  getNumOrgNB(std::vector<AtomDict> & tAtoms, 
                          int  tIdx, 
                          std::vector<std::string> & tOrgTab);
-        void outMetalAtomCoordInfo( FileName tOutName);
+        void outMetalAtomCoordInfo(FileName tOutName);
+        void outMetalClusterInfo(FileName tOutName);
         void outMetalTables(FileName tOutName);
         
         void execute(FileName tOutName);
@@ -302,6 +304,8 @@ namespace LIBMOL
         std::map<unsigned, std::vector<int> >   moleculesInCell;
         std::map<unsigned, std::vector<int> >   moleculesInCryst;
         
+        
+        std::vector<metalCluster>               allMetalClusters;
         std::map<int, std::vector<int> >        bondsMetal2NB;
         std::map<int, std::vector<int> >        anglesMetal2NB;
         std::vector<int>                        noContriMols;

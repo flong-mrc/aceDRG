@@ -173,6 +173,7 @@ namespace LIBMOL
         int                     molIdx;
         
         std::string             order;
+        std::string             orderNI;
         int                     orderK;
         REAL                    orderN;
         std::string             orderNK;

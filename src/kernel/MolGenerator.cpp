@@ -177,12 +177,14 @@ namespace LIBMOL {
             initMetalTab(allMetals);
             checkMetal(allMetals);
 
-            if (lHasMetal) {
+            if (lHasMetal) 
+            {
                 for (std::vector<CrystInfo>::iterator iCryst = allCryst.begin();
                         iCryst != allCryst.end(); iCryst++) 
                 {
                     for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
-                            iA != initAtoms.end(); iA++) {
+                            iA != initAtoms.end(); iA++) 
+                    {
                         iA->sId = "555";
                         allAtoms.push_back(*iA);
                         refAtoms.push_back(*iA);
@@ -200,7 +202,6 @@ namespace LIBMOL {
                     std::cout << "number of atoms in a center unit cell "
                             << allAtoms.size() << std::endl;
                    
-                    
                     if (!lColid) 
                     {
                         
@@ -208,11 +209,15 @@ namespace LIBMOL {
 
                         // getUniqueBonds(aPTable);
                         getUniqueAtomLinks(aPTable, iCryst);
-
-                        // No molecules will be generated 
+                        // No molecules will be generated
+                        /*
                         buildMetalAtomCoordMap(iCryst);
-
                         outMetalAtomCoordInfo(tOutName);
+                        */
+                        // Try the new method related the new class "Metalcluster"
+                        buildMetalClusters(iCryst);
+                        
+                        outMetalClusterInfo(tOutName);
 
                     }
                 }
@@ -816,9 +821,9 @@ namespace LIBMOL {
             //if (allAtoms[i].sId=="555")
             //{
             //j++;
-            std::cout << "Look for bonds to atom " << allAtoms[i].id
-                      << "(serial number  " << allAtoms[i].seriNum
-                      << ") " << std::endl;
+            //std::cout << "Look for bonds to atom " << allAtoms[i].id
+            //          << "(serial number  " << allAtoms[i].seriNum
+            //          << ") " << std::endl;
             
             for (std::vector<int>::iterator iNB = allAtoms[i].neighbAtoms.begin();
                     iNB != allAtoms[i].neighbAtoms.end(); iNB++) 
@@ -853,7 +858,7 @@ namespace LIBMOL {
                 getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                         covalent_sensitivity, tPTab,
                         bondRange);
-                
+                /*
                 std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id 
                                       << " of serial number " 
@@ -868,7 +873,7 @@ namespace LIBMOL {
                                       << " is " << rD << std::endl;
                 std::cout << "Range between " << bondRange[0]
                                       << " and " << bondRange[1] << std::endl;
-                
+                */
                 
                 if (bondRange[0] > 0.20 && bondRange[1] > 0.20) 
                 {
@@ -879,20 +884,29 @@ namespace LIBMOL {
                         if (std::find(allAtoms[i].connAtoms.begin(), allAtoms[i].connAtoms.end(), *iNB)
                                 == allAtoms[i].connAtoms.end()) {
                             allAtoms[i].connAtoms.push_back(*iNB);
+                            if (!inVectABS(allAtoms[i].bondLengths, rD, 0.000001))
+                            {
+                                allAtoms[i].bondLengths.push_back(rD);
+                            }
+                                          
                         }
                         if (std::find(allAtoms[*iNB].connAtoms.begin(), 
                                       allAtoms[*iNB].connAtoms.end(), i)
                                       == allAtoms[*iNB].connAtoms.end()) 
                         {
                             allAtoms[*iNB].connAtoms.push_back(i);
+                            if (!inVectABS(allAtoms[*iNB].bondLengths, rD, 0.000001))
+                            {
+                                allAtoms[*iNB].bondLengths.push_back(rD);
+                            }
                         }
-                       
+                       /*
                         if (allAtoms[i].isMetal || allAtoms[*iNB].isMetal)
                         {
                             
                             //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
                             //          << " neighbor atoms. " << std::endl;
-                           /*
+                           
                             std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id 
                                       << " of serial number " 
@@ -908,14 +922,16 @@ namespace LIBMOL {
                             std::cout << "Range between " << bondRange[0]
                                       << " and " << bondRange[1] << std::endl;
                             
-                            */
+                            
                             std::cout << "a bond between " 
                                       << allAtoms[i].id << " and "
                                       << allAtoms[*iNB].id 
                                       << " is added to the bond_list_cell "
                                       << std::endl << "Its bond length is " << rD
                                       << std::endl;
+                            
                         }
+                        */
                     }
                 }
             }
@@ -949,7 +965,7 @@ namespace LIBMOL {
             }
         }
         */
-        checkAtomLinks();
+        checkAtomLinks(tCryst);
 
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++) {
@@ -974,7 +990,7 @@ namespace LIBMOL {
         // setUniqueAtomLinks(tPTab, tCryst);
     }
     
-    void MolGenerator::checkAtomLinks()
+    void MolGenerator::checkAtomLinks(std::vector<CrystInfo>::iterator tCryst)
     {
         if (allAtoms.size() >0)
         {
@@ -993,6 +1009,12 @@ namespace LIBMOL {
                     for (std::vector<int>::iterator iCo=iAt->connAtoms.begin();
                             iCo != iAt->connAtoms.end(); iCo++)
                     {   
+                        //REAL rD = getBondLenFromFracCoords(iAt->fracCoords, 
+                        //allAtoms[(*iCo)].fracCoords,
+                        //tCryst->itsCell->a, tCryst->itsCell->b,
+                        //tCryst->itsCell->c, tCryst->itsCell->alpha,
+                        //tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                        
                         int tOrigAt = allAtoms[*iCo].fromOrig;
                         //std::cout << "One connected atom is " << allAtoms[*iCo].id
                         //          << " of serial number " << allAtoms[*iCo].seriNum 
@@ -1013,11 +1035,14 @@ namespace LIBMOL {
                         }
                         
                         if (std::find(tAtConns.begin(), tAtConns.end(), iAt->id)
-                                  !=tAtConns.end())
+                            !=tAtConns.end())
                         {
-                            std::cout << iAt->id << " is confirmed bonding to " 
-                                      << "atom " <<  allAtoms[*iCo].id << std::endl;
-                            confirmedLinks.push_back(*iCo);
+                            //if(inVectABS(allAtoms[tOrigAt].bondLengths, rD, 0.00001))
+                            //{
+                                std::cout << iAt->id << " is confirmed bonding to " 
+                                          << "atom " <<  allAtoms[*iCo].id << std::endl;
+                                confirmedLinks.push_back(*iCo);
+                            //}
                         }
                         
                         /*
@@ -1096,7 +1121,7 @@ namespace LIBMOL {
                                 tCryst->itsCell->a, tCryst->itsCell->b,
                                 tCryst->itsCell->c, tCryst->itsCell->alpha,
                                 tCryst->itsCell->beta, tCryst->itsCell->gamma);
-                        if (!inVectABS(aV, rD, 0.00001)) {
+                        if (!inVectABS(aV, rD, 0.000002)) {
                             BondDict aBond;
                             aBond.atomsIdx.push_back(iAt->seriNum);
                             aBond.atomsIdx.push_back(*iCo);
@@ -3795,6 +3820,67 @@ namespace LIBMOL {
         return aInfMol;
     }
 
+    void MolGenerator::buildMetalClusters(
+                              std::vector<CrystInfo>::iterator tCryst)
+    {
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++) 
+        {
+            if (iAt->isInPreCell && iAt->isMetal && checkNBAtomOccp(iAt)) 
+            {
+                bool lMC=true;
+                metalCluster aMC;
+                
+                aMC.metSeril = iAt->seriNum;
+                
+                std::cout << "A Metal cluster is found at atom " 
+                          << iAt->id << " of serial number " 
+                          << iAt->seriNum << std::endl;
+                
+                std::cout << "It connects to " << iAt->connAtoms.size()
+                          << " atoms " << std::endl;
+                
+                for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                        iNB != iAt->connAtoms.end(); iNB++) 
+                {
+                    if (checkNBAtomOccp(allAtoms[*iNB])
+                        && allAtoms[*iNB].chemType.compare("H") !=0
+                        && allAtoms[*iNB].chemType.compare("D") !=0)
+                    {
+                        aMC.ligandSerilSet.push_back(*iNB);
+                        
+                        for (std::vector<int>::iterator 
+                             iNB2=allAtoms[*iNB].connAtoms.begin();
+                             iNB2 !=allAtoms[*iNB].connAtoms.end(); iNB2++)
+                        {
+                            if(*iNB2 !=iAt->seriNum)
+                            {
+                                aMC.ligandNBs[*iNB].push_back(*iNB2);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        lMC = false;
+                        break;
+                    }
+                   
+                }
+                
+                if (lMC)
+                {
+                    aMC.setMetClusterFormu(allAtoms);
+                    aMC.buildBondAndAngleMap(allAtoms, tCryst);
+                    allMetalClusters.push_back(aMC);
+                }
+            }
+        }
+        
+        std::cout << "Number of metal clusters is " << allMetalClusters.size()
+                  << std::endl;
+        
+    }
+    
     void MolGenerator::buildMetalAtomCoordMap(
             std::vector<CrystInfo>::iterator tCryst) 
     {
@@ -4023,6 +4109,128 @@ namespace LIBMOL {
         }
 
     }
+    
+    void MolGenerator::outMetalClusterInfo(FileName tOutName)
+    {
+        std::vector<std::string> aOrgTab;
+        initOrgTable(aOrgTab);
 
+        Name aFName(tOutName);
+        // std::cout << "Output root is " << aFName << std::endl;
+        std::vector<std::string> nameComps;
+        StrTokenize(aFName, nameComps, '.');
+        Name rootFName;
+
+        for (unsigned jF = 0; jF < nameComps.size(); jF++) {
+            rootFName.append(nameComps[jF]);
+        }
+
+        if (rootFName.size() == 0) {
+            rootFName.append("Current");
+        }
+
+        if (allMsg.size()) 
+        {
+        }
+        
+        if (allMetalClusters.size() !=0)
+        {
+            Name bondAndAngleFName(rootFName);
+            bondAndAngleFName.append("_unique_bond_and_angles.txt");
+            std::ofstream aBAndAF(bondAndAngleFName.c_str());
+            if (aBAndAF.is_open()) 
+            {
+                
+                aBAndAF << "MetalElement\tLigandElement\t"
+                        << "MetalAtomName\tLigandAtomName\t"
+                        << "MetCoordinationNum\tMetCoordinationNumOrganicOnly\t"
+                        << "NumberOfLigandNB\t"
+                        << "ClusterFormu\tLigandAtomFormu\t"
+                        << "BondLength" << std::endl;
+                for (std::vector<metalCluster>::iterator iMC=allMetalClusters.begin();
+                        iMC !=allMetalClusters.end(); iMC++)
+                {
+                    ID id1   = allAtoms[iMC->metSeril].chemType;
+                    ID name1 = allAtoms[iMC->metSeril].id;
+                    unsigned coord1 = iMC->ligandSerilSet.size();
+                    const int nOrgConns = getNumOrgNB(allAtoms, iMC->metSeril, aOrgTab);
+                    ID metF    = iMC->formu;
+                    for (std::map<int, std::map<int, REAL> >::iterator 
+                         iBoP=iMC->uniqBondsMap.begin(); 
+                         iBoP !=iMC->uniqBondsMap.end(); iBoP++)
+                    {
+                        for (std::map<int, REAL>::iterator iLoP=iBoP->second.begin();
+                                iLoP != iBoP->second.end(); iLoP++)
+                        {
+                            ID id2   = allAtoms[iLoP->first].chemType;
+                            ID name2 = allAtoms[iLoP->first].id;
+                            unsigned  coord2=iMC->ligandNBs[iLoP->first].size();
+                            ID ligF  = iMC->ligandForma[iLoP->first];
+                            
+                            aBAndAF << id1 << "\t" << id2 << "\t"
+                                    << name1 << "\t" << name2 << "\t"
+                                    << coord1 << "\t" << nOrgConns << "\t"
+                                    << coord2 << "\t" 
+                                    << metF << "\t" << ligF << "\t"
+                                    << iLoP->second << std::endl;
+                        }
+                    }
+                }
+                
+                aBAndAF << "MetalElement\tLigandElement1\tLigandElement2\t"
+                        << "MetAtomName\tLigandAtomName1\tLigandAtomName2\t"
+                        << "MetCoordinationNum\tMetCoordinationNumOrganicOnly\t"
+                        << "NumberOfLigand1NB\tNumberOfLigand2NB\t"
+                        << "ClusterFormu\tLigandAtom1Formu\tLigandAtom2Formu\t"
+                        << "Angle" << std::endl;
+                
+                for (std::vector<metalCluster>::iterator iMC=allMetalClusters.begin();
+                        iMC !=allMetalClusters.end(); iMC++)
+                {
+                    ID idM   = allAtoms[iMC->metSeril].chemType;
+                    ID nameM = allAtoms[iMC->metSeril].id;
+                    unsigned coordM = iMC->ligandSerilSet.size();
+                    const int nOrgConns = getNumOrgNB(allAtoms, iMC->metSeril, aOrgTab);
+                    ID metF    = iMC->formu;
+                    
+                    for (std::map<int, std::map<int, std::map<int, REAL> > >::iterator 
+                         iAM=iMC->uniqAngsMap.begin(); 
+                         iAM != iMC->uniqAngsMap.end(); iAM++)
+                    {
+                        for (std::map<int, std::map<int, REAL> >::iterator 
+                               iAM1=iAM->second.begin(); 
+                               iAM1 != iAM->second.end(); iAM1++)
+                        {
+                            ID id1   = allAtoms[iAM1->first].chemType;
+                            ID name1 = allAtoms[iAM1->first].id;
+                            unsigned coord1 = iMC->ligandNBs[iAM1->first].size();
+                            ID lig1F = iMC->ligandForma[iAM1->first];
+                            
+                            for (std::map<int, REAL>::iterator 
+                                 iAM2=iAM1->second.begin(); 
+                                 iAM2!=iAM1->second.end(); iAM2++)
+                            {
+                                ID id2   = allAtoms[iAM2->first].chemType;
+                                ID name2 = allAtoms[iAM2->first].id;
+                                unsigned coord2 = iMC->ligandNBs[iAM2->first].size();
+                                ID lig2F = iMC->ligandForma[iAM2->first];
+                                
+                                aBAndAF << idM << "\t" << id1 << "\t" << id2 <<"\t"
+                                        << nameM << "\t" << name1 << "\t" << name2 << "\t"
+                                        << coordM << "\t" << nOrgConns << "\t" 
+                                        << coord1 << "\t" << coord2 << "\t"
+                                        << metF  << "\t" << lig1F << "\t"
+                                        << lig2F << "\t" << iAM2->second 
+                                        << std::endl;
+                            }
+                        }
+                    }            
+                }
+                aBAndAF.close();
+            }
+        }
+        
+    }
+    
 
 }

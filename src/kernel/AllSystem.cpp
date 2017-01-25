@@ -444,7 +444,7 @@ namespace LIBMOL
         setAtomsMetalType();
         
         // setAtomsPartialCharges();
-          
+        
         setAllAngles();
            
         ringDetecting();
@@ -468,6 +468,7 @@ namespace LIBMOL
             iA->inRings.clear();
         }
         
+            
         for (int i=0; i < (int)allRingsV.size(); i++)
         {
             for (std::vector<AtomDict>::iterator iA=allRingsV[i].atoms.begin();
@@ -487,8 +488,7 @@ namespace LIBMOL
                 }
             }
         }
-        
-        
+       
         /*
         std::cout << "There are " << allRingsV.size() << " rings " << std::endl
                   << "These are: " << std::endl;
@@ -528,17 +528,16 @@ namespace LIBMOL
          */
               
         detectPlaneGroups(); 
+         
+        
        
-        
-        
         setAllTorsions2();
-        
-        
         
         
         reIndexAtomInRing(allAtoms, allRingsV);
         
         modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
+         
         
         //if (!hasCCP4Type)
         //{
@@ -549,9 +548,9 @@ namespace LIBMOL
         //{
         //    std::cout << "CCP4 types already set " << std::endl;
         //}
-            
+           
         setAllAtomEXcessElectrons(allAtoms);
-        
+       
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
         {
@@ -569,7 +568,7 @@ namespace LIBMOL
                 std::cout << allAtoms[*iSer].id << std::endl;
             }
         }
-        
+       
         int tSum = sumExElectrons(allAtoms);
         std::cout << "Sum of number of excess electrons is " 
                   << tSum << std::endl;
@@ -3178,6 +3177,7 @@ namespace LIBMOL
             setAllTorsionsInOneRing(tDone, *iR);
         }   
         
+       
         /*
         std::cout << "The torsions in following bonds are set in ring section " 
                   << std::endl;
@@ -3236,9 +3236,9 @@ namespace LIBMOL
             }
         }
         
-        /*
-        std::cout << "Number of torsion angles is " << allTorsions.size() << std::endl;
         
+        // std::cout << "Number of torsion angles is " << allTorsions.size() << std::endl;
+        /*
         std::cout << "All torsions have been setup " << std::endl;
        
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
@@ -3254,7 +3254,6 @@ namespace LIBMOL
         }
         */
         
-        
     }
     
     void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs, 
@@ -3268,7 +3267,7 @@ namespace LIBMOL
         for (int i=0; i < (int)tR.atoms.size(); i++)
         {
             tAs.push_back(tR.atoms[i].seriNum);
-            std::cout << tR.atoms[i].seriNum << std::endl;
+            // std::cout << tR.atoms[i].seriNum << std::endl;
         }
         
         tLinkA.push_back(tR.atoms[0].seriNum);
@@ -4143,21 +4142,22 @@ namespace LIBMOL
                                 tLibmolDir, 2);
       
         
-        aCodSystem.setupAllTargetValues2();
-       
-        
-        
+        aCodSystem.setupAllTargetValues2();  
       
         resetSystem2(aCodSystem);
        /*
        for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
-            std::cout << "Atom " << iAt->id << " is in " 
-                      << (int)iAt->ringRep.size() << std::endl;
+            //std::cout << "Atom " << iAt->id << " is in " 
+            //<< (int)iAt->ringRep.size() << std::endl;
+           //std::cout << "Atom " << iAt->id << " has the charge of "
+           //          << iAt->charge << " or formal charge " 
+           //          << iAt->formalCharge << std::endl;
         }
+        */
         
-        */ 
+        
        
     }
     

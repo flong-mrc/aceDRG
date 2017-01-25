@@ -2273,6 +2273,7 @@ namespace LIBMOL
                 itsCurChiral  = new ChiralDict();
             
                 setupSystem();
+                 
             }
             else
             {
@@ -2325,6 +2326,7 @@ namespace LIBMOL
                 itsCurAngle   = new AngleDict();
                 itsCurTorsion = new TorsionDict();
                 itsCurChiral  = new ChiralDict();
+                
                 setupSystem();
             }
             else
@@ -2613,6 +2615,8 @@ namespace LIBMOL
             
             inFile.close();
             
+             
+            
             //std::cout << "CCP4 type " << hasCCP4Type << std::endl;
             
             
@@ -2649,12 +2653,11 @@ namespace LIBMOL
             }
             
             
-            
             setHydroAtomConnect();
             // addMissHydroAtoms();
             
             setAtomsBondingAndChiralCenter(allAtoms);
-            
+           
             // setAllAngles();
             
             setAtomsCChemType();
@@ -2671,6 +2674,7 @@ namespace LIBMOL
             {
                 setAtomsCCP4Type();
             }
+            
             
             /*
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
@@ -2716,7 +2720,7 @@ namespace LIBMOL
                 std::cout << "its order : " << iBo->order << std::endl;
             } 
             */
-           
+            
         }
         
     }
@@ -3187,7 +3191,6 @@ namespace LIBMOL
                 {
                     hasCoords = true;
                     
-                    
                     hasProps["atom"].insert(std::pair<std::string, int>("x",curBlockLine) );
                     //curBlockLine++;
                     //std::cout << curBlockLine << std::endl;
@@ -3248,8 +3251,8 @@ namespace LIBMOL
                 itsCurAtom->existProps["parChange"] = hasProps["atom"]["parCharge"];
                 
                 itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["parChange"]]);
-                // partial charge and formal charge are same in mmcif files in ccp4 monomer lib 
-                itsCurAtom->formalCharge = itsCurAtom->parCharge;
+               // partial charge and formal charge are same in mmcif files in ccp4 monomer lib 
+                // itsCurAtom->formalCharge = itsCurAtom->parCharge;
                 //std::cout << "Its partialCharge :" 
                 //        << itsCurAtom->parCharge
                 //        << std::endl;
@@ -3258,10 +3261,11 @@ namespace LIBMOL
             {
                 itsCurAtom->existProps["charge"] = hasProps["atom"]["charge"];
                 
-                itsCurAtom->parCharge = StrToReal(tF[itsCurAtom->existProps["charge"]]);
+                itsCurAtom->charge = StrToReal(tF[itsCurAtom->existProps["charge"]]);
                 // partial charge and formal charge are same in mmcif files in ccp4 monomer lib 
-                itsCurAtom->formalCharge = itsCurAtom->parCharge;
-                //std::cout << "Its partialCharge :" 
+                itsCurAtom->formalCharge  = itsCurAtom->charge;
+                itsCurAtom->formalChargeI = itsCurAtom->charge;
+                //std::cout << "Its formalCharge :" 
                 //        << itsCurAtom->parCharge
                 //        << std::endl;
             }
@@ -3297,8 +3301,7 @@ namespace LIBMOL
                 {
                     itsCurAtom->coords[2]=StrToReal(tSZ);
                     // std::cout << "Its coord z : " << itsCurAtom->coords[2] << std::endl;
-                }
-                
+                }    
             }
             if (!coordsDone)
             {
@@ -3463,7 +3466,8 @@ namespace LIBMOL
             
             if (hasProps["bond"].find("order") != hasProps["bond"].end())
             {
-                itsCurBond->order  = tF[hasProps["bond"]["order"]];
+                itsCurBond->order   = tF[hasProps["bond"]["order"]];
+                itsCurBond->orderNI = itsCurBond->order;
                 itsCurBond->orderN = StrToOrder(itsCurBond->order);
             }
             
@@ -4883,7 +4887,8 @@ namespace LIBMOL
             allAngles.push_back(*itsCurAngle);
             delete itsCurAngle;
             itsCurAngle = NULL;
-        }   
+        } 
+        
     }
     
    // setAllAngles() may not needed in the future
@@ -7144,15 +7149,22 @@ namespace LIBMOL
     extern void outMMCif(FileName tFName, 
                          ID tMonoRootName,
                          ChemComp  &         tPropComp,
-                         std::vector<LIBMOL::AtomDict>& tAtoms,
+                         std::vector<AtomDict>& tAtoms,
                          // std::vector<int>    & tHydroAtoms,
-                         std::vector<LIBMOL::BondDict>& tBonds, 
-                         std::vector<LIBMOL::AngleDict>& tAngs, 
-                         std::vector<LIBMOL::TorsionDict>& tTorsions, 
-                         std::vector<LIBMOL::RingDict> & tRings, 
-                         std::vector<LIBMOL::PlaneDict>& tPlas, 
-                         std::vector<LIBMOL::ChiralDict>& tChs)
+                         std::vector<BondDict>& tBonds, 
+                         std::vector<AngleDict>& tAngs, 
+                         std::vector<TorsionDict>& tTorsions, 
+                         std::vector<RingDict> & tRings, 
+                         std::vector<PlaneDict>& tPlas, 
+                         std::vector<ChiralDict>& tChs)
     {
+        for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
+                iAt!=tAtoms.end(); iAt++)
+        {
+            std::cout << "atom " << iAt->id << " has charge of "
+                      << iAt->formalCharge << std::endl;
+        }
+        
         
         // newly added 
         if(tAtoms.size()> 0 && tBonds.size() > 0)
@@ -7174,6 +7186,13 @@ namespace LIBMOL
                 iA->id = "\"" + iA->id + "\"";
             }
             // std::cout << iA->id << std::endl;
+        }
+        
+        for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
+                iAt!=tAtoms.end(); iAt++)
+        {
+            std::cout << "atom " << iAt->id << " has charge of "
+                      << iAt->formalCharge << std::endl;
         }
         
         // std::cout << "Print Pos " << std::endl;
@@ -7300,11 +7319,11 @@ namespace LIBMOL
                     //double r2 =  (double) rand()/RAND_MAX;
                     //double r3 =  (double) rand()/RAND_MAX;
                     REAL tCharge =0.0;
-                    if (iA->charge !=0.0)
-                    {
-                        tCharge = iA->charge;
-                    }
-                    else if (iA->formalCharge !=0.0)
+                    //if (iA->charge !=0.0)
+                    //{
+                    //    tCharge = iA->charge;
+                    //}
+                    if (iA->formalCharge !=0.0)
                     {
                         tCharge = iA->formalCharge;
                     }
@@ -7366,12 +7385,21 @@ namespace LIBMOL
                         unifyStrForOrder(iB->order);
                         tAr = "n";
                     }
-                                       
+                    
+                    std::string outOrder;
+                    if (iB->orderNI.size() !=0)
+                    {
+                        outOrder = iB->orderNI;
+                    }
+                    else
+                    {
+                        outOrder = iB->order;
+                    }
                     outRestrF <<  longName
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
-                              // << std::setw(12)  << iB->orderNK 
-                              << std::setw(12)  << iB->order
+                              //<< std::setw(12)  << iB->orderNK 
+                              << std::setw(12)  << outOrder
                               << std::setw(8)   << tAr
                               << std::setw(10)  << std::setprecision(3)
                               << iB->value 

@@ -3212,6 +3212,7 @@ class AcedrgRDKit():
             #print "Its total valence ", val
 
         Chem.SanitizeMol(tMol)
+        Chem.Kekulize(tMol)
         # Make sure an atom in the molecule has the same charge in the input file. 
         # RDKit sometimes change it when initiating the molecule
         if tChargeList:
@@ -3590,7 +3591,7 @@ class AcedrgRDKit():
                 symb2 = atom2.GetSymbol()
 
                 bType = ""
-                #print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
+                print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
                 if aBond.HasProp("SpecialBond"):
                     bType = aBond.GetProp("SpecialBond")
                 else:
@@ -4251,7 +4252,7 @@ class AcedrgRDKit():
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                             print "Its formal charge ", tMol.GetAtomWithIdx(aIdx).GetFormalCharge()
-                        self.setOxyBondDeloc(tMol, aIdx)  
+                        #self.setOxyBondDeloc(tMol, aIdx)  
             tIdxOs = []
                                 
     def setFormalChargePO3N(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -4304,7 +4305,7 @@ class AcedrgRDKit():
                             aBond = tMol.GetBondBetweenAtoms(idxN, aIdx)           
                             aBond.SetBondType(rdchem.BondType.DOUBLE)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
-                            self.setOxyBondDeloc(tMol, aIdx)
+                            #self.setOxyBondDeloc(tMol, aIdx)
                            
     def deProtonationO(self, tMol, tIdx):
         print "\nHere are details of O: "           
@@ -4318,7 +4319,7 @@ class AcedrgRDKit():
             tMol.GetAtomWithIdx(tIdx).SetFormalCharge(-1)
             tMol.GetAtomWithIdx(tIdx).SetNoImplicit(True)
             print "Its formal charge ", tMol.GetAtomWithIdx(tIdx).GetFormalCharge()
-            self.setOxyBondDeloc(tMol, tIdx)  
+            #self.setOxyBondDeloc(tMol, tIdx)  
      
     def setOxyBondDeloc(self, tMol, tIdxO):
   
@@ -4553,7 +4554,7 @@ class FileTransformer :
                     print "==============================="
             """
 
-  
+
     def parseOneMmCifBlk(self, tBlk):
 
         if len(tBlk):
@@ -4721,11 +4722,11 @@ class FileTransformer :
         iStrD = 0
         for aL in tBlk:
             strGrp = aL.strip().split()
-            if len(strGrp) == 1 and strGrp[0].find(";")==-1:
+            if len(strGrp) == 1 and aL[0].find("_") !=-1 and strGrp[0].find(";")==-1:
                 colIdx.append(strGrp[0])
             else:
                 if aL.find("\"") !=-1:
-                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
+                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" or tProp =="strDescriptor" : 
                         strGrp1 = aL.strip().split("\"")
                         strGrp  = []
                         for aStrC in strGrp1:
@@ -4753,6 +4754,11 @@ class FileTransformer :
                         if not self.strDescriptors.has_key("entries"):
                             self.strDescriptors["entries"] = []
                         self.strDescriptors["entries"].append(aL)
+                else :
+                     if not self.strDescriptors.has_key("entries"):
+                         self.strDescriptors["entries"] = []
+                     self.strDescriptors["entries"].append(aL)
+
     
         if tProp =="atom":
             tAtoms = []

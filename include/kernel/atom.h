@@ -20,6 +20,10 @@
 #include "ring.h"
 #endif
 
+#ifndef CRYSTINFO_H
+#include "crystInfo.h"
+#endif
+
 namespace LIBMOL // temp 
 {
     class NeighbList;
@@ -267,6 +271,7 @@ namespace LIBMOL // temp
         REAL     charge;
         REAL     parCharge;
         REAL     formalCharge;
+        int      formalChargeI;
         REAL     radius;
         REAL     ionRadius;
         int      inChiralIdx;
@@ -346,6 +351,7 @@ namespace LIBMOL // temp
         std::vector<int>           connHAtoms; // H atoms connected to this atom
         std::vector<int>           neighbAtoms;
         std::vector<int>           inBonds;
+        std::vector<REAL>          bondLengths;
         std::vector<AngleDict>     inAngles;
         std::vector<int>           inRings; 
         std::vector<int>           inChirals;
@@ -360,6 +366,8 @@ namespace LIBMOL // temp
         REAL                       treeAngle;
         REAL                       treeTorsion;
         
+        
+        
                                             // element 1: immediate neighbor 
                                             // element 2: include neighbor of 
                                             //            of neighbor atoms 
@@ -368,6 +376,37 @@ namespace LIBMOL // temp
                                             //        than key 2
     };
     
+    class metalCluster 
+    {
+    public:
+        // Default constructor
+        metalCluster();
+        // Copy constructor
+        metalCluster(const metalCluster & tMC);
+        
+        // Default destructor
+        ~metalCluster();
+        
+        void setMetClusterFormu(std::vector<AtomDict> & tAtoms);
+        std::string setOneAtomFormu(std::vector<AtomDict> & tAtoms, 
+                                    int  tCenSerial);
+        void buildBondAndAngleMap(std::vector<AtomDict> & tAtoms,
+                                  std::vector<CrystInfo>::iterator tCryst);
+        
+        int                  metSeril;
+        std::vector<int>     ligandSerilSet;
+        std::string          formu;
+        std::string          coordGeoID;
+        
+        std::map<int, std::vector<int> >        ligandNBs;
+        std::map<int, std::string >             ligandForma; // or use atom types
+                                                             // of the acedrg style
+        std::map<int, std::map<int, REAL> >                     uniqBondsMap;
+        std::map<int, std::map<int, std::map<int, REAL> > >     uniqAngsMap;
+        
+        
+        
+    };
     
     extern int getAtom(std::string             tId,
                        int                     tSeri,

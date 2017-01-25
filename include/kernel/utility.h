@@ -141,6 +141,8 @@ namespace LIBMOL
                        REAL tVal, REAL tErr);
     extern bool inVectABS(std::vector<REAL>  & tVect,
                           REAL  tVal, REAL tErr);
+    extern bool inVectAllABS(std::vector<REAL>  & tVect,
+                          REAL  tVal, REAL tErr);
     
     extern bool outVectAbsDiff(std::vector<REAL>  & tVect,
                               REAL  tVal, REAL tErr);
@@ -328,6 +330,11 @@ namespace LIBMOL
                              std::vector<REAL> tFractCoords,
                              REAL a,     REAL b,    REAL c,
                              REAL alpha, REAL beta, REAL gamma);
+    
+    extern REAL getBondLenFromFracCoords(std::vector<REAL> & tCoord1, 
+                                         std::vector<REAL> & tCoord2,
+                                         REAL a, REAL b, REAL c, 
+                                         REAL alpha, REAL beta, REAL gamma);
     
     // Function dealt with environment variables and scripts
     // executing external program using command line arguments
