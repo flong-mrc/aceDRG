@@ -2786,38 +2786,72 @@ class AcedrgRDKit():
                         #print "Number of H atoms bond to atom ", aK, " has changed "
                         for i in range(c2):
                             tMol.GetAtomWithIdx(HConns[aK][i]).SetProp("Name",tNameMap["H"][aK][i])
-                            #print "A H atom has been set to existing name ", tMol.GetAtomWithIdx(HConns[aK][i]).GetProp("Name")
+                            #print "A H atom has been set to existing name ", tMol.GetAtomWithIdx(HConns[aK][i]).GetProp("Name")   
+                        # Decide the root section of additional H atoms
                         tRootId =""
                         hRootId =""
                         for aC in aK:
                             if not aC.isdigit():
                                 tRootId = tRootId + aC
-                        if len(tRootId) <2:
+                        if len(tRootId) !=2:
                             hRootId ="H"
                         else:
                             hRootId = "H" + tRootId[1:]
-                                 
+                        print "H rootName is ", hRootId         
+                        # Find largest digit number of existing H atoms attached to 
+                        # the same non-H atom.
+                        idxMax = 0 
+                        for aEH in tNameMap["H"][aK]:
+                            iNum = 0
+                            for aChar in aEH:
+                                if aChar.isdigit():
+                                    break
+                                else:
+                                    iNum+=1
+                            if iNum < len(aEH) and aEH[iNum:].isdigit():
+                                aInt = int(aEH[iNum:])
+                                if aInt > idxMax:
+                                    idxMax = aInt
+                        #print "idxMax ", idxMax        
                         cDiff = c1 - c2
+                        #print "cDiff is ", cDiff
                         for j in range(cDiff):
-                            tHName = hRootId + str(c2+ j+1)
+                            tHName = hRootId + str(idxMax+1)
                             if not tHName in origHNames: 
                                 tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",tHName)
-                                print "An added H is named as ", tMol.GetAtomWithIdx(HConns[aK][c2+j]).GetProp("Name")
+                                aNewHName = tMol.GetAtomWithIdx(HConns[aK][c2+j]).GetProp("Name")
+                                print "An added H is named as ", aNewHName 
+                                origHNames.append(aNewHName)
                             else:
-                                tHName = hRootId + str(nExtra)
+                                nExtra = 2
+                                tHName = hRootId + str(idxMax+nExtra)
                                 while True:
                                     if not tHName in origHNames:
                                         tMol.GetAtomWithIdx(HConns[aK][c2+j]).SetProp("Name",tHName)
+                                        origHNames.append(tHName)
+                                        print "An added H is named as ", tHName 
                                         nExtra +=1
                                         break
                                     else:
                                         nExtra +=1
-                                        tHName = hRootId + str(nExtra)
+                                        tHName = hRootId + str(idxMax+nExtra)
         
                 else:
-                    hRootId = "H" + aK
+                    hRootId = "H" 
+                    nExtra = 2
                     for i in range(c1):
-                        tMol.GetAtomWithIdx(HConns[aK][i]).SetProp("Name",hRootId + str(i+1))            
+                        tHName = hRootId + str(nExtra)
+                        while True:
+                            if not tHName in origHNames:
+                                tMol.GetAtomWithIdx(HConns[aK][i]).SetProp("Name",tHName)
+                                origHNames.append(tHName)
+                                print "An added H is named as ", tHName 
+                                nExtra +=1
+                                break
+                            else:
+                                nExtra +=1
+                                tHName = hRootId + str(nExtra)
+        
         for aAtom in allAtoms:
             if aAtom.GetSymbol() =="H":
                 aSetBonds = aAtom.GetBonds()
@@ -2830,6 +2864,7 @@ class AcedrgRDKit():
                         print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
                 else:
                     print "\nH atom without name, its idx is ", aAtom.GetIdx()
+
         #if len(tIdxHs) !=0:
             
         #    hNameDone = [] 
@@ -3242,12 +3277,12 @@ class AcedrgRDKit():
             print "Its mplicit Hs ", imHs
             print "Its formal charge ", charge
             print "Its total valence ", val
-            print "It is in the following bonds: "
-            aSetBonds = aAtom.GetBonds()
-            for aB in aSetBonds:
-                print "Bond ", aB.GetIdx()
-                print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+            #print "It is in the following bonds: "
+            #aSetBonds = aAtom.GetBonds()
+            #for aB in aSetBonds:
+            #    print "Bond ", aB.GetIdx()
+            #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+            #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
         print "==========================================="
         """
 
@@ -4084,14 +4119,17 @@ class AcedrgRDKit():
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="N":
-                        #print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
-                        #print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
-                        #print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
-                        #print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
-                        #print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 :
+                        print "atom %s :"%tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                        print "total Val ", tMol.GetAtomWithIdx(aIdx).GetTotalValence()
+                        print "number of bonds ", len(tMol.GetAtomWithIdx(aIdx).GetBonds())
+                        print "num of H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() 
+                        print "num of neighbor ", len(tMol.GetAtomWithIdx(aIdx).GetNeighbors())
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 \
+                            and tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 1:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
+                            print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
+                                  tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
                            and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()==0 :      
@@ -4516,13 +4554,26 @@ class FileTransformer :
 
             self.allBolcLs = []
             aBlockLs     = []
-
+            all2ColLines = []
+            filtedAllLines = []
             for aL in tAllLs:
-                if aL.find("data_") != -1 and aL.find("#") ==-1:
-                    if len(aBlockLs) !=0:
-                        self.allBlockLs.append(aBlockLs)
-                    aBlockLs     = []
-                elif aL.find("loop_") !=-1 and aL.find("#") ==-1:
+                aL = aL.strip()
+                if aL[0].find("_") !=-1:
+                    a2ColList = []
+                    self.aLineToAlist(aL,a2ColList)
+                    if len(a2ColList)==2:
+                        all2ColLines.append(a2ColList)
+                    else:
+                        filtedAllLines.append(aL)
+                else:
+                    filtedAllLines.append(aL)
+
+            for aL in filtedAllLines :
+                #if aL.find("data_") != -1 and aL.find("#") ==-1:
+                #    if len(aBlockLs) !=0:
+                #        self.allBlockLs.append(aBlockLs)
+                #    aBlockLs     = []
+                if aL.find("loop_") !=-1 and aL.find("#") ==-1:
                     if len(aBlockLs) !=0:
                         self.allBlockLs.append(aBlockLs)
                     aBlockLs     = []
@@ -4540,6 +4591,10 @@ class FileTransformer :
             if len(self.allBlockLs):
                 for aBlk in self.allBlockLs:
                     self.parseOneMmCifBlk(aBlk)
+
+            if len(all2ColLines) !=0:
+                self.parserAll2Cols(all2ColLines)
+
            
             # check
             """
@@ -4554,7 +4609,26 @@ class FileTransformer :
                     print "==============================="
             """
 
+    def parserAll2Cols(self, t2ColLines):
 
+        iC =0
+      
+        atomProp = {}
+        bondProp = {}
+        for aPair in t2ColLines:
+            if aPair[0].find("_chem_comp.") !=-1:
+               self.dataDescriptor[iC]=[aPair[0], aPair[1]]    
+               iC+=1
+            elif aPair[0].find("_chem_comp_atom.") !=-1:
+                atomProp[aPair[0]] = aPair[1]
+            elif aPair[0].find("_chem_comp_bond.") !=-1:
+                bondProp[aPair[0]] = aPair[1]
+  
+        if len(atomProp) !=0:
+            self.atoms.append(atomProp)
+        if len(bondProp) !=0:
+            self.bonds.append(bondProp)
+           
     def parseOneMmCifBlk(self, tBlk):
 
         if len(tBlk):
@@ -4721,19 +4795,22 @@ class FileTransformer :
         colIdx = []
         iStrD = 0
         for aL in tBlk:
-            strGrp = aL.strip().split()
+            aL = aL.strip()
+            strGrp = []
+            self.aLineToAlist(aL, strGrp)
+            #strGrp = aL.strip().split()
             if len(strGrp) == 1 and aL[0].find("_") !=-1 and strGrp[0].find(";")==-1:
                 colIdx.append(strGrp[0])
             else:
-                if aL.find("\"") !=-1:
-                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" or tProp =="strDescriptor" : 
-                        strGrp1 = aL.strip().split("\"")
-                        strGrp  = []
-                        for aStrC in strGrp1:
-                            strGrp2 = aStrC.strip().split()
-                            if len(strGrp2) !=0:
-                                for aS in strGrp2:
-                                    strGrp.append(aS)
+                #if aL.find("\"") !=-1:
+                #    if tProp =="atom" or tProp =="bond" or tProp =="chiral" or tProp =="strDescriptor" : 
+                #        strGrp1 = aL.strip().split("\"")
+                #        strGrp  = []
+                #        for aStrC in strGrp1:
+                #            strGrp2 = aStrC.strip().split()
+                #            if len(strGrp2) !=0:
+                #                for aS in strGrp2:
+                #                    strGrp.append(aS)
 
                 if len(strGrp)==len(colIdx):
                     if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
@@ -5272,11 +5349,13 @@ class FileTransformer :
             ccc ="0"
             for aBond in self.bonds:
                 id1 = aBond["_chem_comp_bond.atom_id_1"]
-                n1 = mapIdNum[id1]
                 id2 = aBond["_chem_comp_bond.atom_id_2"]
+                print "id1 %s "%id1 
+                print "id2 %s "%id2
+                n1 = mapIdNum[id1]
                 n2 = mapIdNum[id2]
-                #print "id1 %s n1 %d "%(id1, n1)
-                #print "id2 %s n2 %d "%(id2, n2)
+                print "id1 %s n1 %d "%(id1, n1)
+                print "id2 %s n2 %d "%(id2, n2)
                 a1 = str(n1)
                 a2 = str(n2)
                 b4 = ""
@@ -5431,6 +5510,10 @@ class FileTransformer :
                 name  = aAtom.GetProp("Name").strip() 
                 if len(name)<=2:
                     name = name + " "
+                elif len(name)>3:
+                    if name[0].find("\"")!=-1\
+                       or name[0].find("\'")!=-1:
+                        name = name[1:-1]
                 rName = tIdCode[:3]
                 seqNum = "1"
                 empt1   = "   "
@@ -5572,9 +5655,54 @@ class FileTransformer :
 
         return aResName
    
+    def aLineToAlist(self, tL, tList):
+   
+        aTS = ""
+        l0  = False
+        l1  = False
+        l2  = False   
 
-                 
-               
+        for aS in tL:
+            aS = aS.strip()
+            if len(aS) !=0:
+                if aS.find("\"") !=-1:
+                    if l2:
+                        aTS = "\"" + aTS + "\""
+                        tList.append(aTS.strip())
+                        aTS = ""
+                        l2  = False
+                    elif l1:
+                        aTS = aTS + aS
+                    else:
+                        l2 = True
+                        l1 = False
+                elif aS.find("\'") !=-1:
+                    if l1:
+                        aTS = "\'" + aTS + "\'"
+                        tList.append(aTS)
+                        aTS = ""
+                        l1  = False
+                    elif l2:
+                        aTS = aTS + aS
+                    else:
+                        l1 = True
+                        l2  = False
+                else:
+                    if not l0 and not l1 and not l0:
+                        l0 = True
+                    aTS = aTS + aS
+            else:
+                if l2 or l1:
+                    aTS = aTS + aS
+                elif l0:
+                    if len(aTS):
+                        tList.append(aTS.strip())
+                        aTS = ""
+                        l0  = False
+                else:
+                    l0  = True
+        if aTS != "":
+            tList.append(aTS.strip())        
 
 class ChemCheck():
 
@@ -5631,7 +5759,10 @@ class ChemCheck():
             print "Acedrg currently deals with ligands/molecules with following elements only "
             print "C, N, O, S, P, B, F, Cl, Br, I, H"
         if len(allAtomElems) ==0:
-            print "Can not get the element symbols of atoms. Check input file format"
+            print "The input ligands/molecules contains metal or other heavier atoms "
+            print "Acedrg currently deals with ligands/molecules with following elements only "
+            print "C, N, O, S, P, B, F, Cl, Br, I, H"
+            #print "Can not get the element symbols of atoms. Check input file format"
             organicOnly = False
 
         return organicOnly 
@@ -5676,8 +5807,9 @@ class ChemCheck():
         aLine = ""
         for aEl in tAtomElems:
              aLine += (aEl.strip()+"\t")
-        print "The system contains atoms of the following elements" 
-        print aLine
+        if len(aLine.strip()) > 0:
+            print "The system contains atoms of the following elements" 
+            print aLine
 
     def getAtomElemsFromMmcif(self, tInFileName, tAtomElems):
 
@@ -5712,8 +5844,9 @@ class ChemCheck():
                         colDict[strGrp[1]] = iCol
                         iCol +=1
                     else:
-                        print "Definition error in the input cif file %s"%tInFileName
-                        print "The entry is ", aL
+                        pass 
+                        #print "Definition error in the input cif file %s"%tInFileName
+                        #print "The entry is ", aL
                     
     def getAtomElemsFromMdl(self, tInFileName, tAtomElems):
 
