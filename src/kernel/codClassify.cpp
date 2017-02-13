@@ -15090,6 +15090,8 @@ namespace LIBMOL
                 //          << allAtoms[idx1].id << " and " << allAtoms[idx2].id 
                 //          << std::endl;
                 
+                std::cout << "Number of torsions is " << tTors.size() << std::endl;
+                
                 std::vector<int> idxR1, idxNonH1, idxH1, idxR2, idxNonH2, idxH2;
                 
                 for(std::vector<TorsionDict>::iterator iTor=tTors.begin();
@@ -15355,7 +15357,53 @@ namespace LIBMOL
                               << ", and " << allAtoms[idx2].id 
                               << " connect to H atoms only. Check the input structure ! "
                               << std::endl;
-                    exit(1);  
+                    if (allAtoms[idx1].connAtoms.size() > 1 && allAtoms[idx2].connAtoms.size() > 1)
+                    {
+                        int idxC1 = -1, idxC2 = -1;
+                        for (unsigned idxH1=0; idxH1 < allAtoms[idx1].connAtoms.size();
+                                idxH1++)
+                        {
+                            if ( allAtoms[idx1].connAtoms[idxH1] != idx2)
+                            {
+                                idxC1 = allAtoms[idx1].connAtoms[idxH1];
+                                break;
+                            }
+                                
+                        }
+                        for (unsigned idxH2=0; idxH2 < allAtoms[idx2].connAtoms.size();
+                                idxH2++)
+                        {
+                            if ( allAtoms[idx2].connAtoms[idxH2] != idx1)
+                            {
+                                idxC2 = allAtoms[idx2].connAtoms[idxH2];
+                                break;
+                            }
+                                
+                        }
+                        if (idxC1 !=-1 && idxC2 !=-1)
+                        {
+                            int tIdxT= getTorsion(allTorsions, idxC1, idx1, idx2, idxC2);
+                            if (tIdxT !=-1 )
+                            {
+                                miniTorsions.push_back(allTorsions[tIdxT]);
+                                lDone = true;
+                            }
+                            else
+                            {
+                                std::cout << "Error: can not find the torsion of atoms: "
+                                          << allAtoms[idxC1].id << ", " 
+                                          << allAtoms[idx1].id << ", "
+                                          << allAtoms[idx2].id << ", and "
+                                          << allAtoms[idxC2].id 
+                                          << std::endl;
+                            }
+                        }
+                        else
+                        {
+                            std::cout << "No torsion angle is selected into the mini set"
+                                      << std::endl;
+                        }
+                    }
                 }
             }
         } 
