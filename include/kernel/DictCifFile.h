@@ -192,6 +192,10 @@ namespace LIBMOL
         
         void setupSystem();
         void setupSystem2();
+        void setupSystemCSD(); // special version CSD. disable most of 
+                               // experiment parameters because they are 
+                               // absent from the derived CSD cif files.
+        
         void checkPowder(std::vector<std::string> & tLines);
         void checkCalcAtoms();
         void getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines,

@@ -96,6 +96,9 @@ namespace LIBMOL
     extern void  StrTokenize(const std::string &tStr, 
                              std::vector<std::string>  & tV, char delim);
     
+    extern void StrTokenizeGen(const std::string, 
+                               std::vector<std::string>  & tV);
+    
     // sort-related functions
     extern bool compareNoCase (std::string first, std::string second);
     extern bool compareNoCase2 (std::string first, std::string second);
@@ -309,6 +312,8 @@ namespace LIBMOL
     extern void StrToSymmOneRow(std::string       & tStr,
                                 std::vector<REAL> & tRow);
     extern void StrToSymmOneRow2(std::string       & tStr,
+                                 std::vector<REAL> & tRow);
+    extern void StrToSymmOneRow3(std::string       & tStr,
                                  std::vector<REAL> & tRow);
     //extern void FractToOrtho(std::vector<REAL> tFractCoords,
     //                        std::vector<REAL> tOrthoCoords,

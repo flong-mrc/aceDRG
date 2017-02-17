@@ -117,7 +117,8 @@ namespace LIBMOL
                             PeriodicTable & tPTab);
         
         void packAtomIntoCell(AtomDict & tAtm);
-      
+        
+        
         // Create a system of atom including some of atoms in unit cells around 
         // the center unit cell.
         
@@ -131,7 +132,8 @@ namespace LIBMOL
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         void setUniqueAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
+        
+        
         
         void getMolByEqClassInCell();
         void getMolByEqClassInCrys();
@@ -144,7 +146,14 @@ namespace LIBMOL
                      std::vector<BondDict> & tBonds);
         void getUniqueBonds(PeriodicTable & tPTab);
         void getUniqueAtomLinks(PeriodicTable & tPTab,
+                                std::vector<CrystInfo>::iterator tCryst);
+        void setAssymCellAtomLinks(PeriodicTable & tPTab,
+                                std::vector<CrystInfo>::iterator tCryst);
+        void getUniqueAtomLinksMet(PeriodicTable & tPTab,
                             std::vector<CrystInfo>::iterator tCryst);
+        
+        void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
+        
         void getUniqueBondsMols(Molecule    & tMol, 
                                 std::vector<CrystInfo>::iterator tCryst);
         
@@ -226,6 +235,10 @@ namespace LIBMOL
         bool validateAtomLinks(Molecule    & tMol,
                                PeriodicTable & tPTab,
                                std::string & tErrInfo);
+        
+        bool validateAtomLinksAssymCell(Molecule    & tMol,
+                                        std::string & tErrInfo);
+        
         bool validateMolecule(Molecule    & tMol, PeriodicTable & tPTab,
                               std::string & tErrInfo);
         
