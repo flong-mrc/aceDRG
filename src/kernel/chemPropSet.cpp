@@ -141,7 +141,8 @@ namespace LIBMOL
             */
             int t_len = (int)iAt->connAtoms.size();
             //std::cout << "Atom " << iAt->id << std::endl
-            //          <<  " connect to  " << t_len << std::endl;
+            //          <<  " connect to  " << t_len
+            //          << " atoms." << std::endl;
             if (iAt->chemType.compare("C")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();

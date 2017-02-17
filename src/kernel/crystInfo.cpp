@@ -130,6 +130,7 @@ namespace LIBMOL
                                 || tRecord.find("cenop") !=std::string::npos )
                         {
                             StrTokenize(tRecord, tBuf);
+                            
                             if ((int)tBuf.size() ==2 && 
                                  tBuf[1] !="x,y,z")
                             {

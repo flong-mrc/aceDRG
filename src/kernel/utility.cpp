@@ -101,6 +101,7 @@ namespace LIBMOL
             }
         }
     }
+    
     std::string TrimSpaces( std::string  tStr)
     {
         // Trim Both leading and trailing spaces
@@ -156,7 +157,7 @@ namespace LIBMOL
         }
          
     }
-    
+
     std::vector<std::string> StrTokenize(const std::string &tStr,  char delim)
     {
         std::stringstream sS(tStr);
@@ -167,7 +168,7 @@ namespace LIBMOL
         {
             tV.push_back(tToken);
         }
-         
+        
         return tV;
     }
     
@@ -179,6 +180,95 @@ namespace LIBMOL
         while (std::getline(sS, tToken, delim))
         {
             tV.push_back(tToken);
+        }
+    }
+    
+    void StrTokenizeGen(const std::string   tLine, 
+                        std::vector<std::string>  & tV)
+    {
+        bool l0=false;
+        bool l1=false;
+        bool l2=false;
+        
+        std::string aTS = "";
+        
+        for (unsigned i=0; i < tLine.size(); i++)
+        {
+           std::string aS= tLine.substr(i, 1);
+           if (aS.size() !=0)
+           {
+               if(aS.compare("\"")==0)
+               {
+                   if(l2)
+                   {
+                       aTS = "\"" + aTS + "\"";
+                       tV.push_back(aTS);
+                       aTS = "";
+                       l2 = false;     
+                   }
+                   else if (l1)
+                   {
+                       aTS = aTS + aS;
+                   }
+                   else
+                   {
+                       l2 = true;
+                       l1 = false;
+                   }
+               }
+               else if(aS.compare("\'")==0)
+               {
+                   if (l1)
+                   {
+                       aTS = "\'" + aTS + "\'";
+                       tV.push_back(aTS);
+                       aTS = "";
+                       l1 = false;
+                   }
+                   else if (l2)
+                   {
+                       aTS = aTS + aS;
+                   }
+                   else
+                   {
+                       l1 = true;
+                       l2 = false;
+                   }
+               }
+               else
+               {
+                   if (!l0 && !l1 && !l2)
+                   {
+                       l0 = true;
+                   }
+                   aTS = aTS + aS;
+               }   
+           }
+           else
+           {
+               if (l2 || l1)
+               {
+                   aTS = aTS + aS;
+               }
+               else if (l0)
+               {
+                   if (aTS.size() !=0)
+                   {
+                       tV.push_back(aTS);
+                       aTS = "";
+                       l0  = false;
+                   }
+               }
+               else
+               {
+                   l0 = true;
+               }
+           }
+        }
+        
+        if(aTS.size() !=0)
+        {
+            tV.push_back(aTS);
         }
     }
     
@@ -2274,7 +2364,7 @@ namespace LIBMOL
             tV.push_back(0.0);
             tV.push_back(0.0);
             tV.push_back(0.0);
-            StrToSymmOneRow2(*iS, tV);
+            StrToSymmOneRow3(*iS, tV);
             tMat.push_back(tV);
         }
         
@@ -2471,7 +2561,86 @@ namespace LIBMOL
            }
         }
     }
-              
+    
+    extern void StrToSymmOneRow3(std::string         & tStr,
+                          std::vector<double>        & tRow)
+    { 
+                 
+        
+        std::map<std::string, std::string>  sMap;
+        std::vector<std::string> aVec;
+
+        std::string aS = "";
+        for(unsigned i=0; i < tStr.size(); i++)
+        {
+            if (tStr.substr(i,1).find("+") != std::string::npos
+                || tStr.substr(i,1).find("-") !=std::string::npos)
+            {
+                if(aS.size() !=0)
+                {
+                    aVec.push_back(aS);
+                     aS = tStr.substr(i,1);
+                }
+                aS = tStr.substr(i,1);
+            }
+            else
+            {
+                aS = aS + tStr.substr(i,1);
+            }
+        }
+        
+        if (aS.size() !=0)
+        {
+            aVec.push_back(aS);
+        }
+
+        for (unsigned i=0;  i < aVec.size(); i++)
+        {
+            if (aVec[i].find("x") != std::string::npos)
+            {
+                if (aVec[i].find("-") != std::string::npos)
+                {
+                   tRow[0] =-1;
+                }
+                else
+                {
+                  tRow[0] = 1;
+                }
+            }
+            else if (aVec[i].find("y") != std::string::npos)
+            {
+                if (aVec[i].find("-") != std::string::npos)
+                {
+                   tRow[1] =-1;
+                }
+                else
+                {
+                  tRow[1] = 1;
+                }
+            }
+            else if (aVec[i].find("z") != std::string::npos)
+            {
+                if (aVec[i].find("-") != std::string::npos)
+                {
+                   tRow[2] =-1;
+                }
+                else
+                {
+                  tRow[2] = 1;
+                }
+            }
+            else if (aVec[i].find("/") != std::string::npos)
+            {
+                tRow[3]=StrFractToReal(aVec[i]);
+            }
+            else if (aVec[i].find(".") != std::string::npos)
+            {
+                tRow[3]=StrToReal(aVec[i]);
+            }
+        }
+
+    }
+    
     extern void TranslateIntoUnitCell(std::vector<REAL> & tInitFracX,
                                     std::vector<REAL> & tFinFracX)
     {

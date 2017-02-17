@@ -54,6 +54,15 @@ def listComp(a_list, b_list):
     elif a_list[0] < b_list[0]:
         return -1
 
+def listComp2(a_list, b_list):
+
+    if a_list[0] > b_list[0]:
+        return 1
+    elif a_list[0] < b_list[0]:
+        return -1
+    else :
+        return 0
+
 def listCompDes(a_list, b_list):
 
     if int(a_list[1]) < int(b_list[1]):
@@ -302,9 +311,9 @@ class Acedrg(CExeCode ):
         self.refmacLogName    = ""
 
         self.refmacXYSList    = {}
-        self.refmacMinFValueList = {}
-        self.refmacMinFValueList["value"] =100000.00
-        self.refmacMinFValueList["fileName"] =""
+        self.refmacMinFValueList = []
+        #self.refmacMinFValueList["value"] =100000.00
+        #self.refmacMinFValueList["fileName"] =""
         
 
         self.funcGroupTable   = ""
@@ -345,16 +354,20 @@ class Acedrg(CExeCode ):
         self.runExitCode      = 0 
 
         self.setWorkMode(inputOptionsP)
-        print "workMode is ", self.workMode
+        self.setInputProcPara(inputOptionsP)
+
         self.checkDependency()
         self.checkVersionInfo()
-
 
         if os.path.isfile(self.funcGroupTable):
             self.rdKit = AcedrgRDKit(self.funcGroupTable)
         else:
             self.rdKit = AcedrgRDKit()
-
+        self.rdKit.setProcPara(self.inputPara)
+        print "input RDKit: userExistCoords ? ", self.rdKit.useExistCoords
+        print "input RDKit: number of optimization iters ", self.rdKit.numRDKitOptmSteps
+        print "input RDKit: number of initial conformers ", self.rdKit.numInitConformers
+        print "input RDKit: number of output conformers ", self.rdKit.numConformers
         self.fileConv         = FileTransformer()       
         self.chemCheck        = ChemCheck() 
         
@@ -415,9 +428,17 @@ class Acedrg(CExeCode ):
                                     action="store", type="string", 
                                     help="Input  File containing a SMILE string")
 
-        self.inputParser.add_option("-k",  "--multi_conf", dest="numConformers", 
+        self.inputParser.add_option("-j",  "--numInitConf", dest="numInitConformers", 
                                     action="store", type="int", 
-                                    help="user's input number of conformers")
+                                    help="Number of initial conformers to try")
+
+        self.inputParser.add_option("-k",  "--multiconf", dest="numConformers", 
+                                    action="store", type="int", 
+                                    help="Number of final output conformers")
+
+        self.inputParser.add_option("-l",  "--numOptmStep", dest="numRDKitOptmSteps", 
+                                    action="store", type="int", 
+                                    help="Number of RDKit optimization steps requested")
 
         self.inputParser.add_option("-m",  "--mol", dest="inMdlName", metavar="FILE", 
                                     action="store", type="string", 
@@ -831,6 +852,25 @@ class Acedrg(CExeCode ):
                     tF.close()
                     self.inSmiName = tName
                     print tName
+
+    def setInputProcPara(self, t_inputOptionsP = None):
+        
+        if t_inputOptionsP.useExistCoords:
+            self.inputPara["useExistCoords"]    = t_inputOptionsP.useExistCoords
+
+        if t_inputOptionsP.numInitConformers:
+            self.inputPara["numInitConformers"] = t_inputOptionsP.numInitConformers
+
+        if t_inputOptionsP.numRDKitOptmSteps:
+            self.inputPara["numRDKitOptmSteps"] = t_inputOptionsP.numRDKitOptmSteps
+
+        if t_inputOptionsP.numConformers:
+            self.inputPara["numConformers"]     = t_inputOptionsP.numConformers
+  
+        if t_inputOptionsP.numInitConformers and t_inputOptionsP.numConformers:
+            if t_inputOptionsP.numConformers > t_inputOptionsP.numInitConformers:
+                self.inputPara["numInitConformers"] = t_inputOptionsP.numConformers
+
 
     def printJobs(self):
 
@@ -1462,7 +1502,7 @@ class Acedrg(CExeCode ):
             print "No dictionary file produced ! " 
                         
     def runGeoOpt(self, tRoot, tPdbIn, tCifLibIn):
-        
+       
         # Geometrical optimization
         if os.path.isfile(tPdbIn) and os.path.isfile(tCifLibIn):
             if os.path.getsize(tPdbIn) > 100 and os.path.getsize(tCifLibIn) > 50:
@@ -1486,19 +1526,8 @@ class Acedrg(CExeCode ):
                             self.refmacXYSList[tRoot]["xyz"]    = self.refmacXYZOUTName 
                             self.refmacXYSList[tRoot]["fvalue"] = tFValue 
                             # print "| %s|"%("Done: " + tRoot).ljust(64) 
-                        #else:
-                        #    print "| Done                                                            |"
-                        #    if not self.refmacXYSList.has_key("sing"):
-                        #         self.refmacXYSList["sing"] = {}
-                        #    self.refmacXYSList["sing"]["log"]    = self._log_name 
-                        #    self.refmacXYSList["sing"]["xyz"]    = self.refmacXYZOUTName 
-                        #    self.refmacXYSList["sing"]["fvalue"] = tFValue 
-                        # print "FValue is ", tFValue  
-                        if tFValue < self.refmacMinFValueList["value"]:
-                            self.refmacMinFValueList["value"]     = tFValue
-                            self.refmacMinFValueList["fileName"]  = self.refmacXYZOUTName
-                        #print "Overall lower fvalue is ", self.refmacMinFValueList["value"]
-                        #print "The file associated with it is ", self.refmacMinFValueList["fileName"]
+                        aRefPair = [tFValue, self.refmacXYZOUTName]
+                        self.refmacMinFValueList.append(aRefPair)
             else:
                 print "No dictionary file for optimization ! " 
         else:
@@ -1506,12 +1535,12 @@ class Acedrg(CExeCode ):
 
     def runGeoOptOneMolFull(self, tIdxMol):
 
-        print "Number of conformers generated for molecule %d is %d "%(tIdxMol+1, self.numConformers)
+        print "Number of final output conformers for molecule %d is %d "%(tIdxMol+1, self.numConformers)
         tmpStr = ""
         if self.numConformers == 1:
             tmpStr = "_tmp"
         nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
-        #print "Number of actual conf to be done is ", nConf
+        print "Number of intial conformers for the molecule  ", nConf
 
         inPdbNamesRoot =[]
         for idxConf in range(nConf): 
@@ -1528,16 +1557,19 @@ class Acedrg(CExeCode ):
             #print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
             #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
             self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
-            if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
-                #print "|%s%s|"%("Output LIB : ".ljust(12), self.refmacXYZOUTName.ljust(53))
-                if self.numConformers !=1:
-                    #print "refmac out ", self.refmacXYZOUTName
-                    self.getFinalOutputFiles(aFRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacXYZOUTName, self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
-            else:
+            if  self.runExitCode :
                 print "Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn
-        
-        if self.numConformers == 1:
-            self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList["fileName"], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+        if len(self.refmacMinFValueList) > 0 :
+            self.refmacMinFValueList.sort(listComp2)
+            #for aPair in self.refmacMinFValueList:
+            #    print "======"
+            #    print "FValue: ", aPair[0], "  File name ", aPair[1]  
+            if self.numConformers==1: 
+                self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+            else:
+                for i in range(self.numConformers):
+                    aRoot = "Mol" + str(tIdxMol) + "_conformer" + str(i+1) 
+                    self.getFinalOutputFiles(aRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[i][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             
     def getRefmacFValue(self, tLogName):
 
@@ -1581,7 +1613,6 @@ class Acedrg(CExeCode ):
                 self.inMmCifName      = tInCif
                 self.outRstCifName    = finRst
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
-                print "===================================================================" 
         else:
             print "Failed to produce %s after final geometrical optimization"%tInPdb
 
@@ -2362,7 +2393,7 @@ class Acedrg(CExeCode ):
                                 self.inMmCifName      = self.outRstCifName
                                 self.outRstCifName    = finRst
                                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                print "==================================================================="
+                                #print "==================================================================="
                             else:
                                 print "Failed to produce %s after final geometrical optimization"%finPdb
                             
@@ -2442,7 +2473,7 @@ class Acedrg(CExeCode ):
     
 class AcedrgRDKit():
 
-    def __init__(self, tGFFName = ""):
+    def __init__(self, tGFFName = "", tProcessParaSet=None):
 
         self.molecules  = []
         self.moleculesA = []
@@ -2450,14 +2481,18 @@ class AcedrgRDKit():
 
         self.funcGroupTab     = {}
         self.stdFuncGroupMols = []
-        self.funcGroups   = {}       # key1: index of molecule, key2: stdFSmi, value: tuple of atom idx tuples 
+        self.funcGroups       = {}       
+        # key1: index of molecule, key2: stdFSmi, value: tuple of atom idx tuples 
         if tGFFName and os.path.isfile(tGFFName):
             self.setupFuncGroupTab(tGFFName)
 
-        self.nMaxIters=1000
-        self.nMaxMult =20
+        #self.nMaxIters       = 1000
+        #self.nMaxMult        = 20
+        self.numRDKitOptmSteps       = 1000
+        self.numInitConformers       = 20
+        self.numConformers           = 1
+        self.useExistCoords          = False
       
-        self.useExistCoords  = False
         self.hasCCP4Type     = False
    
         self.chemCheck = ChemCheck()
@@ -2475,6 +2510,35 @@ class AcedrgRDKit():
 
         self.monoName         = ""
         self.longName         = ""
+
+    
+    def setProcPara(self, tProcessParaSet):
+        
+        if tProcessParaSet.has_key("useExistCoords"):
+            self.useExistCoords = tProcessParaSet["useExistCoords"]
+        else:
+            self.useExistCoords = False
+  
+        if tProcessParaSet.has_key("numRDKitOptmSteps"):
+            self.numRDKitOptmSteps = tProcessParaSet["numRDKitOptmSteps"]
+        else:
+            self.numRDKitOptmSteps = 1000
+
+        if tProcessParaSet.has_key("numInitConformers"):
+            self.numInitConformers = tProcessParaSet["numInitConformers"]
+        else:
+            if self.useExistCoords:
+                self.numInitConformers = 1
+            else:
+                self.numInitConformers = 20
+
+        if tProcessParaSet.has_key("numConformers"):
+            self.numConformers = tProcessParaSet["numConformers"]
+        else:
+            self.numConformers = 1
+
+        if self.numConformers > self.numInitConformers:
+            self.numInitConformers = self.numConformers
 
     def setRepSign(self):
 
@@ -3105,7 +3169,7 @@ class AcedrgRDKit():
         if tFailure ==1:
             nFac = 2
             while tFailure ==1 and nFac < tMaxMult:
-                tFailure=AllChem.UFFOptimizeMolecule(tMol, maxIters=nFac*nMaxIters)
+                tFailure=AllChem.UFFOptimizeMolecule(tMol, maxIters=nFac*tMaxIters)
                 nFac += 1
         return tFailure
 
@@ -3157,46 +3221,24 @@ class AcedrgRDKit():
             for aM in tMols:
                 self.molecules.append(aM) 
            
-    def setInitConformersOneMol(self, tMol, tNConfId=1, tConfId=-1, tMaxIters=1000, tMaxMult=20):
+    def setInitConformersOneMol(self, tMol):
             
         #  Setup conformers for the molecules
-        if tNConfId == 1:
-            #  20 initail conformers 
-            if self.useExistCoords: 
-                ttNConfId = 1
-                confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId, maxAttempts=0, randomSeed=-1, clearConfs=False)
-            else:
-                ttNConfId = 20
-                confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId, maxAttempts=0, randomSeed=-1, clearConfs=True)
-            nConf = tMol.GetNumConformers()
-            #for aId in confIds:
-            #    print aId
-            if not self.useExistCoords:
-                for aId in confIds:
-                    aFailure = self.optOneConformer(tMol, tMaxIters, tMaxMult, aId)
-            #ttNConfId = 20
-            #confIds =AllChem.EmbedMultipleConfs(tMol, ttNConfId)
-            #for aId in confIds:
-            #    aFailure = self.optOneConformer(tMol, aId)
-            #    if not aFailure:
-            #        rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
-            #lFailure = self.setInitGeomOneMol(tMol)
-            #if not lFailure:
-                # Setup chiral information associated with this conformer 
-                # rdmolops.AssignAtomChiralTagsFromStructure(tMol)
-            #else:
-            #    print "Geometry of molecule %d can not be optimized within %d circles "%(len(self.allMols), self.nMaxMult*self.nMaxIters)
-        elif tNConfId > 1:
-            #  multiple conformers according to input number of conformations
-            confIds =AllChem.EmbedMultipleConfs(tMol, tNConfId)
-            for aId in confIds:
-                aFailure = self.optOneConformer(tMol, aId)
-                if not aFailure:
-                    rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
-                #else:
-                #    print "Conformer: ", aId, " is not optimized"
-
-        #self.molecules.append(tMol) 
+        if self.useExistCoords:
+            confIds =AllChem.EmbedMultipleConfs(tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=False)
+        else:
+            confIds =AllChem.EmbedMultipleConfs(tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=True)
+        print "Number of initial conformers requested", self.numInitConformers
+        print "Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps
+        nConf = tMol.GetNumConformers()
+        print "Number of initial conformers obtained", nConf
+       
+        #for aId in confIds:
+        #    print aId
+        for aId in confIds:
+            aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.numInitConformers, aId)
+            if not aFailure:
+                rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
                     
     def setExistCoords(self, tMol, tReadInAtoms, tReadInBonds):
 
@@ -3363,7 +3405,7 @@ class AcedrgRDKit():
             #print "Atom ", aAtom.GetProp("Name")
             #print "Is it a temporal chiral center ", aAtom.HasProp("TmpChiral") 
 
-        self.setInitConformersOneMol(aMol, tNumConf)
+        self.setInitConformersOneMol(aMol)
 
         #rdmolfiles.MolToPDBFile(aMol, "Test_2.pdb")
         aSetTorsions = []
@@ -3626,7 +3668,7 @@ class AcedrgRDKit():
                 symb2 = atom2.GetSymbol()
 
                 bType = ""
-                print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
+                #print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
                 if aBond.HasProp("SpecialBond"):
                     bType = aBond.GetProp("SpecialBond")
                 else:
@@ -5246,7 +5288,7 @@ class FileTransformer :
                 if aAtom.has_key("_chem_comp_atom.atom_id"):
                     mapIdNum[aAtom["_chem_comp_atom.atom_id"]] = nAtm
                     nAtm +=1
-                    print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
+                    #print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
                 else:
                     print "Input file bug: no atom_id for atoms!"
                     sys.exit()
@@ -5265,7 +5307,7 @@ class FileTransformer :
             chargeAtomList = []
             idxAtom = 1
             for aAtom in self.atoms:
-                print "Atom ", aAtom["_chem_comp_atom.atom_id"], " with serial number ", idxAtom
+                #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " with serial number ", idxAtom
                 if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal"):
                     x = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
                 elif aAtom.has_key("_chem_comp_atom.model_Cartn_x"):
@@ -5312,12 +5354,12 @@ class FileTransformer :
                 
                 charge = " 0 "
                 if aAtom.has_key("_chem_comp_atom.charge"):
-                    print "The charge is ", aAtom["_chem_comp_atom.charge"]
+                    #print "The charge is ", aAtom["_chem_comp_atom.charge"]
                     #print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
                     if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
                     nCharge = int(aAtom["_chem_comp_atom.charge"])
-                    print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
+                    #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
                     #print " converted to charge symbol ", chargeMap[nCharge] 
                     if nCharge in chargeMap.keys():
                         charge  = " %d "%chargeMap[nCharge]
@@ -5350,12 +5392,12 @@ class FileTransformer :
             for aBond in self.bonds:
                 id1 = aBond["_chem_comp_bond.atom_id_1"]
                 id2 = aBond["_chem_comp_bond.atom_id_2"]
-                print "id1 %s "%id1 
-                print "id2 %s "%id2
+                #print "id1 %s "%id1 
+                #print "id2 %s "%id2
                 n1 = mapIdNum[id1]
                 n2 = mapIdNum[id2]
-                print "id1 %s n1 %d "%(id1, n1)
-                print "id2 %s n2 %d "%(id2, n2)
+                #print "id1 %s n1 %d "%(id1, n1)
+                #print "id2 %s n2 %d "%(id2, n2)
                 a1 = str(n1)
                 a2 = str(n2)
                 b4 = ""
@@ -5392,12 +5434,12 @@ class FileTransformer :
                     if not self.nameMapingCifMol["H"].has_key(id2):
                         self.nameMapingCifMol["H"][id2] = [] 
                     self.nameMapingCifMol["H"][id2].append(id1)
-                    print "H atom %s is bonding to %s "%(id1, id2)
+                    #print "H atom %s is bonding to %s "%(id1, id2)
                 if elem2 == "H":
                     if not self.nameMapingCifMol["H"].has_key(id1):
                         self.nameMapingCifMol["H"][id1] = [] 
                     self.nameMapingCifMol["H"][id1].append(id2)
-                    print "H atom %s is bonding to %s "%(id2, id1)
+                    #print "H atom %s is bonding to %s "%(id2, id1)
                    
             if len(chargeAtomList) != 0:
                 aL = "M CHG  %d "%len(chargeAtomList)
@@ -5688,7 +5730,7 @@ class FileTransformer :
                         l1 = True
                         l2  = False
                 else:
-                    if not l0 and not l1 and not l0:
+                    if not l0 and not l1 and not l2:
                         l0 = True
                     aTS = aTS + aS
             else:

@@ -1172,13 +1172,14 @@ namespace LIBMOL
     void NeighbListDict::putAtomsAndResiduesInCell(std::vector<AtomDict> & aAtomList)
     {   
         //std::cout << "Number of atoms is " << aAtomList.size() << std::endl;
-        
+        //int nIn = 0;
         for (std::vector<AtomDict>::iterator iT=aAtomList.begin();
                 iT != aAtomList.end(); iT++)
         {
             //std::cout << "Atom " << iT->id 
             //          << " of serial number " << iT->seriNum 
             //          << std::endl;
+            
             std::vector<int> tIdx;
             for (int i1 = 0; i1 < (int)iT->coords.size(); i1++)
             {
@@ -1209,12 +1210,12 @@ namespace LIBMOL
             //           << std::endl;
             int aIdx = (itsNumCell[1]*tIdx[0]+tIdx[1])*itsNumCell[2] 
                         + tIdx[2];
-            // std::cout << "Cell position is " << aIdx << std::endl;
+            //std::cout << "Cell position is " << aIdx << std::endl;
             
             if(aIdx != -1)
             {
                 allCells[aIdx].atomsInCell.push_back(iT->seriNum);
-                
+                // nIn++;
                 // The atom has been added into the cell.
                 // check if the residue is already in the residue list.
                 //std::cout << "atom serial number " << iT->seriNum
@@ -1264,7 +1265,9 @@ namespace LIBMOL
                 //}
                
             }
+            
         }
+        // std::cout << " number of atoms in the cell " << nIn << std::endl;
         
     }
     
@@ -1287,7 +1290,7 @@ namespace LIBMOL
             //std::cout << "Cell " << iC1->index[0] << " "
             //          << iC1->index[1] << " "
             //          << iC1->index[2] << std::endl;
-            // std::cout << "Number of atoms in this cell is "
+            //std::cout << "Number of atoms in this cell is "
             //          << iC1->atomsInCell.size() 
             //          << std::endl;
             if ((int)iC1->atomsInCell.size() >0)
@@ -1296,6 +1299,7 @@ namespace LIBMOL
                 {
                     //std::cout << "atoms from own cell " << std::endl;
                     buildAtomNeighListfromAPairCell(aAtomList, tL, (*iC1), (*iC1));
+                    //std::cout << "Done " << std::endl;
                 }
                 // check other cells 
                 int i10, i20, i30;
@@ -1342,21 +1346,22 @@ namespace LIBMOL
         for (std::vector<int>::iterator iA1=tCell1.atomsInCell.begin();
                     iA1!=tCell1.atomsInCell.end(); iA1++)
         {
-            /*
-            if (*iA1==1)
-            {
-            std::cout << "1 Build NBList for atom " 
-                      << aAtomList[*iA1].id
-                      << " of " << *iA1 << std::endl;
-            }
-             */
+            
+            //if (*iA1==0)
+            //{
+            //std::cout << "1 Build NBList for atom " 
+            //          << aAtomList[*iA1].id
+            //          << " of " << *iA1 << std::endl;
+            //}
+            
             for (std::vector<int>::iterator iA2 = tCell2.atomsInCell.begin();
                         iA2 != tCell2.atomsInCell.end(); iA2++)
             {
                 
                 REAL tD = distanceV(aAtomList[*iA1].coords, aAtomList[*iA2].coords);
+                
                 /*
-                if(*iA1==1)
+                if(*iA1==0)
                 {
                     std::cout << "r=" << tD << " for atom " 
                               << aAtomList[*iA2].id 
@@ -1364,25 +1369,24 @@ namespace LIBMOL
                                       
                 }
                  */
+                
                 if ( tD <=tL && tD >= 0.0005)
                 {
                     if (std::find(aAtomList[*iA1].neighbAtoms.begin(),
                         aAtomList[*iA1].neighbAtoms.end(), *iA2) ==aAtomList[*iA1].neighbAtoms.end())
                     {
                         aAtomList[*iA1].neighbAtoms.push_back((*iA2));
-                        
-                        //std::cout << "atom " << aAtomList[*iA2].id
-                        //          << " has been added to the list" << std::endl;
-                       
                     }
                     if (std::find(aAtomList[*iA2].neighbAtoms.begin(),
                         aAtomList[*iA2].neighbAtoms.end(), *iA1) ==aAtomList[*iA2].neighbAtoms.end())
                     {
+                        
                         aAtomList[*iA2].neighbAtoms.push_back((*iA1));  
                     }
                 }
             }
         }
+        
     }
     
     void NeighbListDict::buildResidueNBList()
@@ -1515,17 +1519,15 @@ namespace LIBMOL
             }
         }
         
-        
         buildCellSystem(aAtomList, tDim, tNBCutoff, tNBShell);
         
-       
         REAL fullL = tNBCutoff + tNBShell;
         // std::cout << "error level " << itsErrLevel << std::endl;
         if (!itsErrLevel)
         {
             if (tMode ==0)
             {
-                // std::cout << "Build atom NB List " << std::endl;
+                std::cout << "Build atom NB List " << std::endl;
                 buildAtomNeighbList(aAtomList, fullL);
             }
             else if (tMode==1)
@@ -1533,6 +1535,7 @@ namespace LIBMOL
                 buildResidueNBList();
             }
         }
+        
         //Check
         /*
         for (std::vector<AtomDict>::iterator iA=aAtomList.begin();
@@ -1562,6 +1565,8 @@ namespace LIBMOL
        */
     }
     
+    
+    
     void NeighbListDict::building(std::vector<AtomDict>   & aAtomList, 
                                   std::vector<AtomDict>   & tAllAtoms,
                                   int tDim, REAL tNBCutoff, 
@@ -1583,8 +1588,7 @@ namespace LIBMOL
         // time_t rtime;
         // time(&rtime);
         // std::cout << "Current time is " << ctime(&rtime);
-        std::cout << "Here " << std::endl;
-        exit(1);
+        
         
         for (std::vector<AtomDict>::iterator iA=aAtomList.begin();
                 iA != aAtomList.end(); iA++)
@@ -1605,7 +1609,6 @@ namespace LIBMOL
         std::cout <<  "After building cell, the time is " 
                   << ctime(&rtime) << std::endl;
         
-        exit(1);
         
         REAL fullL = tNBCutoff + tNBShell;
         // std::cout << "error level " << itsErrLevel << std::endl;

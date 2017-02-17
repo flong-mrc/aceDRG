@@ -350,6 +350,7 @@ namespace LIBMOL // temp
         std::vector<int>           connAtoms;
         std::vector<int>           connHAtoms; // H atoms connected to this atom
         std::vector<int>           neighbAtoms;
+        std::map<int, REAL>        NBAtomMap;
         std::vector<int>           inBonds;
         std::vector<REAL>          bondLengths;
         std::vector<AngleDict>     inAngles;

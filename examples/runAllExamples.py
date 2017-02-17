@@ -14,6 +14,7 @@ failNames = []
 print "========================================================="
 print "|  run all examples with input SMILES files at ./inSmil |"
 print "========================================================="
+i = 0
 for aF in glob.glob("./inSmi/*.smiles"):
     aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
     if len(aFRoot) >= 3:
@@ -36,8 +37,25 @@ for aF in glob.glob("./inSmi/*.smiles"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
-            
-
+        i+=1       
+      
+        nInitConf = 100
+        nIterMax  = 100000
+        rRoot = "%s_InitConf%d_IterMax%d_fromSmiles"%(aFRoot, nInitConf, nIterMax)
+        cmdL = "acedrg -i %s -j %d -l %d -o %s "%(aF, nInitConf, nIterMax, rRoot) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
+        i+=1       
 print "========================================================="
 print "|  run all examples with input MOL files at ./inMOL     |"
 print "========================================================="
@@ -50,7 +68,25 @@ for aF in glob.glob("./inMol/*.mol"):
 
     if len(aFRoot) !=0:
         rRoot = "%s_fromMol"%aFRoot
-        cmdL = "acedrg -m %s  -o  %s_fromMol -p "%(aF, aFRoot) 
+        cmdL = "acedrg -m %s  -o  %s -p "%(aF, rRoot) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
+
+    if len(aFRoot) !=0:
+        nInitConf = 100
+        nIterMax  = 100000
+        rRoot = "%s_InitConf%d_IterMax%d_fromMol"%(aFRoot, nInitConf, nIterMax)
+        cmdL = "acedrg -m %s -j %d -l %d -o  %s -p "%(aF,nInitConf, nIterMax, rRoot) 
         print cmdL
         numAllJobs += 1
         lRun=os.system(cmdL)
@@ -105,6 +141,24 @@ for aF in glob.glob("./inMmcifPDB/*.cif"):
     if len(aFRoot) !=0:
         rRoot = "%s_fromMmcifPDB"%aFRoot
         cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
+
+    if len(aFRoot) !=0:
+        nInitConf = 100
+        nIterMax  = 100000
+        rRoot = "%s_InitConf%d_IterMax%d_fromMmcifPDB"%(aFRoot, nInitConf, nIterMax)
+        cmdL = "acedrg -c %s -j %d -l %d -o  %s -p "%(aF,nInitConf, nIterMax, rRoot) 
         print cmdL
         numAllJobs += 1
         lRun=os.system(cmdL)

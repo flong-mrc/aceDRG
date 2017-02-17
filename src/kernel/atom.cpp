@@ -417,6 +417,13 @@ namespace LIBMOL
         {
             neighbAtoms.push_back(*iA);
         }
+        
+        for (std::map<int, REAL>::const_iterator iM=tAtom.NBAtomMap.begin();
+                iM != tAtom.NBAtomMap.end(); iM++)
+        {
+            NBAtomMap[iM->first]=iM->second;
+        }
+        
         for (std::vector<int>::const_iterator iB = tAtom.inBonds.begin();
                 iB != tAtom.inBonds.end(); iB++)
         {
@@ -862,12 +869,22 @@ namespace LIBMOL
     {
         
         std::string aReturn = "";
-        aReturn += (tAtoms[tCenSerial].chemType + ":");
+        int tOrig;
+        if (!tAtoms[tCenSerial].isInPreCell)
+        {
+            tOrig = tAtoms[tCenSerial].fromOrig;
+        }
+        else
+        {
+            tOrig = tAtoms[tCenSerial].seriNum;
+        }
+        
+        aReturn += (tAtoms[tOrig].chemType + ":");
         
         std::map<std::string, std::vector<int> > tmpLF;
         
-        for (std::vector<int>::iterator iLS=tAtoms[tCenSerial].connAtoms.begin();
-                iLS !=tAtoms[tCenSerial].connAtoms.end(); iLS++)
+        for (std::vector<int>::iterator iLS=tAtoms[tOrig].connAtoms.begin();
+                iLS !=tAtoms[tOrig].connAtoms.end(); iLS++)
         {
             tmpLF[tAtoms[*iLS].chemType].push_back(*iLS);
         }

@@ -502,11 +502,282 @@ namespace LIBMOL
                         std::cout << "Its coordinates (fractional) " << std::endl
                                   << "x:   " << iA->fracCoords[0] << std::endl
                                   << "y:   " << iA->fracCoords[1] << std::endl
-                                  << "z:   " << iA->fracCoords[2] << std::endl
-                                  << "Its coordinates  " << std::endl
-                                  << "x:   " << iA->coords[0] << std::endl
-                                  << "y:   " << iA->coords[1] << std::endl
-                                  << "z:   " << iA->coords[2] << std::endl;  
+                                  << "z:   " << iA->fracCoords[2] << std::endl;
+                                  //<< "Its coordinates  " << std::endl
+                                  //<< "x:   " << iA->coords[0] << std::endl
+                                  //<< "y:   " << iA->coords[1] << std::endl
+                                  //<< "z:   " << iA->coords[2] << std::endl;  
+                   
+                        //std::cout << "Is that atom in read-in unit ? " 
+                        //          << iA->isInPreCell << std::endl;
+                   
+                    }
+                }
+            }
+       }
+    }
+    
+    
+    void GenCifFile::setupSystemCSD()
+    {
+       if (inFile.is_open() )
+        { 
+            std::vector<std::vector<std::string> > tBlocs;
+            std::map<std::string, std::string>     all2Cols;
+            
+            // make sure
+            itsCurBlock = "";
+            std::string tRecord="";
+            
+            std::vector<std::string>     tAllLines;
+            std::vector<std::string>     tBlocLines;
+            REAL tROK1 = -1.0;
+            REAL tROK2 = -1.0;
+            
+            while(!inFile.eof())
+            {   
+                std::getline(inFile, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                std::vector<std::string> aPair;
+                StrTokenizeGen(tRecord, aPair);
+                if (aPair.size()==2)
+                {
+                    std::string tP0 = TrimSpaces(aPair[0]);
+                    std::string tP1 = TrimSpaces(aPair[1]);
+                    if (tP0.size() > 0)
+                    {
+                        if (tP0[0] =='_')
+                        {
+                            all2Cols[tP0] = tP1;
+                        }
+                        else if (tP0[0] !='#')
+                        {
+                            tAllLines.push_back(tRecord);
+                        }
+                    }
+                }
+                else if (aPair.size() > 0)
+                {
+                    tAllLines.push_back(tRecord);
+                }
+            }
+            
+            for (unsigned i=0; i < tAllLines.size(); i++)
+            {   
+                tRecord = tAllLines[i];
+                tRecord = TrimSpaces(tRecord);
+                // std::cout <<  tRecord << std::endl;
+                std::vector<std::string> tBuf;
+                std::vector<std::string> tBuf_t;
+                
+                // only use a few blocks in the cif file
+                
+                if (tRecord.find("loop_") !=std::string::npos 
+                    || (tRecord.find("data_") !=std::string::npos
+                        && tRecord.find("_data_") ==std::string::npos))
+                {
+                    if (!tBlocLines.empty())
+                    {
+                        tBlocs.push_back(tBlocLines);
+                        tBlocLines.clear();
+                    }
+                    
+                    itsCurBlock = "loop";
+                }
+                else if (itsCurBlock=="loop" && tRecord.size() >0 )
+                {
+                    if (tRecord[0] !='#')
+                    {
+                        tBlocLines.push_back(tRecord);
+                    }
+                }
+            }
+            
+            if (!tBlocLines.empty())
+            {
+                tBlocs.push_back(tBlocLines);
+                tBlocLines.clear();
+            }
+            
+            if (tROK1 > 0.0 && tROK2 > 0.0)
+            {
+                if (tROK1 <RTHRESHOLD && tROK2 < RTHRESHOLD)
+                {
+                    RFactorOK = true;
+                }
+            }
+            else if (tROK1 > 0.0 && tROK2 < 0.0)
+            {
+                if (tROK1 <RTHRESHOLD)
+                {
+                    RFactorOK = true;
+                }
+            }
+            else if (tROK1 < 0.0 && tROK2 > 0.0)
+            {
+                if (tROK2 <RTHRESHOLD)
+                {
+                    RFactorOK = true;
+                }
+            }
+            
+            if (!RFactorOK)
+            {
+                errMsg.push_back("R FACTOR IS TWO HIGH\n");
+            }
+            
+            inFile.close();
+            
+            checkPowder(tAllLines);
+            
+            if (!notPowder)
+            {
+                return ;
+            }
+            // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
+            
+            /*
+            for (std::vector<std::vector<std::string> >::iterator iBloc=tBlocs.begin();
+                    iBloc !=tBlocs.end(); iBloc++)
+            {
+                std::cout << "====One block lines " << std::endl;
+                for (std::vector<std::string>::iterator iLine=iBloc->begin();
+                        iLine != iBloc->end(); iLine++)
+                {
+                    std::cout << *iLine << std::endl;
+                }
+            }
+            */
+            
+            // 
+            //if ((int)tBlocs.size()!=0 && RFactorOK )
+            if ((int)tBlocs.size()!=0)
+            {
+                
+                std::map<std::string, std::string>   rowProps;
+                std::map<int, std::map<ID, std::vector<std::string> > > colProps;
+           
+                int idxB=0;
+                for (std::vector<std::vector<std::string> >::iterator iBs=
+                        tBlocs.begin(); iBs !=tBlocs.end(); iBs++)
+                {
+                    
+                    if((int)iBs->size() !=0)
+                    {
+                        getPropsToMaps(iBs, rowProps, colProps, idxB);
+                    }
+                }
+                 
+                
+                // Check 
+                
+                /*
+                std::cout << "There are " << rowProps.size() 
+                          << " properties. They are: " << std::endl;
+                for (std::map<std::string, std::string>::iterator iRPs=rowProps.begin();
+                        iRPs !=rowProps.end(); iRPs++)
+                {
+                    std::cout << iRPs->first << " -> " << iRPs->second << std::endl;
+                }
+                
+                
+                std::cout << std::endl << "There are " << colProps.size() 
+                          << " blocks of properties. They are: " << std::endl;
+                
+                for (std::map<int, std::map<ID, std::vector<std::string> > >::iterator 
+                        iCPs=colProps.begin(); iCPs != colProps.end(); iCPs++)
+                {
+                    std::cout << "For block " << iCPs->first << " : " << std::endl;
+                    std::cout << "Property labels: " << std::endl;
+                    for (std::vector<std::string>::iterator 
+                          iOneB=iCPs->second["lab"].begin(); 
+                          iOneB != iCPs->second["lab"].end(); iOneB++)
+                    {
+                        std::cout << (*iOneB) << std::endl;
+                    }
+                    std::cout << "The lines associated : " << std::endl;
+                    for (std::vector<std::string>::iterator 
+                          iOneB=iCPs->second["cont"].begin(); 
+                          iOneB != iCPs->second["cont"].end(); iOneB++)
+                    {
+                        std::cout << (*iOneB) << std::endl;
+                    }
+                }
+                */
+               
+                
+                // Now select what we need from the input cif file.
+                selectPropsToMaps(rowProps, colProps);
+                
+                if (!lErr)
+                {
+                    checkAtomElementID();
+                
+                
+                    // check if the assigned atom element types are right ones
+                    PeriodicTable aPTab;
+                    for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                        iA !=allAtoms.end(); iA++)
+                    {
+                        if (!assignElementType(aPTab, iA->chemType, iA))
+                        {
+                            std::cout << "Warn: atom " << iA->id << " has element type "
+                                      << iA->chemType << " which is not in the Periodic Table"
+                                      << std::endl;
+                        }
+                    }
+                
+                    checkNonHAtomOccp();
+                    setAtomsMetalType();
+                    setAtomOxiType();
+                    
+                    checkCalcAtoms();
+                
+                     // Check
+                
+                    std::cout << "There are " << (int)allAtoms.size() 
+                              << " atoms in the assym unit. They are " << std::endl;
+            
+                    for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                          iA !=allAtoms.end(); iA++)
+                    {
+                        std::cout << "Atom " << iA->id << std::endl
+                                  << " serial Number " << iA->seriNum << std::endl
+                                  << "Its type symbol " << iA->chemType << std::endl
+                                  << "Is it metal ";
+                   
+                        if (iA->isMetal)
+                        {
+                            std::cout << " Yes " << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << " No " << std::endl;
+                        }
+                        
+                        /*
+                        std::cout << "Is that atom from calculations ? ";
+                        if (iA->fromCalc)
+                        {
+                            std::cout <<  "Yes" << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << "No, it is determined from experimental data "
+                                      << std::endl;
+                        }
+                        */
+                        
+                        std::cout << "Its form charge " << iA->formalCharge << std::endl;
+                        std::cout << "Its occupancy " << iA->ocp << std::endl;
+                        std::cout << "Its coordinates (fractional) " << std::endl
+                                  << "x:   " << iA->fracCoords[0] << std::endl
+                                  << "y:   " << iA->fracCoords[1] << std::endl
+                                  << "z:   " << iA->fracCoords[2] << std::endl;
+                                  //<< "Its coordinates  " << std::endl
+                                  //<< "x:   " << iA->coords[0] << std::endl
+                                  //<< "y:   " << iA->coords[1] << std::endl
+                                  //<< "z:   " << iA->coords[2] << std::endl;  
                    
                         //std::cout << "Is that atom in read-in unit ? " 
                         //          << iA->isInPreCell << std::endl;
@@ -1623,6 +1894,7 @@ namespace LIBMOL
                     iOps !=tOnePropGroup["cont"].end(); iOps++)
             {
                 std::vector<std::string> tBuf0, tBuf1, tBuf2;
+                StrLower((*iOps));
                 if ((*iOps).find('\'') !=std::string::npos)
                 {
                     
@@ -1636,14 +1908,13 @@ namespace LIBMOL
                            tBuf1.push_back((*iT));
                        }
                    }
-                   
-                   StrTokenize(tBuf1[aPos], tBuf2,',');
                 }
                 else
                 {
                     StrTokenize((*iOps), tBuf1);
-                    StrTokenize(tBuf1[aPos], tBuf2,',');
                 }
+                
+                StrTokenize(tBuf1[aPos], tBuf2,',');
                 
                 StrToSymmOps(tBuf2, itsCurCryst->itsSpaceGroup->sgOp[(*iOps)]);
             }

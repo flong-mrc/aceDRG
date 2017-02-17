@@ -270,18 +270,22 @@ int main(int argc, char** argv) {
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
-            //std::cout << "Number of crystal in the system is " 
-            //          << dataFromCif.allCryst.size() << std::endl;
-            
+            std::cout << "Number of crystal in the system is " 
+                      << dataFromCif.allCryst.size() << std::endl;
+           
+            // TEMP, CSD do not provide several parameters. Rely on CSD
+            // search criteria. 
             if (dataFromCif.notPowder && dataFromCif.resolOK
                 && dataFromCif.RFactorOK && dataFromCif.colidOK 
-                // && !dataFromCif.lErr)
                 && !dataFromCif.hasHeavyCalcAtoms && !dataFromCif.lErr)
+            //if(!dataFromCif.lErr)
             {
                 std::cout << "The structure is from single crystallographic x-ray "
                           << std::endl;
                 std::cout << "R factor satisfies the requirement" << std::endl;
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
+                std::cout << "workMode " << AJob.workMode << std::endl;
+               
                 
                 aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
                 
@@ -292,7 +296,8 @@ int main(int argc, char** argv) {
                 else if (AJob.workMode ==312)
                 {
                     std::cout << "Studies related metal atoms " << std::endl;
-                    std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
+                    //std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
+                    // std::cout << "Contain Metal " << dataFromCif.hasMetal << std::endl;
                     
                     if (dataFromCif.hasMetal)
                     {
@@ -310,9 +315,9 @@ int main(int argc, char** argv) {
                 
                         LIBMOL::outMetalAtomInfo(AJob.IOEntries["userOutName"].c_str(),
                                         dataFromCif);
-                        std::cout << "The structure is from single crystallographic x-ray "
-                          << std::endl;
-                        std::cout << "R factor satisfies the requirement" << std::endl;
+                        //std::cout << "The structure is from single crystallographic x-ray "
+                        //  << std::endl;
+                        //std::cout << "R factor satisfies the requirement" << std::endl;
                 
                         aMolCreator.executeMet(AJob.IOEntries["userOutName"].c_str());
                     }
