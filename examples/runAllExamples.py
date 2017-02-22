@@ -39,10 +39,9 @@ for aF in glob.glob("./inSmi/*.smiles"):
             failNames.append(rRoot)
         i+=1       
       
-        nInitConf = 100
-        nIterMax  = 100000
-        rRoot = "%s_InitConf%d_IterMax%d_fromSmiles"%(aFRoot, nInitConf, nIterMax)
-        cmdL = "acedrg -i %s -j %d -l %d -o %s "%(aF, nInitConf, nIterMax, rRoot) 
+        nInitConf = 1000
+        rRoot = "%s_InitConf%d_fromSmiles"%(aFRoot, nInitConf)
+        cmdL = "acedrg -i %s -j %d  -o %s "%(aF, nInitConf,  rRoot) 
         print cmdL
         numAllJobs += 1
         lRun=os.system(cmdL)
@@ -83,10 +82,9 @@ for aF in glob.glob("./inMol/*.mol"):
             failNames.append(rRoot)
 
     if len(aFRoot) !=0:
-        nInitConf = 100
-        nIterMax  = 100000
-        rRoot = "%s_InitConf%d_IterMax%d_fromMol"%(aFRoot, nInitConf, nIterMax)
-        cmdL = "acedrg -m %s -j %d -l %d -o  %s -p "%(aF,nInitConf, nIterMax, rRoot) 
+        nInitConf = 1000
+        rRoot = "%s_InitConf%d_fromMol"%(aFRoot, nInitConf)
+        cmdL = "acedrg -m %s -j %d -o  %s -p "%(aF,nInitConf,  rRoot) 
         print cmdL
         numAllJobs += 1
         lRun=os.system(cmdL)
@@ -155,10 +153,9 @@ for aF in glob.glob("./inMmcifPDB/*.cif"):
             failNames.append(rRoot)
 
     if len(aFRoot) !=0:
-        nInitConf = 100
-        nIterMax  = 100000
-        rRoot = "%s_InitConf%d_IterMax%d_fromMmcifPDB"%(aFRoot, nInitConf, nIterMax)
-        cmdL = "acedrg -c %s -j %d -l %d -o  %s -p "%(aF,nInitConf, nIterMax, rRoot) 
+        nInitConf = 1000
+        rRoot = "%s_InitConf%d_fromMmcifPDB"%(aFRoot, nInitConf)
+        cmdL = "acedrg -c %s -j %d -o %s -p "%(aF,nInitConf,  rRoot) 
         print cmdL
         numAllJobs += 1
         lRun=os.system(cmdL)

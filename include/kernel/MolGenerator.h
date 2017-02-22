@@ -328,6 +328,8 @@ namespace LIBMOL
         std::map<int, std::map<int, REAL> >     metalRelatedBonds;
         std::map<int, std::map<int, std::map<int, REAL> > > 
                                                 metalRelatedAngles;
+        // For tempo research
+        std::map<int, std::map<int, REAL> >     metalRelatedMetalNBs;
                  
         
     private :

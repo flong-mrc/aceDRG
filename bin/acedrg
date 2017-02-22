@@ -1539,18 +1539,22 @@ class Acedrg(CExeCode ):
         tmpStr = ""
         if self.numConformers == 1:
             tmpStr = "_tmp"
-        nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
-        print "Number of intial conformers for the molecule  ", nConf
+        #nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
+        #print "Number of intial conformers for the molecule  ", nConf
+        print "Number of intial conformers for refmac geo-opt  ", len(self.rdKit.selecConformerIds)
 
         inPdbNamesRoot =[]
-        for idxConf in range(nConf): 
-            tPdbRoot = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxConf+1) + tmpStr
+        #for idxConf in range(nConf): 
+        idxC = 1
+        for idxConf in self.rdKit.selecConformerIds : 
+            tPdbRoot = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxC) + tmpStr
             aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
             #print "PDB root ", tPdbRoot
             #print aConfPdb
             self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign)
             if os.path.isfile(aConfPdb):
                 inPdbNamesRoot.append(tPdbRoot)
+            idxC+=1
         aLibCifIn = self.outRstCifName 
         for aFRoot in inPdbNamesRoot: 
             aPdbIn    = os.path.join(self.scrDir, aFRoot + "_init.pdb")
@@ -2333,7 +2337,6 @@ class Acedrg(CExeCode ):
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, "L-peptide")
                 #else:
                 if self.workMode in [11,  111]:
-                    nConf = self.rdKit.molecules[iMol].GetNumConformers()
                     print "Using coords ", self.rdKit.useExistCoords
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
@@ -2486,12 +2489,15 @@ class AcedrgRDKit():
         if tGFFName and os.path.isfile(tGFFName):
             self.setupFuncGroupTab(tGFFName)
 
-        #self.nMaxIters       = 1000
-        #self.nMaxMult        = 20
-        self.numRDKitOptmSteps       = 1000
-        self.numInitConformers       = 20
+        self.nMaxIters               = 20
+        self.numRDKitOptmSteps       = 5000
+        self.numInitConformers       = 500
+        self.maxNumInitConformers    = 10000
         self.numConformers           = 1
         self.useExistCoords          = False
+        self.conformerEngMap         = {}
+        self.numSelectForRefConfs    = 25
+        self.selecConformerIds         = []
       
         self.hasCCP4Type     = False
    
@@ -2522,7 +2528,7 @@ class AcedrgRDKit():
         if tProcessParaSet.has_key("numRDKitOptmSteps"):
             self.numRDKitOptmSteps = tProcessParaSet["numRDKitOptmSteps"]
         else:
-            self.numRDKitOptmSteps = 1000
+            self.numRDKitOptmSteps = 5000
 
         if tProcessParaSet.has_key("numInitConformers"):
             self.numInitConformers = tProcessParaSet["numInitConformers"]
@@ -2530,7 +2536,7 @@ class AcedrgRDKit():
             if self.useExistCoords:
                 self.numInitConformers = 1
             else:
-                self.numInitConformers = 20
+                self.numInitConformers = 500
 
         if tProcessParaSet.has_key("numConformers"):
             self.numConformers = tProcessParaSet["numConformers"]
@@ -2539,6 +2545,14 @@ class AcedrgRDKit():
 
         if self.numConformers > self.numInitConformers:
             self.numInitConformers = self.numConformers
+  
+        if self.numInitConformers > self.maxNumInitConformers:
+            self.numInitConformers = self.maxNumInitConformers
+ 
+        self.numSelectForRefConfs = self.numInitConformers/20
+        if self.numSelectForRefConfs < 25:
+            self.numSelectForRefConfs = 25
+        
 
     def setRepSign(self):
 
@@ -3236,10 +3250,36 @@ class AcedrgRDKit():
         #for aId in confIds:
         #    print aId
         for aId in confIds:
-            aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.numInitConformers, aId)
+            aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.nMaxIters, aId)
             if not aFailure:
+                aForceField = AllChem.UFFGetMoleculeForceField(tMol, confId=aId)
+                aEng        = aForceField.CalcEnergy()
+                if not self.conformerEngMap.has_key(aEng):
+                    self.conformerEngMap[aEng] = []
+                self.conformerEngMap[aEng].append(aId)
                 rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
-                    
+
+        #if len(self.conformerEngMap):
+        #    print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
+        #    print "They are : "
+        #    for aEng in sorted(self.conformerEngMap.iterkeys()):
+        #        print "Energy ", aEng
+        #        for aCid in self.conformerEngMap[aEng]:
+        #            print aCid
+
+        print "The following conformers are selected for refinement: "
+        
+        nID= 0
+        for aEng in sorted(self.conformerEngMap.iterkeys()):
+            for aCId in self.conformerEngMap[aEng]:
+                if nID < self.numSelectForRefConfs:
+                    self.selecConformerIds.append(aCId)
+                    print "Conformer ID: ", aCId, " UFF energy : ", aEng
+                    nID +=1
+                else:
+                    break
+        print "Number of conformers selected for refinement is ",  len(self.selecConformerIds) 
+
     def setExistCoords(self, tMol, tReadInAtoms, tReadInBonds):
 
         pass 

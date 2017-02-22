@@ -405,6 +405,9 @@ namespace LIBMOL // temp
         std::map<int, std::map<int, REAL> >                     uniqBondsMap;
         std::map<int, std::map<int, std::map<int, REAL> > >     uniqAngsMap;
         
+        std::map<int, std::map<int, std::map<int, REAL> > >     allAngs;
+        std::map<REAL, std::vector<int> >       angVect;
+        
         
         
     };
