@@ -204,7 +204,6 @@ namespace LIBMOL {
                             << initAtoms.size() << std::endl;
                     
                     symmAtomGen(iCryst, aPTable);
-
                    
                     if (!lColid) 
                     {
@@ -842,8 +841,19 @@ namespace LIBMOL {
 
         int aDim = 3;
         int aMode = 0;
-        LIBMOL::REAL tCellL = 3.5;
-        LIBMOL::REAL tCellShell = 0.5;
+        REAL tCellL, tCellShell;
+        
+        if (lHasMetal)
+        {
+            tCellL = 4.5;
+            tCellShell = 1.0;
+        }
+        else
+        {
+            tCellL= 3.5;
+            tCellShell = 0.5;
+        }
+       
 
         tNBListOfSystem.building(allAtoms, aDim, tCellL, tCellShell, aMode);
 
@@ -891,7 +901,13 @@ namespace LIBMOL {
                         tCryst->itsCell->a, tCryst->itsCell->b,
                         tCryst->itsCell->c, tCryst->itsCell->alpha,
                         tCryst->itsCell->beta, tCryst->itsCell->gamma);
-
+                
+                if (allAtoms[i].isMetal && allAtoms[(*iNB)].isMetal)
+                {
+                    metalRelatedMetalNBs[allAtoms[i].seriNum][allAtoms[(*iNB)].seriNum]
+                            = rD;
+                }
+                
                 std::vector<REAL> bondRange;
 
                 if ((allAtoms[i].chemType == "H" && allAtoms[*iNB].chemType == "O")
