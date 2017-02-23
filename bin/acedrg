@@ -1860,7 +1860,7 @@ class Acedrg(CExeCode ):
                         for aL in tStrDescriptors["props"]:
                             tOutCif.write(aL+"\n")
                         for aL in tStrDescriptors["entries"]:
-                            tOutCif.write(aL)
+                            tOutCif.write(aL+"\n")
                     """
                     elif tStrDescriptors.has_key("defProps") and tStrDescriptors.has_key("defSmiles"):
                         for aProp in tStrDescriptors["defProps"]:
@@ -4668,7 +4668,15 @@ class FileTransformer :
             if len(aBlockLs):
                 self.allBlockLs.append(aBlockLs)
        
-            #print "Number of Blocks ", len(self.allBlockLs)
+            print "Number of Blocks ", len(self.allBlockLs)
+            i = 1
+            for aBlc in self.allBlockLs:
+                print "-------------"
+                print "Block ", i
+                i = i + 1
+                for aL in aBlc:
+                    print aL  
+    
 
             if len(self.allBlockLs):
                 for aBlk in self.allBlockLs:
@@ -4957,7 +4965,6 @@ class FileTransformer :
                     for i in range(len(colIdx)):
                         if colIdx[i].find("chem_comp_atom.atom_id") != -1:
                             print "Prop %s is %s "%(colIdx[i], aAtom[colIdx[i]].ljust(8))
-        """
         # Check
         if len(self.inputCharge) !=0:
             print "The following atoms have charges "
@@ -4992,7 +4999,6 @@ class FileTransformer :
                     print aProp
                 for aEn in self.strDescriptors["entries"]:
                     print aEn.strip()
-        """
 
     def getCCP4MmCifMap(self):
 
