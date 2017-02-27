@@ -29,7 +29,8 @@ from rdkit.Chem import rdmolfiles
 from rdkit.Chem import rdMolTransforms
 from rdkit.Chem import rdmolops
 from rdkit.Chem import Pharm3D 
-from rdkit.Chem.Pharm3D import EmbedLib  
+from rdkit.Chem.Pharm3D import EmbedLib
+ 
 
 if os.name != 'nt':
     import fcntl
@@ -3220,6 +3221,8 @@ class AcedrgRDKit():
 
     def optOneConformer(self, tMol, tMaxIters=1000, tMaxMult=20, tConfId=-1):
         tFailure = 0
+        print "Conformer ID ", tConfId
+        print Chem.MolToMolBlock(tMol)
         tFailure=AllChem.UFFOptimizeMolecule(tMol, tMaxIters)
         if tFailure ==1:
             nFac = 2
@@ -3277,7 +3280,7 @@ class AcedrgRDKit():
         print "Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps
         nConf = tMol.GetNumConformers()
         print "Number of initial conformers obtained", nConf
-       
+         
         for aId in confIds:
             #print "initial Id ", aId 
             aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.nMaxIters, aId)
@@ -3298,7 +3301,7 @@ class AcedrgRDKit():
                 for aCid in self.conformerEngMap[aEng]:
                     print aCid
         print "The following conformers are selected for refinement: "
-       
+        print 
         if not self.useExistCoords: 
             nID= 0
             for aEng in sorted(self.conformerEngMap.iterkeys()):
@@ -3311,7 +3314,7 @@ class AcedrgRDKit():
                         break
         else:
             self.selecConformerIds =[0,1]
-        print "Number of conformers selected for refinement is ",  len(self.selecConformerIds) 
+        print "Number of conformers selected for refinement is ",  len(self.selecConformerIds)
 
     def setExistCoords(self, tMol, tReadInAtoms, tReadInBonds):
 
@@ -3426,7 +3429,7 @@ class AcedrgRDKit():
         print "==========================================="
         """
         tMol.UpdatePropertyCache()
-        aMol = Chem.AddHs(tMol)
+        aMol = Chem.AddHs(tMol, explicitOnly=False, addCoords=True)
 
         # Make SMILES before Hs are added 
         if tMol.HasProp('SmilesIn'):
