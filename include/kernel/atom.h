@@ -394,6 +394,8 @@ namespace LIBMOL // temp
         void buildBondAndAngleMap(std::vector<AtomDict> & tAtoms,
                                   std::vector<CrystInfo>::iterator tCryst);
         
+        void projectCoordsToUnitSph(std::vector<AtomDict> & tAtoms);
+        
         int                  metSeril;
         std::vector<int>     ligandSerilSet;
         std::string          formu;
@@ -406,9 +408,9 @@ namespace LIBMOL // temp
         std::map<int, std::map<int, std::map<int, REAL> > >     uniqAngsMap;
         
         std::map<int, std::map<int, std::map<int, REAL> > >     allAngs;
-        std::map<REAL, std::vector<int> >       angVect;
+        std::map<REAL, std::vector<int> >                       angVect;
         
-        
+        std::vector<std::vector<REAL> >                          unitCoords;
         
     };
     

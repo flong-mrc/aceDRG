@@ -833,7 +833,7 @@ namespace LIBMOL {
         
         REAL covalent_sensitivity = 0.15;
         REAL covalent_sensitivity1 = 0.22;
-        REAL covalent_sensitivity2 = 0.25;
+        REAL covalent_sensitivity2 = 0.245;
         REAL covalent_sensitivity3 = 0.30;
         REAL covalent_sensitivity4 = 0.60;
 
@@ -906,6 +906,35 @@ namespace LIBMOL {
                 {
                     metalRelatedMetalNBs[allAtoms[i].seriNum][allAtoms[(*iNB)].seriNum]
                             = rD;
+                    
+                    
+                }
+                
+                if (allAtoms[i].isInPreCell)
+                {
+                    ID id1 = allAtoms[i].id, id2 = allAtoms[(*iNB)].id;
+                    std::list<std::string> tIds;
+                    tIds.push_back(id1);
+                    tIds.push_back(id2);
+                    tIds.sort(compareNoCase2);
+                    std::string aCombID;
+                    int nRS = 0;
+                    for (std::list<std::string>::iterator iId = tIds.begin();
+                        iId != tIds.end(); iId++) 
+                    {
+                        if (nRS == 0) 
+                        {
+                            aCombID.append(*iId);
+                        } else 
+                        {
+                            aCombID.append("_" + *iId);
+                        }
+                        nRS++;
+                    }
+                    
+                    ID elem1 = allAtoms[i].chemType, elem2 = allAtoms[(*iNB)].chemType;
+                    distsNBs[elem1][elem2][rD].push_back(aCombID);
+                    
                 }
                 
                 std::vector<REAL> bondRange;
@@ -927,7 +956,7 @@ namespace LIBMOL {
                     covalent_sensitivity = covalent_sensitivity2;
                 }
 
-                //std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
+                // std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl; 
 
                 getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                         covalent_sensitivity, tPTab,
@@ -974,13 +1003,13 @@ namespace LIBMOL {
                                 allAtoms[*iNB].bondLengths.push_back(rD);
                             }
                         }
-                       /*
+                      
                         if (allAtoms[i].isMetal || allAtoms[*iNB].isMetal)
                         {
                             
                             //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
                             //          << " neighbor atoms. " << std::endl;
-                           
+                           /*
                             std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id 
                                       << " of serial number " 
@@ -1003,10 +1032,8 @@ namespace LIBMOL {
                                       << " is added to the bond_list_cell "
                                       << std::endl << "Its bond length is " << rD
                                       << std::endl;
-                            
+                          */  
                         }
-                        */
-                       
                     }
                 }
             }
@@ -1499,13 +1526,13 @@ namespace LIBMOL {
                 tRange[0] = 0.2;
             }
             tRange[1] = tRad + 0.8 * tExtraD;
-
-            //std::cout <<  "comp1 " << comp1 << std::endl;
-            //std::cout <<  "comp2 " << comp2 << std::endl;
-            //std::cout << "tRad " << tRad << std::endl;
-            //std::cout << "tSen " << tSens << std::endl;
-            //std::cout << "tExtraD " << std::endl;
-
+            /*
+            std::cout <<  "comp1 " << comp1 << std::endl;
+            std::cout <<  "comp2 " << comp2 << std::endl;
+            std::cout << "tRad " << tRad << std::endl;
+            std::cout << "tSen " << tSens << std::endl;
+            std::cout << "tExtraD " << std::endl;
+            */
         } else {
             std::cout << "Bug! At least one of covalent radius for "
                     << tAtm1.id << " or " << tAtm2.id
@@ -4427,6 +4454,38 @@ namespace LIBMOL {
                     }            
                 }
                 aBAndAF.close();
+            }
+            
+            Name NBDistRanges(rootFName);
+            NBDistRanges.append("_NB_dist.txt");
+            std::ofstream aNBDistF(NBDistRanges.c_str());
+            if (aNBDistF.is_open())
+            {
+                for (std::map<ID, std::map<ID, std::map<REAL, std::vector<ID> > > >::iterator
+                       iDM1=distsNBs.begin(); iDM1 != distsNBs.end(); iDM1++)
+                {
+                    for (std::map<ID, std::map<REAL, std::vector<ID> > >::iterator
+                         iDM2 = iDM1->second.begin(); iDM2 != iDM1->second.end();
+                         iDM2++)
+                    {
+                        for (std::map<REAL, std::vector<ID> >::iterator iDM3
+                              =iDM2->second.begin(); iDM3 !=iDM2->second.end();
+                              iDM3++)
+                        {
+                            aNBDistF << iDM1->first << "\t"
+                                     << iDM2->first << "\t"
+                                     << iDM3->first << std::endl;
+                            aNBDistF << "Pair_list_begin: " << std::endl;
+                            for (std::vector<ID>::iterator iDV=iDM3->second.begin();
+                                    iDV != iDM3->second.end(); iDV++)
+                            {
+                                 aNBDistF << *iDV << std::endl;
+                            }
+                            aNBDistF << "Pair_list_end " << std::endl;
+                        }
+                    }
+                }
+                aNBDistF.close();
             }
         }
         

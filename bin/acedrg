@@ -1,4 +1,4 @@
-#!/usr/bin/env  ccp4-python
+#!/usr/bin/env ccp4-python 
 # Python script
 #
 #
@@ -19,6 +19,7 @@ from optparse import OptionParser
 import time
 import math
 import select
+import random
 
 from rdkit      import rdBase
 
@@ -30,7 +31,7 @@ from rdkit.Chem import rdMolTransforms
 from rdkit.Chem import rdmolops
 from rdkit.Chem import Pharm3D 
 from rdkit.Chem.Pharm3D import EmbedLib
- 
+from rdkit.Geometry import rdGeometry 
 
 if os.name != 'nt':
     import fcntl
@@ -380,7 +381,7 @@ class Acedrg(CExeCode ):
         
     def InputParser(self, t_argvs):
 
-        usage = "Serveral Examples: \n\
+        usage = "\n\
         (1) Input a mmCif file to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
             acedrg -c your_mmCif_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
         (2) Input a SMILES string in a command line (the SMILES string is a pair of quotation marks) or \n \
@@ -390,7 +391,7 @@ class Acedrg(CExeCode ):
             acedrg -m your_mol_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n\
         (4) Input a MOL2 file to get a ligand/Dictionary/restraint files (mmCif fomat) \n\
             acedrg -g your_mol_file -r your_monomer_name(optional) -o output_name_root(optional) \n\n"
-
+    
         """
         (4) Input a small molecule CIF file to get two files describing your molecules, atom types, \n\
             bond lengths and angles (text format)\n\
@@ -478,7 +479,7 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,
                                     help="Calculate bond-orders and charges using HMO ")
 
-        self.inputParser.add_option("-v",  "--ver", dest="versionInfo",  
+        self.inputParser.add_option("-v",  "--version", dest="versionInfo",  
                                     action="store_true",  default=False,
                                     help="The option for checking version information of acedrg")
 
@@ -1903,7 +1904,7 @@ class Acedrg(CExeCode ):
                     nId +=1   
                     aListF.write("%8.4f\t%d\t%s\n"%(aEng, aCId, aPdbName))
 
-            aListF.write("REFMAC-Energy\tOriginal-Conformer-Id\tPDB-File-Name\n")
+            aListF.write("REFMAC-Energy\tPDB-File-Name-With-Original-Conformer-Id\n")
             for aPair in self.refmacMinFValueList:
                 aPair[1]= aPair[1].strip().split("/")[-1].strip()
                 aListF.write("%8.4f\t%s\n"%(aPair[0], aPair[1]))
@@ -2077,7 +2078,7 @@ class Acedrg(CExeCode ):
         self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print "One of output conformers will using input coordinates as initial ones"
-        else:
+        elif self.workMode !=0:
             print "Input coordinates will be ignored"
 
         # Stage 1: initiate a mol file for RDKit obj
@@ -3221,9 +3222,8 @@ class AcedrgRDKit():
 
     def optOneConformer(self, tMol, tMaxIters=1000, tMaxMult=20, tConfId=-1):
         tFailure = 0
-        print "Conformer ID ", tConfId
-        print Chem.MolToMolBlock(tMol)
-        tFailure=AllChem.UFFOptimizeMolecule(tMol, tMaxIters)
+        
+        tFailure=AllChem.UFFOptimizeMolecule(tMol, maxIters=tMaxIters, vdwThresh=10.0, confId=tConfId)
         if tFailure ==1:
             nFac = 2
             while tFailure ==1 and nFac < tMaxMult:
@@ -3274,25 +3274,51 @@ class AcedrgRDKit():
         #  Setup conformers for the molecules
         if self.useExistCoords:
             confIds =AllChem.EmbedMultipleConfs(tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=False)
+            tReq    = self.numInitConformers
+            nNewCon = len(confIds)
+            while nNewCon==0 and tReq <=5 :
+                tReq +=1
+                confIds =AllChem.EmbedMultipleConfs(tMol, tReq, maxAttempts=0, randomSeed=-1, clearConfs=False)
+                nNewCon = len(confIds)             
+                print tReq
+            #for aConf in tMol.GetConformers():
+            #    print "!!!!!!!!!! Conf ", aConf.GetId()
+            #    for aAtom in tMol.GetAtoms():
+            #        aIdx = aAtom.GetIdx()
+            #        name  = aAtom.GetProp("Name") 
+            #        aPos = aConf.GetAtomPosition(aIdx)
+            #        print "For atom ", name
+            #        print "Its coordinates are : "
+            #        print "x:  ", aPos.x           
+            #        print "y:  ", aPos.y           
+            #        print "z:  ", aPos.z           
         else:
             confIds =AllChem.EmbedMultipleConfs(tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=True)
         print "Number of initial conformers requested", self.numInitConformers
         print "Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps
+        print "Number of new conformers ", len(confIds)
         nConf = tMol.GetNumConformers()
         print "Number of initial conformers obtained", nConf
-         
-        for aId in confIds:
-            #print "initial Id ", aId 
-            aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.nMaxIters, aId)
+        allConfs = tMol.GetConformers()
+        allAtoms = tMol.GetAtoms()
+        print Chem.MolToMolBlock(tMol)
+        for aConf in allConfs:
+            aCIdx =  aConf.GetId()
+            aWCoordList = []
+            lNorm = self.checkH_Abnormal(aConf, allAtoms, aWCoordList)
+            if not lNorm:
+                print "Conformer ", aCIdx, " has abormal coordinates."
+                self.forceH_coords(aConf, allAtoms, aWCoordList)
+            aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.nMaxIters, aCIdx)
             if not aFailure:
                 #print "opted id ", aId
-                aForceField = AllChem.UFFGetMoleculeForceField(tMol, confId=aId)
+                aForceField = AllChem.UFFGetMoleculeForceField(tMol, confId=aCIdx)
                 aEng        = aForceField.CalcEnergy()
                 if not self.conformerEngMap.has_key(aEng):
                     self.conformerEngMap[aEng] = []
-                self.conformerEngMap[aEng].append(aId)
-                rdmolops.AssignAtomChiralTagsFromStructure(tMol, aId)
-
+                self.conformerEngMap[aEng].append(aCIdx)
+                print "Conf : ", aCIdx, " Engergy : ", aEng
+                rdmolops.AssignAtomChiralTagsFromStructure(tMol, aCIdx)
         if len(self.conformerEngMap):
             print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
             print "They are : "
@@ -3300,26 +3326,88 @@ class AcedrgRDKit():
                 print "Energy ", aEng
                 for aCid in self.conformerEngMap[aEng]:
                     print aCid
+
         print "The following conformers are selected for refinement: "
-        print 
+        nSelect = 2
         if not self.useExistCoords: 
-            nID= 0
-            for aEng in sorted(self.conformerEngMap.iterkeys()):
-                for aCId in self.conformerEngMap[aEng]:
-                    if nID < self.numSelectForRefConfs:
-                        self.selecConformerIds.append(aCId)
-                        print "Conformer ID: ", aCId, " UFF energy : ", aEng
-                        nID +=1
-                    else:
-                        break
+            nSelect = self.numSelectForRefConfs
         else:
-            self.selecConformerIds =[0,1]
+            if tMol.GetNumConformers() <2:
+                nSelect = self.numSelectForRefConfs
+
+        nID= 0
+        for aEng in sorted(self.conformerEngMap.iterkeys()):
+            for aCId in self.conformerEngMap[aEng]:
+                if nID < self.numSelectForRefConfs:
+                    self.selecConformerIds.append(aCId)
+                    print "Conformer ID: ", aCId, " UFF energy : ", aEng
+                    nID +=1
+                else:
+                    break
         print "Number of conformers selected for refinement is ",  len(self.selecConformerIds)
 
-    def setExistCoords(self, tMol, tReadInAtoms, tReadInBonds):
+    def checkH_Abnormal(self, tConf, tAtoms, tWrongCoordsMap):
 
-        pass 
+        lN = True
+        for aAtom in tAtoms:
+            aIdx = aAtom.GetIdx()
+            aPos = tConf.GetAtomPosition(aIdx)
+            if aAtom.GetSymbol().strip().upper()=="H" and\
+               (math.isnan(aPos.x) or math.isinf(aPos.x)or\
+                math.isnan(aPos.y) or math.isinf(aPos.y)or\
+                math.isnan(aPos.z) or math.isinf(aPos.z)):
+                if not aIdx in tWrongCoordsMap:
+                    tWrongCoordsMap.append(aIdx)
+                lN = False
+                print "for atom ", aIdx
+                print "Its position is :"
+                print "x = ", aPos.x
+                print "Is it nan ? ", math.isnan(aPos.x)
+                print "Is it inf ", math.isinf(aPos.x)
+                print "y = ", aPos.y
+                print "Is it nan ? ", math.isnan(aPos.y)
+                print "Is it inf ", math.isinf(aPos.y)
+                print "z = ", aPos.z
+                print "Is it nan ? ", math.isnan(aPos.z)
+                print "Is it inf ", math.isinf(aPos.z)
+               
+        return lN
+              
+    def forceH_coords(self, tConf, tAtoms, tWrongCoordList, tReadInCoordMap=None):
+        
+        if tReadInCoordMap: 
+            for aIdx in tWrongCoordList:
+                aPos   = rdGeometry.Point3D()
+                if tReadInCoordMap.has_key(aIdx):
+                    aPos.x = tReadInCoordMap[aIdx][0]
+                    aPos.y = tReadInCoordMap[aIdx][1]
+                    aPos.z = tReadInCoordMap[aIdx][2]
+                else:
+                    aPos.x = random.random()
+                    aPos.y = random.random()
+                    aPos.z = random.random()
+                tConf.SetAtomPosition(aIdx, aPos)
+        else:
+            # Better methods required
+            for aIdx in tWrongCoordList:
+                aPos = rdGeometry.Point3D()
+                # Need the better methods
+                aPos.x = random.random()
+                aPos.y = random.random()
+                aPos.z = random.random()
+                tConf.SetAtomPosition(aIdx, aPos)
 
+        # Now output all coordinates in the conformer
+        for aAtom in tAtoms:
+            aIdx = aAtom.GetIdx()
+            name  = aAtom.GetProp("Name") 
+            aPos = tConf.GetAtomPosition(aIdx)
+            print "For atom ", name
+            print "Its coordinates are : "
+            print "x:  ", aPos.x           
+            print "y:  ", aPos.y           
+            print "z:  ", aPos.z           
+            
     def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None):
         
         print "A molecule with residue name %s is generated"%tMol.GetProp("ResidueName")
@@ -4721,6 +4809,7 @@ class FileTransformer :
             if len(all2ColLines) !=0:
                 self.parserAll2Cols(all2ColLines)
 
+            self.TmpChemCheck()
            
             # check
             """
@@ -4735,6 +4824,60 @@ class FileTransformer :
                     print "==============================="
             """
 
+    def TmpChemCheck(self):
+
+        """ 
+        Temporal function
+        Exclude some of cases where RDKit does not accept certain valence values, e.g. those in ligands with B
+        Cancel this function when RDKit make the corresponding changes 
+        """ 
+ 
+        if len(self.bonds) > 0 :
+            atomVals = {}
+            
+            for aBond in self.bonds:
+                if aBond.has_key("_chem_comp_bond.atom_id_1") and\
+                   aBond.has_key("_chem_comp_bond.atom_id_2") and\
+                   aBond.has_key("_chem_comp_bond.value_order"):
+                    aOrd = 0
+                    if aBond["_chem_comp_bond.value_order"].upper().find("SING") !=-1:
+                        aOrd = 1
+                    elif aBond["_chem_comp_bond.value_order"].upper().find("DOUB") !=-1:
+                        aOrd = 2
+                    elif aBond["_chem_comp_bond.value_order"].upper().find("TRIP") !=-1:
+                        aOrd = 3
+                    if not atomVals.has_key(aBond["_chem_comp_bond.atom_id_1"]):
+                        atomVals[aBond["_chem_comp_bond.atom_id_1"]] = 0
+                    if not atomVals.has_key(aBond["_chem_comp_bond.atom_id_2"]):
+                        atomVals[aBond["_chem_comp_bond.atom_id_2"]] = 0
+                    atomVals[aBond["_chem_comp_bond.atom_id_1"]] += aOrd
+                    #print aBond["_chem_comp_bond.atom_id_1"], " : ", aOrd
+                    atomVals[aBond["_chem_comp_bond.atom_id_2"]] += aOrd
+                    #print aBond["_chem_comp_bond.atom_id_2"], " : ", aOrd
+             
+            # find IDs of B, Br etc
+            speAtomIds = []
+            for aAtom in self.atoms:
+                if aAtom.has_key("_chem_comp_atom.atom_id") and\
+                   aAtom.has_key("_chem_comp_atom.type_symbol"):
+                    if aAtom["_chem_comp_atom.type_symbol"].strip() =="B"\
+                       or aAtom["_chem_comp_atom.type_symbol"].strip()=="BR":
+                        speAtomIds.append(aAtom["_chem_comp_atom.atom_id"])
+                        if aAtom.has_key("_chem_comp_atom.charge"): 
+                            if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
+                                aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
+                            aCh = int(aAtom["_chem_comp_atom.charge"])
+                            if aCh !=0 and atomVals.has_key(aAtom["_chem_comp_atom.atom_id"]):
+                                atomVals[aAtom["_chem_comp_atom.atom_id"]] +=aCh
+                                
+            if len(speAtomIds):
+                for aId in speAtomIds:
+                    if atomVals.has_key(aId):
+                        if atomVals[aId] > 3: 
+                            print "Acedrg stops because RDKit does not accept the following: "
+                            print "%s  has total valence of %d "%(aId, atomVals[aId])
+                            sys.exit()        
+        
     def parserAll2Cols(self, t2ColLines):
 
         iC =0
@@ -4975,7 +5118,9 @@ class FileTransformer :
                 if aAtom.has_key("_chem_comp_atom.atom_id"):
                     tCharge =0.0
                     if aAtom.has_key("_chem_comp_atom.charge"):
-                        tCharge = float(aAtom["_chem_comp_atom.charge"])
+                        print "aAtom['_chem_comp_atom.charge'] ", aAtom["_chem_comp_atom.charge"] 
+                        if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
+                            tCharge = float(aAtom["_chem_comp_atom.charge"])
                     elif aAtom.has_key("_chem_comp_atom.partial_charge"):
                         tCharge = float(aAtom["_chem_comp_atom.partial_charge"])
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.partial_charge"]
@@ -5390,7 +5535,8 @@ class FileTransformer :
             idxAtom = 1
             for aAtom in self.atoms:
                 #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " with serial number ", idxAtom
-                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal"):
+                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal") and\
+                   aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"].find("?")==-1:
                     x = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
                 elif aAtom.has_key("_chem_comp_atom.model_Cartn_x"):
                     x = aAtom["_chem_comp_atom.model_Cartn_x"]
@@ -5399,7 +5545,8 @@ class FileTransformer :
                 else:
                     x = "0.0000"
 
-                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_y_ideal"):
+                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_y_ideal") and\
+                   aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"] ==-1:
                     y = aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
                 elif aAtom.has_key("_chem_comp_atom.model_Cartn_y"):
                     y = aAtom["_chem_comp_atom.model_Cartn_y"]
@@ -5408,7 +5555,8 @@ class FileTransformer :
                 else:
                     y = "0.0000"
 
-                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_z_ideal"):
+                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_z_ideal") and\
+                   aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]==-1:
                     z = aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
                 elif aAtom.has_key("_chem_comp_atom.model_Cartn_z"):
                     z = aAtom["_chem_comp_atom.model_Cartn_z"]
@@ -5440,7 +5588,9 @@ class FileTransformer :
                     #print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
                     if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
-                    nCharge = int(aAtom["_chem_comp_atom.charge"])
+                    nCharge =0
+                    if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
+                        nCharge = int(aAtom["_chem_comp_atom.charge"])
                     #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
                     #print " converted to charge symbol ", chargeMap[nCharge] 
                     if nCharge in chargeMap.keys():
@@ -5626,7 +5776,8 @@ class FileTransformer :
             tPDB.write("%s%s%s%s\n"%("HEADER".ljust(10), tClassification.ljust(40), tDate.ljust(9), tIdCode.rjust(7)))
             tPDB.write("CRYST1  100.000  100.000  100.000  90.00  90.00  90.00 P 1\n")
             # Atom section 
-            conformer  =  tMol.GetConformer(idxConf)
+            # print idxConf
+            aConf  =  tMol.GetConformer(idxConf)
             atoms      =  tMol.GetAtoms()
             for aAtom in atoms:
                 idxA  = aAtom.GetIdx() 
@@ -5641,7 +5792,7 @@ class FileTransformer :
                 rName = tIdCode[:3]
                 seqNum = "1"
                 empt1   = "   "
-                pos = conformer.GetAtomPosition(idxA)
+                pos = aConf.GetAtomPosition(idxA)
                 posX ="%8.3f"%pos.x
                 posY ="%8.3f"%pos.y
                 posZ ="%8.3f"%pos.z

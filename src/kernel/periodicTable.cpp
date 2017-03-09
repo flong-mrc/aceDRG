@@ -121,7 +121,7 @@ namespace LIBMOL
         elements["Se"]["atomNum"]  = 34;
         elements["Se"]["val"]      = 6;
         elemProps["Se"]["vdw"]     = 1.90;
-        elemProps["Se"]["cova"]    = 1.22;
+        elemProps["Se"]["cova"]    = 1.16;
         elemProps["Se"]["ionM-"]   = 1.84;
         elemProps["Se"]["ionM+"]   = 0.64;
         
@@ -170,7 +170,7 @@ namespace LIBMOL
         //elements["Br"]["vdw"]     = 1.85;
         //elements["Br"]["cova"]    = 1.21;
         elemProps["Br"]["vdw"]    = 1.85;
-        elemProps["Br"]["cova"]    = 1.21;
+        elemProps["Br"]["cova"]    = 1.14;
         elemProps["Br"]["ionM-"]  = 1.96;
         
         elements["I"]["row"]      = 5;
@@ -181,7 +181,7 @@ namespace LIBMOL
         //elements["I"]["vdw"]      = 1.98;
         //elements["I"]["cova"]     = 1.40;
         elemProps["I"]["vdw"]     = 1.98;
-        elemProps["I"]["cova"]     = 1.40;
+        elemProps["I"]["cova"]     = 1.33;
         elemProps["I"]["ionM-"]   = 2.06;
         
         elements["At"]["row"]      = 6;
@@ -770,7 +770,7 @@ namespace LIBMOL
         //elements["Zn"]["vdw"]       = 1.39;
         //elements["Zn"]["cova"]      = 1.45;
         elemProps["Zn"]["vdw"]      = 1.39;
-        elemProps["Zn"]["cova"]     = 1.22;
+        elemProps["Zn"]["cova"]     = 1.18;
         elemProps["Zn"]["ionM+"]    = 0.88;
         
         elements["Cd"]["row"]       = 5;

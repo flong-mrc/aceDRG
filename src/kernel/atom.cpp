@@ -989,7 +989,34 @@ namespace LIBMOL
                 }
             }
         }
-        std::cout << "The whole cluster is done." << std::endl;
+        std::cout << "The whole cluster is done." << std::endl;  
+    }
+    
+    void metalCluster::projectCoordsToUnitSph(std::vector<AtomDict>& tAtoms)
+    {
+        unitCoords.clear();
+        
+        std::vector<REAL>   tZero;
+        tZero.push_back(0.0);
+        tZero.push_back(0.0);
+        tZero.push_back(0.0);
+        unitCoords.push_back(tZero);
+        
+        for (std::vector<int>::iterator iNB = ligandSerilSet.begin();
+                    iNB != ligandSerilSet.end(); iNB++) 
+        {
+            std::vector<REAL> aDiffVec;
+            aDiffVec.clear();
+            if (tAtoms[*iNB].coords.size()==tAtoms[metSeril].coords.size())
+            for (unsigned i=0; i < tAtoms[*iNB].coords.size(); i++)
+            {
+                aDiffVec.push_back(tAtoms[*iNB].coords[i] -tAtoms[metSeril].coords[i]);
+            }
+            
+            normalizeV(aDiffVec);
+            
+            unitCoords.push_back(aDiffVec);
+        }
         
     }
     
