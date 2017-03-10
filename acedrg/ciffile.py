@@ -1,6 +1,6 @@
 
 import os, sys
-import startools
+from pdbecif import startools
 from collections import OrderedDict
 
 def cifdict_from_file(file):
