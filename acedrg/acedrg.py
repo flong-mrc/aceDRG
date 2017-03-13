@@ -1,4 +1,4 @@
-#!/usr/bin/env ccp4-python 
+#!/usr/bin/env  python
 # Python script
 #
 #
@@ -318,6 +318,9 @@ class Acedrg(CExeCode ):
         #self.refmacMinFValueList["fileName"] =""
         
 
+        self.linkInstructions = ""
+        self.linkInsMap       = {}
+        
         self.funcGroupTable   = ""
 
         self.numConformers    = 1
@@ -490,6 +493,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-z",  "--noGeoOpt", dest="noGeoOpt",  
                                     action="store_true",  default=False,
                                     help="The option for not doing geometry optimization on coordinates")
+
+        self.inputParser.add_option("-L",  "--linkInstruction", dest="linkInstructions", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File that gives the instructions to build a link")
 
         self.inputParser.add_option("-T",  "--Test", dest="testMode",  
                                     action="store_true",  default=False,  
@@ -713,7 +720,7 @@ class Acedrg(CExeCode ):
                     self.acedrgTables = tAcedrgTables
 
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
-           and not t_inputOptionsP.HMO: 
+           and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions: 
             if not t_inputOptionsP.noGeoOpt:
                 if t_inputOptionsP.inMmCifName:
                     self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -800,6 +807,12 @@ class Acedrg(CExeCode ):
             elif t_inputOptionsP.inMol2Name: 
                 self.inMol2Name = t_inputOptionsP.inMol2Name
                 self.workMode    = 55
+        elif t_inputOptionsP.linkInstructions :
+            # Need to add more options here
+            self.linkInstructions = t_inputOptionsP.linkInstructions.strip()
+            self.workMode = 61
+
+ 
 
         if t_inputOptionsP.testMode :
             self.testMode = True
@@ -2493,6 +2506,17 @@ class Acedrg(CExeCode ):
             print "work mode ", self.workMode
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol()    
+        
+        if self.workMode == 61:
+            print "work mode ", self.workMode
+            if os.path.isfile(self.linkInstructions):
+                # input from a file
+                self.getInstructionsForLink()
+            elif len(self.linkInstructions) !=0:
+                # input from command lines
+                self.getInstructionsForLink(1)
+            else:
+                print "%s can not be found for reading"%self.linkInstructions
 
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
@@ -2501,6 +2525,72 @@ class Acedrg(CExeCode ):
                 shutil.copy(self.outRstCifName, tCif) 
             else:
                 print "acedrg failed to generate a dictionary file"       
+
+    def getInstructionsForLink(self, inputMode=0):
+
+        allLs =""
+        aList = []
+        if inputMode==0:
+            try : 
+                aInsF = open(self.linkInstructions, "r")
+            except IOError:
+                print "% can not be open for reading ! "%self.linkInstructions
+            else:
+                allLs = aInsF.readlines()
+                aInsF.close()
+                for aL in allLs:
+                    strs = aL.strip().split()
+                    if len(strs) !=0:
+                       for aStr in strs:
+                           aStr = aStr.upper()
+                           if aStr.find("LINK:") == -1:
+                               aList.append(aStr)
+        elif inputMode==1:  
+            strs = self.linkInstructions.strip().split()
+            if len(strs) !=0:
+                for aStr in strs:
+                    aStr = aStr.upper()
+                    if aStr.find("LINK:") == -1:
+                        aList.append(aStr)
+
+        #keyWordList = ["RES-NAME-1", "ATOM-NAME-1", "RES-NAME-2", "ATOM-NAME-2", "BOND-TYPE", "DELETE"]
+        if len(aList):
+            i = 0
+            nL = len(aList)
+            while i < nL :
+                if aList[i].find("DELETE") == -1:
+                    if (i+1) < nL: 
+                        self.linkInsMap[aList[i]] = aList[i+1] 
+                        i +=2
+                    else:
+                        print "Error : check your link instruction file"
+                        print allLs
+                        break
+                else:
+                    if not self.linkInsMap.has_key("DELETE"):
+                        self.linkInsMap["DELETE"] = []
+                    if i+3 < nL:
+                        self.linkInsMap["DELETE"].append([aList[i+1], aList[i+2], aList[i+3]])
+                        i+=4
+                    else:
+                        print "Error : check your link instruction file"
+                        print allLs
+                        break
+                         
+            if len(self.linkInsMap):
+                print "Instructions for build a link are  "
+                print "Parameter\tValue"
+                for aKey in sorted(self.linkInsMap.iterkeys()):
+                    if aKey.find("DELETE")==-1: 
+                        print "%s\t%s"%(aKey, self.linkInsMap[aKey])
+                if self.linkInsMap.has_key("DELETE"):
+                    print "The following items are deleted."
+                    print "Item\tResidue\tItemName"
+                    for aQ in self.linkInsMap["DELETE"]:
+                        print "%s\t%s\t%s"%(aQ[0], aQ[1], aQ[2])        
+
+        else:
+            print "A empty set of input instructions for link building"
 
 
     def printExitInfo(self):
@@ -4764,15 +4854,16 @@ class FileTransformer :
             filtedAllLines = []
             for aL in tAllLs:
                 aL = aL.strip()
-                if aL[0].find("_") !=-1:
-                    a2ColList = []
-                    self.aLineToAlist(aL,a2ColList)
-                    if len(a2ColList)==2:
-                        all2ColLines.append(a2ColList)
+                if len(aL):
+                    if aL[0].find("_") !=-1:
+                        a2ColList = []
+                        self.aLineToAlist(aL,a2ColList)
+                        if len(a2ColList)==2:
+                            all2ColLines.append(a2ColList)
+                        else:
+                            filtedAllLines.append(aL)
                     else:
                         filtedAllLines.append(aL)
-                else:
-                    filtedAllLines.append(aL)
 
             for aL in filtedAllLines :
                 #if aL.find("data_") != -1 and aL.find("#") ==-1:
@@ -4863,9 +4954,11 @@ class FileTransformer :
                     if aAtom["_chem_comp_atom.type_symbol"].strip() =="B"\
                        or aAtom["_chem_comp_atom.type_symbol"].strip()=="BR":
                         speAtomIds.append(aAtom["_chem_comp_atom.atom_id"])
-                        if aAtom.has_key("_chem_comp_atom.charge"): 
+                        if aAtom.has_key("_chem_comp_atom.charge"):
                             if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
                                 aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
+                            elif aAtom["_chem_comp_atom.charge"].find("?") !=-1:
+                                aAtom["_chem_comp_atom.charge"] =0
                             aCh = int(aAtom["_chem_comp_atom.charge"])
                             if aCh !=0 and atomVals.has_key(aAtom["_chem_comp_atom.atom_id"]):
                                 atomVals[aAtom["_chem_comp_atom.atom_id"]] +=aCh
