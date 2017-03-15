@@ -165,7 +165,8 @@ namespace LIBMOL
                     if (getNumOxyConnect(tAtoms, iAt)==1)
                     {
                         // water is removed 
-                        iAt->bondingIdx=2;
+                        //iAt->bondingIdx=2;
+                        iAt->bondingIdx=1;
                     }
                     else
                     {
