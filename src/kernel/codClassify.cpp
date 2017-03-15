@@ -13124,8 +13124,10 @@ namespace LIBMOL
         {
             if (allAtoms[iAN->atoms[0]].bondingIdx <4)
             {
-                // std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
+                std::cout << "Now check defaulted " << std::endl;
+                std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
                 iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                std::cout << "The value is " << iAN->value << std::endl;
                 iAN->sigValue      = 3.0;
                 iAN->numCodValues  = 0;
                 iAN-> approxLevel = 6;
