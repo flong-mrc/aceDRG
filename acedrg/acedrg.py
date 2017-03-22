@@ -1562,6 +1562,7 @@ class Acedrg(CExeCode ):
         inPdbNamesRoot =[]
         #for idxConf in range(nConf): 
         idxC = 1
+        #print "Number of selct conformers ", self.rdKit.selecConformerIds
         for idxConf in self.rdKit.selecConformerIds : 
             tPdbRoot = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxC) + tmpStr
             aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
@@ -1585,6 +1586,7 @@ class Acedrg(CExeCode ):
             #    print "======"
             #    print "FValue: ", aPair[0], "  File name ", aPair[1]  
             if self.numConformers==1: 
+                #print "Come to output final info"
                 self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             else:
                 for i in range(self.numConformers):
@@ -1627,6 +1629,9 @@ class Acedrg(CExeCode ):
             else:
                 finPdb = self.outRoot +  ".pdb"
                 finRst = self.outRoot +  ".cif"
+            print "tInPdb ", tInPdb 
+            print "finPdb ", finPdb
+
             shutil.copy(tInPdb, finPdb)
             if os.path.isfile(finPdb):
                 self.inPdbName        = finPdb 
@@ -2406,7 +2411,7 @@ class Acedrg(CExeCode ):
                                 if not inPdbNamesRoot.has_key(idxMol):
                                     inPdbNamesRoot[idxMol] = []
                                 print "Number of atoms in molecule %d is %d "%(idxMol+1, self.rdKit.molecules[idxMol].GetNumAtoms())
-                                nConf = self.rdKit.molecules[idxMol].GetNumConformers()
+                                #nConf = self.rdKit.molecules[idxMol].GetNumConformers()
                                 self.runGeoOptOneMolFull(idxMol)
                                 if not self.useExistCoords:
                                     self.outEnergyGeoMap(idxMol)
@@ -3607,7 +3612,10 @@ class AcedrgRDKit():
         print "==========================================="
         """
         tMol.UpdatePropertyCache()
-        aMol = Chem.AddHs(tMol, explicitOnly=False, addCoords=True)
+        if self.useExistCoords:
+            aMol = Chem.AddHs(tMol, explicitOnly=False, addCoords=True)
+        else:
+            aMol = Chem.AddHs(tMol)
 
         # Make SMILES before Hs are added 
         if tMol.HasProp('SmilesIn'):

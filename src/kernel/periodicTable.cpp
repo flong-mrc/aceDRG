@@ -71,7 +71,7 @@ namespace LIBMOL
         elemProps["C"]["ionM-"]   = 0.30;
         
         
-        elements["N"]["row"]     = 2;
+        elements["N"]["row"]       = 2;
         elements["N"]["group"]     = 15;
         elements["N"]["matType"]   = 2;
         elements["N"]["atomNum"]   = 7;

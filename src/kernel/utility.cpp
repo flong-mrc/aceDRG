@@ -2359,6 +2359,8 @@ namespace LIBMOL
         for (std::vector<std::string>::iterator iS=tStrs.begin();
                 iS !=tStrs.end(); iS++)
         {
+            
+            cleanChar(*iS, ' ');
             std::vector<REAL> tV;
             tV.push_back(0.0);
             tV.push_back(0.0);
