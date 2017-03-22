@@ -216,6 +216,9 @@ namespace LIBMOL
         bool connMetal2ndNB(std::vector<int>      & tIdxs, 
                        std::vector<AtomDict> & tAtoms);
         
+        bool checkAtomGeom(std::vector<int>      & tIdxs,
+                           std::vector<AtomDict> & tAtoms);
+        
         bool checkAsmAtomsInMol(Molecule  & tMol, std::string  & tErrInfo);
         bool checkAtomOcp(Molecule  & tMol, std::string  & tErrInfo);
         bool validateBonds(std::vector<BondDict>::iterator tBo, 

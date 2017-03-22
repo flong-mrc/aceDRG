@@ -833,7 +833,7 @@ namespace LIBMOL {
         
         REAL covalent_sensitivity = 0.15;
         REAL covalent_sensitivity1 = 0.22;
-        REAL covalent_sensitivity2 = 0.245;
+        REAL covalent_sensitivity2 = 0.240;
         REAL covalent_sensitivity3 = 0.30;
         REAL covalent_sensitivity4 = 0.60;
 
@@ -932,8 +932,14 @@ namespace LIBMOL {
                         nRS++;
                     }
                     
+                    
                     ID elem1 = allAtoms[i].chemType, elem2 = allAtoms[(*iNB)].chemType;
-                    distsNBs[elem1][elem2][rD].push_back(aCombID);
+                    if (std::find(distsNBs[elem1][elem2][rD].begin(), 
+                                  distsNBs[elem1][elem2][rD].end(), aCombID)
+                             ==distsNBs[elem1][elem2][rD].end())
+                    {
+                        distsNBs[elem1][elem2][rD].push_back(aCombID);
+                    }
                     
                 }
                 
@@ -1006,10 +1012,10 @@ namespace LIBMOL {
                       
                         if (allAtoms[i].isMetal || allAtoms[*iNB].isMetal)
                         {
-                            
+                            /*
                             //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
                             //          << " neighbor atoms. " << std::endl;
-                           /*
+                           
                             std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id 
                                       << " of serial number " 
@@ -1021,11 +1027,12 @@ namespace LIBMOL {
                                       << " of serial number " << allAtoms[*iNB].seriNum
                                       << " from original atom " 
                                       << allAtoms[allAtoms[*iNB].fromOrig].id 
-                                      << " is " << rD << std::endl;
+                                      << " is " << std::endl << rD 
+                                      << std::endl;
                             std::cout << "Range between " << bondRange[0]
                                       << " and " << bondRange[1] << std::endl;
                             
-                         
+                           
                             std::cout << "a bond between " 
                                       << allAtoms[i].id << " and "
                                       << allAtoms[*iNB].id 
@@ -1517,27 +1524,34 @@ namespace LIBMOL {
             tRad = comp1 + comp2;
             tExtraD = tSens*tRad;
             if (tAtm2.chemType == "H" || tAtm1.chemType == "H" 
-                || tAtm1.chemType=="D" || tAtm2.chemType =="D") {
+                || tAtm1.chemType=="D" || tAtm2.chemType =="D") 
+            {
                 tRange[0] = tRad - 0.5 * tExtraD;
-            } else {
+            } 
+            else 
+            {
                 tRange[0] = tRad - 1.55 * tExtraD;
             }
-            if (tRange[0] < 0.2) {
+            if (tRange[0] < 0.2) 
+            {
                 tRange[0] = 0.2;
             }
-            tRange[1] = tRad + 0.8 * tExtraD;
-            /*
-            std::cout <<  "comp1 " << comp1 << std::endl;
-            std::cout <<  "comp2 " << comp2 << std::endl;
-            std::cout << "tRad " << tRad << std::endl;
-            std::cout << "tSen " << tSens << std::endl;
-            std::cout << "tExtraD " << std::endl;
-            */
-        } else {
+            tRange[1] = tRad + 0.5 * tExtraD;
+            
+            //std::cout <<  "comp1 " << comp1 << std::endl;
+            //std::cout <<  "comp2 " << comp2 << std::endl;
+            
+            //std::cout << "tRad "    << tRad  << std::endl;
+            //std::cout << "tSen "    << tSens << std::endl;
+            //std::cout << "tExtraD " << std::endl;
+           
+        } 
+        else 
+        {
             std::cout << "Bug! At least one of covalent radius for "
-                    << tAtm1.id << " or " << tAtm2.id
-                    << " is not defined the internal periodic table"
-                    << std::endl;
+                      << tAtm1.id << " or " << tAtm2.id
+                      << " is not defined the internal periodic table"
+                      << std::endl;
         }
     }
 
@@ -4472,16 +4486,15 @@ namespace LIBMOL {
                               =iDM2->second.begin(); iDM3 !=iDM2->second.end();
                               iDM3++)
                         {
-                            aNBDistF << iDM1->first << "\t"
-                                     << iDM2->first << "\t"
-                                     << iDM3->first << std::endl;
-                            aNBDistF << "Pair_list_begin: " << std::endl;
+                            
                             for (std::vector<ID>::iterator iDV=iDM3->second.begin();
                                     iDV != iDM3->second.end(); iDV++)
                             {
-                                 aNBDistF << *iDV << std::endl;
+                                aNBDistF << iDM1->first << "\t"
+                                         << iDM2->first << "\t"
+                                         << iDM3->first << "\t"
+                                         << *iDV << std::endl;
                             }
-                            aNBDistF << "Pair_list_end " << std::endl;
                         }
                     }
                 }
