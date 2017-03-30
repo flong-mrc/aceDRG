@@ -342,6 +342,8 @@ class Acedrg(CExeCode ):
         self.testMode         = False
 
         self.versionInfo       = {}
+        self.outCifGlobSect    = []
+
         self.allBondsAndAngles = {}
 
         self.allBondsAndAngles["atomClasses"] = {}
@@ -364,6 +366,7 @@ class Acedrg(CExeCode ):
 
         self.checkDependency()
         self.checkVersionInfo()
+        self.setOutCifGlobSec()
 
         if os.path.isfile(self.funcGroupTable):
             self.rdKit = AcedrgRDKit(self.funcGroupTable)
@@ -374,7 +377,9 @@ class Acedrg(CExeCode ):
         print "input RDKit: number of optimization iters ", self.rdKit.numRDKitOptmSteps
         print "input RDKit: number of initial conformers ", self.rdKit.numInitConformers
         print "input RDKit: number of output conformers ", self.rdKit.numConformers
-        self.fileConv         = FileTransformer()       
+
+        self.fileConv         = FileTransformer()   
+            
         self.chemCheck        = ChemCheck() 
         
         self.initMmcifMolMap  = {}
@@ -598,7 +603,8 @@ class Acedrg(CExeCode ):
         #print "Libmol used is at ", self.libmol
         
     def checkVersionInfo(self):
-   
+  
+        # Acedrg version info 
         self.versionInfo["man"] = os.path.join(self.acedrgTables, "manifest.txt")
         if not os.path.isfile(self.versionInfo["man"]):
             print "Version infomation is not available."
@@ -614,8 +620,55 @@ class Acedrg(CExeCode ):
                     if aL.find(":") !=-1:
                         strs = aL.strip().split(":")
                         if len(strs)==2:
-                            self.versionInfo[strs[0]] = strs[1]      
+                            self.versionInfo[strs[0]] = strs[1]
+        
+        # Refmac version info 
+        self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
+        self.runRefmacVersionInfo()
+        if os.path.isfile(self._log_name):
+            fRV = open(self._log_name, "r")
+            allLs = fRV.readlines()
+            fRV.close()
+            for aL in allLs:
+                strs = aL.strip().split()
+                if len(strs)== 4 and aL.find("Program") !=-1:
+                    self.versionInfo["REFMAC_NAME"] = strs[1].strip()[0:-1]
+                    print "REFMAC NAME : ", self.versionInfo["REFMAC_NAME"] 
+                    self.versionInfo["REFMAC_VERSION"] = strs[3].strip()
+                    print "REFMAC VERSION : ", self.versionInfo["REFMAC_VERSION"] 
+                    
+        else: 
+            print "Refmac version info is not available"
+
+        if not self.versionInfo.has_key("REFMAC_VERSION"):
+            print "Refmac version info is not available"
+           
              
+    def setOutCifGlobSec(self):
+         
+        self.outCifGlobSect.append("loop_\n")
+        self.outCifGlobSect.append("_software\n")
+        self.outCifGlobSect.append("_version\n")
+        self.outCifGlobSect.append("_purpose\n")
+        if self.versionInfo.has_key("ACEDRG_VERSION"):
+            self.outCifGlobSect.append("%s%s%s\n"%("acedrg".ljust(30), self.versionInfo["ACEDRG_VERSION"].ljust(20), '\"dictionary generator\"'.ljust(40)))
+        else:
+            self.outCifGlobSect.append("%s%s%s\n"%("acedrg".ljust(30), "?".ljust(20), '\"dictionary generator\"'.ljust(40)))
+        
+        if self.versionInfo.has_key("DATABASE_VERSION"):
+            self.outCifGlobSect.append("%s%s%s\n"%("acedrg_database".ljust(30), self.versionInfo["DATABASE_VERSION"].ljust(20), '\"data source\"'.ljust(40)))
+        else:
+            self.outCifGlobSect.append("%s%s%s\n"%("acedrg_database".ljust(30), "?".ljust(20), '\"data source\"'.ljust(40)))
+
+        self.outCifGlobSect.append("%s%s%s\n"%("rdkit".ljust(30), rdBase.rdkitVersion.ljust(20), '\"chemistry perception\"' )) 
+  
+        if self.versionInfo.has_key("REFMAC_NAME"):
+            self.outCifGlobSect.append("%s%s%s\n"%(self.versionInfo["REFMAC_NAME"].ljust(30), self.versionInfo["REFMAC_VERSION"].ljust(20),\
+                                       '\"optimization tool\"'.ljust(40)))
+        else:
+            self.outCifGlobSect.append("%s%s%s\n"%("refmac".ljust(30), "?".ljust(20), '\"optimization tool\"'.ljust(40)))
+        
+         
     def checInputFormat(self):
         
         try:
@@ -1477,6 +1530,14 @@ class Acedrg(CExeCode ):
         self.setRefmacCom1(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
         self.subExecute()
 
+    def runRefmacVersionInfo(self):
+
+        if self._log_name == "":
+            self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
+
+        self._cmdline = self.refmac  + " -i "
+        self.subExecute()
+
     def runGeoOpt(self):
         
         # Geometrical optimization
@@ -1581,7 +1642,7 @@ class Acedrg(CExeCode ):
             if  self.runExitCode :
                 print "Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn
         if len(self.refmacMinFValueList) > 0 :
-            self.refmacMinFValueList.sort(listComp2)
+            #self.refmacMinFValueList.sort(listComp2)
             #for aPair in self.refmacMinFValueList:
             #    print "======"
             #    print "FValue: ", aPair[0], "  File name ", aPair[1]  
@@ -1629,10 +1690,11 @@ class Acedrg(CExeCode ):
             else:
                 finPdb = self.outRoot +  ".pdb"
                 finRst = self.outRoot +  ".cif"
-            print "tInPdb ", tInPdb 
-            print "finPdb ", finPdb
+            #print "tInPdb ", tInPdb 
+            #print "finPdb ", finPdb
 
             shutil.copy(tInPdb, finPdb)
+
             if os.path.isfile(finPdb):
                 self.inPdbName        = finPdb 
                 self.inMmCifName      = tInCif
@@ -1840,6 +1902,10 @@ class Acedrg(CExeCode ):
                     print "%s can not be opened for reading"%tCifOutName
                     sys.exit()
                 else:
+                    if len(self.outCifGlobSect):
+                        for aL in self.outCifGlobSect:
+                            tOutCif.write(aL)
+                            
                     for aL in cifCont['head']:
                         tOutCif.write(aL)
                     for aL in cifCont['atoms']:
@@ -4779,6 +4845,8 @@ class FileTransformer :
                                "_pdbx_chem_comp_descriptor.program", "_pdbx_chem_comp_descriptor.program_version",\
                                "_pdbx_chem_comp_descriptor.descriptor"]
         self.strDescriptors["defSmiles"]   = []
+
+        self.cifGlobalLines                = []
 
         self.atoms           = []
         self.bonds           = []
