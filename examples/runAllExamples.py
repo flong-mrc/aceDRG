@@ -182,9 +182,12 @@ for aF in glob.glob("./inMmcif/*.cif"):
 
     if len(aFRoot) !=0:
         rRoot = "%s_fromMmcif"%aFRoot
-        cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot) 
-        numAllJobs += 1
+        if aFRoot.find("prodrg-GB8") ==-1:
+            cmdL = "acedrg -c %s  -o  %s -p "%(aF, rRoot)
+        else:
+            cmdL = "acedrg -c %s  -o  %s "%(aF, rRoot)
         print cmdL
+        numAllJobs += 1
         lRun=os.system(cmdL)
         if lRun :
             print "%s runtime error "%rRoot
