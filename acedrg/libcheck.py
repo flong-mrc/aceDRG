@@ -144,7 +144,9 @@ def libcheck():
       sys.argv[:] = (acedrg_sh, '-c', inp, '-r', mon, '-o', prefix)
 
     with open('acedrg.cmd', 'w') as ostream:
-      print >>ostream, ' '.join(sys.argv)
+      cmdline = list(sys.argv)
+      cmdline[0] = os.path.basename(cmdline[0])
+      print >>ostream, ' '.join(cmdline)
 
     if not test:
       import acedrg
