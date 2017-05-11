@@ -123,6 +123,9 @@ namespace LIBMOL
         // the center unit cell.
         
         void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst);
+        void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst, 
+                           int                               tLimNB);
+        
         void addOneSetRefAtoms(AtomDict                         & tCurAtom,
                                std::vector<CrystInfo>::iterator   tCryst);
         void swithAtoms(std::vector<CrystInfo>::iterator tCryst);
@@ -291,6 +294,7 @@ namespace LIBMOL
         void outMetalTables(FileName tOutName);
         
         void execute(FileName tOutName);
+        void execute1(FileName tOutName);
         void executeMet(FileName tOutName);
         
         
