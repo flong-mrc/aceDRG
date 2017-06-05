@@ -57,6 +57,22 @@ class ChemCheck():
                            "LEU", "LYS", "MET", "PHE", "PRO", \
                            "SER", "THR", "TRP", "TYR", "VAL"]
 
+        # Just for checking of amino acids in the old ccp4 monomer lib
+        self.defaultBo ={}
+        self.defaultBo["H"]  = 1
+        self.defaultBo["F"]  = 1
+        self.defaultBo["CL"] = 1
+        self.defaultBo["BR"] = 1
+        self.defaultBo["I"]  = 1
+        self.defaultBo["AT"] = 1
+        self.defaultBo["O"]  = 2
+        self.defaultBo["S"]  = 2
+        self.defaultBo["SE"] = 2
+        self.defaultBo["N"]  = 3
+        self.defaultBo["B"]  = 3
+        self.defaultBo["C"]  = 4
+        self.defaultBo["P"]  = 5
+
         self.torsions   = []
         self.outChiSign  ={}
         self.tmpChiralSign = {}
@@ -297,7 +313,31 @@ class ChemCheck():
         else: 
             print "%s can not be found for reading "%tFileName
                     
+    def tmpModiN_in_AA(self, tCompId, tCifMonomer):
         
+        # Tempo function to add a H atom connected to N in AA coming from the current $CLIBD_MON
+        aAtom = {}
+        aAtom["comp_id"]     = tCompId
+        aAtom["atom_id"]     = "H2"
+        aAtom["type_symbol"] = "H"
+        aAtom["type_energy"] = "HNH2"
+        #aAtom["charge"]      = "0.0"
+        tCifMonomer["atoms"].append(aAtom)
+        aBond = {}
+        aBond["comp_id"]         = tCompId   
+        aBond["atom_id_1"]       = "N"   
+        aBond["atom_id_2"]       = "H2"   
+        aBond["type"]            = "single"   
+        aBond["value_dist"]      = "0.860"   
+        aBond["value_dist_esd"]  = "0.02"   
+        tCifMonomer["bonds"].append(aBond)
+       
+        for aAtm in tCifMonomer["atoms"]:
+            if aAtm["atom_id"].strip()=="N":
+                aAtm["type_energy"] = "NH2"
+            elif aAtm["atom_id"].strip()=="H":
+                aAtm["type_energy"] = "HNH2"
+          
     def checkChiralCenters(self, tMol, tIdx):
    
         # RDKit misses some chiral centers such as N with 3 bonds.

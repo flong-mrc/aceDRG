@@ -38,6 +38,7 @@ from utility  import listCompDes
 from utility  import listCompAcd
 from utility  import setBoolDict
 from utility  import splitLineSpa
+from utility  import splitLineSpa2
 
 class FileTransformer :
 
@@ -1514,10 +1515,17 @@ class Ccp4MmCifObj (dict) :
             aL = aL.strip()
             if len(aL) !=0:
                 aStrSet = [] 
-                aStrSet = splitLineSpa(aL)
+                if tKW =="list":
+                    aStrSet = splitLineSpa2(aL)
+                    print aL
+                    print aStrSet
+                else:
+                    aStrSet = splitLineSpa(aL)
                 for aStr in aStrSet:
                     if aStr.strip()[0] =="_":
                         aKeySet.append(aStr)
+                        if tKW =="list":
+                            print aKeySet
                     else:
                         aValueSet.append(aStr)
 
@@ -1662,3 +1670,23 @@ class Ccp4MmCifObj (dict) :
                         print "%s   :   %s  "%(aKey, aPA[aKey])
                          
 
+    def getAtomById(self, tId, tName):
+
+        aReturn = None
+        for aAtom in self["ccp4CifObj"]["comps"][tName]["atoms"]:
+            if aAtom["atom_id"]==tId:
+                aReturn = aAtom
+                break
+        return aReturn
+
+    def getBondByIds(self, tId1, tId2, tName):
+
+        aReturn = None
+        for aBond in self["ccp4CifObj"]["comps"][tName]["bonds"]:
+            if (aBond["atom_id_1"] == tId1 and aBond["atom_id_2"] == tId2) \
+              or (aBond["atom_id_1"] == tId2 and aBond["atom_id_2"] == tId1) :
+               aReturn = aBond
+               break
+        return aReturn
+         
+       

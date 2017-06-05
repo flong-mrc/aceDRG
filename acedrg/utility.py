@@ -139,3 +139,50 @@ def splitLineSpa(tLine):
             reStrs.append(aStr)   
 
     return reStrs 
+
+def splitLineSpa2(tLine):
+
+    reStrs = []
+
+    aSep1 = "\'"
+    aSep2 = "\""
+    if tLine.find(aSep1) !=-1 or tLine.find(aSep2) !=-1:
+        set1 = tLine.strip().split(aSep1)
+        n1   = len(set1)
+        set2 = tLine.strip().split(aSep2)
+        n2   = len(set2)
+    
+        if n1 >=n2:
+            splitLineSpa3(set1, aSep1, reStrs)
+        else:
+            splitLineSpa3(set2, aSep2, reStrs)
+    else:
+        reStrs = tLine.strip().split()
+         
+    return reStrs
+
+def splitLineSpa3(tSet, tSep, tStrs):
+
+    n = len(tSet)
+ 
+    if n > 3:
+        aM = ""
+        for i in range(1, n-1):
+            aM +=tSet[i] + tSep  
+        aM1 = aM[:-1]
+        TB = tSet[0].strip().split()
+        for aT in TB:
+            tStrs.append(aT)
+        tStrs.append(aM1)
+        TE = tSet[-1].strip().split()
+        for aT in TE:
+            tStrs.append(aT)
+    elif n ==3:
+        TB = tSet[0].strip().split()
+        for aT in TB:
+            tStrs.append(aT)
+        tStrs.append(tSet[1])
+        TE = tSet[-1].strip().split()
+        for aT in TE:
+            tStrs.append(aT)
+                  

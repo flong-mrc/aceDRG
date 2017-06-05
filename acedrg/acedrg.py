@@ -38,6 +38,8 @@ from exebase    import CExeCode
 from covLink    import CovLink
 from covLink    import CovLinkGenerator
 
+from filetools  import Ccp4MmCifObj
+
 from utility    import listComp
 from utility    import listComp2
 from utility    import listCompDes
@@ -1478,10 +1480,12 @@ class Acedrg(CExeCode ):
             if tRoot !="":
                 finPdb = self.outRoot + "_"+ tRoot + ".pdb"
                 finRst = self.outRoot +  "_"+ tRoot +".cif"
+                finTor = self.outRoot +  "_"+ tRoot +"_torsion_only.txt"
                 tStr = tRoot.strip().split("_")[-1]
             else:
                 finPdb = self.outRoot +  ".pdb"
                 finRst = self.outRoot +  ".cif"
+                finTor = self.outRoot +  "_torsion_only.txt"
             #print "tInPdb ", tInPdb 
             #print "finPdb ", finPdb
 
@@ -1492,6 +1496,7 @@ class Acedrg(CExeCode ):
                 self.inMmCifName      = tInCif
                 self.outRstCifName    = finRst
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
+                self.outTorsionRestraints(self.outRstCifName, finTor)
         else:
             print "Failed to produce %s after final geometrical optimization"%tInPdb
 
@@ -1761,6 +1766,36 @@ class Acedrg(CExeCode ):
                     """
                     tOutCif.close()
                         
+    def outTorsionRestraints(self, tCifInName, tTorOutName):
+
+        if os.path.isfile(tCifInName):
+            aCifObj = Ccp4MmCifObj(tCifInName)
+            if aCifObj["ccp4CifObj"]["comps"].has_key(self.monomRoot):
+                if aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("tors")\
+                   and aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("atoms")\
+                   and aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("atoms"):
+                    try: 
+                        aTorOut = open(tTorOutName, "w")
+                    except IOError:
+                        print "%s can not be opened for reading"%tTorOutName
+                    else:
+                        aSetTor = []
+                        for aTor in aCifObj["ccp4CifObj"]["comps"][self.monomRoot]["tors"]: 
+                            id1 = aTor["atom_id_1"]
+                            atom1 = aCifObj.getAtomById(id1, self.monomRoot)
+                            id2 = aTor["atom_id_2"]
+                            atom2 = aCifObj.getAtomById(id2, self.monomRoot)
+                            id3 = aTor["atom_id_3"]
+                            atom3 = aCifObj.getAtomById(id3, self.monomRoot)
+                            id4 = aTor["atom_id_4"]
+                            atom4 = aCifObj.getAtomById(id4, self.monomRoot)
+                            if atom1 and atom2 and atom3 and atom4:
+                                aBond = aCifObj.getBondByIds(id2, id3,  self.monomRoot)
+                                if aBond:
+                                    if aBond["type"].lower().find("sing") !=-1:
+                                        pass 
+          
+ 
     def outEnergyGeoMap(self, tIdxMol):
 
         aListFName = os.path.join(self.scrDir, self.baseRoot + "_energy_vs_Conformers.list")
@@ -3734,24 +3769,12 @@ class AcedrgRDKit():
                                    isAro, bLen, dBlen))
 
             # chiral center section
-            lChiPre = False
+            nChiPre = 0
             print " Number of chiral centers get from the comformer ", nTetraChi
             if tChiDes:
-                print "number of chiral center predefined ", len(tChiDes)
-                if len(tChiDes):
-                    # The molecule contain chiral centers
-                    aMmCif.write("#\n")
-                    aMmCif.write("_chem_comp_chir.comp_id\n")
-                    aMmCif.write("_chem_comp_chir.id\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_centre\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_1\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_2\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_3\n")
-                    aMmCif.write("_chem_comp_chir.volume_sign\n")
-                    for aChiral in tChiDes:
-                        aMmCif.write(aChiral+"\n")
-                    lChiPre=True
-            elif nTetraChi !=0 and not lChiPre: 
+                nChiPre = len(tChiDes)
+                print "number of chiral center predefined ", nChiPre
+            if nChiPre !=0 or nTetraChi !=0:
                 # The molecule contain chiral centers
                 aMmCif.write("#\n")
                 aMmCif.write("_chem_comp_chir.comp_id\n")
@@ -3761,7 +3784,50 @@ class AcedrgRDKit():
                 aMmCif.write("_chem_comp_chir.atom_id_2\n")
                 aMmCif.write("_chem_comp_chir.atom_id_3\n")
                 aMmCif.write("_chem_comp_chir.volume_sign\n")
-
+            if nChiPre:
+                chiCenAtmIds = []
+                for aChiral in tChiDes:
+                    chiStrs = aChiral.strip().split()
+                    if len(chiStrs) ==7:
+                        chiCenAtmIds.append(chiStrs[2])
+                    aMmCif.write(aChiral+"\n")
+                    print "aChiral "
+                    print aChiral
+                print "Predefined chiral centres ", chiCenAtmIds
+                if nChiPre != nTetraChi:
+                    extraChiAtoms = []
+                    for aAtom in allAtoms:
+                        aCT = aAtom.GetChiralTag()
+                        if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
+                            aAtmName=aAtom.GetProp("Name")
+                            if not aAtmName in chiCenAtmIds:
+                                print "Chiral center %s is not in predefined chiral centers"%aAtmName
+                                extraChiAtoms.append(aAtom)
+                    if len(extraChiAtoms):
+                        chiralIdx = nChiPre + 1
+                        for aAtom in extraChiAtoms:      
+                            aCTName = "chir_" + str(chiralIdx)
+                            chiralIdx +=1
+                            aAtmName=aAtom.GetProp("Name")
+                            aSetAtms = []
+                            aSetAtms.append(aAtmName)
+                            aSetBonds = aAtom.GetBonds()
+                            for aBond in aSetBonds:
+                                if len(aSetAtms) < 4:
+                                    atmIdx1 = aBond.GetBeginAtomIdx()
+                                    atmIdx2 = aBond.GetEndAtomIdx() 
+                                    name1   = allAtoms[atmIdx1].GetProp("Name")  
+                                    name2   = allAtoms[atmIdx2].GetProp("Name")
+                                    if name1 == aAtmName:
+                                        aSetAtms.append(name2) 
+                                    if name2== aAtmName:
+                                        aSetAtms.append(name1) 
+                            if len(aSetAtms) == 4:
+                                aChi = "%s%s%s%s%s%s%s"%(tMonoName.ljust(8), aCTName.ljust(12), aSetAtms[0].ljust(8),\
+                                                         aSetAtms[1].ljust(8), aSetAtms[2].ljust(8), aSetAtms[3].ljust(8),"both")
+                                print aChi
+                                aMmCif.write(aChi+"\n")     
+            elif nTetraChi !=0 : 
                 # Set all chiral atom according to format of mmCif 
                 rdmolops.AssignStereochemistry(tMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
                 chiralIdx = 1
