@@ -33,241 +33,23 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
+from exebase    import CExeCode
+
+from covLink    import CovLink
+from covLink    import CovLinkGenerator
+
+from filetools  import Ccp4MmCifObj
+
+from utility    import listComp
+from utility    import listComp2
+from utility    import listCompDes
+from utility    import listCompAcd
+from utility    import setBoolDict
+from utility    import splitLineSpa
+
 if os.name != 'nt':
     import fcntl
 import signal
-
-def listComp(a_list, b_list):
-
-    if a_list[1] > b_list[1]:
-        return 1
-    elif a_list[1] < b_list[1]:
-        return -1
-
-    if len(a_list[0]) < len(b_list[0]):
-        return 1
-    elif len(a_list[0]) > len(b_list[0]):
-        return -1
-
-    if a_list[0] > b_list[0]:
-        return 1
-    elif a_list[0] == b_list[0]:
-        return 0
-    elif a_list[0] < b_list[0]:
-        return -1
-
-def listComp2(a_list, b_list):
-
-    if a_list[0] > b_list[0]:
-        return 1
-    elif a_list[0] < b_list[0]:
-        return -1
-    else :
-        return 0
-
-def listCompDes(a_list, b_list):
-
-    if int(a_list[1]) < int(b_list[1]):
-        return 1
-    elif int(a_list[1]) > int(b_list[1]):
-        return -1
-    else :
-        return 0
-
-def listCompAcd(a_list, b_list):
-
-    if int(a_list[0]) > int(b_list[0]):
-        return 1
-    elif int(a_list[0]) < int(b_list[0]):
-        return -1
-    else :
-        return 0
-
-#################################################   
-
-class CExeCode :
-    """ A generic abstract base class that is to be inheritted by other classes that warp 
-        a executable code. Basically this class defines two main methods that characterize the
-        procedures a job by an executable code, i.e.  forming a command line object and then
-        run the code according to the command line object"""
-
-    def __init__( self ):
-
-        # set pathes
- 
-        self.exitCode = 0
-
-        # test 
-        self._setCmdLineAndFile()
-
-    def _setCmdLineAndFile(self ):         # will be overrided by individual derived classes
-        self._cmdline = 'ls '
-        self.batch_name = None
-        self._log_name = None
-            
-    def subExecute(self, mode = 0, err_str ="" ):
-
-        if self._log_name :
-            if os.name == 'nt':
-                self.logModeWin(mode, err_str)
-            else: 
-                self.logModeLin(mode, err_str)
-        else :
-            self.interactiveMode()
-
-    def logModeLin(self, mode = 0, err_str=""):
-        """ execute self._cmdline and output to a log file (self._log_name)  
-        in a nonblocking way"""
-
-        logfile = open(self._log_name, 'w')
-        logfile.write("\n============ PROCESS INFORMATION =============\n")
-
-        # spawn a sub-process for a job and connect to its input/output(and error)
-        # streams using pipes
-
-        try : 
-            import subprocess
-            subProcess = subprocess.Popen(self._cmdline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
-            subProcess.stdin.close()
-            outfile_sub  = subProcess.stdout
-            outfd_sub    = outfile_sub.fileno()
-        except ImportError:
-            print "module 'subprocess' has not be found, you use a version of PYTHON below 2.4"
-            print "Import module 'popen2' instead, the calculations will not be affected"
-            import popen2
-            subProcess = popen2.Popen4(self._cmdline)
-            subProcess.tochild.close()
-            outfile_sub  = subProcess.fromchild
-            outfd_sub    = outfile_sub.fileno()
-    
-        self._pid  = subProcess.pid
-        pid_c      = self._pid  + 1
-        p_name = os.path.basename(self._cmdline.strip().split()[0])
-        t__log_name = os.path.basename(self._log_name)
-        
-       
-        log_size = 0 
-        log_max  = 500000000
-        outfile_eof = 0
-        if not mode:
-            self._nonBlockingFile(outfd_sub)
-            while not outfile_eof :
-                ready_to_read, ready_to_write, in_error = \
-                     select.select([outfd_sub],[],[],60.0)
-                if outfd_sub in ready_to_read:
-                    out_quantum = outfile_sub.read()
-                    out_quantum_bt = len(out_quantum)
-                    log_size = log_size + out_quantum_bt
-                    if log_size > log_max:
-                        logfile.write("\nTHE SIZE OF LOG FILE, %s, EXCEEDED THE LIMIT AND PROCESS STOPPED\n"%t__log_name)
-                        logfile.write("The process running %s is killed\n"%p_name)
-                        logfile.close()
-                        os.kill(self._pid, signal.SIGKILL)
-                        os.kill(pid_c, signal.SIGKILL)
-                        print "The process running %s is killed " %p_name
-                        time.sleep(1.0)
-                        # be safe stop all process
-                        sys.exit(1)
-                    else :
-                        if out_quantum == '':
-                            outfile_eof = 1
-                        logfile.write(out_quantum)
-                        logfile.flush()
-        else :
-            self._nonBlockingFile(outfd_sub)
-            while not outfile_eof :
-                ready_to_read, ready_to_write, in_error = \
-                     select.select([outfd_sub],[],[],10)
-                if outfd_sub in ready_to_read:
-                    out_quantum = outfile_sub.read()
-                    if out_quantum == '':
-                        outfile_eof = 1
-                    logfile.write(out_quantum)
-                    logfile.flush()
-                    # allProcInfo.append(out_quantum)
-
-        self.exitCode = subProcess.wait()
-      
-        # if mode:
-        #    for item in allProcInfo:
-        #        logfile.write(item)
-
-        logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
-        logfile.close()
-
-        outfile_sub.close()
-
-        if self.exitCode:
-            print "#-----------------------------------------------------------------#"
-            print "The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name
-            print "#-----------------------------------------------------------------#"
-            if not err_str:
-                # if normal runtime errors, stop the program(using log. no err_str)  
-                sys.exit(1)
-                
-        return True
-
-    def logModeWin(self, mode = 0, err_str=""):
-        """ execute self._cmdline and output to a log file (self._log_name)  
-        under Windows system"""
-
-        logfile = open(self._log_name, 'w')
-        logfile.write("\n============ PROCESS INFORMATION =============\n")
-
-        # spawn a sub-process for a job and connect to its input/output(and error)
-        # streams using pipes
-
-        try :
-            import subprocess
-            subProcess = subprocess.Popen(self._cmdline, shell=True, stdout=logfile)
-            #subProcess.stdin.close()
-            #outfile_sub  = subProcess.stdout
-            #outfd_sub    = outfile_sub.fileno()
-        except ImportError:
-            print "module 'subprocess' has not be found, you use a version of PYTHON below 2.4"
-            print "Import module 'popen2' instead, the calculations will not be affected"
-            print "This should not be happening. Exiting Now."
-            sys.exit()
-            #import popen2
-            #subProcess = popen2.Popen4(self._cmdline)
-            #subProcess.tochild.close()
-            #outfile_sub  = subProcess.fromchild
-            #outfd_sub    = outfile_sub.fileno()
-
-        self._pid  = subProcess.pid
-        pid_c      = self._pid  + 1
-        p_name = os.path.basename(self._cmdline.strip().split()[0])
-        t__log_name = os.path.basename(self._log_name)
-
-        self.exitCode = subProcess.wait()
-
-        logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
-        logfile.close()
-
-        #outfile_sub.close()
-
-        if self.exitCode:
-            print "#-----------------------------------------------------------------#"
-            print "The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name
-            print "#-----------------------------------------------------------------#"
-            if not err_str:
-                # if normal runtime errors, stop the program(using log. no err_str)
-                sys.exit(1)
-
-        return True
-    
-    def _nonBlockingFile(self,fd):
-        f_flag = fcntl.fcntl(fd, fcntl.F_GETFL,0)
-        fcntl.fcntl(fd, fcntl.F_SETFL, f_flag | os.O_NONBLOCK)
-
-    def interactiveMode(self):
-        """ execute self._cmdline  just like what is done in a shell """
-        
-        os.system(self._cmdline)
-
-
-# end
-
 
 class Acedrg(CExeCode ):
 
@@ -275,6 +57,8 @@ class Acedrg(CExeCode ):
 
         if len(sys.argv)==1:
             print "Look for help: %s -h "%(os.path.basename(sys.argv[0]))
+
+        self.versionInfo       = {}
 
         self.errMessage       = []
         self.errLevel         = 0
@@ -341,7 +125,6 @@ class Acedrg(CExeCode ):
         
         self.testMode         = False
 
-        self.versionInfo       = {}
         self.outCifGlobSect    = []
 
         self.allBondsAndAngles = {}
@@ -373,17 +156,20 @@ class Acedrg(CExeCode ):
         else:
             self.rdKit = AcedrgRDKit()
         self.rdKit.setProcPara(self.inputPara)
-        print "input RDKit: userExistCoords ? ", self.rdKit.useExistCoords
-        print "input RDKit: number of optimization iters ", self.rdKit.numRDKitOptmSteps
-        print "input RDKit: number of initial conformers ", self.rdKit.numInitConformers
-        print "input RDKit: number of output conformers ", self.rdKit.numConformers
+
+        #print "input RDKit: userExistCoords ? ", self.rdKit.useExistCoords
+        #print "input RDKit: number of optimization iters ", self.rdKit.numRDKitOptmSteps
+        #print "input RDKit: number of initial conformers ", self.rdKit.numInitConformers
+        #print "input RDKit: number of output conformers ", self.rdKit.numConformers
 
         self.fileConv         = FileTransformer()   
             
         self.chemCheck        = ChemCheck() 
         
         self.initMmcifMolMap  = {}
-         
+
+        self.cLinkMap         = {}
+
         #self.execute()  
         self.executeWithRDKit()  
         
@@ -621,7 +407,8 @@ class Acedrg(CExeCode ):
                         strs = aL.strip().split(":")
                         if len(strs)==2:
                             self.versionInfo[strs[0]] = strs[1]
-        
+       
+        self.versionInfo["RDKit_VERSION"] = rdBase.rdkitVersion 
         # Refmac version info 
         self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
         self.runRefmacVersionInfo()
@@ -633,9 +420,9 @@ class Acedrg(CExeCode ):
                 strs = aL.strip().split()
                 if len(strs)== 4 and aL.find("Program") !=-1:
                     self.versionInfo["REFMAC_NAME"] = strs[1].strip()[0:-1]
-                    print "REFMAC NAME : ", self.versionInfo["REFMAC_NAME"] 
+                    #print "REFMAC NAME : ", self.versionInfo["REFMAC_NAME"] 
                     self.versionInfo["REFMAC_VERSION"] = strs[3].strip()
-                    print "REFMAC VERSION : ", self.versionInfo["REFMAC_VERSION"] 
+                    #print "REFMAC VERSION : ", self.versionInfo["REFMAC_VERSION"] 
                     
         else: 
             print "Refmac version info is not available"
@@ -646,27 +433,27 @@ class Acedrg(CExeCode ):
              
     def setOutCifGlobSec(self):
          
-        self.outCifGlobSect.append("loop_\n")
-        self.outCifGlobSect.append("_software\n")
-        self.outCifGlobSect.append("_version\n")
-        self.outCifGlobSect.append("_purpose\n")
+        self.outCifGlobSect.append("#loop_\n")
+        self.outCifGlobSect.append("#_software\n")
+        self.outCifGlobSect.append("#_version\n")
+        self.outCifGlobSect.append("#_purpose\n")
         if self.versionInfo.has_key("ACEDRG_VERSION"):
-            self.outCifGlobSect.append("%s%s%s\n"%("acedrg".ljust(30), self.versionInfo["ACEDRG_VERSION"].ljust(20), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg".ljust(30), self.versionInfo["ACEDRG_VERSION"].ljust(20), '\"dictionary generator\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s\n"%("acedrg".ljust(30), "?".ljust(20), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg".ljust(30), "?".ljust(20), '\"dictionary generator\"'.ljust(40)))
         
         if self.versionInfo.has_key("DATABASE_VERSION"):
-            self.outCifGlobSect.append("%s%s%s\n"%("acedrg_database".ljust(30), self.versionInfo["DATABASE_VERSION"].ljust(20), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg_database".ljust(30), self.versionInfo["DATABASE_VERSION"].ljust(20), '\"data source\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s\n"%("acedrg_database".ljust(30), "?".ljust(20), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg_database".ljust(30), "?".ljust(20), '\"data source\"'.ljust(40)))
 
-        self.outCifGlobSect.append("%s%s%s\n"%("rdkit".ljust(30), rdBase.rdkitVersion.ljust(20), '\"chemistry perception\"' )) 
+        self.outCifGlobSect.append("#%s%s%s\n"%("rdkit".ljust(30), rdBase.rdkitVersion.ljust(20), '\"chemistry perception\"' )) 
   
         if self.versionInfo.has_key("REFMAC_NAME"):
-            self.outCifGlobSect.append("%s%s%s\n"%(self.versionInfo["REFMAC_NAME"].ljust(30), self.versionInfo["REFMAC_VERSION"].ljust(20),\
+            self.outCifGlobSect.append("#%s%s%s\n"%(self.versionInfo["REFMAC_NAME"].ljust(30), self.versionInfo["REFMAC_VERSION"].ljust(20),\
                                        '\"optimization tool\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s\n"%("refmac".ljust(30), "?".ljust(20), '\"optimization tool\"'.ljust(40)))
+            self.outCifGlobSect.append("#%s%s%s\n"%("refmac".ljust(30), "?".ljust(20), '\"optimization tool\"'.ljust(40)))
         
          
     def checInputFormat(self):
@@ -864,7 +651,6 @@ class Acedrg(CExeCode ):
             # Need to add more options here
             self.linkInstructions = t_inputOptionsP.linkInstructions.strip()
             self.workMode = 61
-
  
 
         if t_inputOptionsP.testMode :
@@ -950,10 +736,12 @@ class Acedrg(CExeCode ):
             print "=====================================================================" 
             print "| ACEDRG version is not available                                   |"    
         if self.versionInfo.has_key("DATABASE_VERSION"):
-            print "| ACEDRG database version:  %s|"%self.versionInfo["DATABASE_VERSION"].ljust(40)
+            print "| ACEDRG database: %s|"%self.versionInfo["DATABASE_VERSION"].ljust(49)
         else:
             print "| ACEDRG Database version is not available                          |"
         print "| RDKit version:  %s|"%rdBase.rdkitVersion.ljust(50)
+        if self.versionInfo.has_key("REFMAC_NAME") and self.versionInfo.has_key("REFMAC_VERSION"):
+            print "| %s  %s|"%((self.versionInfo["REFMAC_NAME"] + ":").ljust(15), self.versionInfo["REFMAC_VERSION"].ljust(49))
         print "=====================================================================" 
         if self.workMode in [11, 12, 13, 14, 15, 16, 111, 121, 131, 141, 151, 161] :
         #if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15 \
@@ -995,6 +783,12 @@ class Acedrg(CExeCode ):
         if self.workMode in [51, 52, 53, 54, 55] :
             print "=====================================================================" 
             print "| Your job is to calculate bond-orders and charges using HMO.      |"
+            print "=====================================================================" 
+
+        if self.workMode == 61:
+            print "=====================================================================" 
+            print "| Your job is to generate full descriptions for two monomers, their |"
+            print "| modifications, and a link between them.                           |" 
             print "=====================================================================" 
 
     def runLibmol(self, tIn=None, tIdxMol=-1):
@@ -1686,10 +1480,12 @@ class Acedrg(CExeCode ):
             if tRoot !="":
                 finPdb = self.outRoot + "_"+ tRoot + ".pdb"
                 finRst = self.outRoot +  "_"+ tRoot +".cif"
+                finTor = self.outRoot +  "_"+ tRoot +"_torsion_only.txt"
                 tStr = tRoot.strip().split("_")[-1]
             else:
                 finPdb = self.outRoot +  ".pdb"
                 finRst = self.outRoot +  ".cif"
+                finTor = self.outRoot +  "_torsion_only.txt"
             #print "tInPdb ", tInPdb 
             #print "finPdb ", finPdb
 
@@ -1700,6 +1496,7 @@ class Acedrg(CExeCode ):
                 self.inMmCifName      = tInCif
                 self.outRstCifName    = finRst
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
+                self.outTorsionRestraints(self.outRstCifName, finTor)
         else:
             print "Failed to produce %s after final geometrical optimization"%tInPdb
 
@@ -1969,6 +1766,36 @@ class Acedrg(CExeCode ):
                     """
                     tOutCif.close()
                         
+    def outTorsionRestraints(self, tCifInName, tTorOutName):
+
+        if os.path.isfile(tCifInName):
+            aCifObj = Ccp4MmCifObj(tCifInName)
+            if aCifObj["ccp4CifObj"]["comps"].has_key(self.monomRoot):
+                if aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("tors")\
+                   and aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("atoms")\
+                   and aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("atoms"):
+                    try: 
+                        aTorOut = open(tTorOutName, "w")
+                    except IOError:
+                        print "%s can not be opened for reading"%tTorOutName
+                    else:
+                        aSetTor = []
+                        for aTor in aCifObj["ccp4CifObj"]["comps"][self.monomRoot]["tors"]: 
+                            id1 = aTor["atom_id_1"]
+                            atom1 = aCifObj.getAtomById(id1, self.monomRoot)
+                            id2 = aTor["atom_id_2"]
+                            atom2 = aCifObj.getAtomById(id2, self.monomRoot)
+                            id3 = aTor["atom_id_3"]
+                            atom3 = aCifObj.getAtomById(id3, self.monomRoot)
+                            id4 = aTor["atom_id_4"]
+                            atom4 = aCifObj.getAtomById(id4, self.monomRoot)
+                            if atom1 and atom2 and atom3 and atom4:
+                                aBond = aCifObj.getBondByIds(id2, id3,  self.monomRoot)
+                                if aBond:
+                                    if aBond["type"].lower().find("sing") !=-1:
+                                        pass 
+          
+ 
     def outEnergyGeoMap(self, tIdxMol):
 
         aListFName = os.path.join(self.scrDir, self.baseRoot + "_energy_vs_Conformers.list")
@@ -1993,6 +1820,7 @@ class Acedrg(CExeCode ):
                 aPair[1]= aPair[1].strip().split("/")[-1].strip()
                 aListF.write("%8.4f\t%s\n"%(aPair[0], aPair[1]))
             aListF.close()
+       
             
             
             
@@ -2158,11 +1986,10 @@ class Acedrg(CExeCode ):
     def executeWithRDKit(self):
         
         self.printJobs()
-      
         self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print "One of output conformers will using input coordinates as initial ones"
-        elif self.workMode !=0:
+        elif self.workMode !=0 and self.workMode != 61 :
             print "Input coordinates will be ignored"
 
         # Stage 1: initiate a mol file for RDKit obj
@@ -2516,7 +2343,7 @@ class Acedrg(CExeCode ):
                                 #print "==================================================================="
                             else:
                                 print "Failed to produce %s after final geometrical optimization"%finPdb
-                            
+
         if self.workMode == 21:
             
             # Stage 1: generate molecules and the associated bond and bond-angle values 
@@ -2557,7 +2384,6 @@ class Acedrg(CExeCode ):
                 sys.exit()
             
         if self.workMode == 33:
-            print "work mode ", self.workMode
             if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
                 self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
                 tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
@@ -2569,25 +2395,15 @@ class Acedrg(CExeCode ):
                     print "Do not process atom-types of multiple molecules at the same time, do nothing"
 
         if self.workMode == 34:
-            print "work mode ", self.workMode
             if os.path.isfile(self.inSdfName):
                 self.runLibmol()    
 
         if self.workMode == 35:
-            print "work mode ", self.workMode
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol()    
         
         if self.workMode == 61:
-            print "work mode ", self.workMode
-            if os.path.isfile(self.linkInstructions):
-                # input from a file
-                self.getInstructionsForLink()
-            elif len(self.linkInstructions) !=0:
-                # input from command lines
-                self.getInstructionsForLink(1)
-            else:
-                print "%s can not be found for reading"%self.linkInstructions
+            aCLinkGenerator = CovLinkGenerator(self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
 
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
@@ -2595,74 +2411,7 @@ class Acedrg(CExeCode ):
                 #os.system("cp %s %s"%(self.outRstCifName, tCif)) 
                 shutil.copy(self.outRstCifName, tCif) 
             else:
-                print "acedrg failed to generate a dictionary file"       
-
-    def getInstructionsForLink(self, inputMode=0):
-
-        allLs =""
-        aList = []
-        if inputMode==0:
-            try : 
-                aInsF = open(self.linkInstructions, "r")
-            except IOError:
-                print "% can not be open for reading ! "%self.linkInstructions
-            else:
-                allLs = aInsF.readlines()
-                aInsF.close()
-                for aL in allLs:
-                    strs = aL.strip().split()
-                    if len(strs) !=0:
-                       for aStr in strs:
-                           aStr = aStr.upper()
-                           if aStr.find("LINK:") == -1:
-                               aList.append(aStr)
-        elif inputMode==1:  
-            strs = self.linkInstructions.strip().split()
-            if len(strs) !=0:
-                for aStr in strs:
-                    aStr = aStr.upper()
-                    if aStr.find("LINK:") == -1:
-                        aList.append(aStr)
-
-        #keyWordList = ["RES-NAME-1", "ATOM-NAME-1", "RES-NAME-2", "ATOM-NAME-2", "BOND-TYPE", "DELETE"]
-        if len(aList):
-            i = 0
-            nL = len(aList)
-            while i < nL :
-                if aList[i].find("DELETE") == -1:
-                    if (i+1) < nL: 
-                        self.linkInsMap[aList[i]] = aList[i+1] 
-                        i +=2
-                    else:
-                        print "Error : check your link instruction file"
-                        print allLs
-                        break
-                else:
-                    if not self.linkInsMap.has_key("DELETE"):
-                        self.linkInsMap["DELETE"] = []
-                    if i+3 < nL:
-                        self.linkInsMap["DELETE"].append([aList[i+1], aList[i+2], aList[i+3]])
-                        i+=4
-                    else:
-                        print "Error : check your link instruction file"
-                        print allLs
-                        break
-                         
-            if len(self.linkInsMap):
-                print "Instructions for build a link are  "
-                print "Parameter\tValue"
-                for aKey in sorted(self.linkInsMap.iterkeys()):
-                    if aKey.find("DELETE")==-1: 
-                        print "%s\t%s"%(aKey, self.linkInsMap[aKey])
-                if self.linkInsMap.has_key("DELETE"):
-                    print "The following items are deleted."
-                    print "Item\tResidue\tItemName"
-                    for aQ in self.linkInsMap["DELETE"]:
-                        print "%s\t%s\t%s"%(aQ[0], aQ[1], aQ[2])        
-
-        else:
-            print "A empty set of input instructions for link building"
-
+                print "acedrg failed to generate a dictionary file"     
 
     def printExitInfo(self):
 
@@ -4020,24 +3769,12 @@ class AcedrgRDKit():
                                    isAro, bLen, dBlen))
 
             # chiral center section
-            lChiPre = False
+            nChiPre = 0
             print " Number of chiral centers get from the comformer ", nTetraChi
             if tChiDes:
-                print "number of chiral center predefined ", len(tChiDes)
-                if len(tChiDes):
-                    # The molecule contain chiral centers
-                    aMmCif.write("#\n")
-                    aMmCif.write("_chem_comp_chir.comp_id\n")
-                    aMmCif.write("_chem_comp_chir.id\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_centre\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_1\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_2\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_3\n")
-                    aMmCif.write("_chem_comp_chir.volume_sign\n")
-                    for aChiral in tChiDes:
-                        aMmCif.write(aChiral+"\n")
-                    lChiPre=True
-            elif nTetraChi !=0 and not lChiPre: 
+                nChiPre = len(tChiDes)
+                print "number of chiral center predefined ", nChiPre
+            if nChiPre !=0 or nTetraChi !=0:
                 # The molecule contain chiral centers
                 aMmCif.write("#\n")
                 aMmCif.write("_chem_comp_chir.comp_id\n")
@@ -4047,7 +3784,50 @@ class AcedrgRDKit():
                 aMmCif.write("_chem_comp_chir.atom_id_2\n")
                 aMmCif.write("_chem_comp_chir.atom_id_3\n")
                 aMmCif.write("_chem_comp_chir.volume_sign\n")
-
+            if nChiPre:
+                chiCenAtmIds = []
+                for aChiral in tChiDes:
+                    chiStrs = aChiral.strip().split()
+                    if len(chiStrs) ==7:
+                        chiCenAtmIds.append(chiStrs[2])
+                    aMmCif.write(aChiral+"\n")
+                    print "aChiral "
+                    print aChiral
+                print "Predefined chiral centres ", chiCenAtmIds
+                if nChiPre != nTetraChi:
+                    extraChiAtoms = []
+                    for aAtom in allAtoms:
+                        aCT = aAtom.GetChiralTag()
+                        if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
+                            aAtmName=aAtom.GetProp("Name")
+                            if not aAtmName in chiCenAtmIds:
+                                print "Chiral center %s is not in predefined chiral centers"%aAtmName
+                                extraChiAtoms.append(aAtom)
+                    if len(extraChiAtoms):
+                        chiralIdx = nChiPre + 1
+                        for aAtom in extraChiAtoms:      
+                            aCTName = "chir_" + str(chiralIdx)
+                            chiralIdx +=1
+                            aAtmName=aAtom.GetProp("Name")
+                            aSetAtms = []
+                            aSetAtms.append(aAtmName)
+                            aSetBonds = aAtom.GetBonds()
+                            for aBond in aSetBonds:
+                                if len(aSetAtms) < 4:
+                                    atmIdx1 = aBond.GetBeginAtomIdx()
+                                    atmIdx2 = aBond.GetEndAtomIdx() 
+                                    name1   = allAtoms[atmIdx1].GetProp("Name")  
+                                    name2   = allAtoms[atmIdx2].GetProp("Name")
+                                    if name1 == aAtmName:
+                                        aSetAtms.append(name2) 
+                                    if name2== aAtmName:
+                                        aSetAtms.append(name1) 
+                            if len(aSetAtms) == 4:
+                                aChi = "%s%s%s%s%s%s%s"%(tMonoName.ljust(8), aCTName.ljust(12), aSetAtms[0].ljust(8),\
+                                                         aSetAtms[1].ljust(8), aSetAtms[2].ljust(8), aSetAtms[3].ljust(8),"both")
+                                print aChi
+                                aMmCif.write(aChi+"\n")     
+            elif nTetraChi !=0 : 
                 # Set all chiral atom according to format of mmCif 
                 rdmolops.AssignStereochemistry(tMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
                 chiralIdx = 1

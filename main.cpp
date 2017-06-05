@@ -291,7 +291,7 @@ int main(int argc, char** argv) {
                 
                 if (AJob.workMode==31 || AJob.workMode==311)
                 {
-                    aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+                    aMolCreator.execute1(AJob.IOEntries["userOutName"].c_str());
                 }
                 else if (AJob.workMode ==312)
                 {

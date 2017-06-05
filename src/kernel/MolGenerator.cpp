@@ -14,10 +14,12 @@ namespace LIBMOL {
 
     MolGenerator::MolGenerator() : myNBDepth(1),
     lColid(false),
-    lHasMetal(false) {
+    lHasMetal(false)
+    {
     }
 
-    MolGenerator::MolGenerator(const GenCifFile& tCifObj, int tNBDepth) {
+    MolGenerator::MolGenerator(const GenCifFile& tCifObj, int tNBDepth)
+    {
 
         myNBDepth = tNBDepth;
         lColid = false;
@@ -73,7 +75,8 @@ namespace LIBMOL {
         }
     }
 
-    void MolGenerator::execute(FileName tOutName) {
+    void MolGenerator::execute(FileName tOutName) 
+    {
         CCP4DictParas tCCP4EnergParas;
         ccp4DictParas.push_back(tCCP4EnergParas);
         PeriodicTable aPTable;
@@ -111,7 +114,7 @@ namespace LIBMOL {
                 symmAtomGen(iCryst, aPTable);
 
                 std::cout << "number of atoms in a center unit cell "
-                        << allAtoms.size() << std::endl;
+                          << allAtoms.size() << std::endl;
 
 
                 if (!lColid) 
@@ -131,6 +134,7 @@ namespace LIBMOL {
                     checkInfMols(aSetOfInfMols, aSetOfFiniteMols);
 
                     allMolecules.clear();
+                    
                     for (std::vector<Molecule>::iterator iMol
                             = aSetOfFiniteMols.begin();
                             iMol != aSetOfFiniteMols.end(); iMol++) 
@@ -164,13 +168,121 @@ namespace LIBMOL {
                     
                     getOverallBondAndAnglesNew();
                     outTables(tOutName, allMolecules, aSetOfInfMols);
-                } else {
+                } 
+                else 
+                {
                     outMsg(tOutName);
                 }
             }
         }
     }
 
+    void MolGenerator::execute1(FileName tOutName) 
+    {
+        // Temp speed-up version. split validation procedures into several parts
+        // and carrry out them in different stages to filter some molecules so 
+        // that they do not need to do classifications
+        
+        CCP4DictParas tCCP4EnergParas;
+        ccp4DictParas.push_back(tCCP4EnergParas);
+        PeriodicTable aPTable;
+
+
+        // std::cout << "number of crystal " << allCryst.size() << std::endl;
+        std::cout << "number of atom read in " << std::endl;
+
+        if (initAtoms.size() > 1) {
+            for (std::vector<CrystInfo>::iterator iCryst = allCryst.begin();
+                    iCryst != allCryst.end(); iCryst++) {
+                for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
+                        iA != initAtoms.end(); iA++) 
+                {
+                    
+                    if (iA->ocp < 1.0000001) 
+                    {
+                        packAtomIntoCell((*iA));
+                        //iA->coords.clear();
+                        //FractToOrtho(iA->fracCoords, iA->coords, iCryst->itsCell->a,
+                        //        iCryst->itsCell->b, iCryst->itsCell->c, iCryst->itsCell->alpha,
+                        //        iCryst->itsCell->beta, iCryst->itsCell->gamma);
+                        iA->sId = "555";
+                        allAtoms.push_back(*iA);
+                        refAtoms.push_back(*iA);
+                        // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
+                    }
+                }
+
+                //outPDB("initAtoms.pdb", "UNL", initAtoms);
+
+                std::cout << "Number of atoms read from the input file "
+                        << initAtoms.size() << std::endl;
+
+                symmAtomGen(iCryst, aPTable);
+
+                std::cout << "number of atoms in a center unit cell "
+                          << allAtoms.size() << std::endl;
+
+
+                if (!lColid) 
+                {
+                    buildRefAtoms(iCryst);
+                    // getUniqueBonds(aPTable);
+                    
+                    getUniqueAtomLinks(aPTable, iCryst);
+
+                    getMolByEqClassInCell();
+                    
+                    buildAndValidMols(aPTable, iCryst);
+                    
+                    // getAtomTypeMols();
+                    
+                    std::vector<Molecule> aSetOfFiniteMols, aSetOfInfMols;
+                    checkInfMols(aSetOfInfMols, aSetOfFiniteMols);
+
+                    allMolecules.clear();
+                    
+                    for (std::vector<Molecule>::iterator iMol
+                            = aSetOfFiniteMols.begin();
+                            iMol != aSetOfFiniteMols.end(); iMol++) 
+                    {
+                        allMolecules.push_back(*iMol);
+                    }
+                    /*
+                    HuckelMOSuite aMoTool;
+                    aMoTool.setWorkMode(2);
+                    for (std::vector<Molecule>::iterator iMol
+                            = allMolecules.begin();
+                            iMol != allMolecules.end(); iMol++) 
+                    {
+                        std::cout << std::endl
+                                << "Huckel MO related section for molecules "
+                                << iMol->seriNum << std::endl;
+
+
+                        aMoTool.execute2(iMol->atoms, iMol->allBonds, iMol->rings);
+                        
+                        for (std::vector<BondDict>::iterator iBo=iMol->allBonds.begin();
+                                iBo !=iMol->allBonds.end(); iBo++)
+                        {
+                            std::cout << "Now bond " << iBo->seriNum 
+                                      << " has order " << iBo->orderN << std::endl;
+                        }
+                         
+                    }
+                    */
+                    
+                    
+                    getOverallBondAndAnglesNew();
+                    outTables(tOutName, allMolecules, aSetOfInfMols);
+                } 
+                else 
+                {
+                    outMsg(tOutName);
+                }
+            }
+        }
+    }
+    
     void MolGenerator::executeMet(FileName tOutName) 
     {
         if (initAtoms.size() > 0) 
@@ -2021,8 +2133,8 @@ namespace LIBMOL {
     }
 
     void MolGenerator::buildAndValidMols(PeriodicTable & tPTab,
-            std::vector<CrystInfo>::iterator tCryst) {
-
+            std::vector<CrystInfo>::iterator tCryst) 
+    {
         std::cout << "Number of molecules after linked equiv class: "
                 << moleculesInCell.size() << std::endl;
 
@@ -2434,7 +2546,8 @@ namespace LIBMOL {
 
     }
 
-    void MolGenerator::checkAtomElementID(std::vector<AtomDict> & tAtoms) {
+    void MolGenerator::checkAtomElementID(std::vector<AtomDict> & tAtoms) 
+    {
         PeriodicTable aPTab;
 
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();

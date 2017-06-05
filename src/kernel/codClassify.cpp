@@ -1754,8 +1754,6 @@ namespace LIBMOL
                */
             }
         }
-       
-       
     }
     
     
@@ -5743,6 +5741,10 @@ namespace LIBMOL
     
     void CodClassify::searchCodBonds()
     {
+        time_t tStart, tEnd;
+        std::time (&tStart);
+        std::cout << "Search for  all target bonds started at " << std::ctime(&tStart);
+
         int nFind =0;
               
         for (std::vector<BondDict>::iterator iGB = allBonds.begin();
@@ -5795,6 +5797,12 @@ namespace LIBMOL
         std::cout << "Number of Bonds to be found " << (int)allBonds.size() << std::endl
                   << "Number of Bonds found " << nFind << std::endl;
         
+        std::time(&tEnd);
+        std::cout << "Search for all target bonds finished at " << std::ctime(&tEnd);
+        REAL tDiff;
+        tDiff = std::difftime(tEnd,tStart);
+        std::cout  << "it takes " << std::setprecision(3) <<tDiff 
+                   << " seconds to do that " << std::endl;
     }
     
     void CodClassify::searchCodOrgBonds(std::vector<BondDict>::iterator iB)
@@ -10009,8 +10017,10 @@ namespace LIBMOL
                     std::getline(codAngleFile, tRecord);
                     
                     tRecord = TrimSpaces(tRecord);
+                    
                     std::vector<std::string> tBuf;
                     StrTokenize(tRecord, tBuf);
+                    
                     
                     if ((int)tBuf.size() ==37)
                     {
@@ -10021,7 +10031,7 @@ namespace LIBMOL
                         ha3 = StrToInt(tBuf[2]);
                         
                         
-                        
+                           
                         // Exact match 
                         /*
                         allDictAnglesIdxD[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]][tBuf[7]][tBuf[8]]
@@ -10039,7 +10049,7 @@ namespace LIBMOL
                         aAng.numCodValues  = StrToInt(tBuf[21]);
                         allDictAnglesD.push_back(aAng);
                         */
-                        
+                       
                         // AxM values, AxC not found 
                         aValueSet aAngS1;
                         aAngS1.value        = StrToReal(tBuf[22]);
@@ -10056,35 +10066,12 @@ namespace LIBMOL
                         {
                               
                             allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
-                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]].push_back(aAngS1);
-                            /*
-                            if (ha1==466 && ha2==466 & ha3==958 
-                                && tBuf[13]=="C[6](C[6]C[6]HN)(C[6]C[6]HO)(OH)(H)")
-                            {
-                                std::cout << "Ha1 " << ha1 << std::endl
-                                          << "Ha2 " << ha2 << std::endl 
-                                          << "Ha3 " << ha3 << std::endl
-                                          << "R3A " << tBuf[3] << std::endl
-                                          << "A1R " << tBuf[4] << std::endl
-                                          << "A2R " << tBuf[5] << std::endl
-                                          << "A3R " << tBuf[6] << std::endl
-                                          << "a1NB2 " << tBuf[7] << std::endl
-                                          << "a2NB2 " << tBuf[8] << std::endl
-                                          << "a3NB2 " << tBuf[9] << std::endl
-                                          << "a1NB "  << tBuf[10] << std::endl
-                                          << "a2NB "  << tBuf[11] << std::endl
-                                          << "a3NB "  << tBuf[12] << std::endl
-                                          << "a1M "   << tBuf[13] << std::endl
-                                          << "a2M "   << tBuf[14] << std::endl
-                                          << "a3M "   << tBuf[15] << std::endl;
-                            
-                                std::cout << "angle value : "
-                                          << allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
-                                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]]
-                                             [tBuf[13]][tBuf[14]][tBuf[15]][0].value << std::end
-                            }
-                             */
+                             [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]]
+                              [tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]].push_back(aAngS1);
                         } 
+                        
+                        
+                       
                         
                         // A_NB values, AxM not found 
                         aValueSet aAngS2;
@@ -10149,9 +10136,9 @@ namespace LIBMOL
                         {
                             allDictAnglesIdx5D[ha1][ha2][ha3][tBuf[3]].push_back(aAngS5);
                         }
-                        
+                       
                     }
-                     
+                    
                 }
                 
                 codAngleFile.close();
@@ -10173,8 +10160,6 @@ namespace LIBMOL
         tDiff = std::difftime(tEnd,tStart);
         std::cout  << "it takes " << std::setprecision(3) <<tDiff 
                    << " seconds to finish group COD angles " << std::endl;
-        
-        
     }
 
 
@@ -10348,6 +10333,10 @@ namespace LIBMOL
     
     void CodClassify::searchCodAngles2()
     {
+        time_t tStart, tEnd;
+        std::time (&tStart);
+        std::cout << "Search for target angles started at " << std::ctime(&tStart);
+        
         std::map<int, std::vector<AngleDict> > specialAngs;
         
         for (std::vector<AngleDict>::iterator iA=allAngles.begin();
@@ -10403,7 +10392,13 @@ namespace LIBMOL
         // Final check all constraints 
         checkAngConstraints();
         
-        
+        std::time(&tEnd);
+        std::cout << "Search target angles finished at " << std::ctime(&tEnd);
+        REAL tDiff;
+        tDiff = std::difftime(tEnd,tStart);
+        std::cout  << "it takes " << std::setprecision(3) <<tDiff 
+                   << " to search for all target angles " << std::endl;
+
     }
     
     
@@ -12273,6 +12268,9 @@ namespace LIBMOL
             codClassToAtomAng(allAtoms[iAN->atoms[1]].codClass, allAtoms[iAN->atoms[1]]);
             codClassToAtomAng(allAtoms[iAN->atoms[2]].codClass, allAtoms[iAN->atoms[2]]);
             */
+            
+        
+        
             bool lDef = false;
             int ha1, ha2, ha3; // s2, s3;
             ID Ring3A = IntToStr(iAN->isInSameRing);
