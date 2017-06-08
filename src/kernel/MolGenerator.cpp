@@ -1004,7 +1004,11 @@ namespace LIBMOL {
             //std::cout << "Look for bonds to atom " << allAtoms[i].id
             //          << "(serial number  " << allAtoms[i].seriNum
             //          << ") " << std::endl;
-            
+            bool lMetal = false;
+            if (allAtoms[i].isMetal)
+            {
+                lMetal = true;
+            }
             for (std::vector<int>::iterator iNB = allAtoms[i].neighbAtoms.begin();
                     iNB != allAtoms[i].neighbAtoms.end(); iNB++) 
             {
@@ -1051,6 +1055,11 @@ namespace LIBMOL {
                              ==distsNBs[elem1][elem2][rD].end())
                     {
                         distsNBs[elem1][elem2][rD].push_back(aCombID);
+                    }
+                    
+                    if (lMetal && rD < 4.0)
+                    {
+                        metalNBs[i].push_back(*iNB);
                     }
                     
                 }
@@ -1248,6 +1257,8 @@ namespace LIBMOL {
         
         checkAtomLinks(tCryst);
         
+        // compileMetalAtomNB();
+        
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                 iAt != allAtoms.end(); iAt++) {
             if (iAt->isInPreCell) {
@@ -1267,6 +1278,22 @@ namespace LIBMOL {
                 }
             }
         }
+    }
+    
+    void MolGenerator::compileMetalAtomNB()
+    {
+        for (unsigned i = 0; i < allAtoms.size(); i++) 
+        {
+            
+            if (allAtoms[i].isInPreCell && allAtoms[i].isMetal)
+            {
+                for (std::vector<int>::iterator iNB = allAtoms[i].neighbAtoms.begin();
+                     iNB != allAtoms[i].neighbAtoms.end(); iNB++) 
+                {
+                    metalNBs[i].push_back(*iNB);
+                }
+            }
+        } 
     }
     
     void MolGenerator::checkAtomLinks(std::vector<CrystInfo>::iterator tCryst)
@@ -4394,7 +4421,7 @@ namespace LIBMOL {
                                       << std::endl;
                             
                             int nNBConn = 
-                             allAtoms[allAtoms[*iP].fromOrig].connAtoms.size();
+                            allAtoms[allAtoms[*iP].fromOrig].connAtoms.size();
                             aBAndAF << allAtoms[iM->first].chemType << "\t"
                                     << allAtoms[*iP].chemType << "\t"
                                     << allAtoms[iM->first].id << "\t"
@@ -4613,8 +4640,39 @@ namespace LIBMOL {
                 }
                 aNBDistF.close();
             }
+            
+            for (std::map<int, std::vector<int> >::iterator iNBM=metalNBs.begin();
+                    iNBM !=metalNBs.end(); iNBM++)
+            {
+                std::vector<AtomDict> aSetAtoms;
+                aSetAtoms.push_back(allAtoms[iNBM->first]);
+                std::cout << "For metal atom " << allAtoms[iNBM->first].id << std::endl;
+                std::cout << "Its coordinates " << std::endl;
+                
+                for (std::vector<REAL>::iterator iCo=allAtoms[iNBM->first].coords.begin();
+                        iCo !=allAtoms[iNBM->first].coords.end(); iCo++)
+                {
+                    std::cout << *iCo << std::endl;
+                }
+                std::cout << "Its NB atoms " << std::endl;
+                for (std::vector<int>::iterator iNBAtm=iNBM->second.begin();
+                      iNBAtm != iNBM->second.end(); iNBAtm++)
+                {
+                    aSetAtoms.push_back(allAtoms[*iNBAtm]);
+                    std::cout << "Atom " << allAtoms[*iNBAtm].id << std::endl;
+                    for (std::vector<REAL>::iterator iNBCo=allAtoms[*iNBAtm].coords.begin();
+                        iNBCo !=allAtoms[*iNBAtm].coords.end(); iNBCo++)
+                    {
+                        std::cout << *iNBCo << std::endl;
+                    }
+                }
+                
+                Name metalNBFName(rootFName);
+                metalNBFName.append("_"+allAtoms[iNBM->first].id + "_NB");
+                
+                outPDB(metalNBFName.c_str(), "UNL", aSetAtoms);           
+            }
         }
-        
     }
     
 
