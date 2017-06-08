@@ -249,7 +249,6 @@ int main(int argc, char** argv) {
     }
     else if (AJob.workMode == 21 || AJob.workMode == 22 )
     {
-        
        
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"].c_str(),
                                         AJob.IOEntries["inPdbName"].c_str());
@@ -297,7 +296,7 @@ int main(int argc, char** argv) {
                 {
                     std::cout << "Studies related metal atoms " << std::endl;
                     //std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
-                    // std::cout << "Contain Metal " << dataFromCif.hasMetal << std::endl;
+                    //std::cout << "Contain Metal " << dataFromCif.hasMetal << std::endl;
                     
                     if (dataFromCif.hasMetal)
                     {
