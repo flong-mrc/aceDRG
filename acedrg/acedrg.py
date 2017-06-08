@@ -117,6 +117,7 @@ class Acedrg(CExeCode ):
 
         self.workMode         = 0
         self.useExistCoords   = False
+        self.isAA             = False
 
         self.molGen           = False
         self.repCrds          = False
@@ -1496,7 +1497,7 @@ class Acedrg(CExeCode ):
                 self.inMmCifName      = tInCif
                 self.outRstCifName    = finRst
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
-                self.outTorsionRestraints(self.outRstCifName, finTor)
+                #self.outTorsionRestraints(self.outRstCifName, finTor)
         else:
             print "Failed to produce %s after final geometrical optimization"%tInPdb
 
@@ -1982,6 +1983,30 @@ class Acedrg(CExeCode ):
                 shutil.copy(self.outRstCifName, tCif) 
             else:
                 print "acedrg failed to generate a dictionary file"       
+    
+    def getAAOut(self):
+      
+        aaDir = os.path.join(self.acedrgTables, "AminoAcids")       
+        iniPdb = os.path.join(aaDir, self.monomRoot + ".pdb")
+        #print "iniPdb ", iniPdb
+        finPdb = self.outRoot + ".pdb"
+        if os.path.isfile(iniPdb):
+            shutil.copy(iniPdb, finPdb)
+        else:
+            print "Error in dealing with the pdb of amino acid %s "%self.monomRoot 
+            sys.exit(1)
+        iniCif = os.path.join(aaDir, self.monomRoot + ".cif")
+        finCif = self.outRoot + ".cif"
+        if os.path.isfile(iniCif):
+            shutil.copy(iniCif, finCif)
+        else:
+            print "Error in dealing with the cif of amino acid %s "%self.monomRoot 
+            sys.exit(1)
+        if os.path.isfile(finPdb) and os.path.isfile(finCif):
+           print "====================================================================="
+           print "|               Done                                                |"
+           print "====================================================================="
+
 
     def executeWithRDKit(self):
         
@@ -1989,18 +2014,24 @@ class Acedrg(CExeCode ):
         self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print "One of output conformers will using input coordinates as initial ones"
-        elif self.workMode !=0 and self.workMode != 61 :
-            print "Input coordinates will be ignored"
+        #elif self.workMode !=0 and self.workMode != 61 :
+        #    print "Input coordinates will be ignored"
 
         # Stage 1: initiate a mol file for RDKit obj
-       
         if self.workMode == 11 or self.workMode == 111:
-            # The input file is an mmcif file     
-            if os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
+            if self.monomRoot in self.chemCheck.aminoAcids:
+                self.isAA = True
+                self.getAAOut()
+            elif os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode)\
+                 and not self.isAA:
+                # The input file is an mmcif file     
                 self.fileConv.mmCifReader(self.inMmCifName)
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor) 
-                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 :
+                    if self.monomRoot in self.chemCheck.aminoAcids:
+                        self.isAA = True
+                        self.getAAOut()
+                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 and not self.isAA:
                     # Option A: 
                     if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -2266,7 +2297,7 @@ class Acedrg(CExeCode ):
             self.workMode = 111
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
-        if self.workMode in [11,  111, 51]:
+        if self.workMode in [11,  111, 51] and not self.isAA :
             #print len(self.rdKit.molecules)
             if len(self.rdKit.molecules):
                 print "Ligand ID ", self.monomRoot

@@ -12,6 +12,26 @@ doneNames = []
 failNames = []
 
 print "========================================================="
+print "|  run all examples in inCCP4AA                         |"
+print "========================================================="
+for aF in glob.glob("./inCCP4AA/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) !=0:
+        cmdL = "acedrg -c %s -o  %s -p "%(aF, aFRoot) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%aFRoot
+        outCif = "%s.cif"%aFRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(aFRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(aFRoot)
+
+print "========================================================="
 print "|  run all examples with input SMILES files at ./inSmil |"
 print "========================================================="
 i = 0
@@ -278,7 +298,6 @@ for aF in glob.glob("./inFuns/*.cif"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
-
 
 print "=============================================================="
 print "|  run those cif in CCP4 monomer lib which had some problems |"

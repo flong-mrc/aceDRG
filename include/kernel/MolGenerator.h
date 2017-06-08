@@ -154,6 +154,7 @@ namespace LIBMOL
                                 std::vector<CrystInfo>::iterator tCryst);
         void getUniqueAtomLinksMet(PeriodicTable & tPTab,
                             std::vector<CrystInfo>::iterator tCryst);
+        void compileMetalAtomNB();
         
         void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
         
@@ -338,7 +339,10 @@ namespace LIBMOL
         // For tempo research
         std::map<int, std::map<int, REAL> >     metalRelatedMetalNBs;
         std::map<ID, std::map<ID, 
-        std::map<REAL, std::vector<ID> > > >   distsNBs;  
+        std::map<REAL, std::vector<ID> > > >    distsNBs; 
+        
+        std::map<int, std::vector<int> >        metalNBs;
+        
                  
         
     private :
