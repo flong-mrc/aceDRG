@@ -185,4 +185,17 @@ def splitLineSpa3(tSet, tSep, tStrs):
         TE = tSet[-1].strip().split()
         for aT in TE:
             tStrs.append(aT)
-                  
+
+def BondOrderS2N(tBS):
+
+    aBN = -1
+
+    aBS = tBS.upper()
+    if aBS.find("SING") !=-1:
+        aBN = 1      
+    elif aBS.find("DOUB") !=-1:
+        aBN = 2
+    elif aBS.find("TRIB") !=-1:
+        aBN = 3
+
+    return aBN

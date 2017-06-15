@@ -73,6 +73,24 @@ class ChemCheck():
         self.defaultBo["C"]  = 4
         self.defaultBo["P"]  = 5
 
+        # Copy some data from libmol to here
+        self.orgVal          = {}
+        self.orgVal["H"]     = [1]
+        self.orgVal["D"]     = [1]
+        self.orgVal["F"]     = [1]
+        self.orgVal["CL"]    = [1]
+        self.orgVal["BR"]    = [1]
+        self.orgVal["I"]     = [1]
+        self.orgVal["AT"]    = [1]
+        self.orgVal["O"]     = [2]
+        self.orgVal["S"]     = [6,4,2]
+        self.orgVal["SE"]    = [6,4,2]
+        self.orgVal["N"]     = [3]
+        self.orgVal["B"]     = [3]
+        self.orgVal["C"]     = [4]
+        self.orgVal["P"]     = [5]    # should be [5, 3]. Use one at the moment
+
+
         self.torsions   = []
         self.outChiSign  ={}
         self.tmpChiralSign = {}
@@ -401,4 +419,43 @@ class ChemCheck():
 
         return vSign  
  
+
+    def setHName(self, tHConnAtom, tOtheAtmSet, tAllHIds):
+
+        nAllH =len(tAllHIds)
+        reName = "H" + str(nAllH +1)
+        hIds = []
+        for aA in tOtheAtmSet:
+            if aA["type_symbol"].strip() == "H": 
+                 hIds.append(aA["atom_id"])
+
+        hIds.sort()
+        nL = len(tHConnAtom["atom_id"])
+        nH = len(hIds)
+        if nH ==0:
+           aId = "H" + str(nAllH)
+           if aId in tAllHIds:
+               reName = "H" + str(nAllH +1)
+           else:
+               if nL==1:
+                   aId1 = "H"
+                   aId2 = "H" + tHConnAtom["type_symbol"]
+                   if not aI1 in tAllHIds: 
+                       reName = aId1
+                   elif not aI2 in tAllHIds:
+                       reName = aId2
+        elif nH==1:
+             aId = hIds[0] + "2"
+             if not aId in tAllHIds:
+                 reName = aId
+        else:
+           
+            if hIds[-1][-1].isdigit():
+                aN = int(hIds[-1][-1]) + 1
+                aId = hIds[-1][0:-1] + str(aN)
+                if not aId in tAllHIds:
+                    reName = aId 
+
+        return reName 
+
 
