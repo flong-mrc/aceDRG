@@ -32,7 +32,6 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
-
 from utility  import listComp
 from utility  import listComp2
 from utility  import listCompDes
@@ -330,6 +329,30 @@ class ChemCheck():
                         lAtom = True
         else: 
             print "%s can not be found for reading "%tFileName
+
+
+    def getTotalBondOrderInOneMmcifAtom(self, tAtomId, tBonds):
+
+        # tBonds is prefilted in getBondSetForOneMmcifAtom() and other
+        totalOr = 0
+        for aBond in tBonds:
+            aOr = BondOrderS2N(aBond["type"])
+            if aOr != -1:
+                totalOr += aOr
+            else:
+                totalOr = -1
+                break
+
+        return totalOr
+
+    
+    def checkLocalStructAndCharge(self, tAtomId, tAtoms,  tBondSet1, tBondSet2):
+
+        # For a linked atom, the environment mostly changes.
+        # Formal charge should be corrected respectively
+      
+        pass 
+       
                     
     def tmpModiN_in_AA(self, tCompId, tCifMonomer):
         
@@ -373,8 +396,14 @@ class ChemCheck():
                     if Hyb == Chem.rdchem.HybridizationType.SP2:
                         lSP2 = True
                         break
-
-                if not lSP2:
+                nHs = 0
+                for aNB in aNBSet:
+                    symb = aNB.GetSymbol().strip()
+                    if len(symb)==1 and symb.find("H") !=-1:
+                        nHs +=1            
+                print "atom symb ", aSymb
+                print "number of H NB ", nHs
+                if not lSP2 and nHs < 2:
                     # TEMP, re-calculated when the coordinates are available
                     #tCenAtm.SetChiralTag(rdchem.ChiralType.CHI_TETRAHEDRAL_CW)            
                     tCenAtm.SetProp("TmpChiral", "both")       
