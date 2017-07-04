@@ -96,6 +96,8 @@ class FileTransformer :
  
         self.rdkitSmiles  = {}
 
+        self.mmCifHasCoords   = False
+
         self.ccp4MmCifDataMap = {}
 
         self.nameMapingCifMol = {}             # e.g. self.nameMapingCifMol[1]   = name 
@@ -164,14 +166,14 @@ class FileTransformer :
             if len(aBlockLs):
                 self.allBlockLs.append(aBlockLs)
        
-            print "Number of Blocks ", len(self.allBlockLs)
-            i = 1
-            for aBlc in self.allBlockLs:
-                print "-------------"
-                print "Block ", i
-                i = i + 1
-                for aL in aBlc:
-                    print aL  
+            #print "Number of Blocks ", len(self.allBlockLs)
+            #i = 1
+            #for aBlc in self.allBlockLs:
+            #    print "-------------"
+            #    print "Block ", i
+            #    i = i + 1
+            #    for aL in aBlc:
+            #        print aL  
     
 
             if len(self.allBlockLs):
@@ -182,7 +184,9 @@ class FileTransformer :
                 self.parserAll2Cols(all2ColLines)
 
             self.TmpChemCheck()
-           
+            
+            self.selectAtomCoordinates()
+  
             # check
             """
             idKey = "_chem_comp_atom.atom_id"
@@ -492,7 +496,7 @@ class FileTransformer :
                 if aAtom.has_key("_chem_comp_atom.atom_id"):
                     tCharge =0.0
                     if aAtom.has_key("_chem_comp_atom.charge"):
-                        print "aAtom['_chem_comp_atom.charge'] ", aAtom["_chem_comp_atom.charge"] 
+                        # print "aAtom['_chem_comp_atom.charge'] ", aAtom["_chem_comp_atom.charge"] 
                         if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
                             tCharge = float(aAtom["_chem_comp_atom.charge"])
                     elif aAtom.has_key("_chem_comp_atom.partial_charge"):
@@ -514,12 +518,13 @@ class FileTransformer :
                     aStr +="%s"%aChiral[colIdx[i]].ljust(8)
                 self.chiralPre.append(aStr)
 
-        if len(colIdx):
-            if tProp =="atom":
-                for aAtom in self.atoms:
-                    for i in range(len(colIdx)):
-                        if colIdx[i].find("chem_comp_atom.atom_id") != -1:
-                            print "Prop %s is %s "%(colIdx[i], aAtom[colIdx[i]].ljust(8))
+        #if len(colIdx):
+        #    if tProp =="atom":
+        #        for aAtom in self.atoms:
+        #            for i in range(len(colIdx)):
+        #                if colIdx[i].find("chem_comp_atom.atom_id") != -1:
+        #                    print "Prop %s is %s "%(colIdx[i], aAtom[colIdx[i]].ljust(8))
+
         # Check
         if len(self.inputCharge) !=0:
             print "The following atoms have charges "
@@ -527,33 +532,33 @@ class FileTransformer :
                 print "Name : ", aName, " charge : ", self.inputCharge[aName]
 
         if len(colIdx):
-            for i in range(len(colIdx)):
-                print colIdx[i]
+            #for i in range(len(colIdx)):
+            #    print colIdx[i]
             if tProp =="atom":
                 for aAtom in self.atoms:
                     aStr = ""
                     for i in range(len(colIdx)):
                         aStr +="%s"%aAtom[colIdx[i]].ljust(8)
-                    print aStr
+                    #print aStr
             elif tProp =="bond":
                 for aBond in self.bonds:
                     aStr = ""
                     for i in range(len(colIdx)):
                         aStr +="%s"%aBond[colIdx[i]].ljust(8)
-                    print aStr
+                    #print aStr
             elif tProp =="chiral":
                 for aChiral in self.chirals:
                     aStr = ""
                     for i in range(len(colIdx)):
                         aStr +="%s"%aChiral[colIdx[i]].ljust(8)
-                    print aStr
+                    #print aStr
 
-        if tProp =="strDescriptor":
-            if len(self.strDescriptors["props"]):
-                for aProp in self.strDescriptors["props"]:
-                    print aProp
-                for aEn in self.strDescriptors["entries"]:
-                    print aEn.strip()
+        #if tProp =="strDescriptor":
+        #    if len(self.strDescriptors["props"]):
+        #        for aProp in self.strDescriptors["props"]:
+        #            print aProp
+        #        for aEn in self.strDescriptors["entries"]:
+        #            print aEn.strip()
 
     def getCCP4MmCifMap(self):
 
@@ -795,10 +800,72 @@ class FileTransformer :
                             if aNNA1 != aIdx and atomSet1["atoms"][aNNA1]["elem"].find("H")==-1 :
                                 group1.append([aNA1, aNNA1])
                             #if atomSet2["atomTypes"].has_key(aClassNA) and atomSet2["atomTypes"].has_key(aClassNA):
-                      
                          
-                                             
-       
+    def selectAtomCoordinates(self):
+
+        # Select coordinates as .x, .y and .z when there are several sets of
+        # coordinates for atoms 
+        lq1 = False
+        lq2 = False
+        lq3 = False
+
+        self.mmCifHasCoords = False  
+        if len(self.atoms) > 0:
+            if self.atoms[0].has_key("_chem_comp_atom.model_Cartn_x") and\
+               self.atoms[0].has_key("_chem_comp_atom.model_Cartn_y") and\
+               self.atoms[0].has_key("_chem_comp_atom.model_Cartn_z"):
+                for aAtom in self.atoms:
+                    if aAtom["_chem_comp_atom.model_Cartn_x"].find("?") != -1\
+                       or aAtom["_chem_comp_atom.model_Cartn_y"].find("?") != -1\
+                       or aAtom["_chem_comp_atom.model_Cartn_z"].find("?") != -1:
+                        lq1 = True
+                        break
+                if not lq1 : 
+                    print "Using _chem_comp_atom.pdbx_model_Cartn_x"
+                    self.mmCifHasCoords   = True
+                    for aAtom in self.atoms:
+                        aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.model_Cartn_x"]
+                        aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.model_Cartn_y"]
+                        aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.model_Cartn_z"]
+                       
+            if not self.mmCifHasCoords :
+                print "Not _chem_comp_atom.pdbx_model_Cartn_x"
+                if self.atoms[0].has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal")\
+                   and self.atoms[0].has_key("_chem_comp_atom.pdbx_model_Cartn_y_ideal")\
+                   and self.atoms[0].has_key("_chem_comp_atom.pdbx_model_Cartn_z_ideal"):
+                    for aAtom in self.atoms:           
+                        if aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"].find("?") !=-1\
+                           or aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"].find("?") !=-1\
+                           or aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"].find("?") !=-1:
+                            lq2 = True
+                            break
+                    if not lq2:
+                        self.mmCifHasCoords   = True
+                        print "Using _chem_comp_atom.pdbx_model_Cartn_x_ideal"
+                        for aAtom in self.atoms:           
+                            aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
+                            aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
+                            aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
+
+            if not self.mmCifHasCoords :
+                print "not _chem_comp_atom.model_Cartn_x_ideal"
+                if self.atoms[0].has_key("_chem_comp_atom.x") and\
+                   self.atoms[0].has_key("_chem_comp_atom.y") and\
+                   self.atoms[0].has_key("_chem_comp_atom.z"):
+                    for aAtom in self.atoms:
+                        if aAtom["_chem_comp_atom.x"].find("?") !=-1\
+                           or aAtom["_chem_comp_atom.y"].find("?") !=-1\
+                           or aAtom["_chem_comp_atom.z"].find("?") !=-1:
+                            lq3 = True
+                            break
+                    if not lq3:
+                        print "Using _chem_comp_atom.x,y,z"
+                        self.mmCifHasCoords   = True
+                    else:
+                        print "not _chem_comp_atom.x"
+                        print "No original coordinates will be used for conformer generations"
+                        self.mmCifHasCoords = False  
+
     def MmCifToMolFile(self, tInFileName, tOutMolName, tMode=0):
 
         if tMode==0: 
@@ -852,7 +919,7 @@ class FileTransformer :
             # Atom block
 
             # Re-arrange atoms: non-H atoms first, followed by H atoms
-            print "Befor re-arrange, number of atoms is : ", len(self.atoms) 
+            # print "Befor re-arrange, number of atoms is : ", len(self.atoms) 
             tNonHAtoms = []
             tHAtoms    = []
             for aAtom in self.atoms:
@@ -908,37 +975,17 @@ class FileTransformer :
             chargeAtomList = []
             idxAtom = 1
             for aAtom in self.atoms:
-                #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " with serial number ", idxAtom
-                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal") and\
-                   aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"].find("?")==-1:
-                    x = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
-                elif aAtom.has_key("_chem_comp_atom.model_Cartn_x"):
-                    x = aAtom["_chem_comp_atom.model_Cartn_x"]
-                elif aAtom.has_key("_chem_comp_atom.x"):
+                if self.mmCifHasCoords :
                     x = aAtom["_chem_comp_atom.x"]
-                else:
-                    x = "0.0000"
-
-                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_y_ideal") and\
-                   aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"] ==-1:
-                    y = aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
-                elif aAtom.has_key("_chem_comp_atom.model_Cartn_y"):
-                    y = aAtom["_chem_comp_atom.model_Cartn_y"]
-                elif aAtom.has_key("_chem_comp_atom.y"):
                     y = aAtom["_chem_comp_atom.y"]
-                else:
-                    y = "0.0000"
-
-                if aAtom.has_key("_chem_comp_atom.pdbx_model_Cartn_z_ideal") and\
-                   aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]==-1:
-                    z = aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
-                elif aAtom.has_key("_chem_comp_atom.model_Cartn_z"):
-                    z = aAtom["_chem_comp_atom.model_Cartn_z"]
-                elif aAtom.has_key("_chem_comp_atom.z"):
                     z = aAtom["_chem_comp_atom.z"]
                 else:
+                    x = "0.0000"
+                    y = "0.0000"
                     z = "0.0000"
 
+
+                
                 id = aAtom["type_symbol_in_mol"]
                     
                 md =" 0 "
@@ -1054,7 +1101,7 @@ class FileTransformer :
                 tOutFile.write(aL + "\n")          
    
             tOutFile.write("M  END\n")
-          
+   
     # Mol files related 
     def CheckElemSymbolsInMolFile(self, tInFileName, tOutFileName):
 
@@ -1119,6 +1166,8 @@ class FileTransformer :
                     for aL in aMolSecs[aMol]["Sec3"]:
                         outF.write(aL)
                 outF.close()
+
+       
 
     def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="UNL", idxConf=0, tDelSign=""):
 

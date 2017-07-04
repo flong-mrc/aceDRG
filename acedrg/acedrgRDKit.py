@@ -33,11 +33,14 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
+from chem     import ChemCheck
+
 from utility  import listComp
 from utility  import listComp2
 from utility  import listCompDes
 from utility  import listCompAcd
-    
+
+   
 class AcedrgRDKit():
 
     def __init__(self, tGFFName = "", tProcessParaSet=None):
@@ -494,18 +497,18 @@ class AcedrgRDKit():
                                 nExtra +=1
                                 tHName = hRootId + str(nExtra)
         
-        for aAtom in allAtoms:
-            if aAtom.GetSymbol() =="H":
-                aSetBonds = aAtom.GetBonds()
-                if aAtom.HasProp("Name"):
-                    print "\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name")
-                    print "It is in the following bonds: "
-                    for aB in aSetBonds:
-                        print "Bond ", aB.GetIdx()
-                        print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                        print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
-                else:
-                    print "\nH atom without name, its idx is ", aAtom.GetIdx()
+        #for aAtom in allAtoms:
+        #    if aAtom.GetSymbol() =="H":
+        #        aSetBonds = aAtom.GetBonds()
+        #        if aAtom.HasProp("Name"):
+        #            #print "\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name")
+        #            #print "It is in the following bonds: "
+        #            #for aB in aSetBonds:
+        #            #    print "Bond ", aB.GetIdx()
+        #            #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
+        #            #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
+        #        else:
+        #            print "\nH atom without name, its idx is ", aAtom.GetIdx()
 
         #if len(tIdxHs) !=0:
             
@@ -832,7 +835,7 @@ class AcedrgRDKit():
         print "Number of initial conformers obtained", nConf
         allConfs = tMol.GetConformers()
         allAtoms = tMol.GetAtoms()
-        print Chem.MolToMolBlock(tMol)
+        #print Chem.MolToMolBlock(tMol)
         for aConf in allConfs:
             aCIdx =  aConf.GetId()
             aWCoordList = []
@@ -848,33 +851,33 @@ class AcedrgRDKit():
                 if not self.conformerEngMap.has_key(aEng):
                     self.conformerEngMap[aEng] = []
                 self.conformerEngMap[aEng].append(aCIdx)
-                print "Conf : ", aCIdx, " Engergy : ", aEng
+                #print "Conf : ", aCIdx, " Engergy : ", aEng
                 rdmolops.AssignAtomChiralTagsFromStructure(tMol, aCIdx)
         if len(self.conformerEngMap):
-            print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
-            print "They are : "
+            #print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
+            #print "They are : "
+            #for aEng in sorted(self.conformerEngMap.iterkeys()):
+            #    print "Energy ", aEng
+            #    for aCid in self.conformerEngMap[aEng]:
+            #        print aCid
+
+            #nSelect = 2
+            #if not self.useExistCoords: 
+            #    nSelect = self.numSelectForRefConfs
+            #else:
+            #    if tMol.GetNumConformers() <2:
+            #        nSelect = tMol.GetNumConformers()
+
+            print "The following conformers are selected for refinement: "
+            nID= 0
             for aEng in sorted(self.conformerEngMap.iterkeys()):
-                print "Energy ", aEng
-                for aCid in self.conformerEngMap[aEng]:
-                    print aCid
-
-        print "The following conformers are selected for refinement: "
-        nSelect = 2
-        if not self.useExistCoords: 
-            nSelect = self.numSelectForRefConfs
-        else:
-            if tMol.GetNumConformers() <2:
-                nSelect = self.numSelectForRefConfs
-
-        nID= 0
-        for aEng in sorted(self.conformerEngMap.iterkeys()):
-            for aCId in self.conformerEngMap[aEng]:
-                if nID < self.numSelectForRefConfs:
-                    self.selecConformerIds.append(aCId)
-                    print "Conformer ID: ", aCId, " UFF energy : ", aEng
-                    nID +=1
-                else:
-                    break
+                for aCId in self.conformerEngMap[aEng]:
+                    if nID < self.numSelectForRefConfs:
+                        self.selecConformerIds.append(aCId)
+                        print "Conformer ID: ", aCId, " UFF energy : ", aEng
+                        nID +=1
+                    else:
+                        break
         print "Number of conformers selected for refinement is ",  len(self.selecConformerIds)
 
     def checkH_Abnormal(self, tConf, tAtoms, tWrongCoordsMap):
@@ -982,6 +985,7 @@ class AcedrgRDKit():
             #print "Its name ", name
             #print "Its formal charge ", charge
             #print "Its total valence ", val
+
 
         Chem.SanitizeMol(tMol)
         Chem.Kekulize(tMol)
@@ -1211,7 +1215,7 @@ class AcedrgRDKit():
     def modifyMol(self, tMol, tAllAtoms, tAllBonds, tAllChirals, tDelAtomIdxs, tAtomsBondedToDel):
 
         allAtoms1 = tMol.GetAtoms()
-        allBonds = tMol.GetBonds()       
+        allBonds  = tMol.GetBonds()       
         print "Element to be deleted in the mol is ", self.repSign
         for aBond in tMol.GetBonds():
             lBond = True
@@ -1332,16 +1336,16 @@ class AcedrgRDKit():
             aMmCif.write("_chem_comp_atom.x\n")
             aMmCif.write("_chem_comp_atom.y\n")
             aMmCif.write("_chem_comp_atom.z\n")
-            nTetraChi = 0 
+            #nTetraChi = 0 
             for aAtom in allAtoms:
                 pos = aConformer.GetAtomPosition(aAtom.GetIdx())
-                aChi = aAtom.GetChiralTag()
-                if aChi != rdchem.ChiralType.CHI_UNSPECIFIED:
+                #aChi = aAtom.GetChiralTag()
+                #if aChi != rdchem.ChiralType.CHI_UNSPECIFIED:
                     #print "Atom ", aAtom.GetProp("Name")
                     #print "Chiral center ? ", aChi
-                    nTetraChi +=1
-                elif aAtom.HasProp("TmpChiral") !=0:
-                    nTetraChi +=1
+                    #nTetraChi +=1
+                #elif aAtom.HasProp("TmpChiral") !=0:
+                #    nTetraChi +=1
                 aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n" \
                              %(tMonoName, aAtom.GetProp("Name"), aAtom.GetSymbol(),  \
                                aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), pos.x, pos.y, pos.z))
@@ -1390,24 +1394,44 @@ class AcedrgRDKit():
                                    isAro, bLen, dBlen))
 
             # chiral center section
-            lChiPre = False
-            print " Number of chiral centers get from the comformer ", nTetraChi
+            atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
+            #if len(atomNBCIPMap.keys()):
+            #    for aAtom in allAtoms:
+            #        if aAtom.GetSymbol().find("H")==-1:
+            #            aIdx = aAtom.GetIdx()
+            #            print "=============================================="
+            #            print "| Centered atom :     %s"%aAtom.GetProp("Name")
+            #            print "----------------------------------------------"
+            #            for aPair in atomNBCIPMap[aIdx]:
+            #                print "NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
+            #    print "=============================================="
+
+            aChiralSignMap = self.setChiralsByMultiConformers(tChemCheck, tMol, atomNBCIPMap)
+            self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
+            for aIdx in sorted(aChiralSignMap.iterkeys()):
+                if aChiralSignMap[aIdx]["isChiraled"] and aChiralSignMap[aIdx].has_key("finalChiVolSign"):
+                    cenAtom = tMol.GetAtomWithIdx(aIdx)
+                    print "=============================================="
+                    print "| Centered atom :     %s"%cenAtom.GetProp("Name")
+                    print "----------------------------------------------"
+                    for aPair in atomNBCIPMap[aIdx]:
+                        print "NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
+                    print "----------------------------------------------"
+                    print "Its output chiral volume sign   %s"%aChiralSignMap[aIdx]["finalChiVolSign"]
+                    for aCid in aChiralSignMap[aIdx].keys():
+                        if aCid != "isChiraled" and aCid != "finalChiVolSign" and aChiralSignMap[aIdx][aCid].has_key("confSign"):
+                            print "In conformer %d, its chiral volume sign is %s "%(aCid, aChiralSignMap[aIdx][aCid]["confSign"])
+                    print "==============================================\n"
+            nTetraChi = 0
+            for aIdx in sorted(aChiralSignMap.iterkeys()):
+                if aChiralSignMap[aIdx]["isChiraled"] and aChiralSignMap[aIdx].has_key("finalChiVolSign"):
+                    nTetraChi += 1
+            print " Number of chiral centers get from the conformer ", nTetraChi
+            nChiPre = 0
             if tChiDes:
-                print "number of chiral center predefined ", len(tChiDes)
-                if len(tChiDes):
-                    # The molecule contain chiral centers
-                    aMmCif.write("#\n")
-                    aMmCif.write("_chem_comp_chir.comp_id\n")
-                    aMmCif.write("_chem_comp_chir.id\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_centre\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_1\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_2\n")
-                    aMmCif.write("_chem_comp_chir.atom_id_3\n")
-                    aMmCif.write("_chem_comp_chir.volume_sign\n")
-                    for aChiral in tChiDes:
-                        aMmCif.write(aChiral+"\n")
-                    lChiPre=True
-            elif nTetraChi !=0 and not lChiPre: 
+                nChiPre = len(tChiDes)
+                print "number of chiral center predefined ", nChiPre
+            if nChiPre !=0 or nTetraChi !=0:
                 # The molecule contain chiral centers
                 aMmCif.write("#\n")
                 aMmCif.write("_chem_comp_chir.comp_id\n")
@@ -1417,130 +1441,69 @@ class AcedrgRDKit():
                 aMmCif.write("_chem_comp_chir.atom_id_2\n")
                 aMmCif.write("_chem_comp_chir.atom_id_3\n")
                 aMmCif.write("_chem_comp_chir.volume_sign\n")
-
-                # Set all chiral atom according to format of mmCif 
-                rdmolops.AssignStereochemistry(tMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
-                chiralIdx = 1
-                for aAtom in allAtoms:      
-                    aCT = aAtom.GetChiralTag()
-                    aTmpCT = aAtom.HasProp("TmpChiral")
-                    aSetAtomNames = []
-                    if aCT != rdchem.ChiralType.CHI_UNSPECIFIED or aTmpCT !=0 :
+            if nChiPre:
+                chiCenAtmIds = []
+                for aChiral in tChiDes:
+                    chiStrs = aChiral.strip().split()
+                    if len(chiStrs) ==7:
+                        chiCenAtmIds.append(chiStrs[2])
+                    aMmCif.write(aChiral+"\n")
+                    print "aChiral "
+                    print aChiral
+                print "Predefined chiral centres ", chiCenAtmIds
+                if nChiPre != nTetraChi:
+                    extraChiAtoms = []
+                    for aAtom in allAtoms:
+                        aCT = aAtom.GetChiralTag()
+                        if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
+                            aAtmName=aAtom.GetProp("Name")
+                            if not aAtmName in chiCenAtmIds:
+                                print "Chiral center %s is not in predefined chiral centers"%aAtmName
+                                extraChiAtoms.append(aAtom)
+                    if len(extraChiAtoms):
+                        chiralIdx = nChiPre + 1
+                        for aAtom in extraChiAtoms:      
+                            aCTName = "chir_" + str(chiralIdx)
+                            chiralIdx +=1
+                            aAtmName=aAtom.GetProp("Name")
+                            aSetAtms = []
+                            aSetAtms.append(aAtmName)
+                            aSetBonds = aAtom.GetBonds()
+                            for aBond in aSetBonds:
+                                if len(aSetAtms) < 4:
+                                    atmIdx1 = aBond.GetBeginAtomIdx()
+                                    atmIdx2 = aBond.GetEndAtomIdx() 
+                                    name1   = allAtoms[atmIdx1].GetProp("Name")  
+                                    name2   = allAtoms[atmIdx2].GetProp("Name")
+                                    if name1 == aAtmName:
+                                        aSetAtms.append(name2) 
+                                    if name2== aAtmName:
+                                        aSetAtms.append(name1) 
+                            if len(aSetAtms) == 4:
+                                aChi = "%s%s%s%s%s%s%s"%(tMonoName.ljust(8), aCTName.ljust(12), aSetAtms[0].ljust(8),\
+                                                         aSetAtms[1].ljust(8), aSetAtms[2].ljust(8), aSetAtms[3].ljust(8),"both")
+                                print aChi
+                                aMmCif.write(aChi+"\n")     
+            elif nTetraChi !=0 : 
+                # output all chiral centers in form of mmCif
+                chiralIdx = 1 
+                for aIdx in sorted(aChiralSignMap.iterkeys()):
+                    if aChiralSignMap[aIdx]["isChiraled"] and aChiralSignMap[aIdx].has_key("finalChiVolSign"):
                         aCTName = "chir_" + str(chiralIdx)
-                        print "Atom %s "%aAtom.GetProp("Name")
-                        print "Chiraltype ",  aCT
-                        chiralIdx+=1
-                        aIdx = aAtom.GetIdx()
-                        outSign = ""
-                        if aAtom.HasProp('_CIPCode'):
-                            print "Chiraltype ",  aCT
-                            print "Stereo type(CIPCode) ", aAtom.GetProp("_CIPCode") 
-                            aCVol = EmbedLib.ComputeChiralVolume(tMol, aAtom.GetIdx(), tIdxConform)
-                            aCVol = float(aCVol)
-                            #if str(aAtom.GetProp("_CIPCode")).strip()=="S":
-                                #outSign = "negative"
-                            #    outSign = "positive"
-                            #elif str(aAtom.GetProp("_CIPCode")).strip()=="R":
-                            #    #outSign = "positive"
-                            #    outSign = "negative"
-                            """
-                            if aCVol > 0.000001:
-                                if aAtom.HasProp("pdb_stereo") and aAtom.GetProp("pdb_stereo")=="N":
-                                    outSign = "both"
-                                else: 
-                                    outSign = "positive"
-                            elif aCVol < -0.000001:
-                                if aAtom.HasProp("pdb_stereo") and aAtom.GetProp("pdb_stereo")=="N":
-                                    outSign = "both"
-                                else: 
-                                    outSign = "negative"
-                            else:
-                                outSign = "both"
-                            """
-                        #else:
-                        #    outSign = "both"
+                        cenAtom = tMol.GetAtomWithIdx(aIdx)
+                        aLine = "%s%s%s%s%s%s%s\n"\
+                                %(tMonoName.ljust(12), aCTName.ljust(12),\
+                                  cenAtom.GetProp("Name").ljust(12),\
+                                  atomNBCIPMap[aIdx][0][0].GetProp("Name").ljust(12),\
+                                  atomNBCIPMap[aIdx][1][0].GetProp("Name").ljust(12),\
+                                  atomNBCIPMap[aIdx][2][0].GetProp("Name").ljust(12),\
+                                  aChiralSignMap[aIdx]["finalChiVolSign"])
+                        aMmCif.write(aLine)
+                        print aLine
+                        chiralIdx +=1
 
-                        #print "combined with original stereo sign, the chiral sign is ", outSign
-
-                        aSetBonds = aAtom.GetBonds()
-                        #print "It is in the following bonds: "
-                        #for aB in aSetBonds:
-                        #    print "Bond ", aB.GetIdx()
-                        #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-                        #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
-                        nNB = len(aAtom.GetNeighbors())
-                        #print "Number of NB ", nNB
-                        aSetName = []
-       
-                        for bIdx in range(nNB):
-                            atmIdx1 = aSetBonds[bIdx].GetBeginAtomIdx()
-                            atmIdx2 = aSetBonds[bIdx].GetEndAtomIdx() 
-                            name1   = allAtoms[atmIdx1].GetProp("Name")  
-                            name2   = allAtoms[atmIdx2].GetProp("Name")
-                            symb1   = allAtoms[atmIdx1].GetSymbol()  
-                            symb2   = allAtoms[atmIdx2].GetSymbol()
-                            
-                            if self.reSetSmi and len(self.repSign) !=0:
-                                if not atmIdx1 in delAtomIdxs and not atmIdx2 in delAtomIdxs :
-                                    if symb1.find(self.repSign)==-1 and symb2.find(self.repSign)==-1:
-                                        if atmIdx1 == aIdx:                      
-                                            aSetName.append([allAtoms1[atmIdx2], allAtoms1[atmIdx2].GetProp("_CIPRank")])
-                                        elif atmIdx2 == aIdx:
-                                            aSetName.append([allAtoms1[atmIdx1], allAtoms1[atmIdx1].GetProp("_CIPRank")])
-                                        else:
-                                            print "Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
-                            else:
-                                if atmIdx1 == aIdx:                      
-                                    aSetName.append([allAtoms[atmIdx2], allAtoms[atmIdx2].GetProp("_CIPRank")])
-                                elif atmIdx2 == aIdx:
-                                    aSetName.append([allAtoms[atmIdx1], allAtoms[atmIdx1].GetProp("_CIPRank")])
-                                else:
-                                    print "Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
-
-                        """
-                        print "Atoms linked with the chiral center %s  are : "%aAtom.GetProp("Name")
-                        print "Before sorting "
-                        print "----------------------------------------------"
-                        for aPair in aSetName:
-                            print "Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
-                        print "----------------------------------------------"
-                                         
-                        print "After sorting "
-                        """
-                        aSetName.sort(listCompDes)
-                        print "----------------------------------------------"
-                        for aPair in aSetName:
-                            print "Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
-                        print "----------------------------------------------"
-
-                        aPass = self.checkUncertainChirals(aSetName)
-                        if not aPass:
-                            aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
-                                         %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0].GetProp("Name"), \
-                                           aSetName[1][0].GetProp("Name"), aSetName[2][0].GetProp("Name"), "both"))
-                            print "Chiral sign : both "
-                        else:
-                            posCen = aConformer.GetAtomPosition(aAtom.GetIdx())
-                            coordsCen = [float(posCen.x), float(posCen.y), float(posCen.z)] 
-                            pos1 = aConformer.GetAtomPosition(aSetName[0][0].GetIdx())
-                            coords1 = [float(pos1.x), float(pos1.y), float(pos1.z)] 
-                            pos2 = aConformer.GetAtomPosition(aSetName[1][0].GetIdx())
-                            coords2 = [float(pos2.x), float(pos2.y), float(pos2.z)] 
-                            pos3 = aConformer.GetAtomPosition(aSetName[2][0].GetIdx())
-                            coords3 = [float(pos3.x), float(pos3.y), float(pos3.z)] 
-                       
-                            #print "Chiral volume by RDKit", aCVol
-                            cenName = aAtom.GetProp("Name") 
-                            tChemCheck.outChiSign[cenName] = tChemCheck.getChiralVolumeSign(posCen, pos1, pos2, pos3)
-                            print "chiral sign : ", tChemCheck.outChiSign[cenName]
-                            if len(tChemCheck.outChiSign[cenName]) !=0:                 
-                                aMmCif.write("%s       %s       %s       %s      %s      %s      %s\n" \
-                                             %(tMonoName, aCTName, aAtom.GetProp("Name"),  aSetName[0][0].GetProp("Name"), \
-                                               aSetName[1][0].GetProp("Name"), aSetName[2][0].GetProp("Name"), tChemCheck.outChiSign[cenName]))
-                            else:
-                                print "Failed to calculate chiral volume for atom %s "%aAtom.GetProp("Name")
             aMmCif.close()
-  
+
     def checkUncertainChirals(self, tNBAtoms):
         
         tPass = True
@@ -1561,7 +1524,125 @@ class AcedrgRDKit():
                     tPass = False
 
         return tPass
+
+   
+    def setCIPCodeSerialForNBAtoms(self, tMol, delAtomIdxs):
+
+        reNameSet = {}
         
+        rdmolops.AssignStereochemistry(tMol, cleanIt=True, force=True, flagPossibleStereoCenters=True)
+
+        allAtoms = tMol.GetAtoms()
+
+        for aAtom in allAtoms:
+            aIdx  = aAtom.GetIdx()
+            reNameSet[aIdx] = []
+            aSetBonds = aAtom.GetBonds()
+            nNB = len(aAtom.GetNeighbors())
+            for bIdx in range(nNB):
+                atmIdx1 = aSetBonds[bIdx].GetBeginAtomIdx()
+                atmIdx2 = aSetBonds[bIdx].GetEndAtomIdx() 
+                name1   = allAtoms[atmIdx1].GetProp("Name")  
+                name2   = allAtoms[atmIdx2].GetProp("Name")
+                symb1   = allAtoms[atmIdx1].GetSymbol()  
+                symb2   = allAtoms[atmIdx2].GetSymbol() 
+
+                if self.reSetSmi and len(self.repSign) !=0:
+                    if not atmIdx1 in delAtomIdxs and not atmIdx2 in delAtomIdxs :
+                        if symb1.find(self.repSign)==-1 and symb2.find(self.repSign)==-1:
+                            if atmIdx1 == aIdx:                      
+                                reNameSet[aIdx].append([allAtoms[atmIdx2], allAtoms[atmIdx2].GetProp("_CIPRank")])
+                            elif atmIdx2 == aIdx:
+                                reNameSet[aIdx].append([allAtoms[atmIdx1], allAtoms[atmIdx1].GetProp("_CIPRank")])
+                            else:
+                                print "Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
+                                break
+                else:
+                    if atmIdx1 == aIdx:                      
+                        reNameSet[aIdx].append([allAtoms[atmIdx2], allAtoms[atmIdx2].GetProp("_CIPRank")])
+                    elif atmIdx2 == aIdx:
+                        reNameSet[aIdx].append([allAtoms[atmIdx1], allAtoms[atmIdx1].GetProp("_CIPRank")])
+                    else:
+                        print "Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
+                        break
+            reNameSet[aIdx].sort(listCompDes) 
+        
+        return reNameSet 
+
+    def setChiralsByMultiConformers(self, tChemCheck, tMol, tNBCIPMap):
+
+        """
+           Using several lowest energy conformers to check if the chiral atoms
+           should have "both" as the volume signs. 
+        """
+        
+        aChiralSetMap = {}       #  aChiralSetMap[cenAtomIdx][confId][chiralVolSign]
+ 
+        allAtoms  = tMol.GetAtoms()  
+ 
+        if len(self.selecConformerIds):
+            for aCid in self.selecConformerIds:
+                rdmolops.AssignAtomChiralTagsFromStructure(tMol, confId=aCid)
+                aConformer =  tMol.GetConformer(aCid)
+                print "In conformer ", aCid
+                for aAtom in allAtoms:
+                    aCT = aAtom.GetChiralTag()
+                    print "Atom ", aAtom.GetProp("Name")
+                    print "RDKit sign ", aCT
+                    aTmpCT = aAtom.HasProp("TmpChiral")
+                    aIdx = aAtom.GetIdx()
+                    if not aChiralSetMap.has_key(aIdx):
+                        aChiralSetMap[aIdx] = {}
+                        if aCT != rdchem.ChiralType.CHI_UNSPECIFIED or aTmpCT !=0 :
+                            aChiralSetMap[aIdx]["isChiraled"] = True
+                        else:
+                            aChiralSetMap[aIdx]["isChiraled"] = False
+                            
+                    if aChiralSetMap[aIdx]["isChiraled"] :
+                        aChiralSetMap[aIdx][aCid] = {}
+                        aPass = self.checkUncertainChirals(tNBCIPMap[aIdx])
+                        if not aPass:
+                            aChiralSetMap[aIdx]["finalChiVolSign"] = "both"
+                        else:
+                            if aChiralSetMap[aIdx].has_key("finalChiVolSign") and aChiralSetMap[aIdx]["finalChiVolSign"]=="both":
+                                # Already in "both" sign, no need to further check
+                                pass
+                            else:
+                                if tNBCIPMap.has_key(aIdx) and len(tNBCIPMap[aIdx]) > 2: # the second one should be for insurance
+                                    posCen = aConformer.GetAtomPosition(aIdx)
+                                    coordsCen = [float(posCen.x), float(posCen.y), float(posCen.z)] 
+                                    pos1 = aConformer.GetAtomPosition(tNBCIPMap[aIdx][0][0].GetIdx())
+                                    coords1 = [float(pos1.x), float(pos1.y), float(pos1.z)] 
+                                    pos2 = aConformer.GetAtomPosition(tNBCIPMap[aIdx][1][0].GetIdx())
+                                    coords2 = [float(pos2.x), float(pos2.y), float(pos2.z)] 
+                                    pos3 = aConformer.GetAtomPosition(tNBCIPMap[aIdx][2][0].GetIdx())
+                                    coords3 = [float(pos3.x), float(pos3.y), float(pos3.z)]
+                                    aChiralSetMap[aIdx][aCid]["confSign"] = tChemCheck.getChiralVolumeSign(posCen, pos1, pos2, pos3)
+                                    if not aChiralSetMap[aIdx].has_key("finalChiVolSign"):
+                                        aChiralSetMap[aIdx]["finalChiVolSign"] = aChiralSetMap[aIdx][aCid]["confSign"]
+                                    if aChiralSetMap[aIdx][aCid]["confSign"] != aChiralSetMap[aIdx]["finalChiVolSign"]:
+                                        aChiralSetMap[aIdx]["finalChiVolSign"] = "both"
+                                    
+        return aChiralSetMap 
+
+    def doubleCheckRDKitChiralCenters(self, tChiralSetMap, tNBCIPMap):
+
+        # some RDKit assignes a chiral center to an atom which connects 3 or 4 NB atoms, with at least 2 of them 
+        # have the same CIP-RANK numbers. e.g. the atom of id "P" in mononer "AFS"
+        # Need to exclude those atoms in the list of chiral centers    
+        for aIdx in tChiralSetMap.keys():
+            if tChiralSetMap[aIdx].has_key("isChiraled") and tChiralSetMap[aIdx]["isChiraled"]:
+                aCIPMap = {}         # aCIPMap[aCIP-Rank] = [NB_atomId1,NB_atomId2, .....]
+                for aPair in tNBCIPMap[aIdx]:
+                    if not aCIPMap.has_key(aPair[1]):
+                        aCIPMap[aPair[1]] = []
+                    aCIPMap[aPair[1]].append(aPair[0].GetProp("Name"))
+         
+                for aCIP in aCIPMap.keys():
+                    if len(aCIPMap[aCIP]) > 1: 
+                        tChiralSetMap[aIdx]["isChiraled"] = False
+  
+                    
     def setupFuncGroupTab(self, tFuncFileName):
 
         try:
@@ -2204,4 +2285,3 @@ class AcedrgRDKit():
                     print "atom ", aAt.GetIdx(), " is removed "
         tMol = aEdMol.GetMol()
         print "Number of atoms after removing water", tMol.GetNumAtoms() 
-
