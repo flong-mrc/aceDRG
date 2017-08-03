@@ -142,10 +142,11 @@ class Acedrg(CExeCode ):
 
 
         # self.acedrg    = os.path.abspath(sys.argv[0])
-        self.acedrg    = sys.exec_prefix
-        self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
-        print "self.acedrg ", self.acedrg
-        print "self.acedrgDir ", self.acedrgDir
+        self.acedrg    = ""
+        print "sys.exec_prefix  ", sys.exec_prefix
+        #print "files ", glob.glob(sys.exec_prefix + "/*")
+        self.acedrgDir = sys.exec_prefix
+        #print "files ", glob.glob(self.acedrgDir + "/*")
         self.qmInstructions   = ""
         self.qmSysDict        = {}
 
