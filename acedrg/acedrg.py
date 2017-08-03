@@ -143,7 +143,6 @@ class Acedrg(CExeCode ):
 
         # self.acedrg    = os.path.abspath(sys.argv[0])
         self.acedrg    = ""
-        print "sys.exec_prefix  ", sys.exec_prefix
         #print "files ", glob.glob(sys.exec_prefix + "/*")
         self.acedrgDir = sys.exec_prefix
         #print "files ", glob.glob(self.acedrgDir + "/*")
@@ -401,9 +400,9 @@ class Acedrg(CExeCode ):
             if os.path.isfile(tFuncGroupTable):
                 self.funcGroupTable = tFuncGroupTable
             
-        print  "self.acedrgTables ", self.acedrgTables
-        print "The path to Acedrg tables is at ", self.acedrgTables
-        print "Libmol used is at ", self.libmol
+        #print  "self.acedrgTables ", self.acedrgTables
+        #print "The path to Acedrg tables is at ", self.acedrgTables
+        #print "Libmol used is at ", self.libmol
         
     def checkVersionInfo(self):
   
