@@ -11,6 +11,7 @@
 ## The date of last modification: 21/07/2016
 #
 
+
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -140,9 +141,12 @@ class Acedrg(CExeCode ):
         self.allBondsAndAngles["angles"]      = {}
 
 
-        self.acedrg = os.path.abspath(sys.argv[0])
+        self.acedrg    = os.path.abspath(sys.argv[0])
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
-        #print self.acedrgDir
+
+        self.qmInstructions   = ""
+        self.qmSysDict        = {}
+
         inputOptionsP         = self.InputParser(t_argvs) 
 
         #if inputOptionsP.geneInFileName:
@@ -176,6 +180,7 @@ class Acedrg(CExeCode ):
 
         self.cLinkMap         = {}
 
+
         #self.execute()  
         self.executeWithRDKit()  
         
@@ -204,7 +209,10 @@ class Acedrg(CExeCode ):
         self.inputParser = OptionParser(usage=usage)
 
         # Options 
-        # input file format 
+        self.inputParser.add_option("-a",  "--rechi", dest="ignoreInputChiral",  
+                                    action="store_true",  default=False,
+                                    help="igore chiral signs in input file, re-generate chiral signs by Acedrg")
+
         self.inputParser.add_option("-b",  "--stdcif", dest="inStdCifName", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input small molecule CIF File containing coordinates and crystal information")
@@ -255,10 +263,6 @@ class Acedrg(CExeCode ):
                                     action="store", type="string", 
                                     help="A name root that users want their output files called(without extension)")
 
-        self.inputParser.add_option("-x",  "--pdb", dest="inLigandPdbName", metavar="FILE", 
-                                    action="store", type="string", 
-                                    help="Input File of PDB format containing coordinates of the ligand")
-
         self.inputParser.add_option("-p",  "--coords", dest="useExistCoords",  
                                     action="store_true",  default=False,
                                     help="Using existing coordinates in the input file")
@@ -283,6 +287,10 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,
                                     help="The option for checking version information of acedrg")
 
+        self.inputParser.add_option("-x",  "--pdb", dest="inLigandPdbName", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File of PDB format containing coordinates of the ligand")
+
         self.inputParser.add_option("-y", "--repcrd",
                   action="store_true", dest="repCrd", default=False,
                   help="Use this keyword if you want to replace the atomic coordinates in the input mmCif with those in the input PDB")
@@ -294,6 +302,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-L",  "--linkInstruction", dest="linkInstructions", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File that gives the instructions to build a link")
+
+        self.inputParser.add_option("-Q",  "--qmInstruction", dest="qmInstructions", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File that gives the instructions to do Quamtum Chemical calculations")
 
         self.inputParser.add_option("-T",  "--Test", dest="testMode",  
                                     action="store_true",  default=False,  
@@ -359,15 +371,10 @@ class Acedrg(CExeCode ):
                 if platform.system()=="Windows": tLibmol += ".exe"
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
-            if not self.acedrgTables:
-                tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
-                if glob.glob(tAcedrgTables):
-                    self.acedrgTables = tAcedrgTables
         else :
             print "You need to install CCP4 suite"
             print "or activate ccp4.setup"
             sys.exit()
-
         if not self.acedrgTables:
             if os.environ.has_key("LIBMOL_ROOT"):
                 tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share","acedrg","tables")
@@ -376,23 +383,24 @@ class Acedrg(CExeCode ):
                 else:
                     print "Tables required could not be found at %s"%tAcedrgTables
                     sys.exit()
-                                
         if not self.acedrgTables: 
             tAcedrgTables = os.path.join(self.acedrgDir, "share","acedrg","tables")
             # print tAcedrgTables
             if os.path.isdir(tAcedrgTables):
                 self.acedrgTables = tAcedrgTables
-            else:
-                print "Bond and angle tables required could not be found "
-                sys.exit()
 
+        if not self.acedrgTables:
+            tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
+            if glob.glob(tAcedrgTables):
+                self.acedrgTables = tAcedrgTables
         if self.acedrgTables:
             tFuncGroupTable = os.path.join(self.acedrgTables, "funSmi.table")
             if os.path.isfile(tFuncGroupTable):
                 self.funcGroupTable = tFuncGroupTable
             
-        #print "The path to Acedrg tables is at ", self.acedrgTables
-        #print "Libmol used is at ", self.libmol
+        print  "self.acedrgTables ", self.acedrgTables
+        print "The path to Acedrg tables is at ", self.acedrgTables
+        print "Libmol used is at ", self.libmol
         
     def checkVersionInfo(self):
   
@@ -566,7 +574,7 @@ class Acedrg(CExeCode ):
                     self.acedrgTables = tAcedrgTables
 
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
-           and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions: 
+           and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions and not t_inputOptionsP.qmInstructions: 
             if not t_inputOptionsP.noGeoOpt:
                 if t_inputOptionsP.inMmCifName:
                     self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -657,6 +665,11 @@ class Acedrg(CExeCode ):
             # Need to add more options here
             self.linkInstructions = t_inputOptionsP.linkInstructions.strip()
             self.workMode = 61
+        elif t_inputOptionsP.qmInstructions :
+            self.qmInstructions = t_inputOptionsP.qmInstructions
+            self.workMode = 70
+            
+ 
  
 
         if t_inputOptionsP.testMode :
