@@ -141,9 +141,11 @@ class Acedrg(CExeCode ):
         self.allBondsAndAngles["angles"]      = {}
 
 
-        self.acedrg    = os.path.abspath(sys.argv[0])
+        # self.acedrg    = os.path.abspath(sys.argv[0])
+        self.acedrg    = sys.exec_prefix
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
-
+        print "self.acedrg ", self.acedrg
+        print "self.acedrgDir ", self.acedrgDir
         self.qmInstructions   = ""
         self.qmSysDict        = {}
 
