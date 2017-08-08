@@ -95,7 +95,7 @@ class AcedrgRDKit():
         if tProcessParaSet.has_key("numRDKitOptmSteps"):
             self.numRDKitOptmSteps = tProcessParaSet["numRDKitOptmSteps"]
         else:
-            self.numRDKitOptmSteps = 5000
+            self.numRDKitOptmSteps = 1000
 
         if tProcessParaSet.has_key("numInitConformers"):
             self.numInitConformers = tProcessParaSet["numInitConformers"]
