@@ -141,10 +141,11 @@ class Acedrg(CExeCode ):
         self.allBondsAndAngles["angles"]      = {}
 
 
-        # self.acedrg    = os.path.abspath(sys.argv[0])
-        self.acedrg    = ""
+        self.acedrg    = os.path.abspath(sys.argv[0])
+        self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
+        #self.acedrg    = ""
         #print "files ", glob.glob(sys.exec_prefix + "/*")
-        self.acedrgDir = sys.exec_prefix
+        #self.acedrgDir = sys.exec_prefix
         #print "files ", glob.glob(self.acedrgDir + "/*")
         self.qmInstructions   = ""
         self.qmSysDict        = {}
