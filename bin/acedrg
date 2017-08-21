@@ -1,2 +1,0 @@
-#!/bin/sh
-exec ccp4-python -m acedrg "${@}"
