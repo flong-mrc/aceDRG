@@ -63,5 +63,7 @@ install(PROGRAMS bin/acedrg DESTINATION bin)
 if (WIN32)
     install(PROGRAMS bin/acedrg.bat DESTINATION bin)
 endif()
-install(DIRECTORY ACEDRG_ccp4i DESTINATION share)
+install(DIRECTORY ACEDRG_ccp4i/scripts DESTINATION share/ccp4i)
+install(DIRECTORY ACEDRG_ccp4i/tasks DESTINATION share/ccp4i)
+install(DIRECTORY ACEDRG_ccp4i/templates DESTINATION share/ccp4i)
 
