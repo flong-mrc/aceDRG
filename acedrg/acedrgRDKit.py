@@ -103,7 +103,7 @@ class AcedrgRDKit():
             if self.useExistCoords:
                 self.numInitConformers = 1
             else:
-                self.numInitConformers = 500
+                self.numInitConformers = 20
 
         if tProcessParaSet.has_key("numConformers"):
             self.numConformers = tProcessParaSet["numConformers"]
@@ -116,9 +116,10 @@ class AcedrgRDKit():
         if self.numInitConformers > self.maxNumInitConformers:
             self.numInitConformers = self.maxNumInitConformers
  
-        self.numSelectForRefConfs = self.numInitConformers/20
-        if self.numSelectForRefConfs < 25:
-            self.numSelectForRefConfs = 25
+        #self.numSelectForRefConfs = self.numInitConformers/20
+        #if self.numSelectForRefConfs < 25:
+        #    self.numSelectForRefConfs = 25
+        self.numSelectForRefConfs = 20
         
 
     def setRepSign(self):
