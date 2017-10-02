@@ -11,7 +11,7 @@
 ## The date of last modification: 21/07/2016
 #
 
-
+print "here "
 import os,os.path,sys
 import platform
 import glob,shutil
