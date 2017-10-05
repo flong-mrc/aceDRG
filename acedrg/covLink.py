@@ -2228,14 +2228,14 @@ class CovLinkGenerator(CExeCode):
         aName   = tLinkedObj.stdLigand1["list"]["name"]
         aLN = tLinkedObj.stdLigand1["name"]
         aGrp    = tLinkedObj.stdLigand1["list"]["group"]
-        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(45), aLN.ljust(10), aGrp.ljust(20))
+        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(45), aLN.ljust(10), ".".ljust(20))
         tOutFile.write(aL) 
         
         aMN     = tLinkedObj.modLigand2["name"]
         aName   = tLinkedObj.stdLigand2["list"]["name"]
         aLN     = tLinkedObj.stdLigand2["name"]
         aGrp    = tLinkedObj.stdLigand2["list"]["group"]
-        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(45), aLN.ljust(10), aGrp.ljust(20))
+        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(45), aLN.ljust(10), ".".ljust(20))
         tOutFile.write(aL) 
         
         tOutFile.write("\n")
@@ -2256,10 +2256,12 @@ class CovLinkGenerator(CExeCode):
         aLID  = tLinkedObj.cLink["name"]
         aLN1  = tLinkedObj.stdLigand1["name"]
         aLMN1 = tLinkedObj.modLigand1["name"]
-        aG1   = tLinkedObj.stdLigand1["list"]["group"]
+        #aG1   = tLinkedObj.stdLigand1["list"]["group"]
+        aG1   = "."
         aLN2  = tLinkedObj.stdLigand2["name"]
         aLMN2 = tLinkedObj.modLigand2["name"]
-        aG2   = tLinkedObj.stdLigand2["list"]["group"]
+        #aG2   = tLinkedObj.stdLigand2["list"]["group"]
+        aG2   = "."
         aL="%s%s%s%s%s%s%s%s\n"%(aLID.ljust(15), aLN1.ljust(10), aLMN1.ljust(12), aG1.ljust(20),\
                                  aLN2.ljust(10), aLMN2.ljust(12), aG2.ljust(20), aLID.ljust(15))
         tOutFile.write(aL) 

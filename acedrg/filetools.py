@@ -49,6 +49,7 @@ class FileTransformer :
         self.strDescriptors["defProps"]    = ["loop_", "_pdbx_chem_comp_descriptor.comp_id", "_pdbx_chem_comp_descriptor.type", \
                                "_pdbx_chem_comp_descriptor.program", "_pdbx_chem_comp_descriptor.program_version",\
                                "_pdbx_chem_comp_descriptor.descriptor"]
+        self.hasStrDescriptors = False
         self.strDescriptors["defSmiles"]   = []
 
         self.cifGlobalLines                = []
@@ -186,7 +187,7 @@ class FileTransformer :
             self.TmpChemCheck()
             
             self.selectAtomCoordinates()
-  
+ 
             # check
             """
             idKey = "_chem_comp_atom.atom_id"
@@ -294,6 +295,7 @@ class FileTransformer :
                     break
                 elif aL.find("_pdbx_chem_comp_descriptor") !=-1:
                     self.getProp(tBlk, "strDescriptor")
+                    self.hasStrDescriptors = True
                     break
 
 

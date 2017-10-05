@@ -11,7 +11,6 @@
 ## The date of last modification: 21/07/2016
 #
 
-print "here "
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -63,7 +62,7 @@ class Acedrg(CExeCode ):
 
         if len(sys.argv)==1:
             print "Look for help: %s -h "%(os.path.basename(sys.argv[0]))
-
+       
         self.versionInfo       = {}
 
         self.errMessage       = []
@@ -132,7 +131,9 @@ class Acedrg(CExeCode ):
         
         self.testMode         = False
 
-        self.outCifGlobSect    = []
+        self.hasPDBxComp_descriptor = False
+        self.outCifGlobSectHead    = []
+        self.outCifGlobSect        = []
 
         self.allBondsAndAngles = {}
 
@@ -149,7 +150,6 @@ class Acedrg(CExeCode ):
         #print "files ", glob.glob(self.acedrgDir + "/*")
         self.qmInstructions   = ""
         self.qmSysDict        = {}
-
         inputOptionsP         = self.InputParser(t_argvs) 
 
         #if inputOptionsP.geneInFileName:
@@ -162,7 +162,7 @@ class Acedrg(CExeCode ):
 
         self.checkDependency()
         self.checkVersionInfo()
-        self.setOutCifGlobSec()
+
 
         if os.path.isfile(self.funcGroupTable):
             self.rdKit = AcedrgRDKit(self.funcGroupTable)
@@ -391,7 +391,6 @@ class Acedrg(CExeCode ):
             # print tAcedrgTables
             if os.path.isdir(tAcedrgTables):
                 self.acedrgTables = tAcedrgTables
-
         if not self.acedrgTables:
             tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
             if glob.glob(tAcedrgTables):
@@ -401,7 +400,6 @@ class Acedrg(CExeCode ):
             if os.path.isfile(tFuncGroupTable):
                 self.funcGroupTable = tFuncGroupTable
             
-        #print  "self.acedrgTables ", self.acedrgTables
         #print "The path to Acedrg tables is at ", self.acedrgTables
         #print "Libmol used is at ", self.libmol
         
@@ -409,6 +407,8 @@ class Acedrg(CExeCode ):
   
         # Acedrg version info 
         self.versionInfo["man"] = os.path.join(self.acedrgTables, "manifest.txt")
+        print self.acedrgTables
+        print self.versionInfo["man"] 
         if not os.path.isfile(self.versionInfo["man"]):
             print "Version infomation is not available."
         else:
@@ -449,28 +449,31 @@ class Acedrg(CExeCode ):
            
              
     def setOutCifGlobSec(self):
-         
-        self.outCifGlobSect.append("#loop_\n")
-        self.outCifGlobSect.append("#_software\n")
-        self.outCifGlobSect.append("#_version\n")
-        self.outCifGlobSect.append("#_purpose\n")
+        
+        if not self.fileConv.hasStrDescriptors:
+           for aL in self.fileConv.strDescriptors["defProps"]:
+               self.outCifGlobSect.append(aL + "\n") 
+        #self.outCifGlobSect.append("#loop_\n")
+        #self.outCifGlobSect.append("#_software\n")
+        #self.outCifGlobSect.append("#_version\n")
+        #self.outCifGlobSect.append("#_purpose\n")
         if self.versionInfo.has_key("ACEDRG_VERSION"):
-            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg".ljust(30), self.versionInfo["ACEDRG_VERSION"].ljust(20), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg".ljust(30), "?".ljust(20), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg".ljust(21), "?".ljust(12), '\"dictionary generator\"'.ljust(40)))
         
         if self.versionInfo.has_key("DATABASE_VERSION"):
-            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg_database".ljust(30), self.versionInfo["DATABASE_VERSION"].ljust(20), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg_database".ljust(21), self.versionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("#%s%s%s\n"%("acedrg_database".ljust(30), "?".ljust(20), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg_database".ljust(21), "?".ljust(12), '\"data source\"'.ljust(40)))
 
-        self.outCifGlobSect.append("#%s%s%s\n"%("rdkit".ljust(30), rdBase.rdkitVersion.ljust(20), '\"chemistry perception\"' )) 
+        self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17) ,"rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
   
         if self.versionInfo.has_key("REFMAC_NAME"):
-            self.outCifGlobSect.append("#%s%s%s\n"%(self.versionInfo["REFMAC_NAME"].ljust(30), self.versionInfo["REFMAC_VERSION"].ljust(20),\
+            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
                                        '\"optimization tool\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("#%s%s%s\n"%("refmac".ljust(30), "?".ljust(20), '\"optimization tool\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "refmac".ljust(21), "?".ljust(12), '\"optimization tool\"'.ljust(40)))
         
          
     def checInputFormat(self):
@@ -548,6 +551,7 @@ class Acedrg(CExeCode ):
 
     def setWorkMode(self, t_inputOptionsP = None):
 
+        print "acedrg is in ", self.acedrgDir
         # Sequnence for check the locations of acedrg tables 
         # (1) Check if the user provides the location
         # (2) If not, check CCP4 suite default location.
@@ -558,13 +562,21 @@ class Acedrg(CExeCode ):
                 tAcedrgTables = os.path.join(self.acedrgDir, "share","acedrg","tables")
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
-            elif  not self.acedrgTables and os.environ.has_key("CCP4"):
-                tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
-                if glob.glob(tAcedrgTables):
+            if not self.acedrgTables or not os.path.isdir(self.acedrgTables):
+                tAcedrgTables = os.path.join(self.acedrgDir, "tables")
+                if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
-            else:
-                print "You need to install CCP4 suite"
-                sys.exit()
+            if  not self.acedrgTables or not os.path.isdir(self.acedrgTables):
+                if os.environ.has_key("CCP4"):
+                    tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
+                    if os.path.isdir(tAcedrgTables):
+                        self.acedrgTables = tAcedrgTables
+                    else:
+                        print "%s does not exist, check your installation of CCP4 "%tAcedrgTables
+                        sys.exit()
+                else:
+                    print "You need to install CCP4 suite"
+                    sys.exit()
         else:
             if os.path.isdir(t_inputOptionsP.acedrgTables):
                 self.acedrgTables = t_inputOptionsP.acedrgTables
@@ -575,6 +587,7 @@ class Acedrg(CExeCode ):
                 print tAcedrgTables
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
+        print "Table is at ", self.acedrgTables
 
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
            and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions and not t_inputOptionsP.qmInstructions: 
@@ -1721,9 +1734,6 @@ class Acedrg(CExeCode ):
                     print "%s can not be opened for reading"%tCifOutName
                     sys.exit()
                 else:
-                    if len(self.outCifGlobSect):
-                        for aL in self.outCifGlobSect:
-                            tOutCif.write(aL)
                             
                     for aL in cifCont['head']:
                         tOutCif.write(aL)
@@ -1786,6 +1796,10 @@ class Acedrg(CExeCode ):
                             tOutCif.write("%s%s%s%s \"%s\"\n"%(monoId.ljust(10), "SMILES".ljust(10), "RDKit".ljust(12), "1.00".ljust(6), \
                                     aSmi.ljust(aSmilen)))           
                     """
+                    if len(self.outCifGlobSect):
+                        for aL in self.outCifGlobSect:
+                            tOutCif.write(aL)
+
                     tOutCif.close()
                         
     def outTorsionRestraints(self, tCifInName, tTorOutName):
@@ -2311,6 +2325,8 @@ class Acedrg(CExeCode ):
                 else: 
                     print "Failed to generate initial dictionary file ", self.refmacXYZOUTName
                     sys.exit()
+
+        self.setOutCifGlobSec()
 
         if self.workMode in [11, 12, 13, 14, 15]:
             self.workMode = 11
