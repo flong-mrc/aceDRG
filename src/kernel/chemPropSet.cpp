@@ -222,7 +222,8 @@ namespace LIBMOL
                     iAt->bondingIdx = 2; 
                 }
             }
-            else if (iAt->chemType.compare("S")==0 || iAt->chemType.compare("SE")==0 )
+            else if (iAt->chemType.compare("S")==0 || iAt->chemType.compare("SE")==0
+                     || iAt->chemType.compare("Se")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
                 if(t_len==4 || t_len==3 || t_len==2)
@@ -233,6 +234,22 @@ namespace LIBMOL
                     }
                     iAt->bondingIdx = 3; 
                 }
+                /*
+                else if (t_len==2)
+                {
+                    std::cout << "Atom " << iAt->id << " is in "
+                              << iAt->inBonds.size() 
+                              << " bonds. They are:  "
+                              << std::endl;
+                    for (std::vector<int>::iterator iB=iAt->inBonds.begin();
+                            iB != iAt->inBonds.end(); iB++)
+                    {
+                        std::cout << "Bond " << *iB 
+                                  << " between atom " <<  
+                    }
+                    iAt->inBonds()
+                }
+                 */
                 /*
                 else if (t_len==4)
                 {
@@ -397,13 +414,24 @@ namespace LIBMOL
                 {
                     iA->chiralIdx = 0;
                 }
-            }
-            
-            
+            }  
         }
   
         // Check
         /*
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            
+            std::cout << "Atom " << iAt->id
+                      << " of " << iAt->chemType
+                      << " connects " << iAt->connAtoms.size() 
+                      << " atoms " << std::endl
+                      << " and is with bond index "
+                      << iAt->bondingIdx << std::endl;
+        }
+        
+        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
