@@ -162,6 +162,7 @@ class Acedrg(CExeCode ):
 
         self.checkDependency()
         self.checkVersionInfo()
+        self.showAcedrgPapers()
 
 
         if os.path.isfile(self.funcGroupTable):
@@ -187,6 +188,16 @@ class Acedrg(CExeCode ):
         #self.execute()  
         self.executeWithRDKit()  
         
+    def showAcedrgPapers(self):
+
+        print "====================================================================="
+        print "|                     Main reference                                |"
+        print "| \"AceDRG: a stereochemical description generator for ligands\"      |"
+        print "| Fei Long, Robert A. Nicholls, Paul Emsley, Saulius Grazulis,      |"
+        print "| Andrius Merkys, Antanas Vaitkusb and Garib N. Murshudov,(2017)    |"
+        print "| Acta Crystallogr. D73, 112-122                                    |"
+        print "====================================================================="
+
     def InputParser(self, t_argvs):
 
         usage = "\n\
@@ -551,7 +562,7 @@ class Acedrg(CExeCode ):
 
     def setWorkMode(self, t_inputOptionsP = None):
 
-        print "acedrg is in ", self.acedrgDir
+        #print "acedrg is in ", self.acedrgDir
         # Sequnence for check the locations of acedrg tables 
         # (1) Check if the user provides the location
         # (2) If not, check CCP4 suite default location.
@@ -587,7 +598,7 @@ class Acedrg(CExeCode ):
                 print tAcedrgTables
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
-        print "Table is at ", self.acedrgTables
+        #print "Table is at ", self.acedrgTables
 
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
            and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions and not t_inputOptionsP.qmInstructions: 
