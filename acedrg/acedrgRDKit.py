@@ -33,12 +33,14 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
-from chem     import ChemCheck
+from chem          import ChemCheck
+from periodicTable import PeriodicTab
 
 from utility  import listComp
 from utility  import listComp2
 from utility  import listCompDes
 from utility  import listCompAcd
+from utility  import BondOrderS2N
 
    
 class AcedrgRDKit():
@@ -68,8 +70,8 @@ class AcedrgRDKit():
 
         self.hasCCP4Type     = False
    
-        self.chemCheck = ChemCheck()
-
+        self.chemCheck   = ChemCheck()
+        self.periodicTab = PeriodicTab()
         self.torsins   = []
 
         self.defaultComfId = -10
@@ -80,6 +82,7 @@ class AcedrgRDKit():
         self.repSign          = ""
         self.reSetSmi         = False
         self.reSetChirals     = False
+
 
         self.monoName         = ""
         self.longName         = ""
@@ -987,7 +990,6 @@ class AcedrgRDKit():
             #print "Its formal charge ", charge
             #print "Its total valence ", val
 
-
         Chem.SanitizeMol(tMol)
         Chem.Kekulize(tMol)
         # Make sure an atom in the molecule has the same charge in the input file. 
@@ -999,8 +1001,26 @@ class AcedrgRDKit():
                     aAtom.SetFormalCharge(int(tChargeList[name]))
                 else:
                     aAtom.SetFormalCharge(0)
+        
+        # Extra check added because of bugs in RDKit
+        aErrDict = {}
+        aErrDict["notExist"]   = []
+        aErrDict["wrongOrder"] = []
+        aErrDict["needMod"]    = []
+        aErrDict["unMod"]      = []
+        self.furtherCheckValForAllAtoms(tMol, aErrDict)
+        if len(aErrDict["needMod"]) > 0:
+            print "Number of atoms need to modified ", len(aErrDict["needMod"])
+            for aGrp in aErrDict["needMod"]:
+                aModAtom = tMol.GetAtomWithIdx(aGrp[1])
+                print "Need to extra val %d to atom %s of %s"%(aGrp[0], aGrp[1], aModAtom.GetSymbol())    
+                newCharge = aModAtom.GetFormalCharge() + aGrp[0]
+                oldExHs     = aAtom.GetNumExplicitHs()
+                print "before : num of explicit Hs ", oldExHs
+                tMol.GetAtomWithIdx(aGrp[1]).SetNumExplicitHs(aGrp[0]+oldExHs) 
+                tMol.GetAtomWithIdx(aGrp[1]).UpdatePropertyCache()
+        tMol.UpdatePropertyCache()
         """
-        # Check
         print "==========================================="
         print "\nBefore setup formal charges in the molecule"
         allAtoms = tMol.GetAtoms()
@@ -1027,11 +1047,16 @@ class AcedrgRDKit():
             #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
         print "==========================================="
         """
-
         if tPH[0] :
             self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
         else:
             self.setAllFormalChargeFuncGroupAtoms(tMol)
+        
+        tMol.UpdatePropertyCache()
+        if self.useExistCoords:
+            aMol = Chem.AddHs(tMol, explicitOnly=False, addCoords=True)
+        else:
+            aMol = Chem.AddHs(tMol)
         
         """
         print "\nAfter setup formal charges in the molecule"
@@ -1052,12 +1077,6 @@ class AcedrgRDKit():
             print "Its total valence ", val
         print "==========================================="
         """
-        tMol.UpdatePropertyCache()
-        if self.useExistCoords:
-            aMol = Chem.AddHs(tMol, explicitOnly=False, addCoords=True)
-        else:
-            aMol = Chem.AddHs(tMol)
-
         # Make SMILES before Hs are added 
         if tMol.HasProp('SmilesIn'):
             #print "Input SMILES : ", tMol.GetProp("SmilesIn")
@@ -1077,6 +1096,8 @@ class AcedrgRDKit():
         #print "After sanitize the molecule"
         #print "Number of atom is ", len(allAtoms)
 
+        # Now Cancel to the formal charges added due to furtherCheckValForAllAtoms(tMol, aErrDict)
+        
         # Further: give names to those newly added H atoms
         self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
         if self.reSetChirals:
@@ -1161,6 +1182,54 @@ class AcedrgRDKit():
                             print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
                             print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
                     #print "******************************"
+
+
+    def furtherCheckValForAllAtoms(self, tMol, tErrDict):
+        # Temp for bugs appear in RDKit
+        # Should be used after the molecule has been kekulized
+        allAtoms = tMol.GetAtoms() 
+        for aAtom in allAtoms:
+            # Temporally, just for element S and Se
+            if aAtom.GetSymbol().strip() =="S" or aAtom.GetSymbol().strip() =="Se":
+                elm    = self.periodicTab.standlizeSymbol(aAtom.GetSymbol().strip())
+                if not elm or not self.periodicTab.has_key(elm):
+                    tErrDict["notExist"].append(aAtom)
+                else:
+                    aTotalOrder = aAtom.GetTotalValence()
+                    self.checkBondOrderAndAllowedVal(aAtom, elm, aTotalOrder, tErrDict)                 
+                
+    def checkBondOrderAndAllowedVal(self, tAtom, tElm, tOrd, tErrDict):
+   
+        val    = self.periodicTab[tElm]["val"]
+        charge = tAtom.GetFormalCharge()
+        idx    = tAtom.GetIdx()
+        actV = val 
+        if val > 4:
+            actV = 8-val
+        allowOrd = actV+charge 
+        print "Default allowed bond order ", allowOrd  
+        if tOrd != allowOrd :
+            if self.periodicTab[tElm].has_key("extraVal"):
+                aExtraAllow = []
+                lMod        = False
+                for aV in self.periodicTab[tElm]["extraVal"]:
+                    if aV > 4:
+                        aV = 8-aV
+                    aExtraAllow.append(aV + charge)
+                    print "ExtraAllowed total bond order ",  aV+charge
+                if not tOrd in aExtraAllow:
+                    for aMV in aExtraAllow:
+                        if aMV > tOrd:
+                            tErrDict["needMod"].append([(aMV-tOrd),idx])
+                            lMod = True
+                            break
+                           
+                if not lMod:
+                    tErrDict["unMod"].append(tAtom)
+        
+            else:
+                tErrDict["unMod"].append(tAtom)
+        
 
     def reAssignChirals(self, tMol):
 
