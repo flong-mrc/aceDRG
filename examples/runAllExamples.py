@@ -74,7 +74,8 @@ for aF in glob.glob("./inSmi/*.smiles"):
         else:
             numJobsF   +=1
             failNames.append(rRoot)
-        i+=1       
+        i+=1    
+   
 print "========================================================="
 print "|  run all examples with input MOL files at ./inMOL     |"
 print "========================================================="
@@ -88,23 +89,6 @@ for aF in glob.glob("./inMol/*.mol"):
     if len(aFRoot) !=0:
         rRoot = "%s_fromMol"%aFRoot
         cmdL = "acedrg -m %s  -o  %s -p "%(aF, rRoot) 
-        print cmdL
-        numAllJobs += 1
-        lRun=os.system(cmdL)
-        if lRun :
-            print "%s runtime error "%rRoot
-        outCif = "%s.cif"%rRoot
-        if os.path.isfile(outCif):
-            numJobsS   +=1
-            doneNames.append(rRoot)
-        else:
-            numJobsF   +=1
-            failNames.append(rRoot)
-
-    if len(aFRoot) !=0:
-        nInitConf = 1000
-        rRoot = "%s_InitConf%d_fromMol"%(aFRoot, nInitConf)
-        cmdL = "acedrg -m %s -j %d -o  %s -p "%(aF,nInitConf,  rRoot) 
         print cmdL
         numAllJobs += 1
         lRun=os.system(cmdL)
@@ -132,6 +116,21 @@ for aF in glob.glob("./inMol2/*.mol2"):
     if len(aFRoot) !=0:
         rRoot = "%s_SYBYL_Mol2"%aFRoot
         cmdL = "acedrg -g %s  -o  %s -p "%(aF, rRoot) 
+        numAllJobs += 1
+        print cmdL
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
+
+        rRoot = "%s_SYBYL_Mol2_K"%aFRoot
+        cmdL = "acedrg -g %s  -o  %s -p -K "%(aF, rRoot) 
         numAllJobs += 1
         print cmdL
         lRun=os.system(cmdL)
