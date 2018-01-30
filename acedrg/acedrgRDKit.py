@@ -1876,16 +1876,16 @@ class AcedrgRDKit():
     def setFormalChargeC_ASP(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
-        #print "Pka ", tPka
-        #print "PH  ", tPH
+        print "Pka ", tPka
+        print "PH  ", tPH
         if tPH > tPka :
             for aSetIdxs in tAtomIdxs:
                 #print "a set of atoms: "
                 #print aSetIdxs
                 for aIdx in aSetIdxs:
-                    #print "Atom : ", tMol.GetAtomWithIdx(aIdx).GetProp("Name")
-                    #print "exH  : ", tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()
-                    #print "imH  : ", tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs()
+                    print "Atom : ", tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                    print "exH  : ", tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()
+                    print "imH  : ", tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs()
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
                             and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==0:  
