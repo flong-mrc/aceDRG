@@ -105,7 +105,11 @@ class FileTransformer :
                                                # where 1 : atom serial number   name : atom name
         self.nameMapingCifMol = {}            
         self.nameMapingCifMol["nonH"] = {}            
-        self.nameMapingCifMol["H"]    = {}            
+        self.nameMapingCifMol["H"]    = {}  
+
+        self.nameMapingMol2 = {}
+        self.nameMapingMol2["nonH"] = {}
+        self.nameMapingMol2["H"]    = {}          
                                              
 
         self.nameMapingPDBMol = {}             # e.g. self.nameMapingPDBMol[1]   = name 
@@ -946,6 +950,7 @@ class FileTransformer :
             for aAtom in tNonHAtoms:
                 self.atoms.append(aAtom)
                 self.nameMapingCifMol["nonH"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                print "NameMap ", nAtm, " : ", self.nameMapingCifMol["nonH"][nAtm]
                 #print "NameMap ", aAtom["_chem_comp_atom.atom_id"]
                 nAtm +=1
             for aAtom in tHAtoms:
@@ -1404,6 +1409,104 @@ class FileTransformer :
         if aTS != "":
             tList.append(aTS.strip())        
 
+    def mol2Reader(self, tFileName):
+        """Read a file of mol2 for name matching purpose"""
+
+        self.atoms = []
+        self.bonds = []
+        try:
+            aFile = open(tFileName, "r")
+        except IOError:
+            print "%s can not be open for reading "%tFileName
+            sys.exit()
+        else:
+            allLs = aFile.readlines()
+            aFile.close()
+
+        lAtom = False
+        lBond = False
+  
+        idxNonHA = 0
+        idxHA    = 0
+        idxBo    = 0
+       
+        tNonHAtmOldNewMap = {} 
+        tHAtoms = []
+        for aL in allLs:
+            aL = aL.strip()
+            if len(aL) > 0 and aL[0].find("#") == -1:
+                if aL.find("@<TRIPOS>ATOM") !=-1:
+                    lAtom = True
+                    lBond = False
+                elif aL.find("@<TRIPOS>BOND") !=-1:
+                    lAtom = False
+                    lBond = True
+                elif lAtom or lBond :
+                    strs = aL.split()
+                    if lAtom:
+                        if len(strs) >= 6:
+                            aAtom = {}
+                            aAtom["mol2Seri"] = strs[0].strip()
+                            aAtom["name"]     = strs[1].strip()
+                            elem = ""
+                            if strs[5].find(".")==-1:
+                                elem = strs[5].strip()
+                            else:
+                                elem = strs[5].strip().split(".")[0].strip()
+                            aAtom["element"] = elem
+                            if elem.upper() != "H":
+                                aAtom["seriNum"]  = idxNonHA
+                                self.nameMapingMol2["nonH"][aAtom["seriNum"]] = aAtom["name"]
+                                tNonHAtmOldNewMap[aAtom["mol2Seri"]]  = aAtom["seriNum"] 
+                                idxNonHA +=1
+                                self.atoms.append(aAtom)
+                            else:
+                                tHAtoms.append(aAtom)
+            
+                    elif lBond:
+                        if len(strs) >= 4:
+                            aBond = {}
+                            aBond["mol2Seri"] = strs[0].strip()     
+                            aBond["1stAtm"]   = strs[1].strip()
+                            aBond["2ndAtm"]   = strs[2].strip()
+                            aBond["mol2Ord"]  = strs[3].strip()
+                            self.bonds.append(aBond)
+      
+        if len(tHAtoms) > 0:
+           for aAtm in tHAtoms:
+               curN = len(self.atoms)
+               tNonHAtmOldNewMap[aAtm["mol2Seri"]] = curN
+               self.atoms.append(aAtm)
+
+        self.setNameMap(tNonHAtmOldNewMap)
+        
+    def setNameMap(self, tNonHAtmOldNewMap):
+
+        for aBond in self.bonds:                    
+             idxH     = -1
+             idxOther = -1
+             if tNonHAtmOldNewMap.has_key(aBond["1stAtm"])\
+                 and tNonHAtmOldNewMap.has_key(aBond["2ndAtm"]):
+                  idx1 = tNonHAtmOldNewMap[aBond["1stAtm"]]
+                  elem1 = self.atoms[idx1]["element"]
+                  idx2 = tNonHAtmOldNewMap[aBond["2ndAtm"]]
+                  elem2 = self.atoms[idx2]["element"]
+                  if elem1=="H" and elem2 != "H":
+                      idxH      = idx1
+                      idxOther  = idx2
+                  elif elem2=="H" and elem1 != "H":
+                      idxH      = idx2
+                      idxOther  = idx1
+                  if idxH !=-1 and idxOther !=-1:
+                      otherId  = self.atoms[idxOther]["name"]
+                      if not self.nameMapingMol2["H"].has_key(otherId):
+                          self.nameMapingMol2["H"][otherId] = []
+                      self.nameMapingMol2["H"][otherId].append(self.atoms[idxH]["name"])
+        print "The follow are information on H connections "
+        for aK in sorted(self.nameMapingMol2["H"].iterkeys()):
+            for aH in self.nameMapingMol2["H"][aK]:
+                print "%s  connects to %s "%(aK, aH)
+        
 class Ccp4MmCifObj (dict) :
 
     def __init__(self, tInFileName):

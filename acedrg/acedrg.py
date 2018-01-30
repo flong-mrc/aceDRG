@@ -313,6 +313,10 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,
                                     help="The option for not doing geometry optimization on coordinates")
 
+        self.inputParser.add_option("-K",  "--noProt", dest="noProtonation",  
+                                    action="store_true",  default=False,
+                                    help="No further protonation/deprotonation will be done by Acedrg")
+
         self.inputParser.add_option("-L",  "--linkInstruction", dest="linkInstructions", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File that gives the instructions to build a link")
@@ -756,6 +760,9 @@ class Acedrg(CExeCode ):
 
     def setInputProcPara(self, t_inputOptionsP = None):
         
+        if t_inputOptionsP.noProtonation:
+            self.inputPara["noProtonation"]     = t_inputOptionsP.noProtonation
+
         if t_inputOptionsP.useExistCoords:
             self.inputPara["useExistCoords"]    = t_inputOptionsP.useExistCoords
 
@@ -2272,6 +2279,7 @@ class Acedrg(CExeCode ):
             # The input file is a mol2 file
             if os.path.isfile(self.inMol2Name):
                 if self.chemCheck.isOrganic(self.inMol2Name, self.workMode):
+                    """
                     self.runLibmol(self.inMol2Name)
                     print self.outRstCifName
                     if not self.runExitCode and os.path.isfile(self.outRstCifName):
@@ -2283,6 +2291,9 @@ class Acedrg(CExeCode ):
                             if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 \
                                and os.path.isfile(aIniMolName) :
                                 self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingCifMol)    
+                    """
+                    self.fileConv.mol2Reader(self.inMol2Name)
+                    self.rdKit.initMols("mol2", self.inMol2Name, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingMol2)
             else: 
                 print self.inMol2Name, " can not be found for reading "
                 sys.exit()
@@ -2482,12 +2493,14 @@ class Acedrg(CExeCode ):
                 self.runLibmol()    
         
         if self.workMode == 61:
+
             aAAdir = os.path.join(self.acedrgTables, "AminoAcids")
             
             if os.path.isdir(aAAdir):
                 aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
             else:
                 print "Check installation of acedrg. %s is missing "%aAAdir
+
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
                 tCif = self.outRoot + ".cif"
