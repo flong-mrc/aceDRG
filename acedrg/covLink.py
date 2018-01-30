@@ -150,6 +150,9 @@ class CovLink:
         
         self.delSections                      = []
 
+        self.errLevel                         = 0
+        self.errMessage                       = []
+
     def checkInPara(self):
    
         aReturn = True
@@ -159,20 +162,35 @@ class CovLink:
            or not os.path.isfile(self.stdLigand1["inCif"]) \
            or not os.path.isfile(self.stdLigand2["inCif"]):
             aReturn = False
-            
+            self.errLevel = 12
             if not self.stdLigand1.has_key("name"):
                 print "Residue 1 is not named "
+                self.errMessage.append("Residue 1 is not named\n")   
             if not self.stdLigand1.has_key("atomName"):
                 print "Linked atom in Residue 1 is not named "
+                self.errMessage.append("Linked atom in Residue 1 is not named\n")
             if not self.stdLigand2.has_key("name"):
                 print "Residue 2 is not named "
+                self.errMessage.append("Residue 2 is not named\n")
             if not self.stdLigand2.has_key("atomName"):
                 print "Linked atom in Residue 2 is not named "
+                self.errMessage.append("Linked atom in Residue 2 is not named ")
             if not os.path.isfile(self.stdLigand1["inCif"]):
-                print "%s does not exist"%self.stdLigand1["inCif"]
+                print "InCif 1", self.stdLigand1["inCif"]
+                aBFName = os.path.basename(self.stdLigand1["inCif"])
+                aMess = "The required file %s does not exist.\n"%aBFName
+                aMess += "You need to provide this file.\n"
+                print aMess
+                self.errMessage.append(aMess)
             if not os.path.isfile(self.stdLigand2["inCif"]):
-                print "%s does not exist"%self.stdLigand2["inCif"]
-   
+                print "InCif 2", self.stdLigand2["inCif"]
+                aBFName = os.path.basename(self.stdLigand2["inCif"])
+                aMess = "The required file %s does not exist.\n"%aBFName
+                aMess += "You need to provide this file.\n"
+                print aMess
+                self.errMessage.append(aMess)
+                #print "%s does not exist"%self.stdLigand2["inCif"]
+                #self.errMessage.append("%s does not exist"%self.stdLigand2["inCif"])
         return aReturn 
 
     def filterAtomsAndBonds(self, tFTool, tDS, tMonomer):
@@ -203,14 +221,17 @@ class CovLinkGenerator(CExeCode):
                                      # 1     generate a linked system which optimizes everything. The input monomers 
                                      #       could be in form of mmcif and SMILES strings
         
-        self.errMessage       = []
+        self.errMessage       = {}
         self.errLevel         = 0
         # 0 = OK  
         # 1 = No instructions file for building links
         # 2 = Instructions are not validated, no links will be built
+        # 21 = "No component residue dictionary file (cif)"
         # 3 = Error in building individaul residues
         # 4 = Error in building the combined ligand
         # 5 = Error in extracting the final link info
+
+        self.errFileName                      = ""
 
         # TEMPO
         if not os.environ.has_key("CCP4"):
@@ -221,7 +242,6 @@ class CovLinkGenerator(CExeCode):
         #self.allChemCombDir   = "/Users/flong/DB/PDB_related/PDB_Ligands/Cif"
 
         self.aaDir            = tAADir
-        print self.aaDir
         self.scrDir           = tScrDir
         self.subRoot          = ""
         self.outRoot          = tOutRoot
@@ -231,6 +251,7 @@ class CovLinkGenerator(CExeCode):
         self.cLinks           = []
 
         # engs 
+
         self.chemCheck        = ChemCheck()
 
         if os.path.isfile(self.linkInstructions):
@@ -239,6 +260,9 @@ class CovLinkGenerator(CExeCode):
         else:
             print "%s can not be found for reading"%self.linkInstructions
             self.errLevel = 1
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("Instruction file %s can not be found for reading"%self.linkInstructions)
         
         print "Number of links to be processed ", len(self.cLinks)
 
@@ -247,12 +271,23 @@ class CovLinkGenerator(CExeCode):
                 for aLink in self.cLinks:
                     self.processOneLink(aLink)
             else:
-                self.errMessage.append("No links to be found in the instruction file")
-                print self.errMessage
-                self.errLevel  = 2
-        else:
-            print self.errMessage
+                self.errLevel  = 5
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append("Errors are found in the instruction file")
+                self.errMessage[self.errLevel].append("Check your instruction file")
 
+        if self.errLevel:
+            self.errFileName = self.outRoot + "_errorInfo.txt"
+            errF = open(self.errFileName, "w")
+            for aKey in sorted(self.errMessage.iterkeys()):
+                for aL in self.errMessage[aKey]:
+                    print aL
+                    errF.write(aL)
+            errF.close()
+            time.sleep(0.5)
+            sys.exit(self.errLevel)
+            
     def getInstructionsForLink(self):
 
         aFullName=os.path.basename(self.linkInstructions)
@@ -264,9 +299,6 @@ class CovLinkGenerator(CExeCode):
             else:
                 # Tempo comment off free format at the moment
                 self.getInstructionsForLinkFreeFormat()
-                #print "Please use cif format for link instruction at the moment"
-                #self.errMessage.append("Please use cif format for link instruction at the moment")
-                #self.errLevel = 1
 
     def checkInCompCif(self, tMonomer, tFName, tResName):
        
@@ -281,11 +313,17 @@ class CovLinkGenerator(CExeCode):
                 if os.path.isfile(aFName):
                     tMonomer["inCif"]  =  aFName
                 else:
-                    self.errMessage.append("Input cif %s does not exist\n")
+                    baseName =os.path.basename(tFName).strip()
                     self.errLevel    = 1
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("Input cif %s does not exist"%baseName)
+                    self.errMessage[self.errLevel].append("You need to provide an input dictionary file for %s "%aNL)
             else:
-                self.errMessage.append("Name for an input residue is not given\n")
                 self.errLevel    = 1
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append("Name for an input residue has not been given in the instruction file\n")
                                     
     def getInstructionsForLinkFromCif(self):
         
@@ -329,7 +367,7 @@ class CovLinkGenerator(CExeCode):
         print "Keys in the link object ", aInsObj["ccp4CifObj"]["instructs"]["link"].keys()
         if aLink.checkInPara():
             self.cLinks.append(aLink)
-
+            
 
     def getInstructionsForLinkFreeFormat(self):
 
@@ -339,7 +377,11 @@ class CovLinkGenerator(CExeCode):
         try :
             aInsF = open(self.linkInstructions, "r")
         except IOError:
-            print "% can not be open for reading ! "%self.linkInstructions
+            print "% can not be opened for reading ! "%self.linkInstructions
+            self.errLevel = 11
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("% can not be opened for reading ! "%self.linkInstructions)
         else:
             allLs = aInsF.readlines()
             aInsF.close()
@@ -349,8 +391,6 @@ class CovLinkGenerator(CExeCode):
                     for aStr in strs:
                         if aStr.find("LINK:") == -1:
                             aList.append(aStr)
-        #print len(aList)
-        #print aList
 
         if len(aList):
             lSt  = True
@@ -411,7 +451,7 @@ class CovLinkGenerator(CExeCode):
                             aBond = {}
                             aBond["type"]           = "single"
                             aBond["type"]           = aList[i+1]
-                            aBond["atom_id_1"]         = aLink.stdLigand1["atomName"]
+                            aBond["atom_id_1"]      = aLink.stdLigand1["atomName"]
                             aBond["comp_serial_num_1"] =  1 
                             aBond["atom_id_2"]      = aLink.stdLigand2["atomName"]
                             aBond["comp_serial_num_2"] =  2 
@@ -438,9 +478,12 @@ class CovLinkGenerator(CExeCode):
                             lCh  = False
                             i +=1
                     else:
-                        print "Error : check your link instruction file"
-                        print allLs
-                        self.errLevel = 2
+                        self.errLevel = 12
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        aMess = "Format error in the instruction file. "
+                        aMess+= "%s needs to be followed by a value.\n"% aList[i] 
+                        self.errMessage[self.errLevel].append(aMess) 
                         break
                 elif lDel :
                     if len(aDS.keys()) != 0:
@@ -458,15 +501,20 @@ class CovLinkGenerator(CExeCode):
                             elif aNum == 2:
                                 aLink.modLigand2["deleted"]["atoms"].append(aAtom) 
                             else:
-                                print "Error in DELETE ATOM section: check your link instruction file"
-                                print "Residue number should be 1 or 2 "
-                                print allLs
-                                self.errLevel = 2
+                                self.errLevel = 12
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Format error in DELECTE section of the instruction file. "
+                                aMess+= "Residue number should be 1 or 2"
+                                self.errMessage[self.errLevel].append(aMess)
                             i+=3
                         else:
-                            print "Error Delete Atom section: check your link instruction file"
-                            print allLs
-                            self.errLevel = 2
+                            self.errLevel = 12
+                            if not self.errMessage.has_key(self.errMessage):
+                                self.errMessage[self.errLevel] = []
+                            aMess = "Format error in DELECTE ATOM section of the instruction file. "
+                            aMess+= "%s needs to be followed by two values.\n"% aList[i]
+                            self.errMessage[self.errLevel].append(aMess)
                             break
                     elif aList[i].upper().find("BOND") != -1 :
                         if i+3 < nL:
@@ -481,13 +529,20 @@ class CovLinkGenerator(CExeCode):
                             elif aNum == 2:
                                 aLink.modLigand2["deleted"]["bonds"].append(aBond)
                             else:
-                                print "Error in DELETE BOND section: check your link instruction file"
-                                print "Residue number should be 1 or 2 "
+                                self.errLevel = 12
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Format error in DELECTE BOND section of the instruction file. "
+                                aMess+= "Residue number should be 1 or 2"
+                                self.errMessage[12].append(aMess)
                             i+=4
                         else:
-                            print "Error in DELETE BOND section: check your link instruction file"
-                            print allLs
-                            self.errLevel = 2
+                            self.errLevel = 12
+                            if not self.errMessage.has_key(self.errLevel):
+                                self.errMessage[self.errLevel] = []
+                            aMess = "Format error in DELECTE BOND section of the instruction file. "
+                            aMess+= "%s needs to be followed by two values.\n"% aList[i]
+                            self.errMessage[self.errLevel].append(aMess)
                             break
                     elif aList[i].upper().find("CHANGE") != -1:
                         lCh  = True
@@ -501,18 +556,14 @@ class CovLinkGenerator(CExeCode):
                         lDel = False
                         lCh  = False
                         i +=1
-
-                    #elif aList[i].find("BOND-TYPE") != -1 :
-                    #    if i+1 < nL:
-                    #        aDS["bondOrder"] = aList[i+1]
-                    #        i+=2
-
                     else:
-                        print "Error Delete bond section: check your link instruction file"
-                        print allLs
-                        self.errLevel = 1
+                        self.errLevel = 12
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        aMess = "Format error in DELECTE section of the instruction file. "
+                        aMess+= "Unknown key or value entry %s.\n"% aList[i]
+                        self.errMessage[self.errLevel].append(aMess)
                         break
-
                 elif lCh :
                     if aList[i].upper().find("BOND") != -1 :
                         if i+4 < nL:
@@ -548,6 +599,14 @@ class CovLinkGenerator(CExeCode):
                         lSt  = False
                         lDel = False
                         lCh  = False
+                    else:
+                        self.errLevel = 12
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        aMess = "Format error in CHANGE section of the instruction file. "
+                        aMess+= "Unknown key or value entry %s.\n"% aList[i]
+                        self.errMessage[self.errLevel].append(aMess)
+                        break
                 elif lAd :
                     # Leave for discussion
                     if aList[i].upper().find("Atom") != -1 :
@@ -727,11 +786,17 @@ class CovLinkGenerator(CExeCode):
                             print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
                             print "The bond-order is now ", aB["type"]
             else:
-                self.errMessage.append("Information in the instruction file is not correct/enough to build a link. \n")
-                self.errMessage.append("Please check your instruction file to see names of monomers, atoms etc are there\n")
-                self.errLevel    = 2
+                self.errLevel = aLink.errLevel
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                for aL in aLink.errMessage:
+                    self.errMessage[self.errLevel].append(aL)
+                self.errMessage[self.errLevel].append("Information in the instruction file is not correct/enough to build a link. \n")
         else:
-            print "A empty set of input instructions for link building"  
+            self.errLevel = 12
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("The input instruction file is empty\n")
 
 
     def processOneLink(self, tLinkIns):
@@ -751,9 +816,6 @@ class CovLinkGenerator(CExeCode):
                     if not self.errLevel:
                         self.selectHAtoms(tLinkIns.stdLigand1["comp"])
                         print "Number of H atoms in residue %s is %d "%(tLinkIns.stdLigand1["name"], len(tLinkIns.stdLigand1["comp"]["hAtoms"]))
-                else:
-                    print self.errMessage
-                   
             else:
                 self.setOneMonomer(tLinkIns.stdLigand1)
                 #print "output comp 1 ", tLinkIns.stdLigand1["outComp"] 
@@ -772,9 +834,6 @@ class CovLinkGenerator(CExeCode):
                         #tLinkIns.stdLigand2["ccp4MmCifObj"].printOneComp(tLinkIns.stdLigand2["name"])
                         self.selectHAtoms(tLinkIns.stdLigand2["comp"])
                         print "Number of H atoms in residue %s is %d "%(tLinkIns.stdLigand2["name"], len(tLinkIns.stdLigand2["comp"]["hAtoms"]))
-                    else:
-                        for aL in self.errMessage:
-                            print aL
                 else:
                     self.setOneMonomer(tLinkIns.stdLigand2)
                     #print "output comp 2 ", tLinkIns.stdLigand2["outComp"] 
@@ -789,8 +848,6 @@ class CovLinkGenerator(CExeCode):
                 self.buildComboLigand(tLinkIns)
                 print "#                          Job done                              #"
                 print "##################################################################"
-            else:
-                print self.errMessage
 
             if not self.errLevel:
                 print "##################################################################"
@@ -799,10 +856,6 @@ class CovLinkGenerator(CExeCode):
                 print "#                                                                #"
                 print "##################################################################"
                 self.extractOneLinkInfo(tLinkIns)
-            else:
-                print self.errMessage
-        else:
-            print self.errMessage
 
         # Finally print out 
         if not self.errLevel:
@@ -814,8 +867,6 @@ class CovLinkGenerator(CExeCode):
             self.outOneLinkInfo(tLinkIns)
             print "#                          Job done                              #"
             print "##################################################################"
-        else:
-            print self.errMessage
         
     def setOneCompFromCif(self, tFileName, tMonomer):
      
@@ -859,16 +910,21 @@ class CovLinkGenerator(CExeCode):
                             if aMmcifObj["ccp4CifBlocks"].has_key(dataHead):
                                 tMonomer["dataBlock"] = aMmcifObj["ccp4CifBlocks"][dataHead]
                         else:
-                            self.errMessage.append("Comp %s can not be found in both %s and %s\n"%(tMonomer["name"],\
-                                              tMonomer["inCif"], aNewCif))
-                            self.errLevel = 3
+                            self.errLevel = 21
+                            if not self.errMessage.has_key(self.errLevel):
+                                   self.errMessage[self.errLevel] = []
+                            self.errMessage[self.errLevel].append("Comp %s can not be found in both %s and %s\n"%(tMonomer["name"],\
+                                                                   tMonomer["inCif"], aNewCif))
                     else:
-                        
-                        self.errMessage.append("No %s in CCP4 monomer lib\n"%(aNewCif))
-                        self.errLevel = 3
+                        self.errLevel = 12
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        self.errMessage[self.errLevel].append("No %s in CCP4 monomer lib\n"%(aNewCif))
                 else:        
-                    self.errMessage.append("No file in ccp4 monomer lib contains  %s \n"%tLinkIns.stdLigand1["name"])
-                    self.errLevel = 3
+                    self.errLevel = 12
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("One of residues is  without name\n")
 
     def selectHAtoms(self, tMonomer):
 
@@ -894,11 +950,15 @@ class CovLinkGenerator(CExeCode):
                 if os.path.isfile(aOutLigCif): 
                     tMonomer["outCif"] = aOutLigCif
                 else: 
-                    self.errMessage.append("Error : The output dictionary for %s does not exist\n"%aNL) 
-                    self.errLevel = 3
+                    self.errLevel = 31
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("Run time error : no result dictionary for %s \n"%aNL) 
             else: 
-                self.errMessage.append("Error (run time): generate a dictionary for %s does failed\n"%aNL) 
-                self.errLevel = 3
+                self.errLevel = 31
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append("Run time error : generating a dictionary for %s failed\n"%aNL) 
 
     #def adjustAtomsAndOthersForComboLigand(self, tLinkedObj):
 
@@ -940,8 +1000,10 @@ class CovLinkGenerator(CExeCode):
                     for aAtom in tLinkedObj.modLigand2["deleted"]["atoms"]:
                         print aAtom["atom_id"]  
                 else:
-                    self.errMessage.append("Error in residue number for for DELETED atoms in the input file\n")
-                    self.errLevel    = 2 
+                    self.errLevel    = 21 
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("Error in residue number for for DELETED atoms in the instruction file\n")
 
 
         if not lDelRes1:
@@ -1242,9 +1304,11 @@ class CovLinkGenerator(CExeCode):
                                     print "H connected atom id ", tRes["comp"]["atoms"][aLAtmSerial]["atom_id"]
                                     self.addOneHInRes(tRes["comp"]["atoms"][aLAtmSerial], aLAAtoms, allHIds, tRes, tMod)
         else :
-            self.errLevel = 3
-            self.errMessage.append("Can not find the linked atom in residue %s "%tRes["name"])
-            self.errMessage.append("Check your input instruction file ")
+            self.errLevel    = 22 
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("Can not find the linked atom in residue %s "%tRes["name"])
+            self.errMessage[self.errLevel].append("Check your input instruction file ")
         
     def getBondSetForOneLinkedAtom(self, tAtomId, tAtoms, tBonds, tDelAtomIds):
 
@@ -1363,30 +1427,40 @@ class CovLinkGenerator(CExeCode):
             aBond["atom_id_1_alias"] = self.getAtomAlias(aBond["atom_id_1"], tLinkedObj.stdLigand1["remainAtoms"])
             aBond["atom_id_2_alias"] = self.getAtomAlias(aBond["atom_id_2"], tLinkedObj.stdLigand1["remainAtoms"])
             if aBond["atom_id_1_alias"] == "":
+                self.errLevel    = 32 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
                 aLine = "An error happens in residue 1:\n"
                 aLine += "The alias name for atom %s can not be found\n"%aBond["atom_id_1"]
-                self.errMessage.append(aLine) 
-                self.errLevel    = 3
+                self.errMessage[self.errLevel].append(aLine) 
             if aBond["atom_id_2_alias"] == "":
+                self.errLevel    = 32 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
                 aLine = "An error happens in residue 1:\n"
                 aLine+= "The alias name for atom %s can not be found\n"%aBond["atom_id_2"] 
-                self.errMessage.append(aLine)
-                self.errLevel    = 3
-            tLinkedObj.combLigand["bonds"].append(aBond)
+                self.errMessage[self.errLevel].append(aLine)
+            if not self.errLevel:
+                tLinkedObj.combLigand["bonds"].append(aBond)
         for aBond in tLinkedObj.stdLigand2["remainBonds"]:
             aBond["atom_id_1_alias"] = self.getAtomAlias(aBond["atom_id_1"], tLinkedObj.stdLigand2["remainAtoms"])
             aBond["atom_id_2_alias"] = self.getAtomAlias(aBond["atom_id_2"], tLinkedObj.stdLigand2["remainAtoms"])
             if aBond["atom_id_1_alias"] == "":
+                self.errLevel    = 32 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
                 aLine = "An error happens in residue 2:\n"
                 aLine += "The alias name for atom %s can not be found\n"%aBond["atom_id_1"] 
-                self.errMessage.append(aLine)
-                self.errLevel    = 3
+                self.errMessage[self.errLevel].append(aLine)
             if aBond["atom_id_2_alias"] == "":
+                self.errLevel    = 32 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
                 aLine  = "An error happens in residue 2:\n"
                 aLine += "The alias name for atom %s can not be found\n"%aBond["atom_id_2"] 
-                self.errMessage.append(aLine)
-                self.errLevel    = 3
-            tLinkedObj.combLigand["bonds"].append(aBond)
+                self.errMessage[self.errLevel].append(aLine)
+            if not self.errLevel:
+                tLinkedObj.combLigand["bonds"].append(aBond)
 
         # The added bond as input instruction file
         for aBond in tLinkedObj.suggestBonds:
@@ -1395,17 +1469,21 @@ class CovLinkGenerator(CExeCode):
             print "bond ", aBond["comp_id"]
             print "atom 1 alias ", aBond["atom_id_1_alias"]
             if aBond["atom_id_1_alias"] == "":
+                self.errLevel    = 32 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
                 aLine = "An error happens in residue 1:\n"
                 aLine += "The alias name for atom %s can not be found\n"%aBond["atom_id_1"] 
-                self.errMessage.append(aLine)
-                self.errLevel    = 3
+                self.errMessage[self.errLevel].append(aLine)
             aBond["atom_id_2_alias"] = self.getAtomAlias(aBond["atom_id_2"], tLinkedObj.stdLigand2["remainAtoms"])
             print "atom 2 alias ", aBond["atom_id_2_alias"]
             if aBond["atom_id_2_alias"] == "":
+                self.errLevel    = 32 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
                 aLine += "An error happens in residue 2:\n"
                 aLine += "The alias name for atom %s can not be found\n"%aBond["atom_id_2"] 
-                self.errMessage.append(aLine)
-                self.errLevel    = 3
+                self.errMessage[self.errLevel].append(aLine)
             aBond["value_dist"]      =  0.0             
             aBond["value_dist_esd"]  =  0.20 
             if not self.errLevel:            
@@ -1450,8 +1528,10 @@ class CovLinkGenerator(CExeCode):
                 if aAtom.has_key("atom_id_alias"):
                     aReturnAlias = aAtom["atom_id_alias"]
                 else:
-                   self.errMessage.append("Atom %s does not have alias name\n"%aAtom["atom_id"]) 
-                   self.errLevel    = 3
+                    self.errLevel    = 33 
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("Atom %s does not have alias name\n"%aAtom["atom_id"]) 
                 break
         return aReturnAlias
 
@@ -1464,9 +1544,10 @@ class CovLinkGenerator(CExeCode):
         try:
             tmpF = open(tmpFName, "w")
         except IOError:
-            print "%s can not be open for reading "%tmpFName
-            self.errMessage.append("%s can not be open for reading "%tmpFName)
-            self.errLevel = 3
+            self.errLevel    = 33 
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("%s can not be open for reading "%tmpFName)
         else:
             tmpF.write("The mapping between original atom names and their alias\n")
             tmpF.write("Monomer 1 \n")
@@ -1491,8 +1572,10 @@ class CovLinkGenerator(CExeCode):
             aOutF = open(tOutFName, "w")
         except IOError:
             print "%s can not be open for reading "%tOutFName
-            self.errMessage.append("%s can not be open for reading "%tOutFName)
-            self.errLevel = 3
+            self.errLevel    = 34 
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("%s can not be open for reading "%tOutFName)
         else:
 
             # A list block
@@ -1546,9 +1629,10 @@ class CovLinkGenerator(CExeCode):
                                 aCharge.ljust(10), x.ljust(10), y.ljust(10), z.ljust(10)))
                 
             else: 
-                print "The combo-ligand has no atoms"
-                self.errMessage.append("The combo-ligand has no atoms\n")
-                self.errLevel = 3
+                self.errLevel    = 35
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append("The combo-ligand has no atoms\n")
             if not self.errLevel:
                 if len(tMonomer["bonds"]) !=0:
                     aOutF.write("loop_\n")
@@ -1564,9 +1648,10 @@ class CovLinkGenerator(CExeCode):
                                      str(aBond["value_dist"]).ljust(10), str(aBond["value_dist_esd"]).ljust(10)))
                  
                 else: 
-                    print "The combo-ligand has no bonds"
-                    self.errMessage.append("The combo-ligand has no bonds\n")
-                    self.errLevel = 3
+                    self.errLevel    = 35
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("The combo-ligand has no bonds\n")
 
                 if not self.errLevel and len(tMonomer["chirs"]) !=0:
                     aOutF.write("loop_\n")
@@ -1637,8 +1722,10 @@ class CovLinkGenerator(CExeCode):
                     addedSet2.append(aAtom["atom_id"])
                     tLinkedObj.modLigand2["added"]["atoms"].append(aAtom)
             else:
-                self.errMessage.append("Bug: Atom %s does not attach to any residue\n"%aAtom["atom_id"])
-                self.errLevel   = 4
+                self.errLevel    = 36
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append("Bug: Atom %s does not attach to any residue\n"%aAtom["atom_id"])
 
         print "Num of mod atoms in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["atoms"])
         print "Num of add atoms in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["atoms"])
@@ -2000,8 +2087,10 @@ class CovLinkGenerator(CExeCode):
                     break
 
         if not lFind:
-            self.errMessage.append("Atom %s does not attach any atoms in residue 1 or 2 ")
-            self.errLevel   = 3 
+            self.errLevel    = 37
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("Atom %s does not attach any atoms in residue 1 or 2 ")
                     
     def reIndexCombLigand(self, tLinkedObj):
   
@@ -2154,8 +2243,10 @@ class CovLinkGenerator(CExeCode):
         try: 
             aOutCif = open(aOutCifName, "w")
         except IOError:
-            self.errMessage.append("%s can not be open for writting "%aOutCifName)
-            self.errLevel  = 6
+            self.errLevel    = 41
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("%s can not be open for writting "%aOutCifName)
         else:
             self.outVerInfo(aOutCif)
             self.outCompList(aOutCif, tLinkedObj)

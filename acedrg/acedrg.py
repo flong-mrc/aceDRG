@@ -2493,12 +2493,14 @@ class Acedrg(CExeCode ):
                 self.runLibmol()    
         
         if self.workMode == 61:
+
             aAAdir = os.path.join(self.acedrgTables, "AminoAcids")
             
             if os.path.isdir(aAAdir):
                 aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
             else:
                 print "Check installation of acedrg. %s is missing "%aAAdir
+
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
                 tCif = self.outRoot + ".cif"
