@@ -2285,10 +2285,11 @@ class CovLinkGenerator(CExeCode):
         else:
             aN3 = aNL
         aName   = tLinkedObj.stdLigand1["list"]["name"]
+        aNameL  = len(aName) + 6
         aGrp    = tLinkedObj.stdLigand1["list"]["group"]
         NA      = tLinkedObj.stdLigand1["list"]["number_atoms_all"]
         NAH     = tLinkedObj.stdLigand1["list"]["number_atoms_nh"]
-        aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(45), aGrp.ljust(20), NA.ljust(10), NAH)
+        aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
         tOutFile.write(aL) 
                  
         aNL = tLinkedObj.stdLigand2["name"]
@@ -2299,10 +2300,11 @@ class CovLinkGenerator(CExeCode):
             aN3 = aNL
         
         aName   = tLinkedObj.stdLigand2["list"]["name"]
+        aNameL  = len(aName) + 6
         aGrp    = tLinkedObj.stdLigand2["list"]["group"]
         NA      = tLinkedObj.stdLigand2["list"]["number_atoms_all"]
         NAH     = tLinkedObj.stdLigand2["list"]["number_atoms_nh"]
-        aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(45), aGrp.ljust(20), NA.ljust(10), NAH)
+        aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
         tOutFile.write(aL) 
         tOutFile.write("\n")
                  
@@ -2317,16 +2319,18 @@ class CovLinkGenerator(CExeCode):
             
         aMN     = tLinkedObj.modLigand1["name"]
         aName   = tLinkedObj.stdLigand1["list"]["name"]
+        aNameL  = len(aName) + 6
         aLN = tLinkedObj.stdLigand1["name"]
         aGrp    = tLinkedObj.stdLigand1["list"]["group"]
-        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(45), aLN.ljust(10), ".".ljust(20))
+        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), ".".ljust(20))
         tOutFile.write(aL) 
         
         aMN     = tLinkedObj.modLigand2["name"]
         aName   = tLinkedObj.stdLigand2["list"]["name"]
+        aNameL  = len(aName) + 6
         aLN     = tLinkedObj.stdLigand2["name"]
         aGrp    = tLinkedObj.stdLigand2["list"]["group"]
-        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(45), aLN.ljust(10), ".".ljust(20))
+        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), ".".ljust(20))
         tOutFile.write(aL) 
         
         tOutFile.write("\n")
