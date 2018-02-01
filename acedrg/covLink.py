@@ -290,15 +290,15 @@ class CovLinkGenerator(CExeCode):
             
     def getInstructionsForLink(self):
 
-        aFullName=os.path.basename(self.linkInstructions)
-        aExt     = ""
-        if aFullName.find(".") !=-1:
-            aExt = aFullName.strip().split(".")[-1].strip()
-            if aExt.find("cif") !=-1:
-                self.getInstructionsForLinkFromCif()
-            else:
-                # Tempo comment off free format at the moment
-                self.getInstructionsForLinkFreeFormat()
+        #aFullName=os.path.basename(self.linkInstructions)
+        #aExt     = ""
+        #if aFullName.find(".") !=-1:
+        #    aExt = aFullName.strip().split(".")[-1].strip()
+        #    if aExt.find("cif") !=-1:
+        #        self.getInstructionsForLinkFromCif()
+        #    else:
+        #        # Tempo comment off free format at the moment
+        self.getInstructionsForLinkFreeFormat()
 
     def checkInCompCif(self, tMonomer, tFName, tResName):
        
