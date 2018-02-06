@@ -8,7 +8,7 @@
 #     CCP4 Program Suite Licence Agreement as a CCP4 Library.
 #
 #====================================================================
-## The date of last modification: 21/07/2016
+## The date of last modification: 05/02/2018
 #
 
 import os,os.path,sys
@@ -2182,7 +2182,6 @@ class Acedrg(CExeCode ):
                                             lSmi = True    
                                             aSmi = strGrp[iDes][1:-1]
                                             break
-                       
                         if lSmi :
                             print "Smiles str  ", aSmi
                             aIniSmiName = os.path.join(self.scrDir, self.baseRoot + "_init.smi")

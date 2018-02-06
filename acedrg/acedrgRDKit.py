@@ -1056,7 +1056,6 @@ class AcedrgRDKit():
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
 
         if not self.noProtonation:
-            print "Here "
             if tPH[0] :
                 self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
             else:
@@ -1068,7 +1067,7 @@ class AcedrgRDKit():
         else:
             aMol = Chem.AddHs(tMol)
         tMol.UpdatePropertyCache()
-        self.showInfoAboutAtomsAndBonds(aMol, 1)
+        #self.showInfoAboutAtomsAndBonds(aMol, 1)
         # Make SMILES before Hs are added 
         if tMol.HasProp('SmilesIn'):
             #print "Input SMILES : ", tMol.GetProp("SmilesIn")
@@ -1091,8 +1090,8 @@ class AcedrgRDKit():
             self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
 
-        if self.reSetChirals:
-            self.reAssignChirals(aMol) 
+        #if self.reSetChirals:
+        #    self.reAssignChirals(aMol) 
     
         allAtoms = aMol.GetAtoms()
         for aAtom in allAtoms:
@@ -1100,7 +1099,6 @@ class AcedrgRDKit():
             tChemCheck.checkChiralCenters(aMol,aIdx)
             #print "Atom ", aAtom.GetProp("Name")
             #print "Is it a temporal chiral center ", aAtom.HasProp("TmpChiral") 
-
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
         self.setInitConformersOneMol(aMol)
       
