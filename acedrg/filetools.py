@@ -171,16 +171,6 @@ class FileTransformer :
             if len(aBlockLs):
                 self.allBlockLs.append(aBlockLs)
        
-            #print "Number of Blocks ", len(self.allBlockLs)
-            #i = 1
-            #for aBlc in self.allBlockLs:
-            #    print "-------------"
-            #    print "Block ", i
-            #    i = i + 1
-            #    for aL in aBlc:
-            #        print aL  
-    
-
             if len(self.allBlockLs):
                 for aBlk in self.allBlockLs:
                     self.parseOneMmCifBlk(aBlk)

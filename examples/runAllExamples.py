@@ -368,7 +368,28 @@ for aF in glob.glob("./inProbsCases/*.cif"):
             numJobsF   +=1
             failNames.append(rRoot)
 
-         
+print "========================================================="
+print "|  Run all examples of generating covalent-links with   |"
+print "|  input instruction and other files at ./inLink        |"
+print "========================================================="
+for aF in glob.glob("./inLink/instruct_*.txt"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    MonoName = aFRoot[9:].strip()
+    print MonoName 
+    if len(MonoName) !=0:
+        cmdL = "acedrg -L %s  -o  %s  > %s.log"%(aF, MonoName, MonoName) 
+        print cmdL
+        numAllJobs +=1
+        doneNames.append(MonoName)
+        lRun=os.system(cmdL)
+        if lRun :
+            print "Runtime error for %s "%MonoName
+            numJobsF   +=1
+            failNames.append(MonoName)
+        else:
+            numJobsS   +=1
+            doneNames.append(MonoName)
+            
 """
 print "========================================================="
 print "|  run all examples with input small molecule Cif files |"
