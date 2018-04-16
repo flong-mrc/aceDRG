@@ -48,6 +48,7 @@ from utility       import listCompAcd
 from utility       import setBoolDict
 from utility       import splitLineSpa
 from utility       import BondOrderS2N
+from utility       import setNameByNumPrime
 
 #################################################   
 
@@ -193,6 +194,13 @@ class CovLink:
                 #self.errMessage.append("%s does not exist"%self.stdLigand2["inCif"])
         return aReturn 
 
+    def setModiName(self):
+
+        if self.stdLigand2["name"] != self.stdLigand1["name"]:
+            self.modLigand2["name"]   = self.stdLigand2["name"] + "mod1"
+        else:
+            self.modLigand2["name"]   = self.stdLigand2["name"] + "mod2"
+
     def filterAtomsAndBonds(self, tFTool, tDS, tMonomer):
 
         for aAtom in tFTool.atoms:
@@ -298,7 +306,7 @@ class CovLinkGenerator(CExeCode):
         #        self.getInstructionsForLinkFromCif()
         #    else:
         #        # Tempo comment off free format at the moment
-        self.getInstructionsForLinkFreeFormat()
+        self.getInstructionsForLinkFreeFormat2()
 
     def checkInCompCif(self, tMonomer, tFName, tResName):
        
@@ -368,7 +376,6 @@ class CovLinkGenerator(CExeCode):
         if aLink.checkInPara():
             self.cLinks.append(aLink)
             
-
     def getInstructionsForLinkFreeFormat(self):
 
         allLs = ""
@@ -429,7 +436,8 @@ class CovLinkGenerator(CExeCode):
                             aLink.stdLigand1["userIn"]     = True 
                             i +=2
                         elif aList[i].upper().find("ATOM-NAME-1") != -1:
-                            aLink.stdLigand1["atomName"] = aList[i+1] 
+                            atm1Name = setNameByNumPrime(aList[i+1])
+                            aLink.stdLigand1["atomName"] = atm1Name
                             i +=2
                         elif aList[i].upper().find("RES-NAME-2") != -1:
                             aLink.stdLigand2["name"] = aList[i+1]
@@ -438,14 +446,14 @@ class CovLinkGenerator(CExeCode):
                                 aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "mod1"
                             else:
                                 aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "mod2"
-                            idxR = 2 
                             i +=2
                         elif aList[i].upper().find("FILE-2") != -1:
                             aLink.stdLigand2["inCif"] = aList[i+1]
                             aLink.stdLigand2["userIn"] = True 
                             i +=2
                         elif aList[i].upper().find("ATOM-NAME-2") != -1:
-                            aLink.stdLigand2["atomName"] = aList[i+1] 
+                            atm2Name = setNameByNumPrime(aList[i+1])
+                            aLink.stdLigand2["atomName"] =  atm2Name
                             i +=2
                         elif aList[i].upper().find("BOND-TYPE") != -1 :
                             aBond = {}
@@ -491,8 +499,9 @@ class CovLinkGenerator(CExeCode):
                         aDS = {}
                     if aList[i].upper().find("ATOM") != -1 and aList[i].upper().find("ATOM-NAME") == -1:
                         if i+2 < nL:
+                            atmDName = setNameByNumPrime(aList[i+1])
+                            aDS["atomName"]  = atmDName
                             aNum = int(aList[i+2])
-                            aDS["atomName"]  = aList[i+1]
                             aDS["inRes"]     = aNum
                             aAtom = {}
                             aAtom["atom_id"] = aList[i+1]
@@ -798,7 +807,433 @@ class CovLinkGenerator(CExeCode):
                 self.errMessage[self.errLevel] = []
             self.errMessage[self.errLevel].append("The input instruction file is empty\n")
 
+    def getInstructionsForLinkFreeFormat2(self):
 
+        allLs = ""
+        aList = []
+
+        try :
+            aInsF = open(self.linkInstructions, "r")
+        except IOError:
+            print "% can not be opened for reading ! "%self.linkInstructions
+            self.errLevel = 11
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("% can not be opened for reading ! "%self.linkInstructions)
+        else:
+            allLs = aInsF.readlines()
+            aInsF.close()
+            for aL in allLs:
+                strs = aL.strip().split()
+                if len(strs) !=0:
+                    for aStr in strs:
+                        if aStr.find("LINK:") == -1:
+                            aList.append(aStr)
+
+        if len(aList):
+            lSt  = True
+            lDel = False
+            lCh  = False
+            lAd  = False
+            aDS  = {}
+            i = 0
+            idxAddAtm = 1
+            aLink = CovLink()
+           
+            # Some default values. They will be changed at different stages
+ 
+            aLink.stdLigand1["userIn"]  = False 
+            aLink.stdLigand1["outComp"] = False 
+            aLink.stdLigand1["outMod"]  = True 
+            aLink.stdLigand2["userIn"]  = False 
+            aLink.stdLigand2["outComp"] = False 
+            aLink.stdLigand2["outMod"]  = True 
+
+            aLink.stdLigand1["group"]   = "."
+            aLink.stdLigand2["group"]   = "."
+
+            nL = len(aList)
+
+            while i < nL :
+                #print aList[i]
+                if (i+1) < nL:
+                    if aList[i].upper().find("RES-NAME-1") != -1:
+                        aLink.stdLigand1["name"]   = aList[i+1]
+                        aLink.stdLigand1["resNum"] = 1
+                        aLink.modLigand1["name"]   = aLink.stdLigand1["name"] + "mod1"
+                        if aLink.stdLigand2.has_key("name"):
+                            if aLink.stdLigand2["name"] != aLink.stdLigand1["name"]:
+                                aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "mod1"
+                            else:
+                                aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "mod2"
+                        i +=2
+                    elif aList[i].upper().find("FILE-1") != -1:
+                        aLink.stdLigand1["inCif"] = aList[i+1]
+                        aLink.stdLigand1["userIn"]     = True 
+                        i +=2
+                    elif aList[i].upper().find("ATOM-NAME-1") != -1:
+                        atm1Name = setNameByNumPrime(aList[i+1])
+                        aLink.stdLigand1["atomName"] =  atm1Name
+                        #aLink.stdLigand1["atomName"] = aList[i+1] 
+                        i +=2
+                    elif aList[i].upper().find("RES-NAME-2") != -1:
+                        aLink.stdLigand2["name"] = aList[i+1]
+                        aLink.stdLigand2["resNum"] = 2
+                        if aLink.stdLigand1.has_key("name"):
+                            if aLink.stdLigand2["name"] != aLink.stdLigand1["name"]:
+                                aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "mod1"
+                            else:
+                                aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "mod2"
+                        i +=2
+                    elif aList[i].upper().find("FILE-2") != -1:
+                        aLink.stdLigand2["inCif"] = aList[i+1]
+                        aLink.stdLigand2["userIn"] = True 
+                        i +=2
+                    elif aList[i].upper().find("ATOM-NAME-2") != -1:
+                        atm2Name = setNameByNumPrime(aList[i+1])
+                        aLink.stdLigand2["atomName"] =  atm2Name
+                        #aLink.stdLigand2["atomName"] = aList[i+1] 
+                        i +=2
+                    elif aList[i].upper().find("BOND-TYPE") != -1 :
+                        aBond = {}
+                        aBond["type"]           = "single"
+                        aBond["type"]           = aList[i+1]
+                        aBond["atom_id_1"]      = aLink.stdLigand1["atomName"]
+                        aBond["comp_serial_num_1"] =  1 
+                        aBond["atom_id_2"]      = aLink.stdLigand2["atomName"]
+                        aBond["comp_serial_num_2"] =  2 
+                        aBond["value_dist"]     = 0.0     
+                        aBond["value_dist_esd"] = 0.02
+                        aLink.suggestBonds.append(aBond) 
+                        i+=2
+                    elif aList[i].upper().find("DELETE") != -1:
+                        lDel = True
+                        lSt  = False
+                        lCh  = False
+                        lAd  = False
+                        i +=1
+                    elif aList[i].upper().find("CHANGE") != -1:
+                        lCh  = True
+                        lSt  = False
+                        lDel = False
+                        lAd  = False
+                        i +=1
+                    elif aList[i].upper().find("ADD") != -1:
+                        lAd  = True
+                        lSt  = False
+                        lDel = False
+                        lCh  = False
+                        i +=1
+                    elif lDel :
+                        lDel = False
+                        if len(aDS.keys()) != 0:
+                            aLink.delSections.append(aDS)
+                            aDS = {}
+                        if aList[i].upper().find("ATOM") != -1 and aList[i].upper().find("ATOM-NAME") == -1:
+                            if i+2 < nL:
+                                if not aList[i+2].isdigit():
+                                    self.errLevel = 2
+                                    if not self.errMessage.has_key(self.errLevel):
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Format error in DELECTE ATOM section of the instruction file. "
+                                    aMess += "%s should be followed by residue number 1 or 2"%aList[i+1]
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break
+                                atmDName = setNameByNumPrime(aList[i+1])
+                                aDS["atomName"]  = atmDName
+                                aNum = int(aList[i+2])
+                                aDS["inRes"]     = aNum
+                                aAtom = {}
+                                aAtom["atom_id"] = atmDName
+                                if aNum == 1:
+                                    aLink.modLigand1["deleted"]["atoms"].append(aAtom) 
+                                elif aNum == 2:
+                                    aLink.modLigand2["deleted"]["atoms"].append(aAtom) 
+                                else:
+                                    self.errLevel = 2
+                                    if not self.errMessage.has_key(self.errLevel):
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Format error in DELECTE section of the instruction file. "
+                                    aMess+= "Residue number should be 1 or 2"
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break
+                                i+=3
+                            else:
+                                self.errLevel = 2
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Format error in DELECTE ATOM section of the instruction file. "
+                                aMess+= "%s needs to be followed by two values.\n"% aList[i]
+                                self.errMessage[self.errLevel].append(aMess)
+                                break
+                        elif aList[i].upper().find("BOND") != -1 :
+                            if i+3 < nL:
+                                aBond = {}
+                                aBond["atom_id_1"] = aList[i+1]
+                                aBond["atom_id_2"] = aList[i+2]
+                                aNum  = int(aList[i+3])
+                                aBond["comp_serial_num_1"] = aNum 
+                                aBond["comp_serial_num_2"] = aNum 
+                                if aNum == 1:
+                                    aLink.modLigand1["deleted"]["bonds"].append(aBond)
+                                elif aNum == 2:
+                                    aLink.modLigand2["deleted"]["bonds"].append(aBond)
+                                else:
+                                    self.errLevel = 2
+                                    if not self.errMessage.has_key(self.errLevel):
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Format error in DELECTE BOND section of the instruction file. "
+                                    aMess+= "Residue number should be 1 or 2"
+                                    self.errMessage[12].append(aMess)
+                                    break
+                                i+=4
+                            else:
+                                self.errLevel = 2
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Format error in DELECTE BOND section of the instruction file.\n"
+                                aMess+= "%s needs to be followed by two values.\n"% aList[i]
+                                self.errMessage[self.errLevel].append(aMess)
+                                break
+                    elif lCh :
+                        lCh=False
+                        if aList[i].upper().find("BOND") != -1 :
+                            if i+4 < nL:
+                                aBond = {}
+                                aBond["atom_id_1"]      = aList[i+1]
+                                aBond["atom_id_2"]      = aList[i+2]
+                                aBond["type"]           = aList[i+3]
+                                aBond["comp_serial_num"]= int(aList[i+4])
+                                aBond["value_dist"]     = 0.0     
+                                aBond["value_dist_esd"] = 0.02
+                                i+=5
+                                if aBond["comp_serial_num"] ==1 :
+                                    aLink.modLigand1["changed"]["bonds"].append(aBond)
+                                elif aBond["comp_serial_num"] ==2 :
+                                    aLink.modLigand2["changed"]["bonds"].append(aBond)
+                                else:
+                                    print "Error in BOND CHANGE section: invalide monomer serial number (should be 1 or 2)"
+                                    print "Check your link instruction file"
+                                    self.errLevel = 2
+                                    if not self.errMessage.has_key(self.errLevel):
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Error in BOND CHANGE section in the instruction file.\n"
+                                    aMess+= "invalide monomer serial number (should be 1 or 2)\n"
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break
+                            else:
+                                self.errLevel = 2
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Error in BOND CHANGE section in the instruction file:\n "
+                                aMess+= "Not enough information to define the change of the bond\n"
+                                self.errMessage[self.errLevel].append(aMess)
+                                break
+
+                    elif lAd :
+                        lAd = False
+                        # Leave for discussion
+                        if aList[i].upper().find("Atom") != -1 :
+                            if i+5 < nL:
+                                aAtom = {}
+                                aAtom["atom_id"]     = aList[i+1]
+                                aAtom["type_symbol"] = aList[i+2]
+                                aAtom["type_energy"] = aAtom["type_symbol"]
+                                aNum = int(aList[i+3]) 
+                                aBond = {}
+                                aBond["atom_id_1"] = aAtom["atom_id"]
+                                aBond["atom_id_2"] = aList[i+4]
+                                aBond["type"]      = aList[i+5]
+                                i+=6
+                                if aNum == 1:
+                                    aAtom["comp_id"] = aLink.stdLigand1["name"]
+                                    aLink.modLigand1["added"]["atoms"].append(aAtom)
+                                    aLink.modLigand1["added"]["bonds"].append(aBond)
+                                elif aNum==2:
+                                    aAtom["comp_id"] = aLink.stdLigand2["name"]
+                                    aLink.modLigand2["added"]["atoms"].append(aAtom)
+                                    aLink.modLigand2["added"]["bonds"].append(aBond)
+                                else:
+                                    self.errLevel = 2
+                                    if not self.errMessage.has_key(self.errLevel):
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Error in ADD ATOM section:\n "
+                                    aMess += "Residue number should be 1 or 2 !\n "
+                                    aMess += "Check your link instruction file.\n"
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break
+                            else:
+                                self.errLevel = 2
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Error in BOND CHANGE section in the instruction file:\n "
+                                aMess+= "Not enough information to define the change of the bond\n"
+                                self.errMessage[self.errLevel].append(aMess)
+                                break
+                    else :
+                        self.errLevel = 2
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        aMess = "Unknown keyword  %s. Check your instruction file\n"%aList[i]
+                        self.errMessage[self.errLevel].append(aMess)  
+                        break
+                else :
+                    print "Errors begin at %s. Check your instruction file "%aList[i]
+                    self.errLevel = 2
+                    if not self.errMessage.has_key(2):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("Errors begin at %s. Check your instruction file\n"%aList[i])             
+                    break
+            if self.errLevel==0:
+                if len(aDS.keys()) != 0:
+                    aLink.delSections.append(aDS)
+            
+                if len(aLink.suggestBonds)==0 and aLink.stdLigand1.has_key("atomName") and aLink.stdLigand2.has_key("atomName"):
+                    aBond = {}
+                    aBond["type"]              = "single"
+                    aBond["atom_id_1"]         = aLink.stdLigand1["atomName"]
+                    aBond["comp_serial_num_1"] =  1 
+                    aBond["atom_id_2"]         = aLink.stdLigand2["atomName"]
+                    aBond["comp_serial_num_2"] =  2 
+                    aBond["value_dist"]        = 0.0     
+                    aBond["value_dist_esd"]    = 0.02
+                    aLink.suggestBonds.append(aBond) 
+
+                aNS = aLink.stdLigand1["name"][0].lower()
+                aNL = aLink.stdLigand1["name"].upper()
+                if not aLink.stdLigand1["userIn"]:
+                    if aNL in self.chemCheck.aminoAcids :
+                        aLink.stdLigand1["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
+                        aLink.stdLigand1["userIn"] = True
+                    else :
+                        aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+
+                aNS = aLink.stdLigand2["name"][0].lower()
+                aNL = aLink.stdLigand2["name"].upper()
+                if not aLink.stdLigand2["userIn"]:
+                    if aNL in self.chemCheck.aminoAcids :
+                        aLink.stdLigand2["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
+                        aLink.stdLigand2["userIn"] = True
+                    else :
+                        aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+
+                if aLink.checkInPara() and not self.errLevel:
+                    self.cLinks.append(aLink)
+                    print "Instructions for build a link are  "
+                    print "Link will happen between "
+                    print "Atom : %s in Residue %s "%(aLink.stdLigand1["atomName"], aLink.stdLigand1["name"])
+                    print " and " 
+                    print "Atom : %s in Residue %s "%(aLink.stdLigand2["atomName"], aLink.stdLigand2["name"])
+                    if len(aLink.suggestBonds) >0:
+                        print "The suggested bonds linking two residues are: "
+                        for aBond in aLink.suggestBonds:
+                            print "Bond between atom %s in residue %s and atom %s in residue %s "\
+                                  %(aBond["atom_id_1"], aBond["comp_serial_num_1"],\
+                                    aBond["atom_id_2"], aBond["comp_serial_num_2"])
+                            print "Bond order is %s "%aBond["type"]
+
+                    print "Two input cif files are : "
+                    print "%s for comp 1 and "%aLink.stdLigand1["inCif"]
+                    print "%s for comp 2"%aLink.stdLigand2["inCif"]
+
+                    #if len(aLink.delSections):
+                    nda1 = len(aLink.modLigand1["deleted"]["atoms"])
+                    nda2 = len(aLink.modLigand2["deleted"]["atoms"])
+                    if nda1 >0 or nda2 >0:
+                        print "The following atoms are deleted."
+                        if nda1 >0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aA in aLink.modLigand1["deleted"]["atoms"]:
+                                print "Atom %s "%aA["atom_id"]
+                        if nda2 >0:
+                            print "In residue %s: "%aLink.modLigand2["name"]
+                            for aA in aLink.modLigand2["deleted"]["atoms"]:
+                                print "Atom %s "%aA["atom_id"]
+
+                        #for aDS in aLink.delSections:
+                        #    if aDS.has_key("inRes") and aDS.has_key("atomName"):
+                        #        print "Atom %s in Residue %d "%(aDS["atomName"], aDS["inRes"]) 
+
+                    ndb1 = len(aLink.modLigand1["deleted"]["bonds"])
+                    ndb2 = len(aLink.modLigand2["deleted"]["bonds"])
+                    if ndb1 >0 or ndb2 >0:
+                        print "The following bonds are deleted."
+                        if ndb1 > 0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aB in aLink.modLigand1["deleted"]["bonds"]:
+                                print "Bond between atom %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+                        if ndb2 > 0:
+                            print "In residue %s: "%aLink.modLigand2["name"]
+                            for aB in aLink.modLigand2["deleted"]["bonds"]:
+                                print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+
+
+                    naa1 = len(aLink.modLigand1["added"]["atoms"])
+                    naa2 = len(aLink.modLigand2["added"]["atoms"])
+                    if naa1 > 0 or naa2 > 0:
+                        print "The following atoms are added."
+                        if naa1 > 0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aA in aLink.modLigand1["added"]["atoms"]:
+                                print "Atom %s "%aA["atom_id"]
+                        if naa2 > 0:
+                            print "In residue %s: "%aLink.modLigand2["name"]
+                            for aA in aLink.modLigand2["added"]["atoms"]:
+                                print "Atom %s "%aA["atom_id"]
+
+                    nab1 = len(aLink.modLigand1["added"]["bonds"])
+                    nab2 = len(aLink.modLigand2["added"]["bonds"])
+                    if nab1 >0 or nab2 >0:
+                        print "The following bonds are added."
+                        if nab1 > 0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aB in aLink.modLigand1["added"]["bonds"]:
+                                print "Bond between atom %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+                        if nab2 > 0:
+                            print "In residue %s: "%aLink.modLigand2["name"]
+                            for aB in aLink.modLigand2["added"]["bonds"]:
+                                print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+                        
+                    nca1 = len(aLink.modLigand1["changed"]["atoms"])
+                    nca2 = len(aLink.modLigand2["changed"]["atoms"])
+                    if nca1 > 0 or nca2 > 0:
+                        print "The following atoms are changed."
+                        if nca1 > 0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aA in aLink.modLigand1["changed"]["atoms"]:
+                                print "Atom %s "%aA["atom_id"]
+                        if nca2 > 0:
+                            print "In residue %s: "%aLink.modLigand2["name"]
+                            for aA in aLink.modLigand2["changed"]["atoms"]:
+                                print "Atom %s "%aA["atom_id"]
+
+
+                    ncb1 = len(aLink.modLigand1["changed"]["bonds"])
+                    ncb2 = len(aLink.modLigand2["changed"]["bonds"])
+                    if ncb1 >0 or ncb2 >0:
+                        print "The following bonds are changed."
+                        if ncb1 > 0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aB in aLink.modLigand1["changed"]["bonds"]:
+                                print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+                                print "The bond-order is now ", aB["type"]
+                        if ncb2 > 0:
+                            print "In residue %s: "%aLink.modLigand1["name"]
+                            for aB in aLink.modLigand2["changed"]["bonds"]:
+                                print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+                                print "The bond-order is now ", aB["type"]
+                else:
+                    self.errLevel = aLink.errLevel
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    for aL in aLink.errMessage:
+                        self.errMessage[self.errLevel].append(aL)
+                    self.errMessage[self.errLevel].append("Information in the instruction file is not correct/enough to build a link. \n")
+            else:
+                for aKey in self.errMessage.keys():
+                    for aLine in self.errMessage[aKey]:
+                        print aLine
+        
     def processOneLink(self, tLinkIns):
         
         if not self.errLevel:
@@ -1404,8 +1839,8 @@ class CovLinkGenerator(CExeCode):
             tLinkedObj.atomMap[aAtmName] = [1, aAtom["atom_id"]] 
             tLinkedObj.combLigand["atoms"].append(aAtom)
             if aAtom["atom_id"] == tLinkedObj.stdLigand1["atomName"]:
-                tLinkedObj.stdLigand1["atomName_alias"] =aAtmName 
-        
+                tLinkedObj.stdLigand1["atomName_alias"] =aAtmName
+ 
         idxA2      = 0
         for aAtom in tLinkedObj.stdLigand2["remainAtoms"]:
             aAtom["idx"]             = idxA2
@@ -1481,7 +1916,7 @@ class CovLinkGenerator(CExeCode):
                 self.errLevel    = 32 
                 if not self.errMessage.has_key(self.errLevel):
                     self.errMessage[self.errLevel] = []
-                aLine += "An error happens in residue 2:\n"
+                aLine = "An error happens in residue 2:\n"
                 aLine += "The alias name for atom %s can not be found\n"%aBond["atom_id_2"] 
                 self.errMessage[self.errLevel].append(aLine)
             aBond["value_dist"]      =  0.0             
@@ -2729,6 +3164,7 @@ class CovLinkGenerator(CExeCode):
         if tLink.has_key("torsions") and len(tLink["torsions"]) !=0:
             tOutFile.write("loop_\n")
             tOutFile.write("_chem_link_tor.link_id\n")
+            tOutFile.write("_chem_link_tor.tor_id\n")
             tOutFile.write("_chem_link_tor.atom_1_comp_id\n")
             tOutFile.write("_chem_link_tor.atom_id_1\n")
             tOutFile.write("_chem_link_tor.atom_2_comp_id\n")
@@ -2742,7 +3178,8 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_link_tor.period\n")
           
             for aTor in tLink["torsions"]: 
-                aL="%s%s%s%s%s%s%s%s%s%s%s%s\n"%(tLink["name"].ljust(10),str(aTor["atom_id_1_resNum"]).ljust(10),  aTor["atom_id_1"].ljust(10),\
+                aL="%s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(tLink["name"].ljust(10),"omega".ljust(12),\
+                                           str(aTor["atom_id_1_resNum"]).ljust(10),  aTor["atom_id_1"].ljust(10),\
                                            str(aTor["atom_id_2_resNum"]).ljust(10),  aTor["atom_id_2"].ljust(10),\
                                            str(aTor["atom_id_3_resNum"]).ljust(10),  aTor["atom_id_3"].ljust(10),\
                                            str(aTor["atom_id_4_resNum"]).ljust(10),  aTor["atom_id_4"].ljust(10),\
@@ -2778,7 +3215,7 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_link_plane.plane_id\n")
             tOutFile.write("_chem_link_plane.atom_comp_id\n")
             tOutFile.write("_chem_link_plane.atom_id\n")
-            tOutFile.write("_chem_link_plane.dist_id\n")
+            tOutFile.write("_chem_link_plane.dist_esd\n")
             for aPl in tLink["planes"].keys():
                 for aAtm in tLink["planes"][aPl]:
                     aL="%s%s%s%s%s\n"%(tLink["name"].ljust(10), aAtm["plane_id"].ljust(10),\

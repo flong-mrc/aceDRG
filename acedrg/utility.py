@@ -186,6 +186,22 @@ def splitLineSpa3(tSet, tSep, tStrs):
         for aT in TE:
             tStrs.append(aT)
 
+def setNameByNumPrime(tStr):
+
+    aRet = tStr
+    aL = len(tStr)
+    pos1 =0
+    pos2 =aL-1
+    if len(tStr) > 0:
+        if tStr.count("\'") ==1:
+            if tStr[pos1] !="\"" and tStr[pos2] !="\"":
+                aRet= "\"" + tStr + "\""
+        elif tStr.count("\"") ==1:
+            if tStr[pos1] !="\'" and tStr[pos2] !="\'":
+                aRet= "\'" + tStr + "\'"
+ 
+    return aRet
+
 def BondOrderS2N(tBS):
 
     aBN = -1
