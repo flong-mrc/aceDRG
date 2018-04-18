@@ -1271,8 +1271,8 @@ class CovLinkGenerator(CExeCode):
                         print "Number of H atoms in residue %s is %d "%(tLinkIns.stdLigand2["name"], len(tLinkIns.stdLigand2["comp"]["hAtoms"]))
                 else:
                     self.setOneMonomer(tLinkIns.stdLigand2)
-                    #print "output comp 2 ", tLinkIns.stdLigand2["outComp"] 
-
+                    #print "output comp 2 ", tLinkIns.stdLigand2["outComp"]
+ 
             if not self.errLevel:
                 print "##################################################################"
                 print "#                                                                #"
@@ -1281,9 +1281,8 @@ class CovLinkGenerator(CExeCode):
                 print "##################################################################"
                 tLinkIns.cLink["name"] = tLinkIns.stdLigand1["name"] + "-" + tLinkIns.stdLigand2["name"]
                 self.buildComboLigand(tLinkIns)
-                print "#                          Job done                              #"
+                print "#  Job done                                                      #"
                 print "##################################################################"
-
             if not self.errLevel:
                 print "##################################################################"
                 print "#                                                                #"
@@ -1458,7 +1457,7 @@ class CovLinkGenerator(CExeCode):
                 tModMonomer["deleted"]["atoms"].append(aAtom)
  
     def getHAtomConnected(self, tNonHAtomName, tMonomer, tHNames):
-
+        
         for aBond in tMonomer["comp"]["bonds"]:
             if aBond["atom_id_1"].upper()==tNonHAtomName and aBond["atom_id_2"].upper() in tMonomer["comp"]["hAtoms"]:
                 tHNames.append(aBond["atom_id_2"])
@@ -1586,17 +1585,26 @@ class CovLinkGenerator(CExeCode):
         # as the center atom.
         # Change signs of chiral volumes of chiral centers
         # where one of NB atoms replaced.
-        
         if tRes["comp"].has_key("chirs"):
             for aChi in tRes["comp"]["chirs"]:
-                if aChi["atom_id_centre"].upper() in delAtomIdSet:
+                #print "center atom ", aChi["atom_id_centre"], " in chir ", aChi['id']
+                #print "atom ", aChi["atom_id_1"], " in chir ", aChi['id']
+                #print "atom ", aChi["atom_id_2"], " in chir ", aChi['id']
+                #print "atom ", aChi["atom_id_3"], " in chir ", aChi['id']
+                if aChi["atom_id_centre"].upper() in delAtomIdSet\
+                   or aChi["atom_id_1"].upper() in delAtomIdSet\
+                   or aChi["atom_id_2"].upper() in delAtomIdSet\
+                   or aChi["atom_id_3"].upper() in delAtomIdSet:
                     tMod["deleted"]["chirs"].append(aChi)
-                elif aChi["atom_id_1"].upper() in delAtomIdSet:
-                    self.modOneChir(tLinkBonds, aChi["atom_id_centre"], "atom_id_1", aChir, tRes["remainChirs"])
-                elif aChi["atom_id_2"].upper() in delAtomIdSet:
-                    self.modOneChir(tLinkBonds, aChi["atom_id_centre"], "atom_id_2", aChir, tRes["remainChirs"])
-                elif aChi["atom_id_3"].upper() in delAtomIdSet:
-                    self.modOneChir(tLinkBonds, aChi["atom_id_centre"], "atom_id_3", aChir, tRes["remainChirs"])
+                    if aChi["atom_id_centre"].upper() in delAtomIdSet:
+                        print "atom ", aChi["atom_id_centre"], " in chir ", aChi['id'], " is deleted "
+                    elif aChi["atom_id_1"].upper() in delAtomIdSet:
+                        print "atom ", aChi["atom_id_1"], " in chir ", aChi['id'], " is deleted "
+                    elif aChi["atom_id_2"].upper() in delAtomIdSet:
+                        print "atom ", aChi["atom_id_2"], " in chir ", aChi['id'], " is deleted "
+                    elif aChi["atom_id_3"].upper() in delAtomIdSet:
+                        print "atom ", aChi["atom_id_3"], " in chir ", aChi['id'], " is deleted "
+                    print "Chiral center ", aChi['id'], " is deleted "
                 else:
                     tRes["remainChirs"].append(aChi)
                        
@@ -1615,7 +1623,7 @@ class CovLinkGenerator(CExeCode):
                     tMod["deleted"]["planes"].append(tRes["comp"]["planes"][aPl])
                 else:
                     tRes["remainPls"].append(aPlGrp)
-        
+
     def resetChargeForLinkedNAtom(self,  tRes, tMod, tLinkBonds, tDelAtomIds):
         # For atoms of type_symbol "N"  only at the moment.
         aLAtmId = tRes["atomName"]
@@ -1635,7 +1643,8 @@ class CovLinkGenerator(CExeCode):
                         tRes["comp"]["atoms"][aLAtmSerial]["charge"] = "0"
                     elif tRes["comp"]["atoms"][aLAtmSerial].has_key("form_charge"):
                         tRes["comp"]["atoms"][aLAtmSerial]["form_charge"] = "0"
-                    print "Charges in atom %s is set to 0 "%aLAtmId             
+                    print "Charges in atom %s is set to 0 "%aLAtmId  
+           
     def adjustAtomsAroundOneAtom(self, tCenAtomId, tRes, tMod, tLinkBonds, tDelAtomIds, tMode):
         #aLAtmId = tRes["atomName"]
         aLAtmId  = tCenAtomId
@@ -1814,8 +1823,8 @@ class CovLinkGenerator(CExeCode):
                 break
             elif aBond["atom_id_2"] ==tCenAtmID:
                 tChir[tKw]=aBond["atom_id_1"]
-                aChir["volume_sign"] = "both"
-                tResChirs.append(aChir)
+                tChir["volume_sign"] = "both"
+                tResChirs.append(tChir)
                 break
 
     def setInitComboLigand(self, tLinkedObj):
@@ -2169,7 +2178,6 @@ class CovLinkGenerator(CExeCode):
         print "Num of add atoms in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["atoms"])
         print "Num of deleted atoms in residue 1 is %d "%(len(tLinkedObj.modLigand1["deleted"]["atoms"]))
         
-                         
         # Bonds
         aTmpChBonds_1 =  {}
         i1 = 0
@@ -2244,6 +2252,13 @@ class CovLinkGenerator(CExeCode):
                 else:
                     tLinkedObj.modLigand2["added"]["angles"].append(aAng) 
          
+        print "Number of changed angles in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["angles"])  
+        print "Number of added angles in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["angles"])  
+        print "Number of deleted angles in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["angles"])  
+        print "Number of changed angles in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["angles"])  
+        print "Number of added angles in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["angles"])  
+        print "Number of deleted angles in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["angles"]) 
+         
         # Torsions
         for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
             print "A torsion "
@@ -2266,6 +2281,13 @@ class CovLinkGenerator(CExeCode):
                 else: 
                     LinkedObj.modLigand2["added"]["tors"].append(aTor)
     
+        print "Number of changed tors in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["tors"])  
+        print "Number of added tors in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["tors"])  
+        print "Number of deleted tors in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["tors"])  
+        print "Number of changed tors in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["tors"])  
+        print "Number of added tors in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["tors"])  
+        print "Number of deleted tors in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["tors"]) 
+         
         # Chirs
         for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
             print "A chiral center "
@@ -2288,6 +2310,13 @@ class CovLinkGenerator(CExeCode):
                 else:
                     tLinkedObj.modLigand2["added"]["chirs"].append(aChi)
 
+        print "Number of changed chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["chirs"])  
+        print "Number of added chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["chirs"])  
+        print "Number of deleted chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["chirs"])  
+        print "Number of changed chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["chirs"])  
+        print "Number of added chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["chirs"])  
+        print "Number of deleted chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["chirs"]) 
+         
         # Planes
         for aPl in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys():
             print "For plane ", aPl
