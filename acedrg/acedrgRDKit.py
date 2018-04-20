@@ -1657,11 +1657,11 @@ class AcedrgRDKit():
             for aCid in self.selecConformerIds:
                 rdmolops.AssignAtomChiralTagsFromStructure(tMol, confId=aCid)
                 aConformer =  tMol.GetConformer(aCid)
-                print "In conformer ", aCid
+                #print "In conformer ", aCid
                 for aAtom in allAtoms:
                     aCT = aAtom.GetChiralTag()
-                    print "Atom ", aAtom.GetProp("Name")
-                    print "RDKit sign ", aCT
+                    #print "Atom ", aAtom.GetProp("Name")
+                    #print "RDKit sign ", aCT
                     aTmpCT = aAtom.HasProp("TmpChiral")
                     aIdx = aAtom.GetIdx()
                     if not aChiralSetMap.has_key(aIdx):

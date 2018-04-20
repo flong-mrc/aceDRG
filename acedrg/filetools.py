@@ -317,20 +317,24 @@ class FileTransformer :
         if l2: # 2 col format
             iC =0
             for aL in tBlk:
+                print aL 
                 if aL.find("\"") !=-1:
                     strGrp = aL.strip().split("\"")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\""+ strGrp[1] + "\""]
+                        print self.dataDescriptor[iC]
                         iC +=1
                 elif aL.find("\'") !=-1 :
                     strGrp = aL.strip().split("\'")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\'"+ strGrp[1] + "\'"]
+                        print self.dataDescriptor[iC]
                         iC +=1
                 else:
                     strGrp = aL.strip().split()
                     if len(strGrp) == 2:
                         self.dataDescriptor[iC]=[strGrp[0], strGrp[1]]
+                        print self.dataDescriptor[iC]
                         iC +=1
                                            
         else:   # multiple col format          
@@ -1177,14 +1181,16 @@ class FileTransformer :
             if not self.PdbForMols.has_key(idxMol):
                 self.PdbForMols[idxMol] = []
             self.PdbForMols[idxMol].append(tOutFileName)
-      
+           
             self.PdbForMols    = {}
             # Head section 
             tClassification="UNL"
             tDate =time.strftime("%d/%m/%Y")
-            tIdCode = str(tMonoRoot) 
-           
-            if tDataDiscriptor:
+            
+            tIdCode = "UNL"
+            if tMonoRoot != "UNL":
+                tIdCode = str(tMonoRoot) 
+            elif tDataDiscriptor:
                 for aIdx in tDataDiscriptor.keys():
                     if tDataDiscriptor[aIdx][0].find("_chem_comp.group") !=-1  \
                        or tDataDiscriptor[aIdx][0].find("_chem_comp.name") !=-1 \
@@ -1388,7 +1394,8 @@ class FileTransformer :
                     aTS = aTS + aS
             else:
                 if l2 or l1:
-                    aTS = aTS + aS
+                    aTS = aTS + " "
+                    #print "\"" + aTS + "\""
                 elif l0:
                     if len(aTS):
                         tList.append(aTS.strip())
