@@ -712,7 +712,7 @@ class Acedrg(CExeCode ):
             #print self.monomRoot
             self.setMonoRoot()
             # self.monomRoot   = "UNL"
-        #print "monomRoot: ", self.monomRoot
+        print "monomRoot: ", self.monomRoot
         if t_inputOptionsP.outRoot:
             self.outRoot   = t_inputOptionsP.outRoot
             self.baseRoot  = os.path.basename(t_inputOptionsP.outRoot)
@@ -1476,6 +1476,7 @@ class Acedrg(CExeCode ):
             aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
             #print "PDB root ", tPdbRoot
             #print aConfPdb
+
             self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign)
             if os.path.isfile(aConfPdb):
                 inPdbNamesRoot.append(tPdbRoot)
@@ -1558,17 +1559,28 @@ class Acedrg(CExeCode ):
         cifCont = {}
         cifCont['head'] = []
         monoId = ""
+
         if self.monomRoot.find("UNL") ==-1:
-            monoId = self.monomRoot
+            if len(self.monomRoot) >=3:
+                monoId = self.monomRoot[:3]
+            else:
+                monoId = self.monomRoot
+ 
         elif tDataDescriptor:
             monoId = tDataDescriptor[-1].strip().split()[0]
         else:
             monoId = "UNL"
-      
+
+        #print monoId 
+
         if tDataDescriptor:
             cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
             for aL in tDataDescriptor:
-                cifCont['head'].append(aL+"\n")   
+                if aL[0].find("_")==-1:
+                    aNewL = "%s%s"%(monoId.ljust(8),monoId.ljust(8))+ aL[15:]
+                    cifCont['head'].append(aNewL+"\n")   
+                else:
+                    cifCont['head'].append(aL+"\n")   
             cifCont['head'].append("#\n")
             # monoId = tDataDescriptor[-1].strip().split()[0]
             cifCont['head'].append("data_comp_%s\n"%monoId)
@@ -1794,7 +1806,8 @@ class Acedrg(CExeCode ):
                         for aL in tStrDescriptors["props"]:
                             tOutCif.write(aL+"\n")
                         for aL in tStrDescriptors["entries"]:
-                            tOutCif.write(aL+"\n")
+                            aL1 = monoId + aL[3:]
+                            tOutCif.write(aL1+"\n")
                     """
                     elif tStrDescriptors.has_key("defProps") and tStrDescriptors.has_key("defSmiles"):
                         for aProp in tStrDescriptors["defProps"]:
@@ -2349,6 +2362,7 @@ class Acedrg(CExeCode ):
 
         self.setOutCifGlobSec()
 
+
         if self.workMode in [11, 12, 13, 14, 15]:
             self.workMode = 11
         elif self.workMode in [111, 121, 131, 141, 151]:
@@ -2369,6 +2383,7 @@ class Acedrg(CExeCode ):
                 #else:
                 if self.workMode in [11,  111]:
                     print "Using coords ", self.rdKit.useExistCoords
+ 
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):

@@ -188,6 +188,49 @@ for aF in glob.glob("./inMmcifPDB/*.cif"):
             numJobsF   +=1
             failNames.append(rRoot)
 
+print "============================================================"
+print "|  compare examples with and without option -r             |"
+print "============================================================"
+MonoName = ""
+for aF in glob.glob("./inOption_r/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+    else:
+        MonoName = aFRoot
+
+    if len(aFRoot) !=0:
+        rRoot = "%s_NoOption_r"%aFRoot
+        cmdL = "acedrg -c %s  -o  %s  -p "%(aF, rRoot) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
+
+        rRoot = "%s_withOption_r"%aFRoot
+        aR1   = aR1   = MonoName[0] +  MonoName[0] +  MonoName[0]
+
+        cmdL = "acedrg -c %s  -o  %s -r %s -p "%(aF, rRoot, aR1) 
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
 
 print "========================================================="
 print "|  run all examples with input mmCif files at ./inMmcif |"
