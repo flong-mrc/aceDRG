@@ -3193,7 +3193,7 @@ class CovLinkGenerator(CExeCode):
         if tLink.has_key("torsions") and len(tLink["torsions"]) !=0:
             tOutFile.write("loop_\n")
             tOutFile.write("_chem_link_tor.link_id\n")
-            tOutFile.write("_chem_link_tor.tor_id\n")
+            tOutFile.write("_chem_link_tor.id\n")
             tOutFile.write("_chem_link_tor.atom_1_comp_id\n")
             tOutFile.write("_chem_link_tor.atom_id_1\n")
             tOutFile.write("_chem_link_tor.atom_2_comp_id\n")
