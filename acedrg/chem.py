@@ -378,7 +378,7 @@ class ChemCheck():
                 aAtm["type_energy"] = "NH2"
             elif aAtm["atom_id"].strip()=="H":
                 aAtm["type_energy"] = "HNH2"
-          
+
     def checkChiralCenters(self, tMol, tIdx):
    
         # RDKit misses some chiral centers such as N with 3 bonds.

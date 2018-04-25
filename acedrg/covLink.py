@@ -65,7 +65,8 @@ class CovLink:
         self.stdLigand1                     = {}
         self.stdLigand1["fromScr"]          = False
         self.stdLigand1["userIn"]           = False
-        self.stdLigand1["inCif"]           = False
+        self.stdLigand1["compOut"]          = False
+        self.stdLigand1["inCif"]            = False
         self.stdLigand1["dataBlock"]        = None
         self.stdLigand1["comp"]             = None
         self.stdLigand1["hAtom"]            = []
@@ -75,12 +76,13 @@ class CovLink:
         self.stdLigand1["remainBonds"]      = []
         self.stdLigand1["remainAngs"]       = []
         self.stdLigand1["remainTors"]       = []
-        self.stdLigand1["remainChirs"]    = []
+        self.stdLigand1["remainChirs"]      = []
         self.stdLigand1["remainPls"]        = []
         self.stdLigand2                     = {}
         self.stdLigand2["fromScr"]          = False
-        self.stdLigand2["userIn"]            = False
-        self.stdLigand2["inCif"]           = False
+        self.stdLigand2["userIn"]           = False
+        self.stdLigand2["compOut"]          = False
+        self.stdLigand2["inCif"]            = False
         self.stdLigand2["dataBlock"]        = None
         self.stdLigand2["comp"]             = None
         self.stdLigand2["hAtom"]            = []
@@ -311,7 +313,7 @@ class CovLinkGenerator(CExeCode):
     def checkInCompCif(self, tMonomer, tFName, tResName):
        
         if os.path.isfile(tFName):
-            tMonomer["inCif"]    =  tFName
+            tMonomer["inCif"]    = tFName
             tMonomer["userIn"]   = True 
         else:
             if len(tResName) > 0:                    
@@ -412,9 +414,11 @@ class CovLinkGenerator(CExeCode):
             # Some default values. They will be changed at different stages
  
             aLink.stdLigand1["userIn"]  = False 
+            aLink.stdLigand1["compOut"]  = False 
             aLink.stdLigand1["outComp"] = False 
             aLink.stdLigand1["outMod"]  = True 
             aLink.stdLigand2["userIn"]  = False 
+            aLink.stdLigand2["compOut"]  = False 
             aLink.stdLigand2["outComp"] = False 
             aLink.stdLigand2["outMod"]  = True 
 
@@ -432,8 +436,8 @@ class CovLinkGenerator(CExeCode):
                             aLink.modLigand1["name"]   = aLink.stdLigand1["name"] + "mod1"
                             i +=2
                         elif aList[i].upper().find("FILE-1") != -1:
-                            aLink.stdLigand1["inCif"] = aList[i+1]
-                            aLink.stdLigand1["userIn"]     = True 
+                            aLink.stdLigand1["inCif"]    = aList[i+1]
+                            aLink.stdLigand1["compOut"]  =  True
                             i +=2
                         elif aList[i].upper().find("ATOM-NAME-1") != -1:
                             atm1Name = setNameByNumPrime(aList[i+1])
@@ -449,7 +453,7 @@ class CovLinkGenerator(CExeCode):
                             i +=2
                         elif aList[i].upper().find("FILE-2") != -1:
                             aLink.stdLigand2["inCif"] = aList[i+1]
-                            aLink.stdLigand2["userIn"] = True 
+                            aLink.stdLigand2["compOut"]  =  True
                             i +=2
                         elif aList[i].upper().find("ATOM-NAME-2") != -1:
                             atm2Name = setNameByNumPrime(aList[i+1])
@@ -869,7 +873,8 @@ class CovLinkGenerator(CExeCode):
                         i +=2
                     elif aList[i].upper().find("FILE-1") != -1:
                         aLink.stdLigand1["inCif"] = aList[i+1]
-                        aLink.stdLigand1["userIn"]     = True 
+                        aLink.stdLigand1["userIn"]   =  True
+                        aLink.stdLigand1["compOut"]  =  True
                         i +=2
                     elif aList[i].upper().find("ATOM-NAME-1") != -1:
                         atm1Name = setNameByNumPrime(aList[i+1])
@@ -887,7 +892,8 @@ class CovLinkGenerator(CExeCode):
                         i +=2
                     elif aList[i].upper().find("FILE-2") != -1:
                         aLink.stdLigand2["inCif"] = aList[i+1]
-                        aLink.stdLigand2["userIn"] = True 
+                        aLink.stdLigand2["userIn"]   =  True
+                        aLink.stdLigand2["compOut"]  =  True
                         i +=2
                     elif aList[i].upper().find("ATOM-NAME-2") != -1:
                         atm2Name = setNameByNumPrime(aList[i+1])
@@ -1234,6 +1240,9 @@ class CovLinkGenerator(CExeCode):
                     for aLine in self.errMessage[aKey]:
                         print aLine
         
+	print "User input cif for L 1 ", aLink.stdLigand1["compOut"]
+        print "User input cif for L 2 ", aLink.stdLigand2["compOut"]
+
     def processOneLink(self, tLinkIns):
         
         if not self.errLevel:
@@ -1978,6 +1987,34 @@ class CovLinkGenerator(CExeCode):
                     self.errMessage[self.errLevel].append("Atom %s does not have alias name\n"%aAtom["atom_id"]) 
                 break
         return aReturnAlias
+
+    def setTorIdsInOneLink(self, tTors):
+
+        if len(tTors) !=0:
+
+           aTorIdMap = {}
+           newStrs = []
+           aSeriNum = 0 
+           for aTor in tTors:
+               idStrs = aTor["id"].strip().split("_")
+               if len(idStrs)==3:
+                   newStrs = idStrs[:2]
+               elif len(idStrs)==4:
+                   newStrs = idStrs[1:3]
+    
+               if len(newStrs)==2:
+                   newId = newStrs[0] + "_" + newStrs[1]
+                   if not newId in aTorIdMap.keys():
+                       aTorIdMap[newId] = []
+                   aTorIdMap[newId].append(aSeriNum)
+               aSeriNum = aSeriNum + 1       
+
+           if len(aTorIdMap) >0:
+               for aKey in aTorIdMap.keys():
+                   aNum = 1
+                   for aIdx in aTorIdMap[aKey]:
+                       tTors[aIdx]["id"] = aKey + "_" + str(aNum)
+                       aNum = aNum + 1
 
     def outTmpComboLigandMap(self, tLinkObj):
 
@@ -2828,10 +2865,11 @@ class CovLinkGenerator(CExeCode):
         tOutFile.write("\n")
 
     def outAllComps(self, tOutFile, tLinkedObj):
-
-        if tLinkedObj.stdLigand1["dataBlock"] and tLinkedObj.stdLigand1["outComp"]:
+        print "L1 ", tLinkedObj.stdLigand1["compOut"]
+        print "L2 ", tLinkedObj.stdLigand2["compOut"]
+        if tLinkedObj.stdLigand1["dataBlock"] and tLinkedObj.stdLigand1["outComp"] and tLinkedObj.stdLigand1["compOut"]:
             self.outOneComp(tOutFile, tLinkedObj.stdLigand1)
-        if tLinkedObj.stdLigand2["dataBlock"] and tLinkedObj.stdLigand2["outComp"]:
+        if tLinkedObj.stdLigand2["dataBlock"] and tLinkedObj.stdLigand2["outComp"] and tLinkedObj.stdLigand2["compOut"]:
             self.outOneComp(tOutFile, tLinkedObj.stdLigand2)
 
     def outOneComp(self, tOutFile, tMonomer):
@@ -3191,6 +3229,9 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("\n")
 
         if tLink.has_key("torsions") and len(tLink["torsions"]) !=0:
+  
+            self.setTorIdsInOneLink(tLink["torsions"])
+ 
             tOutFile.write("loop_\n")
             tOutFile.write("_chem_link_tor.link_id\n")
             tOutFile.write("_chem_link_tor.id\n")
@@ -3207,7 +3248,7 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_link_tor.period\n")
           
             for aTor in tLink["torsions"]: 
-                aL="%s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(tLink["name"].ljust(10),"omega".ljust(12),\
+                aL="%s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(tLink["name"].ljust(10), aTor["id"].ljust(16),\
                                            str(aTor["atom_id_1_resNum"]).ljust(10),  aTor["atom_id_1"].ljust(10),\
                                            str(aTor["atom_id_2_resNum"]).ljust(10),  aTor["atom_id_2"].ljust(10),\
                                            str(aTor["atom_id_3_resNum"]).ljust(10),  aTor["atom_id_3"].ljust(10),\
