@@ -59,22 +59,6 @@ for aF in glob.glob("./inSmi/*.smiles"):
             failNames.append(rRoot)
         i+=1       
       
-        nInitConf = 1000
-        rRoot = "%s_InitConf%d_fromSmiles"%(aFRoot, nInitConf)
-        cmdL = "acedrg -i %s -j %d  -o %s "%(aF, nInitConf,  rRoot) 
-        print cmdL
-        numAllJobs += 1
-        lRun=os.system(cmdL)
-        if lRun :
-            print "%s runtime error "%rRoot
-        outCif = "%s.cif"%rRoot
-        if os.path.isfile(outCif):
-            numJobsS   +=1
-            doneNames.append(rRoot)
-        else:
-            numJobsF   +=1
-            failNames.append(rRoot)
-        i+=1    
    
 print "========================================================="
 print "|  run all examples with input MOL files at ./inMOL     |"
@@ -171,23 +155,6 @@ for aF in glob.glob("./inMmcifPDB/*.cif"):
             numJobsF   +=1
             failNames.append(rRoot)
 
-    if len(aFRoot) !=0:
-        nInitConf = 1000
-        rRoot = "%s_InitConf%d_fromMmcifPDB"%(aFRoot, nInitConf)
-        cmdL = "acedrg -c %s -j %d -o %s -p "%(aF,nInitConf,  rRoot) 
-        print cmdL
-        numAllJobs += 1
-        lRun=os.system(cmdL)
-        if lRun :
-            print "%s runtime error "%rRoot
-        outCif = "%s.cif"%rRoot
-        if os.path.isfile(outCif):
-            numJobsS   +=1
-            doneNames.append(rRoot)
-        else:
-            numJobsF   +=1
-            failNames.append(rRoot)
-
 print "============================================================"
 print "|  compare examples with and without option -r             |"
 print "============================================================"
@@ -261,7 +228,7 @@ for aF in glob.glob("./inMmcif/*.cif"):
             numJobsF   +=1
             failNames.append(rRoot)
 
-
+"""
 print "========================================================="
 print "|  run all examples containing pyranose at ./inPyraCCD  |"
 print "========================================================="
@@ -314,6 +281,7 @@ for aF in glob.glob("./inPyraCCP4/*.cif"):
             numJobsF   +=1
             failNames.append(rRoot)
 
+"""
 
 print "========================================================="
 print "|  run all examples in inFuns                           |"
@@ -432,6 +400,31 @@ for aF in glob.glob("./inLink/instruct_*.txt"):
         else:
             numJobsS   +=1
             doneNames.append(MonoName)
+
+print "============================================================"
+print "|  check special chars in mmcif file                       |"
+print "============================================================"
+for aF in glob.glob("./inSpeChars/*.cif"):
+    aFRoot = os.path.basename(aF).strip().split(".")[0].strip()
+    MonoName = aFRoot
+    if len(aFRoot) >= 3:
+        MonoName = aFRoot[-3:]
+
+    if len(aFRoot) !=0:
+        rRoot = "%s_checkChar"%MonoName
+        cmdL = "acedrg -c %s  -o  %s  -p "%(aF, rRoot)
+        print cmdL
+        numAllJobs += 1
+        lRun=os.system(cmdL)
+        if lRun :
+            print "%s runtime error "%rRoot
+        outCif = "%s.cif"%rRoot
+        if os.path.isfile(outCif):
+            numJobsS   +=1
+            doneNames.append(rRoot)
+        else:
+            numJobsF   +=1
+            failNames.append(rRoot)
             
 """
 print "========================================================="

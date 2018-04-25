@@ -1760,6 +1760,7 @@ class Acedrg(CExeCode ):
                                   
                 try:
                     tOutCif = open(tCifOutName, "w")
+                    print "Out cif name ", tCifOutName
                 except IOError:
                     print "%s can not be opened for reading"%tCifOutName
                     sys.exit()
@@ -1802,11 +1803,15 @@ class Acedrg(CExeCode ):
                                 tOutCif.write(aL1)
                     
                     if tStrDescriptors and tStrDescriptors.has_key("props") and len(tStrDescriptors["props"]) !=0:
+                        aSetChars = ["#", ";", "\""]
                         tOutCif.write("loop_"+"\n")
                         for aL in tStrDescriptors["props"]:
                             tOutCif.write(aL+"\n")
                         for aL in tStrDescriptors["entries"]:
-                            aL1 = monoId + aL[3:]
+                            if len(aL.strip()) >0 and not aL[0] in aSetChars: 
+                                aL1 = monoId + aL[3:]
+                            else:
+                                aL1 = aL
                             tOutCif.write(aL1+"\n")
                     """
                     elif tStrDescriptors.has_key("defProps") and tStrDescriptors.has_key("defSmiles"):
