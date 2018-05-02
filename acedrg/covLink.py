@@ -1281,7 +1281,7 @@ class CovLinkGenerator(CExeCode):
                 else:
                     self.setOneMonomer(tLinkIns.stdLigand2)
                     #print "output comp 2 ", tLinkIns.stdLigand2["outComp"]
- 
+
             if not self.errLevel:
                 print "##################################################################"
                 print "#                                                                #"
@@ -2739,7 +2739,6 @@ class CovLinkGenerator(CExeCode):
         #aOutCifName = tLinkedObj.combLigand["name"] + "_link.cif"
         aOutCifName = self.outRoot + "_link.cif"
         
-        print aOutCifName
         
         try: 
             aOutCif = open(aOutCifName, "w")
@@ -2759,6 +2758,11 @@ class CovLinkGenerator(CExeCode):
       
             aOutCif.close()
 
+        aOutPDBName = self.outRoot + "_fullMol.pdb"
+
+        #for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
+            
+  
     def outVerInfo(self, tOutFile):
 
         tOutFile.write("#%s%s\n"%("ACEDRG_VERSION".ljust(30),    self.verInfo["ACEDRG_VERSION"].ljust(20)))
@@ -2770,44 +2774,48 @@ class CovLinkGenerator(CExeCode):
 
     def outCompList(self, tOutFile, tLinkedObj):
 
-        tOutFile.write("data_comp_list\n\n")
-        tOutFile.write("loop_\n")
-        tOutFile.write("_chem_comp.id\n")
-        tOutFile.write("_chem_comp.three_letter_code\n")
-        tOutFile.write("_chem_comp.name\n")
-        tOutFile.write("_chem_comp.group\n")
-        tOutFile.write("_chem_comp.number_atoms_all\n")
-        tOutFile.write("_chem_comp.number_atoms_nh\n")
-            
-        aNL = tLinkedObj.stdLigand1["name"]
-        aN3 =""
-        if len(aNL) >= 3:
-            aN3 = tLinkedObj.stdLigand1["name"][:3]
-        else:
-            aN3 = aNL
-        aName   = tLinkedObj.stdLigand1["list"]["name"]
-        aNameL  = len(aName) + 6
-        aGrp    = tLinkedObj.stdLigand1["list"]["group"]
-        NA      = tLinkedObj.stdLigand1["list"]["number_atoms_all"]
-        NAH     = tLinkedObj.stdLigand1["list"]["number_atoms_nh"]
-        aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
-        tOutFile.write(aL) 
-                 
-        aNL = tLinkedObj.stdLigand2["name"]
-        aN3 =""
-        if len(aNL) >= 3:
-            aN3 = tLinkedObj.stdLigand2["name"][:3]
-        else:
-            aN3 = aNL
+        if tLinkedObj.stdLigand1["compOut"] or tLinkedObj.stdLigand2["compOut"]: 
+            tOutFile.write("data_comp_list\n\n")
+            tOutFile.write("loop_\n")
+            tOutFile.write("_chem_comp.id\n")
+            tOutFile.write("_chem_comp.three_letter_code\n")
+            tOutFile.write("_chem_comp.name\n")
+            tOutFile.write("_chem_comp.group\n")
+            tOutFile.write("_chem_comp.number_atoms_all\n")
+            tOutFile.write("_chem_comp.number_atoms_nh\n")
         
-        aName   = tLinkedObj.stdLigand2["list"]["name"]
-        aNameL  = len(aName) + 6
-        aGrp    = tLinkedObj.stdLigand2["list"]["group"]
-        NA      = tLinkedObj.stdLigand2["list"]["number_atoms_all"]
-        NAH     = tLinkedObj.stdLigand2["list"]["number_atoms_nh"]
-        aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
-        tOutFile.write(aL) 
-        tOutFile.write("\n")
+        if tLinkedObj.stdLigand1["compOut"] :    
+            aNL = tLinkedObj.stdLigand1["name"]
+            aN3 =""
+            if len(aNL) >= 3:
+                aN3 = tLinkedObj.stdLigand1["name"][:3]
+            else:
+                aN3 = aNL
+            aName   = tLinkedObj.stdLigand1["list"]["name"]
+            aNameL  = len(aName) + 6
+            aGrp    = tLinkedObj.stdLigand1["list"]["group"]
+            NA      = tLinkedObj.stdLigand1["list"]["number_atoms_all"]
+            NAH     = tLinkedObj.stdLigand1["list"]["number_atoms_nh"]
+            aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
+            tOutFile.write(aL) 
+        
+        if tLinkedObj.stdLigand2["compOut"]:          
+            aNL = tLinkedObj.stdLigand2["name"]
+            aN3 =""
+            if len(aNL) >= 3:
+                aN3 = tLinkedObj.stdLigand2["name"][:3]
+            else:
+                aN3 = aNL
+        
+            aName   = tLinkedObj.stdLigand2["list"]["name"]
+            aNameL  = len(aName) + 6
+            aGrp    = tLinkedObj.stdLigand2["list"]["group"]
+            NA      = tLinkedObj.stdLigand2["list"]["number_atoms_all"]
+            NAH     = tLinkedObj.stdLigand2["list"]["number_atoms_nh"]
+            aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
+            tOutFile.write(aL) 
+        if tLinkedObj.stdLigand1["compOut"] or tLinkedObj.stdLigand2["compOut"]: 
+            tOutFile.write("\n")
                  
     def outModList(self, tOutFile, tLinkedObj):
 

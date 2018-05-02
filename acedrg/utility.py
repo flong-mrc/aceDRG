@@ -140,6 +140,56 @@ def splitLineSpa(tLine):
 
     return reStrs 
 
+def aLineToAlist(tL, tList):
+
+    aTS = ""
+    l0  = False
+    l1  = False
+    l2  = False   
+
+    for aS in tL:
+        aS = aS.strip()
+        if len(aS) !=0:
+            if aS.find("\"") !=-1:
+                if l2:
+                    aTS = "\"" + aTS + "\""
+                    tList.append(aTS.strip())
+                    aTS = ""
+                    l2  = False
+                elif l1:
+                    aTS = aTS + aS
+                else:
+                    l2 = True
+                    l1 = False
+            elif aS.find("\'") !=-1:
+                if l1:
+                    aTS = "\'" + aTS + "\'"
+                    tList.append(aTS)
+                    aTS = ""
+                    l1  = False
+                elif l2:
+                    aTS = aTS + aS
+                else:
+                    l1 = True
+                    l2  = False
+            else:
+                if not l0 and not l1 and not l2:
+                    l0 = True
+                aTS = aTS + aS
+        else:
+            if l2 or l1:
+                aTS = aTS + " "
+                #print "\"" + aTS + "\""
+            elif l0:
+                if len(aTS):
+                    tList.append(aTS.strip())
+                    aTS = ""
+                    l0  = False
+            else:
+                l0  = True
+    if aTS != "":
+        tList.append(aTS.strip())    
+
 def splitLineSpa2(tLine):
 
     reStrs = []
