@@ -1496,6 +1496,7 @@ class Acedrg(CExeCode ):
             #    print "FValue: ", aPair[0], "  File name ", aPair[1]  
             if self.numConformers==1: 
                 #print "Come to output final info"
+               
                 self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             else:
                 for i in range(self.numConformers):

@@ -39,6 +39,7 @@ from utility  import listCompAcd
 from utility  import setBoolDict
 from utility  import splitLineSpa
 from utility  import splitLineSpa2
+from utility  import aLineToAlist
 
 class FileTransformer :
 
@@ -184,6 +185,10 @@ class FileTransformer :
  
             # check
             """
+            if len(self.dataDescriptor.keys()):
+                for aK in self.dataDescriptor.keys():
+                    print "Key : ", aK
+                    print "values ", self.dataDescriptor[aK]
             idKey = "_chem_comp_atom.atom_id"
             for aAtom in self.atoms:
                 if aAtom.has_key(idKey):
@@ -194,6 +199,7 @@ class FileTransformer :
                         print "label : ", aKey, " Value : ", aAtom[aKey]
                     print "==============================="
             """
+        
 
     def TmpChemCheck(self):
 
@@ -259,7 +265,9 @@ class FileTransformer :
         bondProp = {}
         for aPair in t2ColLines:
             if aPair[0].find("_chem_comp.") !=-1:
-               self.dataDescriptor[iC]=[aPair[0], aPair[1]]    
+               self.dataDescriptor[iC]=[aPair[0], aPair[1]]
+               #print "aPair[0] ", aPair[0]
+               #print "aPair[1] ", aPair[1]    
                iC+=1
             elif aPair[0].find("_chem_comp_atom.") !=-1:
                 atomProp[aPair[0]] = aPair[1]
@@ -389,6 +397,7 @@ class FileTransformer :
         print aSt
         print "\n" 
         """
+       
 
     def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):
 
@@ -1404,7 +1413,7 @@ class FileTransformer :
                 else:
                     l0  = True
         if aTS != "":
-            tList.append(aTS.strip())        
+            tList.append(aTS.strip())    
 
     def mol2Reader(self, tFileName):
         """Read a file of mol2 for name matching purpose"""
@@ -1667,16 +1676,14 @@ class Ccp4MmCifObj (dict) :
             if len(aL) !=0:
                 aStrSet = [] 
                 if tKW =="list":
-                    aStrSet = splitLineSpa2(aL)
-                    print aL
-                    print aStrSet
+                    aLineToAlist(aL, aStrSet)
                 else:
                     aStrSet = splitLineSpa(aL)
                 for aStr in aStrSet:
                     if aStr.strip()[0] =="_":
                         aKeySet.append(aStr)
-                        if tKW =="list":
-                            print aKeySet
+                        #if tKW =="list":
+                        #    print aKeySet
                     else:
                         aValueSet.append(aStr)
 
