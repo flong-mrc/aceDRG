@@ -62,7 +62,7 @@ class Acedrg(CExeCode ):
 
         if len(sys.argv)==1:
             print "Look for help: %s -h "%(os.path.basename(sys.argv[0]))
-       
+
         self.versionInfo       = {}
 
         self.errMessage       = []
@@ -1803,6 +1803,7 @@ class Acedrg(CExeCode ):
                                 aL1 = monoId + aL[3:]
                                 tOutCif.write(aL1)
                     
+                    aPos = len(monoId)   
                     if tStrDescriptors and tStrDescriptors.has_key("props") and len(tStrDescriptors["props"]) !=0:
                         aSetChars = ["#", ";", "\""]
                         tOutCif.write("loop_"+"\n")
@@ -1810,7 +1811,7 @@ class Acedrg(CExeCode ):
                             tOutCif.write(aL+"\n")
                         for aL in tStrDescriptors["entries"]:
                             if len(aL.strip()) >0 and not aL[0] in aSetChars: 
-                                aL1 = monoId + aL[3:]
+                                aL1 = monoId + aL[aPos:]
                             else:
                                 aL1 = aL
                             tOutCif.write(aL1+"\n")
@@ -2515,7 +2516,6 @@ class Acedrg(CExeCode ):
         if self.workMode == 61:
 
             aAAdir = os.path.join(self.acedrgTables, "AminoAcids")
-            
             if os.path.isdir(aAAdir):
                 aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
             else:
