@@ -1751,7 +1751,6 @@ class Ccp4MmCifObj (dict) :
                         self["ccp4CifObj"]["comps"][tName]["planes"][aPlAtm["plane_id"]] = []
                     self["ccp4CifObj"]["comps"][tName]["planes"][aPlAtm["plane_id"]].append(aPlAtm)
    
-
     def printOneComp(self, tName):
 
         if self["ccp4CifObj"]["comps"].has_key(tName):

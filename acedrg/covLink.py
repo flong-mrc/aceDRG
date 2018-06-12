@@ -1282,6 +1282,7 @@ class CovLinkGenerator(CExeCode):
                     self.setOneMonomer(tLinkIns.stdLigand2)
                     #print "output comp 2 ", tLinkIns.stdLigand2["outComp"]
 
+
             if not self.errLevel:
                 print "##################################################################"
                 print "#                                                                #"
@@ -1313,7 +1314,6 @@ class CovLinkGenerator(CExeCode):
         
     def setOneCompFromCif(self, tFileName, tMonomer):
      
-        print "UserIn ", tFileName
         # Using the input file or the file in ccp4 monomer lib as it is
         aMmcifObj = Ccp4MmCifObj(tFileName)
         if not aMmcifObj["errLevel"]:
@@ -1342,7 +1342,6 @@ class CovLinkGenerator(CExeCode):
                     print "aNewCif ", aNewCif 
                     if os.path.isfile(aNewCif):
                         aMmcifObj = Ccp4MmCifObj(aNewCif)
-                        
                         if aMmcifObj["ccp4CifObj"]["comps"].has_key(tMonomer["name"]):
                             tMonomer["comp"]  = aMmcifObj["ccp4CifObj"]["comps"][tMonomer["name"]]
                             self.selectHAtoms(tMonomer["comp"])   
@@ -1368,7 +1367,78 @@ class CovLinkGenerator(CExeCode):
                     if not self.errMessage.has_key(self.errLevel):
                         self.errMessage[self.errLevel] = []
                     self.errMessage[self.errLevel].append("One of residues is  without name\n")
+              
+            if not self.errLevel and tMonomer["comp"].has_key("bonds"):
+     
+                self.checkDelocAndAromaBonds(tMonomer["comp"], tMonomer["name"])
+                  
 
+    def checkDelocAndAromaBonds(self, tCompMonomer, tName):
+
+        # check if a bond has the type of "deloc"
+
+        allDelocBs = []
+        if tCompMonomer.has_key("bonds") and tCompMonomer.has_key("atoms"):
+            for iB in range(len(tCompMonomer["bonds"])):
+                if tCompMonomer["bonds"][iB].has_key("type"): 
+                    if tCompMonomer["bonds"][iB]["type"].upper().find("DELOC") != -1\
+                       or tCompMonomer["bonds"][iB]["type"].upper().find("AROMATIC") != -1:
+                        self.errLevel = 12
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        aLine  = "The component %s.cif contains a deloc or aromatic bond. It needs to be kekulized.\n"%tName
+                        aLine += "You could use acedrg to do kekulization of the bonds.\n"
+                        aLine += "Try getting %s.cif from PDB/CCD and then use it as an input file\n"%tName
+                        aLine += "to run acedrg to generate a cif file for the ligand description.\n"
+                        aLine += "e.g. You get the file %s.cif from PDB/CCD and then,\n"%tName
+                        aLine += "acedrg -c %s.cif -o  %s_fromAcedrg \n"%(tName, tName)
+                        aLine += "After that, you can put the newly generated %s_fromAcedrg.cif\n"%tName
+                        aLine += "into the instruction file %s, which contains(in one line), e.g. \n"%"instruc.txt"
+                        aLine += "LINK: RES-NAME-1 MUR FILE-1 MUR_fromAcedrg.cif ATOM-NAME-1 C8 RES-NAME-2 HIS ATOM-NAME-2 N DELETE ATOM O9 1\n"
+                        aLine += "Then run acedrg again to generate the link description, e.g. \n"
+                        aLine += "acedrg -L %s   -o xxxxx(anyname) \n"%"instruct.txt" 
+                        aLine += "The file generated for the link description is xxxxx_link.cif \n" 
+                        self.errMessage[self.errLevel].append(aLine) 
+                        break
+                        """
+                        if tCompMonomer["bonds"][iB]["type"].upper().find("DELOC") != -1:
+                            self.modOneDelocBond(iB, tCompMonomer)
+                        print "a deloc bond: "
+                        print "atom 1 ",  tCompMonomer["bonds"][iB]["atom_id_1"], " element ",tCompMonomer["atoms"][idxAtm1]["type_symbol"]
+                        print "atom 2 ",  tCompMonomer["bonds"][iB]["atom_id_2"], " element ",tCompMonomer["atoms"][idxAtm2]["type_symbol"]
+                        print "bond type ", tCompMonomer["bonds"][iB]["type"]
+                        """
+    def modOneDelocBond(self, tIdxBond, tCompMonomer):
+
+        lDone = False
+
+        idxAtm1 = self.getAtomById(tCompMonomer["bonds"][iB]["atom_id_1"], tCompMonomer["atoms"])
+        idxAtm2 = self.getAtomById(tCompMonomer["bonds"][iB]["atom_id_2"], tCompMonomer["atoms"])
+        if idxAtm1 !=-1 and idxAtm2 !=-1:
+            if tCompMonomer["atoms"][idxAtm1]["type_symbol"] == "O":
+                 allDelocBs.append([iB,idxAtm2, idxAtm1])
+            elif tCompMonomer["atoms"][idxAtm2]["type_symbol"] == "O": 
+                 allDelocBs.append([iB,idxAtm1, idxAtm2])
+            else:
+                self.errLevel = 12
+                self.errMessage[self.errLevel].append("%s or %s does not exist \n")\
+                      %(tCompMonomer["bonds"][iB]["atom_id_1"], tCompMonomer["bonds"][iB]["atom_id_2"])
+
+        
+
+    def getAtomById(self, tId, atoms):
+
+        aRet = -1
+       
+        for iA in range(len(atoms)):
+            if tId == atoms[iA]["atom_id"] :
+                aRet = iA
+                break
+
+        return aRet
+        
+           
+    
     def selectHAtoms(self, tMonomer):
 
         tMonomer["hAtoms"] = []
