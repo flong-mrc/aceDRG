@@ -178,7 +178,6 @@ class FileTransformer :
 
             if len(all2ColLines) !=0:
                 self.parserAll2Cols(all2ColLines)
-
             self.TmpChemCheck()
             
             self.selectAtomCoordinates()
@@ -1750,7 +1749,15 @@ class Ccp4MmCifObj (dict) :
                     if not self["ccp4CifObj"]["comps"][tName]["planes"].has_key(aPlAtm["plane_id"]):
                         self["ccp4CifObj"]["comps"][tName]["planes"][aPlAtm["plane_id"]] = []
                     self["ccp4CifObj"]["comps"][tName]["planes"][aPlAtm["plane_id"]].append(aPlAtm)
-   
+  
+    def checkBlockCompsExist(self):
+        
+        if len(self["ccp4CifObj"]["comps"])==0 :
+            self["errLevel"]   = 2           
+            self["errMessage"]  =  "%s does not have required file format for the component!\n"%self["inCif"]
+            self["errMessage"] +=  "The component mmcif file should have the same format\n"
+            self["errMessage"] +=  "as those mmcif in CCP4 monomer lib\n" 
+ 
     def printOneComp(self, tName):
 
         if self["ccp4CifObj"]["comps"].has_key(tName):

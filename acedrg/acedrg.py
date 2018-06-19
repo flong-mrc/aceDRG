@@ -1578,10 +1578,13 @@ class Acedrg(CExeCode ):
             cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
             for aL in tDataDescriptor:
                 if aL[0].find("_")==-1:
-                    aNewL = "%s%s"%(monoId.ljust(8),monoId.ljust(8))+ aL[15:]
+                    if len(monoId) < 3:
+                        aNewL = "%s%s"%(monoId.ljust(6),monoId.ljust(6))+ aL[10:]
+                    else:
+                        aNewL = "%s%s"%(monoId.ljust(8),monoId.ljust(8))+ aL[15:]
                     cifCont['head'].append(aNewL+"\n")   
                 else:
-                    cifCont['head'].append(aL+"\n")   
+                    cifCont['head'].append(aL+"\n")
             cifCont['head'].append("#\n")
             # monoId = tDataDescriptor[-1].strip().split()[0]
             cifCont['head'].append("data_comp_%s\n"%monoId)
@@ -2082,7 +2085,8 @@ class Acedrg(CExeCode ):
 
 
     def executeWithRDKit(self):
-        
+       
+ 
         self.printJobs()
         self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
@@ -2097,7 +2101,7 @@ class Acedrg(CExeCode ):
                 self.getAAOut()
             elif os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode)\
                  and not self.isAA:
-                # The input file is an mmcif file     
+                # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor) 

@@ -288,6 +288,10 @@ class CovLinkGenerator(CExeCode):
                 self.errMessage[self.errLevel].append("Check your instruction file")
 
         if self.errLevel:
+            print "====================================================================="
+            print "| Your job stoped because of the following errors:                  |"
+            print "====================================================================="
+
             self.errFileName = self.outRoot + "_errorInfo.txt"
             errF = open(self.errFileName, "w")
             for aKey in sorted(self.errMessage.iterkeys()):
@@ -1316,14 +1320,18 @@ class CovLinkGenerator(CExeCode):
      
         # Using the input file or the file in ccp4 monomer lib as it is
         aMmcifObj = Ccp4MmCifObj(tFileName)
+        aMmcifObj.checkBlockCompsExist()
         if not aMmcifObj["errLevel"]:
-            #print aMmcifObj["ccp4CifObj"].keys()
+            print aMmcifObj["ccp4CifObj"].keys()
+            print aMmcifObj["ccp4CifObj"]["comps"].keys()
             if aMmcifObj["ccp4CifObj"]["comps"].has_key(tMonomer["name"]):
                 tMonomer["outComp"] = True
                 tMonomer["comp"] = aMmcifObj["ccp4CifObj"]["comps"][tMonomer["name"]]
                 if (not tMonomer["userIn"]) and (tMonomer["name"].upper() in self.chemCheck.aminoAcids):
                     self.chemCheck.tmpModiN_in_AA(tMonomer["name"].upper(), tMonomer["comp"])
-                self.selectHAtoms(tMonomer["comp"])    
+                self.selectHAtoms(tMonomer["comp"])   
+                #print aMmcifObj["ccp4CifObj"]["lists"]["comp"].keys()
+    
                 tMonomer["list"] = aMmcifObj["ccp4CifObj"]["lists"]["comp"][tMonomer["name"]]
                 #print tMonomer["list"]
                 dataHead = "data_comp_%s"%tMonomer["name"]
@@ -1371,7 +1379,12 @@ class CovLinkGenerator(CExeCode):
             if not self.errLevel and tMonomer["comp"].has_key("bonds"):
      
                 self.checkDelocAndAromaBonds(tMonomer["comp"], tMonomer["name"])
-                  
+        else:
+            self.errLevel = aMmcifObj["errLevel"]
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append(aMmcifObj["errMessage"])
+          
 
     def checkDelocAndAromaBonds(self, tCompMonomer, tName):
 
@@ -2943,8 +2956,6 @@ class CovLinkGenerator(CExeCode):
         tOutFile.write("\n")
 
     def outAllComps(self, tOutFile, tLinkedObj):
-        print "L1 ", tLinkedObj.stdLigand1["compOut"]
-        print "L2 ", tLinkedObj.stdLigand2["compOut"]
         if tLinkedObj.stdLigand1["dataBlock"] and tLinkedObj.stdLigand1["outComp"] and tLinkedObj.stdLigand1["compOut"]:
             self.outOneComp(tOutFile, tLinkedObj.stdLigand1)
         if tLinkedObj.stdLigand2["dataBlock"] and tLinkedObj.stdLigand2["outComp"] and tLinkedObj.stdLigand2["compOut"]:
