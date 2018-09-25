@@ -188,6 +188,11 @@ namespace LIBMOL
                     iAt->chiralIdx  = 0;
                     iAt->bondingIdx = 2;
                 } 
+                else if (t_len==1)
+                {
+                    iAt->chiralIdx  = 0;
+                    iAt->bondingIdx = 1;
+                }
             }
             else if (iAt->chemType.compare("O")==0)
             {
@@ -219,8 +224,16 @@ namespace LIBMOL
                         iAt->chiralIdx  = 2;
                     }
                     
-                    iAt->bondingIdx = 2; 
+                    iAt->bondingIdx = 3; 
                 }
+                
+                if (iAt->chemType.compare("P")==0 &&
+                    t_len==5)
+                {
+                    iAt->chiralIdx  = 2;    
+                    iAt->bondingIdx = 3;
+                }
+                
             }
             else if (iAt->chemType.compare("S")==0 || iAt->chemType.compare("SE")==0
                      || iAt->chemType.compare("Se")==0)
@@ -233,6 +246,11 @@ namespace LIBMOL
                         iAt->chiralIdx  = 2;
                     }
                     iAt->bondingIdx = 3; 
+                }
+                else if (t_len==6)
+                {
+                    iAt->chiralIdx = 0;
+                    iAt->bondingIdx = 5;
                 }
                 /*
                 else if (t_len==2)
@@ -418,7 +436,7 @@ namespace LIBMOL
         }
   
         // Check
-        /*
+        
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -430,6 +448,8 @@ namespace LIBMOL
                       << " and is with bond index "
                       << iAt->bondingIdx << std::endl;
         }
+        
+        /*
         
         
         std::cout << "Chiral and plane feather for atoms in the system" 

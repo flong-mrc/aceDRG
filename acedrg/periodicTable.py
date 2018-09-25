@@ -41,7 +41,9 @@ class PeriodicTab(dict):
         self["N"]["group"]     = 15 
         self["N"]["matType"]   = 2 
         self["N"]["atomNum"]   = 7 
-        self["N"]["val"]       = 5 
+        self["N"]["val"]       = 3 
+        self["N"]["extraVal"]  = []
+        self["N"]["extraVal"].append(5)
       
          
         self["O"]              = {}
@@ -57,6 +59,8 @@ class PeriodicTab(dict):
         self["P"]["matType"]   = 2 
         self["P"]["atomNum"]   = 15 
         self["P"]["val"]       = 5 
+        self["P"]["extraVal"]  = []
+        self["P"]["extraVal"].append(3)
         
         self["S"]              = {}
         self["S"]["row"]       = 3 

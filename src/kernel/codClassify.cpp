@@ -9499,6 +9499,7 @@ namespace LIBMOL
         DefaultOrgAngles[1] = 180.000;
         DefaultOrgAngles[2] = 120.000;
         DefaultOrgAngles[3] = 109.471; 
+        
     }
     
     void CodClassify::setDefaultCoordGeos()
@@ -12879,6 +12880,10 @@ namespace LIBMOL
                     iAN->numCodValues  = 0;
                     iAN-> approxLevel = 6;
                     lDef = true;
+                }
+                else if (allAtoms[iAN->atoms[0]].bondingIdx==5)
+                {
+                    
                 }
                 else
                 {
