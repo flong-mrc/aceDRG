@@ -397,6 +397,10 @@ namespace LIBMOL
                         tAtom.ccp4Type ="NH2";
                     }
                 }
+                else if (tAtom.connHAtoms.size() == 1)
+                {
+                    tAtom.ccp4Type = "NSP";
+                }
                 else if (tAtom.connHAtoms.size() ==0)
                 {
                     if (tAtom.connAtoms.size() == 2 && R6)
@@ -435,7 +439,7 @@ namespace LIBMOL
             }
             else if (tAtom.bondingIdx==1)
             {
-                tAtom.ccp4Type = "NS";
+                tAtom.ccp4Type = "NSP";
             }
             
         }  
@@ -701,19 +705,20 @@ namespace LIBMOL
         }
         
         
-        //std::cout << "Atom Name " << tAtom.id << " bonding index " 
-        //              << tAtom.bondingIdx << std::endl;
-        //std::cout << "Its element type " << tAtom.chemType << std::endl;
+        std::cout << "Atom Name " << tAtom.id << " bonding index " 
+                      << tAtom.bondingIdx << std::endl;
+        std::cout << "Its element type " << tAtom.chemType << std::endl;
         
-        //if (!tAtom.codClass.empty())
-        //{
-            //std::cout << " Cod type" << tAtom.codClass << std::endl; 
-        //}
-        //else
-        //{
-            //std::cout << std::endl;
-        //}
-        //std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
+        if (!tAtom.codClass.empty())
+        {
+            std::cout << " Cod type" << tAtom.codClass << std::endl; 
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
+        std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
+        
     }
     
     void CCP4AtomType::SetAlkaliMetalsAtomCCP4Type(AtomDict& tAtom)

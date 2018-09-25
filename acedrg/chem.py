@@ -345,7 +345,6 @@ class ChemCheck():
 
         return totalOr
 
-    
     def checkLocalStructAndCharge(self, tAtomId, tAtoms,  tBondSet1, tBondSet2):
 
         # For a linked atom, the environment mostly changes.

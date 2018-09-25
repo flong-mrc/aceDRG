@@ -1042,6 +1042,10 @@ class AcedrgRDKit():
         aErrDict["needMod"]    = []
         aErrDict["unMod"]      = []
         self.furtherCheckValForAllAtoms(tMol, aErrDict)
+        if len(aErrDict["wrongOrder"]) > 0:
+            for aErr in aErrDict["wrongOrder"]:
+                print aErr
+            sys.exit()
         if len(aErrDict["needMod"]) > 0:
             print "Number of atoms need to modified ", len(aErrDict["needMod"])
             for aGrp in aErrDict["needMod"]:
@@ -1189,18 +1193,23 @@ class AcedrgRDKit():
     def furtherCheckValForAllAtoms(self, tMol, tErrDict):
         # Temp for bugs appear in RDKit
         # Should be used after the molecule has been kekulized
+        checkElems1 = ["I", "P"]
+        checkElems2 = ["S", "Se"]
         allAtoms = tMol.GetAtoms() 
         for aAtom in allAtoms:
             # Temporally, just for element S and Se
-            if aAtom.GetSymbol().strip() =="S" or aAtom.GetSymbol().strip() =="Se":
+            aElem = aAtom.GetSymbol().strip()
+            if aElem in checkElems1 or aElem in checkElems2 :
                 elm    = self.periodicTab.standlizeSymbol(aAtom.GetSymbol().strip())
                 if not elm or not self.periodicTab.has_key(elm):
                     tErrDict["notExist"].append(aAtom)
                 else:
                     aTotalOrder = aAtom.GetTotalValence()
                     self.checkBondOrderAndAllowedVal(aAtom, elm, aTotalOrder, tErrDict)                 
-                
+     
     def checkBondOrderAndAllowedVal(self, tAtom, tElm, tOrd, tErrDict):
+        checkElems1 = ["I", "P"]
+        checkElems2 = ["S", "Se"]
         val    = self.periodicTab[tElm]["val"]
         charge = tAtom.GetFormalCharge()
         idx    = tAtom.GetIdx()
@@ -1209,6 +1218,7 @@ class AcedrgRDKit():
         if val > 4:
             actV = 8-val
         allowOrd = actV+charge 
+        print "Total bond order calculated from th bonds ", tOrd
         print "Default allowed bond order ", allowOrd  
         if tOrd != allowOrd :
             if self.periodicTab[tElm].has_key("extraVal"):
@@ -1221,12 +1231,14 @@ class AcedrgRDKit():
                     print "ExtraAllowed total bond order ",  aV+charge
                 aExtraAllow.sort()
                 if not tOrd in aExtraAllow:
-                    for aMV in aExtraAllow:
-                        if aMV > tOrd:
-                            tErrDict["needMod"].append([(aMV-tOrd),idx])
-                            lMod = True
-                            break
-                           
+                    if tElem in checkElems2:
+                        for aMV in aExtraAllow:
+                            if aMV > tOrd:
+                                tErrDict["needMod"].append([(aMV-tOrd),idx])
+                                lMod = True
+                                break
+                    elif tElem in checkElems1:
+                        tErrDict["wrongOrder"].append("Check, wrong valence on atom "+ tAtom.GetProp("Name") + " !")       
                 if not lMod:
                     tErrDict["unMod"].append(tAtom)
         
