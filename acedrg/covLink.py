@@ -1463,13 +1463,14 @@ class CovLinkGenerator(CExeCode):
     def setOneMonomer(self, tMonomer):
 
         if os.path.isfile(tMonomer["inCif"]):
+            print tMonomer["inCif"]
             aNL = tMonomer["name"].upper()
             if len(aNL) > 3:
                 aNL = "UNL"
             self._log_name  = os.path.join(self.scrDir, aNL + "_for_link.log")
             self.subRoot    = os.path.join(self.scrDir, aNL + "_for_link")
             self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)   
-            #print self._cmdline
+            print self._cmdline
             self.runExitCode = self.subExecute()
             if not self.runExitCode :
                 aOutLigCif = self.subRoot + ".cif"
@@ -1500,7 +1501,22 @@ class CovLinkGenerator(CExeCode):
 
         self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
         self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+        self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+        self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
 
+    def setChargeInLinkAtom(self, tRes, tMod, tLinkBonds):
+
+        for idxA in range(len(tRes["remainAtoms"])):
+            if tRes["remainAtoms"][idxA]["atom_id"] == tRes["atomName"]:
+               if tRes["remainAtoms"][idxA]["type_symbol"] != "N":
+                   if tRes["remainAtoms"][idxA].has_key("charge"):
+                       nC = int(tRes["remainAtoms"][idxA]["charge"])
+                       if nC !=0:
+                           if len(tLinkBonds) > 0:
+                               aOr = BondOrderS2N(tLinkBonds[0]["type"])                   
+                               tRes["remainAtoms"][idxA]["charge"] = str(nC+aOr)
+                               
+  
     def setDeletedAtomsForModification(self, tLinkedObj):
         # Not used anymore 
         # Delete atoms as instructed 

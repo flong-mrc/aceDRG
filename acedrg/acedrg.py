@@ -2085,7 +2085,6 @@ class Acedrg(CExeCode ):
 
 
     def executeWithRDKit(self):
-       
  
         self.printJobs()
         self.rdKit.useExistCoords  = self.useExistCoords 
