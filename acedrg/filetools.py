@@ -952,7 +952,7 @@ class FileTransformer :
             for aAtom in tNonHAtoms:
                 self.atoms.append(aAtom)
                 self.nameMapingCifMol["nonH"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
-                print "NameMap ", nAtm, " : ", self.nameMapingCifMol["nonH"][nAtm]
+                #print "NameMap ", nAtm, " : ", self.nameMapingCifMol["nonH"][nAtm]
                 #print "NameMap ", aAtom["_chem_comp_atom.atom_id"]
                 nAtm +=1
             for aAtom in tHAtoms:
@@ -965,7 +965,7 @@ class FileTransformer :
                 if aAtom.has_key("_chem_comp_atom.atom_id"):
                     mapIdNum[aAtom["_chem_comp_atom.atom_id"]] = nAtm
                     nAtm +=1
-                    #print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
+                    print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
                 else:
                     print "Input file bug: no atom_id for atoms!"
                     sys.exit()
@@ -1080,9 +1080,9 @@ class FileTransformer :
                     sys.exit()
                 aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                        sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                #print "The bond between %s of serial number %s and %s of serial number %s is : "\
-                #      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2)
-                #print aBL
+                print "The bond between %s of serial number %s and %s of serial number %s is : "\
+                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2)
+                print aBL
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
 
@@ -1106,11 +1106,13 @@ class FileTransformer :
             if len(chargeAtomList) != 0:
                 aL = "M CHG  %d "%len(chargeAtomList)
                 for aPair in chargeAtomList:
+                    print "atom serial number (mol format)  ", aPair[0], ", its new id ", self.atoms[aPair[0]-1]["_chem_comp_atom.atom_id"]
+                    print "Charge ", aPair[1]
                     aL += " %d  %d "%(aPair[0], aPair[1])
                 tOutFile.write(aL + "\n")          
    
             tOutFile.write("M  END\n")
-   
+
     # Mol files related 
     def CheckElemSymbolsInMolFile(self, tInFileName, tOutFileName):
 
