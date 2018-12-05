@@ -202,7 +202,10 @@ namespace LIBMOL
                 }
                 else if (iAt->connAtoms.size()==1)
                 {
-                    iAt->bondingIdx = 2;
+                    if (tAtoms[iAt->connAtoms[0]].connAtoms.size()!=1)
+                    {      
+                        iAt->bondingIdx = 2;
+                    }
                 }
             }
             else if (iAt->chemType.compare("SI")==0 
