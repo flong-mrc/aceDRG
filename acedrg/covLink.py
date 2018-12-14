@@ -1295,7 +1295,6 @@ class CovLinkGenerator(CExeCode):
                 print "##################################################################"
                 tLinkIns.cLink["name"] = tLinkIns.stdLigand1["name"] + "-" + tLinkIns.stdLigand2["name"]
                 self.buildComboLigand(tLinkIns)
-                print "#  Job done                                                      #"
                 print "##################################################################"
             if not self.errLevel:
                 print "##################################################################"
@@ -1470,7 +1469,7 @@ class CovLinkGenerator(CExeCode):
             self._log_name  = os.path.join(self.scrDir, aNL + "_for_link.log")
             self.subRoot    = os.path.join(self.scrDir, aNL + "_for_link")
             self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)   
-            print self._cmdline
+            #print self._cmdline
             self.runExitCode = self.subExecute()
             if not self.runExitCode :
                 aOutLigCif = self.subRoot + ".cif"
@@ -1866,12 +1865,12 @@ class CovLinkGenerator(CExeCode):
 
         aAtomSet = []
         aBondSet = []
-        print "Number of bonds ", len(tBonds)
+        #print "atom ", tAtomId
+        #print "Number of bonds ", len(tBonds)
         for aBond in tBonds:
             aId1 = aBond["atom_id_1"].strip()
             aId2 = aBond["atom_id_2"].strip()
-            #print "Id1 ", aId1
-            #print "Id2 ", aId2
+            #print "bond between atom ", aId1, " and atom  ", aId2
             if aId1 == tAtomId and not aId2 in tDelAtomIds:
                 aIdx = self.getOneAtomSerialById(aId2, tAtoms)
                 aAtomSet.append(tAtoms[aIdx])
@@ -1882,8 +1881,31 @@ class CovLinkGenerator(CExeCode):
                 aAtomSet.append(tAtoms[aIdx])
                 aBondSet.append(aBond)
                 #print "a bond found "
-        print "Number of bonds ", len(aBondSet)
-        
+        #print "Number of bonds found ", len(aBondSet)
+        return [aAtomSet, aBondSet]      
+
+    def getBondSetForOneAtomByAlias(self, tAtomId, tAtoms, tBonds, tDelAtomIds):
+
+        aAtomSet = []
+        aBondSet = []
+        #print "atom ", tAtomId
+        #print "Number of bonds ", len(tBonds)
+        for aBond in tBonds:
+            aId1 = aBond["atom_id_1_alias"].strip()
+            aId2 = aBond["atom_id_2_alias"].strip()
+            if aId1 == tAtomId and not aId2 in tDelAtomIds:
+                aIdx = self.getOneAtomSerialById(aId2, tAtoms)
+                aAtomSet.append(tAtoms[aIdx])
+                aBondSet.append(aBond)
+                #print "bond between atom ", aId1, " and atom  ", aId2
+                #print "a bond found "
+            if aId2 == tAtomId and not aId1 in tDelAtomIds:
+                aIdx = self.getOneAtomSerialById(aId1, tAtoms)
+                aAtomSet.append(tAtoms[aIdx])
+                aBondSet.append(aBond)
+                #print "bond between atom ", aId1, " and atom  ", aId2
+                #print "a bond found "
+        #print "Number of bonds found ", len(aBondSet)
         return [aAtomSet, aBondSet]      
         
     def getTotalBondOrderInOneMmcifAtom(self, tAtomId, tBonds):
@@ -2146,6 +2168,31 @@ class CovLinkGenerator(CExeCode):
             tmpF.write("-------------------------\n")
             tmpF.close()
 
+    def checkChemInMonomer(self, tMonomer, tMode):
+
+        tDelAtomIds = []
+        for aAtom in tMonomer["atoms"]:
+            atmId = aAtom["atom_id"]
+            atmElm = aAtom["type_symbol"]
+            if tMode == 2:
+                atmId = aAtom["atom_id_alias"]
+            [bondAtomSet, aLABonds] =  self.getBondSetForOneAtomByAlias(atmId, tMonomer["atoms"], tMonomer["bonds"], tDelAtomIds)
+            nTotalVa=self.getTotalBondOrderInOneMmcifAtom(atmId, aLABonds) 
+            aCharge = 0
+            if aAtom.has_key("charge"):
+                aCharge = int(aAtom["charge"])
+            if aCharge != 0: 
+                nTotalVa = nTotalVa - aCharge
+            print "atom ", atmId, "charge ", aCharge, " equiv bond-order ", nTotalVa
+            if self.chemCheck.orgVal.has_key(atmElm):
+                if not nTotalVa in self.chemCheck.orgVal[atmElm]:
+                    self.errLevel    = 45
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    self.errMessage[self.errLevel].append("atom %s in monomer %s has a total valence of %d, which is not allowed!\n"\
+                                                          %(aAtom["atom_id"], aAtom["comp_id"], nTotalVa))
+                    break 
+
     def comboLigToSimplifiedMmcif(self, tMonomer, tOutFName):
       
         try: 
@@ -2268,20 +2315,23 @@ class CovLinkGenerator(CExeCode):
                     print "%s%s%s%s%s"%(aBond["atom_id_1_alias"].ljust(10), aBond["atom_id_2_alias"].ljust(10),\
                                     ("("+aBond["atom_id_1"]).ljust(10), (aBond["atom_id_2"]+ ")").ljust(10), aBond["type"].ljust(10))
                 #self.outTmpComboLigandMap(tLinkedObj)    # Check 
-   
-                tLinkedObj.combLigand["inCif"] = os.path.join(self.scrDir, tLinkedObj.combLigand["name"] + "_comboIn.cif")
-                print "The cif file of the combo-ligand for input ", tLinkedObj.combLigand["inCif"]
-                self.comboLigToSimplifiedMmcif(tLinkedObj.combLigand, tLinkedObj.combLigand["inCif"])
-                self.setOneMonomer(tLinkedObj.combLigand)
+                self.checkChemInMonomer(tLinkedObj.combLigand, 2)
                 if not self.errLevel:
-                    tLinkedObj.outCombLigand["name"] = tLinkedObj.combLigand["name"]
-                    tLinkedObj.outCombLigand["cifObj"] = Ccp4MmCifObj(tLinkedObj.combLigand["outCif"])["ccp4CifObj"]            
-                    print "output comboLigand name ", tLinkedObj.outCombLigand["name"]
-                    print "Number of atoms in the comboLigand : ", len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"])
+                    tLinkedObj.combLigand["inCif"] = os.path.join(self.scrDir, tLinkedObj.combLigand["name"] + "_comboIn.cif")
+                    print "The cif file of the combo-ligand for input ", tLinkedObj.combLigand["inCif"]
+                    self.comboLigToSimplifiedMmcif(tLinkedObj.combLigand, tLinkedObj.combLigand["inCif"])
+                    self.setOneMonomer(tLinkedObj.combLigand)
+                    if not self.errLevel:
+                        tLinkedObj.outCombLigand["name"] = tLinkedObj.combLigand["name"]
+                        tLinkedObj.outCombLigand["cifObj"] = Ccp4MmCifObj(tLinkedObj.combLigand["outCif"])["ccp4CifObj"]            
+                        print "output comboLigand name ", tLinkedObj.outCombLigand["name"]
+                        print "Number of atoms in the comboLigand : ", len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"])
                     
     def getChangesInModificationFromCombLigand(self, tLinkedObj):
 
         for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
+            print aAtom.keys()
+            print aAtom["atom_id"]
             print "Atom %s is in residue %s "%(aAtom["atom_id"], aAtom["res_idx"])
             print "Is it added ? ", aAtom["is_added"]
 
@@ -2396,120 +2446,123 @@ class CovLinkGenerator(CExeCode):
         print "Number of deleted angles in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["angles"]) 
          
         # Torsions
-        for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
-            print "A torsion "
-            print "atom %s in residue %d "%(aTor["atom_id_1"], aTor["atom_id_1_resNum"])   
-            print "atom %s in residue %d "%(aTor["atom_id_2"], aTor["atom_id_2_resNum"])   
-            print "atom %s in residue %d "%(aTor["atom_id_3"], aTor["atom_id_3_resNum"])  
-            print "atom %s in residue %d "%(aTor["atom_id_4"], aTor["atom_id_4_resNum"])  
-            if aTor["atom_id_1_resNum"]==1 and aTor["atom_id_2_resNum"]==1\
-               and aTor["atom_id_3_resNum"]==1 and aTor["atom_id_4_resNum"]==1:
-                if not aTor["atom_id_1"] in addedSet1 and not aTor["atom_id_2"] in addedSet1\
-                   and not aTor["atom_id_3"] in addedSet1 and not aTor["atom_id_4"] in addedSet1: 
-                    self.checkTorMod(tLinkedObj.stdLigand1["remainTors"], aTor, tLinkedObj.modLigand1["changed"]["tors"])
-                else: 
-                    LinkedObj.modLigand1["added"]["tors"].append(aTor)
-            elif aTor["atom_id_1_resNum"]==2 and aTor["atom_id_2_resNum"]==2\
-               and aTor["atom_id_3_resNum"]==2 and aTor["atom_id_4_resNum"]==2:
-                if not aTor["atom_id_1"] in addedSet2 and not aTor["atom_id_2"] in addedSet2\
-                   and not aTor["atom_id_3"] in addedSet2 and not aTor["atom_id_4"] in addedSet2: 
-                    self.checkTorMod(tLinkedObj.stdLigand2["remainTors"], aTor, tLinkedObj.modLigand2["changed"]["tors"])
-                else: 
-                    LinkedObj.modLigand2["added"]["tors"].append(aTor)
+        if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("tors"):
+            for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
+                print "A torsion "
+                print "atom %s in residue %d "%(aTor["atom_id_1"], aTor["atom_id_1_resNum"])   
+                print "atom %s in residue %d "%(aTor["atom_id_2"], aTor["atom_id_2_resNum"])   
+                print "atom %s in residue %d "%(aTor["atom_id_3"], aTor["atom_id_3_resNum"])  
+                print "atom %s in residue %d "%(aTor["atom_id_4"], aTor["atom_id_4_resNum"])  
+                if aTor["atom_id_1_resNum"]==1 and aTor["atom_id_2_resNum"]==1\
+                   and aTor["atom_id_3_resNum"]==1 and aTor["atom_id_4_resNum"]==1:
+                    if not aTor["atom_id_1"] in addedSet1 and not aTor["atom_id_2"] in addedSet1\
+                       and not aTor["atom_id_3"] in addedSet1 and not aTor["atom_id_4"] in addedSet1: 
+                        self.checkTorMod(tLinkedObj.stdLigand1["remainTors"], aTor, tLinkedObj.modLigand1["changed"]["tors"])
+                    else: 
+                        LinkedObj.modLigand1["added"]["tors"].append(aTor)
+                elif aTor["atom_id_1_resNum"]==2 and aTor["atom_id_2_resNum"]==2\
+                   and aTor["atom_id_3_resNum"]==2 and aTor["atom_id_4_resNum"]==2:
+                    if not aTor["atom_id_1"] in addedSet2 and not aTor["atom_id_2"] in addedSet2\
+                       and not aTor["atom_id_3"] in addedSet2 and not aTor["atom_id_4"] in addedSet2: 
+                        self.checkTorMod(tLinkedObj.stdLigand2["remainTors"], aTor, tLinkedObj.modLigand2["changed"]["tors"])
+                    else: 
+                        LinkedObj.modLigand2["added"]["tors"].append(aTor)
     
-        print "Number of changed tors in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["tors"])  
-        print "Number of added tors in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["tors"])  
-        print "Number of deleted tors in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["tors"])  
-        print "Number of changed tors in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["tors"])  
-        print "Number of added tors in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["tors"])  
-        print "Number of deleted tors in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["tors"]) 
+            print "Number of changed tors in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["tors"])  
+            print "Number of added tors in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["tors"])  
+            print "Number of deleted tors in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["tors"])  
+            print "Number of changed tors in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["tors"])  
+            print "Number of added tors in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["tors"])  
+            print "Number of deleted tors in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["tors"]) 
          
         # Chirs
-        for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
-            print "A chiral center "
-            print "atom %s in residue %d "%(aChi["atom_id_centre"], aChi["atom_id_centre_resNum"])  
-            print "atom %s in residue %d "%(aChi["atom_id_1"], aChi["atom_id_1_resNum"])   
-            print "atom %s in residue %d "%(aChi["atom_id_2"], aChi["atom_id_2_resNum"])   
-            print "atom %s in residue %d "%(aChi["atom_id_3"], aChi["atom_id_3_resNum"])  
-            if aChi["atom_id_centre_resNum"] == 1 and aChi["atom_id_1_resNum"] == 1 and\
-               aChi["atom_id_2_resNum"] == 1 and aChi["atom_id_3_resNum"] == 1: 
-                if not aChi["atom_id_centre"] in addedSet1 and not aChi["atom_id_1"] in addedSet1\
-                   and not aChi["atom_id_2"] in addedSet1 and not aChi["atom_id_3"] in addedSet1:
-                    self.checkChiMod(tLinkedObj.stdLigand1["remainChirs"], aChi, tLinkedObj.modLigand1["changed"]["chirs"])
-                else:
-                    tLinkedObj.modLigand1["added"]["chirs"].append(aChi)
-            elif aChi["atom_id_centre_resNum"] == 2 and  aChi["atom_id_1_resNum"] == 2 and\
-                 aChi["atom_id_2_resNum"] == 2 and  aChi["atom_id_3_resNum"] == 2: 
-                if not aChi["atom_id_centre"] in addedSet2 and not aChi["atom_id_1"] in addedSet2\
-                   and not aChi["atom_id_2"] in addedSet2 and not aChi["atom_id_3"] in addedSet2:
-                    self.checkChiMod(tLinkedObj.stdLigand2["remainChirs"], aChi, tLinkedObj.modLigand2["changed"]["chirs"])
-                else:
-                    tLinkedObj.modLigand2["added"]["chirs"].append(aChi)
+        if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("chirs"):
+            for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
+                print "A chiral center "
+                print "atom %s in residue %d "%(aChi["atom_id_centre"], aChi["atom_id_centre_resNum"])  
+                print "atom %s in residue %d "%(aChi["atom_id_1"], aChi["atom_id_1_resNum"])   
+                print "atom %s in residue %d "%(aChi["atom_id_2"], aChi["atom_id_2_resNum"])   
+                print "atom %s in residue %d "%(aChi["atom_id_3"], aChi["atom_id_3_resNum"])  
+                if aChi["atom_id_centre_resNum"] == 1 and aChi["atom_id_1_resNum"] == 1 and\
+                   aChi["atom_id_2_resNum"] == 1 and aChi["atom_id_3_resNum"] == 1: 
+                    if not aChi["atom_id_centre"] in addedSet1 and not aChi["atom_id_1"] in addedSet1\
+                       and not aChi["atom_id_2"] in addedSet1 and not aChi["atom_id_3"] in addedSet1:
+                        self.checkChiMod(tLinkedObj.stdLigand1["remainChirs"], aChi, tLinkedObj.modLigand1["changed"]["chirs"])
+                    else:
+                        tLinkedObj.modLigand1["added"]["chirs"].append(aChi)
+                elif aChi["atom_id_centre_resNum"] == 2 and  aChi["atom_id_1_resNum"] == 2 and\
+                     aChi["atom_id_2_resNum"] == 2 and  aChi["atom_id_3_resNum"] == 2: 
+                    if not aChi["atom_id_centre"] in addedSet2 and not aChi["atom_id_1"] in addedSet2\
+                       and not aChi["atom_id_2"] in addedSet2 and not aChi["atom_id_3"] in addedSet2:
+                        self.checkChiMod(tLinkedObj.stdLigand2["remainChirs"], aChi, tLinkedObj.modLigand2["changed"]["chirs"])
+                    else:
+                        tLinkedObj.modLigand2["added"]["chirs"].append(aChi)
 
-        print "Number of changed chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["chirs"])  
-        print "Number of added chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["chirs"])  
-        print "Number of deleted chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["chirs"])  
-        print "Number of changed chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["chirs"])  
-        print "Number of added chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["chirs"])  
-        print "Number of deleted chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["chirs"]) 
+            print "Number of changed chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["chirs"])  
+            print "Number of added chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["chirs"])  
+            print "Number of deleted chirs in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["chirs"])  
+            print "Number of changed chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["chirs"])  
+            print "Number of added chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["chirs"])  
+            print "Number of deleted chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["chirs"]) 
          
         # Planes
-        for aPl in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys():
-            print "For plane ", aPl
-            inRes1 = []
-            inRes2 = []
-            nAtmInPl = len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl])
-            for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl]:
-                print "atom %s in residue %d "%(aAtom["atom_id"], aAtom["atom_id_resNum"])
-                if aAtom["atom_id_resNum"]== 1:
-                    inRes1.append(aAtom["atom_id"])
-                elif aAtom["atom_id_resNum"]== 2:
-                    inRes2.append(aAtom["atom_id"])
-            if len(inRes1) == nAtmInPl:
-                self.checkPlMod(tLinkedObj.stdLigand1["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
-                                tLinkedObj.modLigand1["deleted"]["planes"], tLinkedObj.modLigand1["added"]["planes"]) 
-            elif len(inRes2) == nAtmInPl:
-                self.checkPlMod(tLinkedObj.stdLigand2["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
+        if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("planes"):
+            for aPl in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys():
+                print "For plane ", aPl
+                inRes1 = []
+                inRes2 = []
+                nAtmInPl = len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl])
+                for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl]:
+                    print "atom %s in residue %d "%(aAtom["atom_id"], aAtom["atom_id_resNum"])
+                    if aAtom["atom_id_resNum"]== 1:
+                        inRes1.append(aAtom["atom_id"])
+                    elif aAtom["atom_id_resNum"]== 2:
+                        inRes2.append(aAtom["atom_id"])
+                if len(inRes1) == nAtmInPl:
+                    self.checkPlMod(tLinkedObj.stdLigand1["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
+                                    tLinkedObj.modLigand1["deleted"]["planes"], tLinkedObj.modLigand1["added"]["planes"]) 
+                elif len(inRes2) == nAtmInPl:
+                    self.checkPlMod(tLinkedObj.stdLigand2["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
                                 tLinkedObj.modLigand2["deleted"]["planes"], tLinkedObj.modLigand2["added"]["planes"])
      
-        nDP1 = len(tLinkedObj.modLigand1["deleted"]["planes"])   
-        nAP1 = len(tLinkedObj.modLigand1["added"]["planes"])
-        nDP2 = len(tLinkedObj.modLigand2["deleted"]["planes"])   
-        nAP2 = len(tLinkedObj.modLigand2["added"]["planes"])
-        print "For residue 1 : "
-        print "Number of deleted planes ", nDP1
-        if nDP1:
-            print "They are : "
-            for aPl in tLinkedObj.modLigand1["deleted"]["planes"]:
-                print "----------- A plane -------------"
-                for aPlAtm in aPl:
-                    print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
-            print "------------------ -------------"
-        print "Number of added planes ", nAP1
-        if nAP1:
-            print "They are : "
-            for aPl in tLinkedObj.modLigand1["added"]["planes"]:
-                print "----------- A plane -------------"
-                for aPlAtm in aPl:
-                    print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
-            print "------------------ -------------"
-        print "\nFor residue 2 : "
-        print "Number of deleted planes ", nDP2
-        if nDP2:
-            print "They are : "
-            for aPl in tLinkedObj.modLigand2["deleted"]["planes"]:
-                print "----------- A plane -------------"
-                for aPlAtm in aPl:
-                    print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
-            print "------------------ -------------"
-        print "Number of added planes ", nAP2
-        if nAP2:
-            print "They are : "
-            for aPl in tLinkedObj.modLigand2["added"]["planes"]:
-                print "----------- A plane -------------"
-                for aPlAtm in aPl:
-                    print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
-            print "------------------ -------------"
+            nDP1 = len(tLinkedObj.modLigand1["deleted"]["planes"])   
+            nAP1 = len(tLinkedObj.modLigand1["added"]["planes"])
+            nDP2 = len(tLinkedObj.modLigand2["deleted"]["planes"])   
+            nAP2 = len(tLinkedObj.modLigand2["added"]["planes"])
+            print "For residue 1 : "
+            print "Number of deleted planes ", nDP1
+            if nDP1:
+                print "They are : "
+                for aPl in tLinkedObj.modLigand1["deleted"]["planes"]:
+                    print "----------- A plane -------------"
+                    for aPlAtm in aPl:
+                        print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
+                print "------------------ -------------"
+            print "Number of added planes ", nAP1
+            if nAP1:
+                print "They are : "
+                for aPl in tLinkedObj.modLigand1["added"]["planes"]:
+                    print "----------- A plane -------------"
+                    for aPlAtm in aPl:
+                        print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
+                print "------------------ -------------"
+            print "\nFor residue 2 : "
+            print "Number of deleted planes ", nDP2
+            if nDP2:
+                print "They are : "
+                for aPl in tLinkedObj.modLigand2["deleted"]["planes"]:
+                    print "----------- A plane -------------"
+                    for aPlAtm in aPl:
+                        print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
+                print "------------------ -------------"
+            print "Number of added planes ", nAP2
+            if nAP2:
+                print "They are : "
+                for aPl in tLinkedObj.modLigand2["added"]["planes"]:
+                    print "----------- A plane -------------"
+                    for aPlAtm in aPl:
+                        print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
+                print "------------------ -------------"
         
         
         
@@ -2734,21 +2787,22 @@ class CovLinkGenerator(CExeCode):
             aTor["atom_id_4_alias"] = aTor["atom_id_4"]
             [aTor["atom_id_4_resNum"], aTor["atom_id_4"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aTor["atom_id_4_alias"]) 
 
-        for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
-            aChi["atom_id_centre_alias"] = aChi["atom_id_centre"]
-            [aChi["atom_id_centre_resNum"], aChi["atom_id_centre"]]=\
-                              self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_centre_alias"])  
-            aChi["atom_id_1_alias"] = aChi["atom_id_1"]
-            [aChi["atom_id_1_resNum"], aChi["atom_id_1"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_1_alias"]) 
-            aChi["atom_id_2_alias"] = aChi["atom_id_2"]
-            [aChi["atom_id_2_resNum"], aChi["atom_id_2"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_2_alias"]) 
-            aChi["atom_id_3_alias"] = aChi["atom_id_3"]
-            [aChi["atom_id_3_resNum"], aChi["atom_id_3"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_3_alias"]) 
-
-        for aPl in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys():
-            for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl]:
-                aAtom["atom_id_alias"] = aAtom["atom_id"]
-                [aAtom["atom_id_resNum"], aAtom["atom_id"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aAtom["atom_id_alias"]) 
+        if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("chirs"):
+            for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
+                aChi["atom_id_centre_alias"] = aChi["atom_id_centre"]
+                [aChi["atom_id_centre_resNum"], aChi["atom_id_centre"]]=\
+                                  self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_centre_alias"])  
+                aChi["atom_id_1_alias"] = aChi["atom_id_1"]
+                [aChi["atom_id_1_resNum"], aChi["atom_id_1"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_1_alias"]) 
+                aChi["atom_id_2_alias"] = aChi["atom_id_2"]
+                [aChi["atom_id_2_resNum"], aChi["atom_id_2"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_2_alias"]) 
+                aChi["atom_id_3_alias"] = aChi["atom_id_3"]
+                [aChi["atom_id_3_resNum"], aChi["atom_id_3"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aChi["atom_id_3_alias"]) 
+        if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("planes"):
+            for aPl in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys():
+                for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl]:
+                    aAtom["atom_id_alias"] = aAtom["atom_id"]
+                    [aAtom["atom_id_resNum"], aAtom["atom_id"]]=self.getOneOrigAtomIdFromAlias(tLinkedObj.atomMap, aAtom["atom_id_alias"]) 
 
  
     def getLinkInfo(self, tLinkedObj):
@@ -2826,11 +2880,12 @@ class CovLinkGenerator(CExeCode):
                         tLinkedObj.cLink["planes"][aPl] = [] 
                         for aPlAtm in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl]:
                             tLinkedObj.cLink["planes"][aPl].append(aPlAtm)
-        print "Number of Link planes ", len(tLinkedObj.cLink["planes"].keys())
-        for aPl in sorted(tLinkedObj.cLink["planes"].iterkeys()):
-            print "Plane %s contains %d atoms. They are: "%(aPl, len(tLinkedObj.cLink["planes"][aPl]))
-            for aAtm in tLinkedObj.cLink["planes"][aPl]:
-                print "Plane %s, atom  %s in residue %d, dist_esd  %s "%(aAtm["plane_id"], aAtm["atom_id"], aAtm["atom_id_resNum"], aAtm["dist_esd"])
+        if tLinkedObj.cLink.has_key("planes"):
+            print "Number of Link planes ", len(tLinkedObj.cLink["planes"].keys())
+            for aPl in sorted(tLinkedObj.cLink["planes"].iterkeys()):
+                print "Plane %s contains %d atoms. They are: "%(aPl, len(tLinkedObj.cLink["planes"][aPl]))
+                for aAtm in tLinkedObj.cLink["planes"][aPl]:
+                    print "Plane %s, atom  %s in residue %d, dist_esd  %s "%(aAtm["plane_id"], aAtm["atom_id"], aAtm["atom_id_resNum"], aAtm["dist_esd"])
 
        
     def outOneLinkInfo(self, tLinkedObj):

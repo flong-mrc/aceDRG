@@ -304,7 +304,8 @@ namespace LIBMOL
         //elements["Sr"]["vdw"]      = 2.19;
         //elements["Sr"]["cova"]     = 1.12;
         elemProps["Sr"]["vdw"]     = 2.19;
-        elemProps["Sr"]["cova"]    = 1.92;
+        // elemProps["Sr"]["cova"]    = 1.92;
+        elemProps["Sr"]["cova"]    = 1.85;
         elemProps["Sr"]["ionM+"]    = 1.32;
         
         elements["Ba"]["row"]      = 6;

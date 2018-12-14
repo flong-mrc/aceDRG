@@ -258,6 +258,8 @@ namespace LIBMOL
             std::vector<std::string>     tBlocLines;
             REAL tROK1 = -1.0;
             REAL tROK2 = -1.0;
+            REAL tROK3 = -1.0;
+            
             while(!inFile.eof())
             {   
                 std::getline(inFile, tRecord);
@@ -297,11 +299,30 @@ namespace LIBMOL
                         {
                             tROK2 = tROK2/100.0;
                         }
+                        std::cout << "_refine_ls_R_factor_gt="
+                                  << tROK2 << std::endl;
+          
+                    }
+                }
+                
+                if (tRecord.find("_refine_ls_R_factor_obs") !=std::string::npos)
+                {
+                    std::cout << "R factor line: " << tRecord << std::endl;
+                    
+                    StrTokenize(tRecord,  tBuf);
+                    if (tBuf.size()==2)
+                    {
+                        tROK3=StrToReal(tBuf[1]);
+                        if (tROK2 >=1.0)
+                        {
+                            tROK2 = tROK2/100.0;
+                        }
                         std::cout << "_refine_ls_R_factor_all="
                                   << tROK2 << std::endl;
           
                     }
                 }
+                
                 
                 if (tRecord.find("loop_") !=std::string::npos 
                     || (tRecord.find("data_") !=std::string::npos
@@ -330,9 +351,10 @@ namespace LIBMOL
                 tBlocLines.clear();
             }
             
-            if (tROK1 > 0.0 && tROK2 > 0.0)
+            if (tROK1 > 0.0 && (tROK2 > 0.0 || tROK3 >0.0))
             {
-                if (tROK1 <RTHRESHOLD && tROK2 < RTHRESHOLD)
+                if (tROK1 <RTHRESHOLD && 
+                    (tROK2 < RTHRESHOLD || tROK3 < RTHRESHOLD))
                 {
                     RFactorOK = true;
                 }
