@@ -82,7 +82,7 @@ class ChemCheck():
         self.orgVal["I"]     = [1]
         self.orgVal["AT"]    = [1]
         self.orgVal["O"]     = [2]
-        self.orgVal["S"]     = [2]
+        self.orgVal["S"]     = [2, 4, 6]
         self.orgVal["SE"]    = [2]
         self.orgVal["N"]     = [3]
         self.orgVal["B"]     = [3]
