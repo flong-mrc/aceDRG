@@ -1278,7 +1278,7 @@ class Acedrg(CExeCode ):
         if tStage==0:
             tLog = os.path.join(self.scrDir, "init_cif.log")
             if platform.system()=="Windows":
-                self._cmdline = "(ECHO ligand && ECHO ncyc 40 ECHO make hout yes ECHO make hydr full ECHO end) | " + self._cmdline
+                self._cmdline = "(ECHO ligand && ECHO ncyc 40 && ECHO make hout yes && ECHO make hydr full && ECHO end) | " + self._cmdline
             else:
                 self._cmdline += "ligand    \n"
                 self._cmdline += "ncyc 40   \n"
