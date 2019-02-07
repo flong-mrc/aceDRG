@@ -221,8 +221,13 @@ class CovLink:
 
 class CovLinkGenerator(CExeCode):
 
-    def __init__(self, tAADir, tLinkInstructions, tScrDir, tOutRoot, tVerInfo=None):
+    def __init__(self, tAADir, tLinkInstructions, tScrDir, tOutRoot, tVerInfo=None, tTestMode=None):
 
+        
+        if tTestMode:
+            self.testMode = True
+        else:
+            self.testMode = False
         self.verInfo          =  tVerInfo
         #print self.verInfo
 
@@ -2326,6 +2331,10 @@ class CovLinkGenerator(CExeCode):
                         tLinkedObj.outCombLigand["cifObj"] = Ccp4MmCifObj(tLinkedObj.combLigand["outCif"])["ccp4CifObj"]            
                         print "output comboLigand name ", tLinkedObj.outCombLigand["name"]
                         print "Number of atoms in the comboLigand : ", len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"])
+                        comboScrDN = self.subRoot + "_TMP"
+                        if os.path.isdir(comboScrDN) and not self.testMode:
+                            #print "Delete the tempo dir ", comboScrDN
+                            shutil.rmtree(comboScrDN)
                     
     def getChangesInModificationFromCombLigand(self, tLinkedObj):
 
