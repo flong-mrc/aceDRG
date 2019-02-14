@@ -268,6 +268,7 @@ class CovLinkGenerator(CExeCode):
         # engs 
 
         self.chemCheck        = ChemCheck()
+        self.fileTool         = FileTransformer()
 
         if os.path.isfile(self.linkInstructions):
             # input from a file
@@ -2335,6 +2336,9 @@ class CovLinkGenerator(CExeCode):
                         if os.path.isdir(comboScrDN) and not self.testMode:
                             #print "Delete the tempo dir ", comboScrDN
                             shutil.rmtree(comboScrDN)
+                        comboLigMolFileName = self.subRoot + ".mol"
+                        self.fileTool.MmCifToMolFile(tLinkedObj.combLigand["outCif"], comboLigMolFileName)
+                        
                     
     def getChangesInModificationFromCombLigand(self, tLinkedObj):
 
