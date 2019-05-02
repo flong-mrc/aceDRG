@@ -83,6 +83,7 @@ int main(int argc, char** argv) {
     
     std::cout << "workMode " << AJob.workMode << std::endl;
     std::cout << "user output name " << AJob.IOEntries["userOutName"] << std::endl;
+   
     
     for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
             iKW !=AJob.IOEntries.end(); iKW++)
@@ -128,7 +129,12 @@ int main(int argc, char** argv) {
                                            
             
             
-            LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
+            LIBMOL::AllSystem   aTargetSystem(dataFromCif, 
+                                              AJob.IOEntries["libMolTabDir"],
+                                              AJob.upperBondSig,
+                                              AJob.lowBondSig, 
+                                              AJob.upperAngleSig,
+                                              AJob.lowAngleSig); 
             
             
         
@@ -137,18 +143,31 @@ int main(int argc, char** argv) {
                  aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
                                                             AJob.IOEntries["monoRootName"], 
                                                             AJob.IOEntries["libMolTabDir"]);
-                
+                 std::cout << "DOUBLE CHECKing again 2" << std::endl;
+        
+                 for (std::vector<LIBMOL::BondDict>::iterator 
+                      iB=aTargetSystem.allBonds.begin();
+                      iB != aTargetSystem.allBonds.end(); iB++)
+                 {
+                    std::cout << "Bond sig value " << iB->sigValue << std::endl;
+                 }
+                 
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                   AJob.IOEntries["monoRootName"], 
                                   aTargetSystem.propComp,
-                                 aTargetSystem.allAtoms,
-                                 // aTargetSystem.allHAtomIdx,
-                                 aTargetSystem.allBonds,
-                                 aTargetSystem.allAngles,
-                                 aTargetSystem.miniTorsions,
-                                 aTargetSystem.allRingsV,
-                                 aTargetSystem.allPlanes,
-                                 aTargetSystem.allChirals);
+                                  aTargetSystem.allAtoms,
+                                  // aTargetSystem.allHAtomIdx,
+                                  aTargetSystem.allBonds,
+                                  aTargetSystem.allAngles,
+                                  aTargetSystem.miniTorsions,
+                                  aTargetSystem.allRingsV,
+                                  aTargetSystem.allPlanes,
+                                  aTargetSystem.allChirals,
+                                  aTargetSystem.upperBondSig, 
+                                  aTargetSystem.lowBondSig, 
+                                  aTargetSystem.upperAngleSig,
+                                  aTargetSystem.lowAngleSig);
+                                
                  
                 LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
                                AJob.IOEntries["monoRootName"], 
@@ -208,7 +227,11 @@ int main(int argc, char** argv) {
                                                  aTargetSystem.allTorsions,
                                                  aTargetSystem.allRingsV,
                                                  aTargetSystem.allPlanes,
-                                                 aTargetSystem.allChirals);
+                                                 aTargetSystem.allChirals,
+                                                 aTargetSystem.upperBondSig,
+                                                 aTargetSystem.lowBondSig,
+                                                 aTargetSystem.upperAngleSig,
+                                                 aTargetSystem.lowAngleSig);
                         
                         
                         LIBMOL::outPDB(tOutName.c_str(),

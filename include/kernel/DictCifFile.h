@@ -635,7 +635,11 @@ namespace LIBMOL
                          std::vector<LIBMOL::TorsionDict>& tTorsions, 
                          std::vector<LIBMOL::RingDict> & tRings, 
                          std::vector<LIBMOL::PlaneDict>& tPlas, 
-                         std::vector<LIBMOL::ChiralDict>& tChs);
+                         std::vector<LIBMOL::ChiralDict>& tChs,
+                         const   double         tUBS,
+                         const   double         tLBS,
+                         const   double         tUAS,
+                         const   double         tLAS);
     
     extern void outMMCif2(FileName tFName, 
                          ID tMonoRootName,

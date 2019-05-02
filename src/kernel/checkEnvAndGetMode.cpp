@@ -70,7 +70,7 @@ namespace LIBMOL
         // extern int optind, opterr, optopt;
         
         // opterr = 0;
-           
+         
         if (numArg  < 5)
         {
             // temporarily interface 
@@ -81,7 +81,8 @@ namespace LIBMOL
         }
         
         int c, index; 
-        while ((c = getopt (numArg, ArgVars, "a:b:c:d:i:j:k:m:n:o:p:r:s:t:y:z:A:D:M:O:S:T:U:X:Y:Z:")) != -1)
+        while ((c = getopt (numArg, ArgVars, 
+         "a:b:c:d:i:j:k:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:M:O:S:T:U:X:Y:Z:1:2:3:4:")) != -1)
         {
             switch (c)
             {
@@ -213,6 +214,26 @@ namespace LIBMOL
                 case 'Z':
                     IOEntries["HUMO"] = optarg;
                     break;    
+                case '1':
+                    IOEntries["uBS"] = optarg;
+                    std::cout << "Upper bound for b " << IOEntries["uBS"]
+                              << std::endl;
+                    break;
+                case '2':
+                    IOEntries["lBS"] = optarg;
+                    std::cout << "low bound for b " << IOEntries["lBS"]
+                              << std::endl;
+                    break;      
+                case '3':
+                    IOEntries["uAS"] = optarg;
+                    std::cout << "Upper bound for a " << IOEntries["uAS"]
+                              << std::endl;
+                    break;
+                case '4':
+                    IOEntries["lAS"] = optarg;
+                    std::cout << "low bound for a " << IOEntries["lAS"]
+                              << std::endl;
+                    break;
                 case '?':
                     if (std::isprint(optopt))
                     {
@@ -255,6 +276,9 @@ namespace LIBMOL
             }
         }
         
+        
+        setBandASiga();
+         
         SetWorkMode();
         
     }
@@ -346,6 +370,35 @@ namespace LIBMOL
     
     void CheckEnvAndGetMode::printManual()
     {
+        
+    }
+    
+    void CheckEnvAndGetMode::setBandASiga()
+    {
+        if (IOEntries.find("uBS")==IOEntries.end())
+        {
+            IOEntries["uBS"] = "0.02";
+        }
+        
+        if (IOEntries.find("lBS")==IOEntries.end())
+        {
+            IOEntries["lBS"] = "0.01";
+        }
+        
+        if (IOEntries.find("uAS")==IOEntries.end())
+        {
+            IOEntries["uAS"] = "3.00";
+        }
+        
+        if (IOEntries.find("lAS")==IOEntries.end())
+        {
+            IOEntries["lAS"] = "1.5";
+        }
+        
+        upperBondSig  = StrToReal(IOEntries["uBS"]);
+        lowBondSig    = StrToReal(IOEntries["lBS"]);
+        upperAngleSig = StrToReal(IOEntries["uAS"]);
+        lowAngleSig   = StrToReal(IOEntries["lAS"]);         
         
     }
     void CheckEnvAndGetMode::SetWorkMode()

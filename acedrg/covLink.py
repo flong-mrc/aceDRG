@@ -423,17 +423,17 @@ class CovLinkGenerator(CExeCode):
            
             # Some default values. They will be changed at different stages
  
-            aLink.stdLigand1["userIn"]  = False 
-            aLink.stdLigand1["compOut"]  = False 
-            aLink.stdLigand1["outComp"] = False 
-            aLink.stdLigand1["outMod"]  = True 
-            aLink.stdLigand2["userIn"]  = False 
-            aLink.stdLigand2["compOut"]  = False 
-            aLink.stdLigand2["outComp"] = False 
-            aLink.stdLigand2["outMod"]  = True 
+            aLink.stdLigand1["userIn"]    = False 
+            aLink.stdLigand1["compOut"]   = False 
+            aLink.stdLigand1["outComp"]   = False 
+            aLink.stdLigand1["outMod"]    = True 
+            aLink.stdLigand2["userIn"]    = False 
+            aLink.stdLigand2["compOut"]   = False 
+            aLink.stdLigand2["outComp"]   = False 
+            aLink.stdLigand2["outMod"]    = True 
 
-	    aLink.stdLigand1["group"]   = "."
-            aLink.stdLigand2["group"]   = "."
+	    aLink.stdLigand1["group"]     = "."
+            aLink.stdLigand2["group"]     = "."
 
             nL = len(aList)
             while i < nL :
@@ -632,13 +632,14 @@ class CovLinkGenerator(CExeCode):
                         break
                 elif lAd :
                     # Leave for discussion
-                    if aList[i].upper().find("Atom") != -1 :
+                    if aList[i].upper().find("ATOM") != -1 :
                         if i+5 < nL:
                             aAtom = {}
                             aAtom["atom_id"]     = aList[i+1]
                             aAtom["type_symbol"] = aList[i+2]
                             aAtom["type_energy"] = aAtom["type_symbol"]
                             aNum = int(aList[i+3]) 
+                            aAtom["res_idx"] =  aNum
                             aBond = {}
                             aBond["atom_id_1"] = aAtom["atom_id"]
                             aBond["atom_id_2"] = aList[i+4]
@@ -1047,45 +1048,64 @@ class CovLinkGenerator(CExeCode):
                                 break
 
                     elif lAd :
-                        lAd = False
                         # Leave for discussion
-                        if aList[i].upper().find("Atom") != -1 :
-                            if i+5 < nL:
+                        if aList[i].upper().find("ATOM") != -1 :
+                            if i+4 < nL:
                                 aAtom = {}
                                 aAtom["atom_id"]     = aList[i+1]
                                 aAtom["type_symbol"] = aList[i+2]
+                                aAtom["charge"]      = aList[i+3]
                                 aAtom["type_energy"] = aAtom["type_symbol"]
-                                aNum = int(aList[i+3]) 
-                                aBond = {}
-                                aBond["atom_id_1"] = aAtom["atom_id"]
-                                aBond["atom_id_2"] = aList[i+4]
-                                aBond["type"]      = aList[i+5]
-                                i+=6
+                                aAtom["is_added"]    = True
+                                aNum = int(aList[i+4]) 
                                 if aNum == 1:
                                     aAtom["comp_id"] = aLink.stdLigand1["name"]
                                     aLink.modLigand1["added"]["atoms"].append(aAtom)
-                                    aLink.modLigand1["added"]["bonds"].append(aBond)
                                 elif aNum==2:
                                     aAtom["comp_id"] = aLink.stdLigand2["name"]
                                     aLink.modLigand2["added"]["atoms"].append(aAtom)
-                                    aLink.modLigand2["added"]["bonds"].append(aBond)
                                 else:
                                     self.errLevel = 2
                                     if not self.errMessage.has_key(self.errLevel):
                                         self.errMessage[self.errLevel] = []
                                     aMess = "Error in ADD ATOM section:\n "
-                                    aMess += "Residue number should be 1 or 2 !\n "
+                                    aMess += "Residue number for an atom should be 1 or 2 !\n "
                                     aMess += "Check your link instruction file.\n"
                                     self.errMessage[self.errLevel].append(aMess)
                                     break
+                                i+=5
                             else:
                                 self.errLevel = 2
                                 if not self.errMessage.has_key(self.errLevel):
                                     self.errMessage[self.errLevel] = []
-                                aMess = "Error in BOND CHANGE section in the instruction file:\n "
-                                aMess+= "Not enough information to define the change of the bond\n"
+                                aMess = "Error in add ATOM section in the instruction file:\n "
+                                aMess+= "Not enough information to define the added atom\n"
                                 self.errMessage[self.errLevel].append(aMess)
                                 break
+                        if aList[i].upper().find("BOND") != -1 :
+                            if i+4 < nL:
+                                aBond = {}
+                                aBond["atom_id_1"] = aList[i+1]
+                                aBond["atom_id_2"] = aList[i+2]
+                                aBond["type"]      = aList[i+3]
+                                aNum = int(aList[i+4]) 
+                                aBond["comp_serial_num"]= aNum
+                                aBond["value_dist"]     = 0.0     
+                                aBond["value_dist_esd"] = 0.02
+                                if aNum == 1:
+                                    aLink.modLigand1["added"]["bonds"].append(aBond)
+                                elif aNum==2:
+                                    aLink.modLigand2["added"]["bonds"].append(aBond)
+                                i+=5
+                            else:
+                                self.errLevel = 2
+                                if not self.errMessage.has_key(self.errLevel):
+                                    self.errMessage[self.errLevel] = []
+                                aMess = "Error in add BOND section in the instruction file:\n "
+                                aMess+= "Not enough information to define the added bond\n"
+                                self.errMessage[self.errLevel].append(aMess)
+                                break
+  
                     else :
                         self.errLevel = 2
                         if not self.errMessage.has_key(self.errLevel):
@@ -1229,15 +1249,15 @@ class CovLinkGenerator(CExeCode):
                     if ncb1 >0 or ncb2 >0:
                         print "The following bonds are changed."
                         if ncb1 > 0:
-                            print "In residue %s: "%aLink.modLigand1["name"]
                             for aB in aLink.modLigand1["changed"]["bonds"]:
                                 print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
                                 print "The bond-order is now ", aB["type"]
-                        if ncb2 > 0:
                             print "In residue %s: "%aLink.modLigand1["name"]
+                        if ncb2 > 0:
                             for aB in aLink.modLigand2["changed"]["bonds"]:
                                 print "Bond between atoms %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
                                 print "The bond-order is now ", aB["type"]
+                            print "In residue %s: "%aLink.modLigand1["name"]
                 else:
                     self.errLevel = aLink.errLevel
                     if not self.errMessage.has_key(self.errLevel):
@@ -1252,6 +1272,7 @@ class CovLinkGenerator(CExeCode):
         
 	print "User input cif for L 1 ", aLink.stdLigand1["compOut"]
         print "User input cif for L 2 ", aLink.stdLigand2["compOut"]
+        
 
     def processOneLink(self, tLinkIns):
         
@@ -1382,8 +1403,8 @@ class CovLinkGenerator(CExeCode):
                     self.errMessage[self.errLevel].append("One of residues is  without name\n")
               
             if not self.errLevel and tMonomer["comp"].has_key("bonds"):
-     
                 self.checkDelocAndAromaBonds(tMonomer["comp"], tMonomer["name"])
+
         else:
             self.errLevel = aMmcifObj["errLevel"]
             if not self.errMessage.has_key(self.errLevel):
@@ -1504,10 +1525,21 @@ class CovLinkGenerator(CExeCode):
 
     def adjustAtomsAndOthersForComboLigand(self, tLinkedObj):
 
-        self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
-        self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
-        self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
-        self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+        self.setAddedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+        if not self.errLevel:
+            self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+            if not self.errLevel:
+                self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+                if not self.errLevel:
+                    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+                    if not self.errLevel:
+                        self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+
+        if self.errLevel:
+            print "Error level is ", self.errLevel
+            print "Error message is : "
+            for aL in self.errMessage[self.errLevel]:
+                print aL
 
     def setChargeInLinkAtom(self, tRes, tMod, tLinkBonds):
 
@@ -1577,6 +1609,127 @@ class CovLinkGenerator(CExeCode):
             if aBond["atom_id_2"].upper()==tNonHAtomName and aBond["atom_id_1"].upper() in tMonomer["comp"]["hAtoms"]:
                 tHNames.append(aBond["atom_id_1"])
                 
+    def setAddedInOneResForModification(self, tRes, tMod, tLinkBonds):
+
+        print "For residue ", tRes["name"]
+        
+        if len(tMod["added"]["atoms"]) > 0:
+            for aAtom in tMod["added"]["atoms"]:
+                print "Add atom ", aAtom["atom_id"]
+                aBool = self.checkDubAtomNameInOneRes(tRes, aAtom)
+                if not aBool : 
+                    self.addOneAtomAndConnectedBonds(tRes, tMod, tLinkBonds, aAtom)
+                else:
+                    self.errLevel = 12
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    aLine = "Atom Name Dublication : added atom %s already exists in residue %s\n"\
+                            %(aAtom["atom_id"], tRes["name"])
+                    print aLine 
+                    self.errMessage[self.errLevel].append(aLine)
+                    break
+
+    def checkDubAtomNameInOneRes(self, tRes, tAtom):
+
+        aRet = False
+
+        existAtmIds = []
+        for aAtom in tRes["comp"]["atoms"]:
+            existAtmIds.append(aAtom["atom_id"])
+       
+        if tAtom["atom_id"] in existAtmIds:
+            aRet = True
+
+        return aRet          
+
+    def addOneAtomAndConnectedBonds(self, tRes, tMod, tLinkBonds, tAtom):
+
+        tRes["remainAtoms"].append(tAtom)
+        tmpBandA = []
+        tmpBonds = []
+
+        nAtoms = len(tRes["comp"]["atoms"])
+        for aBond in tMod["added"]["bonds"]:
+            tRes["remainBonds"].append(aBond)
+            if aBond["atom_id_1"]==tAtom["atom_id"]:
+                atmIdx = self.getOneAtomSerialById(aBond["atom_id_2"], tRes["comp"]["atoms"])
+                if atmIdx > 0 and atmIdx < nAtoms:
+                    tmpBandA.append([aBond, tRes["comp"]["atoms"][atmIdx]])
+                    tmpBonds.append(aBond)
+                else:
+                    self.errLevel = 12
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    aLine = "Can not find idx for atom ", aBond["atom_id_2"] 
+                    self.errMessage[self.errLevel].append(aLine)
+                    break
+            elif aBond["atom_id_2"]==tAtom["atom_id"]:
+                atmIdx = self.getOneAtomSerialById(aBond["atom_id_1"], tRes["comp"]["atoms"])
+                if atmIdx > 0 and atmIdx < nAtoms:
+                    tmpBandA.append([aBond, tRes["comp"]["atoms"][atmIdx]])
+                    tmpBonds.append(aBond)
+                else:
+                    self.errLevel = 12
+                    if not self.errMessage.has_key(self.errLevel):
+                        self.errMessage[self.errLevel] = []
+                    aLine = "Can not find idx for atom ", aBond["atom_id_1"] 
+                    self.errMessage[self.errLevel].append(aLine)
+                    break
+
+
+        for aBond in tLinkBonds :
+            if aBond["atom_id_1"]==tAtom["atom_id"]:
+                tmpBonds.append(aBond)
+            elif aBond["atom_id_2"]==tAtom["atom_id"]:
+                tmpBonds.append(aBond)
+
+        if len(tmpBonds) > 0:
+            # Check bonds around the added atoms
+
+            print "Check added atom %s and around bonds "%tAtom["atom_id"]
+            aPair = self.chemCheck.valideBondOrderForOneOrgAtom(tAtom, tmpBonds)
+            if not aPair[0]:
+                self.errLevel = 12
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append(aPair[1])
+                print aPair[1]
+            else:
+                print "Bonds connected to atom %s are OK "%tAtom["atom_id"]
+        else :
+            aLine = "No bonds are defined to connected to atom %s, check your input file! \n"%tAtom["atom_id"]
+            self.errLevel = 12
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append(aLine)
+
+        if not self.errLevel:
+            if len(tmpBandA) >0:
+                for aPair in tmpBandA:
+                    print "Added bond between atom %s and %s "%(aPair[0]["atom_id_1"], aPair[0]["atom_id_2"])
+                    print "Need to adjust bonds connected to atom %s "%aPair[1]["atom_id"]
+            
+            tmpDelIds =[]
+            for [aBond, aAtom] in tmpBandA:
+                aBandASet = self.getBondSetForOneLinkedAtom(aAtom["atom_id"], tRes["comp"]["atoms"],tRes["comp"]["bonds"], tmpDelIds)
+                aBandASet[0].append(tAtom)
+                aBandASet[1].append(aBond)
+                if len(aBandASet[0]) > 0:
+                    print "Check the bonds connected atom %s "%aAtom["atom_id"]
+                    print "These bonds are : "
+                    for aB in aBandASet[1]:
+                        print "Bond between atom %s and %s "%(aB["atom_id_1"], aB["atom_id_2"])
+                    print "Atoms involved are: "
+                    for aA in aBandASet[0]:
+                        print "Atom %s "%aA["atom_id"]
+                    [noErr, errLine] =self.chemCheck.adjustNBForOneAddedAtom(aAtom, aBandASet[0], aBandASet[1], tRes, tMod, tmpDelIds)
+                    if not noErr:
+                        self.errLevel = 12
+                        if not self.errMessage.has_key(self.errLevel):
+                            self.errMessage[self.errLevel] = []
+                        self.errMessage[self.errLevel].append(errLine)  
+                        break
+
     def setDeletedInOneResForModification(self, tRes, tMod, tLinkBonds):
 
         print "For residue ", tRes["name"]
@@ -1764,8 +1917,12 @@ class CovLinkGenerator(CExeCode):
         aLAtmSerial = self.getOneAtomSerialById(aLAtmId, tRes["comp"]["atoms"])
         tExtraChAtms = []
         #print "center atom: ", aLAtmSerial
-        print "center atom: ", aLAtmId
-        if aLAtmSerial != -1:
+        print "center atom: ", aLAtmId 
+        addAtmIds = []
+        if len(tMod["added"]["atoms"]) !=0:
+            for aA in tMod["added"]["atoms"]:
+                addAtmIds.append(aA["atom_id"])
+        if aLAtmSerial != -1 and not aLAtmId in addAtmIds:
             aLAtmElem = tRes["comp"]["atoms"][aLAtmSerial]["type_symbol"]
             # Atoms and bonds around the linked atom
             [aLAAtoms,aTmpLABonds] =  self.getBondSetForOneLinkedAtom(aLAtmId, tRes["comp"]["atoms"], tRes["comp"]["bonds"], tDelAtomIds)
@@ -1861,11 +2018,12 @@ class CovLinkGenerator(CExeCode):
                                     print "H connected atom id ", tRes["comp"]["atoms"][aLAtmSerial]["atom_id"]
                                     self.addOneHInRes(tRes["comp"]["atoms"][aLAtmSerial], aLAAtoms, allHIds, tRes, tMod)
         else :
-            self.errLevel    = 22 
-            if not self.errMessage.has_key(self.errLevel):
-                self.errMessage[self.errLevel] = []
-            self.errMessage[self.errLevel].append("Can not find the linked atom in residue %s "%tRes["name"])
-            self.errMessage[self.errLevel].append("Check your input instruction file ")
+            if not aLAtmId in addAtmIds:
+                self.errLevel    = 22 
+                if not self.errMessage.has_key(self.errLevel):
+                    self.errMessage[self.errLevel] = []
+                self.errMessage[self.errLevel].append("Can not find the linked atom in residue %s "%tRes["name"])
+                self.errMessage[self.errLevel].append("Check your input instruction file ")
         
     def getBondSetForOneLinkedAtom(self, tAtomId, tAtoms, tBonds, tDelAtomIds):
 
@@ -1894,8 +2052,8 @@ class CovLinkGenerator(CExeCode):
 
         aAtomSet = []
         aBondSet = []
-        #print "atom ", tAtomId
-        #print "Number of bonds ", len(tBonds)
+        print "atom ", tAtomId
+        print "Number of bonds ", len(tBonds)
         for aBond in tBonds:
             aId1 = aBond["atom_id_1_alias"].strip()
             aId2 = aBond["atom_id_2_alias"].strip()
@@ -1903,15 +2061,15 @@ class CovLinkGenerator(CExeCode):
                 aIdx = self.getOneAtomSerialById(aId2, tAtoms)
                 aAtomSet.append(tAtoms[aIdx])
                 aBondSet.append(aBond)
-                #print "bond between atom ", aId1, " and atom  ", aId2
-                #print "a bond found "
+                print "bond between atom ", aId1, " and atom  ", aId2
+                print "a bond found "
             if aId2 == tAtomId and not aId1 in tDelAtomIds:
                 aIdx = self.getOneAtomSerialById(aId1, tAtoms)
                 aAtomSet.append(tAtoms[aIdx])
                 aBondSet.append(aBond)
-                #print "bond between atom ", aId1, " and atom  ", aId2
-                #print "a bond found "
-        #print "Number of bonds found ", len(aBondSet)
+                print "bond between atom ", aId1, " and atom  ", aId2
+                print "a bond found "
+        print "Number of bonds found ", len(aBondSet)
         return [aAtomSet, aBondSet]      
         
     def getTotalBondOrderInOneMmcifAtom(self, tAtomId, tBonds):
@@ -2070,7 +2228,7 @@ class CovLinkGenerator(CExeCode):
                 tLinkedObj.combLigand["bonds"].append(aBond)
 
         # Chiral centers 
-        tLinkedObj.combLigand["chirs"]
+        #tLinkedObj.combLigand["chirs"]
         for aChir in  tLinkedObj.stdLigand1["remainChirs"]:
             aChir["atom_id_centre_alias"] = self.getAtomAlias(aChir["atom_id_centre"], tLinkedObj.stdLigand1["remainAtoms"])
             aChir["atom_id_1_alias"]      = self.getAtomAlias(aChir["atom_id_1"], tLinkedObj.stdLigand1["remainAtoms"])
@@ -2087,6 +2245,48 @@ class CovLinkGenerator(CExeCode):
             if aChir["atom_id_centre_alias"] and aChir["atom_id_1_alias"] and aChir["atom_id_2_alias"] and aChir["atom_id_3_alias"]:
                 tLinkedObj.combLigand["chirs"].append(aChir)
 
+        self.outAtomNameMapToJSon(tLinkedObj)
+
+    def outAtomNameMapToJSon(self, tLinkedObj):
+
+        #aOutFN = os.path.join(self.scrDir, tLinkedObj.combLigand["name"] + "_AtomNameMapping.json")
+        aOutFN = os.path.join(self.scrDir, "UNL_AtomNameMapping.json")
+        try: 
+            aOutF = open(aOutFN, "w")
+        except IOError:
+            print "%s can not be open for writing "%aOutFN
+            self.errLevel    = 32
+            if not self.errMessage.has_key(self.errLevel):
+                self.errMessage[self.errLevel] = []
+            self.errMessage[self.errLevel].append("%s can not be open for write "%tOutFName)
+        else:       
+            resNames =["UNL", tLinkedObj.stdLigand1["name"], tLinkedObj.stdLigand2["name"]]
+            aOutF.write("{\n\"ResidueNameMapping\":\n")
+            aOutF.write("    [{ \"RESIDUE_1\":\"%s\"},\n"%tLinkedObj.stdLigand1["name"])
+            aOutF.write("     { \"RESIDUE_2\":\"%s\"}],\n"%tLinkedObj.stdLigand2["name"])
+            aOutF.write("\"AtomNameMapping\":\n")
+            nLs = len(tLinkedObj.atomMap.keys())
+            idxL = 0
+            aOutF.write("    [\n")
+            for aCombAtmName in tLinkedObj.atomMap.keys():
+                aCombAtmNameT  = "\"" + aCombAtmName + "\","
+                aAtmName  = "\"" + tLinkedObj.atomMap[aCombAtmName][1] + "\","
+                aResIndex = tLinkedObj.atomMap[aCombAtmName][0]
+                aLine = ""
+                if idxL != nLs -1:
+                    aLine = "    { \"ALIAS\":%s \"ATOM_NAME\":%s \"RESIDUE_INDEX\":%d },\n"\
+                            %((aCombAtmNameT).ljust(8), (aAtmName).ljust(8), aResIndex)
+                else:
+                    aLine = "    { \"ALIAS\":%s \"ATOM_NAME\":%s \"RESIDUE_INDEX\":%d }\n"\
+                            %((aCombAtmNameT).ljust(8), (aAtmName).ljust(8), aResIndex)
+                    
+                aOutF.write(aLine)
+                idxL = idxL +1
+            aOutF.write("    ]\n")
+            aOutF.write("}\n")
+
+            aOutF.close()
+             
     def getOneAtomSerialById(self, tId, tAtoms):
 
         nReturn = -1
@@ -2244,6 +2444,7 @@ class CovLinkGenerator(CExeCode):
                 for aAtom in tMonomer["atoms"]:
                     aCharge = "0"
                     if aAtom.has_key("charge"):
+                        print aAtom["charge"]
                         if aAtom["charge"].find(".")==-1:
                             aCharge = aAtom["charge"]
                         else:
@@ -2322,6 +2523,7 @@ class CovLinkGenerator(CExeCode):
                                     ("("+aBond["atom_id_1"]).ljust(10), (aBond["atom_id_2"]+ ")").ljust(10), aBond["type"].ljust(10))
                 #self.outTmpComboLigandMap(tLinkedObj)    # Check 
                 self.checkChemInMonomer(tLinkedObj.combLigand, 2)
+
                 if not self.errLevel:
                     tLinkedObj.combLigand["inCif"] = os.path.join(self.scrDir, tLinkedObj.combLigand["name"] + "_comboIn.cif")
                     print "The cif file of the combo-ligand for input ", tLinkedObj.combLigand["inCif"]
@@ -2338,24 +2540,30 @@ class CovLinkGenerator(CExeCode):
                             shutil.rmtree(comboScrDN)
                         comboLigMolFileName = self.subRoot + ".mol"
                         self.fileTool.MmCifToMolFile(tLinkedObj.combLigand["outCif"], comboLigMolFileName)
-                        
-                    
+            else:
+                print self.errLevel            
+       
     def getChangesInModificationFromCombLigand(self, tLinkedObj):
 
-        for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
-            print aAtom.keys()
-            print aAtom["atom_id"]
-            print "Atom %s is in residue %s "%(aAtom["atom_id"], aAtom["res_idx"])
-            print "Is it added ? ", aAtom["is_added"]
+        #for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
+        #    print aAtom.keys()
+        #    print aAtom["atom_id"]
+        #    print "Atom %s is in residue %s "%(aAtom["atom_id"], aAtom["res_idx"])
+        #    print "Is it added ? ", aAtom["is_added"]
 
         addedSet1 = []
         addedSet2 = []
         # Atoms 
-        for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]: 
+  
+        for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
+            print "Atom id ",aAtom["atom_id"]
+            print "Atom id alias ", aAtom["atom_id_alias"] 
             if aAtom["res_idx"] == 1:
                 if not aAtom["is_added"]:
+                    print "It is in changed section "
                     self.checkAtomMod(tLinkedObj.stdLigand1["remainAtoms"], aAtom, tLinkedObj.modLigand1["changed"]["atoms"])
                 else:
+                    print "It is in added section "
                     addedSet1.append(aAtom["atom_id"])
                     tLinkedObj.modLigand1["added"]["atoms"].append(aAtom)
             elif aAtom["res_idx"] == 2:
@@ -2374,9 +2582,9 @@ class CovLinkGenerator(CExeCode):
         print "Num of add atoms in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["atoms"])
         print "Num of deleted atoms in residue 1 is %d "%(len(tLinkedObj.modLigand1["deleted"]["atoms"]))
         print "Num of mod atoms in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["atoms"])
-        print "Num of add atoms in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["atoms"])
-        print "Num of deleted atoms in residue 1 is %d "%(len(tLinkedObj.modLigand1["deleted"]["atoms"]))
-        
+        print "Num of add atoms in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["atoms"])
+        print "Num of deleted atoms in residue 2 is %d "%(len(tLinkedObj.modLigand2["deleted"]["atoms"]))
+
         # Bonds
         aTmpChBonds_1 =  {}
         i1 = 0
@@ -2433,7 +2641,13 @@ class CovLinkGenerator(CExeCode):
         print "Number of changed bonds in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["bonds"])  
         print "Number of added bonds in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["bonds"])  
         print "Number of deleted bonds in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["bonds"])  
-   
+
+        if len(tLinkedObj.modLigand1["added"]["atoms"]) > 0:
+            for aAtom in tLinkedObj.modLigand1["added"]["atoms"]:
+                addedSet1.append(aAtom["atom_id"])
+        if len(tLinkedObj.modLigand2["added"]["atoms"]) > 0:
+            for aAtom in tLinkedObj.modLigand2["added"]["atoms"]:
+                addedSet2.append(aAtom["atom_id"])
         # Angles
         for aAng in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["angles"]:
             print "A angle "
@@ -2457,7 +2671,6 @@ class CovLinkGenerator(CExeCode):
         print "Number of changed angles in residue 2 is %d "%len(tLinkedObj.modLigand2["changed"]["angles"])  
         print "Number of added angles in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["angles"])  
         print "Number of deleted angles in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["angles"]) 
-         
         # Torsions
         if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("tors"):
             for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
@@ -2472,14 +2685,14 @@ class CovLinkGenerator(CExeCode):
                        and not aTor["atom_id_3"] in addedSet1 and not aTor["atom_id_4"] in addedSet1: 
                         self.checkTorMod(tLinkedObj.stdLigand1["remainTors"], aTor, tLinkedObj.modLigand1["changed"]["tors"])
                     else: 
-                        LinkedObj.modLigand1["added"]["tors"].append(aTor)
+                        tLinkedObj.modLigand1["added"]["tors"].append(aTor)
                 elif aTor["atom_id_1_resNum"]==2 and aTor["atom_id_2_resNum"]==2\
                    and aTor["atom_id_3_resNum"]==2 and aTor["atom_id_4_resNum"]==2:
                     if not aTor["atom_id_1"] in addedSet2 and not aTor["atom_id_2"] in addedSet2\
                        and not aTor["atom_id_3"] in addedSet2 and not aTor["atom_id_4"] in addedSet2: 
                         self.checkTorMod(tLinkedObj.stdLigand2["remainTors"], aTor, tLinkedObj.modLigand2["changed"]["tors"])
                     else: 
-                        LinkedObj.modLigand2["added"]["tors"].append(aTor)
+                        tLinkedObj.modLigand2["added"]["tors"].append(aTor)
     
             print "Number of changed tors in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["tors"])  
             print "Number of added tors in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["tors"])  
@@ -2576,8 +2789,6 @@ class CovLinkGenerator(CExeCode):
                     for aPlAtm in aPl:
                         print "%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"])
                 print "------------------ -------------"
-        
-        
         
     def checkAtomMod(self, tOriAtoms, tAtom, tModAtoms):
 
@@ -2683,17 +2894,21 @@ class CovLinkGenerator(CExeCode):
         tPlAtmIds = []
         for aAtm in tPl:
             tPlAtmIds.append(aAtm["atom_id"])
-
+        #print "number of Pl atoms in comb ",nAtoms
+        #print "compare with ", len(tOrigPls), " in one residue "
         for aPl in tOrigPls:
             tOrigPlAtmIds = []
             for aPlAtm in aPl:
-                tOrigPlAtmIds.append(aPlAtm["atom_id"])
+                if aPlAtm["atom_id"][0] != "H":
+                    tOrigPlAtmIds.append(aPlAtm["atom_id"])
             nOrigAtoms = len(tOrigPlAtmIds)
+            #print "number of non-Pl atoms in orgi ",nOrigAtoms
             if nAtoms > nOrigAtoms: 
                 overlapAtms = []
                 for aOId in tOrigPlAtmIds:
                     if aOId in tPlAtmIds:
                         overlapAtms.append(aOId)
+                #print "overlaped atoms ",  len(overlapAtms)
                 if len(overlapAtms) == nOrigAtoms:
                     tModDelPls.append(aPl) 
                     tModAddPls.append(tPl)
@@ -2708,6 +2923,24 @@ class CovLinkGenerator(CExeCode):
                     tModAddPls.append(tPl)
                     break
 
+        #print "compare with ", len(tModDelPls), " deleted planes in one residue "
+        for aPl in tModDelPls:
+            tOrigPlAtmIds = []
+            for aPlAtm in aPl:
+                if aPlAtm["atom_id"][0] != "H":
+                    tOrigPlAtmIds.append(aPlAtm["atom_id"])
+            nOrigAtoms = len(tOrigPlAtmIds)
+            #print "number of non-H Pl atoms in delected orgi ",nOrigAtoms
+            if nAtoms > nOrigAtoms: 
+                overlapAtms = []
+                for aOId in tOrigPlAtmIds:
+                    if aOId in tPlAtmIds:
+                        overlapAtms.append(aOId)
+                print "overlaped atoms ",  len(overlapAtms)
+                if len(overlapAtms) == nOrigAtoms:
+                    tModAddPls.append(tPl)
+                    break
+      
     def extractOneLinkInfo(self, tLinkedObj):
 
         self.reIndexCombLigand(tLinkedObj) 
@@ -2763,6 +2996,8 @@ class CovLinkGenerator(CExeCode):
         addedAtoms = []
 
         # Atoms 
+        addAtoms1 =[]
+        addAtoms2 =[]
         for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
             aAtom["is_added"] = False 
             aAtom["atom_id_alias"] = aAtom["atom_id"]
@@ -3170,8 +3405,8 @@ class CovLinkGenerator(CExeCode):
                 for aBond in tModLigand["added"]["bonds"]:
                     aBT = aBond["type"].lower()
                     aL = "%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15), aBond["atom_id_1"].ljust(10),\
-                                             aBond["atom_id_2"].ljust(10), aBT.ljust(15), aBond["value_dist"].ljust(15),\
-                                             aBond["value_dist_esd"].ljust(10))
+                                             aBond["atom_id_2"].ljust(10), aBT.ljust(15), str(aBond["value_dist"]).ljust(15),\
+                                             str(aBond["value_dist_esd"]).ljust(10))
                     tOutFile.write(aL)
                     
             

@@ -11,7 +11,11 @@
 namespace LIBMOL
 {   
     CodClassify::CodClassify():wSize(1000),
-                               libmolTabDir("")
+                               libmolTabDir(""),
+                               upperBondSig(0.2),
+                               lowBondSig(0.2),
+                               upperAngleSig(3.0),
+                               lowAngleSig(1.5)
     {    
         pPeriodictable = new PeriodicTable();
 
@@ -60,7 +64,11 @@ namespace LIBMOL
     */
     
     CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms):wSize(1000), 
-                                                                  libmolTabDir("")
+                                                                  libmolTabDir(""),
+                                                                  upperBondSig(0.2),
+                                                                  lowBondSig(0.2),
+                                                                  upperAngleSig(3.0),
+                                                                  lowAngleSig(1.5)
                                                                   
     {
         
@@ -74,10 +82,10 @@ namespace LIBMOL
     }
  
     CodClassify::CodClassify(const DictCifFile & tCifObj,
-                             std::string   tLibmolTabDir):wSize(1000)
+                             std::string   tLibmolTabDir):wSize(1000),
+                                                          libmolTabDir(tLibmolTabDir)
                                                          
     {
-        libmolTabDir = tLibmolTabDir;
        
         pPeriodictable = new PeriodicTable();
         
@@ -142,8 +150,9 @@ namespace LIBMOL
     }
     
     CodClassify::CodClassify(const std::vector<Molecule>& tMols,
-                             std::string                   tTables):wSize(1000),
-                                                                 libmolTabDir(tTables)
+                             std::string                   tTables):
+                             wSize(1000),
+                             libmolTabDir(tTables)
     {
         pPeriodictable = new PeriodicTable();
         
@@ -303,6 +312,94 @@ namespace LIBMOL
                              int                       nTM):wSize(1000) 
     {
         libmolTabDir = tLibmolTabDir; 
+        pPeriodictable = new PeriodicTable();
+        
+        for (std::vector<AtomDict>::const_iterator iA=tAtoms.begin();
+                iA != tAtoms.end(); iA++)
+        {
+            allAtoms.push_back(*iA);
+        }
+        
+        for (std::vector<int>::const_iterator iH = tHAtomIdx.begin();
+                iH != tHAtomIdx.end(); iH++)
+        {
+            allHAtomIdx.push_back(*iH);
+        }
+        
+        for (std::vector<BondDict>::const_iterator iB=tBonds.begin();
+                iB != tBonds.end(); iB++)
+        {
+            allBonds.push_back(*iB);
+        }
+        
+        for (std::vector<AngleDict>::const_iterator iAng=tAngles.begin();
+                iAng != tAngles.end(); iAng++)
+        {
+            allAngles.push_back(*iAng);
+        }
+        
+        for (std::vector<TorsionDict>::const_iterator iTor=tTorsions.begin();
+               iTor != tTorsions.end(); iTor++)
+        {
+            allTorsions.push_back(*iTor); 
+        }
+        
+        for (std::vector<ChiralDict>::const_iterator iCh=tChirals.begin();
+                iCh !=tChirals.end(); iCh++)
+        {
+            allChirals.push_back(*iCh);
+        }
+        
+        for (std::vector<int>::const_iterator iH=tHAtomIdx.begin();
+                iH !=tHAtomIdx.end(); iH++)
+        {
+            allHydroAtoms.push_back(*iH);
+        }
+        
+        for (std::vector<PlaneDict>::const_iterator iP=tPlans.begin();
+                iP!=tPlans.end(); iP++)
+        {
+            allPlanes.push_back(*iP);
+        }
+                
+        for (std::map<ID, std::vector<RingDict> >::const_iterator iR=tRings.begin();
+                iR !=tRings.end(); iR++)
+        {
+            for (std::vector<RingDict>::const_iterator iR1=iR->second.begin();
+                    iR1 !=iR->second.end(); iR1++)
+            {
+                allRings[iR->first].push_back(*iR1);
+            }
+        }
+        
+        // setupSystem();
+        setupSystem2();
+        
+    }
+   
+    CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms, 
+                             const std::vector<int>& tHAtomIdx, 
+                             const std::vector<BondDict>& tBonds, 
+                             const std::vector<AngleDict>& tAngles, 
+                             const std::vector<TorsionDict>& tTorsions, 
+                             const std::vector<ChiralDict>& tChirals, 
+                             const std::vector<PlaneDict>& tPlans, 
+                             const std::map<ID,std::vector<RingDict> >& tRings,
+                             std::string               tLibmolTabDir,
+                             int                       nTM,
+                             const  double             tUBS,
+                             const  double             tLBS,
+                             const  double             tUAS,
+                             const  double             tLAS):
+                             wSize(1000),
+                             libmolTabDir(tLibmolTabDir),
+                             upperBondSig(tUBS),
+                             lowBondSig(tLBS),
+                             upperAngleSig(tUAS),
+                             lowAngleSig(tLAS)
+                             
+    {
+        
         pPeriodictable = new PeriodicTable();
         
         for (std::vector<AtomDict>::const_iterator iA=tAtoms.begin();
@@ -5431,10 +5528,10 @@ namespace LIBMOL
                             aBond.sigValue   = StrToReal(tBuf[9]);
                             //aBond.valueP     = StrToReal(tBuf[11]);
                             //aBond.sigValueP  = StrToReal(tBuf[12]);
-                            if(aBond.sigValue < 0.01)
-                            {
-                                aBond.sigValue = 0.01;
-                            }
+                            //if(aBond.sigValue < 0.01)
+                            //{
+                            //    aBond.sigValue = 0.01;
+                            //}
                             aBond.numCodValues  = StrToInt(tBuf[10]);
                             //aBond.numCodValuesP = StrToInt(tBuf[13]);
                             //std::cout << aBond.atomsCodClasses[0] << std::endl;
@@ -5542,10 +5639,10 @@ namespace LIBMOL
                             tB.sigValue   = StrToReal(tBuf[13]);
                             //aBond.valueP     = StrToReal(tBuf[11]);
                             //aBond.sigValueP  = StrToReal(tBuf[12]);
-                            if(tB.sigValue < 0.01)
-                            {
-                                tB.sigValue = 0.01;
-                            }
+                            //if(tB.sigValue < 0.01)
+                            //{
+                            //    tB.sigValue = 0.01;
+                            //}
                             tB.numCodValues  = StrToInt(tBuf[14]);
                             
     
@@ -5562,10 +5659,10 @@ namespace LIBMOL
                             tB1.value    = StrToReal(a);
                             tB1.sigValue = StrToReal(tBuf[16]);
                             
-                            if (tB1.sigValue <0.01)
-                            {
-                                tB1.sigValue = 0.01;
-                            }
+                            //if (tB1.sigValue <0.01)
+                            //{
+                            //    tB1.sigValue = 0.01;
+                            //}
                             tB1.numCodValues = StrToInt(tBuf[17]);
                             
                             allDictBondsIdx1D[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]]
@@ -5678,10 +5775,10 @@ namespace LIBMOL
                             aBond.sigValue   = StrToReal(tBuf[9]);
                             //aBond.valueP     = StrToReal(tBuf[11]);
                             //aBond.sigValueP  = StrToReal(tBuf[12]);
-                            if(aBond.sigValue < 0.01)
-                            {
-                                aBond.sigValue = 0.01;
-                            }
+                            //if(aBond.sigValue < 0.01)
+                            //{
+                            //    aBond.sigValue = 0.01;
+                            //}
                             aBond.numCodValues  = StrToInt(tBuf[10]);
                             //aBond.numCodValuesP = StrToInt(tBuf[13]);
                             //std::cout << aBond.atomsCodClasses[0] << std::endl;
@@ -5784,6 +5881,8 @@ namespace LIBMOL
             
             std::cout << "The final target bond value is " 
                       << iGB->value << std::endl;
+            std::cout << "Its sig value is " << iGB->sigValue << std::endl;
+            
             std::cout << std::endl
                       << "+++++++++++++++++++++++++++++++++++++++++++++++++++"
                       << std::endl;
@@ -6143,7 +6242,8 @@ namespace LIBMOL
             }
             
             
-            //std::cout << "The bond value is now " << iB->value << std::endl;
+            
+            
             //if (iB->hasCodValue)
             //{
             //    std::cout << "It have exact matches to COD atoms " << std::endl;
@@ -6861,6 +6961,12 @@ namespace LIBMOL
                                                     std::cout << " find " << a2C << std::endl;
                                                     int tIdx = allDictBondsIdxD[ha1][ha2][hybrComb][tInR][a1NB2][a2NB2][a1NB1NB2][a2NB1NB2][a1M][a2M][a1C][a2C];
                                                     std::cout << "Found exact matches of atom cod-classes " << std::endl;
+                                                    std::cout << "Number of value associate it "
+                                                              << allDictBondsD[tIdx].numCodValues
+                                                              << std::endl
+                                                              << "the table sigma "
+                                                              << allDictBondsD[tIdx].sigValue
+                                                              << std::endl;
                                                     if (allDictBondsD[tIdx].numCodValues >=4)
                                                     {
                                                         iB->hasCodValue = true;
@@ -6868,12 +6974,14 @@ namespace LIBMOL
                                                         iB->sigValue = allDictBondsD[tIdx].sigValue;  
                                                         iB->numCodValues = allDictBondsD[tIdx].numCodValues;
                                                         iB->approxLevel   =  0;
+                                                        
                                                     }
                                                     else
                                                     {
                                                         interLevelSearchBonds(aHaV, aKeySet, 0, iB);
                                                         
                                                     }
+                                                    
                                                 }
                                                 else
                                                 {
@@ -7024,6 +7132,8 @@ namespace LIBMOL
                 
             }
             
+            std::cout << "Finally bond sig is " << iB->sigValue << std::endl;
+            
     }
     
     void CodClassify::searchBondHashAndSP(std::vector<BondDict>::iterator iB)
@@ -7148,6 +7258,7 @@ namespace LIBMOL
                 iB->value        = tVaS.value;
                 iB->valueST      = iB->value;
                 iB->sigValue     = tVaS.sigValue;
+                std::cout << "Bond sig is " << iB->sigValue << std::endl;
                 iB->sigValueST   = iB->sigValue;
                 iB->numCodValues = tVaS.numCodValues;
                 iB->approxLevel  = 0;
@@ -7716,7 +7827,9 @@ namespace LIBMOL
             levelSearchBondsT(tKeySet1, tKeySet2, aLev, iB);
             if (iB->numCodValues >=4)
             {
+                
                 std::cout << "The end search level is " << aLev << std::endl;
+                std::cout << "The sig value is " << iB->sigValue << std::endl;
                 break;
             }
             aLev++;
@@ -8329,6 +8442,7 @@ namespace LIBMOL
                       << std::endl;
             exit(1);
         }
+
         
         if (nSum > 1)
         {
@@ -8344,6 +8458,8 @@ namespace LIBMOL
                       << std::endl;
             exit(1);
         }
+            
+       
     }
     
     
@@ -8958,7 +9074,7 @@ namespace LIBMOL
         
         groupCodMetBonds();
         searchCodBonds();
-        constrBondSigmas();
+        //constrBondSigmas();
     }
     
     void CodClassify::setupTargetBonds2()
@@ -8969,7 +9085,8 @@ namespace LIBMOL
         
         groupCodMetBonds();
         searchCodBonds();
-        constrBondSigmas();
+        // constrBondSigmas();
+       
     }
     /*
     void CodClassify::setupTargetBondsUsingSqlite()
@@ -10055,10 +10172,10 @@ namespace LIBMOL
                         aValueSet aAngS1;
                         aAngS1.value        = StrToReal(tBuf[22]);
                         aAngS1.sigValue     = StrToReal(tBuf[23]);
-                        if(aAngS1.sigValue <0.0001 || aAngS1.sigValue > 3.0)
-                        {
-                            aAngS1.sigValue = 3.0;
-                        }
+                        //if(aAngS1.sigValue <0.0001 || aAngS1.sigValue > 3.0)
+                        //{
+                        //    aAngS1.sigValue = 3.0;
+                        //}
                         aAngS1.numCodValues = StrToInt(tBuf[24]);
                        
                         if (allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
@@ -10078,10 +10195,10 @@ namespace LIBMOL
                         aValueSet aAngS2;
                         aAngS2.value        = StrToReal(tBuf[25]);
                         aAngS2.sigValue     = StrToReal(tBuf[26]);
-                        if(aAngS2.sigValue <0.0001 || aAngS2.sigValue > 3.0)
-                        {
-                            aAngS2.sigValue = 3.0;
-                        }
+                        //if(aAngS2.sigValue <0.0001 || aAngS2.sigValue > 3.0)
+                        //{
+                        //    aAngS2.sigValue = 3.0;
+                        //}
                         aAngS2.numCodValues = StrToInt(tBuf[27]);
                        
                         if (allDictAnglesIdx2D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
@@ -10095,10 +10212,10 @@ namespace LIBMOL
                         aValueSet aAngS3;
                         aAngS3.value        = StrToReal(tBuf[28]);
                         aAngS3.sigValue     = StrToReal(tBuf[29]);
-                        if(aAngS3.sigValue <0.0001 || aAngS3.sigValue > 3.0)
-                        {
-                            aAngS3.sigValue = 3.0;
-                        }
+                        //if(aAngS3.sigValue <0.0001 || aAngS3.sigValue > 3.0)
+                        //{
+                        //    aAngS3.sigValue = 3.0;
+                        //}
                         aAngS3.numCodValues = StrToInt(tBuf[30]);
                         
                         if (allDictAnglesIdx3D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
@@ -10112,10 +10229,10 @@ namespace LIBMOL
                         aValueSet aAngS4;
                         aAngS4.value        = StrToReal(tBuf[31]);
                         aAngS4.sigValue     = StrToReal(tBuf[32]);
-                        if(aAngS4.sigValue <0.0001 || aAngS4.sigValue > 3.0)
-                        {
-                            aAngS4.sigValue = 3.0;
-                        }
+                        //if(aAngS4.sigValue <0.0001 || aAngS4.sigValue > 3.0)
+                        //{
+                        //    aAngS4.sigValue = 3.0;
+                        //}
                         aAngS4.numCodValues = StrToInt(tBuf[33]);
                         
                         if (allDictAnglesIdx4D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]].size()==0)
@@ -10127,10 +10244,10 @@ namespace LIBMOL
                         aValueSet aAngS5;
                         aAngS5.value        = StrToReal(tBuf[34]);
                         aAngS5.sigValue     = StrToReal(tBuf[35]);
-                        if(aAngS5.sigValue <0.0001 || aAngS5.sigValue > 3.0)
-                        {
-                            aAngS5.sigValue = 3.0;
-                        }
+                        //if(aAngS5.sigValue <0.0001 || aAngS5.sigValue > 3.0)
+                        //{
+                        //    aAngS5.sigValue = 3.0;
+                        //}
                         aAngS5.numCodValues = StrToInt(tBuf[36]);
                         
                         if (allDictAnglesIdx5D[ha1][ha2][ha3][tBuf[3]].size()==0)
@@ -12906,14 +13023,18 @@ namespace LIBMOL
                 iAN->sigValue = 3.0;
                 iAN->  approxLevel = 6;
             }
-            if (iAN->sigValue > 3.0)
-            {
-                iAN->sigValue = 3.0;
-            }
-            if (iAN->sigValue < 1.5)
-            {
-                iAN->sigValue = 1.5;
-            }           
+            //if (iAN->sigValue > 3.0)
+            //{
+            //    iAN->sigValue = 3.0;
+            //}
+            //if (iAN->sigValue < 1.5)
+            //{
+            //    iAN->sigValue = 1.5;
+            //}
+            std::cout << "Finally the angle value is " 
+                      << iAN->value << std::endl;
+            std::cout << "It sig value is " << iAN->sigValue 
+                      << std::endl;
     }
     
     void CodClassify::levelSearchAngles(std::vector<int>          &      tHa,
@@ -15456,6 +15577,7 @@ namespace LIBMOL
         // std::cout << "libmol table should be " << libmolTabDir << std::endl;
 
         setupTargetBonds2();
+        
         // setupTargetBondsUsingSqlite();
         
         setupTargetAngles2();
@@ -15476,6 +15598,14 @@ namespace LIBMOL
         // initRoughCoords();
         setupAllStdValues();
         
+        //std::cout << "DOUBLE CHECKing again " << std::endl;
+        
+        //for (std::vector<BondDict>::iterator iB=allBonds.begin();
+        //        iB != allBonds.end(); iB++)
+        //{
+        //    std::cout << "Bond sig value " << iB->sigValue << std::endl;
+        //}
+        
     }
     
     
@@ -15488,10 +15618,10 @@ namespace LIBMOL
                 iB != allBonds.end(); iB++)
         {
             iB->valueST = iB->value;
-            if (iB->sigValue < 0.01 || iB->sigValue > 0.02)
-            {
-                iB->sigValue= 0.02;
-            }
+            //if (iB->sigValue < 0.01 || iB->sigValue > 0.02)
+            //{
+            //    iB->sigValue= 0.02;
+            //}
             iB->sigValueST = iB->sigValue;
             
         }
@@ -15500,10 +15630,10 @@ namespace LIBMOL
                 iAn !=allAngles.end(); iAn++)
         {
             iAn->valueST    = iAn->value;
-            if (iAn->sigValue < 0.1 || iAn->sigValue > 3.0)
-            {
-                iAn->sigValue = 3.0;
-            }
+            //if (iAn->sigValue < 0.1 || iAn->sigValue > 3.0)
+            //{
+            //    iAn->sigValue = 3.0;
+            //}
             iAn->sigValueST = iAn->sigValue;
         }
         

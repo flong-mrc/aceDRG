@@ -36,6 +36,7 @@ from utility  import listComp
 from utility  import listComp2
 from utility  import listCompDes
 from utility  import listCompAcd
+from utility  import BondOrderS2N
 
 class ChemCheck():
 
@@ -158,7 +159,17 @@ class ChemCheck():
 
         aMolT = Chem.AddHs(tMol)
         print "Number of atom after is ", aMolT.GetNumAtoms()
-        
+
+    def getNumNBHAtoms(self, tAtom):
+ 
+        nRet =0
+
+        nbAtoms = tAtom.GetNeighbors()
+        for aNBAtm in nbAtoms:
+            if aNBAtm.GetSymbol()=="H":
+                nRet+=1
+        return nRet
+
     def getAtomElems(self, tInFileName, tTypeIdx, tAtomElems):
         if tTypeIdx in self.atomFileType["mmCif"]: 
             self.getAtomElemsFromMmcif(tInFileName, tAtomElems)
@@ -351,8 +362,137 @@ class ChemCheck():
         # Formal charge should be corrected respectively
       
         pass 
-       
-                    
+      
+    def getAllowBondOrderForOneOrgAtom(self, tAtom):
+  
+        allowedBo = []
+        aT = tAtom["type_symbol"]
+        if self.orgVal.has_key(aT):
+            for aOrd in self.orgVal[aT]:
+                if tAtom.has_key("charge"):
+                    allowedBo.append(aOrd + int(tAtom["charge"]))
+                else:
+                    allowedBo.append(aOrd)
+        
+        return allowedBo 
+
+    def valideBondOrderForOneOrgAtom(self, tAtom, tBonds):
+
+        aBool = True
+        aLine = ""
+
+        nOrder = 0
+        for aB in tBonds:
+            nBT = BondOrderS2N(aB["type"])
+            if nBT != -1 : 
+                if tAtom.has_key("charge"):
+                    nOrder += (nBT + int(tAtom["charge"]))
+                else:
+                    nOrder += nBT
+            else:  
+                aLine = "Unknown type %s for the added bond between %s and %s \n"\
+                        %(aPair[0]["type"], aPair[0]["atom_id_1"], aPair[0]["atom_id_2"])
+                aBool = False
+                break
+        if aBool:
+            print "Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder)
+            curAllowOrds = self.getAllowBondOrderForOneOrgAtom(tAtom)
+            if len(curAllowOrds) !=0:
+                print "Total allowed bond orders are : "
+                for aOrd in curAllowOrds:
+                    print aOrd
+                if not nOrder in curAllowOrds:
+                     aLine ="Bond order (valence) %d around added atom %s are wrong.\n"%(nOrder, tAtom["atom_id"])
+                     aLine += "It should be %d, check your input file(bond order or charge)\n"%curAllowOrds[0]
+                     aBool = False   
+            else:
+                aLine = "Bug, can not find the allowed valence for added atom %s\n"%tAtom["atom_id"]
+                aBool = False
+         
+        return [aBool, aLine]
+
+    def adjustNBForOneAddedAtom(self, tAtom, tNBAtoms, tBonds, tRes, tMod, tDelAtmIds):
+
+        aBool = True
+        aLine = ""
+
+        nOrder = 0
+        for aB in tBonds:
+            nBT = -1
+            if aB.has_key("type"):
+                nBT = BondOrderS2N(aB["type"])
+                print "Bond-type between atom %s and %s is %d "%(aB["atom_id_1"], aB["atom_id_2"], nBT)
+            if nBT != -1 :
+                nOrder += nBT
+            else: 
+                aLine = "Unknown type for the added bond between %s and %s \n"\
+                        %(aB["atom_id_1"], aB["atom_id_2"])
+                aBool = False
+                break
+
+        if aBool:
+            print "Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder)
+            curAllowOrds = self.getAllowBondOrderForOneOrgAtom(tAtom)
+            if len(curAllowOrds) !=0:
+                print "Total allowed bond orders are : "
+                for aOrd in curAllowOrds:
+                    print aOrd
+                print "Current bond order is : ", nOrder
+                if not nOrder in curAllowOrds:
+                    # If total valence does not equal to one of allowed valences. Use curAllowOrds[0]
+                    # The procedures are:
+                    # (1) if the atom has formal charge, dealt with it first
+                    # (2) adjust H atom around the atom
+                    # (3) error info : tell the user to re-define the added bonds
+
+                    if nOrder == (curAllowOrds[0] - 1):
+                        if tAtom["charge"]=="1":
+                            # (1a) nOrder = curAllowOrds[0] - 1, cancel the formal charge in atom
+                            tAtom["charge"]="0"
+                            tMod["changed"]["atoms"].append(tAtom)
+                            print "The formal charge at atom %s is reduced to %s"%(tAtom["atom_id"], tAtom["charge"])
+                        else:
+                            # (1b) to add H atoms and therefore the valence of the atom.
+                            aAtom = {}
+                            aAtom["atom_id"]     = "HXX"          # tempo
+                            aAtom["type_symbol"] = "H"
+                            aAtom["type_energy"] = aAtom["type_symbol"]
+                            aAtom["comp_id"]     = tAtom["comp_id"] 
+                            tMod["added"]["atoms"].append(aAtom)
+                            print "One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"])
+                            aBond = {}
+                            aBond["atom_id_1"] = aAtom["atom_id"]
+                            aBond["atom_id_2"] = tAtom["atom_id"]
+                            aBond["type"]      = "SINGLE"
+                            tMod["added"]["bonds"].append(aBond)
+                    elif nOrder > curAllowOrds[0]:
+                        aN = nOrder-curAllowOrds[0]
+                        print "%d H atom will be deleted "%aN
+                        hAtomIds =[]
+                        for aAtom in tNBAtoms:
+                            if aAtom["type_symbol"]=="H" and not aAtom["atom_id"] in tDelAtmIds:
+                                hAtomIds.append(aAtom["atom_id"])
+                        print "%s connects %d H atom "%(tAtom["atom_id"], len(hAtomIds))
+                        if aN <=len(hAtomIds) :
+                            hAtomIds.sort()
+                            idxD = -1
+                            for i in range(aN):
+                                aHName = hAtomIds[idxD]
+                                if not aHName in tDelAtmIds:
+                                    tDelAtmIds.append(aHName)
+                                    print "H atom %s is deleted "%aHName
+                                idxD = idxD -1
+                            for aAtom in tRes["comp"]["atoms"]:
+                                if aAtom["atom_id"] in tDelAtmIds:
+                                    tMod["deleted"]["atoms"].append(aAtom)
+                        else :
+                             aLine = "Currently it is not allowed to do such a change for atom %s %s\n"%tAtom["atom_id"]
+                             aBool = False
+            else:
+                aLine = "Bug, can not find the allowed valence for added atom %s\n"%tAtom["atom_id"]
+                aBool = False
+        return [aBool, aLine]
+        
     def tmpModiN_in_AA(self, tCompId, tCifMonomer):
         
         # Tempo function to add a H atom connected to N in AA coming from the current $CLIBD_MON

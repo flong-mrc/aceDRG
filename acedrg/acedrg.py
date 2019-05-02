@@ -8,7 +8,7 @@
 #     CCP4 Program Suite Licence Agreement as a CCP4 Library.
 #
 #====================================================================
-## The date of last modification: 05/02/2018
+## The date of last modification: 30/04/2019
 #
 
 import os,os.path,sys
@@ -136,6 +136,12 @@ class Acedrg(CExeCode ):
         self.outCifGlobSect        = []
 
         self.allBondsAndAngles = {}
+
+        self.upperSigForBonds   = 0.02
+        self.lowSigForBonds     = 0.01
+        self.upperSigForAngles  = 3.0
+        self.lowSigForAngles    = 1.5
+        
 
         self.allBondsAndAngles["atomClasses"] = {}
         self.allBondsAndAngles["bonds"]       = {}
@@ -289,6 +295,27 @@ class Acedrg(CExeCode ):
                                     action="store", type="string", 
                                     help="Input File of SDF format containing coordinates and bonds")
 
+        self.inputParser.add_option("--bsu", dest="upperSigForBonds",  
+                                    action="store", type="float", 
+                                    help="Set upper bound for the sigma of bonds")
+
+        self.inputParser.add_option("--bsl", dest="lowSigForBonds",  
+                                    action="store", type="float", 
+                                    help="Set low bound for the sigma of bonds")
+
+        self.inputParser.add_option("--asu", dest="upperSigForAngles",  
+                                    action="store", type="float", 
+                                    help="Set upper bound for the sigma of angles")
+
+        self.inputParser.add_option("--asl", dest="lowSigForAngles",  
+                                    action="store", type="float", 
+                                    help="Set low bound for the sigma of angles")
+
+        self.inputParser.add_option("--fpar", dest="inParamFile", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File containing paramets that define upper and lower bounds for the sigma of bonds and angles")
+
+
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input path that stores all bond and angle tables (if no input, default CCP4 location will be used)")
@@ -422,8 +449,8 @@ class Acedrg(CExeCode ):
   
         # Acedrg version info 
         self.versionInfo["man"] = os.path.join(self.acedrgTables, "manifest.txt")
-        print self.acedrgTables
-        print self.versionInfo["man"] 
+        #print self.acedrgTables
+        #print self.versionInfo["man"] 
         if not os.path.isfile(self.versionInfo["man"]):
             print "Version infomation is not available."
         else:
@@ -701,8 +728,6 @@ class Acedrg(CExeCode ):
             self.workMode = 70
             
  
- 
-
         if t_inputOptionsP.testMode :
             self.testMode = True
 
@@ -712,7 +737,7 @@ class Acedrg(CExeCode ):
             #print self.monomRoot
             self.setMonoRoot()
             # self.monomRoot   = "UNL"
-        print "monomRoot: ", self.monomRoot
+        #print "monomRoot: ", self.monomRoot
         if t_inputOptionsP.outRoot:
             self.outRoot   = t_inputOptionsP.outRoot
             self.baseRoot  = os.path.basename(t_inputOptionsP.outRoot)
@@ -758,8 +783,28 @@ class Acedrg(CExeCode ):
                     self.inSmiName = tName
                     print tName
 
+
     def setInputProcPara(self, t_inputOptionsP = None):
-        
+       
+        if t_inputOptionsP.upperSigForBonds:
+            self.upperSigForBonds = t_inputOptionsP.upperSigForBonds
+            print "upper bound for the bond sigma is set to ", self.upperSigForBonds
+        if t_inputOptionsP.lowSigForBonds:
+            self.lowSigForBonds = t_inputOptionsP.lowSigForBonds
+            print "low bound for the bond sigma is set to ", self.lowSigForBonds
+        if t_inputOptionsP.upperSigForAngles:
+            self.upperSigForAngles = t_inputOptionsP.upperSigForAngles
+            print "upper bound of the angle sigma is set to ", self.upperSigForAngles
+        if t_inputOptionsP.lowSigForAngles:
+            self.lowSigForAngles = t_inputOptionsP.lowSigForAngles
+            print "low bound of the angle sigma is set to ", self.lowSigForAngles
+
+        if t_inputOptionsP.inParamFile:
+            self.inParamFile = t_inputOptionsP.inParamFile 
+            print "Input paramet file is ", self.inParamFile
+            self.setSigmaBounds()
+
+
         if t_inputOptionsP.noProtonation:
             self.inputPara["noProtonation"]     = t_inputOptionsP.noProtonation
 
@@ -779,6 +824,37 @@ class Acedrg(CExeCode ):
             if t_inputOptionsP.numConformers > t_inputOptionsP.numInitConformers:
                 self.inputPara["numInitConformers"] = t_inputOptionsP.numConformers
 
+    def setSigmaBounds(self):
+        
+        if os.path.isfile(self.inParamFile):
+            aPF = open(self.inParamFile, "r")
+            allParaLs = aPF.readlines()
+            aPF.close()
+            for aLT in allParaLs:
+                aL = aLT.upper().strip()
+                if aL.find(":") != -1:
+                    strs = aL.split(":") 
+                    if len (strs) >= 2:
+                        if strs[0].find("BSU") !=-1:
+                            self.upperSigForBonds = float(strs[1])
+                        if strs[0].find("BSL") !=-1:
+                            self.lowSigForBonds = float(strs[1])
+                        if strs[0].find("ASU") !=-1:
+                            self.upperSigForAngles = float(strs[1])
+                        if strs[0].find("ASL") !=-1:
+                            self.lowSigForAngles = float(strs[1])
+                    else:
+                        print "Wrong format in the paramet file ",self.inParamFile
+                        print "Problem line at : "
+                        print aLT
+                        sys.exit()
+        else:
+            print "Input paramet file %s does not exist"%self.inParamFile
+            sys.exit()        
+        print "Upper bound for sigma of bonds ", self.upperSigForBonds
+        print "Lower bound for sigma of bonds ", self.lowSigForBonds
+        print "Upper bound for sigma of angles ", self.upperSigForAngles
+        print "Lower bound for sigma of angles ", self.lowSigForAngles
 
     def printJobs(self):
 
@@ -856,6 +932,10 @@ class Acedrg(CExeCode ):
            or self.workMode==15 or self.workMode ==16\
            or self.workMode == 111 or self.workMode == 121 or self.workMode == 131 \
            or self.workMode==141 or self.workMode==151 or self.workMode==161:
+            self._cmdline += " -1 %f -2 %f -3 %f -4 %f "\
+                            %(self.upperSigForBonds, self.lowSigForBonds,\
+                              self.upperSigForAngles, self.lowSigForAngles)
+
             print "===================================================================" 
             print "| Generate the dictionary file using the internal database        |"
             print "===================================================================" 
@@ -904,7 +984,7 @@ class Acedrg(CExeCode ):
             self._cmdline += " -m yes -r %s -o %s "%(self.monomRoot, self.outRoot)
             #print self._cmdline
             #print "self.outRoot ", self.outRoot 
-            self.subExecute()
+            self.runExitCode = self.subExecute()
 
         if self.workMode == 22 :
             if os.path.isdir(self.inStdCifDir):

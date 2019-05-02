@@ -214,6 +214,22 @@ namespace LIBMOL
                     std::string                                 tLibmolTabDir,
                     int                                         nTM);
         
+        CodClassify(const std::vector<AtomDict>                 & tAtoms,
+                    const std::vector<int>                      & tHAtomIdx, 
+                    const std::vector<BondDict>                 & tBonds,
+                    const std::vector<AngleDict>                & tAngles,
+                    const std::vector<TorsionDict>              & tTorsions,
+                    const std::vector<ChiralDict>               & tChirals,
+                    const std::vector<PlaneDict>                & tPlans,
+                    const std::map<ID, std::vector<RingDict> >  & tRings, 
+                    std::string                                 tLibmolTabDir,
+                    int                                         nTM,
+                    const  double                               tUBS,
+                    const  double                               tLBS,
+                    const  double                               tUAS,
+                    const  double                               tLAS);
+        
+        
         // Constructor by a DictCifFile object
         CodClassify(const DictCifFile & tCifObj, 
                     std::string   tLibmolTabDir);
@@ -580,6 +596,11 @@ namespace LIBMOL
         
         int                                      wSize;
         std::string                              libmolTabDir;
+        
+        double                                   upperBondSig;
+        double                                   lowBondSig;
+        double                                   upperAngleSig;
+        double                                   lowAngleSig;
         
         PeriodicTable *                          pPeriodictable;
         

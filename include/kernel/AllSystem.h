@@ -166,6 +166,10 @@ namespace LIBMOL
         // so as planarity
         
         AllSystem(DictCifFile & tCifObj, std::string tLibmolTabDir);
+        AllSystem(DictCifFile & tCifObj, std::string tLibmolTabDir,
+                  const double ubs, const double lbs, const double uas,
+                  const double las);
+        
         AllSystem(Molecule & tMol, std::string tLibmolTabDir);
         AllSystem(SYBLMol2File & tMol2Obj, std::string tLibmolTabDir);
         // AllSystem(MolSdfFile & tSdfObj);
@@ -285,6 +289,7 @@ namespace LIBMOL
         void mergeLargePLGroups(std::vector<PlaneDict> & tSmaPls);
         bool isInSameRing(PlaneDict & tP1, PlaneDict & tP2);
         bool furtherM(std::vector<int> &tV1, std::vector<int> &tV2);     
+        void doubleCheckM();
         
         // COD database related 
         void setAtomCodClassName(AtomDict &tAtom, AtomDict &tOriAtom, int tLev);
@@ -314,7 +319,13 @@ namespace LIBMOL
         bool                                     hasCoords;
         bool                                     hasCCP4Type;
         bool                                     usingInChiral;
+        
         std::string                              libmolTabDir;
+        
+        double                                   upperBondSig;
+        double                                   lowBondSig;
+        double                                   upperAngleSig;
+        double                                   lowAngleSig;
         
         ChemComp                                 propComp;
         
