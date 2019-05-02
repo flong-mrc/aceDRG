@@ -113,6 +113,11 @@ namespace LIBMOL
                                  std::vector<AtomDict >     & tAtoms, 
                                  std::vector<PlaneDict>     & tPlanes);
     
+    extern void setAllRingPlanes2(std::vector<RingDict>      & tAllRings,
+                                  std::vector<std::vector<int> >  & tMRingIdxs,
+                                  std::vector<AtomDict >     & tAtoms, 
+                                  std::vector<PlaneDict>     & tPlanes);
+    
     extern void setAllOtherPlanes(std::vector<RingDict>     & tAllRings,
                                   std::vector<AtomDict >    & tAtoms, 
                                   std::vector<PlaneDict>    & tPlanes);

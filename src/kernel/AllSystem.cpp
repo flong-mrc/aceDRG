@@ -13,6 +13,7 @@ namespace LIBMOL
     AllSystem::AllSystem():hasCoords(false),
                            hasCCP4Type(false),
                            usingInChiral(true),
+                           
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -26,6 +27,11 @@ namespace LIBMOL
     AllSystem::AllSystem(const AllSystem& tAllSys):hasCoords(tAllSys.hasCoords),
                                                    hasCCP4Type(tAllSys.hasCCP4Type),
                                                    usingInChiral(tAllSys.usingInChiral),
+                                                   libmolTabDir(tAllSys.libmolTabDir),
+                                                   upperBondSig(tAllSys.upperBondSig),
+                                                   lowBondSig(tAllSys.lowBondSig),
+                                                   upperAngleSig(tAllSys.upperAngleSig),
+                                                   lowAngleSig(tAllSys.lowAngleSig),
                                                    itsContainMetal(tAllSys.itsContainMetal),
                                                    itsCurAngleSeriNum(ZeroInt),
                                                    itsCurAngle(NullPoint),
@@ -57,7 +63,11 @@ namespace LIBMOL
                           :hasCoords(false),
                            hasCCP4Type(false),
                            usingInChiral(true),
-                           libmolTabDir(""),
+                           libmolTabDir(tLibmolTab),
+                           upperBondSig(0.02),
+                           lowBondSig(0.01),
+                           upperAngleSig(3.0),
+                           lowAngleSig(1.5),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -66,7 +76,6 @@ namespace LIBMOL
                            itsCurChiralSeriNum(ZeroInt),
                            itsCurChiral(NullPoint)
     {
-        libmolTabDir  = tLibmolTab;
         
         AddAtoms(tAllAtoms);
         for (std::vector<int>::const_iterator iH = tAllHAtomIdx.begin();
@@ -91,6 +100,40 @@ namespace LIBMOL
                                                hasCCP4Type(tCifObj.hasCCP4Type),
                                                usingInChiral(true),
                                                libmolTabDir(""),
+                                               upperBondSig(0.02),
+                                               lowBondSig(0.01),
+                                               upperAngleSig(3.0),
+                                               lowAngleSig(1.5),
+                                               itsContainMetal(false),
+                                               itsCurAngleSeriNum(ZeroInt),
+                                               itsCurAngle(NullPoint),
+                                               itsCurTorsionSeriNum(ZeroInt),
+                                               itsCurTorsion(NullPoint),
+                                               itsCurChiralSeriNum(ZeroInt),
+                                               itsCurChiral(NullPoint)
+    {
+        libmolTabDir  = tLibmolTab;
+        AddAtoms(tCifObj.allAtoms);
+        AddBonds(tCifObj.allBonds);
+        // AddTorsions(tCifObj.allTorsions);
+        AddChirals(tCifObj.allChirals);
+        AddPropComp(tCifObj.propComp);
+        setSysProps();
+        
+    }
+    
+    
+    AllSystem::AllSystem(DictCifFile & tCifObj, std::string tLibmolTab,
+                         const double tUBS,  const double tLBS,
+                         const double tUAS,  const double tLAS):
+                                               hasCoords(tCifObj.hasCoords),
+                                               hasCCP4Type(tCifObj.hasCCP4Type),
+                                               usingInChiral(true),
+                                               libmolTabDir(""),
+                                               upperBondSig(tUBS),
+                                               lowBondSig(tLBS),
+                                               upperAngleSig(tUAS),
+                                               lowAngleSig(tLAS),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -113,6 +156,10 @@ namespace LIBMOL
                                                hasCoords(tMol2Obj.hasCoords),             
                                                usingInChiral(true),
                                                libmolTabDir(""),
+                                               upperBondSig(0.02),
+                                               lowBondSig(0.01),
+                                               upperAngleSig(3.0),
+                                               lowAngleSig(1.5),
                                                itsContainMetal(false),
                                                itsCurAngleSeriNum(ZeroInt),
                                                itsCurAngle(NullPoint),
@@ -133,13 +180,18 @@ namespace LIBMOL
                                          hasCoords(tMol.hasCoords),
                                          hasCCP4Type(false),
                                          usingInChiral(true),
-                                               itsContainMetal(false),
-                                               itsCurAngleSeriNum(ZeroInt),
-                                               itsCurAngle(NullPoint),
-                                               itsCurTorsionSeriNum(ZeroInt),
-                                               itsCurTorsion(NullPoint),
-                                               itsCurChiralSeriNum(ZeroInt),
-                                               itsCurChiral(NullPoint)
+                                         libmolTabDir(""),
+                                         upperBondSig(0.02),
+                                         lowBondSig(0.01),
+                                         upperAngleSig(3.0),
+                                         lowAngleSig(1.5),
+                                         itsContainMetal(false),
+                                         itsCurAngleSeriNum(ZeroInt),
+                                         itsCurAngle(NullPoint),
+                                         itsCurTorsionSeriNum(ZeroInt),
+                                         itsCurTorsion(NullPoint),
+                                         itsCurChiralSeriNum(ZeroInt),
+                                         itsCurChiral(NullPoint)
     {
         libmolTabDir  = tLibmolTab;
         AddAtoms(tMol.atoms);
@@ -4036,8 +4088,13 @@ namespace LIBMOL
                 allPlanes.push_back(aPl);
             }
         } 
+        
+        // comment out later on
+        // doubleCheckM();
     }
 
+    
+    
     bool AllSystem::isInSameRing(PlaneDict & tP1, PlaneDict & tP2)
     {
         if (std::find(allAtoms[tP1.archPos].connAtoms.begin(),
@@ -4105,6 +4162,107 @@ namespace LIBMOL
     }
         
     
+    void AllSystem::doubleCheckM()
+    {
+        std::cout << "Originally total number of planes is " << allPlanes.size()
+                  << std::endl;
+        std::vector<PlaneDict>  tmpPls;
+        
+        std::map<int, std::vector<int> > setPlAtms;
+        std::map<int, int> aMap;
+        for (unsigned iP=0; iP < allPlanes.size(); iP++)
+        {
+            aMap[iP] = iP;
+            for (std::map<ID, int>::iterator iA=allPlanes[iP].atoms.begin();
+                  iA!=allPlanes[iP].atoms.end(); iA++)
+            {
+                setPlAtms[iP].push_back(iA->second);
+            }
+        }
+        
+        for (unsigned iP=0; iP < allPlanes.size(); iP++)
+        {
+            for (unsigned jP=iP+1; jP < allPlanes.size(); jP++)
+            {
+                bool aM=furtherM(setPlAtms[iP], setPlAtms[jP]);
+                if (aM)
+                {
+                    aMap[jP] = iP;
+                }
+            }
+        }
+        
+        std::map<int, std::vector<int> > aReMap;
+        
+        for (std::map<int, int>::iterator iRM=aMap.begin();
+                iRM !=aMap.end(); iRM++)
+        {
+            aReMap[iRM->second].push_back(iRM->first);
+        }
+        
+        std::vector<int> delPls;
+        
+        for (std::map<int, std::vector<int> >::iterator iBack=aReMap.begin();
+                iBack !=aReMap.end(); iBack++)
+        {
+            if (iBack->second.size() > 1)
+            {
+                PlaneDict aTmpPl(allPlanes[iBack->second[0]]);
+                delPls.push_back(iBack->second[0]);
+                std::cout << "the following planes will be merged: " 
+                          << std::endl;
+                std::cout << "plane " << iBack->second[0] << std::endl;
+                
+                for (unsigned iP2=iBack->second[1]; iP2 < iBack->second.size();
+                       iP2++)
+                {
+                    for (std::map<ID,int>::iterator 
+                         iA=allPlanes[iP2].atoms.begin();
+                            iA !=allPlanes[iP2].atoms.end(); iA++)
+                    {
+                        if (aTmpPl.atoms.find(iA->first)==aTmpPl.atoms.end())
+                        {
+                            aTmpPl.atoms[iA->first]=iA->second;
+                        }
+                    }
+                    delPls.push_back(iP2);
+                    std::cout << "plane " << iP2 << std::endl;
+                }
+                tmpPls.push_back(aTmpPl);
+            }
+        }
+        
+        for (unsigned iP3=0; iP3 < allPlanes.size(); iP3++)
+        {
+            if (std::find(delPls.begin(), delPls.end(), iP3)
+                        ==delPls.end())
+            {
+                    tmpPls.push_back(allPlanes[iP3]);
+            }
+        }
+            
+        allPlanes.clear();
+            
+        for (unsigned iP4=0; iP4 < tmpPls.size(); iP4++)
+        {
+            allPlanes.push_back(tmpPls[iP4]);
+        }
+     
+        std::cout << "Now total number of planes is " << allPlanes.size()
+                  << std::endl;
+        std::cout << "They are : " << std::endl;
+        
+        for (unsigned iP5=0; iP5 < allPlanes.size(); iP5++)
+        {
+            std::cout << "Plane " << iP5+1 << std::endl;
+            for (std::map<ID, int>::iterator iA=allPlanes[iP5].atoms.begin();
+                  iA!=allPlanes[iP5].atoms.end(); iA++)
+            {
+                std::cout << "Atom " << iA->first << std::endl;
+            }
+        }
+        
+    }
     
     void AllSystem::setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName, 
                                                 ID tLibmolDir)
@@ -4143,8 +4301,11 @@ namespace LIBMOL
       
         
         aCodSystem.setupAllTargetValues2();  
-      
+        
+        
         resetSystem2(aCodSystem);
+        
+        
        /*
        for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)

@@ -43,12 +43,17 @@ namespace LIBMOL {
 
 
         void parseArgs(int numArg, char** argVars);
+        void setBandASiga();
         void SetWorkMode();
         void printManual();
         void printVarAndMode();
         
         int workMode;
         
+        double                                   upperBondSig;
+        double                                   lowBondSig;
+        double                                   upperAngleSig;
+        double                                   lowAngleSig;
         std::map<ID, ID> envVars;
         std::map<ID, ID> IOEntries;
 

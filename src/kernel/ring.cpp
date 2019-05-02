@@ -515,7 +515,6 @@ namespace LIBMOL
                                 std::vector<AtomDict >         & tAtoms)
     {
         
-        std::cout << "Number of rings " << tAllRings.size() << std::endl;
         /*
         for (unsigned i=0; i < tAllRings.size(); i++)
         {
@@ -551,21 +550,22 @@ namespace LIBMOL
         if (mergedRings.size() !=0)
         {
             
-            std::cout << "Merged planar rings : " << std::endl;
+            std::cout << "number of Merged planar rings : " 
+                      << mergedRings.size() << std::endl;
             for (std::vector<std::vector<int> >::iterator iMr=mergedRings.begin();
                     iMr != mergedRings.end(); iMr++)
             {
                 std::vector<int> atmIdxs;
-                //std::cout << "A merged system contains " << iMr->size() 
-                //          << " rings. They are:  " << std::endl;
+                std::cout << "A merged system contains " << iMr->size() 
+                          << " rings. They are:  " << std::endl;
                 for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
                 {
-                    //std::cout << "The Ring with atoms " << std::endl;
+                    std::cout << "The Ring with atoms " << std::endl;
                     for (std::vector<AtomDict>::iterator iA=tAllRings[*iR].atoms.begin();
                             iA != tAllRings[*iR].atoms.end(); iA++)
                     {
-                        //std::cout << iA->id << std::endl;
+                        std::cout << iA->id << std::endl;
                         if(std::find(atmIdxs.begin(), atmIdxs.end(), iA->seriNum)
                             ==atmIdxs.end())
                         {
@@ -581,7 +581,7 @@ namespace LIBMOL
                 if(checkAromaSys(atmIdxs, tAtoms))
                 {
                     std::cout << "It is an aromatic system" << std::endl;
-                    tRingAtoms.push_back(atmIdxs);
+                    tRingAtoms.push_back(*iMr);
                     for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
                     {
@@ -1085,14 +1085,19 @@ namespace LIBMOL
             
         }
         
-        
-        std::vector<std::vector<int> >  ringAtomSets;
-        mergePlaneRings(tAllRings, ringAtomSets, tAtoms);
+        //std::cout << "A: Number of rings " 
+        //          << tAllRings.size() << std::endl;
+        std::vector<std::vector<int> >  mergedRingSets;
+        mergePlaneRings(tAllRings, mergedRingSets, tAtoms);
       
+        //std::cout << "B: Number of rings " 
+        //          << tAllRings.size() << std::endl;
+        
         tPlanes.clear();
         
-        setAllRingPlanes(tAllRings, tAtoms, tPlanes);
-        
+        // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
+        setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
+        //std::cout << "Here 4 for planes " << std::endl;
         
         setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
         /*

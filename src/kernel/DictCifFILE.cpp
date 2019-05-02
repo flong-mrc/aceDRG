@@ -7449,8 +7449,13 @@ namespace LIBMOL
                          std::vector<TorsionDict>& tTorsions, 
                          std::vector<RingDict> & tRings, 
                          std::vector<PlaneDict>& tPlas, 
-                         std::vector<ChiralDict>& tChs)
+                         std::vector<ChiralDict>& tChs,
+                         const   double           tUBS,
+                         const   double           tLBS,
+                         const   double           tUAS,
+                         const   double           tLAS)
     {
+        
         for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
                 iAt!=tAtoms.end(); iAt++)
         {
@@ -7688,6 +7693,20 @@ namespace LIBMOL
                     {
                         outOrder = iB->order;
                     }
+                    
+                    double aSigV;
+                    if (iB->sigValue < tLBS)
+                    {
+                        aSigV = tLBS;
+                    }
+                    else if (iB->sigValue > tUBS)
+                    {
+                        aSigV = tUBS;
+                    }
+                    else
+                    {
+                        aSigV  = iB->sigValue;
+                    }
                     outRestrF <<  longName
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
@@ -7696,8 +7715,8 @@ namespace LIBMOL
                               << std::setw(8)   << tAr
                               << std::setw(10)  << std::setprecision(3)
                               << iB->value 
-                              << std::setw(8) << std::setprecision(3)
-                              << iB->sigValue << std::endl;
+                              << std::setw(8) << std::setprecision(4)
+                              << aSigV << std::endl;
                     
                     //   if(iB->hasCodValue)
                     //   {
@@ -7731,20 +7750,38 @@ namespace LIBMOL
                     // difference in comp atom definitions between cod and
                     // dictionary: inner-out1-out2(cod),
                     // atom1-atom2(center)-atom3(dictionary)
-                    if (iA->sigValue < 1.5)
+                    double aSigAV;
+                    
+                    if (iA->sigValue < tLAS)
                     {
-                        iA->sigValue = 1.5;
+                        aSigAV = tLAS;
                     }
+                    else if (iA->sigValue > tUAS)
+                    {
+                        aSigAV = tUAS;
+                    }
+                    else
+                    {
+                        aSigAV = iA->sigValue;
+                    }
+                    
                     if (tAtoms[iA->atoms[0]].isMetal)
                     {
                         for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
                                 iCA !=iA->codAngleValues.end(); iCA++)
                         {
-                            outRestrF << tMonoRootName.substr(0,3) << std::setw(12)
-                                      << tAtoms[iA->atoms[1]].id << std::setw(12)
-                                      << tAtoms[iA->atoms[0]].id << std::setw(12)
-                                      << tAtoms[iA->atoms[2]].id << std::setw(12) << std::setprecision(3) <<  *iCA << "    "
-                                      << std::setw(8) << std::setprecision(2) << iA->sigValue << std::endl;
+                            outRestrF << tMonoRootName.substr(0,3) 
+                                      << std::setw(12)
+                                      << tAtoms[iA->atoms[1]].id 
+                                      << std::setw(12)
+                                      << tAtoms[iA->atoms[0]].id 
+                                      << std::setw(12)
+                                      << tAtoms[iA->atoms[2]].id 
+                                      << std::setw(12) 
+                                      << std::setprecision(3) 
+                                      <<  *iCA << "    "
+                                      << std::setw(8) << std::setprecision(2) 
+                                      << aSigAV << std::endl;
                         }
                     }
                     else
@@ -7754,7 +7791,7 @@ namespace LIBMOL
                                   << std::setw(12) << tAtoms[iA->atoms[0]].id 
                                   << std::setw(12) << tAtoms[iA->atoms[2]].id;
                         outRestrF << std::setw(12) << std::setprecision(3) <<  iA->value
-                                  << std::setw(8) << std::setprecision(2) << iA->sigValue 
+                                  << std::setw(8) << std::setprecision(2) << aSigAV 
                                   << std::endl;
                     }
                     /*
