@@ -1479,16 +1479,17 @@ class AcedrgRDKit():
 
             # chiral center section
             atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
-            #if len(atomNBCIPMap.keys()):
-            #    for aAtom in allAtoms:
-            #        if aAtom.GetSymbol().find("H")==-1:
-            #            aIdx = aAtom.GetIdx()
-            #            print "=============================================="
-            #            print "| Centered atom :     %s"%aAtom.GetProp("Name")
-            #            print "----------------------------------------------"
-            #            for aPair in atomNBCIPMap[aIdx]:
-            #                print "NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
-            #    print "=============================================="
+            if len(atomNBCIPMap.keys()):
+                for aAtom in allAtoms:
+                    if aAtom.GetSymbol().find("H")==-1:
+                        aIdx = aAtom.GetIdx()
+                        aId  = aAtom.GetProp("Name")
+                        print "=============================================="
+                        print "| Centered atom :     %s"%aAtom.GetProp("Name")
+                        print "----------------------------------------------"
+                        for aPair in atomNBCIPMap[aId]:
+                            print "NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1])
+                print "=============================================="
 
             aChiralSignMap = self.setChiralsByMultiConformers(tChemCheck, tMol, atomNBCIPMap)
             self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
@@ -1505,7 +1506,6 @@ class AcedrgRDKit():
                         if aCid != "isChiraled" and aCid != "finalChiVolSign" and aChiralSignMap[aId][aCid].has_key("confSign"):
                             print "In conformer %d, its chiral volume sign is %s "%(aCid, aChiralSignMap[aId][aCid]["confSign"])
                     print "==============================================\n"
-
 
             chiCenAtmIds1     = []
             nChiPre = 0
@@ -1535,12 +1535,14 @@ class AcedrgRDKit():
                 aElem = aAtom.GetSymbol()
                 aName=aAtom.GetProp("Name")
                 aHyb  = aAtom.GetHybridization()
+                nNB   = len(aAtom.GetNeighbors())
                 print "for atom ", aName
                 print "its hyb is ", aHyb
+                print "it connects to ",nNB, " NBs"
                 if aHyb == rdchem.HybridizationType.SP3 and aElem != "H" and aElem != "O":
                     nConnHs =  self.chemCheck.getNumNBHAtoms(aAtom)
                     print "number of H atoms connected  ", nConnHs
-                    if not aName in chiCenAtmIds1 and not aName in chiCenAtmIds2 and nConnHs < 2:
+                    if not aName in chiCenAtmIds1 and not aName in chiCenAtmIds2 and nConnHs < 2 and nNB > 2:
                         chiCenAtms3.append(aAtom)                        
             nChiBoth = len(chiCenAtms3)
             print "nChiBoth ",nChiBoth
@@ -1645,11 +1647,13 @@ class AcedrgRDKit():
                     if not atmIdx1 in delAtomIdxs and not atmIdx2 in delAtomIdxs :
                         if symb1.find(self.repSign)==-1 and symb2.find(self.repSign)==-1:
                             if atmIdx1 == aIdx:                      
+                                #print name2
                                 reNameSet[aId].append([allAtoms[atmIdx2], allAtoms[atmIdx2].GetProp("_CIPRank")])
                             elif atmIdx2 == aIdx:
+                                #print name1
                                 reNameSet[aId].append([allAtoms[atmIdx1], allAtoms[atmIdx1].GetProp("_CIPRank")])
                             else:
-                                print "Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
+                                print "Bug! atom %s is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name"))
                                 break
                 else:
                     if atmIdx1 == aIdx:                      
@@ -1661,6 +1665,12 @@ class AcedrgRDKit():
                         break
             reNameSet[aId].sort(listCompDes) 
         
+        #for aId in reNameSet.keys():
+        #    if aId.find("H")==-1:
+        #        print "Atom ",aId
+        #        print "Its NB CIP is arranged as follow "
+        #        for aPair in reNameSet[aId]:
+        #            print "Atom %s : CIP RANK %s "%(aPair[0].GetProp("Name"), aPair[1])
         return reNameSet 
 
     def setChiralsByMultiConformers(self, tChemCheck, tMol, tNBCIPMap):
