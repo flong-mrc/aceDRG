@@ -295,6 +295,8 @@ namespace LIBMOL
     extern bool isOrganc(std::vector<ID> & tOrgTab, ID tID);
     extern void initMetalTab(std::vector<ID> & tMeTab);
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID);
+    extern void initMetalloidTab(std::vector<ID> & tTab);
+    extern bool isMetalloid(std::vector<ID> & tTab, ID tID);
     extern void initAminoAcidTab(std::vector<ID> & tAATab);
     extern bool isAminoAcid(std::vector<ID> & tAATab, ID tID);
     extern void fromIdToChemType(ID tId, ID & tChemType);

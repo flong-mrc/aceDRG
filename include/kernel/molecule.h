@@ -12,6 +12,7 @@
 #include "kernel.h"
 #endif
 
+
 #ifndef ATOM_H
 #include "atom.h"
 #endif
@@ -96,6 +97,7 @@ namespace LIBMOL
         void setFormula();
         void calcSumExcessElecs();
         void calcSumCharges();
+        void setAtomFormTypes();
              
         std::vector<AtomDict>            atoms;
         std::vector<BondDict>            bonds;

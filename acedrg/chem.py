@@ -466,32 +466,64 @@ class ChemCheck():
                             aBond["type"]      = "SINGLE"
                             tMod["added"]["bonds"].append(aBond)
                     elif nOrder > curAllowOrds[0]:
-                        aN = nOrder-curAllowOrds[0]
-                        print "%d H atom will be deleted "%aN
-                        hAtomIds =[]
-                        for aAtom in tNBAtoms:
-                            if aAtom["type_symbol"]=="H" and not aAtom["atom_id"] in tDelAtmIds:
-                                hAtomIds.append(aAtom["atom_id"])
-                        print "%s connects %d H atom "%(tAtom["atom_id"], len(hAtomIds))
-                        if aN <=len(hAtomIds) :
-                            hAtomIds.sort()
-                            idxD = -1
-                            for i in range(aN):
-                                aHName = hAtomIds[idxD]
-                                if not aHName in tDelAtmIds:
-                                    tDelAtmIds.append(aHName)
-                                    print "H atom %s is deleted "%aHName
-                                idxD = idxD -1
-                            for aAtom in tRes["comp"]["atoms"]:
-                                if aAtom["atom_id"] in tDelAtmIds:
-                                    tMod["deleted"]["atoms"].append(aAtom)
-                        else :
-                             aLine = "Currently it is not allowed to do such a change for atom %s %s\n"%tAtom["atom_id"]
-                             aBool = False
+                        if len(curAllowOrds)==1:
+                            aN = nOrder-curAllowOrds[0]
+                            print "%d H atom will be deleted "%aN
+                            hAtomIds =[]
+                            for aAtom in tNBAtoms:
+                                if aAtom["type_symbol"]=="H" and not aAtom["atom_id"] in tDelAtmIds:
+                                    hAtomIds.append(aAtom["atom_id"])
+                            print "%s connects %d H atom "%(tAtom["atom_id"], len(hAtomIds))
+                            if aN <=len(hAtomIds) :
+                                hAtomIds.sort()
+                                idxD = -1
+                                for i in range(aN):
+                                    aHName = hAtomIds[idxD]
+                                    if not aHName in tDelAtmIds:
+                                        tDelAtmIds.append(aHName)
+                                        print "H atom %s is deleted "%aHName
+                                    idxD = idxD -1
+                                for aAtom in tRes["comp"]["atoms"]:
+                                    if aAtom["atom_id"] in tDelAtmIds:
+                                        tMod["deleted"]["atoms"].append(aAtom)
+                            else :
+                                 aLine = "Currently it is not allowed to do such a change for atom %s %s\n"%tAtom["atom_id"]
+                                 aBool = False
+                        else: 
+                            print "Here "
+                            sys.exit()
+                            nAdded = 1 # TEMPO
+                            lAdded = False
+                            for i in range(1,len(curAllowOrds)):
+                                if nOrder == curAllowOrds[i] -1:
+                                    self.addOneHAtomAndRelatedBond(tMod["added"]["atoms"], tMod["added"]["bonds"], tAtom, nAdded)
+                                    nAdded +=1
+                                    lAdded = True
+                                    break
+                            if not lAdded:
+                                aLine = "Currently it is not allowed to do such a change for atom %s %s\n"%tAtom["atom_id"]
+                                aBool = False
             else:
                 aLine = "Bug, can not find the allowed valence for added atom %s\n"%tAtom["atom_id"]
                 aBool = False
         return [aBool, aLine]
+
+    def addOneHAtomAndRelatedBond(self, tAtoms, tBonds, tConnAtom, tIdxH):
+        # Add a H atom that connect tConnAtom
+        aAtom = {}
+        aStr = str(tIdxH)
+        aAtom["atom_id"]     = "HX" + aStr          # tempo
+        aAtom["type_symbol"] = "H"
+        aAtom["type_energy"] = aAtom["type_symbol"]
+        aAtom["comp_id"]     = tConnAtom["comp_id"] 
+        tAtoms.append(aAtom)
+        print "One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"])
+        Bond = {}
+        aBond["atom_id_1"] = aAtom["atom_id"]
+        aBond["atom_id_2"] = tConnAtom["atom_id"]
+        aBond["type"]      = "SINGLE"
+        tBonds.append(aBond)
+     
         
     def tmpModiN_in_AA(self, tCompId, tCifMonomer):
         

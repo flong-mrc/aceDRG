@@ -156,6 +156,7 @@ namespace LIBMOL
         itsSegNum = tN;
     }
     
+    
     IDCode Atom::getSegID()  const
     {
         return itsSegID;
@@ -273,6 +274,7 @@ namespace LIBMOL
             chiralIdx(ZeroInt),
             bondingIdx(ZeroInt),
             hybrid(NullString),
+            matType(0),
             isMetal(false),
             metalGeo(NullString),
             isoB(ZeroReal),
@@ -344,6 +346,7 @@ namespace LIBMOL
             chiralIdx(tAtom.chiralIdx),
             bondingIdx(tAtom.bondingIdx),
             hybrid(tAtom.hybrid),
+            matType(tAtom.matType),
             isMetal(tAtom.isMetal),
             metalGeo(tAtom.metalGeo),
             isoB(tAtom.isoB),
@@ -495,6 +498,13 @@ namespace LIBMOL
                 iMRP != tAtom.baseRingProp.end(); iMRP++)
         {
             baseRingProp[iMRP->first] = iMRP->second;
+        }
+        
+        for (std::vector<std::string>::const_iterator 
+             iFMType=tAtom.formType.begin();
+             iFMType !=tAtom.formType.end(); iFMType++)
+        {
+            formType.push_back(*iFMType);
         }
     }
     
@@ -840,6 +850,13 @@ namespace LIBMOL
             }
         }
         
+        allRings.clear();
+        for (std::vector<RingDict>::const_iterator iR=tMC.allRings.begin();
+              iR != tMC.allRings.end(); iR++)
+        {
+            allRings.push_back(*iR);
+        }
+        
     }
     
     metalCluster::~metalCluster()
@@ -1017,7 +1034,11 @@ namespace LIBMOL
             
             unitCoords.push_back(aDiffVec);
         }
-        
+    }
+    
+    void metalCluster::setOrgRingsInMetalCluster(std::vector<AtomDict> & tAtoms, 
+                                                 int tCenSerial)
+    {
     }
     
     extern int getAtom(std::string              tId,

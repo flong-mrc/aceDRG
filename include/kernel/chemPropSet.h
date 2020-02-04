@@ -333,6 +333,8 @@ namespace LIBMOL
                                std::vector<AtomDict>  & tAtoms,
                                std::vector<BondDict>  & tBonds);
     
+    extern void setAtomFormTypes(std::vector<AtomDict> & tAtoms);
+    
     class HuckelMOSuite
     {
     public :

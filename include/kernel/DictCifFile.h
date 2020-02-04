@@ -60,7 +60,6 @@
 #include "libglink.h"
 #endif
 
-
 #ifndef SECONDARYSTRUCTURES_H
 #include "secondaryStructures.h"
 #endif
@@ -143,6 +142,7 @@ namespace LIBMOL
     
     class Molecule;
     
+    
     struct DictCifHead {
         Name   libName;
         ID     monType;
@@ -197,7 +197,9 @@ namespace LIBMOL
                                // absent from the derived CSD cif files.
         
         void checkPowder(std::vector<std::string> & tLines);
+        void checkNeutronD(std::vector<std::string> & tLines);
         void checkCalcAtoms();
+        bool checkOverAll(int tWorkMode);
         void getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines,
                             std::map<std::string, std::string>  & tRowProps,
                             std::map<int, std::map<ID, std::vector<std::string> > > & tColProps,
@@ -242,6 +244,7 @@ namespace LIBMOL
         void setAtomsCCP4Type();
         int  atomPosition(ID tID);
         void setAtomsPartialCharges();
+        void getHAtomIdxs();
         
         // Bonds related 
         void getBondAndConnect(std::vector<std::string> tF);
@@ -321,6 +324,7 @@ namespace LIBMOL
         void getAnglesFromPDB(ID tFName);
         void outRestraintCif(FileName tFName, ID tMonoRootName);
         void outPDB(FileName tFName, ID tMonoRootName);
+        void reOrdErrMsg();
         
         int                        curBlockLine;
         
@@ -367,9 +371,11 @@ namespace LIBMOL
         bool                       hasH;
         bool                       hasMetal;
         bool                       notPowder;
+        bool                       notNeuD;
         bool                       resolOK;
         bool                       RFactorOK;
         bool                       colidOK;    // check before molecule generated
+        bool                       hasOcpLab;
         bool                       hasHeavyCalcAtoms;
         
     private:
@@ -658,7 +664,8 @@ namespace LIBMOL
                                    Molecule & tMol);
     
     extern int getHAtomNum(std::vector<LIBMOL::AtomDict>& tAtoms);
-
+    extern void outHAtomIds(FileName tFName);
+    
     extern void outMMCif3Secs(FileName tFName, 
                               ID tMonoRootName,
                               std::vector<LIBMOL::AtomDict> & tAtoms,

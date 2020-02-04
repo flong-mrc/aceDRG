@@ -12,6 +12,7 @@ namespace LIBMOL
     
     CheckEnvAndGetMode::CheckEnvAndGetMode():workMode(0)
     {
+        
         // Currently CCP4 suite is the only requited thing 
         char * pClibdMon = std::getenv("CLIBD_MON");
         if (pClibdMon !=NULL)
@@ -82,7 +83,7 @@ namespace LIBMOL
         
         int c, index; 
         while ((c = getopt (numArg, ArgVars, 
-         "a:b:c:d:i:j:k:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:M:O:S:T:U:X:Y:Z:1:2:3:4:")) != -1)
+         "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:M:O:P:S:T:U:X:Y:Z:1:2:3:4:")) != -1)
         {
             switch (c)
             {
@@ -114,6 +115,11 @@ namespace LIBMOL
                     IOEntries["inMol2Name"] =  optarg;
                     //std::cout << "The input Mol2 files are in " 
                     //          <<  IOEntries["inMol2Name"] << std::endl;
+                    break;
+                case 'l':
+                    IOEntries["enableNeu"] =  optarg;
+                    // std::cout << "The input files are in " 
+                    //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
                 case 'm':
                     IOEntries["molGen"] =  optarg;
@@ -171,19 +177,21 @@ namespace LIBMOL
                     break;
                 case 'D':
                     IOEntries["libMolTabDir"] = optarg;
-                    //std::cout << "COD atom types are output to : " 
-                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    //std::cout << "Libmol table directory is  : " 
+                    //          << IOEntries["libMolTabDir"] 
+                    //          << std::endl;
                     break;
                 case 'M':
                     IOEntries["MetalEnable"] = optarg;
-                    //std::cout << "COD atom types are output to : " 
-                    //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
                 case 'O':
                     IOEntries["NoGeoOpt"] = optarg;
                     StrLower(IOEntries["NoGeoOpt"]);
-                    //std::cout << "COD atom types are output to : " 
-                    //          << IOEntries["AtomTypeOutName"] << std::endl;
+                    break;
+                case 'P':
+                    IOEntries["UserParaFile"] = optarg;
+                    std::cout << "The param file from the user : " 
+                              << IOEntries["UserParaFile"] << std::endl;
                     break;
                 case 'S':
                     IOEntries["codAtomStr"] = optarg;
@@ -280,7 +288,7 @@ namespace LIBMOL
         setBandASiga();
          
         SetWorkMode();
-        
+           
     }
     
     CheckEnvAndGetMode::~CheckEnvAndGetMode()
@@ -405,10 +413,13 @@ namespace LIBMOL
     {
         if (IOEntries.find("TempTests") !=IOEntries.end())
         {
-            
             if (IOEntries.find("inCifName")!=IOEntries.end())
             {
                 workMode = 1001;
+            }
+            else if (IOEntries.find("inCifNameB")!=IOEntries.end())
+            {
+                workMode = 1002;
             }
             else
             {
@@ -438,7 +449,14 @@ namespace LIBMOL
             }
             else if (IOEntries.find("inCifNameB")!=IOEntries.end())
             {
-                workMode = 312;
+                if (IOEntries.find("UserParaFile")!=IOEntries.end())
+                {
+                    workMode = 313;
+                }
+                else
+                {
+                    workMode = 312;
+                }
             }
         }
         else if ( IOEntries.find("inCifName")!=IOEntries.end() )
@@ -516,7 +534,14 @@ namespace LIBMOL
             {
                 // This mode takes a general cif file and generate a whole molecule 
                 // and unique bonds and angles within the molecule
-                workMode = 31;
+                if (IOEntries.find("enableNeu") != IOEntries.end())
+                {
+                    workMode = 3111;
+                }
+                else
+                {
+                    workMode = 31;
+                }
             }
             else if (IOEntries.find("tabGen") != IOEntries.end())
             {

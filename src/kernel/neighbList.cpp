@@ -1598,6 +1598,7 @@ namespace LIBMOL
                 iA->neighbAtoms.clear();
             }
         }
+        
         std::cout << "Build neighbor list System " << std::endl;
         time_t rtime;
         time(&rtime);
@@ -1622,7 +1623,7 @@ namespace LIBMOL
             
         }
         //Check
-        /*
+        
         for (std::vector<AtomDict>::iterator iA=aAtomList.begin();
                 iA != aAtomList.end(); iA++)
         {
@@ -1639,15 +1640,14 @@ namespace LIBMOL
             else
             {
                 std::cout << ", it has no NB atom " << std::endl;
-            }
-            
+            }  
         }
         //std::cout << "Finish building neighbor lists "<< std::endl;
         //time(&rtime);
         //std::cout << "Current time is " << ctime(&rtime);         
         //std::cout << "------------------------------------------"
         //          << std::endl;
-       */
+        
        
     }
 }
