@@ -126,6 +126,7 @@ class Acedrg(CExeCode ):
 
         self.molGen           = False
         self.repCrds          = False
+        self.neuDif           = False
 
         self.HMO              = False
         
@@ -314,6 +315,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("--fpar", dest="inParamFile", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File containing paramets that define upper and lower bounds for the sigma of bonds and angles")
+
+        self.inputParser.add_option("--neu", dest="neuDif",  
+                                    action="store_true",  default=False,  
+                                    help="The option to look into structures (represented by cif files) determined by neutron diffraction")
 
 
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
@@ -678,10 +683,18 @@ class Acedrg(CExeCode ):
         elif t_inputOptionsP.molGen:
             if t_inputOptionsP.inStdCifName: 
                 self.inStdCifName = t_inputOptionsP.inStdCifName
-                self.workMode     = 21
+                if t_inputOptionsP.neuDif:
+                    self.neuDif   = True
+                    self.workMode = 211
+                else:
+                    self.workMode     = 21
             elif t_inputOptionsP.inStdCifDir: 
                 self.inStdCifDir = t_inputOptionsP.inStdCifDir
-                self.workMode    = 22
+                if t_inputOptionsP.neuDif:
+                    self.neuDif   = True
+                    self.workMode = 221
+                else:
+                    self.workMode    = 22
         elif t_inputOptionsP.typeOut:
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -895,7 +908,7 @@ class Acedrg(CExeCode ):
             if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15:
                 print "Output coordinate file: %s"%self.outRoot + ".pdb"
 
-        if self.workMode == 21 or self.workMode==22:
+        if self.workMode in [21, 22]:
             print "=====================================================================" 
             print "| Your job is to generate molecules (sets of connected atoms), to   |"
             print "| get unique bonds and angles within the molecules and cluster them |" 
@@ -906,6 +919,21 @@ class Acedrg(CExeCode ):
                 print "Output molecules: %s"%self.outRoot + "_all_mols.txt"
                 print "Output bonds and angles : %s"%self.outRoot + "_unique_bond_and_angles.txt"
             elif self.workMode==22:
+                print "Input directory where cif files are: %s"%self.inStdCifDir
+                print "Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table")
+        elif self.workMode in [211, 221]:
+            print "=====================================================================" 
+            print "| You would like to look into structures determined by neutron      |"
+            print "| diffractions.                                                     |"
+            print "| Your job is to generate molecules (sets of connected atoms), to   |"
+            print "| get unique bonds and angles within the molecules and cluster them |" 
+            print "| by specificted desigend atom types.                               |" 
+            print "=====================================================================" 
+            if self.workMode == 211:
+                print "Input file: %s"%os.path.basename(self.inStdCifName)
+                print "Output molecules: %s"%self.outRoot + "_all_mols.txt"
+                print "Output bonds and angles : %s"%self.outRoot + "_unique_bond_and_angles.txt"
+            elif self.workMode==221:
                 print "Input directory where cif files are: %s"%self.inStdCifDir
                 print "Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table")
 
@@ -973,7 +1001,7 @@ class Acedrg(CExeCode ):
             self.runExitCode = self.subExecute()
            
 
-        if self.workMode == 21 :
+        if self.workMode in [21, 211] :
             if tIn:
                 self.inStdCifName = tIn
             self.outRstCifName  = self.outRoot + ".cif"
@@ -981,12 +1009,15 @@ class Acedrg(CExeCode ):
             self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
 
             self._cmdline += " -b %s  "%self.inStdCifName
-            self._cmdline += " -m yes -r %s -o %s "%(self.monomRoot, self.outRoot)
+            if self.workMode == 21:
+                self._cmdline += " -m yes -r %s -o %s "%(self.monomRoot, self.outRoot)
+            elif self.workMode == 211:
+                self._cmdline += " -m yes -l yes -r %s -o %s "%(self.monomRoot, self.outRoot)
             #print self._cmdline
             #print "self.outRoot ", self.outRoot 
             self.runExitCode = self.subExecute()
 
-        if self.workMode == 22 :
+        if self.workMode in [22, 221] :
             if os.path.isdir(self.inStdCifDir):
                 bTable = self.outRoot + "_all_atoms_bonds_angles.table"
                 self.workMode  == 21
@@ -1002,7 +1033,10 @@ class Acedrg(CExeCode ):
                     self._log_name = os.path.join(self.scrDir,tMonomRoot + "_cod.log")
                     self._cmdline += " -b %s  "%aCif
                     tempMonRt = os.path.join(self.scrDir, tMonomRoot)
-                    self._cmdline += " -m yes -r %s -o %s.cif "%(tMonomRoot, tempMonRt)
+                    if self.workMode==22:
+                        self._cmdline += " -m yes -r %s -o %s.cif "%(tMonomRoot, tempMonRt)
+                    elif self.workMode==221:
+                        self._cmdline += " -m yes -l yes -r %s -o %s.cif "%(tMonomRoot, tempMonRt)
                     #print self._cmdline
                     self.subExecute()
                     if os.path.isfile(self.outBondsAndAnglesName):
@@ -2077,7 +2111,7 @@ class Acedrg(CExeCode ):
             else:
                 self.printExitInfo() 
 
-        if self.workMode == 21:
+        if self.workMode in [21, 211]:
             
             # Stage 1: generate molecules and the associated bond and bond-angle values 
             # using a small molecule cif file
@@ -2086,7 +2120,7 @@ class Acedrg(CExeCode ):
             else:
                 print "Can not find the input file ", self.inStdCifName 
             
-        if self.workMode == 22:
+        if self.workMode in [22, 221]:
             
             # 1. Generate molecules using the small molecule cif files at the input directory. 
             # 2. Generate atom classes for atoms in the molecules.
@@ -2538,7 +2572,7 @@ class Acedrg(CExeCode ):
                             else:
                                 print "Failed to produce %s after final geometrical optimization"%finPdb
 
-        if self.workMode == 21:
+        if self.workMode in [21, 211]:
             
             # Stage 1: generate molecules and the associated bond and bond-angle values 
             # using a small molecule cif file
@@ -2547,7 +2581,7 @@ class Acedrg(CExeCode ):
             else:
                 print "Can not find the input file ", self.inStdCifName 
             
-        if self.workMode == 22:
+        if self.workMode in [22, 221]:
             
             # 1. Generate molecules using the small molecule cif files at the input directory. 
             # 2. Generate atom classes for atoms in the molecules.

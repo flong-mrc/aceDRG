@@ -2035,25 +2035,27 @@ namespace LIBMOL
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                        "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                        "Sc", "sc", "Y",  "y",
-                       "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po", 
                        "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
                        "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
                        "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
                        "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",  
                        "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",   
                        "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",  
-                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",  
+                       "Ni", "ni", "Pt", "pt", "Ds", "ds",   
                        "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
                        "Zn", "zn", "Cd", "cd", "Hg", "hg",   
-                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
-                       "Sn", "sn", "Pb", "pb", "Bi", "bi", "Pu", "pu", "Nd", "nd", "Ce", "ce",
+                       "Al", "al", "Ti", "ti", 
+                       "Bi", "bi", "Pu", "pu", "Nd", "nd", "Ce", "ce",
                        "La", "la","Pr", "pr", "Pm", "pm", "Sm", "sm", "Eu", "eu", "Gd", "gd", 
                        "Tb", "tb", "Dy", "dy", "Ho", "ho", "Er", "er", "Tm", "tm", "Yb", "yb",
                        "Lu", "lu", "Ac", "ac", "Th", "th", "Pa", "pa", "U", "u", "Np", "np",
                        "Am", "am", "Cm", "cm", "Bk", "bk", "Cf", "cf", "Es", "es", "Fm", "fm",
                        "Md", "md", "No", "no", "Lr", "lr"};
         
-        tMeTab.assign(metals, metals+181);
+        tMeTab.assign(metals, metals+159);
+        
+        // The following are taken away from the metal element list
+        // As, Ga, Ge, In, Pd, Si, Sn
         /*
         for (std::vector<ID>::iterator iM=tMeTab.begin();
                 iM !=tMeTab.end(); iM++)
@@ -2063,12 +2065,42 @@ namespace LIBMOL
          */
     }
     
+    extern void initMetalloidTab(std::vector<ID> & tTab)
+    {
+        // Although definition "metalloid" is used. It is actually 
+        // include some elements of 3-4 valence electron 
+        ID metals[] = {"Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", 
+                       "Te", "te", "Po", "po", "Pd", "pd", "Ga", "ga", 
+                       "In", "in",  "Sn", "sn", "Pb", "pb"};
+        
+        tTab.assign(metals, metals+22);
+        
+        /*
+        for (std::vector<ID>::iterator iM=tMeTab.begin();
+                iM !=tMeTab.end(); iM++)
+        {
+            std::cout << "Metal " << *iM << std::endl;
+        }
+         */
+    }
     
     extern bool isMetal(std::vector<ID> & tMeTab, ID tID)
     {
          
         std::vector<ID>::iterator iFind = std::find(tMeTab.begin(), tMeTab.end(), tID);
         if (iFind != tMeTab.end())
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    extern bool isMetalloid(std::vector<ID> & tTab, ID tID)
+    {
+         
+        std::vector<ID>::iterator iFind = std::find(tTab.begin(), tTab.end(), tID);
+        if (iFind != tTab.end())
         {
             return true;
         }

@@ -153,6 +153,7 @@ namespace LIBMOL // temp
         void         setIonRadius (REAL tIR);
         
         
+        
         // some data variables made public for efficiency 
         //Cartesian coordinates of a atom in angstroms
         std::vector<REAL> coords; 
@@ -278,6 +279,7 @@ namespace LIBMOL // temp
         int      chiralIdx;
         int      bondingIdx;
         ID       hybrid;
+        int      matType;                    // 0:org; 1:metal; 2:metalloid
         bool     isMetal;
         ID       metalGeo;
         REAL     isoB;
@@ -367,14 +369,14 @@ namespace LIBMOL // temp
         REAL                       treeAngle;
         REAL                       treeTorsion;
         
-        
-        
                                             // element 1: immediate neighbor 
                                             // element 2: include neighbor of 
                                             //            of neighbor atoms 
                                             //            => codClass
                                             // element 3: one more neighbor layers
                                             //        than key 2
+        
+        std::vector<std::string>  formType;
     };
     
     class metalCluster 
@@ -393,6 +395,8 @@ namespace LIBMOL // temp
                                     int  tCenSerial);
         void buildBondAndAngleMap(std::vector<AtomDict> & tAtoms,
                                   std::vector<CrystInfo>::iterator tCryst);
+        void setOrgRingsInMetalCluster(std::vector<AtomDict> & tAtoms,
+                                       int  tCenSerial);
         
         void projectCoordsToUnitSph(std::vector<AtomDict> & tAtoms);
         
@@ -411,6 +415,8 @@ namespace LIBMOL // temp
         std::map<REAL, std::vector<int> >                       angVect;
         
         std::vector<std::vector<REAL> >                          unitCoords;
+        
+        std::vector<RingDict>                                    allRings;
         
     };
     

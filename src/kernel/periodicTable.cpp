@@ -567,7 +567,7 @@ namespace LIBMOL
         //elements["Fe"]["cova"]      = 1.34;
         elemProps["Fe"]["vdw"]      = 1.40;
         elemProps["Fe"]["cova"]     = 1.32;
-        elemProps["Fe"]["ionM+"]   = 0.75;
+        elemProps["Fe"]["ionM+"]    = 0.75;
         //elemProps["Fe3+"]["cova"]   = 0.69;
         //elemProps["Fe4+"]["cova"]   = 0.725;
         //elemProps["Fe6+"]["cova"]   = 0.39;
@@ -1626,6 +1626,112 @@ namespace LIBMOL
     
     PeriodicTable::~PeriodicTable()
     {
+    }
+    
+    void PeriodicTable::compareIdealDists(std::map<std::string, std::map<
+                                          std::string, std::map<std::string,
+                                          REAL> > >  & tAllowedRangeDists,
+                                          double tDelta)
+    {
+        
+        //std::ofstream compTab("idealComp.table");
+        
+        std::vector<ID>  metTab, metLoidTab;
+        
+        initMetalTab(metTab);
+        initMetalloidTab(metLoidTab);
+        
+        for (std::map<ID,  std::map<ID, REAL> >::iterator 
+             iProp1=elemProps.begin(); iProp1 != elemProps.end(); iProp1++)
+        {
+            ID elem1 = iProp1->first;
+            if (isMetal(metTab, elem1) || isMetalloid(metLoidTab, elem1))
+            {
+                for (std::map<ID,  std::map<ID, REAL> >::iterator 
+                     iProp2=elemProps.begin(); iProp2 != elemProps.end(); 
+                     iProp2++)
+                {
+                    
+                    double d1=0.0, d2=0.0, dI=0;
+                    ID elem2 = iProp2->first;
+                    if (isMetal(metTab, elem2))
+                    {
+                        if (elemProps[elem2].find("ionM-") 
+                            !=elemProps[elem2].end())
+                        {
+                            dI = elemProps[elem1]["ionM+"] 
+                               + elemProps[elem2]["ionM-"];
+                        }
+                        else
+                        {
+                            dI = elemProps[elem1]["ionM+"] 
+                               + elemProps[elem2]["ionM+"];
+                        }
+                    }
+                    else
+                    {
+                        if (elemProps[elem1].find("cova") 
+                            !=elemProps[elem1].end()
+                            && 
+                            elemProps[elem2].find("cova") 
+                            !=elemProps[elem2].end())
+                        {
+                            d1 = elemProps[elem1]["cova"] 
+                               + elemProps[elem2]["cova"];
+                        }
+                    
+                        if (elemProps[elem1].find("ionM+") 
+                             !=elemProps[elem1].end()
+                             && 
+                             elemProps[elem2].find("ionM-") 
+                             !=elemProps[elem2].end())
+                        {
+                            d2 = elemProps[elem1]["ionM+"] 
+                                + elemProps[elem2]["ionM-"];
+                        }
+                    
+                        if (d1 >= d2)
+                        {
+                            dI = d1;
+                        }
+                        else
+                        {
+                            dI = d2;
+                        }
+                    }
+                    
+                    if (dI !=0)
+                    {
+                        tAllowedRangeDists[elem1][elem2]["max"]= dI*(1+tDelta);
+                        tAllowedRangeDists[elem1][elem2]["min"]= dI*(1-tDelta);
+                    }
+                    else
+                    {
+                        std::cout << "The distance range between elements "
+                                  << elem1 << " and " << elem2 
+                                  << " is not determined " << std::endl;
+                    }
+                }
+            }
+        }
+        /*
+        for (std::map<std::string, std::map<std::string, 
+             std::map<std::string, REAL> > >::iterator 
+             iR1=tAllowedRangeDists.begin(); 
+             iR1 != tAllowedRangeDists.end(); iR1++)
+        {
+            for (std::map<std::string, std::map<std::string, REAL> >::iterator
+                 iR2=iR1->second.begin(); iR2 !=iR1->second.end(); iR2++)
+            {
+                compTab << iR1->first << "\t"
+                        << iR2->first << "\t"
+                        << iR2->second["min"] << "\t"
+                        << iR2->second["max"] << "\n";
+            }
+        }
+        
+        compTab.close();
+         */
     }
     
 }

@@ -1973,7 +1973,6 @@ class CovLinkGenerator(CExeCode):
                         allowedBO = self.chemCheck.orgVal[aLAtmElem][0]
                     print "Allowed order is ", allowedBO
                     if nTotalVa != allowedBO:
-
                         lUseOther = False
                         if len(self.chemCheck.orgVal[aLAtmElem]) > 1:
                             for i in range(1, len(self.chemCheck.orgVal[aLAtmElem])):
@@ -1993,9 +1992,9 @@ class CovLinkGenerator(CExeCode):
                                     print "H atom ", aA["atom_id"]
                             if nTotalVa > allowedBO:
                                 aN = nTotalVa-allowedBO
-                                print "%d H atom will be deleted "%aN
-                                print "%s connects %d H atom "%(tRes["comp"]["atoms"][aLAtmSerial]["atom_id"], len(aLAHIds))
                                 if aN <=len(aLAHIds) :
+                                    print "%d H atom will be deleted "%aN
+                                    print "%s connects %d H atom "%(tRes["comp"]["atoms"][aLAtmSerial]["atom_id"], len(aLAHIds))
                                     tmpDelAtomSet = []
                                     aLAHIds.sort()
                                     idxD = -1
@@ -2011,6 +2010,28 @@ class CovLinkGenerator(CExeCode):
                                     for aAtom in tRes["comp"]["atoms"]:
                                         if aAtom["atom_id"] in tmpDelAtomSet:
                                             tMod["deleted"]["atoms"].append(aAtom)
+
+                                elif len(self.chemCheck.orgVal[aLAtmElem]) > 1:
+                                    nV = len(self.chemCheck.orgVal[aLAtmElem])
+                                    lAdded = False
+                                    for i in range(1,nV):
+                                        if tRes["comp"]["atoms"][ aLAtmSerial].has_key("charge"):
+                                            allowedBO1 = self.chemCheck.orgVal[aLAtmElem][i] + int(tRes["comp"]["atoms"][ aLAtmSerial]["charge"])
+                                        else:
+                                            allowedBO1 = self.chemCheck.orgVal[aLAtmElem][i]
+                                        aN = allowedBO1 - nTotalVa
+                                        if aN==1:
+                                            print "H connected atom id ", tRes["comp"]["atoms"][aLAtmSerial]["atom_id"]
+                                            self.addOneHInRes(tRes["comp"]["atoms"][aLAtmSerial], aLAAtoms, allHIds, tRes, tMod)
+                                            lAdded = True
+                                            break
+                                    if not lAdded:
+                                        self.errLevel    = 22 
+                                        if not self.errMessage.has_key(self.errLevel):
+                                            self.errMessage[self.errLevel] = []
+                                            aL = "Currently it is not allowed to do such a change for atom %s\n"\
+                                                 %(tRes["comp"]["atoms"][aLAtmSerial]["atom_id"])
+                                            self.errMessage[self.errLevel].append(aL)
 
                             elif nTotalVa < self.chemCheck.orgVal[aLAtmElem][0]:
                                 aN = allowedBO - nTotalVa
@@ -2444,7 +2465,6 @@ class CovLinkGenerator(CExeCode):
                 for aAtom in tMonomer["atoms"]:
                     aCharge = "0"
                     if aAtom.has_key("charge"):
-                        print aAtom["charge"]
                         if aAtom["charge"].find(".")==-1:
                             aCharge = aAtom["charge"]
                         else:
@@ -3100,21 +3120,23 @@ class CovLinkGenerator(CExeCode):
                  %(aTor["atom_id_1"],aTor["atom_id_1_resNum"], aTor["atom_id_2"], aTor["atom_id_2_resNum"],\
                    aTor["atom_id_3"],aTor["atom_id_3_resNum"], aTor["atom_id_4"], aTor["atom_id_4_resNum"])
 
+        
         tLinkedObj.cLink["chirals"] = [] 
-        for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
-            if aChi["atom_id_centre_alias"] ==atm1:
-                tLinkedObj.cLink["chirals"].append(aChi)
-            elif aChi["atom_id_centre_alias"] ==atm2:
-                tLinkedObj.cLink["chirals"].append(aChi)
-        print "Number of Link chirals ", len(tLinkedObj.cLink["chirals"])
-        print "They are :"
-        for aChi in tLinkedObj.cLink["chirals"]:
-            print "Chiral centre on atom %s in residue %d "%(aChi["atom_id_centre"], aChi["atom_id_centre_resNum"])
-            print "other atoms are : "
-            print "atom %s in residue %d"%(aChi["atom_id_1"], aChi["atom_id_1_resNum"])
-            print "atom %s in residue %d"%(aChi["atom_id_2"], aChi["atom_id_2_resNum"])
-            print "atom %s in residue %d"%(aChi["atom_id_3"], aChi["atom_id_3_resNum"])
-            print "Volume sign ", aChi["volume_sign"]
+        if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("chirs"):
+            for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
+                if aChi["atom_id_centre_alias"] ==atm1:
+                    tLinkedObj.cLink["chirals"].append(aChi)
+                elif aChi["atom_id_centre_alias"] ==atm2:
+                    tLinkedObj.cLink["chirals"].append(aChi)
+            print "Number of Link chirals ", len(tLinkedObj.cLink["chirals"])
+            print "They are :"
+            for aChi in tLinkedObj.cLink["chirals"]:
+                print "Chiral centre on atom %s in residue %d "%(aChi["atom_id_centre"], aChi["atom_id_centre_resNum"])
+                print "other atoms are : "
+                print "atom %s in residue %d"%(aChi["atom_id_1"], aChi["atom_id_1_resNum"])
+                print "atom %s in residue %d"%(aChi["atom_id_2"], aChi["atom_id_2_resNum"])
+                print "atom %s in residue %d"%(aChi["atom_id_3"], aChi["atom_id_3_resNum"])
+                print "Volume sign ", aChi["volume_sign"]
 
         if tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"].has_key("planes"):
             if len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys()) !=0:
