@@ -37,6 +37,9 @@ from utility  import listComp2
 from utility  import listCompDes
 from utility  import listCompAcd
 from utility  import BondOrderS2N
+from utility  import splitLineSpa
+from utility  import splitLineSpa2
+from utility  import aLineToAlist
 
 class ChemCheck():
 
@@ -208,7 +211,9 @@ class ChemCheck():
                     iCol =0
                     break
                 elif lAtom and aL.find("_chem_comp_atom.") ==-1 :
-                    strGrp = aL.strip().split()
+                    #strGrp = aL.strip().split()
+                    strGrp = []
+                    aLineToAlist(aL, strGrp)
                     if colDict.has_key("type_symbol") and len(strGrp) == len(colDict) \
                        and colDict["type_symbol"] < len(strGrp):
                         aAtomElem = strGrp[colDict["type_symbol"]]

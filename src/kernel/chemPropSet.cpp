@@ -253,7 +253,17 @@ namespace LIBMOL
                     {
                         iAt->chiralIdx  = 2;
                     }
-                    iAt->bondingIdx = 3; 
+                    
+                   
+                    if (t_len==3)
+                    {
+                        iAt->bondingIdx = 2;
+                    }
+                    else
+                    {
+                        iAt->bondingIdx = 3;
+                    }
+                   
                 }
                 else if (t_len==6)
                 {
