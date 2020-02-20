@@ -51,6 +51,8 @@ from utility    import listCompDes
 from utility    import listCompAcd
 from utility    import setBoolDict
 from utility    import splitLineSpa
+from utility    import splitLineSpa2
+from utility    import aLineToAlist
 
 if os.name != 'nt':
     import fcntl
@@ -2511,6 +2513,8 @@ class Acedrg(CExeCode ):
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
+                        print "JJJJJ "
+                        sys.exit()
                         print "The input system contains metal or other heavier element"
                         print "The current version deals only with the atoms in the set of 'organic' elements" 
                         sys.exit()

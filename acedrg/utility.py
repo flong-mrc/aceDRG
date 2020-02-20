@@ -21,6 +21,20 @@ import math
 import select
 import random
 
+# Functions for numbers
+
+def isInt(t_string):
+
+    aRet = True
+
+    t_string = t_string.strip()
+    try:
+        aInt = int(t_string)
+    except ValueError:
+        aRet = False
+
+    return aRet    
+
 # Functions for list comparison
 
 def listComp(a_list, b_list):
