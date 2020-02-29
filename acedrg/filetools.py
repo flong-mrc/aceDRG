@@ -32,6 +32,7 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
+from utility  import isInt
 from utility  import listComp
 from utility  import listComp2
 from utility  import listCompDes
@@ -40,6 +41,7 @@ from utility  import setBoolDict
 from utility  import splitLineSpa
 from utility  import splitLineSpa2
 from utility  import aLineToAlist
+from utility  import BondOrderS2N
 
 class FileTransformer :
 
@@ -122,6 +124,8 @@ class FileTransformer :
         self.inputCharge      = {}             # input charges in a mmCif file
 
         self.PdbForMols       = {}
+
+        self.rdkitRemeAtms = {}
 
         self.hasCCP4Type      = False
 
@@ -256,6 +260,54 @@ class FileTransformer :
                             print "Acedrg stops because RDKit does not accept the following: "
                             print "%s  has total valence of %d "%(aId, atomVals[aId])
                             sys.exit()        
+    
+
+    def tmpModi_Atms(self):
+        for aAtm in self.atoms:
+            if aAtm.has_key("_chem_comp_atom.type_symbol") and aAtm.has_key("_chem_comp_atom.atom_id")\
+            and aAtm.has_key("_chem_comp_atom.charge"):
+                # functions for different cases
+                # 1. B atom with a charge
+                print aAtm["_chem_comp_atom.charge"]
+                if isInt(aAtm["_chem_comp_atom.charge"]):
+                    nCharge = int(aAtm["_chem_comp_atom.charge"])
+                else:
+                    nS = str(aAtm["_chem_comp_atom.charge"])
+                    nCharge = int(nS.strip().split(".")[0])
+                if aAtm["_chem_comp_atom.type_symbol"].strip().upper() == "B" and nCharge == 1:
+                    nOrder  = self.getBondOrderForOneAtom(aAtm)
+                    if nOrder==4 :
+                        self.rdkitRemeAtms[aAtm["_chem_comp_atom.atom_id"]] = ["C", "B", 0, 1, 4]
+   
+    def putBackOrginalChemTypes(self, tMol):
+
+        for aAtm in tMol.GetAtoms():
+            id = aAtm.GetProp("Name")
+            print "Before ", id, "  ", aAtm.GetSymbol(), "    ", aAtm.GetFormalCharge()
+            if id in self.rdkitRemeAtms.keys():
+                print id, "  xxxxxxx "
+                print self.rdkitRemeAtms[id][3]
+                aAtm.SetFormalCharge(self.rdkitRemeAtms[id][3])
+            print "after ", id, "  ", aAtm.GetSymbol(), "    ", aAtm.GetFormalCharge()
+        
+        for aAtm in tMol.GetAtoms():
+            print  aAtm.GetProp("Name"),  "  ", aAtm.GetSymbol(), "    ", aAtm.GetFormalCharge()
+        sys.exit()
+    def getBondOrderForOneAtom(self, tAtom):
+
+        retBO = 0
+
+        atmId = tAtom["_chem_comp_atom.atom_id"] 
+        for aBond in self.bonds:
+	    if aBond.has_key("_chem_comp_bond.atom_id_1") and\
+               aBond.has_key("_chem_comp_bond.atom_id_2") and\
+               aBond.has_key("_chem_comp_bond.type"):
+                aList = [aBond["_chem_comp_bond.atom_id_1"], aBond["_chem_comp_bond.atom_id_2"]]
+                if atmId in aList:
+                    aOrd = BondOrderS2N(aBond["_chem_comp_bond.type"])
+                    if aOrd != -1:
+                        retBO += aOrd
+        return retBO
         
     def parserAll2Cols(self, t2ColLines):
 
@@ -942,12 +994,30 @@ class FileTransformer :
                 else:
                     print "Input file bug: no type_symbol for atoms!"
                     sys.exit()
-                aAtom["type_symbol_in_mol"] = id
+
+                if tMode ==3 :
+                    if aAtom["_chem_comp_atom.atom_id"] in self.rdkitRemeAtms.keys():
+                        aAtom["type_symbol_in_mol"] = self.rdkitRemeAtms[aAtom["_chem_comp_atom.atom_id"]][0]
+                        if aAtom.has_key("_chem_comp_atom.charge"):
+                            aAtom["charge_in_mol"] = str(self.rdkitRemeAtms[aAtom["_chem_comp_atom.atom_id"]][2])
+                    else:
+                        aAtom["type_symbol_in_mol"] = id
+                        if aAtom.has_key("_chem_comp_atom.charge"):
+                            aAtom["charge_in_mol"] = aAtom["_chem_comp_atom.charge"]
+                else:
+                    aAtom["type_symbol_in_mol"] = id
+                    if aAtom.has_key("_chem_comp_atom.charge"):
+                        aAtom["charge_in_mol"] = aAtom["_chem_comp_atom.charge"]
+                
                 if id != "H":
                     tNonHAtoms.append(aAtom)
                 else :
-                   tHAtoms.append(aAtom)
-                
+                    tHAtoms.append(aAtom)
+            #print "Number of atoms ", len(self.atoms)
+            #print "Number of Non-H atom ", len(tNonHAtoms)
+            #print "Number of H atom ", len(tHAtoms)    
+
+
             self.atoms = []
             nAtm =0
             for aAtom in tNonHAtoms:
@@ -959,6 +1029,12 @@ class FileTransformer :
             for aAtom in tHAtoms:
                 self.atoms.append(aAtom)
 
+            #for aAtom in self.atoms:
+            #    print "-----------------------"
+            #    print aAtom["_chem_comp_atom.atom_id"], "   ", aAtom["_chem_comp_atom.type_symbol"], "    ", aAtom["type_symbol_in_mol"] 
+            #    if aAtom.has_key("_chem_comp_atom.charge"):
+            #        print aAtom["_chem_comp_atom.charge"], "   ",   aAtom["charge_in_mol"]
+ 
             # Set up atom seq match for bond section
             mapIdNum = {}
             nAtm =1
@@ -997,6 +1073,8 @@ class FileTransformer :
 
                 
                 id = aAtom["type_symbol_in_mol"]
+
+                
                     
                 md =" 0 "
                
@@ -1014,16 +1092,12 @@ class FileTransformer :
                 chargeMap["doublet radical"]  = 4
                 
                 charge = " 0 "
-                if aAtom.has_key("_chem_comp_atom.charge"):
-                    #print "The charge is ", aAtom["_chem_comp_atom.charge"]
-                    #print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
-                    if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
-                        aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
+                if aAtom.has_key("charge_in_mol"):
+                    if aAtom["charge_in_mol"].find(".") !=-1:
+                        aAtom["charge_in_mol"] = aAtom["charge_in_mol"].strip().split(".")[0]
                     nCharge =0
-                    if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
-                        nCharge = int(aAtom["_chem_comp_atom.charge"])
-                    #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
-                    #print " converted to charge symbol ", chargeMap[nCharge] 
+                    if aAtom["charge_in_mol"].find("?") ==-1:
+                        nCharge = int(aAtom["charge_in_mol"])
                     if nCharge in chargeMap.keys():
                         charge  = " %d "%chargeMap[nCharge]
                     if nCharge !=0:
@@ -1035,15 +1109,15 @@ class FileTransformer :
                         cha = "1"
                     elif aAtom["_chem_comp_atom.pdbx_stereo_config"].find("R") !=-1:
                         cha = "2"
-
-                tOutFile.write("%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
-                                                                     id.ljust(3), md.rjust(2), charge.rjust(3), \
-                                                                     cha.rjust(3), hhh.rjust(3), bbb.rjust(3), \
-                                                                     vvv.rjust(3), HHH.rjust(3), rrr.rjust(3), \
-                                                                     iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
-                                                                     eee.rjust(3)))
+                aLine = "%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
+                                                               id.ljust(3), md.rjust(2), charge.rjust(3), \
+                                                               cha.rjust(3), hhh.rjust(3), bbb.rjust(3), \
+                                                               vvv.rjust(3), HHH.rjust(3), rrr.rjust(3), \
+                                                               iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
+                                                               eee.rjust(3))
+                tOutFile.write(aLine)
                 idxAtom +=1
-
+                
             # Bond block
            
             self.DelocBondConvertor()

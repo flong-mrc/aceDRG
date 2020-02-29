@@ -2224,13 +2224,17 @@ class Acedrg(CExeCode ):
                         self.isAA = True
                         self.getAAOut()
                 if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 and not self.isAA:
-                    # Option A: 
-                    if self.useExistCoords :
+                    self.fileConv.tmpModi_Atms()
+                    # Option A:
+                    nRemedAtms = len(self.fileConv.rdkitRemeAtms.keys()) 
+                    if self.useExistCoords or nRemedAtms !=0 :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
-                        self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
+                        if nRemedAtms ==0 :
+                            self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
+                        else :
+                            self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 3)
                         if os.path.isfile(aIniMolName) :
-                            if len(self.fileConv.chiralPre) !=0:
-                            # Chiral centers defined in the original cif file
+                            if len(self.fileConv.chiralPre) !=0: # Chiral centers defined in the original cif file
                                 self.rdKit.chiralPre =[]
                                 for aChi in self.fileConv.chiralPre:
                                     self.rdKit.chiralPre.append(aChi) 
@@ -2507,14 +2511,16 @@ class Acedrg(CExeCode ):
                 #if self.monomRoot.upper() in self.chemCheck.aminoAcids:
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, "L-peptide")
                 #else:
-                if self.workMode in [11,  111]:
-                    print "Using coords ", self.rdKit.useExistCoords
- 
-                self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
+                #if self.workMode in [11,  111]:
+                #    print "Using coords ", self.rdKit.useExistCoords
+                nRemedAtms = len(self.fileConv.rdkitRemeAtms.keys())
+                if nRemedAtms !=0:
+                    self.rdKit.MolToSimplifiedMmcif2(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck,\
+                                                     self.monomRoot, self.fileConv.chiralPre, self.fileConv.rdkitRemeAtms)
+                else:
+                    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
-                        print "JJJJJ "
-                        sys.exit()
                         print "The input system contains metal or other heavier element"
                         print "The current version deals only with the atoms in the set of 'organic' elements" 
                         sys.exit()
