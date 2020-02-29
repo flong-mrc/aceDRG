@@ -1,4 +1,4 @@
-#!/usr/bin/env  ccp4-python
+ #!/usr/bin/env  ccp4-python
 # Python script
 #
 #
@@ -1553,7 +1553,7 @@ class CovLinkGenerator(CExeCode):
             self._log_name  = os.path.join(self.scrDir, aNL + "_for_link.log")
             self.subRoot    = os.path.join(self.scrDir, aNL + "_for_link")
             self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)   
-            #print self._cmdline
+            print self._cmdline
             self.runExitCode = self.subExecute()
             if not self.runExitCode :
                 aOutLigCif = self.subRoot + ".cif"
@@ -1592,8 +1592,8 @@ class CovLinkGenerator(CExeCode):
             self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
             if not self.errLevel:
                 self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
-                if not self.errLevel:
-                    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+                #if not self.errLevel:
+                #    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
                     #if not self.errLevel:
                     #    self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
 
