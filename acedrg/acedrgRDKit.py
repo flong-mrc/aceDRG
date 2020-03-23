@@ -347,7 +347,7 @@ class AcedrgRDKit():
 
         if not tNameMap:
             for aA in tMol.GetAtoms():
-                aElem = aA.GetSymbol()
+                aElem = aA.GetSymbol().upper()
                 if not dictAtomTypes.has_key(aElem):
                     dictAtomTypes[aElem] = []
                 dictAtomTypes[aElem].append(aA.GetIdx())
