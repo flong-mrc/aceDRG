@@ -1,4 +1,3 @@
-#!/usr/bin/env  ccp4-python
 # Python script
 #
 #
@@ -11,6 +10,7 @@
 ## The date of last modification: 21/07/2016
 #
 
+from builtins import range
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -88,7 +88,7 @@ def setBoolDict(tKey, tVK, tDict, tVD):
 
     tDict[tKey] = tVK
 
-    for aK in tDict.keys():
+    for aK in list(tDict.keys()):
         if aK != tKey:
             tDict[aK] = tVD
 

@@ -1,8 +1,11 @@
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import zip
 import os, sys, re, shutil
 import subprocess as SP
 from collections import namedtuple
-import ciffile
+from . import ciffile
 
 def isfile():
   return lambda x: os.path.isfile(x)
@@ -89,8 +92,8 @@ def libcheck():
     SP.Popen((libcheck_exe, '-i')).wait()
     return
 
-  kwd, default = zip(*default_list)
-  param_dict = dict(zip(kwd, default))
+  kwd, default = list(zip(*default_list))
+  param_dict = dict(list(zip(kwd, default)))
   line_list = sys.stdin.readlines()
   assert line_list.pop(0).strip().lower() in 'yn'
   for line in line_list:
@@ -101,7 +104,7 @@ def libcheck():
         param_dict[key.upper()] = value.lstrip()
 
   assert not sep
-  default_filter = dict(zip(kwd, [eq(value) for value in default]))
+  default_filter = dict(list(zip(kwd, [eq(value) for value in default])))
   pattern = namedtuple('Pattern', kwd)
   params = pattern(**param_dict)
   inp_mode = None
@@ -146,10 +149,10 @@ def libcheck():
     with open('acedrg.cmd', 'w') as ostream:
       cmdline = list(sys.argv)
       cmdline[0] = os.path.basename(cmdline[0])
-      print >>ostream, ' '.join(cmdline)
+      print(' '.join(cmdline), file=ostream)
 
     if not test:
-      import acedrg
+      from . import acedrg
       acedrg.main()
       cifdict = ciffile.cifdict_from_file(prefix + '.cif')
       ciffile.to_old_version(cifdict)

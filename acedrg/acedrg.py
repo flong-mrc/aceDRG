@@ -1,16 +1,22 @@
-#!/usr/bin/env  ccp4-python
+#!/usr/bin/env python3
 # Python script
 #
 #
-#     Copyright (C) 2014 --- 2019 Fei Long,  G. Murshudov
+#     Copyright (C) 2014 --- 2020 Fei Long,  G. Murshudov
 #
 #     This code is distributed under the terms and conditions of the
 #     CCP4 Program Suite Licence Agreement as a CCP4 Library.
 #
 #====================================================================
-## The date of last modification: 30/04/2019
+## The date of last modification: 21/02/2020
 #
 
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+#from past.utils import old_div
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -63,8 +69,7 @@ class Acedrg(CExeCode ):
     def __init__( self, t_argvs):
 
         if len(sys.argv)==1:
-            print "Look for help: %s -h "%(os.path.basename(sys.argv[0]))
-
+            print("Look for help: %s -h "%(os.path.basename(sys.argv[0])))
         self.versionInfo       = {}
 
         self.errMessage       = []
@@ -150,7 +155,6 @@ class Acedrg(CExeCode ):
         self.allBondsAndAngles["bonds"]       = {}
         self.allBondsAndAngles["angles"]      = {}
 
-
         self.acedrg    = os.path.abspath(sys.argv[0])
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
         #self.acedrg    = ""
@@ -172,7 +176,6 @@ class Acedrg(CExeCode ):
         self.checkDependency()
         self.checkVersionInfo()
         self.showAcedrgPapers()
-
 
         if os.path.isfile(self.funcGroupTable):
             self.rdKit = AcedrgRDKit(self.funcGroupTable)
@@ -199,13 +202,13 @@ class Acedrg(CExeCode ):
         
     def showAcedrgPapers(self):
 
-        print "====================================================================="
-        print "|                     Main reference                                |"
-        print "| \"AceDRG: a stereochemical description generator for ligands\"      |"
-        print "| Fei Long, Robert A. Nicholls, Paul Emsley, Saulius Grazulis,      |"
-        print "| Andrius Merkys, Antanas Vaitkusb and Garib N. Murshudov,(2017)    |"
-        print "| Acta Crystallogr. D73, 112-122                                    |"
-        print "====================================================================="
+        print("=====================================================================")
+        print("|                     Main reference                                |")
+        print("| \"AceDRG: a stereochemical description generator for ligands\"      |")
+        print("| Fei Long, Robert A. Nicholls, Paul Emsley, Saulius Grazulis,      |")
+        print("| Andrius Merkys, Antanas Vaitkusb and Garib N. Murshudov,(2017)    |")
+        print("| Acta Crystallogr. D73, 112-122                                    |")
+        print("=====================================================================")
 
     def InputParser(self, t_argvs):
 
@@ -366,9 +369,9 @@ class Acedrg(CExeCode ):
         (inputOptionsP, inputOptionsU) = self.inputParser.parse_args(t_argvs)
 
         if inputOptionsU:    
-            print "Line arguments for those keywords are missing "
+            print("Line arguments for those keywords are missing ")
             for a_opt in inputOptionsU:
-                print "Keyword %s ?"%a_opt
+                print("Keyword %s ?"%a_opt)
             sys.exit()
 
         return inputOptionsP 
@@ -381,31 +384,31 @@ class Acedrg(CExeCode ):
             if glob.glob(tLibmol):
                 self.libmol = tLibmol
 
-        if not self.libmol  and os.environ.has_key("CCP4"):
+        if not self.libmol  and "CCP4" in os.environ:
             tLibmol = os.path.join(os.environ['CCP4'], "libexec","libmol")
             if platform.system()=="Windows": tLibmol += ".exe"
             if glob.glob(tLibmol):
                 self.libmol = tLibmol
 
         if not self.libmol :
-            if os.environ.has_key("LIBMOL_ROOT"):
+            if "LIBMOL_ROOT" in os.environ:
                 tLibmol = os.path.join(os.environ['LIBMOL_ROOT'], "libexec","libmol")
                 if platform.system()=="Windows": tLibmol += ".exe"
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
                 else:
-                    print "libmol could not be found at %s"%tLibmol
+                    print("libmol could not be found at %s"%tLibmol)
                     sys.exit()
 
         if not self.libmol: 
-            print "can not find libmol at libexec/"
+            print("can not find libmol at libexec/")
             sys.exit()
                                 
-        if os.environ.has_key("CCP4"):
+        if "CCP4" in os.environ:
             tRefmac = os.path.join(os.environ['CBIN'], "refmac5")
             if platform.system()=="Windows": tRefmac += ".exe"
             if not glob.glob(tRefmac):
-                print "refmac5 could not be found"
+                print("refmac5 could not be found")
                 sys.exit()
             else:
                 self.refmac = tRefmac
@@ -413,7 +416,7 @@ class Acedrg(CExeCode ):
             tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
             if platform.system()=="Windows": tLibcheck += ".exe"
             if not glob.glob(tLibcheck):
-                print "libcheck could not be found"
+                print("libcheck could not be found")
                 sys.exit()
             else:
                 self.libcheck = tLibcheck
@@ -424,16 +427,16 @@ class Acedrg(CExeCode ):
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
         else :
-            print "You need to install CCP4 suite"
-            print "or activate ccp4.setup"
+            print("You need to install CCP4 suite")
+            print("or activate ccp4.setup")
             sys.exit()
         if not self.acedrgTables:
-            if os.environ.has_key("LIBMOL_ROOT"):
+            if "LIBMOL_ROOT" in os.environ:
                 tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share","acedrg","tables")
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
                 else:
-                    print "Tables required could not be found at %s"%tAcedrgTables
+                    print("Tables required could not be found at %s"%tAcedrgTables)
                     sys.exit()
         if not self.acedrgTables: 
             tAcedrgTables = os.path.join(self.acedrgDir, "share","acedrg","tables")
@@ -459,14 +462,14 @@ class Acedrg(CExeCode ):
         #print self.acedrgTables
         #print self.versionInfo["man"] 
         if not os.path.isfile(self.versionInfo["man"]):
-            print "Version infomation is not available."
+            print("Version infomation is not available.")
         else:
             # print self.versionInfo["man"]
             try:
                 vInfo = open(self.versionInfo["man"], "r")
             except IOError:
-                print self.versionInfo["man"], " Could not be opened for reading"
-                print "Version infomation is not available."
+                print(self.versionInfo["man"], " Could not be opened for reading")
+                print("Version infomation is not available.")
             else:
                 for aL in vInfo.readlines():
                     if aL.find(":") !=-1:
@@ -478,6 +481,7 @@ class Acedrg(CExeCode ):
         # Refmac version info 
         self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
         self.runRefmacVersionInfo()
+        
         if os.path.isfile(self._log_name):
             fRV = open(self._log_name, "r")
             allLs = fRV.readlines()
@@ -491,10 +495,10 @@ class Acedrg(CExeCode ):
                     #print "REFMAC VERSION : ", self.versionInfo["REFMAC_VERSION"] 
                     
         else: 
-            print "Refmac version info is not available"
+            print("Refmac version info is not available")
 
-        if not self.versionInfo.has_key("REFMAC_VERSION"):
-            print "Refmac version info is not available"
+        if "REFMAC_VERSION" not in self.versionInfo:
+            print("Refmac version info is not available")
            
              
     def setOutCifGlobSec(self):
@@ -506,19 +510,19 @@ class Acedrg(CExeCode ):
         #self.outCifGlobSect.append("#_software\n")
         #self.outCifGlobSect.append("#_version\n")
         #self.outCifGlobSect.append("#_purpose\n")
-        if self.versionInfo.has_key("ACEDRG_VERSION"):
+        if "ACEDRG_VERSION" in self.versionInfo:
             self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
         else:
             self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg".ljust(21), "?".ljust(12), '\"dictionary generator\"'.ljust(40)))
         
-        if self.versionInfo.has_key("DATABASE_VERSION"):
+        if "DATABASE_VERSION" in self.versionInfo:
             self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg_database".ljust(21), self.versionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
         else:
             self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg_database".ljust(21), "?".ljust(12), '\"data source\"'.ljust(40)))
 
         self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17) ,"rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
   
-        if self.versionInfo.has_key("REFMAC_NAME"):
+        if "REFMAC_NAME" in self.versionInfo:
             self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
                                        '\"optimization tool\"'.ljust(40)))
         else:
@@ -530,7 +534,7 @@ class Acedrg(CExeCode ):
         try:
             tF =open(self.geneInFileName, "r")
         except IOError:
-            print "%s can not be open for reading "%tFName
+            print("%s can not be open for reading "%tFName)
             sys.exit()
         else:
             
@@ -555,7 +559,7 @@ class Acedrg(CExeCode ):
             return
  
         if tDataDesc:
-            for aIdx in tDataDesc.keys():
+            for aIdx in list(tDataDesc.keys()):
                 if tDataDesc[aIdx][0].find("_chem_comp.id") !=-1:
                     self.monomRoot = tDataDesc[aIdx][1].strip()
                     return
@@ -564,7 +568,7 @@ class Acedrg(CExeCode ):
             try:
                 tF =open(self.inMdlName, "r")
             except IOError:
-                print "%s can not be open for reading "%self.inMdlName
+                print("%s can not be open for reading "%self.inMdlName)
                 sys.exit()
             else:
                 tL = tF.readline().strip()
@@ -582,7 +586,7 @@ class Acedrg(CExeCode ):
             try:
                 tF =open(self.inMmCifName, "r")
             except IOError:
-                print "%s can not be open for reading "%self.inMmCifName
+                print("%s can not be open for reading "%self.inMmCifName)
                 sys.exit()
             else:
                 tLs = tF.readlines()
@@ -616,24 +620,24 @@ class Acedrg(CExeCode ):
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
             if  not self.acedrgTables or not os.path.isdir(self.acedrgTables):
-                if os.environ.has_key("CCP4"):
+                if "CCP4" in os.environ:
                     tAcedrgTables = os.path.join(os.environ['CCP4'], "share","acedrg","tables")
                     if os.path.isdir(tAcedrgTables):
                         self.acedrgTables = tAcedrgTables
                     else:
-                        print "%s does not exist, check your installation of CCP4 "%tAcedrgTables
+                        print("%s does not exist, check your installation of CCP4 "%tAcedrgTables)
                         sys.exit()
                 else:
-                    print "You need to install CCP4 suite"
+                    print("You need to install CCP4 suite")
                     sys.exit()
         else:
             if os.path.isdir(t_inputOptionsP.acedrgTables):
                 self.acedrgTables = t_inputOptionsP.acedrgTables
  
         if not self.acedrgTables or not glob.glob(self.acedrgTables):
-            if os.environ.has_key("LIBMOL_ROOT"):
+            if "LIBMOL_ROOT" in os.environ:
                 tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share","acedrg","tables")
-                print tAcedrgTables
+                print(tAcedrgTables)
                 if os.path.isdir(tAcedrgTables):
                     self.acedrgTables = tAcedrgTables
         #print "Table is at ", self.acedrgTables
@@ -790,33 +794,33 @@ class Acedrg(CExeCode ):
                 try :
                     tF =open(tName, "w")
                 except IOError:
-                    print "Could not put the input smiles in a file "
+                    print("Could not put the input smiles in a file ")
                     sys.exit(1)
                 else:
                     tF.write(self.inSmiName+ "\n")
                     tF.close()
                     self.inSmiName = tName
-                    print tName
+                    print(tName)
 
 
     def setInputProcPara(self, t_inputOptionsP = None):
        
         if t_inputOptionsP.upperSigForBonds:
             self.upperSigForBonds = t_inputOptionsP.upperSigForBonds
-            print "upper bound for the bond sigma is set to ", self.upperSigForBonds
+            print("upper bound for the bond sigma is set to ", self.upperSigForBonds)
         if t_inputOptionsP.lowSigForBonds:
             self.lowSigForBonds = t_inputOptionsP.lowSigForBonds
-            print "low bound for the bond sigma is set to ", self.lowSigForBonds
+            print("low bound for the bond sigma is set to ", self.lowSigForBonds)
         if t_inputOptionsP.upperSigForAngles:
             self.upperSigForAngles = t_inputOptionsP.upperSigForAngles
-            print "upper bound of the angle sigma is set to ", self.upperSigForAngles
+            print("upper bound of the angle sigma is set to ", self.upperSigForAngles)
         if t_inputOptionsP.lowSigForAngles:
             self.lowSigForAngles = t_inputOptionsP.lowSigForAngles
-            print "low bound of the angle sigma is set to ", self.lowSigForAngles
+            print("low bound of the angle sigma is set to ", self.lowSigForAngles)
 
         if t_inputOptionsP.inParamFile:
             self.inParamFile = t_inputOptionsP.inParamFile 
-            print "Input paramet file is ", self.inParamFile
+            print("Input paramet file is ", self.inParamFile)
             self.setSigmaBounds()
 
 
@@ -859,99 +863,99 @@ class Acedrg(CExeCode ):
                         if strs[0].find("ASL") !=-1:
                             self.lowSigForAngles = float(strs[1])
                     else:
-                        print "Wrong format in the paramet file ",self.inParamFile
-                        print "Problem line at : "
-                        print aLT
+                        print("Wrong format in the paramet file ",self.inParamFile)
+                        print("Problem line at : ")
+                        print(aLT)
                         sys.exit()
         else:
-            print "Input paramet file %s does not exist"%self.inParamFile
+            print("Input paramet file %s does not exist"%self.inParamFile)
             sys.exit()        
-        print "Upper bound for sigma of bonds ", self.upperSigForBonds
-        print "Lower bound for sigma of bonds ", self.lowSigForBonds
-        print "Upper bound for sigma of angles ", self.upperSigForAngles
-        print "Lower bound for sigma of angles ", self.lowSigForAngles
+        print("Upper bound for sigma of bonds ", self.upperSigForBonds)
+        print("Lower bound for sigma of bonds ", self.lowSigForBonds)
+        print("Upper bound for sigma of angles ", self.upperSigForAngles)
+        print("Lower bound for sigma of angles ", self.lowSigForAngles)
 
     def printJobs(self):
 
-        print "=====================================================================" 
-        if self.versionInfo.has_key("ACEDRG_VERSION"):
-            print "| ACEDRG version:  %s|"%self.versionInfo["ACEDRG_VERSION"].ljust(49)
+        print("=====================================================================") 
+        if "ACEDRG_VERSION" in self.versionInfo:
+            print("| ACEDRG version:  %s|"%self.versionInfo["ACEDRG_VERSION"].ljust(49))
         else: 
-            print "=====================================================================" 
-            print "| ACEDRG version is not available                                   |"    
-        if self.versionInfo.has_key("DATABASE_VERSION"):
-            print "| ACEDRG database: %s|"%self.versionInfo["DATABASE_VERSION"].ljust(49)
+            print("=====================================================================") 
+            print("| ACEDRG version is not available                                   |")    
+        if "DATABASE_VERSION" in self.versionInfo:
+            print("| ACEDRG database: %s|"%self.versionInfo["DATABASE_VERSION"].ljust(49))
         else:
-            print "| ACEDRG Database version is not available                          |"
-        print "| RDKit version:  %s|"%rdBase.rdkitVersion.ljust(50)
-        if self.versionInfo.has_key("REFMAC_NAME") and self.versionInfo.has_key("REFMAC_VERSION"):
-            print "| %s  %s|"%((self.versionInfo["REFMAC_NAME"] + ":").ljust(15), self.versionInfo["REFMAC_VERSION"].ljust(49))
-        print "=====================================================================" 
+            print("| ACEDRG Database version is not available                          |")
+        print("| RDKit version:  %s|"%rdBase.rdkitVersion.ljust(50))
+        if "REFMAC_NAME" in self.versionInfo and "REFMAC_VERSION" in self.versionInfo:
+            print("| %s  %s|"%((self.versionInfo["REFMAC_NAME"] + ":").ljust(15), self.versionInfo["REFMAC_VERSION"].ljust(49)))
+        print("=====================================================================") 
         if self.workMode in [11, 12, 13, 14, 15, 16, 111, 121, 131, 141, 151, 161] :
         #if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15 \
         #   or self.workMode == 111 or self.workMode==121 or self.workMode ==131 or self.workMode==141 or self.workMode==151 :
-            print "=====================================================================" 
-            print "| Your job is  generating the dictionary (cif) and coord(pdb) files |"
-            print "| for your ligand and/or monomer                                    |"
-            print "=====================================================================" 
+            print("=====================================================================") 
+            print("| Your job is  generating the dictionary (cif) and coord(pdb) files |")
+            print("| for your ligand and/or monomer                                    |")
+            print("=====================================================================") 
             if self.workMode==11 or self.workMode==111:
-                print "Input file: %s"%os.path.basename(self.inMmCifName)
+                print("Input file: %s"%os.path.basename(self.inMmCifName))
             if self.workMode==12 or self.workMode==121:
-                print "Input file: %s"%os.path.basename(self.inSmiName)
+                print("Input file: %s"%os.path.basename(self.inSmiName))
             if self.workMode==13 or self.workMode==131:
-                print "Input file: %s"%os.path.basename(self.inMdlName)
+                print("Input file: %s"%os.path.basename(self.inMdlName))
             if self.workMode==14 or self.workMode==141:
-                print "Input file: %s"%os.path.basename(self.inSdfName)
+                print("Input file: %s"%os.path.basename(self.inSdfName))
             if self.workMode==15 or self.workMode==151:
-                print "Input file: %s"%os.path.basename(self.inMol2Name)
+                print("Input file: %s"%os.path.basename(self.inMol2Name))
             if self.workMode==16 or self.workMode==161:
-                print "Input file: %s"%os.path.basename(self.inLigandPdbName)
-            print "Output dictionary file: %s"%self.outRoot + ".cif"
+                print("Input file: %s"%os.path.basename(self.inLigandPdbName))
+            print("Output dictionary file: %s"%self.outRoot + ".cif")
             if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15:
-                print "Output coordinate file: %s"%self.outRoot + ".pdb"
+                print("Output coordinate file: %s"%self.outRoot + ".pdb")
 
         if self.workMode in [21, 22]:
-            print "=====================================================================" 
-            print "| Your job is to generate molecules (sets of connected atoms), to   |"
-            print "| get unique bonds and angles within the molecules and cluster them |" 
-            print "| by specificted desigend atom types.                               |" 
-            print "=====================================================================" 
+            print("=====================================================================") 
+            print("| Your job is to generate molecules (sets of connected atoms), to   |")
+            print("| get unique bonds and angles within the molecules and cluster them |") 
+            print("| by specificted desigend atom types.                               |") 
+            print("=====================================================================") 
             if self.workMode == 21:
-                print "Input file: %s"%os.path.basename(self.inStdCifName)
-                print "Output molecules: %s"%self.outRoot + "_all_mols.txt"
-                print "Output bonds and angles : %s"%self.outRoot + "_unique_bond_and_angles.txt"
+                print("Input file: %s"%os.path.basename(self.inStdCifName))
+                print("Output molecules: %s"%self.outRoot + "_all_mols.txt")
+                print("Output bonds and angles : %s"%self.outRoot + "_unique_bond_and_angles.txt")
             elif self.workMode==22:
-                print "Input directory where cif files are: %s"%self.inStdCifDir
-                print "Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table")
+                print("Input directory where cif files are: %s"%self.inStdCifDir)
+                print("Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table"))
         elif self.workMode in [211, 221]:
-            print "=====================================================================" 
-            print "| You would like to look into structures determined by neutron      |"
-            print "| diffractions.                                                     |"
-            print "| Your job is to generate molecules (sets of connected atoms), to   |"
-            print "| get unique bonds and angles within the molecules and cluster them |" 
-            print "| by specificted desigend atom types.                               |" 
-            print "=====================================================================" 
+            print("=====================================================================") 
+            print("| You would like to look into structures determined by neutron      |")
+            print("| diffractions.                                                     |")
+            print("| Your job is to generate molecules (sets of connected atoms), to   |")
+            print("| get unique bonds and angles within the molecules and cluster them |") 
+            print("| by specificted desigend atom types.                               |") 
+            print("=====================================================================") 
             if self.workMode == 211:
-                print "Input file: %s"%os.path.basename(self.inStdCifName)
-                print "Output molecules: %s"%self.outRoot + "_all_mols.txt"
-                print "Output bonds and angles : %s"%self.outRoot + "_unique_bond_and_angles.txt"
+                print("Input file: %s"%os.path.basename(self.inStdCifName))
+                print("Output molecules: %s"%self.outRoot + "_all_mols.txt")
+                print("Output bonds and angles : %s"%self.outRoot + "_unique_bond_and_angles.txt")
             elif self.workMode==221:
-                print "Input directory where cif files are: %s"%self.inStdCifDir
-                print "Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table")
+                print("Input directory where cif files are: %s"%self.inStdCifDir)
+                print("Output bond and angle file : %s "%(self.outRoot + "_all_bonds_and_angles.table"))
 
         if self.workMode in [51, 52, 53, 54, 55] :
-            print "=====================================================================" 
-            print "| Your job is to calculate bond-orders and charges using HMO.      |"
-            print "=====================================================================" 
+            print("=====================================================================") 
+            print("| Your job is to calculate bond-orders and charges using HMO.      |")
+            print("=====================================================================") 
 
         if self.workMode == 61:
-            print "=====================================================================" 
-            print "| Your job is to generate full descriptions for two monomers, their |"
-            print "| modifications, and a link between them.                           |" 
-            print "=====================================================================" 
+            print("=====================================================================") 
+            print("| Your job is to generate full descriptions for two monomers, their |")
+            print("| modifications, and a link between them.                           |") 
+            print("=====================================================================") 
 
     def runLibmol(self, tIn=None, tIdxMol=-1):
-        print "workMode ", self.workMode
+        print("workMode ", self.workMode)
         self._cmdline = self.libmol
         if tIdxMol !=-1: 
             self._log_name       = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.log")
@@ -966,9 +970,9 @@ class Acedrg(CExeCode ):
                             %(self.upperSigForBonds, self.lowSigForBonds,\
                               self.upperSigForAngles, self.lowSigForAngles)
 
-            print "===================================================================" 
-            print "| Generate the dictionary file using the internal database        |"
-            print "===================================================================" 
+            print("===================================================================") 
+            print("| Generate the dictionary file using the internal database        |")
+            print("===================================================================") 
             if tIdxMol !=-1: 
                 self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.rst")   
                 self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.pdb")
@@ -1007,7 +1011,7 @@ class Acedrg(CExeCode ):
             if tIn:
                 self.inStdCifName = tIn
             self.outRstCifName  = self.outRoot + ".cif"
-	    self.outMolsName    = self.monomRoot + "_all_mols.txt"
+            self.outMolsName    = self.monomRoot + "_all_mols.txt"
             self.outBondsAndAnglesName  = self.monomRoot + "_unique_bond_and_angles.txt"
 
             self._cmdline += " -b %s  "%self.inStdCifName
@@ -1028,7 +1032,7 @@ class Acedrg(CExeCode ):
                 tempCifStr = os.path.join(self.inStdCifDir,"*.cif")
                 for aCif in glob.glob(tempCifStr):
                     tMonomRoot = os.path.basename(aCif).split(".")[0]
-                    print "Generate molecules, bonds and angles from ", aCif
+                    print("Generate molecules, bonds and angles from ", aCif)
                     self._cmdline = self.libmol
                     self.outMolsName            = os.path.join(self.scrDir,tMonomRoot + "_all_mols.txt")
                     self.outBondsAndAnglesName  = os.path.join(self.scrDir, tMonomRoot + "_unique_bond_and_angles.txt")
@@ -1044,14 +1048,14 @@ class Acedrg(CExeCode ):
                     if os.path.isfile(self.outBondsAndAnglesName):
                         tAllBondInMols.append(self.outBondsAndAnglesName)
                     else:
-                        print "No bonds and angles are generated from ", aCif
+                        print("No bonds and angles are generated from ", aCif)
                         tExcludedCif.append(aCif)
                 if len(tAllBondInMols) !=0:
                     self.getBondsAndAngles(bTable, tAllBondInMols)
                 if len(tExcludedCif) !=0:
-                    print "The following cif files have been excluded from calculations because their large R factors"
+                    print("The following cif files have been excluded from calculations because their large R factors")
                     for aExCif in tExcludedCif:
-                        print aExCif
+                        print(aExCif)
 
         if self.workMode == 31 or self.workMode == 32 or self.workMode == 33 or self.workMode == 34 or self.workMode == 35 : 
             #print "===================================================================" 
@@ -1069,9 +1073,9 @@ class Acedrg(CExeCode ):
                         aStr = "2"
                     self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
                 elif self.workMode == 33:
-                    print "===================================================================" 
-                    print "| Generate atom types of Acedrg style                             |"
-                    print "===================================================================" 
+                    print("===================================================================") 
+                    print("| Generate atom types of Acedrg style                             |")
+                    print("===================================================================") 
                     self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
                 #print self._cmdline
@@ -1100,7 +1104,7 @@ class Acedrg(CExeCode ):
             try:
                 f1 = open(aMonTab, "r")
             except IOError:
-                print "%s has not been found for reading"%aMonTab
+                print("%s has not been found for reading"%aMonTab)
             else:
                 f1_lines = f1.readlines()
                 f1.close()
@@ -1118,15 +1122,15 @@ class Acedrg(CExeCode ):
                          bSet  = [strGrp[1], bElem, strGrp[3]]   
                          tSets = [aSet, bSet]
                          tSets.sort(listComp)
-                         if not self.allBondsAndAngles["bonds"].has_key(tSets[0][1]):         # class 1
+                         if tSets[0][1] not in self.allBondsAndAngles["bonds"]:         # class 1
                              self.allBondsAndAngles["bonds"][tSets[0][1]] = {}
-                         if not self.allBondsAndAngles["bonds"][tSets[0][1]].has_key(tSets[1][1]): # class 2 
+                         if tSets[1][1] not in self.allBondsAndAngles["bonds"][tSets[0][1]]: # class 2 
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]] = {}
-                         if not self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]].has_key(tSets[0][0]): # id 1
+                         if tSets[0][0] not in self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]]: # id 1
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]] ={}
-                         if not self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]].has_key(tSets[1][0]): # id 2
+                         if tSets[1][0] not in self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]]: # id 2
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]] = {}
-                         if not self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]].has_key(strGrp[5]):
+                         if strGrp[5] not in self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]]:
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]] = {}
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]]["observations"] = []
                              self.allBondsAndAngles["bonds"][tSets[0][1]][tSets[1][1]][tSets[0][0]][tSets[1][0]][strGrp[5]]["stats"]        = {}
@@ -1136,16 +1140,16 @@ class Acedrg(CExeCode ):
                 
 
                          # Get sorted atom types
-                         if not self.allBondsAndAngles["atomClasses"].has_key(tSets[0][1]):            # atom 1 element type
+                         if tSets[0][1] not in self.allBondsAndAngles["atomClasses"]:            # atom 1 element type
                              self.allBondsAndAngles["atomClasses"][tSets[0][1]] = {}
-                         if not self.allBondsAndAngles["atomClasses"][tSets[0][1]].has_key(tSets[0][0]): # atom 1 class type
+                         if tSets[0][0] not in self.allBondsAndAngles["atomClasses"][tSets[0][1]]: # atom 1 class type
                              self.allBondsAndAngles["atomClasses"][tSets[0][1]][tSets[0][0]] = 1
                          else:
                              self.allBondsAndAngles["atomClasses"][tSets[0][1]][tSets[0][0]] +=1
 
-                         if not self.allBondsAndAngles["atomClasses"].has_key(tSets[1][1]):            # atom 2 element type
+                         if tSets[1][1] not in self.allBondsAndAngles["atomClasses"]:            # atom 2 element type
                               self.allBondsAndAngles["atomClasses"][tSets[1][1]] = {}
-                         if not self.allBondsAndAngles["atomClasses"][tSets[1][1]].has_key(tSets[1][0]): # atom 2 class type
+                         if tSets[1][0] not in self.allBondsAndAngles["atomClasses"][tSets[1][1]]: # atom 2 class type
                               self.allBondsAndAngles["atomClasses"][tSets[1][1]][tSets[1][0]] = 1
                          else:
                               self.allBondsAndAngles["atomClasses"][tSets[1][1]][tSets[1][0]] +=1
@@ -1159,17 +1163,17 @@ class Acedrg(CExeCode ):
                          cSet  = [strGrp[2], bElem, strGrp[5]]   
                          tSets = [bSet, cSet]
                          tSets.sort(listComp)
-                         if not self.allBondsAndAngles["angles"].has_key(aSet[1]):         # center atom element  
+                         if aSet[1] not in self.allBondsAndAngles["angles"]:         # center atom element  
                              self.allBondsAndAngles["angles"][aSet[1]] = {}
-                         if not self.allBondsAndAngles["angles"][aSet[1]].has_key(tSets[0][1]): # atom1 element 
+                         if tSets[0][1] not in self.allBondsAndAngles["angles"][aSet[1]]: # atom1 element 
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]] = {}
-                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]].has_key(tSets[1][1]) : # atom2 elment 
+                         if tSets[1][1] not in self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]] : # atom2 elment 
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]] = {}
-                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]].has_key(aSet[0]): # center atom class
+                         if aSet[0] not in self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]]: # center atom class
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]] = {}
-                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]].has_key(tSets[0][0]): #  atom1 class
+                         if tSets[0][0] not in self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]]: #  atom1 class
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]] = {}
-                         if not self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]].has_key(tSets[1][0]): #  atom1 class
+                         if tSets[1][0] not in self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]]: #  atom1 class
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]] = {}
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]]["observations"] = []
                              self.allBondsAndAngles["angles"][aSet[1]][tSets[0][1]][tSets[1][1]][aSet[0]][tSets[0][0]][tSets[1][0]]["stats"]        = {}
@@ -1185,20 +1189,20 @@ class Acedrg(CExeCode ):
         try:
             f2 = open(tFName, "w")
         except IOError:
-            print "%s has not been found for writing"%tFName
+            print("%s has not been found for writing"%tFName)
         else:
             if len(self.allBondsAndAngles["atomClasses"]):
                 f2.write("All unique atom types: \n")
-                for aElem in sorted(self.allBondsAndAngles["atomClasses"].iterkeys()):
-                    for aCl in sorted(self.allBondsAndAngles["atomClasses"][aElem].iterkeys()):
+                for aElem in sorted(self.allBondsAndAngles["atomClasses"].keys()):
+                    for aCl in sorted(self.allBondsAndAngles["atomClasses"][aElem].keys()):
                         f2.write("%s        %s     \n"%(aElem,aCl))   
             if len(self.allBondsAndAngles["bonds"]):
                 f2.write("All bond lengths: \n")  
-                for aElem in sorted(self.allBondsAndAngles["bonds"].iterkeys()):
-                    for bElem in sorted(self.allBondsAndAngles["bonds"][aElem].iterkeys()):
-                        for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].iterkeys()):
-                            for bCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl].iterkeys()):
-                                for rP in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl].iterkeys()):
+                for aElem in sorted(self.allBondsAndAngles["bonds"].keys()):
+                    for bElem in sorted(self.allBondsAndAngles["bonds"][aElem].keys()):
+                        for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].keys()):
+                            for bCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl].keys()):
+                                for rP in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl].keys()):
                                     self.getStatsForOneBondClass(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"], \
                                                             self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"])                                  
                                     for aSet in self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["observations"]:
@@ -1217,11 +1221,11 @@ class Acedrg(CExeCode ):
                         os.mkdir(casesDir)
                      
                 
-                for aElem in sorted(self.allBondsAndAngles["bonds"].iterkeys()):
-                    for bElem in sorted(self.allBondsAndAngles["bonds"][aElem].iterkeys()):
-                        for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].iterkeys()):
-                            for bCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl].iterkeys()):
-                                for rP in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl].iterkeys()):
+                for aElem in sorted(self.allBondsAndAngles["bonds"].keys()):
+                    for bElem in sorted(self.allBondsAndAngles["bonds"][aElem].keys()):
+                        for aCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem].keys()):
+                            for bCl in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl].keys()):
+                                for rP in sorted(self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl].keys()):
                                     ave = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["mean"]
                                     sig = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["sig"]
                                     num = self.allBondsAndAngles["bonds"][aElem][bElem][aCl][bCl][rP]["stats"]["nObs"]
@@ -1239,12 +1243,12 @@ class Acedrg(CExeCode ):
   
             if len(self.allBondsAndAngles["angles"]):
                 f2.write("\n\nAll bond angles: \n")
-                for cenElem in sorted(self.allBondsAndAngles["angles"].iterkeys()):
-                    for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].iterkeys()):
-                        for bElem in sorted(self.allBondsAndAngles["angles"][cenElem][aElem].iterkeys()):
-                            for cenC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem].iterkeys()):
-                                for aC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC].iterkeys()):
-                                    for bC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC].iterkeys()):
+                for cenElem in sorted(self.allBondsAndAngles["angles"].keys()):
+                    for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].keys()):
+                        for bElem in sorted(self.allBondsAndAngles["angles"][cenElem][aElem].keys()):
+                            for cenC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem].keys()):
+                                for aC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC].keys()):
+                                    for bC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC].keys()):
                                         self.getStatsForOneAngleClass(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["observations"], \
                                                                       self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"])
                                         for aSet in self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["observations"]:
@@ -1255,12 +1259,12 @@ class Acedrg(CExeCode ):
                                                 f2.write("%s      %s       %s        %s      %s      %s      %s        %s      %s     %7.5f\n" \
                                                           %(cenElem, aElem, bElem, cenC, aC, bC, aSet[0],  aSet[1], aSet[2], aSet[3]))   
                 f2.write("\nAll bond angle stats : \n")
-                for cenElem in sorted(self.allBondsAndAngles["angles"].iterkeys()):
-                    for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].iterkeys()):
-                        for bElem in sorted(self.allBondsAndAngles["angles"][cenElem][aElem].iterkeys()):
-                            for cenC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem].iterkeys()):
-                                for aC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC].iterkeys()):
-                                    for bC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC].iterkeys()):
+                for cenElem in sorted(self.allBondsAndAngles["angles"].keys()):
+                    for aElem in sorted(self.allBondsAndAngles["angles"][cenElem].keys()):
+                        for bElem in sorted(self.allBondsAndAngles["angles"][cenElem][aElem].keys()):
+                            for cenC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem].keys()):
+                                for aC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC].keys()):
+                                    for bC in sorted(self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC].keys()):
                                         ave  = self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"]["mean"]
                                         sig  = self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"]["sig"]
                                         nObs = self.allBondsAndAngles["angles"][cenElem][aElem][bElem][cenC][aC][bC]["stats"]["nObs"]
@@ -1301,10 +1305,10 @@ class Acedrg(CExeCode ):
                     if aTup[2] < tBondStatsDict["min"]:
                         tBondStatsDict["min"] = aTup[2]
                 else: 
-                    print "Bug. error in ", aTup
+                    print("Bug. error in ", aTup)
                     sys.exit(1)
 
-            tBondStatsDict["mean"] = sum/numObjs
+            tBondStatsDict["mean"] = old_div(sum,numObjs)
 
             sum_diff_sq = 0.0
 
@@ -1312,7 +1316,7 @@ class Acedrg(CExeCode ):
                 sum_diff_sq +=((aTup[2]- tBondStatsDict["mean"])*(aTup[2]- tBondStatsDict["mean"]))
                               
             if numObjs > 1:
-                tBondStatsDict["sig"] = math.sqrt(sum_diff_sq/(numObjs-1))
+                tBondStatsDict["sig"] = math.sqrt(old_div(sum_diff_sq,(numObjs-1)))
             else:
                 tBondStatsDict["sig"] = 0.0  
             
@@ -1341,10 +1345,10 @@ class Acedrg(CExeCode ):
                     if aTup[3] < tAngleStatsDict["min"]:
                         tAngleStatsDict["min"] = aTup[3]
                 else: 
-                    print "Bug. error in ", aTup
+                    print("Bug. error in ", aTup)
                     sys.exit(1)
 
-            tAngleStatsDict["mean"] = sum/numObjs
+            tAngleStatsDict["mean"] = old_div(sum,numObjs)
 
             sum_diff_sq = 0.0
 
@@ -1352,7 +1356,7 @@ class Acedrg(CExeCode ):
                 sum_diff_sq +=((aTup[3]- tAngleStatsDict["mean"])*(aTup[3]- tAngleStatsDict["mean"]))
 
             if numObjs > 1:
-                tAngleStatsDict["sig"] = math.sqrt(sum_diff_sq/(numObjs-1))
+                tAngleStatsDict["sig"] = math.sqrt(old_div(sum_diff_sq,(numObjs-1)))
             else:
                 tAngleStatsDict["sig"] = 0.0  
             
@@ -1365,7 +1369,7 @@ class Acedrg(CExeCode ):
         try:
             libcheckBat = open(libcheckBatName,"w")
         except IOError:
-            print libcheckBatName, " could not be opened for write "
+            print(libcheckBatName, " could not be opened for write ")
             sys.exit()
         else:
             libcheckBat.write(" N \n")
@@ -1474,7 +1478,7 @@ class Acedrg(CExeCode ):
 
     def runRefmac(self, tPdbIn, tLibIn, tStage=2):
       
-        print "| Stage  %d        |"%tStage
+        print("| Stage  %d        |"%tStage)
         self._log_name    = os.path.join(self.scrDir, self.baseRoot + "_refmac_stage_"+ str(tStage) + ".log")
         self.refmacXYZOUTName = os.path.join(self.scrDir, self.baseRoot + "_refmac_stage_"+ str(tStage) + ".pdb")
         self.setRefmacCom1(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
@@ -1527,19 +1531,19 @@ class Acedrg(CExeCode ):
                                 self.inMmCifName      = self.outRstCifName
                                 self.outRstCifName    = finRst
                                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                print "===================================================================" 
+                                print("===================================================================") 
                             else:
-                                print "Failed to produce %s after final geometrical optimization"%finPdb
+                                print("Failed to produce %s after final geometrical optimization"%finPdb)
                         else:
-                            print "Failed to produce the  coordinates at stage 3 optimization" 
+                            print("Failed to produce the  coordinates at stage 3 optimization") 
                     else:
-                        print "Failed to produce the coordinates at stage 2 optimization" 
+                        print("Failed to produce the coordinates at stage 2 optimization") 
                 else:
-                    print "Failed to produce the coordinates at stage 1 optimization" 
+                    print("Failed to produce the coordinates at stage 1 optimization") 
             else:
-                print "No dictionary file produced ! " 
+                print("No dictionary file produced ! ") 
         else:
-            print "No dictionary file produced ! " 
+            print("No dictionary file produced ! ") 
                         
     def runGeoOpt(self, tRoot, tPdbIn, tCifLibIn):
        
@@ -1554,13 +1558,13 @@ class Acedrg(CExeCode ):
                 self.runRefmac(tPdbIn1, tCifLibIn, tRoot, stageNow)
                 #self.refmacXYZOUTName
                 if not os.path.isfile(self.refmacXYZOUTName):
-                    print "Failed to produce the coordinates for input file %s in optimization"%tPdbIn 
+                    print("Failed to produce the coordinates for input file %s in optimization"%tPdbIn) 
                 else:
                     tFValue = -1.0 
                     tFValue = self.getRefmacFValue(self._log_name)
                     if tFValue >= -0.000001:
                         if len(tRoot) !=0:
-                            if not self.refmacXYSList.has_key(tRoot):
+                            if tRoot not in self.refmacXYSList:
                                  self.refmacXYSList[tRoot] = {}
                             self.refmacXYSList[tRoot]["log"]    = self._log_name 
                             self.refmacXYSList[tRoot]["xyz"]    = self.refmacXYZOUTName 
@@ -1569,19 +1573,19 @@ class Acedrg(CExeCode ):
                         aRefPair = [tFValue, self.refmacXYZOUTName]
                         self.refmacMinFValueList.append(aRefPair)
             else:
-                print "No dictionary file for optimization ! " 
+                print("No dictionary file for optimization ! ") 
         else:
-            print "No input pdb and/or dictionary files for optimization ! " 
+            print("No input pdb and/or dictionary files for optimization ! ") 
 
     def runGeoOptOneMolFull(self, tIdxMol):
 
-        print "Number of final output conformers for molecule %d is %d "%(tIdxMol+1, self.numConformers)
+        print("Number of final output conformers for molecule %d is %d "%(tIdxMol+1, self.numConformers))
         tmpStr = ""
         if self.numConformers == 1:
             tmpStr = "_tmp"
         #nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
         #print "Number of intial conformers for the molecule  ", nConf
-        print "Number of intial conformers for refmac geo-opt  ", len(self.rdKit.selecConformerIds)
+        print("Number of intial conformers for refmac geo-opt  ", len(self.rdKit.selecConformerIds))
 
         inPdbNamesRoot =[]
         #for idxConf in range(nConf): 
@@ -1604,7 +1608,7 @@ class Acedrg(CExeCode ):
             #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
             self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
             if  self.runExitCode :
-                print "Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn
+                print("Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn)
         if len(self.refmacMinFValueList) > 0 :
             #self.refmacMinFValueList.sort(listComp2)
             #for aPair in self.refmacMinFValueList:
@@ -1626,7 +1630,7 @@ class Acedrg(CExeCode ):
         try:
             aLogIn = open(tLogName, "r")
         except IOError:
-            print "Error %s can not be opened for reading"%tLogName
+            print("Error %s can not be opened for reading"%tLogName)
         else:
             allLs = aLogIn.readlines()
             aLogIn.close()
@@ -1669,7 +1673,7 @@ class Acedrg(CExeCode ):
                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName, tMol, tDataDescriptor, tStrDescriptors, tDelocList)
                 #self.outTorsionRestraints(self.outRstCifName, finTor)
         else:
-            print "Failed to produce %s after final geometrical optimization"%tInPdb
+            print("Failed to produce %s after final geometrical optimization"%tInPdb)
 
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol=-1, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
 
@@ -1718,13 +1722,13 @@ class Acedrg(CExeCode ):
         try:
             tPdbIn = open(tPdbInName, "r")
         except IOError:
-            print "%s can not be opened for reading"%tPdbInName
+            print("%s can not be opened for reading"%tPdbInName)
             sys.exit()
         else:
             try: 
                 tCifIn = open(tCifInName, "r")
             except IOError:
-                print "%s can not be opened for reading"%tCifInName
+                print("%s can not be opened for reading"%tCifInName)
                 sys.exit()
             else:
                 allPdbLines  = tPdbIn.readlines()
@@ -1784,14 +1788,14 @@ class Acedrg(CExeCode ):
                                 else:
                                     tName = tID
                             
-                                if pdbAtoms.has_key(tName):
+                                if tName in pdbAtoms:
                                     bLine = "%s%s%s%s%s%s%s%s\n"%(monoId.ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
                                                                 strGrp[3].ljust(8), strGrp[4].ljust(8), \
                                                                 pdbAtoms[tName][0].ljust(12), pdbAtoms[tName][1].ljust(12), \
                                                                 pdbAtoms[tName][2].ljust(12)) 
                                     cifCont['atoms'].append(bLine)
                                 else: 
-                                    print "Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName) 
+                                    print("Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName)) 
                                     sys.exit()
                         elif lBond:
                             cifCont['bonds'].append(aLine)
@@ -1823,19 +1827,19 @@ class Acedrg(CExeCode ):
                             else:
                                 tName = tID
                             
-                            if pdbAtoms.has_key(tName):
+                            if tName in pdbAtoms:
                                 bLine = "%s%s%s%s%s%s%s%s\n"%(strGrp[0].ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
                                                               strGrp[3].ljust(8), strGrp[4].ljust(8), \
                                                               pdbAtoms[tName][0].ljust(12), pdbAtoms[tName][1].ljust(12), \
                                                               pdbAtoms[tName][2].ljust(12)) 
                                 cifCont['atoms'].append(bLine)
                             else: 
-                                print "Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName) 
+                                print("Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName)) 
                                 sys.exit()
                         elif lOther:
                             cifCont['others'].append(aLine)
  
-                if cifCont.has_key("bonds") and len(cifCont['bonds']) !=0:
+                if "bonds" in cifCont and len(cifCont['bonds']) !=0:
                     idxMap = {}
                     tHead  = []
                     tBLs   = []
@@ -1880,9 +1884,9 @@ class Acedrg(CExeCode ):
                                   
                 try:
                     tOutCif = open(tCifOutName, "w")
-                    print "Out cif name ", tCifOutName
+                    print("Out cif name ", tCifOutName)
                 except IOError:
-                    print "%s can not be opened for reading"%tCifOutName
+                    print("%s can not be opened for reading"%tCifOutName)
                     sys.exit()
                 else:
                             
@@ -1898,7 +1902,7 @@ class Acedrg(CExeCode ):
                             else:
                                 aL1 = monoId + aL[3:]
                                 tOutCif.write(aL1)
-                        if cifCont.has_key('bonds'):
+                        if 'bonds' in cifCont:
                             for aL in  cifCont['bonds']:
                                 strGrp = aL.strip().split()
                                 if len(strGrp)==1:
@@ -1923,7 +1927,7 @@ class Acedrg(CExeCode ):
                                 tOutCif.write(aL1)
                     
                     aPos = len(monoId)   
-                    if tStrDescriptors and tStrDescriptors.has_key("props") and len(tStrDescriptors["props"]) !=0:
+                    if tStrDescriptors and "props" in tStrDescriptors and len(tStrDescriptors["props"]) !=0:
                         aSetChars = ["#", ";", "\""]
                         tOutCif.write("loop_"+"\n")
                         for aL in tStrDescriptors["props"]:
@@ -1963,14 +1967,14 @@ class Acedrg(CExeCode ):
 
         if os.path.isfile(tCifInName):
             aCifObj = Ccp4MmCifObj(tCifInName)
-            if aCifObj["ccp4CifObj"]["comps"].has_key(self.monomRoot):
-                if aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("tors")\
-                   and aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("atoms")\
-                   and aCifObj["ccp4CifObj"]["comps"][self.monomRoot].has_key("atoms"):
+            if self.monomRoot in aCifObj["ccp4CifObj"]["comps"]:
+                if "tors" in aCifObj["ccp4CifObj"]["comps"][self.monomRoot]\
+                   and "atoms" in aCifObj["ccp4CifObj"]["comps"][self.monomRoot]\
+                   and "atoms" in aCifObj["ccp4CifObj"]["comps"][self.monomRoot]:
                     try: 
                         aTorOut = open(tTorOutName, "w")
                     except IOError:
-                        print "%s can not be opened for reading"%tTorOutName
+                        print("%s can not be opened for reading"%tTorOutName)
                     else:
                         aSetTor = []
                         for aTor in aCifObj["ccp4CifObj"]["comps"][self.monomRoot]["tors"]: 
@@ -1995,14 +1999,14 @@ class Acedrg(CExeCode ):
         try: 
             aListF = open(aListFName, "w")
         except IOError:
-            print "%s can not be opened for reading"%aListFName
+            print("%s can not be opened for reading"%aListFName)
         else:
             tmpStr = ""
             if self.numConformers == 1:
                 tmpStr = "_tmp"
             aListF.write("RDKit-Energy\tOriginal-Conformer-Id\tPDB-File-Name\n")
             nId = 1
-            for aEng in sorted(self.rdKit.conformerEngMap.iterkeys()):
+            for aEng in sorted(self.rdKit.conformerEngMap.keys()):
                 for aCId in self.rdKit.conformerEngMap[aEng]:
                     aPdbName = "mol_" + str(tIdxMol+1) + "_conf_" + str(nId) + tmpStr + "_init.pdb"
                     nId +=1   
@@ -2026,12 +2030,12 @@ class Acedrg(CExeCode ):
             # Stage 1: dictionary generation using a mmcif file 
             if os.path.isfile(self.inMmCifName):
                 if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
-                    print "The input system contains metal or other heavier element"
-                    print "The current version deals only with the atoms in the set of 'organic' elements" 
+                    print("The input system contains metal or other heavier element")
+                    print("The current version deals only with the atoms in the set of 'organic' elements") 
                     sys.exit()
                 self.runLibmol(self.inMmCifName)
             else:
-                print "The input %s does not exist"%self.inMmCifName
+                print("The input %s does not exist"%self.inMmCifName)
                 sys.exit()
             
             if self.workMode == 11 and not self.runExitCode :
@@ -2046,17 +2050,17 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inSmiName):
                 self.runLibcheck(self.inSmiName)
             else:
-                print "%s does not exist"%self.inSmiName
+                print("%s does not exist"%self.inSmiName)
                 sys.exit()
             # Stage 2: dictionary generation using a mmcif file
             if os.path.isfile(self.libcheckLibName):
                 if not self.chemCheck.isOrganic(self.libcheckLibName, 11):
-                    print "The input system contains metal or other heavier element"
-                    print "The current version deals only with the atoms in the set of 'organic' elements" 
+                    print("The input system contains metal or other heavier element")
+                    print("The current version deals only with the atoms in the set of 'organic' elements") 
                     sys.exit()
                 self.runLibmol(self.libcheckLibName)
             else:
-                print "The input smiles contain metal elements "
+                print("The input smiles contain metal elements ")
                 sys.exit()
 
             if self.workMode == 12 and not self.runExitCode:
@@ -2089,7 +2093,7 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inSdfName):
                 self.runLibmol(self.inSdfName)
             else:
-                print "%s does not exist"%self.inSdfName
+                print("%s does not exist"%self.inSdfName)
                 sys.exit()
            
             if self.workMode == 14 and not self.runExitCode: 
@@ -2104,7 +2108,7 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inMol2Name):
                 self.runLibmol(self.inMol2Name)
             else:
-                print "%s does not exist"%self.inMol2Name
+                print("%s does not exist"%self.inMol2Name)
                 sys.exit()
            
             if self.workMode == 15 and not self.runExitCode: 
@@ -2120,7 +2124,7 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol(self.inStdCifName)
             else:
-                print "Can not find the input file ", self.inStdCifName 
+                print("Can not find the input file ", self.inStdCifName) 
             
         if self.workMode in [22, 221]:
             
@@ -2131,40 +2135,40 @@ class Acedrg(CExeCode ):
             if os.path.isdir(self.inStdCifDir):
                 self.runLibmol()
             else:
-                print "Can not find the input directory ", self.inStdCifDir
+                print("Can not find the input directory ", self.inStdCifDir)
                 
         if self.workMode == 31:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inMmCifName):
                 self.runLibmol()    
         
         if self.workMode == 32:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inSmiName):
                 self.runLibcheck(self.inSmiName)
             else:
-                print "%s does not exist"%self.inSmiName
+                print("%s does not exist"%self.inSmiName)
                 sys.exit()
 
             if os.path.isfile(self.libcheckLibName):
                 self.runLibmol(self.libcheckLibName)
             else:
-                print "%s does not exist"%self.inMmCifName
+                print("%s does not exist"%self.inMmCifName)
                 sys.exit()
             
         if self.workMode == 33:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inMdlName):
                 self.runLibmol()    
         
 
         if self.workMode == 34:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inSdfName):
                 self.runLibmol()    
 
         if self.workMode == 35:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol()    
 
@@ -2174,7 +2178,7 @@ class Acedrg(CExeCode ):
                 #os.system("cp %s %s"%(self.outRstCifName, tCif)) 
                 shutil.copy(self.outRstCifName, tCif) 
             else:
-                print "acedrg failed to generate a dictionary file"       
+                print("acedrg failed to generate a dictionary file")       
     
     def getAAOut(self):
       
@@ -2185,27 +2189,28 @@ class Acedrg(CExeCode ):
         if os.path.isfile(iniPdb):
             shutil.copy(iniPdb, finPdb)
         else:
-            print "Error in dealing with the pdb of amino acid %s "%self.monomRoot 
+            print("Error in dealing with the pdb of amino acid %s "%self.monomRoot) 
             sys.exit(1)
         iniCif = os.path.join(aaDir, self.monomRoot + ".cif")
         finCif = self.outRoot + ".cif"
         if os.path.isfile(iniCif):
             shutil.copy(iniCif, finCif)
         else:
-            print "Error in dealing with the cif of amino acid %s "%self.monomRoot 
+            print("Error in dealing with the cif of amino acid %s "%self.monomRoot) 
             sys.exit(1)
         if os.path.isfile(finPdb) and os.path.isfile(finCif):
-           print "====================================================================="
-           print "|               Done                                                |"
-           print "====================================================================="
+           print("=====================================================================")
+           print("|               Done                                                |")
+           print("=====================================================================")
 
 
     def executeWithRDKit(self):
  
         self.printJobs()
+
         self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
-            print "One of output conformers will using input coordinates as initial ones"
+            print("One of output conformers will using input coordinates as initial ones")
         #elif self.workMode !=0 and self.workMode != 61 :
         #    print "Input coordinates will be ignored"
 
@@ -2218,31 +2223,28 @@ class Acedrg(CExeCode ):
                  and not self.isAA:
                 # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
+
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor) 
                     if self.monomRoot in self.chemCheck.aminoAcids:
                         self.isAA = True
                         self.getAAOut()
                 if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 and not self.isAA:
-                    self.fileConv.tmpModi_Atms()
-                    # Option A:
-                    nRemedAtms = len(self.fileConv.rdkitRemeAtms.keys()) 
-                    if self.useExistCoords or nRemedAtms !=0 :
+                    # Option A: 
+                    if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
-                        if nRemedAtms ==0 :
-                            self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
-                        else :
-                            self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 3)
+                        self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
                         if os.path.isfile(aIniMolName) :
-                            if len(self.fileConv.chiralPre) !=0: # Chiral centers defined in the original cif file
+                            if len(self.fileConv.chiralPre) !=0:
+                            # Chiral centers defined in the original cif file
                                 self.rdKit.chiralPre =[]
                                 for aChi in self.fileConv.chiralPre:
                                     self.rdKit.chiralPre.append(aChi) 
                             self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
                                                 self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
                                                 self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
-                    elif self.fileConv.strDescriptors.has_key("props") \
-                       and self.fileConv.strDescriptors.has_key("entries"):
+                    elif "props" in self.fileConv.strDescriptors \
+                       and "entries" in self.fileConv.strDescriptors:
                         iProp = 0
                         iType = -1
                         iDes  = -1
@@ -2326,10 +2328,10 @@ class Acedrg(CExeCode ):
                                             aSmi = strGrp[iDes][1:-1]
                                             break
                         if lSmi :
-                            print "Smiles str  ", aSmi
+                            print("Smiles str  ", aSmi)
                             aIniSmiName = os.path.join(self.scrDir, self.baseRoot + "_init.smi")
-                            #print "Smiles file ", aIniSmiName
-                            #print "Smiles str  ", aSmi
+                            print("Smiles file ", aIniSmiName)
+                            print("Smiles str  ", aSmi)
                             fSmi = open(aIniSmiName, "w")
                             fSmi.write(aSmi+"\n")
                             fSmi.close()
@@ -2367,7 +2369,7 @@ class Acedrg(CExeCode ):
                                  self.fileConv.addAtomOrigChiralSign(self.rdKit.molecules[0])
                                  self.useCifCoords = True
                             self.workMode = 11
-                    else: 
+                    else:
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                         if os.path.isfile(self.inMmCifName):
                             aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -2437,7 +2439,7 @@ class Acedrg(CExeCode ):
                     self.fileConv.mol2Reader(self.inMol2Name)
                     self.rdKit.initMols("mol2", self.inMol2Name, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingMol2)
             else: 
-                print self.inMol2Name, " can not be found for reading "
+                print(self.inMol2Name, " can not be found for reading ")
                 sys.exit()
 
         if self.workMode == 16 or self.workMode == 161 :
@@ -2463,7 +2465,7 @@ class Acedrg(CExeCode ):
                     self.runRefmac(self.iniLigandPdbName, aLibIn, self.monomRoot, curStage)
                     #print "initial input cif is  ", self.refmacXYZOUTName
                 else:
-                    print "Can not add line with 'CRYST1' to the temp PDB file ", tPDBName
+                    print("Can not add line with 'CRYST1' to the temp PDB file ", tPDBName)
                     sys.exit() 
 
                 if os.path.isfile(self.refmacXYZOUTName):
@@ -2487,11 +2489,10 @@ class Acedrg(CExeCode ):
                                                 self.fileConv.nameMapingCifMol, self.fileConv.inputCharge)    
                     """
                 else: 
-                    print "Failed to generate initial dictionary file ", self.refmacXYZOUTName
+                    print("Failed to generate initial dictionary file ", self.refmacXYZOUTName)
                     sys.exit()
 
         self.setOutCifGlobSec()
-
 
         if self.workMode in [11, 12, 13, 14, 15]:
             self.workMode = 11
@@ -2502,7 +2503,7 @@ class Acedrg(CExeCode ):
         if self.workMode in [11,  111, 51] and not self.isAA :
             #print len(self.rdKit.molecules)
             if len(self.rdKit.molecules):
-                print "Ligand ID ", self.monomRoot
+                print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
                 self.rdKit.hasCCP4Type = self.fileConv.hasCCP4Type
             for iMol in range(len(self.rdKit.molecules)):
@@ -2511,60 +2512,58 @@ class Acedrg(CExeCode ):
                 #if self.monomRoot.upper() in self.chemCheck.aminoAcids:
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, "L-peptide")
                 #else:
-                #if self.workMode in [11,  111]:
-                #    print "Using coords ", self.rdKit.useExistCoords
-                nRemedAtms = len(self.fileConv.rdkitRemeAtms.keys())
-                if nRemedAtms !=0:
-                    self.rdKit.MolToSimplifiedMmcif2(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck,\
-                                                     self.monomRoot, self.fileConv.chiralPre, self.fileConv.rdkitRemeAtms)
-                else:
-                    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
+                if self.workMode in [11,  111]:
+                    print("Using coords ", self.rdKit.useExistCoords)
+ 
+                self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
-                        print "The input system contains metal or other heavier element"
-                        print "The current version deals only with the atoms in the set of 'organic' elements" 
+                        print("JJJJJ ")
+                        sys.exit()
+                        print("The input system contains metal or other heavier element")
+                        print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
                     self.runLibmol(self.inMmCifName, iMol)
                 else:
-                    print "The input %s does not exist"%self.inMmCifName
+                    print("The input %s does not exist"%self.inMmCifName)
                     sys.exit()
 
                 if self.workMode == 11:
                     if  not self.runExitCode :
                         # Stage 2: optimization
-                        print "===================================================================" 
-                        print "| Geometrical Optimization                                        |"
-                        print "===================================================================" 
+                        print("===================================================================") 
+                        print("| Geometrical Optimization                                        |")
+                        print("===================================================================") 
                         
                         if len(self.rdKit.molecules) != 0 and os.path.isfile(self.outRstCifName):
                             inPdbNamesRoot = {} 
                             for idxMol in range(len(self.rdKit.molecules)): 
-                                if not inPdbNamesRoot.has_key(idxMol):
+                                if idxMol not in inPdbNamesRoot:
                                     inPdbNamesRoot[idxMol] = []
-                                print "Number of atoms in molecule %d is %d "%(idxMol+1, self.rdKit.molecules[idxMol].GetNumAtoms())
+                                print("Number of atoms in molecule %d is %d "%(idxMol+1, self.rdKit.molecules[idxMol].GetNumAtoms()))
                                 #nConf = self.rdKit.molecules[idxMol].GetNumConformers()
                                 self.runGeoOptOneMolFull(idxMol)
                                 if not self.useExistCoords:
                                     self.outEnergyGeoMap(idxMol)
                     else:
-                        print "Error: No dictionary cif file is generated by Acedrg "
+                        print("Error: No dictionary cif file is generated by Acedrg ")
 
         elif self.workMode == 16 or self.workMode == 161:
             if os.path.isfile(self.inMmCifName):
                 if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
-                    print "The input system contains metal or other heavier element"
-                    print "The current version deals only with the atoms in the set of 'organic' elements" 
+                    print("The input system contains metal or other heavier element")
+                    print("The current version deals only with the atoms in the set of 'organic' elements") 
                     sys.exit()
                 self.runLibmol()
             else:
-                print "The input %s does not exist"%self.inMmCifName
+                print("The input %s does not exist"%self.inMmCifName)
                 sys.exit()
             if self.workMode == 16: 
                 if not self.runExitCode :
                     # Stage 2: optimization
-                    print "===================================================================" 
-                    print "| Geometrical Optimization                                        |"
-                    print "===================================================================" 
+                    print("===================================================================") 
+                    print("| Geometrical Optimization                                        |")
+                    print("===================================================================") 
                         
                     if os.path.isfile(self.outRstCifName):
                         self.refmacXYZOUTName = ""
@@ -2580,7 +2579,7 @@ class Acedrg(CExeCode ):
                                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
                                 #print "==================================================================="
                             else:
-                                print "Failed to produce %s after final geometrical optimization"%finPdb
+                                print("Failed to produce %s after final geometrical optimization"%finPdb)
 
         if self.workMode in [21, 211]:
             
@@ -2589,7 +2588,7 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol(self.inStdCifName)
             else:
-                print "Can not find the input file ", self.inStdCifName 
+                print("Can not find the input file ", self.inStdCifName) 
             
         if self.workMode in [22, 221]:
             
@@ -2600,25 +2599,25 @@ class Acedrg(CExeCode ):
             if os.path.isdir(self.inStdCifDir):
                 self.runLibmol()
             else:
-                print "Can not find the input directory ", self.inStdCifDir
+                print("Can not find the input directory ", self.inStdCifDir)
                 
         if self.workMode == 31:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inMmCifName):
                 self.runLibmol()    
         
         if self.workMode == 32:
-            print "work mode ", self.workMode
+            print("work mode ", self.workMode)
             if os.path.isfile(self.inSmiName):
                 self.runLibcheck(self.inSmiName)
             else:
-                print "%s does not exist"%self.inSmiName
+                print("%s does not exist"%self.inSmiName)
                 sys.exit()
 
             if os.path.isfile(self.libcheckLibName):
                 self.runLibmol(self.libcheckLibName)
             else:
-                print "%s does not exist"%self.inMmCifName
+                print("%s does not exist"%self.inMmCifName)
                 sys.exit()
             
         if self.workMode == 33:
@@ -2627,10 +2626,10 @@ class Acedrg(CExeCode ):
                 tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
                 if len(self.rdKit.molecules)==1:
                     self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tMolMmcifName, self.chemCheck, self.monomRoot)
-                    print "Number of molecules ", len(self.rdKit.molecules)
+                    print("Number of molecules ", len(self.rdKit.molecules))
                     self.runLibmol(tMolMmcifName)
                 else:
-                    print "Do not process atom-types of multiple molecules at the same time, do nothing"
+                    print("Do not process atom-types of multiple molecules at the same time, do nothing")
 
         if self.workMode == 34:
             if os.path.isfile(self.inSdfName):
@@ -2653,11 +2652,11 @@ class Acedrg(CExeCode ):
                 #os.system("cp %s %s"%(self.outRstCifName, tCif)) 
                 shutil.copy(self.outRstCifName, tCif) 
             else:
-                print "acedrg failed to generate a dictionary file"     
+                print("acedrg failed to generate a dictionary file")     
 
     def printExitInfo(self):
 
-        print "Error: check log file at %s"%self._log_name
+        print("Error: check log file at %s"%self._log_name)
     
 
             

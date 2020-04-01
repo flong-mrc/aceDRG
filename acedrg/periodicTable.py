@@ -1,10 +1,10 @@
-#!/usr/bin/env python
 # Python script
 #
 #
 ## The date of last modification: 06/11/2017
 #
 
+from __future__ import print_function
 import os,os.path,sys
 import glob,shutil
 import re,string
@@ -806,7 +806,7 @@ class PeriodicTab(dict):
         elif len(tStr) == 2:
             aEl = tStr[0] + tStr[1].lower()
         else :
-             print "Wrong element symbol ", tStr
+             print("Wrong element symbol ", tStr)
         # for a string of length other than 1 or 2, return the original string 
         return aEl
 

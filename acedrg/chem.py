@@ -1,4 +1,3 @@
-#!/usr/bin/env  ccp4-python
 # Python script
 #
 #
@@ -11,6 +10,11 @@
 ## The date of last modification: 21/07/2016
 #
 
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -41,7 +45,7 @@ from utility  import splitLineSpa
 from utility  import splitLineSpa2
 from utility  import aLineToAlist
 
-class ChemCheck():
+class ChemCheck(object):
 
     def __init__( self):
 
@@ -126,13 +130,13 @@ class ChemCheck():
                 organicOnly = False
                 break;
         if not organicOnly :
-            print "The input ligands/molecules contains metal or other heavier atoms "
-            print "Acedrg currently deals with ligands/molecules with following elements only "
-            print "C, N, O, S, P, B, F, Cl, Br, I, H"
+            print("The input ligands/molecules contains metal or other heavier atoms ")
+            print("Acedrg currently deals with ligands/molecules with following elements only ")
+            print("C, N, O, S, P, B, F, Cl, Br, I, H")
         if len(allAtomElems) ==0:
-            print "The input ligands/molecules contains metal or other heavier atoms "
-            print "Acedrg currently deals with ligands/molecules with following elements only "
-            print "C, N, O, S, P, B, F, Cl, Br, I, H"
+            print("The input ligands/molecules contains metal or other heavier atoms ")
+            print("Acedrg currently deals with ligands/molecules with following elements only ")
+            print("C, N, O, S, P, B, F, Cl, Br, I, H")
             #print "Can not get the element symbols of atoms. Check input file format"
             organicOnly = False
 
@@ -147,10 +151,10 @@ class ChemCheck():
 
         # print "Number of atom before is ", tMol.GetNumAtoms()
         aMolT=Chem.MolFromSmiles(rdmolfiles.MolToSmiles(tMol))
-        print rdmolfiles.MolToSmiles(tMol)
+        print(rdmolfiles.MolToSmiles(tMol))
         aMol = Chem.AddHs(aMolT)
         rdmolfiles.MolToMolFile(tMol, "1.mol")
-        print "Number of atom now is ", aMol.GetNumAtoms()
+        print("Number of atom now is ", aMol.GetNumAtoms())
         tDoneAtms = []
         for i in range(len(tMol.GetAtoms())):
             elem = tMol.GetAtomWithIdx(i).GetSymbol()
@@ -161,7 +165,7 @@ class ChemCheck():
                 tMol.GetAtomWithIdx(i).SetFormalCharge(nAddHs) 
 
         aMolT = Chem.AddHs(tMol)
-        print "Number of atom after is ", aMolT.GetNumAtoms()
+        print("Number of atom after is ", aMolT.GetNumAtoms())
 
     def getNumNBHAtoms(self, tAtom):
  
@@ -183,21 +187,21 @@ class ChemCheck():
         elif tTypeIdx in self.atomFileType["mol2"]: 
             self.getAtomElemsFromMol2(tInFileName, tAtomElems)
         else: 
-            print "Could not recognize format for the input file. It should be one of cif, smiles, sdf/mol, mol2"
+            print("Could not recognize format for the input file. It should be one of cif, smiles, sdf/mol, mol2")
             sys.exit(1) 
         aLine = ""
         for aEl in tAtomElems:
              aLine += (aEl.strip()+"\t")
         if len(aLine.strip()) > 0:
-            print "The system contains atoms of the following elements" 
-            print aLine
+            print("The system contains atoms of the following elements") 
+            print(aLine)
 
     def getAtomElemsFromMmcif(self, tInFileName, tAtomElems):
 
         try :
             inFile = open(tInFileName, "r")
         except IOError :
-             print "%s can not be opened for reading "%tInFileName
+             print("%s can not be opened for reading "%tInFileName)
              sys.exit(1)
         else:
              allLines = inFile.readlines()
@@ -214,7 +218,7 @@ class ChemCheck():
                     #strGrp = aL.strip().split()
                     strGrp = []
                     aLineToAlist(aL, strGrp)
-                    if colDict.has_key("type_symbol") and len(strGrp) == len(colDict) \
+                    if "type_symbol" in colDict and len(strGrp) == len(colDict) \
                        and colDict["type_symbol"] < len(strGrp):
                         aAtomElem = strGrp[colDict["type_symbol"]]
                         if not aAtomElem in tAtomElems:
@@ -236,7 +240,7 @@ class ChemCheck():
         try :
             inFile = open(tInFileName, "r")
         except IOError :
-            print "%s can not be opened for reading "%tInFileName
+            print("%s can not be opened for reading "%tInFileName)
             sys.exit(1)
         else:
             allLines = inFile.readlines()
@@ -253,8 +257,8 @@ class ChemCheck():
                         if tN.isdigit():
                             nAtoms = int(tN)
                         else:
-                            print "Format error is input MOL/SDF file. The count line is : "
-                            print aL 
+                            print("Format error is input MOL/SDF file. The count line is : ")
+                            print(aL) 
                             sys.exit()
                     elif nOneMolLines > 3 and nOneMolLines < nAtoms:
                         aElem = aL[30:34].strip()
@@ -269,7 +273,7 @@ class ChemCheck():
             try:
                 fSmi = open(tFileName, "r")
             except IOError:
-                print  "% can not be open for reading "%tFileName
+                print("% can not be open for reading "%tFileName)
                 sys.exit()
             else:
                 aSmiStr = fSmi.read()
@@ -277,7 +281,7 @@ class ChemCheck():
                 if len(tSmiStr) >0 :
                     aSmiStr = tSmiStr[0].strip()
                 else:
-                    print "String format error"
+                    print("String format error")
                     sys.exit()    
                 fSmi.close()
         else:
@@ -292,8 +296,8 @@ class ChemCheck():
                     if len(aSym) and not aSym in tAtomElems:
                         tAtomElems.append(aSym)
             else:
-                print "Can not generate a molecule from the input SMILES string!"
-                print "Check your SMILES or report the bug "
+                print("Can not generate a molecule from the input SMILES string!")
+                print("Check your SMILES or report the bug ")
 
     """
     def getAtomElemsFromMol2(self, tFileName, tAtomElems):
@@ -344,7 +348,7 @@ class ChemCheck():
                     elif aL.find("@<TRIPOS>ATOM") !=-1:
                         lAtom = True
         else: 
-            print "%s can not be found for reading "%tFileName
+            print("%s can not be found for reading "%tFileName)
 
 
     def getTotalBondOrderInOneMmcifAtom(self, tAtomId, tBonds):
@@ -372,9 +376,9 @@ class ChemCheck():
   
         allowedBo = []
         aT = tAtom["type_symbol"]
-        if self.orgVal.has_key(aT):
+        if aT in self.orgVal:
             for aOrd in self.orgVal[aT]:
-                if tAtom.has_key("charge"):
+                if "charge" in tAtom:
                     allowedBo.append(aOrd + int(tAtom["charge"]))
                 else:
                     allowedBo.append(aOrd)
@@ -390,7 +394,7 @@ class ChemCheck():
         for aB in tBonds:
             nBT = BondOrderS2N(aB["type"])
             if nBT != -1 : 
-                if tAtom.has_key("charge"):
+                if "charge" in tAtom:
                     nOrder += (nBT + int(tAtom["charge"]))
                 else:
                     nOrder += nBT
@@ -400,12 +404,12 @@ class ChemCheck():
                 aBool = False
                 break
         if aBool:
-            print "Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder)
+            print("Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder))
             curAllowOrds = self.getAllowBondOrderForOneOrgAtom(tAtom)
             if len(curAllowOrds) !=0:
-                print "Total allowed bond orders are : "
+                print("Total allowed bond orders are : ")
                 for aOrd in curAllowOrds:
-                    print aOrd
+                    print(aOrd)
                 if not nOrder in curAllowOrds:
                      aLine ="Bond order (valence) %d around added atom %s are wrong.\n"%(nOrder, tAtom["atom_id"])
                      aLine += "It should be %d, check your input file(bond order or charge)\n"%curAllowOrds[0]
@@ -424,9 +428,9 @@ class ChemCheck():
         nOrder = 0
         for aB in tBonds:
             nBT = -1
-            if aB.has_key("type"):
+            if "type" in aB:
                 nBT = BondOrderS2N(aB["type"])
-                print "Bond-type between atom %s and %s is %d "%(aB["atom_id_1"], aB["atom_id_2"], nBT)
+                print("Bond-type between atom %s and %s is %d "%(aB["atom_id_1"], aB["atom_id_2"], nBT))
             if nBT != -1 :
                 nOrder += nBT
             else: 
@@ -436,13 +440,13 @@ class ChemCheck():
                 break
 
         if aBool:
-            print "Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder)
+            print("Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder))
             curAllowOrds = self.getAllowBondOrderForOneOrgAtom(tAtom)
             if len(curAllowOrds) !=0:
-                print "Total allowed bond orders are : "
+                print("Total allowed bond orders are : ")
                 for aOrd in curAllowOrds:
-                    print aOrd
-                print "Current bond order is : ", nOrder
+                    print(aOrd)
+                print("Current bond order is : ", nOrder)
                 if not nOrder in curAllowOrds:
                     # If total valence does not equal to one of allowed valences. Use curAllowOrds[0]
                     # The procedures are:
@@ -455,7 +459,7 @@ class ChemCheck():
                             # (1a) nOrder = curAllowOrds[0] - 1, cancel the formal charge in atom
                             tAtom["charge"]="0"
                             tMod["changed"]["atoms"].append(tAtom)
-                            print "The formal charge at atom %s is reduced to %s"%(tAtom["atom_id"], tAtom["charge"])
+                            print("The formal charge at atom %s is reduced to %s"%(tAtom["atom_id"], tAtom["charge"]))
                         else:
                             # (1b) to add H atoms and therefore the valence of the atom.
                             aAtom = {}
@@ -464,7 +468,7 @@ class ChemCheck():
                             aAtom["type_energy"] = aAtom["type_symbol"]
                             aAtom["comp_id"]     = tAtom["comp_id"] 
                             tMod["added"]["atoms"].append(aAtom)
-                            print "One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"])
+                            print("One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"]))
                             aBond = {}
                             aBond["atom_id_1"] = aAtom["atom_id"]
                             aBond["atom_id_2"] = tAtom["atom_id"]
@@ -473,12 +477,12 @@ class ChemCheck():
                     elif nOrder > curAllowOrds[0]:
                         if len(curAllowOrds)==1:
                             aN = nOrder-curAllowOrds[0]
-                            print "%d H atom will be deleted "%aN
+                            print("%d H atom will be deleted "%aN)
                             hAtomIds =[]
                             for aAtom in tNBAtoms:
                                 if aAtom["type_symbol"]=="H" and not aAtom["atom_id"] in tDelAtmIds:
                                     hAtomIds.append(aAtom["atom_id"])
-                            print "%s connects %d H atom "%(tAtom["atom_id"], len(hAtomIds))
+                            print("%s connects %d H atom "%(tAtom["atom_id"], len(hAtomIds)))
                             if aN <=len(hAtomIds) :
                                 hAtomIds.sort()
                                 idxD = -1
@@ -486,7 +490,7 @@ class ChemCheck():
                                     aHName = hAtomIds[idxD]
                                     if not aHName in tDelAtmIds:
                                         tDelAtmIds.append(aHName)
-                                        print "H atom %s is deleted "%aHName
+                                        print("H atom %s is deleted "%aHName)
                                     idxD = idxD -1
                                 for aAtom in tRes["comp"]["atoms"]:
                                     if aAtom["atom_id"] in tDelAtmIds:
@@ -495,7 +499,7 @@ class ChemCheck():
                                  aLine = "Currently it is not allowed to do such a change for atom %s %s\n"%tAtom["atom_id"]
                                  aBool = False
                         else: 
-                            print "Here "
+                            print("Here ")
                             sys.exit()
                             nAdded = 1 # TEMPO
                             lAdded = False
@@ -522,7 +526,7 @@ class ChemCheck():
         aAtom["type_energy"] = aAtom["type_symbol"]
         aAtom["comp_id"]     = tConnAtom["comp_id"] 
         tAtoms.append(aAtom)
-        print "One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"])
+        print("One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"]))
         Bond = {}
         aBond["atom_id_1"] = aAtom["atom_id"]
         aBond["atom_id_2"] = tConnAtom["atom_id"]
@@ -577,8 +581,8 @@ class ChemCheck():
                     symb = aNB.GetSymbol().strip()
                     if len(symb)==1 and symb.find("H") !=-1:
                         nHs +=1            
-                print "atom symb ", aSymb
-                print "number of H NB ", nHs
+                print("atom symb ", aSymb)
+                print("number of H NB ", nHs)
                 if not lSP2 and nHs < 2:
                     # TEMP, re-calculated when the coordinates are available
                     #tCenAtm.SetChiralTag(rdchem.ChiralType.CHI_TETRAHEDRAL_CW)            
@@ -620,7 +624,7 @@ class ChemCheck():
             #print "Sign ", vSign 
 
         else :
-            print "Can not calculate chiral volume. atom coordinates are not 3 dim "
+            print("Can not calculate chiral volume. atom coordinates are not 3 dim ")
 
         return vSign  
  
