@@ -39,22 +39,22 @@ if os.name != 'nt':
     import fcntl
 import signal
 
-from exebase       import CExeCode
+from . exebase       import CExeCode
 
-from acedrgRDKit   import AcedrgRDKit
-from filetools     import FileTransformer
-from filetools     import Ccp4MmCifObj
-from chem          import ChemCheck
+from . acedrgRDKit   import AcedrgRDKit
+from . filetools     import FileTransformer
+from . filetools     import Ccp4MmCifObj
+from . chem          import ChemCheck
 
-from utility       import isInt
-from utility       import listComp
-from utility       import listComp2
-from utility       import listCompDes
-from utility       import listCompAcd
-from utility       import setBoolDict
-from utility       import splitLineSpa
-from utility       import BondOrderS2N
-from utility       import setNameByNumPrime
+from . utility       import isInt
+from . utility       import listComp
+from . utility       import listComp2
+from . utility       import listCompDes
+from . utility       import listCompAcd
+from . utility       import setBoolDict
+from . utility       import splitLineSpa
+from . utility       import BondOrderS2N
+from . utility       import setNameByNumPrime
 
 #################################################   
 

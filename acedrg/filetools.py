@@ -36,14 +36,14 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
-from utility  import listComp
-from utility  import listComp2
-from utility  import listCompDes
-from utility  import listCompAcd
-from utility  import setBoolDict
-from utility  import splitLineSpa
-from utility  import splitLineSpa2
-from utility  import aLineToAlist
+from . utility  import listComp
+from . utility  import listComp2
+from . utility  import listCompDes
+from . utility  import listCompAcd
+from . utility  import setBoolDict
+from . utility  import splitLineSpa
+from . utility  import splitLineSpa2
+from . utility  import aLineToAlist
 
 class FileTransformer(object) :
 

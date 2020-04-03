@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env ccp4-python
 # Python script
 #
 #
@@ -39,26 +39,26 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
-from exebase     import CExeCode
+from . exebase     import CExeCode
 
-from acedrgRDKit import AcedrgRDKit
+from . acedrgRDKit import AcedrgRDKit
 
-from chem        import ChemCheck
+from . chem        import ChemCheck
 
-from covLink     import CovLink
-from covLink     import CovLinkGenerator
+from . covLink     import CovLink
+from . covLink     import CovLinkGenerator
 
-from filetools   import Ccp4MmCifObj
-from filetools   import FileTransformer
+from . filetools   import Ccp4MmCifObj
+from . filetools   import FileTransformer
 
-from utility    import listComp
-from utility    import listComp2
-from utility    import listCompDes
-from utility    import listCompAcd
-from utility    import setBoolDict
-from utility    import splitLineSpa
-from utility    import splitLineSpa2
-from utility    import aLineToAlist
+from . utility    import listComp
+from . utility    import listComp2
+from . utility    import listCompDes
+from . utility    import listCompAcd
+from . utility    import setBoolDict
+from . utility    import splitLineSpa
+from . utility    import splitLineSpa2
+from . utility    import aLineToAlist
 
 if os.name != 'nt':
     import fcntl
