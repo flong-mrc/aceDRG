@@ -1,0 +1,24 @@
+data_instruct_link
+
+loop_
+_instruct_link_atom.comp_id
+_instruct_link_atom.comp_serial_num
+_instruct_link_atom.comp_file
+_instruct_link_atom.atom_id
+ALA 1   inFiles/ALA-TRR_altered.cif   CA     
+TRR 2   inFiles/ALA-TRR_altered.cif   CZ      
+
+loop_
+_instruct_link_bond.comp_serial_num_1
+_instruct_link_bond.atom_id_1
+_instruct_link_bond.comp_serial_num_2
+_instruct_link_bond.atom_id_2
+_instruct_link_bond.type
+1  CA    2   CZ    .
+
+loop_
+_instruct_del_datom.comp_serial_num
+_instruct_del_datom.atom_id
+1    HA
+2    HZ
+

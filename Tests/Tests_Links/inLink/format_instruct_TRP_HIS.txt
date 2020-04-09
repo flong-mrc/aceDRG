@@ -1,0 +1,1 @@
+LINK: RES-NAME-1 value  ATOM-NAME-1 value   RES-NAME-2 value ATOM-NAME-2  value  ADD ATOM id_value elem_value charge_value residue_number_value BOND atom1_id  atom2_id bond_order_value residue_number
