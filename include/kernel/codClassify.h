@@ -369,6 +369,7 @@ namespace LIBMOL
         void groupCodOrgBonds();
         void groupCodOrgBonds2();
         void groupCodOrgBonds3();
+        
         void searchCodOrgBonds(std::vector<BondDict>::iterator iOB);
         void searchCodOrgBonds2(std::vector<BondDict>::iterator iB);
         void searchCodOrgBonds2_2(std::vector<BondDict>::iterator iB);

@@ -6010,94 +6010,69 @@ namespace LIBMOL
     }
     
     extern void setAtomFormTypes(std::vector<AtomDict> & tAtoms)
-    {
-        
+    {   
         for (std::vector<AtomDict>::iterator iAtm=tAtoms.begin();
                     iAtm !=tAtoms.end(); iAtm++)
         {
-            
-            if (iAtm->chemType.compare("H")!=0)
+               
+            iAtm->formType.clear();
+            iAtm->formType.push_back(iAtm->chemType);
+            if (iAtm->isInAromRing)
             {
-                iAtm->formType.clear();
-                iAtm->formType.push_back(iAtm->chemType);
-                if (iAtm->isInAromRing)
-                {
-                    std::cout << "Atom " << iAtm->id 
-                              << " is at least in one aromatic ring " 
-                              << std::endl;
-                }
-                std::string sAll="", s1="", s2="", s3="";
-                s1 = iAtm->chemType + "_sp" + IntToStr(iAtm->bondingIdx);
-                if (iAtm->isInAromRing)
-                {
-                    s2 = "_arom";
-                }
-            
-                
-                //if (iAtm->isInDelocBond)
-                // {
-                //    s3 = "_deloc";
-                //}
-                
-            
-                if (s2.size()>0 && s3.size() > 0)
-                {
-                    sAll = s1 + s2 +s3;
-                }
-                else if (s2.size() > 0)
-                {
-                    sAll = s1 + s2;
-                }
-                else if (s3.size() >0)
-                {
-                    sAll = s1 + s3;
-                }
-                else
-                {
-                    sAll = s1;
-                }
-            
-                iAtm->formType.push_back(sAll);
+                std::cout << "Atom " << iAtm->id 
+                          << " is at least in one aromatic ring " 
+                          << std::endl;
             }
-        }
-        
-        std::cout << "Pass " << std::endl;
-        
-        for (std::vector<AtomDict>::iterator iAtm=tAtoms.begin();
-                    iAtm !=tAtoms.end(); iAtm++)
-        {
+            std::string sAll="", s1="", s2="", s3="", s4="";
             if (iAtm->chemType.compare("H")==0)
             {
-                iAtm->formType.clear();
-                iAtm->formType.push_back(iAtm->chemType);
-                
-                std::string aS;
-                
-                if (iAtm->connAtoms.size() >0)
-                {
-                    if (tAtoms[iAtm->connAtoms[0]].formType.size()==2)
-                    {
-                        aS =iAtm->chemType + "_"
-                            + tAtoms[iAtm->connAtoms[0]].formType[1];
-                    }
-                    else if (tAtoms[iAtm->connAtoms[0]].formType.size()==1)
-                    {
-                        aS =iAtm->chemType + "_"
-                            + tAtoms[iAtm->connAtoms[0]].formType[0];
-                    }
-                    else
-                    {
-                        aS = iAtm->chemType + "_" 
-                            +  tAtoms[iAtm->connAtoms[0]].chemType;
-                    }
-                }
-                else
-                {
-                    aS = iAtm->chemType + "_X";
-                }
-                
-                iAtm->formType.push_back(aS);
+                s1 = iAtm->chemType + "_sp" + IntToStr(tAtoms[iAtm->connAtoms[0]].bondingIdx);
             }
+            else
+            {
+                s1 = iAtm->chemType + "_sp" + IntToStr(iAtm->bondingIdx);
+            }
+            if (iAtm->isInAromRing)
+            {
+                s2 = "_arom";
+            }
+                
+            //if (iAtm->isInDelocBond)
+            //{
+            //    s3 = "_deloc";
+            //}
+            
+            if (iAtm->chemType.compare("H")==0
+                && iAtm->connAtoms.size() > 0)
+            {
+                s4 = "_" + tAtoms[iAtm->connAtoms[0]].chemType;
+            }
+            
+            if (s2.size()>0 && s3.size() > 0)
+            {
+                sAll = s1 + s2 +s3;
+            }
+            else if (s2.size() > 0)
+            {
+                sAll = s1 + s2;
+            }
+            else if (s3.size() >0)
+            {
+                sAll = s1 + s3;
+            }
+            else
+            {
+                sAll = s1;
+            }
+            
+            if(iAtm->chemType.compare("H") ==0)
+            {
+                sAll = sAll + s4;
+            }
+            
+            iAtm->formType.push_back(sAll);
+            //std::cout << iAtm->id << std::endl;
+            //std::cout << iAtm->formType[1] << std::endl;
         }
         
     }

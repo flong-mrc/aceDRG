@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
     std::cout << "workMode " << AJob.workMode << std::endl;
     //std::cout << "user output name " << AJob.IOEntries["userOutName"] 
     //          << std::endl;
-   
+    
     for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
             iKW !=AJob.IOEntries.end(); iKW++)
     {   
@@ -143,14 +143,7 @@ int main(int argc, char** argv) {
                  aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
                                                             AJob.IOEntries["monoRootName"], 
                                                             AJob.IOEntries["libMolTabDir"]);
-                 std::cout << "DOUBLE CHECKing again 2" << std::endl;
-        
-                 for (std::vector<LIBMOL::BondDict>::iterator 
-                      iB=aTargetSystem.allBonds.begin();
-                      iB != aTargetSystem.allBonds.end(); iB++)
-                 {
-                    std::cout << "Bond sig value " << iB->sigValue << std::endl;
-                 }
+                 
                  
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                   AJob.IOEntries["monoRootName"], 
@@ -166,7 +159,8 @@ int main(int argc, char** argv) {
                                   aTargetSystem.upperBondSig, 
                                   aTargetSystem.lowBondSig, 
                                   aTargetSystem.upperAngleSig,
-                                  aTargetSystem.lowAngleSig);
+                                  aTargetSystem.lowAngleSig,
+                                  aTargetSystem.HydrDistTable);
                                 
                  
                 LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
@@ -230,7 +224,8 @@ int main(int argc, char** argv) {
                                                  aTargetSystem.upperBondSig,
                                                  aTargetSystem.lowBondSig,
                                                  aTargetSystem.upperAngleSig,
-                                                 aTargetSystem.lowAngleSig);
+                                                 aTargetSystem.lowAngleSig,
+                                                 aTargetSystem.HydrDistTable);
                         
                         
                         LIBMOL::outPDB(tOutName.c_str(),
@@ -286,6 +281,7 @@ int main(int argc, char** argv) {
              || AJob.workMode==3111
              || AJob.workMode ==312
              || AJob.workMode ==313 
+             || AJob.workMode ==314
              || AJob.workMode==32 
              || AJob.workMode==33)
     {
@@ -296,7 +292,8 @@ int main(int argc, char** argv) {
             || AJob.workMode==311 
             || AJob.workMode==3111
             || AJob.workMode ==312
-            || AJob.workMode ==313)
+            || AJob.workMode ==313
+            || AJob.workMode ==314)
         {
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
             LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
@@ -352,7 +349,7 @@ int main(int argc, char** argv) {
                 }
                 else if (AJob.workMode ==312 || AJob.workMode==313)
                 {
-                    std::cout << "Studies related metal atoms " << std::endl;
+                    std::cout << "Studies on metal atoms " << std::endl;
                     
                     if (dataFromCif.hasMetal)
                     {
@@ -364,12 +361,14 @@ int main(int argc, char** argv) {
                             aDDelta = 
                             LIBMOL::StrToReal(AJob.IOEntries["distDelta"]);
                         }
+                        
                         aPTab.compareIdealDists(aMolCreator.metalBondRange,
                                                 aDDelta);
-                       
+                        
                         std::cout << "The system contain metal atoms " << std::endl;
                         std::cout << "Those metal atoms are : " << std::endl;
-                        for (std::vector<LIBMOL::AtomDict>::iterator iAt=dataFromCif.allAtoms.begin();
+                        for (std::vector<LIBMOL::AtomDict>::iterator 
+                             iAt=dataFromCif.allAtoms.begin();
                              iAt != dataFromCif.allAtoms.end(); iAt++)
                         {
                             if (iAt->isMetal)
@@ -399,8 +398,31 @@ int main(int argc, char** argv) {
                     {
                         dataFromCif.errMsg.push_back("The system contains no metal atoms \n");
                         LIBMOL::writeMsgFile(AJob.IOEntries["userOutName"],
-                                         dataFromCif.errMsg);
+                                             dataFromCif.errMsg);
                     }
+                }
+                else if (AJob.workMode==314)
+                {
+                    
+                    std::cout << "Studies of neighbor distribution of "
+                                "certain non-metal atoms " << std::endl;
+                    
+                    LIBMOL::PeriodicTable aPTab;
+                    double aDDelta = 0.3;
+                    
+                    
+                    if (AJob.IOEntries.find("distDelta") 
+                            !=AJob.IOEntries.end())
+                    {
+                        aDDelta = 
+                        LIBMOL::StrToReal(AJob.IOEntries["distDelta"]);
+                    }
+                    
+                    aMolCreator.executeSelectedAtomRange(
+                                        AJob.IOEntries["UserParaFile"].c_str(),
+                                        AJob.IOEntries["userOutName"].c_str());
+                    
+                    
                 }
             }
             else
@@ -461,7 +483,6 @@ int main(int argc, char** argv) {
             
             //aCodSystem.codAtomClassifyNew2(2);
             LIBMOL::setAtomFormTypes(aCodSystem.allAtoms);
-            std::cout << "here " << std::endl;
             LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
                                                aCodSystem.allAtoms,
                                                aCodSystem.allBonds);
@@ -519,8 +540,21 @@ int main(int argc, char** argv) {
               iB != allBondLines.end(); iB++)
         {
             outBonds << *iB;
-        }
+        }   
+    }
+    else if (AJob.workMode == 800)
+    {
+        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
         
+        LIBMOL::AllSystem   aTargetSystem(dataFromCif, 
+                                          AJob.IOEntries["libMolTabDir"],
+                                          AJob.upperBondSig,
+                                          AJob.lowBondSig, 
+                                          AJob.upperAngleSig,
+                                          AJob.lowAngleSig);
+        
+        LIBMOL::outProElecDistances(AJob.IOEntries["userOutName"].c_str(),
+                                    aTargetSystem);        
     }
     else if (AJob.workMode == 900)
     {

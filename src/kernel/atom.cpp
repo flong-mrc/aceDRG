@@ -803,14 +803,20 @@ namespace LIBMOL
             ligandSerilSet.push_back(*iLA);
         }
         
-        for (std::map<int, std::vector<int> >::const_iterator 
+        for (std::map<int, std::map<int, std::vector<int> > >::const_iterator 
                   iLF=tMC.ligandNBs.begin();
                   iLF!=tMC.ligandNBs.end(); iLF++)
         {
-            for (std::vector<int>::const_iterator iOneLF=iLF->second.begin();
+            for (std::map<int, std::vector<int> >::const_iterator 
+                    iOneLF=iLF->second.begin();
                     iOneLF !=iLF->second.end(); iOneLF++)
             {
-                ligandNBs[iLF->first].push_back(*iOneLF);
+                for (std::vector<int>::const_iterator 
+                     iNB = iOneLF->second.begin();
+                     iNB != iOneLF->second.end(); iNB++)
+                {
+                    ligandNBs[iLF->first][iOneLF->first].push_back(*iNB);
+                }
             }
         }
         
@@ -845,6 +851,24 @@ namespace LIBMOL
                       iAng2 !=iAng1->second.end(); iAng2++)
                 {
                     uniqAngsMap[iAngM->first][iAng1->first][iAng2->first]
+                           = iAng2->second;
+                }
+            }
+        }
+        
+        for (std::map<int, std::map<int, std::map<int, REAL> > >::const_iterator 
+            iAngM=tMC.secondNBAngsMap.begin(); iAngM !=tMC.secondNBAngsMap.end();
+            iAngM++)
+        {
+            for (std::map<int, std::map<int, REAL> >::const_iterator 
+                    iAng1=iAngM->second.begin(); 
+                    iAng1 != iAngM->second.end(); iAng1++)
+            {
+                for (std::map<int, REAL>::const_iterator 
+                      iAng2=iAng1->second.begin();
+                      iAng2 !=iAng1->second.end(); iAng2++)
+                {
+                    secondNBAngsMap[iAngM->first][iAng1->first][iAng2->first]
                            = iAng2->second;
                 }
             }
@@ -959,7 +983,7 @@ namespace LIBMOL
         std::cout << "Build the metal cluster centered at atom "
                   << tAtoms[metSeril].id << " of serial number "
                   << tAtoms[metSeril].seriNum << std::endl;
-        std::vector<REAL>  bVList, aVList;
+        std::vector<REAL>  bVList, aVList, a2VList;
         
         for (std::vector<int>::iterator iNB = ligandSerilSet.begin();
                     iNB != ligandSerilSet.end(); iNB++) 
@@ -980,6 +1004,24 @@ namespace LIBMOL
                 // filter the exact same bond values caused by the symm atoms 
                 uniqBondsMap[metSeril][*iNB] = rD;
                 bVList.push_back(rD);
+            }
+            
+            // build angle map for Metal--NB1--NB22
+            for (std::vector<int>::iterator iNB22=ligandNBs[metSeril][*iNB].begin();
+                 iNB22!=ligandNBs[metSeril][*iNB].end(); iNB22++)
+            {
+                REAL rA22 = getAngleValueFromFracCoords(tAtoms[*iNB],
+                                        tAtoms[metSeril], tAtoms[*iNB22],
+                                        tCryst->itsCell->a, tCryst->itsCell->b,
+                                        tCryst->itsCell->c, tCryst->itsCell->alpha,
+                                        tCryst->itsCell->beta, tCryst->itsCell->gamma);
+                REAL tRA22 = rA22*PID180;
+                if (!inVectAllABS(a2VList, tRA22, 0.0001))
+                {
+                    secondNBAngsMap[metSeril][*iNB][*iNB22] = tRA22;
+                    a2VList.push_back(tRA22);
+                }
+                
             }
             
             for (std::vector<int>::iterator iNB2 = ligandSerilSet.begin();

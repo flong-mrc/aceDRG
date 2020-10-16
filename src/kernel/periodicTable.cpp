@@ -1714,6 +1714,7 @@ namespace LIBMOL
                 }
             }
         }
+        
         /*
         for (std::map<std::string, std::map<std::string, 
              std::map<std::string, REAL> > >::iterator 
@@ -1732,6 +1733,130 @@ namespace LIBMOL
         
         compTab.close();
          */
+    }
+    
+    void PeriodicTable::construAtomIdealDists(std::map<std::string,
+       std::map<std::string,std::map<std::string,REAL> > >& tAllowedRangeDists, 
+       double tDelta)
+    {
+        const double dS = 1.0, dL=2.0, dDiff=0.5;
+        
+        // Try use electro-negative to decide the ideal pair distances.
+        for (std::map<ID,  std::map<ID, REAL> >::iterator 
+             iProp1=elemProps.begin(); iProp1 != elemProps.end(); iProp1++)
+        {
+            ID elem1 = iProp1->first;
+            for (std::map<ID,  std::map<ID, REAL> >::iterator 
+                     iProp2=elemProps.begin(); iProp2 != elemProps.end(); 
+                     iProp2++)
+            {
+                ID elem2 = iProp2->first;
+                double dIon, dCova, dMax, dIdeal=0.0;
+                
+                if (electronegativities.find(elem1) !=electronegativities.end()
+                    && 
+                    electronegativities.find(elem2) !=electronegativities.end())
+                {   
+                    // dIon
+                    if(electronegativities[elem1] <=
+                       electronegativities[elem2])
+                    {
+                        if (elemProps[elem2].find("ionM-") 
+                            !=elemProps[elem2].end()
+                            && elemProps[elem1].find("ionM+")
+                            !=elemProps[elem1].end())
+                        {
+                            dIon=elemProps[elem1]["ionM+"]
+                                +elemProps[elem2]["ionM-"]; 
+                        }
+                        else
+                        {
+                            dIon = elemProps[elem1]["cova"]
+                                   +elemProps[elem2]["cova"];
+                        }
+                    }
+                    else
+                    {
+                        if (elemProps[elem1].find("ionM-") 
+                            !=elemProps[elem1].end()
+                            && elemProps[elem2].find("ionM+")
+                            !=elemProps[elem2].end())
+                        {
+                            dIon=elemProps[elem1]["ionM-"]
+                                +elemProps[elem2]["ionM+"]; 
+                        }
+                        else
+                        {
+                            dIon = elemProps[elem1]["cova"]
+                                   +elemProps[elem2]["cova"];
+                        }
+                    }
+                    
+                    // dCova
+                    dCova = elemProps[elem1]["cova"]
+                           +elemProps[elem2]["cova"];
+                    
+                    // dMax
+                    if (dIon >= dCova)
+                    {
+                        dMax = dIon;
+                    }
+                    else
+                    {
+                        dMax = dCova;
+                    }
+                    
+                    
+                    if (electronegativities[elem1] <= dS &&
+                        electronegativities[elem2] <= dS)
+                    {
+                        dIdeal = dMax;
+                    }
+                    else if (electronegativities[elem1] >= dL &&
+                             electronegativities[elem2] >= dL)
+                    {
+                        dIdeal = dCova;
+                    }
+                    else
+                    {
+                        double diffNE = fabs(electronegativities[elem1]
+                                            -electronegativities[elem2]);
+                        if (diffNE<= dDiff)
+                        {
+                            dIdeal = dCova;
+                        }
+                        else
+                        {
+                            dIdeal = dIon;
+                        }
+                    }
+                    
+                    if (dIdeal !=0.0)
+                    {
+                        tAllowedRangeDists[elem1][elem2]["max"] 
+                                                  =dIdeal*(1+tDelta);
+                        tAllowedRangeDists[elem1][elem2]["min"]
+                                                  = dIdeal*(1-tDelta);
+                    }
+                    else
+                    {
+                        std::cout << "The distance range between elements "
+                                  << elem1 << " and " << elem2 
+                                  << " is not determined " << std::endl;
+                    }
+                        
+                }
+                else
+                {
+                    // dCova
+                    dCova = elemProps[elem1]["cova"]
+                           +elemProps[elem2]["cova"];
+                    
+                    
+                }
+            }
+        }
+        
     }
     
 }

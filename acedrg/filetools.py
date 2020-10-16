@@ -1,4 +1,3 @@
-#!/usr/bin/env  ccp4-python
 # Python script
 #
 #
@@ -11,6 +10,11 @@
 ## The date of last modification: 21/07/2016
 #
 
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -32,18 +36,16 @@ from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry 
 
-from utility  import isInt
-from utility  import listComp
-from utility  import listComp2
-from utility  import listCompDes
-from utility  import listCompAcd
-from utility  import setBoolDict
-from utility  import splitLineSpa
-from utility  import splitLineSpa2
-from utility  import aLineToAlist
-from utility  import BondOrderS2N
+from . utility  import listComp
+from . utility  import listComp2
+from . utility  import listCompDes
+from . utility  import listCompAcd
+from . utility  import setBoolDict
+from . utility  import splitLineSpa
+from . utility  import splitLineSpa2
+from . utility  import aLineToAlist
 
-class FileTransformer :
+class FileTransformer(object) :
 
     def __init__(self):
 
@@ -125,8 +127,6 @@ class FileTransformer :
 
         self.PdbForMols       = {}
 
-        self.rdkitRemeAtms = {}
-
         self.hasCCP4Type      = False
 
     def mmCifReader(self, tFileName):
@@ -135,7 +135,7 @@ class FileTransformer :
         try:
             tFile = open(tFileName, "r")
         except IOError:
-            print "%s can not be open for reading "%tFileName
+            print("%s can not be open for reading "%tFileName)
             sys.exit()
         else:
             tAllLs = tFile.readlines()
@@ -216,9 +216,9 @@ class FileTransformer :
             atomVals = {}
             
             for aBond in self.bonds:
-                if aBond.has_key("_chem_comp_bond.atom_id_1") and\
-                   aBond.has_key("_chem_comp_bond.atom_id_2") and\
-                   aBond.has_key("_chem_comp_bond.value_order"):
+                if "_chem_comp_bond.atom_id_1" in aBond and\
+                   "_chem_comp_bond.atom_id_2" in aBond and\
+                   "_chem_comp_bond.value_order" in aBond:
                     aOrd = 0
                     if aBond["_chem_comp_bond.value_order"].upper().find("SING") !=-1:
                         aOrd = 1
@@ -226,9 +226,9 @@ class FileTransformer :
                         aOrd = 2
                     elif aBond["_chem_comp_bond.value_order"].upper().find("TRIP") !=-1:
                         aOrd = 3
-                    if not atomVals.has_key(aBond["_chem_comp_bond.atom_id_1"]):
+                    if aBond["_chem_comp_bond.atom_id_1"] not in atomVals:
                         atomVals[aBond["_chem_comp_bond.atom_id_1"]] = 0
-                    if not atomVals.has_key(aBond["_chem_comp_bond.atom_id_2"]):
+                    if aBond["_chem_comp_bond.atom_id_2"] not in atomVals:
                         atomVals[aBond["_chem_comp_bond.atom_id_2"]] = 0
                     atomVals[aBond["_chem_comp_bond.atom_id_1"]] += aOrd
                     #print aBond["_chem_comp_bond.atom_id_1"], " : ", aOrd
@@ -238,75 +238,27 @@ class FileTransformer :
             # find IDs of B, Br etc
             speAtomIds = []
             for aAtom in self.atoms:
-                if aAtom.has_key("_chem_comp_atom.atom_id") and\
-                   aAtom.has_key("_chem_comp_atom.type_symbol"):
+                if "_chem_comp_atom.atom_id" in aAtom and\
+                   "_chem_comp_atom.type_symbol" in aAtom:
                     if aAtom["_chem_comp_atom.type_symbol"].strip() =="B"\
                        or aAtom["_chem_comp_atom.type_symbol"].strip()=="BR":
                         speAtomIds.append(aAtom["_chem_comp_atom.atom_id"])
-                        if aAtom.has_key("_chem_comp_atom.charge"):
+                        if "_chem_comp_atom.charge" in aAtom:
                             if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
                                 aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
                             elif aAtom["_chem_comp_atom.charge"].find("?") !=-1:
                                 aAtom["_chem_comp_atom.charge"] =0
                             aCh = int(aAtom["_chem_comp_atom.charge"])
-                            if aCh !=0 and atomVals.has_key(aAtom["_chem_comp_atom.atom_id"]):
+                            if aCh !=0 and aAtom["_chem_comp_atom.atom_id"] in atomVals:
                                 atomVals[aAtom["_chem_comp_atom.atom_id"]] +=aCh
                                 
             if len(speAtomIds):
                 for aId in speAtomIds:
-                    if atomVals.has_key(aId):
+                    if aId in atomVals:
                         if atomVals[aId] > 3: 
-                            print "Acedrg stops because RDKit does not accept the following: "
-                            print "%s  has total valence of %d "%(aId, atomVals[aId])
+                            print("Acedrg stops because RDKit does not accept the following: ")
+                            print("%s  has total valence of %d "%(aId, atomVals[aId]))
                             sys.exit()        
-    
-
-    def tmpModi_Atms(self):
-        for aAtm in self.atoms:
-            if aAtm.has_key("_chem_comp_atom.type_symbol") and aAtm.has_key("_chem_comp_atom.atom_id")\
-            and aAtm.has_key("_chem_comp_atom.charge"):
-                # functions for different cases
-                # 1. B atom with a charge
-                print aAtm["_chem_comp_atom.charge"]
-                if isInt(aAtm["_chem_comp_atom.charge"]):
-                    nCharge = int(aAtm["_chem_comp_atom.charge"])
-                else:
-                    nS = str(aAtm["_chem_comp_atom.charge"])
-                    nCharge = int(nS.strip().split(".")[0])
-                if aAtm["_chem_comp_atom.type_symbol"].strip().upper() == "B" and nCharge == 1:
-                    nOrder  = self.getBondOrderForOneAtom(aAtm)
-                    if nOrder==4 :
-                        self.rdkitRemeAtms[aAtm["_chem_comp_atom.atom_id"]] = ["C", "B", 0, 1, 4]
-   
-    def putBackOrginalChemTypes(self, tMol):
-
-        for aAtm in tMol.GetAtoms():
-            id = aAtm.GetProp("Name")
-            print "Before ", id, "  ", aAtm.GetSymbol(), "    ", aAtm.GetFormalCharge()
-            if id in self.rdkitRemeAtms.keys():
-                print id, "  xxxxxxx "
-                print self.rdkitRemeAtms[id][3]
-                aAtm.SetFormalCharge(self.rdkitRemeAtms[id][3])
-            print "after ", id, "  ", aAtm.GetSymbol(), "    ", aAtm.GetFormalCharge()
-        
-        for aAtm in tMol.GetAtoms():
-            print  aAtm.GetProp("Name"),  "  ", aAtm.GetSymbol(), "    ", aAtm.GetFormalCharge()
-        sys.exit()
-    def getBondOrderForOneAtom(self, tAtom):
-
-        retBO = 0
-
-        atmId = tAtom["_chem_comp_atom.atom_id"] 
-        for aBond in self.bonds:
-	    if aBond.has_key("_chem_comp_bond.atom_id_1") and\
-               aBond.has_key("_chem_comp_bond.atom_id_2") and\
-               aBond.has_key("_chem_comp_bond.type"):
-                aList = [aBond["_chem_comp_bond.atom_id_1"], aBond["_chem_comp_bond.atom_id_2"]]
-                if atmId in aList:
-                    aOrd = BondOrderS2N(aBond["_chem_comp_bond.type"])
-                    if aOrd != -1:
-                        retBO += aOrd
-        return retBO
         
     def parserAll2Cols(self, t2ColLines):
 
@@ -376,24 +328,24 @@ class FileTransformer :
         if l2: # 2 col format
             iC =0
             for aL in tBlk:
-                print aL 
+                print(aL) 
                 if aL.find("\"") !=-1:
                     strGrp = aL.strip().split("\"")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\""+ strGrp[1] + "\""]
-                        print self.dataDescriptor[iC]
+                        print(self.dataDescriptor[iC])
                         iC +=1
                 elif aL.find("\'") !=-1 :
                     strGrp = aL.strip().split("\'")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\'"+ strGrp[1] + "\'"]
-                        print self.dataDescriptor[iC]
+                        print(self.dataDescriptor[iC])
                         iC +=1
                 else:
                     strGrp = aL.strip().split()
                     if len(strGrp) == 2:
                         self.dataDescriptor[iC]=[strGrp[0], strGrp[1]]
-                        print self.dataDescriptor[iC]
+                        print(self.dataDescriptor[iC])
                         iC +=1
                                            
         else:   # multiple col format          
@@ -403,7 +355,7 @@ class FileTransformer :
                     strGrp1 = aL.strip().split("\'")
                     strGrp  = []
                     if len(strGrp1) == 3: 
-			strGrp10 = strGrp1[0].strip().split()
+                        strGrp10 = strGrp1[0].strip().split()
                         strGrp12 = strGrp1[2].strip().split()
                         for aS in strGrp10:
                             strGrp.append(aS)
@@ -417,7 +369,7 @@ class FileTransformer :
                     strGrp1 = aL.strip().split("\"")
                     strGrp  = []
                     if len(strGrp1) == 3: 
-			strGrp10 = strGrp1[0].strip().split()
+                        strGrp10 = strGrp1[0].strip().split()
                         strGrp12 = strGrp1[2].strip().split()
                         for aS in strGrp10:
                             strGrp.append(aS)
@@ -461,7 +413,7 @@ class FileTransformer :
         s6 = str(tMol.GetNumHeavyAtoms())
         s7 ="."
 
-        for aKey in sorted(self.dataDescriptor.iterkeys()):
+        for aKey in sorted(self.dataDescriptor.keys()):
             if self.dataDescriptor[aKey][0].find("_chem_comp.id") !=-1:
                 s1 = self.dataDescriptor[aKey][1]  
                 s2 = self.dataDescriptor[aKey][1]  
@@ -531,15 +483,15 @@ class FileTransformer :
                         elif tProp =="chiral":
                             self.chirals.append(aProp)
                     elif tProp =="strDescriptor":
-                        if not self.strDescriptors.has_key("props"):
+                        if "props" not in self.strDescriptors:
                             self.strDescriptors["props"] = []
                             for iProp in colIdx: 
                                 self.strDescriptors["props"].append(iProp)
-                        if not self.strDescriptors.has_key("entries"):
+                        if "entries" not in self.strDescriptors:
                             self.strDescriptors["entries"] = []
                         self.strDescriptors["entries"].append(aL)
                 else :
-                     if not self.strDescriptors.has_key("entries"):
+                     if "entries" not in self.strDescriptors:
                          self.strDescriptors["entries"] = []
                      self.strDescriptors["entries"].append(aL)
 
@@ -553,18 +505,18 @@ class FileTransformer :
                 else:
                     tHAtoms.append(aAtom)
 
-                if aAtom.has_key("_chem_comp_atom.atom_id"):
+                if "_chem_comp_atom.atom_id" in aAtom:
                     tCharge =0.0
-                    if aAtom.has_key("_chem_comp_atom.charge"):
+                    if "_chem_comp_atom.charge" in aAtom:
                         # print "aAtom['_chem_comp_atom.charge'] ", aAtom["_chem_comp_atom.charge"] 
                         if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
                             tCharge = float(aAtom["_chem_comp_atom.charge"])
-                    elif aAtom.has_key("_chem_comp_atom.partial_charge"):
+                    elif "_chem_comp_atom.partial_charge" in aAtom:
                         tCharge = float(aAtom["_chem_comp_atom.partial_charge"])
                         aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.partial_charge"]
                     if math.fabs(float(tCharge)) >=0.001:
                         self.inputCharge[aAtom["_chem_comp_atom.atom_id"]] = tCharge
-                if aAtom.has_key("_chem_comp_atom.type_energy"):
+                if "_chem_comp_atom.type_energy" in aAtom:
                     self.hasCCP4Type = True
             self.atoms = []
             for aAtom in tAtoms:
@@ -587,9 +539,9 @@ class FileTransformer :
 
         # Check
         if len(self.inputCharge) !=0:
-            print "The following atoms have charges "
-            for aName in self.inputCharge.keys():
-                print "Name : ", aName, " charge : ", self.inputCharge[aName]
+            print("The following atoms have charges ")
+            for aName in list(self.inputCharge.keys()):
+                print("Name : ", aName, " charge : ", self.inputCharge[aName])
 
         if len(colIdx):
             #for i in range(len(colIdx)):
@@ -630,7 +582,7 @@ class FileTransformer :
 
         if len(self.dataDescriptor):
             nFind =0
-            for aIdx in self.dataDescriptor.keys():
+            for aIdx in list(self.dataDescriptor.keys()):
                 if self.dataDescriptor[aIdx][0] in self.ccp4DataDis:
                     self.ccp4MmCifDataMap[self.dataDescriptor[aIdx][0]]=aIdx
                     nFind +=1    
@@ -644,26 +596,26 @@ class FileTransformer :
 
         for i in range(len(self.bonds)):
             aB2 = ""
-            if self.bonds[i].has_key("_chem_comp_bond.value_order"):
+            if "_chem_comp_bond.value_order" in self.bonds[i]:
                 aBarg = "_chem_comp_bond.value_order"
                 aB2 = self.bonds[i]["_chem_comp_bond.value_order"]
-            elif self.bonds[i].has_key("_chem_comp_bond.type"):             
+            elif "_chem_comp_bond.type" in self.bonds[i]:             
                 aBarg = "_chem_comp_bond.type"
                 aB2 = self.bonds[i]["_chem_comp_bond.type"]
             if len(aB2) !=0:
                 if aB2.lower().find("delo") !=-1:
                     a1 = self.bonds[i]["_chem_comp_bond.atom_id_1"]
                     a2 = self.bonds[i]["_chem_comp_bond.atom_id_2"]
-                    if not delocMap.has_key(a1) :
+                    if a1 not in delocMap :
                         delocMap[a1] = []
-                    if not delocMap.has_key(a2) :
+                    if a2 not in delocMap :
                         delocMap[a2] = []
                     delocMap[a1].append(i)
                     delocMap[a2].append(i)
                     self.delocBondList.append([a1.strip(), a2.strip()])
 
         if len(delocMap) !=0 and aBarg !="":
-            for aKey in sorted(delocMap.iterkeys()):
+            for aKey in sorted(delocMap.keys()):
                 if len(delocMap[aKey])==2 or len(delocMap[aKey])==3:
                     if not delocMap[aKey][0] in doneList and not delocMap[aKey][1] in doneList:
                         self.bonds[delocMap[aKey][0]][aBarg] = "1"
@@ -682,7 +634,7 @@ class FileTransformer :
         try:
             tFile = open(tFileName, "r")
         except IOError:
-            print "%s can not be open for reading "%tFileName
+            print("%s can not be open for reading "%tFileName)
             sys.exit()
         else:
             nameMap = {}
@@ -697,22 +649,22 @@ class FileTransformer :
 
             for aAtom in tMol.GetAtoms():
                 oldName = aAtom.GetProp("Name") 
-                if nameMap.has_key(oldName):
+                if oldName in nameMap:
                     aAtom.SetProp("Name", nameMap[oldName]) 
-                    print "Atom: old name %s : new name %s"%(oldName, aAtom.GetProp("Name"))
+                    print("Atom: old name %s : new name %s"%(oldName, aAtom.GetProp("Name")))
 
     def addAtomOrigChiralSign(self, tMol):
 
         nameMap = {}
    
         for i in range(len(self.atoms)):
-            if self.atoms[i].has_key("_chem_comp_atom.atom_id"):
+            if "_chem_comp_atom.atom_id" in self.atoms[i]:
                 nameMap[self.atoms[i]["_chem_comp_atom.atom_id"].strip()] = i
  
         for aAtom in tMol.GetAtoms():
             atomId = aAtom.GetProp("Name").strip()
-            if nameMap.has_key(atomId):
-                if self.atoms[nameMap[atomId]].has_key("_chem_comp_atom.pdbx_stereo_config"):
+            if atomId in nameMap:
+                if "_chem_comp_atom.pdbx_stereo_config" in self.atoms[nameMap[atomId]]:
                     tSign = self.atoms[nameMap[atomId]]["_chem_comp_atom.pdbx_stereo_config"].strip() 
                     aAtom.SetProp("pdb_stereo", tSign)
                     #print "atom %s now has pdb_stereo %s"%(aAtom.GetProp("Name"), aAtom.GetProp("pdb_stereo"))
@@ -722,7 +674,7 @@ class FileTransformer :
         try:
             tFile = open(tFileName, "r")
         except IOError:
-            print "%s can not be open for reading "%tFileName
+            print("%s can not be open for reading "%tFileName)
             sys.exit()
         else:
             lA = False
@@ -741,10 +693,10 @@ class FileTransformer :
                         if len(strGrp)==4: 
                             if lA :
                                 idxA = int(strGrp[0])
-                                if not tAtomTypeMaps["atomTypes"].has_key(strGrp[3]):
+                                if strGrp[3] not in tAtomTypeMaps["atomTypes"]:
                                     tAtomTypeMaps["atomTypes"][strGrp[3]]=[]
                                 tAtomTypeMaps["atomTypes"][strGrp[3]].append(idxA)
-                                if not tAtomTypeMaps["atoms"].has_key(idxA):
+                                if idxA not in tAtomTypeMaps["atoms"]:
                                     tAtomTypeMaps["atoms"][idxA]={}
                                 tAtomTypeMaps["atoms"][idxA]["elem"]  = strGrp[1]
                                 tAtomTypeMaps["atoms"][idxA]["name"]  = strGrp[2]
@@ -753,9 +705,9 @@ class FileTransformer :
                             if lC :
                                 idx0 = int(strGrp[0])
                                 idx1 = int(strGrp[1])
-                                if not tAtomTypeMaps["connections"].has_key(idx0):
+                                if idx0 not in tAtomTypeMaps["connections"]:
                                     tAtomTypeMaps["connections"][idx0]=[]
-                                if not tAtomTypeMaps["connections"].has_key(idx1):
+                                if idx1 not in tAtomTypeMaps["connections"]:
                                     tAtomTypeMaps["connections"][idx1]=[]
                                 tAtomTypeMaps["connections"][idx0].append(idx1)
                                 tAtomTypeMaps["connections"][idx1].append(idx0)
@@ -763,38 +715,38 @@ class FileTransformer :
             tFile.close() 
 
             # Check 
-            print "Here are the details for atoms: "
+            print("Here are the details for atoms: ")
             nAtms =0
-            for aT in  sorted(tAtomTypeMaps["atomTypes"].iterkeys()):
+            for aT in  sorted(tAtomTypeMaps["atomTypes"].keys()):
                 tAtomTypeMaps["atomTypes"][aT].sort()
-                print " %d atoms has atom-type %s "%(len(tAtomTypeMaps["atomTypes"][aT]), aT)
+                print(" %d atoms has atom-type %s "%(len(tAtomTypeMaps["atomTypes"][aT]), aT))
                 nAtms += len(tAtomTypeMaps["atomTypes"][aT])
                 for aA in tAtomTypeMaps["atomTypes"][aT]:
-                    print "atom %s  of serial number %d "%(tAtomTypeMaps["atoms"][aA]["name"], aA)                                               
-                    print "which bonds the following atoms :"
-                    print tAtomTypeMaps["connections"][aA]
+                    print("atom %s  of serial number %d "%(tAtomTypeMaps["atoms"][aA]["name"], aA))                                               
+                    print("which bonds the following atoms :")
+                    print(tAtomTypeMaps["connections"][aA])
                     for aNA in tAtomTypeMaps["connections"][aA]:
-                        print "atom %s "%tAtomTypeMaps["atoms"][aNA]["name"]
-            print "Total number of atoms is ", nAtms
+                        print("atom %s "%tAtomTypeMaps["atoms"][aNA]["name"])
+            print("Total number of atoms is ", nAtms)
     
     def AtomDictMapping(self, atomSet1, atomSet2, tMol):
  
         allIdxs  = []
         nonHIdxs = []
-        for aIdx in sorted(atomSet1["atoms"].iterkeys()):
+        for aIdx in sorted(atomSet1["atoms"].keys()):
             allIdxs.append(aIdx)
             if atomSet1["atoms"][aIdx]["elem"].find("H")==-1:
                 nonHIdxs.append(aIdx)
                 
-        print "total number of atoms ", len(allIdxs)
-        print "total number of nonH atoms ", len(nonHIdxs)
+        print("total number of atoms ", len(allIdxs))
+        print("total number of nonH atoms ", len(nonHIdxs))
 
         doneList        = []
         matchedAtoms    = {}
         remainClasses   = []
        
         # Match unique classses
-        for aClass in atomSet1["atomTypes"].keys():
+        for aClass in list(atomSet1["atomTypes"].keys()):
             if len(atomSet1["atomTypes"][aClass]) == 1 and aClass in atomSet2["atomTypes"]:
                 if len(atomSet2["atomTypes"][aClass]) == 1 :
                     aIdx1 = atomSet1["atomTypes"][aClass][0]
@@ -802,33 +754,33 @@ class FileTransformer :
                     matchedAtoms[aIdx1] = aIdx2
                     doneList.append(aIdx2)
                 else:
-                    print "atom type %s appears in sys 1 and sys 2 different times "%aClass 
+                    print("atom type %s appears in sys 1 and sys 2 different times "%aClass) 
                     sys.exit()
             else:
                 remainClasses.append(aClass)
   
-        print "number of matched atoms ", len(doneList)
-        print "Matched atoms:  "
-        for aIdx in sorted(matchedAtoms.iterkeys()):
+        print("number of matched atoms ", len(doneList))
+        print("Matched atoms:  ")
+        for aIdx in sorted(matchedAtoms.keys()):
             bIdx = matchedAtoms[aIdx]
-            print atomSet1["atoms"][aIdx]["class"]
-            print "Atom %s to Atom %s "%(atomSet1["atoms"][aIdx]["name"],\
-                                         atomSet2["atoms"][bIdx]["name"]) 
+            print(atomSet1["atoms"][aIdx]["class"])
+            print("Atom %s to Atom %s "%(atomSet1["atoms"][aIdx]["name"],\
+                                         atomSet2["atoms"][bIdx]["name"])) 
 
-        print "Number of atoms to be matched ", len(atomSet1["atoms"])-len(doneList)
-        print "Un-matched atoms:  "
+        print("Number of atoms to be matched ", len(atomSet1["atoms"])-len(doneList))
+        print("Un-matched atoms:  ")
         for aIdx in allIdxs:
             if not aIdx in doneList:
-                print "Atom : %s of class %s "%(atomSet1["atoms"][aIdx]["name"], atomSet1["atoms"][aIdx]["class"])
+                print("Atom : %s of class %s "%(atomSet1["atoms"][aIdx]["name"], atomSet1["atoms"][aIdx]["class"]))
 
         # Match symmetrical ones (Non-H) 
         # 1. singly bonded classes
         for aC in remainClasses:
             nAC1 = len(atomSet1["atomTypes"][aC])
-            if aC in atomSet2["atomTypes"].keys():
+            if aC in list(atomSet2["atomTypes"].keys()):
                 nAC2 = len(atomSet2["atomTypes"][aC])
             else:
-                print "Check %s in sys1 but not in sys2 "%aC
+                print("Check %s in sys1 but not in sys2 "%aC)
                 sys.exit()
 
             if nAC1 > 1 and nAC1==nAC2:
@@ -838,13 +790,13 @@ class FileTransformer :
                         aIdx1 = atomSet1["atomTypes"][aC][i]
                         aIdx2 = atomSet2["atomTypes"][aC][i]
                         matchedAtoms[aIdx1] = aIdx2
-                        print "Atom %s to Atom %s "%(atomSet1["atoms"][aIdx1]["name"],\
-                                                     atomSet2["atoms"][aIdx2]["name"])
+                        print("Atom %s to Atom %s "%(atomSet1["atoms"][aIdx1]["name"],\
+                                                     atomSet2["atoms"][aIdx2]["name"]))
                         doneList.append(aIdx2)
 
         # 2. Linked symmetrical classes
         # Match the rest using connections 
-        tmpDoneList1 = matchedAtoms.keys()
+        tmpDoneList1 = list(matchedAtoms.keys())
         tmpDoneList2 = []
         for aIdx in tmpDoneList1:
             for aNA in atomSet1["connection"][aIdx]:
@@ -853,8 +805,8 @@ class FileTransformer :
                     group1 = []
                     group2 = []
                     aClassNA = atomSet1["atoms"][aNA1]["class"]
-                    if not atomSet2["atomTypes"].has_key(aClassNA):
-                        print "Discrepany in sys 1 and 2 at %s"%aClassNA
+                    if aClassNA not in atomSet2["atomTypes"]:
+                        print("Discrepany in sys 1 and 2 at %s"%aClassNA)
                     else:      
                         for aNNA1 in atomSet1["connection"][aNA1]:
                             if aNNA1 != aIdx and atomSet1["atoms"][aNNA1]["elem"].find("H")==-1 :
@@ -871,9 +823,9 @@ class FileTransformer :
 
         self.mmCifHasCoords = False  
         if len(self.atoms) > 0:
-            if self.atoms[0].has_key("_chem_comp_atom.model_Cartn_x") and\
-               self.atoms[0].has_key("_chem_comp_atom.model_Cartn_y") and\
-               self.atoms[0].has_key("_chem_comp_atom.model_Cartn_z"):
+            if "_chem_comp_atom.model_Cartn_x" in self.atoms[0] and\
+               "_chem_comp_atom.model_Cartn_y" in self.atoms[0] and\
+               "_chem_comp_atom.model_Cartn_z" in self.atoms[0]:
                 for aAtom in self.atoms:
                     if aAtom["_chem_comp_atom.model_Cartn_x"].find("?") != -1\
                        or aAtom["_chem_comp_atom.model_Cartn_y"].find("?") != -1\
@@ -881,7 +833,7 @@ class FileTransformer :
                         lq1 = True
                         break
                 if not lq1 : 
-                    print "Using _chem_comp_atom.pdbx_model_Cartn_x"
+                    print("Using _chem_comp_atom.pdbx_model_Cartn_x")
                     self.mmCifHasCoords   = True
                     for aAtom in self.atoms:
                         aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.model_Cartn_x"]
@@ -889,10 +841,10 @@ class FileTransformer :
                         aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.model_Cartn_z"]
                        
             if not self.mmCifHasCoords :
-                print "Not _chem_comp_atom.pdbx_model_Cartn_x"
-                if self.atoms[0].has_key("_chem_comp_atom.pdbx_model_Cartn_x_ideal")\
-                   and self.atoms[0].has_key("_chem_comp_atom.pdbx_model_Cartn_y_ideal")\
-                   and self.atoms[0].has_key("_chem_comp_atom.pdbx_model_Cartn_z_ideal"):
+                print("Not _chem_comp_atom.pdbx_model_Cartn_x")
+                if "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in self.atoms[0]\
+                   and "_chem_comp_atom.pdbx_model_Cartn_y_ideal" in self.atoms[0]\
+                   and "_chem_comp_atom.pdbx_model_Cartn_z_ideal" in self.atoms[0]:
                     for aAtom in self.atoms:           
                         if aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"].find("?") !=-1\
                            or aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"].find("?") !=-1\
@@ -901,17 +853,17 @@ class FileTransformer :
                             break
                     if not lq2:
                         self.mmCifHasCoords   = True
-                        print "Using _chem_comp_atom.pdbx_model_Cartn_x_ideal"
+                        print("Using _chem_comp_atom.pdbx_model_Cartn_x_ideal")
                         for aAtom in self.atoms:           
                             aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
                             aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
                             aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
 
             if not self.mmCifHasCoords :
-                print "not _chem_comp_atom.model_Cartn_x_ideal"
-                if self.atoms[0].has_key("_chem_comp_atom.x") and\
-                   self.atoms[0].has_key("_chem_comp_atom.y") and\
-                   self.atoms[0].has_key("_chem_comp_atom.z"):
+                print("not _chem_comp_atom.model_Cartn_x_ideal")
+                if "_chem_comp_atom.x" in self.atoms[0] and\
+                   "_chem_comp_atom.y" in self.atoms[0] and\
+                   "_chem_comp_atom.z" in self.atoms[0]:
                     for aAtom in self.atoms:
                         if aAtom["_chem_comp_atom.x"].find("?") !=-1\
                            or aAtom["_chem_comp_atom.y"].find("?") !=-1\
@@ -919,11 +871,11 @@ class FileTransformer :
                             lq3 = True
                             break
                     if not lq3:
-                        print "Using _chem_comp_atom.x,y,z"
+                        print("Using _chem_comp_atom.x,y,z")
                         self.mmCifHasCoords   = True
                     else:
-                        print "not _chem_comp_atom.x"
-                        print "No original coordinates will be used for conformer generations"
+                        print("not _chem_comp_atom.x")
+                        print("No original coordinates will be used for conformer generations")
                         self.mmCifHasCoords = False  
 
     def MmCifToMolFile(self, tInFileName, tOutMolName, tMode=0):
@@ -934,18 +886,18 @@ class FileTransformer :
         #print "Num of atoms ", len(self.atoms)
         #print "Num of bonds ", len(self.bonds)
         if not len(self.atoms) or not len(self.bonds):
-            print "No atoms and/or bonds from the input file, check !"
+            print("No atoms and/or bonds from the input file, check !")
             sys.exit()
             
         try:
             tOutFile = open(tOutMolName, "w")
         except IOError:
-            print "%s can not be open for reading "%tOutMolName
+            print("%s can not be open for reading "%tOutMolName)
             sys.exit()
         else:
             nId   = -1 
             nName = -1
-            for aKey in sorted(self.dataDescriptor.iterkeys()):
+            for aKey in sorted(self.dataDescriptor.keys()):
                 if self.dataDescriptor[aKey][0].find("_chem_comp.id") !=-1:
                     nId = aKey
                 if self.dataDescriptor[aKey][0].find("_chem_comp.name") !=-1:
@@ -984,39 +936,21 @@ class FileTransformer :
             tHAtoms    = []
             for aAtom in self.atoms:
                 id = ""
-                if aAtom.has_key("_chem_comp_atom.type_symbol"):
+                if "_chem_comp_atom.type_symbol" in aAtom:
                     tId = aAtom["_chem_comp_atom.type_symbol"].strip()
                     if len(tId) ==1:
                         id = tId.strip().upper()
                     elif len(tId) > 1:
                         id = tId[0].upper() + tId[1:].strip().lower()
                 else:
-                    print "Input file bug: no type_symbol for atoms!"
+                    print("Input file bug: no type_symbol for atoms!")
                     sys.exit()
-
-                if tMode ==3 :
-                    if aAtom["_chem_comp_atom.atom_id"] in self.rdkitRemeAtms.keys():
-                        aAtom["type_symbol_in_mol"] = self.rdkitRemeAtms[aAtom["_chem_comp_atom.atom_id"]][0]
-                        if aAtom.has_key("_chem_comp_atom.charge"):
-                            aAtom["charge_in_mol"] = str(self.rdkitRemeAtms[aAtom["_chem_comp_atom.atom_id"]][2])
-                    else:
-                        aAtom["type_symbol_in_mol"] = id
-                        if aAtom.has_key("_chem_comp_atom.charge"):
-                            aAtom["charge_in_mol"] = aAtom["_chem_comp_atom.charge"]
-                else:
-                    aAtom["type_symbol_in_mol"] = id
-                    if aAtom.has_key("_chem_comp_atom.charge"):
-                        aAtom["charge_in_mol"] = aAtom["_chem_comp_atom.charge"]
-                
+                aAtom["type_symbol_in_mol"] = id
                 if id != "H":
                     tNonHAtoms.append(aAtom)
                 else :
-                    tHAtoms.append(aAtom)
-            #print "Number of atoms ", len(self.atoms)
-            #print "Number of Non-H atom ", len(tNonHAtoms)
-            #print "Number of H atom ", len(tHAtoms)    
-
-
+                   tHAtoms.append(aAtom)
+                
             self.atoms = []
             nAtm =0
             for aAtom in tNonHAtoms:
@@ -1028,22 +962,16 @@ class FileTransformer :
             for aAtom in tHAtoms:
                 self.atoms.append(aAtom)
 
-            #for aAtom in self.atoms:
-            #    print "-----------------------"
-            #    print aAtom["_chem_comp_atom.atom_id"], "   ", aAtom["_chem_comp_atom.type_symbol"], "    ", aAtom["type_symbol_in_mol"] 
-            #    if aAtom.has_key("_chem_comp_atom.charge"):
-            #        print aAtom["_chem_comp_atom.charge"], "   ",   aAtom["charge_in_mol"]
- 
             # Set up atom seq match for bond section
             mapIdNum = {}
             nAtm =1
             for aAtom in self.atoms:
-                if aAtom.has_key("_chem_comp_atom.atom_id"):
+                if "_chem_comp_atom.atom_id" in aAtom:
                     mapIdNum[aAtom["_chem_comp_atom.atom_id"]] = nAtm
                     nAtm +=1
-                    print "atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]])
+                    print("atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]]))
                 else:
-                    print "Input file bug: no atom_id for atoms!"
+                    print("Input file bug: no atom_id for atoms!")
                     sys.exit()
     
             # Now write out atom section in the Mol file
@@ -1072,8 +1000,6 @@ class FileTransformer :
 
                 
                 id = aAtom["type_symbol_in_mol"]
-
-                
                     
                 md =" 0 "
                
@@ -1091,32 +1017,36 @@ class FileTransformer :
                 chargeMap["doublet radical"]  = 4
                 
                 charge = " 0 "
-                if aAtom.has_key("charge_in_mol"):
-                    if aAtom["charge_in_mol"].find(".") !=-1:
-                        aAtom["charge_in_mol"] = aAtom["charge_in_mol"].strip().split(".")[0]
+                if "_chem_comp_atom.charge" in aAtom:
+                    #print "The charge is ", aAtom["_chem_comp_atom.charge"]
+                    #print "Is that number digit ", aAtom["_chem_comp_atom.charge"].isdigit() 
+                    if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
+                        aAtom["_chem_comp_atom.charge"] = aAtom["_chem_comp_atom.charge"].strip().split(".")[0]
                     nCharge =0
-                    if aAtom["charge_in_mol"].find("?") ==-1:
-                        nCharge = int(aAtom["charge_in_mol"])
-                    if nCharge in chargeMap.keys():
+                    if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
+                        nCharge = int(aAtom["_chem_comp_atom.charge"])
+                    #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
+                    #print " converted to charge symbol ", chargeMap[nCharge] 
+                    if nCharge in list(chargeMap.keys()):
                         charge  = " %d "%chargeMap[nCharge]
                     if nCharge !=0:
                         chargeAtomList.append([idxAtom, nCharge])       
 
                 cha ="0"
-                if aAtom.has_key("_chem_comp_atom.pdbx_stereo_config"):
+                if "_chem_comp_atom.pdbx_stereo_config" in aAtom:
                     if aAtom["_chem_comp_atom.pdbx_stereo_config"].find("S") !=-1:
                         cha = "1"
                     elif aAtom["_chem_comp_atom.pdbx_stereo_config"].find("R") !=-1:
                         cha = "2"
-                aLine = "%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
-                                                               id.ljust(3), md.rjust(2), charge.rjust(3), \
-                                                               cha.rjust(3), hhh.rjust(3), bbb.rjust(3), \
-                                                               vvv.rjust(3), HHH.rjust(3), rrr.rjust(3), \
-                                                               iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
-                                                               eee.rjust(3))
-                tOutFile.write(aLine)
+
+                tOutFile.write("%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
+                                                                     id.ljust(3), md.rjust(2), charge.rjust(3), \
+                                                                     cha.rjust(3), hhh.rjust(3), bbb.rjust(3), \
+                                                                     vvv.rjust(3), HHH.rjust(3), rrr.rjust(3), \
+                                                                     iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
+                                                                     eee.rjust(3)))
                 idxAtom +=1
-                
+
             # Bond block
            
             self.DelocBondConvertor()
@@ -1138,10 +1068,10 @@ class FileTransformer :
                 a2 = str(n2)
                 b4 = ""
                 bt = ""
-                if aBond.has_key("_chem_comp_bond.value_order") or  aBond.has_key("_chem_comp_bond.type"):         # mmcif in PDB or ccp4 monolib 
-                    if aBond.has_key("_chem_comp_bond.value_order"):
+                if "_chem_comp_bond.value_order" in aBond or  "_chem_comp_bond.type" in aBond:         # mmcif in PDB or ccp4 monolib 
+                    if "_chem_comp_bond.value_order" in aBond:
                         aB4 = aBond["_chem_comp_bond.value_order"]
-                    elif aBond.has_key("_chem_comp_bond.type"):             
+                    elif "_chem_comp_bond.type" in aBond:             
                         aB4 = aBond["_chem_comp_bond.type"]
                     if len(aB4) >=4: 
                         b4 = aB4[:4].upper()
@@ -1150,13 +1080,13 @@ class FileTransformer :
                     # print b4
                     bt = self.bondTypeMmcifToMol[b4]
                 else:
-                    print "Input file bug: no bond type(order) for bonds!"        
+                    print("Input file bug: no bond type(order) for bonds!")        
                     sys.exit()
                 aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                        sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                print "The bond between %s of serial number %s and %s of serial number %s is : "\
-                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2)
-                print aBL
+                print("The bond between %s of serial number %s and %s of serial number %s is : "\
+                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2))
+                print(aBL)
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
 
@@ -1167,12 +1097,12 @@ class FileTransformer :
                 #print "id1 %s elem1 %s "%(id1, elem1)
                 #print "id2 %s elem2 %s "%(id2, elem2)
                 if elem1 == "H":
-                    if not self.nameMapingCifMol["H"].has_key(id2):
+                    if id2 not in self.nameMapingCifMol["H"]:
                         self.nameMapingCifMol["H"][id2] = [] 
                     self.nameMapingCifMol["H"][id2].append(id1)
                     #print "H atom %s is bonding to %s "%(id1, id2)
                 if elem2 == "H":
-                    if not self.nameMapingCifMol["H"].has_key(id1):
+                    if id1 not in self.nameMapingCifMol["H"]:
                         self.nameMapingCifMol["H"][id1] = [] 
                     self.nameMapingCifMol["H"][id1].append(id2)
                     #print "H atom %s is bonding to %s "%(id2, id1)
@@ -1180,8 +1110,8 @@ class FileTransformer :
             if len(chargeAtomList) != 0:
                 aL = "M CHG  %d "%len(chargeAtomList)
                 for aPair in chargeAtomList:
-                    print "atom serial number (mol format)  ", aPair[0], ", its new id ", self.atoms[aPair[0]-1]["_chem_comp_atom.atom_id"]
-                    print "Charge ", aPair[1]
+                    print("atom serial number (mol format)  ", aPair[0], ", its new id ", self.atoms[aPair[0]-1]["_chem_comp_atom.atom_id"])
+                    print("Charge ", aPair[1])
                     aL += " %d  %d "%(aPair[0], aPair[1])
                 tOutFile.write(aL + "\n")          
    
@@ -1220,8 +1150,8 @@ class FileTransformer :
                         if tN.isdigit():
                             nAtoms = int(tN)
                         else:
-                            print "Format error is input MOL/SDF file. The count line is : "
-                            print aL 
+                            print("Format error is input MOL/SDF file. The count line is : ")
+                            print(aL) 
                             sys.exit()
                 elif nOneMolLines >= 4:
                      if nAtoms > 0:
@@ -1236,14 +1166,14 @@ class FileTransformer :
                          else: 
                              aMolSecs[iMol]["Sec3"].append(aL)
                      else:    
-                            print "Format error is input MOL/SDF file. No count line found  "
+                            print("Format error is input MOL/SDF file. No count line found  ")
                             sys.exit()
                 nOneMolLines +=1
 
             if len(aMolSecs[0]["Sec2"]) > 0:
                 # at least there is a molecule in the file.
                 outF = open(tOutFileName, "w")
-                for aMol in sorted(aMolSecs.iterkeys()):
+                for aMol in sorted(aMolSecs.keys()):
                     for aL in aMolSecs[aMol]["Sec1"]:
                         outF.write(aL)
                     for aL in aMolSecs[aMol]["Sec2"]:
@@ -1259,10 +1189,10 @@ class FileTransformer :
         try:
             tPDB = open(tOutFileName, "w")
         except IOError:
-            print "%s (PDB format) can not be open for writing "%tOutFileName
+            print("%s (PDB format) can not be open for writing "%tOutFileName)
             sys.exit()
         else:
-            if not self.PdbForMols.has_key(idxMol):
+            if idxMol not in self.PdbForMols:
                 self.PdbForMols[idxMol] = []
             self.PdbForMols[idxMol].append(tOutFileName)
            
@@ -1275,7 +1205,7 @@ class FileTransformer :
             if tMonoRoot != "UNL":
                 tIdCode = str(tMonoRoot) 
             elif tDataDiscriptor:
-                for aIdx in tDataDiscriptor.keys():
+                for aIdx in list(tDataDiscriptor.keys()):
                     if tDataDiscriptor[aIdx][0].find("_chem_comp.group") !=-1  \
                        or tDataDiscriptor[aIdx][0].find("_chem_comp.name") !=-1 \
                        or tDataDiscriptor[aIdx][0].find("_chem_comp.type") !=-1 :
@@ -1337,7 +1267,7 @@ class FileTransformer :
         try:
             tPDB = open(tInFileName, "r")
         except IOError:
-            print "%s (PDB format) can not be open for reading "%tInFileName
+            print("%s (PDB format) can not be open for reading "%tInFileName)
             sys.exit()
         else:
             allLines =tPDB.readlines()
@@ -1352,20 +1282,20 @@ class FileTransformer :
                         seriNum = int(sNum)-1
                         self.nameMapingPDBMol[seriNum] = name
                     else:
-                        print "Errors in the input file %s format (PDB) "%tInFileName
-                        print "Serial number of atom is ", sNum
-                        print "in line %s "%aL
+                        print("Errors in the input file %s format (PDB) "%tInFileName)
+                        print("Serial number of atom is ", sNum)
+                        print("in line %s "%aL)
                         sys.exit()   
                 if head.find("CONECT") !=-1 :
                     sNum = aL[6:11].strip()
                     if sNum.isdigit():
                         seriNum = int(sNum)-1
-                        if not self.connInPDB.has_key(seriNum):
+                        if seriNum not in self.connInPDB:
                             self.connInPDB[seriNum] = []
                     else:
-                        print "Errors in the input file %s format (PDB) "%tInFileName
-                        print "Serial number of atom is ", sNum
-                        print "in line %s "%aL
+                        print("Errors in the input file %s format (PDB) "%tInFileName)
+                        print("Serial number of atom is ", sNum)
+                        print("in line %s "%aL)
                         sys.exit() 
                     if len(aL) > 16:
                         cNum = int(aL[11:16].strip())-1
@@ -1381,13 +1311,13 @@ class FileTransformer :
                         self.connInPDB[seriNum].append(cNum)  
                
             # Check
-            print "Atom names in PDB file %s are recorded here "%tInFileName 
-            for aKey in sorted(self.nameMapingPDBMol.iterkeys()):
-                print "Atom : ", aKey
-                print "Name : ", self.nameMapingPDBMol[aKey]
-                print "Its connection are : "
+            print("Atom names in PDB file %s are recorded here "%tInFileName) 
+            for aKey in sorted(self.nameMapingPDBMol.keys()):
+                print("Atom : ", aKey)
+                print("Name : ", self.nameMapingPDBMol[aKey])
+                print("Its connection are : ")
                 for aConn in self.connInPDB[aKey]:
-                    print "serial number %d and name %s "%(aConn, self.nameMapingPDBMol[aConn])
+                    print("serial number %d and name %s "%(aConn, self.nameMapingPDBMol[aConn]))
           
     def checkAndAddCryst1InPDB(self, tInFileName, tOutFileName):
 
@@ -1395,7 +1325,7 @@ class FileTransformer :
         try:
             inPDB = open(tInFileName, "r")
         except IOError:
-            print "%s (PDB format) can not be open for reading "%tInFileName
+            print("%s (PDB format) can not be open for reading "%tInFileName)
             sys.exit()
         else:
             allLs = inPDB.readlines()
@@ -1412,7 +1342,7 @@ class FileTransformer :
                 try: 
                     outPDB = open(tOutFileName, "w")
                 except IOError:
-                    print "%s (PDB format) can not be open for writing "%tOutFileName
+                    print("%s (PDB format) can not be open for writing "%tOutFileName)
                     sys.exit()
                 else:
                     outPDB.write(self.cryst1 + "\n")
@@ -1426,7 +1356,7 @@ class FileTransformer :
         try:
             inPDB = open(tInFileName, "r")
         except IOError:
-            print "%s (PDB format) can not be open for reading "%tInFileName
+            print("%s (PDB format) can not be open for reading "%tInFileName)
             sys.exit()
         else:
             allLs = inPDB.readlines()
@@ -1498,7 +1428,7 @@ class FileTransformer :
         try:
             aFile = open(tFileName, "r")
         except IOError:
-            print "%s can not be open for reading "%tFileName
+            print("%s can not be open for reading "%tFileName)
             sys.exit()
         else:
             allLs = aFile.readlines()
@@ -1566,8 +1496,8 @@ class FileTransformer :
         for aBond in self.bonds:                    
              idxH     = -1
              idxOther = -1
-             if tNonHAtmOldNewMap.has_key(aBond["1stAtm"])\
-                 and tNonHAtmOldNewMap.has_key(aBond["2ndAtm"]):
+             if aBond["1stAtm"] in tNonHAtmOldNewMap\
+                 and aBond["2ndAtm"] in tNonHAtmOldNewMap:
                   idx1 = tNonHAtmOldNewMap[aBond["1stAtm"]]
                   elem1 = self.atoms[idx1]["element"]
                   idx2 = tNonHAtmOldNewMap[aBond["2ndAtm"]]
@@ -1580,13 +1510,13 @@ class FileTransformer :
                       idxOther  = idx1
                   if idxH !=-1 and idxOther !=-1:
                       otherId  = self.atoms[idxOther]["name"]
-                      if not self.nameMapingMol2["H"].has_key(otherId):
+                      if otherId not in self.nameMapingMol2["H"]:
                           self.nameMapingMol2["H"][otherId] = []
                       self.nameMapingMol2["H"][otherId].append(self.atoms[idxH]["name"])
-        print "The follow are information on H connections "
-        for aK in sorted(self.nameMapingMol2["H"].iterkeys()):
+        print("The follow are information on H connections ")
+        for aK in sorted(self.nameMapingMol2["H"].keys()):
             for aH in self.nameMapingMol2["H"][aK]:
-                print "%s  connects to %s "%(aK, aH)
+                print("%s  connects to %s "%(aK, aH))
         
 class Ccp4MmCifObj (dict) :
 
@@ -1606,13 +1536,13 @@ class Ccp4MmCifObj (dict) :
         self["ccp4CifObj"]["instructs"]  = {}
 
         self["inCif"] = tInFileName
-        print self["inCif"]
+        print(self["inCif"])
         if os.path.isfile(self["inCif"]):
             self.getCCP4CifObj()
         else:
             self["errMessage"] = "%s does not exist "%self["inCif"]
             self["errLevel"]   = 1
-            print self["errMessage"]
+            print(self["errMessage"])
             
        
     def getCCP4CifObj(self):
@@ -1640,11 +1570,11 @@ class Ccp4MmCifObj (dict) :
                     elif aDataHead !="":
                         self["ccp4CifBlocks"][aDataHead].append(aL)
                     else:
-                        print "Bug in analyse the line : "
-                        print aL
+                        print("Bug in analyse the line : ")
+                        print(aL)
                         sys.exit()
 
-            for aKey in self["ccp4CifBlocks"].keys():        
+            for aKey in list(self["ccp4CifBlocks"].keys()):        
                 if aKey != "head_sec":
                     self.setupOneBlock(aKey, self["ccp4CifBlocks"])
             """
@@ -1657,7 +1587,7 @@ class Ccp4MmCifObj (dict) :
  
     def setupOneBlock(self, tKey, tBlock):
         
-        print "Block ", tKey
+        print("Block ", tKey)
         allLoops = []
         aLoop = []
         for aL in tBlock[tKey]:
@@ -1672,7 +1602,7 @@ class Ccp4MmCifObj (dict) :
  
         if len(aLoop) != 0:
             allLoops.append(aLoop)
-        print "It contains ", len(allLoops), " loops "
+        print("It contains ", len(allLoops), " loops ")
 
         lB = {}
         lB["LC"]  =False
@@ -1719,26 +1649,26 @@ class Ccp4MmCifObj (dict) :
                     self.setupOneLoop(self["ccp4CifObj"]["lists"]["link"], aLoop, "list")
                 elif lB["COMP"]:
                     #print "set  comp %s loop "%strsKey[2]
-                    if not self["ccp4CifObj"]["comps"].has_key(strsKey[2]):
+                    if strsKey[2] not in self["ccp4CifObj"]["comps"]:
                         self["ccp4CifObj"]["comps"][strsKey[2]] = {}
                     self.setupOneLoop(self["ccp4CifObj"]["comps"][strsKey[2]],aLoop)
                 elif lB["MOD"]:
                     #print "set mod %s loop "%strsKey[2]
-                    if not self["ccp4CifObj"]["mods"].has_key(strsKey[2]):
+                    if strsKey[2] not in self["ccp4CifObj"]["mods"]:
                         self["ccp4CifObj"]["mods"][strsKey[2]] = {}
                     self.setupOneLoop(self["ccp4CifObj"]["mods"][strsKey[2]], aLoop)
                 elif lB["LINK"]:
                     #print "set list %s loop "%strsKey[2]
-                    if not self["ccp4CifObj"]["links"].has_key(strsKey[2]):
+                    if strsKey[2] not in self["ccp4CifObj"]["links"]:
                         self["ccp4CifObj"]["links"][strsKey[2]] = {}
                     self.setupOneLoop(self["ccp4CifObj"]["links"][strsKey[2]], aLoop)
                 elif lB["INS"]:
-                    if not self["ccp4CifObj"]["instructs"].has_key(strsKey[2]):
+                    if strsKey[2] not in self["ccp4CifObj"]["instructs"]:
                         self["ccp4CifObj"]["instructs"][strsKey[2]] = {}
                     self.setupOneLoop(self["ccp4CifObj"]["instructs"][strsKey[2]], aLoop)
         
             # Re-group plane-atoms in comps according to planes:
-            if self["ccp4CifObj"].has_key("comps"):
+            if "comps" in self["ccp4CifObj"]:
                 for aComp in self["ccp4CifObj"]["comps"]:
                     self.setPlaneAtmGroupInOneComp(aComp)
  
@@ -1769,8 +1699,8 @@ class Ccp4MmCifObj (dict) :
 
         nK = len(aKeySet)
         nV = len(aValueSet) 
-        print "Number of keys in the loop is ", nK
-        print "Number of values in the loop is ", nV
+        print("Number of keys in the loop is ", nK)
+        print("Number of values in the loop is ", nV)
         if nK > 0 and nV > 0:
             if tKW =="list":
                 idxV = 0
@@ -1785,9 +1715,9 @@ class Ccp4MmCifObj (dict) :
                         tDict[compId][k] = v
                         idxV +=1
                     remV -=nK
-                    print "For list entry  %s, it has the following properties "%compId
-                    for aPro in tDict[compId].keys():
-                        print "%s : %s "%(aPro, tDict[compId][aPro])
+                    print("For list entry  %s, it has the following properties "%compId)
+                    for aPro in list(tDict[compId].keys()):
+                        print("%s : %s "%(aPro, tDict[compId][aPro]))
             else:
                 aType    = ""
                 parts = aKeySet[0].strip().split(".")[0].strip().split("_")
@@ -1795,13 +1725,13 @@ class Ccp4MmCifObj (dict) :
                     aType = parts[3] + "_" + parts[4] + "s"
                 else:
                     aType = parts[3] + "s"
-                if not tDict.has_key(aType):
+                if aType not in tDict:
                     tDict[aType] = []
 
                 idxV = 0
                 remV = nV
-                print aType
-                print idKeys
+                print(aType)
+                print(idKeys)
                 while remV >= nK:
                     aObj = {}
                     for i in range(nK):
@@ -1811,18 +1741,18 @@ class Ccp4MmCifObj (dict) :
                         idxV +=1
                     remV -=nK
                     tDict[aType].append(aObj)
-                    print "-----------------"
-                    for aKey in aObj.keys():
-                        print "%s   :   %s "%(aKey, aObj[aKey])
-                print "Number of %s is %d "%(aType, len(tDict[aType])) 
+                    print("-----------------")
+                    for aKey in list(aObj.keys()):
+                        print("%s   :   %s "%(aKey, aObj[aKey]))
+                print("Number of %s is %d "%(aType, len(tDict[aType]))) 
 
     def setPlaneAtmGroupInOneComp(self, tName):
 
-        if self["ccp4CifObj"]["comps"].has_key(tName):
-            if self["ccp4CifObj"]["comps"][tName].has_key("plane_atoms"):
+        if tName in self["ccp4CifObj"]["comps"]:
+            if "plane_atoms" in self["ccp4CifObj"]["comps"][tName]:
                 self["ccp4CifObj"]["comps"][tName]["planes"] = {}
                 for aPlAtm in self["ccp4CifObj"]["comps"][tName]["plane_atoms"]:
-                    if not self["ccp4CifObj"]["comps"][tName]["planes"].has_key(aPlAtm["plane_id"]):
+                    if aPlAtm["plane_id"] not in self["ccp4CifObj"]["comps"][tName]["planes"]:
                         self["ccp4CifObj"]["comps"][tName]["planes"][aPlAtm["plane_id"]] = []
                     self["ccp4CifObj"]["comps"][tName]["planes"][aPlAtm["plane_id"]].append(aPlAtm)
   
@@ -1836,78 +1766,78 @@ class Ccp4MmCifObj (dict) :
  
     def printOneComp(self, tName):
 
-        if self["ccp4CifObj"]["comps"].has_key(tName):
+        if tName in self["ccp4CifObj"]["comps"]:
 
-            print "Information on compound %s : \n"%tName
+            print("Information on compound %s : \n"%tName)
 
-            if self["ccp4CifObj"]["comps"][tName].has_key("atoms"):
-                print "The following is information for atoms :"
-                print "number of atom is ", len(self["ccp4CifObj"]["comps"][tName]["atoms"])
+            if "atoms" in self["ccp4CifObj"]["comps"][tName]:
+                print("The following is information for atoms :")
+                print("number of atom is ", len(self["ccp4CifObj"]["comps"][tName]["atoms"]))
                 i = 0
                 for aAtom in  self["ccp4CifObj"]["comps"][tName]["atoms"]:
-                    print "For atom ", i
+                    print("For atom ", i)
                     i+=1
-                    for aKey in aAtom.keys():
-                        print "%s   :   %s  "%(aKey, aAtom[aKey])
+                    for aKey in list(aAtom.keys()):
+                        print("%s   :   %s  "%(aKey, aAtom[aKey]))
  
-            if self["ccp4CifObj"]["comps"][tName].has_key("bonds"):
-                print "The following is information for bonds :"
+            if "bonds" in self["ccp4CifObj"]["comps"][tName]:
+                print("The following is information for bonds :")
                 i = 0
                 for aBond in  self["ccp4CifObj"]["comps"][tName]["bonds"]:
-                    print "For bond ", i
+                    print("For bond ", i)
                     i+=1
-                    for aKey in aBond.keys():
-                        print "%s   :   %s  "%(aKey, aBond[aKey])
+                    for aKey in list(aBond.keys()):
+                        print("%s   :   %s  "%(aKey, aBond[aKey]))
  
 
-            if self["ccp4CifObj"]["comps"][tName].has_key("angles"):
-                print "The following is information for angles :"
+            if "angles" in self["ccp4CifObj"]["comps"][tName]:
+                print("The following is information for angles :")
                 i = 0
                 for aAngle in  self["ccp4CifObj"]["comps"][tName]["angles"]:
-                    print "For angle ", i
+                    print("For angle ", i)
                     i+=1
-                    for aKey in aAngle.keys():
-                        print "%s   :   %s  "%(aKey, aAngle[aKey])
+                    for aKey in list(aAngle.keys()):
+                        print("%s   :   %s  "%(aKey, aAngle[aKey]))
  
 
-            if self["ccp4CifObj"]["comps"][tName].has_key("tors"):
-                print "The following is information for torsions :"
+            if "tors" in self["ccp4CifObj"]["comps"][tName]:
+                print("The following is information for torsions :")
                 i = 0
                 for aTor in  self["ccp4CifObj"]["comps"][tName]["tors"]:
-                    print "For torsion angle ", i
+                    print("For torsion angle ", i)
                     i+=1
-                    for aKey in aTor.keys():
-                        print "%s   :   %s  "%(aKey, aTor[aKey])
+                    for aKey in list(aTor.keys()):
+                        print("%s   :   %s  "%(aKey, aTor[aKey]))
  
-            if self["ccp4CifObj"]["comps"][tName].has_key("chirs"):
-                print "The following is information for chiral centers :"
+            if "chirs" in self["ccp4CifObj"]["comps"][tName]:
+                print("The following is information for chiral centers :")
                 i = 0
                 for aChi in  self["ccp4CifObj"]["comps"][tName]["chirs"]:
-                    print "For chiral center ", i
+                    print("For chiral center ", i)
                     i+=1
-                    for aKey in achi.keys():
-                        print "%s   :   %s  "%(aKey, aChi[aKey])
+                    for aKey in list(achi.keys()):
+                        print("%s   :   %s  "%(aKey, aChi[aKey]))
  
-            if self["ccp4CifObj"]["comps"][tName].has_key("plane_atoms"):
-                print "The following is information for plane atoms :"
+            if "plane_atoms" in self["ccp4CifObj"]["comps"][tName]:
+                print("The following is information for plane atoms :")
                 i = 0
                 for aPA in  self["ccp4CifObj"]["comps"][tName]["plane_atoms"]:
-                    print "For plane atom ", i
+                    print("For plane atom ", i)
                     i+=1
-                    for aKey in aPA.keys():
-                        print "%s   :   %s  "%(aKey, aPA[aKey])
+                    for aKey in list(aPA.keys()):
+                        print("%s   :   %s  "%(aKey, aPA[aKey]))
 
     def printOneModOrLink(self, tName):
 
-        if self["ccp4CifObj"]["mods"].has_key(tName):
+        if tName in self["ccp4CifObj"]["mods"]:
 
-            print "Information on modification %s : \n"%tName
+            print("Information on modification %s : \n"%tName)
 
-            for aKey in self["ccp4CifObj"]["mods"][tName].keys():
-                print "\nProp %s"%aKey
+            for aKey in list(self["ccp4CifObj"]["mods"][tName].keys()):
+                print("\nProp %s"%aKey)
                 for aProp in self["ccp4CifObj"]["mods"][tName][aKey]:
-                    for aEntry in aProp.keys():
-                        print "%s   :   %s  "%(aKey, aPA[aKey])
+                    for aEntry in list(aProp.keys()):
+                        print("%s   :   %s  "%(aKey, aPA[aKey]))
                          
 
     def getAtomById(self, tId, tName):

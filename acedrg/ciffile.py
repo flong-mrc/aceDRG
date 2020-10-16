@@ -1,4 +1,6 @@
+from __future__ import print_function
 
+from builtins import zip
 import os, sys
 from pdbecif import startools
 from collections import OrderedDict
@@ -53,10 +55,10 @@ def cifdict_from_file(file):
       e3_list[cou].append(tv)
       cou += 1
 
-  for k1, e1 in e0.items():
-    for k2, e2 in e1.items():
+  for k1, e1 in list(e0.items()):
+    for k2, e2 in list(e1.items()):
       cou = 0
-      for k3, e3 in e2.items():
+      for k3, e3 in list(e2.items()):
         if cou:
           assert cou == len(e3)
 
@@ -70,7 +72,7 @@ def to_old_version(e0):
   e1 = e0['data_comp_' + mon]
   e2 = e1['_chem_comp_bond']
   if 'aromatic' in e2:
-    ta = zip(e2['type'], e2.pop('aromatic'))
+    ta = list(zip(e2['type'], e2.pop('aromatic')))
     e2['type'] = ['aromatic' if a == 'y' else t.lower() for t, a in ta]
 
   else:
@@ -87,9 +89,9 @@ def to_old_version(e0):
 def rename_atoms(e0, rename_dict):
   mon = e0['data_comp_list']['_chem_comp']['id'][0]
   e1 = e0['data_comp_' + mon]
-  for e2 in e1.values():
+  for e2 in list(e1.values()):
     changes = list()
-    for k3, e3, in e2.items():
+    for k3, e3, in list(e2.items()):
       if k3.startswith('atom_id'):
         changes.append((k3, [rename_dict.get(e4, e4) for e4 in e3]))
 
@@ -123,7 +125,7 @@ def complete_aa(e0):
     e1 = e0['data_comp_' + mon]
     e2 = e1['_chem_comp_atom']
     if not 'OXT' in e2['atom_id']:
-      for e3 in e2.values():
+      for e3 in list(e2.values()):
         e3.append('.')
 
       e2['comp_id'][-1] = mon
@@ -136,7 +138,7 @@ def complete_aa(e0):
         e2['partial_charge'][-1] = '0'
 
       e2 = e1['_chem_comp_bond']
-      for e3 in e2.values():
+      for e3 in list(e2.values()):
         e3.append('.')
 
       e2['comp_id'][-1] = mon
@@ -146,17 +148,17 @@ def complete_aa(e0):
 
 def cifdict_to_file(e0, file):
   with open(file, 'w') as ostream:
-    for k1, e1 in e0.items():
-      print >>ostream, k1
-      for k2, e2 in e1.items():
-        print >>ostream, 'loop_'
+    for k1, e1 in list(e0.items()):
+      print(k1, file=ostream)
+      for k2, e2 in list(e1.items()):
+        print('loop_', file=ostream)
         e3_list = list()
-        for k3, e3 in e2.items():
-          print >>ostream, '.'.join((k2, k3))
+        for k3, e3 in list(e2.items()):
+          print('.'.join((k2, k3)), file=ostream)
           e3_list.append(e3)
 
         for row in zip(*e3_list):
-          print >>ostream, ' '.join(row)
+          print(' '.join(row), file=ostream)
 
 if __name__ == '__main__':
   e0 = cifdict_from_file(sys.argv[1])

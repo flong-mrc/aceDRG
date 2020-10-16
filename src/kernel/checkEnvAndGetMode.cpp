@@ -83,7 +83,8 @@ namespace LIBMOL
         
         int c, index; 
         while ((c = getopt (numArg, ArgVars, 
-         "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:M:O:P:S:T:U:X:Y:Z:1:2:3:4:")) != -1)
+         "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:M:N:O:P:R:S:T:U:X:Y:Z:1:2:3:4:"))
+               != -1)
         {
             switch (c)
             {
@@ -184,6 +185,9 @@ namespace LIBMOL
                 case 'M':
                     IOEntries["MetalEnable"] = optarg;
                     break;
+                case 'N':
+                    IOEntries["OrgOnlyEnable"] = optarg;
+                    break;
                 case 'O':
                     IOEntries["NoGeoOpt"] = optarg;
                     StrLower(IOEntries["NoGeoOpt"]);
@@ -192,6 +196,11 @@ namespace LIBMOL
                     IOEntries["UserParaFile"] = optarg;
                     std::cout << "The param file from the user : " 
                               << IOEntries["UserParaFile"] << std::endl;
+                    break;
+                case 'R':
+                    IOEntries["addProtCol"] = optarg;
+                    std::cout << "Job to add proton distances : " 
+                              << IOEntries["addProtCol"] << std::endl;
                     break;
                 case 'S':
                     IOEntries["codAtomStr"] = optarg;
@@ -458,6 +467,20 @@ namespace LIBMOL
                     workMode = 312;
                 }
             }
+        }
+        else if (IOEntries.find("OrgOnlyEnable")!=IOEntries.end())
+        {
+            if (IOEntries.find("inCifNameB")!=IOEntries.end())
+            {
+                if (IOEntries.find("UserParaFile")!=IOEntries.end())
+                {
+                    workMode = 314;
+                }
+            }
+        }
+        else if (IOEntries.find("addProtCol") != IOEntries.end() )
+        {
+            workMode = 800;
         }
         else if ( IOEntries.find("inCifName")!=IOEntries.end() )
         {

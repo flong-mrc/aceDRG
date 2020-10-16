@@ -365,6 +365,7 @@ namespace LIBMOL // temp
         std::map<std::string, std::string> baseRingProp;
         std::map<std::string, std::vector<int> > tree;
         
+        
         REAL                       treeBond;
         REAL                       treeAngle;
         REAL                       treeTorsion;
@@ -405,11 +406,13 @@ namespace LIBMOL // temp
         std::string          formu;
         std::string          coordGeoID;
         
-        std::map<int, std::vector<int> >        ligandNBs;
+        std::map<int, std::map<int, 
+        std::vector<int> > >                    ligandNBs;
         std::map<int, std::string >             ligandForma; // or use atom types
                                                              // of the acedrg style
         std::map<int, std::map<int, REAL> >                     uniqBondsMap;
         std::map<int, std::map<int, std::map<int, REAL> > >     uniqAngsMap;
+        std::map<int, std::map<int, std::map<int, REAL> > >     secondNBAngsMap;
         
         std::map<int, std::map<int, std::map<int, REAL> > >     allAngs;
         std::map<REAL, std::vector<int> >                       angVect;

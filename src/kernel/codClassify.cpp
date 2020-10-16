@@ -376,6 +376,7 @@ namespace LIBMOL
         // setupSystem();
         setupSystem2();
         
+        
     }
    
     CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms, 
@@ -5715,6 +5716,7 @@ namespace LIBMOL
     }
     
     
+    
     void  CodClassify::groupCodOrgBonds3()
     {
         setOrgBondHeadHashList();
@@ -9083,7 +9085,6 @@ namespace LIBMOL
         groupHashAndSpBonds();
         groupHashAndSpAndRingBonds();
         groupCodOrgBonds2();
-        
         groupCodMetBonds();
         searchCodBonds();
         // constrBondSigmas();
