@@ -131,6 +131,7 @@ class FileTransformer(object) :
 
     def mmCifReader(self, tFileName):
         """Read a detailed mmicif file to get basic information"""
+
         try:
             tFile = open(tFileName, "r")
         except IOError:
@@ -150,8 +151,6 @@ class FileTransformer(object) :
                     if aL[0].find("_") !=-1:
                         a2ColList = []
                         self.aLineToAlist(aL,a2ColList)
-                        print aL
-                        print a2ColList
                         if len(a2ColList)==2:
                             all2ColLines.append(a2ColList)
                         else:
@@ -186,7 +185,7 @@ class FileTransformer(object) :
             self.TmpChemCheck()
             
             self.selectAtomCoordinates()
-           
+ 
             # check
             """
             if len(self.dataDescriptor.keys()):

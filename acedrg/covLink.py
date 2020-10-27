@@ -883,7 +883,11 @@ class CovLinkGenerator(CExeCode):
                     if aList[i].upper().find("RES-NAME-1") != -1:
                         aLink.stdLigand1["name"]   = aList[i+1]
                         aLink.stdLigand1["resNum"] = 1
+<<<<<<< TREE
                         aLink.modLigand1["name"]   = aLink.stdLigand1["name"] + "m1"
+=======
+                        aLink.modLigand1["name"]   = aLink.stdLigand1["name"] + "mod1"
+>>>>>>> MERGE-SOURCE
                         if "name" in aLink.stdLigand2:
                             if aLink.stdLigand2["name"] != aLink.stdLigand1["name"]:
                                 aLink.modLigand2["name"]   = aLink.stdLigand2["name"] + "m1"
@@ -1551,7 +1555,11 @@ class CovLinkGenerator(CExeCode):
     def setOneMonomer(self, tMonomer):
 
         if os.path.isfile(tMonomer["inCif"]):
+<<<<<<< TREE
             #print(tMonomer["inCif"])
+=======
+            print(tMonomer["inCif"])
+>>>>>>> MERGE-SOURCE
             aNL = tMonomer["name"].upper()
             if len(aNL) > 3:
                 aNL = "UNL"
@@ -1598,8 +1606,8 @@ class CovLinkGenerator(CExeCode):
             self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
             if not self.errLevel:
                 self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
-                #if not self.errLevel:
-                #    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+                if not self.errLevel:
+                    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
                     #if not self.errLevel:
                     #    self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
 
@@ -2631,9 +2639,14 @@ class CovLinkGenerator(CExeCode):
                 for aAtom in tLinkedObj.combLigand["atoms"]:
                     print("%s%s%s"%(aAtom["atom_id"].ljust(10), aAtom["atom_id_alias"].ljust(10), aAtom["type_symbol"]))
                 for aBond in tLinkedObj.combLigand["bonds"]:
+<<<<<<< TREE
                     print("%s%s%s%s%s\n"%(aBond["atom_id_1_alias"].ljust(10), aBond["atom_id_2_alias"].ljust(10),
                                    ("("+aBond["atom_id_1"]).ljust(10), (aBond["atom_id_2"]+ ")").ljust(10),
                                     aBond["type"].ljust(1) )) 
+=======
+                    print("%s%s%s%s%s"%(aBond["atom_id_1_alias"].ljust(10), aBond["atom_id_2_alias"].ljust(10),\
+                                    ("("+aBond["atom_id_1"]).ljust(10), (aBond["atom_id_2"]+ ")").ljust(10), aBond["type"].ljust(10)))
+>>>>>>> MERGE-SOURCE
                 #self.outTmpComboLigandMap(tLinkedObj)    # Check 
                 self.checkChemInMonomer(tLinkedObj.combLigand, 2)
                 if not self.errLevel:
@@ -2677,14 +2690,28 @@ class CovLinkGenerator(CExeCode):
                 existChangeAtmIdsRes2.append(aA["atom_id"])
          
         for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
+<<<<<<< TREE
             #print("Atom id ",aAtom["atom_id"])
             #print("Atom id alias ", aAtom["atom_id_alias"]) 
+=======
+            print("Atom id ",aAtom["atom_id"])
+            print("Atom id alias ", aAtom["atom_id_alias"]) 
+>>>>>>> MERGE-SOURCE
             if aAtom["res_idx"] == 1:
                 if not aAtom["is_added"]:
+<<<<<<< TREE
                     #print("It is in changed section ")
                     self.checkAtomMod(tLinkedObj.stdLigand1["remainAtoms"], aAtom, tLinkedObj.modLigand1["changed"]["atoms"], existChangeAtmIdsRes1)
+=======
+                    print("It is in changed section ")
+                    self.checkAtomMod(tLinkedObj.stdLigand1["remainAtoms"], aAtom, tLinkedObj.modLigand1["changed"]["atoms"], existChangeAtmIdsRes2)
+>>>>>>> MERGE-SOURCE
                 else:
+<<<<<<< TREE
                     #print("It is in added section ")
+=======
+                    print("It is in added section ")
+>>>>>>> MERGE-SOURCE
                     addedSet1.append(aAtom["atom_id"])
                     tLinkedObj.modLigand1["added"]["atoms"].append(aAtom)
             elif aAtom["res_idx"] == 2:
@@ -2852,10 +2879,32 @@ class CovLinkGenerator(CExeCode):
             print("Number of deleted chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["chirs"])) 
          
         # Planes
+<<<<<<< TREE
 
         self.checkPlModFromCombo(tLinkedObj)
         self.checkPlModFromOrig(tLinkedObj)
+=======
+        if "planes" in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]:
+            for aPl in list(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys()):
+                print("For plane ", aPl)
+                inRes1 = []
+                inRes2 = []
+                nAtmInPl = len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl])
+                for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl]:
+                    print("atom %s in residue %d "%(aAtom["atom_id"], aAtom["atom_id_resNum"]))
+                    if aAtom["atom_id_resNum"]== 1:
+                        inRes1.append(aAtom["atom_id"])
+                    elif aAtom["atom_id_resNum"]== 2:
+                        inRes2.append(aAtom["atom_id"])
+                if len(inRes1) == nAtmInPl:
+                    self.checkPlMod(tLinkedObj.stdLigand1["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
+                                    tLinkedObj.modLigand1["deleted"]["planes"], tLinkedObj.modLigand1["added"]["planes"]) 
+                elif len(inRes2) == nAtmInPl:
+                    self.checkPlMod(tLinkedObj.stdLigand2["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
+                                tLinkedObj.modLigand2["deleted"]["planes"], tLinkedObj.modLigand2["added"]["planes"])
+>>>>>>> MERGE-SOURCE
      
+<<<<<<< TREE
         nDP1 = len(tLinkedObj.modLigand1["deleted"]["planes"])   
         nAP1 = len(tLinkedObj.modLigand1["added"]["planes"])
         nDP2 = len(tLinkedObj.modLigand2["deleted"]["planes"])   
@@ -2895,6 +2944,46 @@ class CovLinkGenerator(CExeCode):
                     print("%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"]))
             print("------------------ -------------")
 
+=======
+            nDP1 = len(tLinkedObj.modLigand1["deleted"]["planes"])   
+            nAP1 = len(tLinkedObj.modLigand1["added"]["planes"])
+            nDP2 = len(tLinkedObj.modLigand2["deleted"]["planes"])   
+            nAP2 = len(tLinkedObj.modLigand2["added"]["planes"])
+            print("For residue 1 : ")
+            print("Number of deleted planes ", nDP1)
+            if nDP1:
+                print("They are : ")
+                for aPl in tLinkedObj.modLigand1["deleted"]["planes"]:
+                    print("----------- A plane -------------")
+                    for aPlAtm in aPl:
+                        print("%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"]))
+                print("------------------ -------------")
+            print("Number of added planes ", nAP1)
+            if nAP1:
+                print("They are : ")
+                for aPl in tLinkedObj.modLigand1["added"]["planes"]:
+                    print("----------- A plane -------------")
+                    for aPlAtm in aPl:
+                        print("%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"]))
+                print("------------------ -------------")
+            print("\nFor residue 2 : ")
+            print("Number of deleted planes ", nDP2)
+            if nDP2:
+                print("They are : ")
+                for aPl in tLinkedObj.modLigand2["deleted"]["planes"]:
+                    print("----------- A plane -------------")
+                    for aPlAtm in aPl:
+                        print("%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"]))
+                print("------------------ -------------")
+            print("Number of added planes ", nAP2)
+            if nAP2:
+                print("They are : ")
+                for aPl in tLinkedObj.modLigand2["added"]["planes"]:
+                    print("----------- A plane -------------")
+                    for aPlAtm in aPl:
+                        print("%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"]))
+                print("------------------ -------------")
+>>>>>>> MERGE-SOURCE
         
     def checkAtomMod(self, tOriAtoms, tAtom, tModAtoms, tExistChangedAtoms):
 
@@ -2909,8 +2998,12 @@ class CovLinkGenerator(CExeCode):
 
         lChange = False
         if "type_energy" in tOriAtom and "type_energy" in tAtom:
+<<<<<<< TREE
             if tOriAtom["type_energy"] !=tAtom["type_energy"]: 
                 tOriAtom["type_energy"] =tAtom["type_energy"]
+=======
+            if tOriAtom["type_energy"] !=tAtom["type_energy"]:
+>>>>>>> MERGE-SOURCE
                 lChange = True
         if "charge" in tOriAtom and "charge" in tAtom:
             if tOriAtom["charge"] !=tAtom["charge"]:
@@ -3076,6 +3169,10 @@ class CovLinkGenerator(CExeCode):
                 for aOId in tOrigPlAtmIds:
                     if aOId in tPlAtmIds:
                         overlapAtms.append(aOId)
+<<<<<<< TREE
+=======
+                print("overlaped atoms ",  len(overlapAtms))
+>>>>>>> MERGE-SOURCE
                 if len(overlapAtms) == nOrigAtoms:
                     tModAddPls.append(tPl)
                     break

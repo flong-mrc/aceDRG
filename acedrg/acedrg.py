@@ -2437,6 +2437,10 @@ class Acedrg(CExeCode ):
  
         self.printJobs()
 
+<<<<<<< TREE
+=======
+        self.rdKit.useExistCoords  = self.useExistCoords 
+>>>>>>> MERGE-SOURCE
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
         #elif self.workMode !=0 and self.workMode != 61 :
@@ -2720,8 +2724,12 @@ class Acedrg(CExeCode ):
                     print("Failed to generate initial dictionary file ", self.refmacXYZOUTName)
                     sys.exit()
 
+<<<<<<< TREE
         if not self.workMode in [80, 1001, 1002]:
             self.setOutCifGlobSec()
+=======
+        self.setOutCifGlobSec()
+>>>>>>> MERGE-SOURCE
 
         if self.workMode in [11, 12, 13, 14, 15]:
             self.workMode = 11
@@ -2747,6 +2755,11 @@ class Acedrg(CExeCode ):
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
+<<<<<<< TREE
+=======
+                        print("JJJJJ ")
+                        sys.exit()
+>>>>>>> MERGE-SOURCE
                         print("The input system contains metal or other heavier element")
                         print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
@@ -2880,12 +2893,15 @@ class Acedrg(CExeCode ):
                 shutil.copy(self.outRstCifName, tCif) 
             else:
                 print("acedrg failed to generate a dictionary file")     
+<<<<<<< TREE
 
         if self.workMode == 80:
             if os.path.isfile(self.inMmCifName):
                 self.addProtCols()
             else:
                 print("The mmcif file to be modified does not exist")
+=======
+>>>>>>> MERGE-SOURCE
 
     def printExitInfo(self):
 

@@ -295,12 +295,21 @@ class AcedrgRDKit(object):
             if len(aSmiStr):
                 self.smiOrig = aSmiStr
                 print(self.smiOrig)
+<<<<<<< TREE
                 #if self.reSetSmi:
                 #    self.modifySmiTmp()
                 #    self.smiMod = self.smiMod.strip()
                 #    aMolT     = Chem.MolFromSmiles(self.smiMod.strip())
                 #else:
                 aMolT     = Chem.MolFromSmiles(self.smiOrig)
+=======
+                if self.reSetSmi:
+                    self.modifySmiTmp()
+                    self.smiMod = self.smiMod.strip()
+                    aMolT     = Chem.MolFromSmiles(self.smiMod.strip())
+                else:
+                    aMolT     = Chem.MolFromSmiles(self.smiOrig)
+>>>>>>> MERGE-SOURCE
                 if aMolT:
                     aMolT.SetProp("SmilesIn", self.smiOrig)
                 else:
@@ -337,6 +346,7 @@ class AcedrgRDKit(object):
             aMolT.SetProp("ResidueName", tMonoRoot)
             #print("file %s aTmpMode %d"%(tFileName,  aTmpMode))
             self.setOtherMolInfo(aMolT, tNumConf, tChemCheck, tPH, tNameMap, tMode, tChargeList, aTmpMode)
+ 
             """
             lenA = len(self.moleculesA)
             lenB = len(self.moleculesB)
@@ -862,6 +872,7 @@ class AcedrgRDKit(object):
             #        print "y:  ", aPos.y           
             #        print "z:  ", aPos.z           
         else:
+<<<<<<< TREE
             confIds = self.generateMultiComformersByRDKit(tMol)
         if confIds:
             print("Number of initial conformers requested", self.numInitConformers)
@@ -904,7 +915,43 @@ class AcedrgRDKit(object):
                         self.conformerEngMap[aEng] = []
                     self.conformerEngMap[aEng].append(aCIdx)
                     #print "Conf : ", aCIdx, " Engergy : ", aEng
+=======
+            confIds =AllChem.EmbedMultipleConfs(tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=True)
+        print("Number of initial conformers requested", self.numInitConformers)
+        print("Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps)
+        print("Number of new conformers ", len(confIds))
+        nConf = tMol.GetNumConformers()
+        print("Number of initial conformers obtained", nConf)
+
+        allConfs = tMol.GetConformers()
+        allAtoms = tMol.GetAtoms()
+        formalE = -len(allConfs)    # Formal energy
+        #print Chem.MolToMolBlock(tMol)
+        iFormalE = 0
+        for aConf in allConfs:
+            aCIdx =  aConf.GetId()
+            aWCoordList = []
+            lNorm = self.checkH_Abnormal(aConf, allAtoms, aWCoordList)
+            if not lNorm:
+                print("Conformer ", aCIdx, " has abormal coordinates.")
+                self.forceH_coords(aConf, allAtoms, aWCoordList)
+            try:
+                aFailure = self.optOneConformer(tMol, self.numRDKitOptmSteps, self.nMaxIters, aCIdx)
+            except :
+                # If RDKit can not optimize the conformers, then use the existing conformers and use the formal energies
+                print("Conformer ", aCIdx, " not optimized ")
+                #aForceField = AllChem.UFFGetMoleculeForceField(tMol, confId=aCIdx)
+                #aEng        = aForceField.CalcEnergy()
+                if iFormalE==0:
+                    if formalE not in self.conformerEngMap:
+                        self.conformerEngMap[formalE] = []
+                    self.conformerEngMap[formalE].append(aCIdx)
+                    formalE +=1
+                    iFormalE +=1
+                    #print "Conf : ", aCIdx, " Engergy : ", formalE
+>>>>>>> MERGE-SOURCE
                     rdmolops.AssignAtomChiralTagsFromStructure(tMol, aCIdx)
+<<<<<<< TREE
             if len(self.conformerEngMap):
                 #print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
                 #print "They are : "
@@ -945,6 +992,43 @@ class AcedrgRDKit(object):
                          randNegEig=True, numZeroFail=1, pruneRmsThresh=-1.0,  coordMap={}, forceTol=0.01)
 
         return retConfIds
+=======
+            else:
+                #print "opted id ", aId
+                aForceField = AllChem.UFFGetMoleculeForceField(tMol, confId=aCIdx)
+                aEng        = aForceField.CalcEnergy()
+                if aEng not in self.conformerEngMap:
+                    self.conformerEngMap[aEng] = []
+                self.conformerEngMap[aEng].append(aCIdx)
+                #print "Conf : ", aCIdx, " Engergy : ", aEng
+                rdmolops.AssignAtomChiralTagsFromStructure(tMol, aCIdx)
+        if len(self.conformerEngMap):
+            #print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
+            #print "They are : "
+            #for aEng in sorted(self.conformerEngMap.iterkeys()):
+            #    print "Energy ", aEng
+            #    for aCid in self.conformerEngMap[aEng]:
+            #        print aCid
+
+            #nSelect = 2
+            #if not self.useExistCoords: 
+            #    nSelect = self.numSelectForRefConfs
+            #else:
+            #    if tMol.GetNumConformers() <2:
+            #        nSelect = tMol.GetNumConformers()
+
+            print("The following conformers are selected for refinement: ")
+            nID= 0
+            for aEng in sorted(self.conformerEngMap.keys()):
+                for aCId in self.conformerEngMap[aEng]:
+                    if nID < self.numSelectForRefConfs:
+                        self.selecConformerIds.append(aCId)
+                        print("Conformer ID: ", aCId, " UFF energy : ", aEng)
+                        nID +=1
+                    else:
+                        break
+        print("Number of conformers selected for refinement is ",  len(self.selecConformerIds))
+>>>>>>> MERGE-SOURCE
 
     def checkH_Abnormal(self, tConf, tAtoms, tWrongCoordsMap):
 
@@ -1458,7 +1542,11 @@ class AcedrgRDKit(object):
             aMmCif.write("_chem_comp_bond.aromatic\n")
             aMmCif.write("_chem_comp_bond.value_dist\n")
             aMmCif.write("_chem_comp_bond.value_dist_esd\n")
+<<<<<<< TREE
             print("N Bonds ", len(allBonds))
+=======
+            #print "N Bonds ", len(allBonds)
+>>>>>>> MERGE-SOURCE
             for aBond in allBonds:
                 atom1 = aBond.GetBeginAtom()
                 name1 = atom1.GetProp("Name")
@@ -1479,6 +1567,7 @@ class AcedrgRDKit(object):
                 isAro = "n"
                 if aBond.GetIsAromatic():
                     isAr  = "y" 
+<<<<<<< TREE
                 #if self.reSetSmi:
                 #    if symb1.find(self.repSign)==-1 and symb2.find(self.repSign)==-1:
                 #        bLen  = rdMolTransforms.GetBondLength(aConformer, idx1, idx2)
@@ -1492,9 +1581,39 @@ class AcedrgRDKit(object):
                 aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
                               %(tMonoName, name1, name2,  bType, \
                                 isAro, bLen, dBlen))
+=======
+                if self.reSetSmi:
+                    if symb1.find(self.repSign)==-1 and symb2.find(self.repSign)==-1:
+                        bLen  = rdMolTransforms.GetBondLength(aConformer, idx1, idx2)
+                        dBlen = 0.20
+                        aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
+                                     %(tMonoName, name1, name2,  bType, \
+                                       isAro, bLen, dBlen))
+                else:
+                    bLen  = rdMolTransforms.GetBondLength(aConformer, idx1, idx2)
+                    dBlen = 0.20
+                    aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
+                                 %(tMonoName, name1, name2,  bType, \
+                                   isAro, bLen, dBlen))
+>>>>>>> MERGE-SOURCE
 
             # chiral center section
             atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
+<<<<<<< TREE
+=======
+            if len(list(atomNBCIPMap.keys())):
+                for aAtom in allAtoms:
+                    if aAtom.GetSymbol().find("H")==-1:
+                        aIdx = aAtom.GetIdx()
+                        aId  = aAtom.GetProp("Name")
+                        print("==============================================")
+                        print("| Centered atom :     %s"%aAtom.GetProp("Name"))
+                        print("----------------------------------------------")
+                        for aPair in atomNBCIPMap[aId]:
+                            print("NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1]))
+                print("==============================================")
+           
+>>>>>>> MERGE-SOURCE
             aChiralSignMap = self.setChiralsByMultiConformers(tChemCheck, tMol, atomNBCIPMap)
             self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
             for aId in sorted(aChiralSignMap.keys()):
@@ -1522,6 +1641,7 @@ class AcedrgRDKit(object):
                     if len(chiStrs) ==7:
                         chiCenAtmIds1.append(chiStrs[2])
        
+<<<<<<< TREE
             #chiCenAtmIds2 = []
             #for aAtom in allAtoms:
             #    aCT = aAtom.GetChiralTag()
@@ -1534,23 +1654,53 @@ class AcedrgRDKit(object):
             #                chiCenAtmIds2.append(aAtmName)
             #nTetraChi = len(chiCenAtmIds2)
             #print(" Number of chiral centers get from the conformer ", nTetraChi)
+=======
+            chiCenAtmIds2 = []
+            for aAtom in allAtoms:
+                aCT = aAtom.GetChiralTag()
+                if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
+                    aAtmName=aAtom.GetProp("Name")
+                    if not aAtmName in chiCenAtmIds1:
+                        if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
+                            print("Chiral center %s is not in predefined chiral centers"%aAtmName)
+                            chiCenAtmIds2.append(aAtmName)
+            nTetraChi = len(chiCenAtmIds2)
+            print(" Number of chiral centers get from the conformer ", nTetraChi)
+
+>>>>>>> MERGE-SOURCE
             chiCenAtms3 = []
             for aAtom in allAtoms:
                 aElem = aAtom.GetSymbol()
                 aName=aAtom.GetProp("Name")
                 aHyb  = aAtom.GetHybridization()
                 nNB   = len(aAtom.GetNeighbors())
+<<<<<<< TREE
                 #print("for atom ", aName)
                 #print("its hyb is ", aHyb)
                 #print("it connects to ",nNB, " NBs")
+=======
+                print("for atom ", aName)
+                print("its hyb is ", aHyb)
+                print("it connects to ",nNB, " NBs")
+>>>>>>> MERGE-SOURCE
                 if aHyb == rdchem.HybridizationType.SP3 and aElem != "H" and aElem != "O":
                     nConnHs =  self.chemCheck.getNumNBHAtoms(aAtom)
+<<<<<<< TREE
                     #print("number of H atoms connected  ", nConnHs)
                     if not aName in chiCenAtmIds1 and nConnHs < 2 and nNB > 2:
+=======
+                    print("number of H atoms connected  ", nConnHs)
+                    if not aName in chiCenAtmIds1 and not aName in chiCenAtmIds2 and nConnHs < 2 and nNB > 2:
+>>>>>>> MERGE-SOURCE
                         chiCenAtms3.append(aAtom)                        
             nChiBoth = len(chiCenAtms3)
+<<<<<<< TREE
             print("nChi ",nChiBoth)
             if nChiPre !=0 or nChiBoth !=0 :
+=======
+            print("nChiBoth ",nChiBoth)
+            if nChiPre !=0 or nTetraChi !=0 or nChiBoth !=0 :
+>>>>>>> MERGE-SOURCE
                 # The molecule contain chiral centers
                 aMmCif.write("#\n")
                 aMmCif.write("_chem_comp_chir.comp_id\n")
@@ -1568,6 +1718,7 @@ class AcedrgRDKit(object):
                     print("aChiral ")
                     print(aChiral)
                 print("Predefined chiral centres ", chiCenAtmIds1)
+<<<<<<< TREE
             #if nTetraChi : 
             #    # output all chiral centers in form of mmCif
             #    chiralIdx = nChiPre + 1
@@ -1585,10 +1736,33 @@ class AcedrgRDKit(object):
             #            aMmCif.write(aLine)
             #            print(aLine)
             #            chiralIdx +=1
+=======
+            if nTetraChi : 
+                # output all chiral centers in form of mmCif
+                chiralIdx = nChiPre + 1
+                for aId in chiCenAtmIds2 :
+                    if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
+                        print("Chiral center %s is not in predefined chiral centers"%aId)
+                        aCTName = "chir_" + str(chiralIdx)
+                        aLine = "%s%s%s%s%s%s%s\n"\
+                                %(tMonoName.ljust(12), aCTName.ljust(12),\
+                                  aId.ljust(12),\
+                                  atomNBCIPMap[aId][0][0].GetProp("Name").ljust(12),\
+                                  atomNBCIPMap[aId][1][0].GetProp("Name").ljust(12),\
+                                  atomNBCIPMap[aId][2][0].GetProp("Name").ljust(12),\
+                                  aChiralSignMap[aId]["finalChiVolSign"])
+                        aMmCif.write(aLine)
+                        print(aLine)
+                        chiralIdx +=1
+>>>>>>> MERGE-SOURCE
 
             if nChiBoth :
                 for aAtom in chiCenAtms3 :
                     aId = aAtom.GetProp("Name")  
+<<<<<<< TREE
+=======
+                    print("Chiral center %s is defined a sign 'both' "%aId)
+>>>>>>> MERGE-SOURCE
                     aCTName = "chir_" + str(chiralIdx)
                     aLine = "%s%s%s%s%s%s%s\n"\
                             %(tMonoName.ljust(12), aCTName.ljust(12),\
@@ -1596,12 +1770,19 @@ class AcedrgRDKit(object):
                               atomNBCIPMap[aId][0][0].GetProp("Name").ljust(12),\
                               atomNBCIPMap[aId][1][0].GetProp("Name").ljust(12),\
                               atomNBCIPMap[aId][2][0].GetProp("Name").ljust(12),\
+<<<<<<< TREE
                               aChiralSignMap[aId]["finalChiVolSign"])
+=======
+                              "both")
+>>>>>>> MERGE-SOURCE
                     aMmCif.write(aLine)
                     print(aLine)
                     chiralIdx +=1
             aMmCif.close()
+<<<<<<< TREE
         
+=======
+>>>>>>> MERGE-SOURCE
 
     def checkUncertainChirals(self, tNBAtoms):
         
@@ -1611,7 +1792,11 @@ class AcedrgRDKit(object):
         for aPair in tNBAtoms:
             if aPair[0].GetSymbol().find("O") !=-1 and len(aPair[0].GetBonds())==1:
                 tOneBondOs +=1 
+<<<<<<< TREE
             if not aPair[1] in tNBRanks:
+=======
+            if aPair[1] not in tNBRanks:
+>>>>>>> MERGE-SOURCE
                 tNBRanks[aPair[1]] = []
             tNBRanks[aPair[1]].append(1)
 
@@ -1636,10 +1821,15 @@ class AcedrgRDKit(object):
         for aAtom in allAtoms:
             aIdx  = aAtom.GetIdx()
             aId   = aAtom.GetProp("Name")
+            print(aId)
             reNameSet[aId] = []
             aSetBonds = aAtom.GetBonds()
             nNB = len(aAtom.GetNeighbors())
+<<<<<<< TREE
             #print("nNB %d"%nNB)
+=======
+            print("nNB %d"%nNB)
+>>>>>>> MERGE-SOURCE
             for bIdx in range(nNB):
                 atmIdx1 = aSetBonds[bIdx].GetBeginAtomIdx()
                 atmIdx2 = aSetBonds[bIdx].GetEndAtomIdx() 
@@ -1669,6 +1859,7 @@ class AcedrgRDKit(object):
                         print("Bug! atom is not in bonds obtained by aAtom.GetBonds()"%(aAtom.GetProp("Name")))
                         break
             #reNameSet[aId].sort(key=listCompDes) 
+<<<<<<< TREE
             reNameSet[aId]=sorted(reNameSet[aId], key=cmp_to_key(listCompDes))
             #if len(reNameSet[aId]) > 2:
             #    print("center atom ",aId)
@@ -1681,6 +1872,17 @@ class AcedrgRDKit(object):
                 print("Its NB CIP is arranged as follow ")
                 for aPair in reNameSet[aId]:
                     print ("Atom %s : CIP RANK %s "%(aPair[0].GetProp("Name"), aPair[1]))
+=======
+            sorted(reNameSet[aId], key=cmp_to_key(listCompDes))
+            #for aPair in reNameSet[aId]:
+            #    print(aPair[0].GetProp("Name"), " : ", aPair[1])
+        #for aId in reNameSet.keys():
+        #    if aId.find("H")==-1:
+        #        print "Atom ",aId
+        #        print "Its NB CIP is arranged as follow "
+        #        for aPair in reNameSet[aId]:
+        #            print "Atom %s : CIP RANK %s "%(aPair[0].GetProp("Name"), aPair[1])
+>>>>>>> MERGE-SOURCE
         return reNameSet 
 
     def setChiralsByMultiConformers(self, tChemCheck, tMol, tNBCIPMap):
@@ -1923,16 +2125,16 @@ class AcedrgRDKit(object):
     def setFormalChargeC_ASP(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]
-        print "Pka ", tPka
-        print "PH  ", tPH
+        #print "Pka ", tPka
+        #print "PH  ", tPH
         if tPH > tPka :
             for aSetIdxs in tAtomIdxs:
                 #print "a set of atoms: "
                 #print aSetIdxs
                 for aIdx in aSetIdxs:
-                    print "Atom : ", tMol.GetAtomWithIdx(aIdx).GetProp("Name")
-                    print "exH  : ", tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()
-                    print "imH  : ", tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs()
+                    #print "Atom : ", tMol.GetAtomWithIdx(aIdx).GetProp("Name")
+                    #print "exH  : ", tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()
+                    #print "imH  : ", tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs()
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol()=="O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
                             and (tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() ==1 
