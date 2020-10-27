@@ -1,0 +1,395 @@
+#loop_
+#_software
+#_version
+#_purpose
+#acedrg                           188              "dictionary generator"                  
+#acedrg_database                11                 "data source"                           
+#rdkit                         2017.03.2           "chemistry perception"
+#refmac5                       5.8.0158            "optimization tool"                     
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+UNL     UNL     .              non-polymer     63     35     .     
+#
+data_comp_UNL
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+UNL     O1      O       O       0       -2.738      4.753       -3.346      
+UNL     C1      C       CR6     0       -3.013      3.648       -2.874      
+UNL     N1      N       NR6     0       -3.992      2.865       -3.466      
+UNL     C2      C       CR16    0       -4.334      1.631       -2.986      
+UNL     N2      N       NRD6    0       -3.778      1.096       -1.953      
+UNL     C3      C       CR66    0       -2.768      1.786       -1.268      
+UNL     C4      C       CR66    0       -2.360      3.064       -1.699      
+UNL     C5      C       CR16    0       -1.338      3.731       -0.983      
+UNL     C6      C       CR16    0       -0.781      3.114       0.096       
+UNL     N3      N       NRD6    0       -1.157      1.893       0.517       
+UNL     C7      C       CR6     0       -2.137      1.205       -0.113      
+UNL     N4      N       NR5     0       -2.420      -0.088      0.434       
+UNL     C8      C       CR15    0       -2.018      -0.596      1.627       
+UNL     C9      C       CR5     0       -2.496      -1.895      1.712       
+UNL     C10     C       CR15    0       -3.167      -2.124      0.533       
+UNL     N5      N       NRD5    0       -3.123      -1.049      -0.250      
+UNL     C11     C       CH2     0       -2.263      -2.844      2.856       
+UNL     C12     C       CH2     0       -0.920      -3.579      2.788       
+UNL     N6      N       NT      0       0.182       -2.725      2.300       
+UNL     C13     C       CH2     0       1.248       -3.393      1.532       
+UNL     C14     C       CH2     0       2.077       -2.353      0.803       
+UNL     N7      N       NR6     0       2.553       -1.262      1.681       
+UNL     C15     C       CH2     0       1.584       -0.767      2.679       
+UNL     C16     C       CH2     0       0.797       -1.881      3.336       
+UNL     C17     C       C       0       3.778       -0.708      1.536       
+UNL     C18     C       CH2     0       3.891       0.803       1.452       
+UNL     C19     C       CH2     0       3.052       1.433       0.348       
+UNL     S1      S       S2      0       3.630       0.999       -1.315      
+UNL     C20     C       CH2     0       2.215       1.439       -2.362      
+UNL     C21     C       CH1     0       1.169       0.340       -2.515      
+UNL     C22     C       C       0       -0.063      0.747       -3.344      
+UNL     O2      O       OC      -1      -1.032      -0.038      -3.321      
+UNL     O3      O       O       0       -0.021      1.820       -3.990      
+UNL     N8      N       NT3     1       1.809       -0.849      -3.143      
+UNL     O4      O       O       0       4.789       -1.402      1.504       
+UNL     H1      H       H       0       -4.412      3.180       -4.180      
+UNL     H2      H       H       0       -5.010      1.148       -3.431      
+UNL     H3      H       H       0       -1.044      4.607       -1.260      
+UNL     H4      H       H       0       -0.083      3.568       0.585       
+UNL     H5      H       H       0       -1.499      -0.151      2.278       
+UNL     H6      H       H       0       -3.625      -2.947      0.275       
+UNL     H7      H       H       0       -2.987      -3.507      2.869       
+UNL     H8      H       H       0       -2.307      -2.341      3.698       
+UNL     H9      H       H       0       -1.023      -4.352      2.199       
+UNL     H10     H       H       0       -0.701      -3.912      3.681       
+UNL     H11     H       H       0       1.820       -3.914      2.131       
+UNL     H12     H       H       0       0.853       -4.005      0.878       
+UNL     H13     H       H       0       1.535       -1.964      0.088       
+UNL     H14     H       H       0       2.841       -2.799      0.384       
+UNL     H15     H       H       0       0.962       -0.153      2.241       
+UNL     H16     H       H       0       2.056       -0.266      3.375       
+UNL     H17     H       H       0       1.388       -2.418      3.901       
+UNL     H18     H       H       0       0.099       -1.496      3.904       
+UNL     H19     H       H       0       4.831       1.041       1.303       
+UNL     H20     H       H       0       3.626       1.192       2.311       
+UNL     H21     H       H       0       3.074       2.408       0.440       
+UNL     H22     H       H       0       2.118       1.149       0.439       
+UNL     H23     H       H       0       2.547       1.674       -3.243      
+UNL     H24     H       H       0       1.784       2.225       -1.989      
+UNL     H25     H       H       0       0.859       0.072       -1.620      
+UNL     H26     H       H       0       1.212       -1.538      -3.181      
+UNL     H27     H       H       0       2.529       -1.109      -2.648      
+UNL     H28     H       H       0       2.085       -0.643      -3.986      
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.aromatic
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+UNL          O1          C1      DOUBLE       n     1.232   0.010
+UNL          C1          N1      SINGLE       y     1.376   0.013
+UNL          N1          C2      SINGLE       y     1.348   0.017
+UNL          C2          N2      DOUBLE       y     1.282   0.010
+UNL          N2          C3      SINGLE       y     1.392   0.010
+UNL          C3          C4      DOUBLE       y     1.389   0.013
+UNL          C4          C5      SINGLE       y     1.410   0.010
+UNL          C5          C6      DOUBLE       y     1.358   0.010
+UNL          C6          N3      SINGLE       y     1.335   0.012
+UNL          N3          C7      DOUBLE       y     1.332   0.013
+UNL          C7          N4      SINGLE       n     1.414   0.012
+UNL          N4          C8      SINGLE       y     1.355   0.014
+UNL          C8          C9      DOUBLE       y     1.398   0.020
+UNL          C9         C10      SINGLE       y     1.382   0.020
+UNL         C10          N5      DOUBLE       y     1.325   0.014
+UNL          C9         C11      SINGLE       n     1.501   0.010
+UNL         C11         C12      SINGLE       n     1.526   0.010
+UNL         C12          N6      SINGLE       n     1.468   0.012
+UNL          N6         C13      SINGLE       n     1.469   0.014
+UNL         C13         C14      SINGLE       n     1.512   0.010
+UNL         C14          N7      SINGLE       n     1.462   0.011
+UNL          N7         C15      SINGLE       n     1.462   0.011
+UNL         C15         C16      SINGLE       n     1.512   0.010
+UNL          N7         C17      SINGLE       n     1.346   0.010
+UNL         C17         C18      SINGLE       n     1.503   0.020
+UNL         C18         C19      SINGLE       n     1.521   0.012
+UNL         C19          S1      SINGLE       n     1.813   0.010
+UNL          S1         C20      SINGLE       n     1.814   0.010
+UNL         C20         C21      SINGLE       n     1.516   0.017
+UNL         C21         C22      SINGLE       n     1.533   0.011
+UNL         C22          O2      SINGLE       n     1.247   0.019
+UNL         C22          O3      DOUBLE       n     1.247   0.019
+UNL         C21          N8      SINGLE       n     1.488   0.011
+UNL         C17          O4      DOUBLE       n     1.226   0.011
+UNL          C1          C4      SINGLE       y     1.460   0.010
+UNL          C3          C7      SINGLE       y     1.414   0.012
+UNL          N4          N5      SINGLE       y     1.366   0.012
+UNL          N6         C16      SINGLE       n     1.469   0.014
+UNL          N1          H1      SINGLE       n     0.886   0.020
+UNL          C2          H2      SINGLE       n     0.942   0.020
+UNL          C5          H3      SINGLE       n     0.965   0.020
+UNL          C6          H4      SINGLE       n     0.965   0.020
+UNL          C8          H5      SINGLE       n     0.943   0.020
+UNL         C10          H6      SINGLE       n     0.976   0.020
+UNL         C11          H7      SINGLE       n     0.982   0.015
+UNL         C11          H8      SINGLE       n     0.982   0.015
+UNL         C12          H9      SINGLE       n     0.977   0.011
+UNL         C12         H10      SINGLE       n     0.977   0.011
+UNL         C13         H11      SINGLE       n     0.978   0.011
+UNL         C13         H12      SINGLE       n     0.978   0.011
+UNL         C14         H13      SINGLE       n     0.978   0.016
+UNL         C14         H14      SINGLE       n     0.978   0.016
+UNL         C15         H15      SINGLE       n     0.978   0.016
+UNL         C15         H16      SINGLE       n     0.978   0.016
+UNL         C16         H17      SINGLE       n     0.978   0.011
+UNL         C16         H18      SINGLE       n     0.978   0.011
+UNL         C18         H19      SINGLE       n     0.980   0.017
+UNL         C18         H20      SINGLE       n     0.980   0.017
+UNL         C19         H21      SINGLE       n     0.980   0.019
+UNL         C19         H22      SINGLE       n     0.980   0.019
+UNL         C20         H23      SINGLE       n     0.970   0.010
+UNL         C20         H24      SINGLE       n     0.970   0.010
+UNL         C21         H25      SINGLE       n     0.985   0.020
+UNL          N8         H26      SINGLE       n     0.911   0.020
+UNL          N8         H27      SINGLE       n     0.911   0.020
+UNL          N8         H28      SINGLE       n     0.911   0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+UNL          O1          C1          N1     119.989    1.50
+UNL          O1          C1          C4     124.006    1.50
+UNL          N1          C1          C4     116.005    1.50
+UNL          C1          N1          C2     122.350    1.50
+UNL          C1          N1          H1     118.523    1.50
+UNL          C2          N1          H1     119.127    1.50
+UNL          N1          C2          N2     122.273    2.18
+UNL          N1          C2          H2     119.069    2.13
+UNL          N2          C2          H2     118.658    1.50
+UNL          C2          N2          C3     118.389    1.50
+UNL          N2          C3          C4     121.857    1.50
+UNL          N2          C3          C7     118.564    1.50
+UNL          C4          C3          C7     119.579    1.50
+UNL          C3          C4          C5     118.748    1.50
+UNL          C3          C4          C1     119.126    1.50
+UNL          C5          C4          C1     122.126    1.50
+UNL          C4          C5          C6     119.508    1.50
+UNL          C4          C5          H3     119.750    1.50
+UNL          C6          C5          H3     120.742    1.50
+UNL          C5          C6          N3     122.816    1.50
+UNL          C5          C6          H4     119.058    1.51
+UNL          N3          C6          H4     118.126    1.50
+UNL          C6          N3          C7     118.581    1.50
+UNL          N3          C7          N4     117.105    1.50
+UNL          N3          C7          C3     120.767    1.87
+UNL          N4          C7          C3     122.127    1.68
+UNL          C7          N4          C8     128.673    1.50
+UNL          C7          N4          N5     120.475    1.62
+UNL          C8          N4          N5     110.852    1.50
+UNL          N4          C8          C9     108.078    1.50
+UNL          N4          C8          H5     125.445    2.94
+UNL          C9          C8          H5     126.477    1.50
+UNL          C8          C9         C10     106.445    1.50
+UNL          C8          C9         C11     125.935    2.31
+UNL         C10          C9         C11     127.621    1.92
+UNL          C9         C10          N5     109.939    1.50
+UNL          C9         C10          H6     127.134    3.00
+UNL          N5         C10          H6     122.927    1.50
+UNL         C10          N5          N4     104.687    1.50
+UNL          C9         C11         C12     113.880    2.07
+UNL          C9         C11          H7     108.985    1.50
+UNL          C9         C11          H8     108.985    1.50
+UNL         C12         C11          H7     109.065    1.50
+UNL         C12         C11          H8     109.065    1.50
+UNL          H7         C11          H8     107.724    1.50
+UNL         C11         C12          N6     113.409    2.39
+UNL         C11         C12          H9     108.546    1.50
+UNL         C11         C12         H10     108.546    1.50
+UNL          N6         C12          H9     108.913    1.50
+UNL          N6         C12         H10     108.913    1.50
+UNL          H9         C12         H10     107.868    1.50
+UNL         C12          N6         C13     111.219    1.66
+UNL         C12          N6         C16     111.219    1.66
+UNL         C13          N6         C16     108.582    1.50
+UNL          N6         C13         C14     110.891    1.50
+UNL          N6         C13         H11     109.491    1.50
+UNL          N6         C13         H12     109.491    1.50
+UNL         C14         C13         H11     109.532    1.50
+UNL         C14         C13         H12     109.532    1.50
+UNL         H11         C13         H12     108.187    1.50
+UNL         C13         C14          N7     110.526    1.50
+UNL         C13         C14         H13     109.532    1.50
+UNL         C13         C14         H14     109.532    1.50
+UNL          N7         C14         H13     109.471    1.50
+UNL          N7         C14         H14     109.471    1.50
+UNL         H13         C14         H14     108.187    1.50
+UNL         C14          N7         C15     112.790    1.50
+UNL         C14          N7         C17     123.605    3.00
+UNL         C15          N7         C17     123.605    3.00
+UNL          N7         C15         C16     110.526    1.50
+UNL          N7         C15         H15     109.471    1.50
+UNL          N7         C15         H16     109.471    1.50
+UNL         C16         C15         H15     109.532    1.50
+UNL         C16         C15         H16     109.532    1.50
+UNL         H15         C15         H16     108.187    1.50
+UNL         C15         C16          N6     110.891    1.50
+UNL         C15         C16         H17     109.532    1.50
+UNL         C15         C16         H18     109.532    1.50
+UNL          N6         C16         H17     109.491    1.50
+UNL          N6         C16         H18     109.491    1.50
+UNL         H17         C16         H18     108.187    1.50
+UNL          N7         C17         C18     118.257    1.50
+UNL          N7         C17          O4     121.078    1.50
+UNL         C18         C17          O4     120.666    1.81
+UNL         C17         C18         C19     113.415    2.42
+UNL         C17         C18         H19     109.148    1.50
+UNL         C17         C18         H20     109.148    1.50
+UNL         C19         C18         H19     109.066    1.50
+UNL         C19         C18         H20     109.066    1.50
+UNL         H19         C18         H20     107.739    1.50
+UNL         C18         C19          S1     113.522    2.26
+UNL         C18         C19         H21     109.701    1.50
+UNL         C18         C19         H22     109.701    1.50
+UNL          S1         C19         H21     108.801    1.50
+UNL          S1         C19         H22     108.801    1.50
+UNL         H21         C19         H22     107.939    1.50
+UNL         C19          S1         C20     102.177    1.97
+UNL          S1         C20         C21     114.974    1.55
+UNL          S1         C20         H23     108.759    1.50
+UNL          S1         C20         H24     108.759    1.50
+UNL         C21         C20         H23     108.537    1.50
+UNL         C21         C20         H24     108.537    1.50
+UNL         H23         C20         H24     107.812    1.50
+UNL         C20         C21         C22     110.419    2.31
+UNL         C20         C21          N8     109.354    1.50
+UNL         C20         C21         H25     109.209    1.50
+UNL         C22         C21          N8     109.494    1.50
+UNL         C22         C21         H25     108.606    1.50
+UNL          N8         C21         H25     107.983    1.50
+UNL         C21         C22          O2     117.134    1.50
+UNL         C21         C22          O3     117.134    1.50
+UNL          O2         C22          O3     125.732    1.50
+UNL         C21          N8         H26     109.671    1.50
+UNL         C21          N8         H27     109.671    1.50
+UNL         C21          N8         H28     109.671    1.50
+UNL         H26          N8         H27     109.028    2.41
+UNL         H26          N8         H28     109.028    2.41
+UNL         H27          N8         H28     109.028    2.41
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+UNL             sp2_sp2_3          N3          C7          N4          C8       0.000   10.00     2
+UNL       const_sp2_sp2_2          C9          C8          N4          C7     180.000   10.00     2
+UNL              const_52          C7          N4          N5         C10     180.000   10.00     2
+UNL       const_sp2_sp2_6          N4          C8          C9         C11     180.000   10.00     2
+UNL              const_10          N5         C10          C9         C11     180.000   10.00     2
+UNL            sp2_sp3_14          C8          C9         C11         C12     -90.000   10.00     6
+UNL              const_13          C9         C10          N5          N4       0.000   10.00     2
+UNL            sp3_sp3_25          C9         C11         C12          N6     180.000   10.00     3
+UNL            sp3_sp3_35         C11         C12          N6         C13     -60.000   10.00     3
+UNL             sp3_sp3_2         C14         C13          N6         C12     180.000   10.00     3
+UNL            sp3_sp3_74         C15         C16          N6         C12     -60.000   10.00     3
+UNL             sp3_sp3_7          N6         C13         C14          N7     -60.000   10.00     3
+UNL              const_17          O1          C1          N1          C2     180.000   10.00     2
+UNL              const_45          O1          C1          C4          C3     180.000   10.00     2
+UNL             sp2_sp3_4         C17          N7         C14         C13     180.000   10.00     6
+UNL            sp2_sp3_10         C17          N7         C15         C16     180.000   10.00     6
+UNL             sp2_sp2_5         C18         C17          N7         C14     180.000   10.00     2
+UNL            sp3_sp3_16          N7         C15         C16          N6      60.000   10.00     3
+UNL            sp2_sp3_23          O4         C17         C18         C19     -60.000   10.00     6
+UNL            sp3_sp3_40         C17         C18         C19          S1     180.000   10.00     3
+UNL            sp3_sp3_49         C18         C19          S1         C20     180.000   10.00     3
+UNL            sp3_sp3_52         C21         C20          S1         C19     180.000   10.00     3
+UNL            sp3_sp3_55          S1         C20         C21         C22     180.000   10.00     3
+UNL            sp2_sp3_25          O2         C22         C21         C20       0.000   10.00     6
+UNL            sp3_sp3_64         C20         C21          N8         H26     180.000   10.00     3
+UNL              const_19          N2          C2          N1          C1       0.000   10.00     2
+UNL              const_23          N1          C2          N2          C3       0.000   10.00     2
+UNL              const_25          C4          C3          N2          C2       0.000   10.00     2
+UNL              const_49          N2          C3          C7          N3     180.000   10.00     2
+UNL              const_28          N2          C3          C4          C5     180.000   10.00     2
+UNL              const_31          C3          C4          C5          C6       0.000   10.00     2
+UNL              const_35          C4          C5          C6          N3       0.000   10.00     2
+UNL              const_39          C5          C6          N3          C7       0.000   10.00     2
+UNL              const_42          N4          C7          N3          C6     180.000   10.00     2
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+UNL    chir_1    N6    C13    C16    C12    both
+UNL    chir_2    C21    N8    C20    C22    negative
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+UNL    plan-1          C1   0.020
+UNL    plan-1          C3   0.020
+UNL    plan-1          C4   0.020
+UNL    plan-1          C5   0.020
+UNL    plan-1          C6   0.020
+UNL    plan-1          C7   0.020
+UNL    plan-1          H3   0.020
+UNL    plan-1          H4   0.020
+UNL    plan-1          N2   0.020
+UNL    plan-1          N3   0.020
+UNL    plan-1          N4   0.020
+UNL    plan-2         C10   0.020
+UNL    plan-2         C11   0.020
+UNL    plan-2          C7   0.020
+UNL    plan-2          C8   0.020
+UNL    plan-2          C9   0.020
+UNL    plan-2          H5   0.020
+UNL    plan-2          H6   0.020
+UNL    plan-2          N4   0.020
+UNL    plan-2          N5   0.020
+UNL    plan-3          C1   0.020
+UNL    plan-3          C2   0.020
+UNL    plan-3          C3   0.020
+UNL    plan-3          C4   0.020
+UNL    plan-3          C5   0.020
+UNL    plan-3          C7   0.020
+UNL    plan-3          H1   0.020
+UNL    plan-3          H2   0.020
+UNL    plan-3          N1   0.020
+UNL    plan-3          N2   0.020
+UNL    plan-3          O1   0.020
+UNL    plan-4         C14   0.020
+UNL    plan-4         C15   0.020
+UNL    plan-4         C17   0.020
+UNL    plan-4          N7   0.020
+UNL    plan-5         C17   0.020
+UNL    plan-5         C18   0.020
+UNL    plan-5          N7   0.020
+UNL    plan-5          O4   0.020
+UNL    plan-6         C21   0.020
+UNL    plan-6         C22   0.020
+UNL    plan-6          O2   0.020
+UNL    plan-6          O3   0.020

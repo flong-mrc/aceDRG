@@ -1,0 +1,25 @@
+Atom_id
+Atom_acedrg_type
+        O3    O(NOO)
+         N    N(O)3
+        O1    O(NOO)
+        O2    O(NOO)
+Bond_approx_level
+Bond_atom1_id
+Bond_atom2_id
+Bond_value 
+Bond_sigma_value
+Bond_COD_observation_num
+     1      O1       N         1.22618 0.0161884   22560
+     1      O2       N         1.22618 0.0161884   22560
+     1       N      O3         1.22618 0.0161884   22560
+Angle_approx_level
+Angle_center_atom_id
+Angle_atom1_id
+Angle_atom2_id
+Angle_value 
+Angle_sigma_value
+Angle_COD_observation_num
+     0       N      O1      O2             120            1.59            4241
+     0       N      O1      O3         119.996            1.59            4241
+     0       N      O2      O3         119.996            1.59            4241

@@ -1,0 +1,7 @@
+HEADER     MONOMER tests                NH4 Date:    NH4                 
+CRYST1  100.000  100.000  100.000  90.00  90.00  90.00 P 1                      
+HETATM    1 N    NH4 A   1      -0.581   0.302  -0.782  1.00 20.00           N  
+HETATM    2 HN1  NH4 A   1      -0.581   0.302   0.262  1.00 20.00           H  
+HETATM    3 HN2  NH4 A   1      -0.581   1.287  -1.130  1.00 20.00           H  
+HETATM    4 HN3  NH4 A   1       0.272  -0.190  -1.130  1.00 20.00           H  
+HETATM    5 HN4  NH4 A   1      -1.434  -0.190  -1.130  1.00 20.00           H  
