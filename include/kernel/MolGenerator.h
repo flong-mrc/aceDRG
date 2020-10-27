@@ -168,6 +168,8 @@ namespace LIBMOL
         
         void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
         
+        void checkAtomLinksByAngles(std::vector<CrystInfo>::iterator tCryst);
+        
         void getUniqueBondsMols(Molecule    & tMol, 
                                 std::vector<CrystInfo>::iterator tCryst);
         
@@ -313,18 +315,31 @@ namespace LIBMOL
                            PeriodicTable & tPTab,
                            std::vector<CrystInfo>::iterator tCryst,
                            FileName tOutName);
+        void buildSelectedAtomsSph(double                  & tRadFac,
+                           PeriodicTable                   & tPTab,
+                           std::vector<CrystInfo>::iterator  tCryst,
+                           std::vector<std::string>        & tElems, 
+                           FileName tOutName);
                            
         void outMetalAtomCoordInfo(FileName tOutName);
         void outMetalClusterInfo(FileName tOutName);
         void outMetalTables(FileName tOutName);
+        
+        void getUserParasList(FileName tInName,
+                              std::map<std::string, 
+                              std::vector<std::string> > & tUserLists);
+        
         void getUserParas(FileName tInName, 
                           std::map<std::string, double> & tUserParas);
+        
         
         void execute(FileName tOutName);
         void execute1(FileName tOutName);
         void executeNeuD(FileName tOutName);
         void executeMet(FileName tOutName);
         void executeMetRange(FileName tInParaName, FileName tOutName);
+        void executeSelectedAtomRange(FileName tInParaName,
+                                      FileName tOutName);
         
         
         std::string                     aLibmolTabDir;

@@ -35,6 +35,11 @@ namespace LIBMOL
                                REAL> > >  & tAllowedRangeDists,
                                double tDelta);
         
+       void construAtomIdealDists(std::map<std::string, std::map<
+                                  std::string, std::map<std::string,
+                                  REAL> > >  & tAllowedRangeDists,
+                                  double tDelta); 
+        
         std::map<ID,  std::map<ID, int> >                  elements;
         std::map<ID,  std::map<ID, REAL> >                 elemProps;
         std::map<int, std::string>                         matTypes;
@@ -43,6 +48,8 @@ namespace LIBMOL
         std::map<ID, std::vector<int> >                    extraValences;
               
     };
+    
+    
     
 }
 

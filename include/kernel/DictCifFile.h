@@ -645,7 +645,10 @@ namespace LIBMOL
                          const   double         tUBS,
                          const   double         tLBS,
                          const   double         tUAS,
-                         const   double         tLAS);
+                         const   double         tLAS,
+                         std::map<int, std::map<std::string,
+                         std::map<std::string, double > > > 
+                         &  tHDistMap);
     
     extern void outMMCif2(FileName tFName, 
                          ID tMonoRootName,
@@ -677,6 +680,9 @@ namespace LIBMOL
     
     extern void outMetalAtomInfo(FileName tFName,
                                  GenCifFile  & tCifObj);
+    
+    extern void outSelectedAtomInfo(FileName tFName,
+                                    std::vector<std::string> & tIds);
 }
 
 

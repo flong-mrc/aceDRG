@@ -477,15 +477,24 @@ namespace LIBMOL
         std::vector<std::string> nameComps;
         StrTokenize(aFName, nameComps, '.');
         Name rootFName;
+       
         
-        for (unsigned jF=0; jF < nameComps.size()-1; jF++)
-        {
-            rootFName.append(nameComps[jF]);
-        }
-        if (rootFName.size() ==0)
+        if (nameComps.size()==0) 
         {
             rootFName.append("Current");
         }
+        if (nameComps.size()==1)
+        {
+            rootFName.append(nameComps[0]);
+        }
+        else if (nameComps.size() > 1)
+        {
+            for (unsigned jF=0; jF < nameComps.size()-1; jF++)
+            {
+                rootFName.append(nameComps[jF]);
+            }
+        }
+        
         
         Name msgFName(rootFName);
         msgFName.append("_msg.txt");

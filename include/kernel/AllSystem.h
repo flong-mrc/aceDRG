@@ -207,19 +207,23 @@ namespace LIBMOL
         bool isOrgSys();
         int  atomPosition(ID tID);
         void setSysProps();
-        void setHydroAtomConnect();
-        void addMissHydroAtoms();
         int  getNumSpecAtomConnect(int i, ID tChemType);
         int  getNumSpecAtomConnect(std::vector<AtomDict>::iterator iA,
                                    ID tChemType);
         int  getNumOxyConnect(std::vector<AtomDict>::iterator iA);
         REAL getTotalOrderOneAtom(std::vector<AtomDict>::iterator iA);
+        
         // void setAtomsBondingAndChiralCenter();
         void setAtomsCChemType();
         void setAtomsCCP4Type();
         const bool containMetal();
         void setAtomsMetalType();
         void setAtomsPartialCharges();
+        
+        //Hydrogen distances related
+        void setHDists();
+        void setHydroAtomConnect();
+        void addMissHydroAtoms();
         
         
         // Angles related 
@@ -298,6 +302,8 @@ namespace LIBMOL
         // metal-related 
         void setDefaultCoordGeos();
         
+        
+        
         // COD applications 
         void setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName, ID tLibmolTabDir);
         void setupAllTargetValuesFromCOD2(ID tOutName, ID tMonoName, ID tLibmolTabDir);
@@ -352,6 +358,8 @@ namespace LIBMOL
         
         std::vector<AtomDict>                    allDummyAtoms;
         
+        std::map<int, std::map<std::string,
+        std::map<std::string, double > > >       HydrDistTable;
         
         
     private:
@@ -383,6 +391,9 @@ namespace LIBMOL
     
     void extern outCodAndCcp4AtomTypes(FileName                 tFName,
                                        std::vector<AtomDict>  & tAtoms);
+    
+    void extern outProElecDistances(FileName                    tFName,
+                                    AllSystem                &  tMonomer);
        
 
 }

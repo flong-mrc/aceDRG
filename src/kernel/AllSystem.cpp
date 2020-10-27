@@ -496,6 +496,7 @@ namespace LIBMOL
         setAtomsMetalType();
         
         // setAtomsPartialCharges();
+        setHDists();
         
         setAllAngles();
            
@@ -973,6 +974,106 @@ namespace LIBMOL
         }
     }
     
+    void AllSystem::setHDists()
+    {
+        std::string phdFName = libmolTabDir + "/prot_hydr_dists.table";
+        std::ifstream phdF(phdFName.c_str());
+        if(phdF.is_open())
+        {
+            std::string tRecord="";
+            
+            while(!phdF.eof())
+            {
+                std::getline(phdF, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                std::vector<std::string> tBuf;
+                StrTokenize(tRecord, tBuf);
+                
+                if ((int)tBuf.size() ==13)
+                {
+                    
+                    std::string elem2            = TrimSpaces(tBuf[1]);
+                    std::string atmTypeH         = TrimSpaces(tBuf[2]);
+                    double      pDistNeu         = StrToReal(tBuf[3]);
+                    double      sigaPDistNeu     = StrToReal(tBuf[4]);
+                    double      pDistQM          = StrToReal(tBuf[5]);
+                    double      sigaPDistQM      = StrToReal(tBuf[6]);
+                    double      eDistQM          = StrToReal(tBuf[7]);
+                    double      sigaEDistQM      = StrToReal(tBuf[8]);
+                    double      pDistQM_elm      = StrToReal(tBuf[9]);
+                    double      sigaPDistQM_elm  = StrToReal(tBuf[10]);
+                    double      eDistQM_elm      = StrToReal(tBuf[11]);
+                    double      sigaEDistQM_elm  = StrToReal(tBuf[12]);
+                    
+                    HydrDistTable[1][elem2]["pDist"]        = pDistQM_elm;
+                    HydrDistTable[1][elem2]["pDistSiga"]    = sigaPDistQM_elm;
+                    HydrDistTable[1][elem2]["eDist"]        = eDistQM_elm;
+                    HydrDistTable[1][elem2]["eDistSiga"]    = sigaEDistQM_elm;
+                    
+                    HydrDistTable[2][atmTypeH]["pDistNeu"]     = pDistNeu;
+                    HydrDistTable[2][atmTypeH]["pDistSigaNeu"] = sigaPDistNeu;
+                   
+                    HydrDistTable[2][atmTypeH]["pDistQM"]      = pDistQM;
+                    HydrDistTable[2][atmTypeH]["pDistSigaQM"]  = sigaPDistQM;
+                    HydrDistTable[2][atmTypeH]["eDistQM"]      = eDistQM;
+                    HydrDistTable[2][atmTypeH]["eDistSigaQM"]  = sigaEDistQM;
+                    
+                }
+            }
+            
+            phdF.close();
+            std::cout << "H distance table done " << std::endl;
+            // Check 
+            std::cout << "The following are H-X distances by elements " 
+                     << std::endl;
+            for (std::map<std::string, std::map<std::string, double> >::iterator
+                 iE = HydrDistTable[1].begin(); 
+                 iE != HydrDistTable[1].end(); iE++)
+            {
+                std::cout << "Distance Proton and " << iE->first << " is : "
+                          <<  HydrDistTable[1][iE->first]["pDist"]
+                          << " by QM with siga " 
+                          << HydrDistTable[1][iE->first]["pDistSiga"] 
+                          << std::endl;
+                std::cout << "Distance electron and " << iE->first << " is : "
+                          <<  HydrDistTable[1][iE->first]["eDist"]
+                          << " by QM with siga " 
+                          << HydrDistTable[1][iE->first]["eDistSiga"]
+                          << std::endl;
+            }
+            
+            std::cout << "The following are H-X distances by atom types " 
+                     << std::endl;
+            
+            for (std::map<std::string, std::map<std::string, double> >::iterator
+                 iE = HydrDistTable[2].begin(); 
+                 iE != HydrDistTable[2].end(); iE++)
+            {
+                std::cout << "Distance Proton and " << iE->first << " is : "
+                          <<  HydrDistTable[2][iE->first]["pDistQM"]
+                          << " by QM with siga " 
+                          << HydrDistTable[2][iE->first]["pDistSigaQM"] 
+                          << std::endl;
+                std::cout << "Distance electron and " << iE->first << " is : "
+                          <<  HydrDistTable[2][iE->first]["eDistQM"]
+                          << " by QM with siga " 
+                          << HydrDistTable[2][iE->first]["eDistSigaQM"]
+                          << std::endl;
+                std::cout << "Distance Proton and " << iE->first << " is : "
+                          <<  HydrDistTable[2][iE->first]["pDistNeu"]
+                          << " by netron data with siga " 
+                          << HydrDistTable[2][iE->first]["pDistSigaNeu"] 
+                          << std::endl;
+            }
+        }
+        else
+        {
+            std::cout << "Bug: Can not find " << phdFName 
+                      << " to read !" << std::endl;
+        }  
+    }
+    
+ 
     // setAllAngles() may not needed in the future
     void AllSystem::setAllAngles()
     {
@@ -4545,5 +4646,88 @@ namespace LIBMOL
             ouAtmTypes.close();
         }
     }
+    
+    void extern outProElecDistances(FileName         tOutFName, 
+                                    AllSystem      & tMonomer  )
+    {
+        std::ofstream outBTab(tOutFName);
+        if (outBTab.is_open())
+        {
+            if (tMonomer.allBonds.size() >0)
+            {   
+                // Bond sections 
+                //outBTab   << "_chem_comp_bond.atom_id_1" << std::endl
+                //          << "_chem_comp_bond.atom_id_2" << std::endl
+                //          << "_chem_comp_bond.value_dist_prot" << std::endl
+                //          << "_chem_comp_bond.value_dist_prot_esd" 
+                //          << std::endl;
+               
+                
+                for (std::vector<BondDict>::iterator iB=tMonomer.allBonds.begin();
+                          iB !=tMonomer.allBonds.end(); iB++)
+                {
+                    
+                    // Add Proton-X distances if they exist
+                    int idxH = -1, idxX=-1;
+                    
+                    if (tMonomer.allAtoms[iB->atomsIdx[0]].chemType.compare("H")==0)
+                    {
+                        idxH = iB->atomsIdx[0];
+                        idxX = iB->atomsIdx[1];
+                    }
+                    else if (tMonomer.allAtoms[iB->atomsIdx[1]].chemType.compare("H")==0)
+                    {
+                        idxH = iB->atomsIdx[1];
+                        idxX = iB->atomsIdx[0];
+                    }
+                    
+                    double aProtD      = 0.0;
+                    double aProtD_siga = 0.0;
+                            
+                               
+                    if (idxH > -1)
+                    {
+                        
+                        if (tMonomer.HydrDistTable[2].find(tMonomer.allAtoms[idxH].formType[1])
+                             !=tMonomer.HydrDistTable[2].end())
+                        {
+                            aProtD = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["pDistNeu"];
+                            aProtD_siga 
+                            = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["pDistSigaNeu"];
+                        }
+                        else if (tMonomer.HydrDistTable[1].find(tMonomer.allAtoms[idxX].chemType)
+                             !=tMonomer.HydrDistTable[1].end())
+                        {
+                            aProtD = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["pDist"];
+                            aProtD_siga 
+                            = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["pDistSiga"];
+                        }
+                        else
+                        {
+                            aProtD = iB->value;
+                            aProtD_siga = iB->sigValue;
+                        }
+                        
+                        outBTab << std::setw(12)  
+                            << tMonomer.allAtoms[iB->atomsIdx[0]].id  
+                            << std::setw(12)  
+                            << tMonomer.allAtoms[iB->atomsIdx[1]].id  
+                            << std::setw(12) 
+                            << aProtD
+                            << std::setw(8) << std::setprecision(4)
+                            << aProtD_siga << std::endl;
+                          
+                    }
+                    
+                    
+                    
+                    
+                    
 
+                    
+                    
+                }
+            }
+        }
+    }
 }

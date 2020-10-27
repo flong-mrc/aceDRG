@@ -1,4 +1,3 @@
-#!/usr/bin/env  ccp4-python
 # Python script
 #
 #
@@ -11,6 +10,8 @@
 ## The date of last modification: 21/07/2016
 #
 
+from __future__ import print_function
+from builtins import object
 import os,os.path,sys
 import platform
 import glob,shutil
@@ -27,7 +28,7 @@ import signal
 
 #################################################   
 
-class CExeCode :
+class CExeCode(object) :
     """ A generic abstract base class that is to be inheritted by other classes that warp 
         a executable code. Basically this class defines two main methods that characterize the
         procedures a job by an executable code, i.e.  forming a command line object and then
@@ -61,21 +62,20 @@ class CExeCode :
         """ execute self._cmdline and output to a log file (self._log_name)  
         in a nonblocking way"""
 
-        logfile = open(self._log_name, 'w')
+        logfile = open(self._log_name, 'w+')
         logfile.write("\n============ PROCESS INFORMATION =============\n")
 
         # spawn a sub-process for a job and connect to its input/output(and error)
         # streams using pipes
-
         try : 
             import subprocess
-            subProcess = subprocess.Popen(self._cmdline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+            subProcess = subprocess.Popen(self._cmdline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True, universal_newlines=True)
             subProcess.stdin.close()
             outfile_sub  = subProcess.stdout
             outfd_sub    = outfile_sub.fileno()
         except ImportError:
-            print "module 'subprocess' has not be found, you use a version of PYTHON below 2.4"
-            print "Import module 'popen2' instead, the calculations will not be affected"
+            print("module 'subprocess' has not be found, you use a version of PYTHON below 2.4")
+            print("Import module 'popen2' instead, the calculations will not be affected")
             import popen2
             subProcess = popen2.Popen4(self._cmdline)
             subProcess.tochild.close()
@@ -106,14 +106,15 @@ class CExeCode :
                         logfile.close()
                         os.kill(self._pid, signal.SIGKILL)
                         os.kill(pid_c, signal.SIGKILL)
-                        print "The process running %s is killed " %p_name
+                        print("The process running %s is killed " %p_name)
                         time.sleep(1.0)
                         # be safe stop all process
                         sys.exit(1)
                     else :
                         if out_quantum == '':
                             outfile_eof = 1
-                        logfile.write(out_quantum)
+                        s_out_quantum = str(out_quantum)
+                        logfile.write(s_out_quantum)
                         logfile.flush()
         else :
             self._nonBlockingFile(outfd_sub)
@@ -124,7 +125,9 @@ class CExeCode :
                     out_quantum = outfile_sub.read()
                     if out_quantum == '':
                         outfile_eof = 1
-                    logfile.write(out_quantum)
+                    s_out_quantum = str(out_quantum)
+                    logfile.write(s_out_quantum)
+                    #logfile.write(out_quantum)
                     logfile.flush()
                     # allProcInfo.append(out_quantum)
 
@@ -140,9 +143,9 @@ class CExeCode :
         outfile_sub.close()
 
         if self.exitCode:
-            print "#-----------------------------------------------------------------#"
-            print "The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name
-            print "#-----------------------------------------------------------------#"
+            print("#-----------------------------------------------------------------#")
+            print("The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name)
+            print("#-----------------------------------------------------------------#")
             if not err_str:
                 # if normal runtime errors, stop the program(using log. no err_str)  
                 sys.exit(1)
@@ -166,9 +169,9 @@ class CExeCode :
             #outfile_sub  = subProcess.stdout
             #outfd_sub    = outfile_sub.fileno()
         except ImportError:
-            print "module 'subprocess' has not be found, you use a version of PYTHON below 2.4"
-            print "Import module 'popen2' instead, the calculations will not be affected"
-            print "This should not be happening. Exiting Now."
+            print("module 'subprocess' has not be found, you use a version of PYTHON below 2.4")
+            print("Import module 'popen2' instead, the calculations will not be affected")
+            print("This should not be happening. Exiting Now.")
             sys.exit()
             #import popen2
             #subProcess = popen2.Popen4(self._cmdline)
@@ -189,9 +192,9 @@ class CExeCode :
         #outfile_sub.close()
 
         if self.exitCode:
-            print "#-----------------------------------------------------------------#"
-            print "The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name
-            print "#-----------------------------------------------------------------#"
+            print("#-----------------------------------------------------------------#")
+            print("The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name)
+            print("#-----------------------------------------------------------------#")
             if not err_str:
                 # if normal runtime errors, stop the program(using log. no err_str)
                 sys.exit(1)

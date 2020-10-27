@@ -911,9 +911,9 @@ namespace LIBMOL
     bool GenCifFile::checkOverAll(int tWorkMode)
     {
         bool aRet= true;
-        std::cout << "not neutron diffr " << notNeuD << std::endl;
-        std::cout << "not powder diffr " << notPowder << std::endl;
-        std::cout << "RFactorOK " << RFactorOK << std::endl;
+        //std::cout << "not neutron diffr " << notNeuD << std::endl;
+        //std::cout << "not powder diffr " << notPowder << std::endl;
+        //std::cout << "RFactorOK " << RFactorOK << std::endl;
         
         if (tWorkMode==3111)
         {
@@ -928,6 +928,7 @@ namespace LIBMOL
              || tWorkMode==311
              || tWorkMode ==312
              || tWorkMode ==313 
+             || tWorkMode ==314
              || tWorkMode==32 
              || tWorkMode==33)
         {
@@ -1077,13 +1078,16 @@ namespace LIBMOL
             }
         }
         
-        if (nColid/nAll >0.2)
+        //if (nColid/nAll >0.2)
+        if (nColid > 0)
         {
-            std::cout << "nAll " << nAll << std::endl;
-            std::cout << "nColid " << nColid << std::endl;
-            std::cout << "ratio " << nColid/nAll << std::endl;
+            //std::cout << "nAll " << nAll << std::endl;
+            //std::cout << "nColid " << nColid << std::endl;
+            //std::cout << "ratio " << nColid/nAll << std::endl;
+            //errMsg.push_back("HIGHLY COLLIDED STRUCUTRE \n");
             
-            errMsg.push_back("HIGHLY COLLIDED STRUCUTRE \n");
+            
+            errMsg.push_back("Some non-H atoms have less than 1.0 occupancy \n");
             colidOK = false;
         }
         
@@ -2734,7 +2738,7 @@ namespace LIBMOL
         }
         else if (!colidOK)
         {
-            errMsg.push_back("REJECTED STRUCTURE: Too many atoms have less than 1.0 occp.\n");
+            errMsg.push_back("REJECTED STRUCTURE: Non-H atoms have less than 1.0 occp.\n");
         }
         else if (!hasHeavyCalcAtoms)
         {
@@ -3183,6 +3187,7 @@ namespace LIBMOL
             }
             
             
+            
             setHydroAtomConnect();
             // addMissHydroAtoms();
             
@@ -3199,6 +3204,8 @@ namespace LIBMOL
             setAtomsPartialCharges();
             
             ringDetecting();
+            
+            setAtomFormTypes(allAtoms);
             
             if (!hasCCP4Type)
             {
@@ -7690,7 +7697,10 @@ namespace LIBMOL
                          const   double           tUBS,
                          const   double           tLBS,
                          const   double           tUAS,
-                         const   double           tLAS)
+                         const   double           tLAS,
+                         std::map<int, std::map<std::string,
+                         std::map<std::string, double > > > 
+                         &  tHDistMap)
     {
         
         for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
@@ -7730,17 +7740,10 @@ namespace LIBMOL
                       << iAt->formalCharge << std::endl;
         }
         
-        // std::cout << "Print Pos " << std::endl;
-        // Open a temp file for writing 
+        
         std::vector<std::string> aSetStrs;
         StrTokenize(tFName, aSetStrs, '.');
-        //std::string outTempFName;
-        //for (unsigned i=0; i < aSetStrs.size()-1; i++ )
-        //{
-        //    outTempFName+=aSetStrs[i];
-        //}
-        //outTempFName +="_ac.txt";
-        //std::cout << "output AandC file name : " << outTempFName << std::endl;
+        
         
         std::ofstream outRestrF(tFName);
         
@@ -7898,6 +7901,8 @@ namespace LIBMOL
                           << "_chem_comp_bond.atom_id_2" << std::endl
                           << "_chem_comp_bond.type" << std::endl
                           << "_chem_comp_bond.aromatic"  << std::endl
+                          << "_chem_comp_bond.value_dist_prot" << std::endl
+                          << "_chem_comp_bond.value_dist_prot_esd" << std::endl
                           << "_chem_comp_bond.value_dist"<< std::endl
                           << "_chem_comp_bond.value_dist_esd" << std::endl;
                           // << "_chem_comp_bond.exact_cod_dist" << std::endl;
@@ -7944,6 +7949,54 @@ namespace LIBMOL
                     {
                         aSigV  = iB->sigValue;
                     }
+                    
+                    // Add Proton-X distances if they exist
+                    int idxH = -1, idxX=-1;
+                    
+                    if (tAtoms[iB->atomsIdx[0]].chemType.compare("H")==0)
+                    {
+                        idxH = iB->atomsIdx[0];
+                        idxX = iB->atomsIdx[1];
+                    }
+                    else if (tAtoms[iB->atomsIdx[1]].chemType.compare("H")==0)
+                    {
+                        idxH = iB->atomsIdx[1];
+                        idxX = iB->atomsIdx[0];
+                    }
+                    
+                    double aProtD      = 0.0;
+                    double aProtD_siga = 0.0;
+                            
+                               
+                    if (idxH > -1)
+                    {
+                        
+                        if (tHDistMap[2].find(tAtoms[idxH].formType[1])
+                             !=tHDistMap[2].end())
+                        {
+                            aProtD = tHDistMap[2][tAtoms[idxH].formType[1]]["pDistNeu"];
+                            aProtD_siga 
+                            = tHDistMap[2][tAtoms[idxH].formType[1]]["pDistSigaNeu"];
+                        }
+                        else if (tHDistMap[1].find(tAtoms[idxX].chemType)
+                             !=tHDistMap[1].end())
+                        {
+                            aProtD = tHDistMap[1][tAtoms[idxX].chemType]["pDist"];
+                            aProtD_siga 
+                            = tHDistMap[1][tAtoms[idxX].chemType]["pDistSiga"];
+                        }
+                        else
+                        {
+                            aProtD = iB->value;
+                            aProtD_siga = aSigV;
+                        }
+                    }
+                    else
+                    {
+                        aProtD = iB->value;
+                        aProtD_siga = aSigV;
+                    }
+                    
                     outRestrF <<  longName
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id  
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id  
@@ -7951,18 +8004,15 @@ namespace LIBMOL
                               << std::setw(12)  << outOrder
                               << std::setw(8)   << tAr
                               << std::setw(10)  << std::setprecision(3)
+                              << aProtD
+                              << std::setw(8) << std::setprecision(4)
+                              << aProtD_siga
+                              << std::setw(10)  << std::setprecision(3)
                               << iB->value 
                               << std::setw(8) << std::setprecision(4)
                               << aSigV << std::endl;
                     
-                    //   if(iB->hasCodValue)
-                    //   {
-                    //       outRestrF << "Yes " << std::endl;
-                    //   }
-                    //   else
-                    //   {
-                    //       outRestrF << "No "  << std::endl;
-                    //   }
+                    
                 }
             }
            
@@ -9014,9 +9064,12 @@ namespace LIBMOL
     {
         std::ofstream outMF(tFName);
         
-        outMF << "Is the structure not from Power diff : " << tCifObj.notPowder << std::endl;
-        outMF << "Resolution OK : " << tCifObj.resolOK << std::endl;
-        outMF << "R factors OK : " << tCifObj.RFactorOK << std::endl;
+        outMF << "Is the structure not from Power diff : " 
+              << tCifObj.notPowder << std::endl;
+        outMF << "Resolution OK : " 
+              << tCifObj.resolOK << std::endl;
+        outMF << "R factors OK : " 
+              << tCifObj.RFactorOK << std::endl;
         outMF << "Occp OK : " << tCifObj.colidOK << std::endl;
         outMF << "The following are metal atoms in the file " << std::endl;
         for (std::vector<AtomDict>::iterator iAt=tCifObj.allAtoms.begin();
@@ -9031,6 +9084,22 @@ namespace LIBMOL
         
         outMF.close();        
               
+    }
+    
+    void extern outSelectedAtomInfo(FileName tFName,
+                                    std::vector<std::string> & tSelectedIds)
+    {
+        std::ofstream outAF(tFName);
+        
+        
+        outAF << "The following are selected atoms in the file " << std::endl;
+        for (std::vector<std::string>::iterator iI = tSelectedIds.begin();
+             iI != tSelectedIds.end(); iI++)
+        {              
+            outAF << "Atom : " << *iI << std::endl;    
+        }
+        
+        outAF.close();
     }
     
 }
