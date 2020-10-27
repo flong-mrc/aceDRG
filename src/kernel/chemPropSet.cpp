@@ -243,7 +243,25 @@ namespace LIBMOL
                 }
                 
             }
-            else if (iAt->chemType.compare("S")==0 || iAt->chemType.compare("SE")==0
+            else if (iAt->chemType.compare("S")==0)
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                if(t_len==4 || t_len==3 || t_len==2)
+                {
+                    if (iAt->chiralIdx ==0)
+                    {
+                        iAt->chiralIdx  = 2;
+                    }
+                    iAt->bondingIdx = 3;
+                }
+                else if (t_len==6)
+                {
+                    iAt->chiralIdx = 0;
+                    iAt->bondingIdx = 5;
+                }
+                
+            }
+            else if (iAt->chemType.compare("SE")==0
                      || iAt->chemType.compare("Se")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();

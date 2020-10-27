@@ -182,6 +182,8 @@ class Acedrg(CExeCode ):
         else:
             self.rdKit = AcedrgRDKit()
         self.rdKit.setProcPara(self.inputPara)
+        if self.useExistCoords or not self.workMode in [12, 121, 52]:
+            self.rdKit.useExistCoords  = True        
 
         #print "input RDKit: userExistCoords ? ", self.rdKit.useExistCoords
         #print "input RDKit: number of optimization iters ", self.rdKit.numRDKitOptmSteps
@@ -796,6 +798,8 @@ class Acedrg(CExeCode ):
       
         if t_inputOptionsP.useExistCoords:
             self.useExistCoords = t_inputOptionsP.useExistCoords
+
+        
 
         self.scrDir = self.outRoot + "_TMP"
         if not os.path.isdir(self.scrDir):
@@ -2433,7 +2437,6 @@ class Acedrg(CExeCode ):
  
         self.printJobs()
 
-        self.rdKit.useExistCoords  = self.useExistCoords 
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
         #elif self.workMode !=0 and self.workMode != 61 :

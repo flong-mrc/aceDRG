@@ -1,0 +1,25 @@
+Atom_id
+Atom_acedrg_type
+         N    N(H)3
+       HN1    H(NHH)
+       HN2    H(NHH)
+       HN3    H(NHH)
+Bond_approx_level
+Bond_atom1_id
+Bond_atom2_id
+Bond_value 
+Bond_sigma_value
+Bond_COD_observation_num
+     0       N     HN1          0.9276    0.0693     109
+     0       N     HN2          0.9276    0.0693     109
+     0       N     HN3          0.9276    0.0693     109
+Angle_approx_level
+Angle_center_atom_id
+Angle_atom1_id
+Angle_atom2_id
+Angle_value 
+Angle_sigma_value
+Angle_COD_observation_num
+     0       N     HN1     HN2         106.383          13.347             106
+     0       N     HN1     HN3         106.383          13.347             106
+     0       N     HN2     HN3         106.383          13.347             106

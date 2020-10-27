@@ -1,0 +1,515 @@
+
+============ PROCESS INFORMATION =============
+Upper bound for b 0.020000
+low bound for b 0.010000
+Upper bound for a 3.000000
+low bound for a 1.500000
+||=====================Job description====================================||
+You will get an output cif file for a list of dictionary restraints
+based on the input cif file
+Your input cif file : Test_NO3_inDictProb_P_TMP/Test_NO3_inDictProb_P_mol_0.cif
+Your monomer name : NO3
+The output dictionary file(cif) : Test_NO3_inDictProb_P_TMP/Test_NO3_inDictProb_P_mol_0_cod.rst
+||========================================================================||
+workMode 11
+NBDepth	1
+inCifName	Test_NO3_inDictProb_P_TMP/Test_NO3_inDictProb_P_mol_0.cif
+lAS	1.500000
+lBS	0.010000
+libMolTabDir	/Users/flong/JHBUILD/ccp4-20200403/share/acedrg/tables
+monoRootName	NO3
+uAS	3.000000
+uBS	0.020000
+userOutName	Test_NO3_inDictProb_P_TMP/Test_NO3_inDictProb_P_mol_0_cod.rst
+Compound ID NO3
+Compound Code NO3
+Compound name '.             '
+Compound group non-polymer
+Number of atoms  4
+number of H atoms 4
+The following is the property of the system in the input cif: 
+The system ID NO3
+The system three-letter code NO3
+The system name  '.             '
+The system group NON-POLYMER
+Number of atoms in the system  4
+Number of H atoms in the system 4
+ Is it a peptide ?  No 
+Atom O3 of O connects 1 atoms 
+ and is with bond index 2
+Atom N of N connects 3 atoms 
+ and is with bond index 2
+Atom O1 of O connects 1 atoms 
+ and is with bond index 2
+Atom O2 of O connects 1 atoms 
+ and is with bond index 2
+Atom O3 of O connects 1 atoms 
+ and is with bond index 2
+Atom N of N connects 3 atoms 
+ and is with bond index 2
+Atom O1 of O connects 1 atoms 
+ and is with bond index 2
+Atom O2 of O connects 1 atoms 
+ and is with bond index 2
+Atom name N
+number of bonding 3
+The angle is 0.00577242
+Atom Name O3 bonding index 2
+Its element type O
+
+ Its ccp4 type OC
+Atom Name N bonding index 2
+Its element type N
+
+ Its ccp4 type N
+Atom Name O1 bonding index 2
+Its element type O
+
+ Its ccp4 type O
+Atom Name O2 bonding index 2
+Its element type O
+
+ Its ccp4 type OC
+Atom 0 of O3 is  a O atom 
+For atom O3 : 
+it connects 1 atom(s) 
+its formal charge is -1
+its number of EX electrons is 0
+Atom 1 of N is  a N atom 
+For atom N : 
+it connects 3 atom(s) 
+its formal charge is 1
+its number of EX electrons is 1
+Atom 2 of O1 is  a O atom 
+For atom O1 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 1
+Atom 3 of O2 is  a O atom 
+For atom O2 : 
+it connects 1 atom(s) 
+its formal charge is -1
+its number of EX electrons is 0
+
+Atom 0 : 
+Its ID : O3
+Its Chemical Type : O
+Its bonding index : 2
+Its formal charge : -1
+Its CCP4 atom type : OC
+Its residue Name: NO3
+Its connected atoms are : 
+N
+
+Atom 1 : 
+Its ID : N
+Its Chemical Type : N
+Its bonding index : 2
+Its formal charge : 1
+Its CCP4 atom type : N
+Its residue Name: NO3
+Its connected atoms are : 
+O1
+O2
+O3
+
+Atom 2 : 
+Its ID : O1
+Its Chemical Type : O
+Its bonding index : 2
+Its formal charge : 0
+Its CCP4 atom type : O
+Its residue Name: NO3
+Its connected atoms are : 
+N
+
+Atom 3 : 
+Its ID : O2
+Its Chemical Type : O
+Its bonding index : 2
+Its formal charge : -1
+Its CCP4 atom type : OC
+Its residue Name: NO3
+Its connected atoms are : 
+N
+Sum of number of excess electrons is 2
+Atom O3 of O connects 1 atoms 
+ and is with bond index 2
+Atom N of N connects 3 atoms 
+ and is with bond index 2
+Atom O1 of O connects 1 atoms 
+ and is with bond index 2
+Atom O2 of O connects 1 atoms 
+ and is with bond index 2
+Atom name N
+number of bonding 3
+The angle is 0.00577242
+Atom 0 : 
+Its ID O3
+Its element type O
+Its COD root atom type O
+Its acedrg atom type O(NOO)
+Its acedrg atom main type O(NOO)
+Its base ring type 
+Its ccp4 atom type OC
+Its second NB sp props N-2_2_2
+Its number of extra-electrons is 0
+Its second NB extra-electron sign is N-1_0_0
+Its hashing is 955
+Atom 1 : 
+Its ID N
+Its element type N
+Its COD root atom type N
+Its acedrg atom type N(O)3
+Its acedrg atom main type N(O)3
+Its base ring type 
+Its ccp4 atom type N
+Its second NB sp props O-2:O-2:O-2
+Its number of extra-electrons is 1
+Its second NB extra-electron sign is O-1:O-1:O-1
+Its hashing is 670
+Atom 2 : 
+Its ID O1
+Its element type O
+Its COD root atom type O
+Its acedrg atom type O(NOO)
+Its acedrg atom main type O(NOO)
+Its base ring type 
+Its ccp4 atom type O
+Its second NB sp props N-2_2_2
+Its number of extra-electrons is 1
+Its second NB extra-electron sign is N-1_0_0
+Its hashing is 955
+Atom 3 : 
+Its ID O2
+Its element type O
+Its COD root atom type O
+Its acedrg atom type O(NOO)
+Its acedrg atom main type O(NOO)
+Its base ring type 
+Its ccp4 atom type OC
+Its second NB sp props N-2_2_2
+Its number of extra-electrons is 0
+Its second NB extra-electron sign is N-1_0_0
+Its hashing is 955
+Clustering COD org bonds started at Thu Apr  9 02:25:33 2020
+Finish clustering COD org bonds 
+finished at Thu Apr  9 02:25:33 2020
+it takes 0 seconds to finish group COD bonds 
+Group COD bonds involving metal elements 
+Search for  all target bonds started at Thu Apr  9 02:25:33 2020
+Bond between O1 and N
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+ search a organic-only bond 
+for target bond of atoms N and O1
+The bond is not within the same ring.
+Bond order is DOUBLE
+ha1 670 ha2 955
+the hybr-combination is SP2_SP2
+In or not in the same ring N
+ a1NB2 1:1:1: a2NB2 3:
+ a1NB1NB2 O-1:O-1:O-1 a2NB1NB2 N-1_0_0
+ a1M N(O)3 a2M O(NOO)
+ a1C N(O)3 a2C O(NOO)
+atom 1 N  atom 2 O
+Found all hashing codes 
+Found hybr-combination SP2_SP2
+Find in-ring prop N
+find 1:1:1:
+find 3:
+The end search level is 7
+The sig value is 0.0162
+Finally bond sig is 0.0162
+The final target bond value is 1.23
+Its sig value is 0.0162
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Bond between O2 and N
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+ search a organic-only bond 
+for target bond of atoms N and O2
+The bond is not within the same ring.
+Bond order is SINGLE
+ha1 670 ha2 955
+the hybr-combination is SP2_SP2
+In or not in the same ring N
+ a1NB2 1:1:1: a2NB2 3:
+ a1NB1NB2 O-1:O-1:O-1 a2NB1NB2 N-1_0_0
+ a1M N(O)3 a2M O(NOO)
+ a1C N(O)3 a2C O(NOO)
+atom 1 N  atom 2 OC
+Found all hashing codes 
+Found hybr-combination SP2_SP2
+Find in-ring prop N
+find 1:1:1:
+find 3:
+The end search level is 7
+The sig value is 0.0162
+Finally bond sig is 0.0162
+The final target bond value is 1.23
+Its sig value is 0.0162
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Bond between N and O3
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+ search a organic-only bond 
+for target bond of atoms N and O3
+The bond is not within the same ring.
+Bond order is SINGLE
+ha1 670 ha2 955
+the hybr-combination is SP2_SP2
+In or not in the same ring N
+ a1NB2 1:1:1: a2NB2 3:
+ a1NB1NB2 O-1:O-1:O-1 a2NB1NB2 N-1_0_0
+ a1M N(O)3 a2M O(NOO)
+ a1C N(O)3 a2C O(NOO)
+atom 1 N  atom 2 OC
+Found all hashing codes 
+Found hybr-combination SP2_SP2
+Find in-ring prop N
+find 1:1:1:
+find 3:
+The end search level is 7
+The sig value is 0.0162
+Finally bond sig is 0.0162
+The final target bond value is 1.23
+Its sig value is 0.0162
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Number of Bonds to be found 3
+Number of Bonds found 3
+Search for all target bonds finished at Thu Apr  9 02:25:33 2020
+it takes 0 seconds to do that 
+Finish setDefaultCoordGeos() 
+Clustering all COD angles started at Thu Apr  9 02:25:33 2020
+Clustering COD org angles finished at Thu Apr  9 02:25:33 2020
+it takes 0 seconds to finish group COD angles 
+Finish groupCodOrgAngles() 
+Finish groupCodMetAngles() 
+Finish groupCodAnglesWithNonCenteredMetal() 
+Search for target angles started at Thu Apr  9 02:25:33 2020
+
+%=========================================%
+Angle between N(center) and O2 and O1
+
+Center Atom : N
+Its Hashing code  670
+Its root atom symbol N
+Its codNB2Symb 1:1:1:
+Its codNBSymb O-1:O-1:O-1:
+Its atom type main sec N(O)3
+Its atom type full N(O)3
+
+Atom2 : O2
+Its Hashing code 955
+Its root atom symbol O
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section O(NOO)
+Its atom type full O(NOO)
+
+Atom3: O1
+Its Hashing code  955
+Its root atom symbol O
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section O(NOO)
+Its atom type full O(NOO)
+
+These 3 atoms are in a ring of size 0
+The hybridization on three atoms is 0:SP2_SP2_SP2
+Find ha1 670
+Find ha2 955
+Find ha3 955
+Found 0:SP2_SP2_SP2
+Found N
+Found O
+Found O
+Found 1:1:1:
+Found 3:
+Found 3:
+Found O-1:O-1:O-1:
+Found N-3:
+Found N-3:
+Found N(O)3
+Found O(NOO)
+Found O(NOO)
+Angle value 120
+Angle siga 1.59
+Number of observations  4241
+Approximation level 0
+Finally the angle value is 120
+It sig value is 1.59
+Target angle value : 120
+
+%=========================================%
+Angle between N(center) and O3 and O1
+
+Center Atom : N
+Its Hashing code  670
+Its root atom symbol N
+Its codNB2Symb 1:1:1:
+Its codNBSymb O-1:O-1:O-1:
+Its atom type main sec N(O)3
+Its atom type full N(O)3
+
+Atom2 : O3
+Its Hashing code 955
+Its root atom symbol O
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section O(NOO)
+Its atom type full O(NOO)
+
+Atom3: O1
+Its Hashing code  955
+Its root atom symbol O
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section O(NOO)
+Its atom type full O(NOO)
+
+These 3 atoms are in a ring of size 0
+The hybridization on three atoms is 0:SP2_SP2_SP2
+Find ha1 670
+Find ha2 955
+Find ha3 955
+Found 0:SP2_SP2_SP2
+Found N
+Found O
+Found O
+Found 1:1:1:
+Found 3:
+Found 3:
+Found O-1:O-1:O-1:
+Found N-3:
+Found N-3:
+Found N(O)3
+Found O(NOO)
+Found O(NOO)
+Angle value 120
+Angle siga 1.59
+Number of observations  4241
+Approximation level 0
+Finally the angle value is 120
+It sig value is 1.59
+Target angle value : 120
+
+%=========================================%
+Angle between N(center) and O3 and O2
+
+Center Atom : N
+Its Hashing code  670
+Its root atom symbol N
+Its codNB2Symb 1:1:1:
+Its codNBSymb O-1:O-1:O-1:
+Its atom type main sec N(O)3
+Its atom type full N(O)3
+
+Atom2 : O3
+Its Hashing code 955
+Its root atom symbol O
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section O(NOO)
+Its atom type full O(NOO)
+
+Atom3: O2
+Its Hashing code  955
+Its root atom symbol O
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section O(NOO)
+Its atom type full O(NOO)
+
+These 3 atoms are in a ring of size 0
+The hybridization on three atoms is 0:SP2_SP2_SP2
+Find ha1 670
+Find ha2 955
+Find ha3 955
+Found 0:SP2_SP2_SP2
+Found N
+Found O
+Found O
+Found 1:1:1:
+Found 3:
+Found 3:
+Found O-1:O-1:O-1:
+Found N-3:
+Found N-3:
+Found N(O)3
+Found O(NOO)
+Found O(NOO)
+Angle value 120
+Angle siga 1.59
+Number of observations  4241
+Approximation level 0
+Finally the angle value is 120
+It sig value is 1.59
+Target angle value : 120
+There are 0 rings 
+These are: 
+Search target angles finished at Thu Apr  9 02:25:33 2020
+it takes 0 to search for all target angles 
+Finish searching angles 
+Total number of torsions is 0
+Number of torsions in the mini-set 0
+Originally the system has 0
+Number of torsions from cod section 0
+DOUBLE CHECKing again 2
+Bond sig value 0.0162
+Bond sig value 0.0162
+Bond sig value 0.0162
+atom O3 has charge of -1
+atom N has charge of 1
+atom O1 has charge of 0
+atom O2 has charge of -1
+Kekulize the system 
+Atom 0 of O3 is  a O atom 
+Atom 1 of N is  a N atom 
+Atom 2 of O1 is  a O atom 
+Atom 3 of O2 is  a O atom 
+For atom O3 : 
+it connects 1 atom(s) 
+its formal charge is -1
+its number of EX electrons is 0
+For atom N : 
+it connects 3 atom(s) 
+its formal charge is 1
+its number of EX electrons is 0
+For atom O1 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 1
+For atom O2 : 
+it connects 1 atom(s) 
+its formal charge is -1
+its number of EX electrons is 0
+Atom O3   0     0
+Atom N   1     0
+Atom O1   2     1
+Atom O2   3     0
+Now those atoms are considered to be with pi electrons 
+Atom O1 of serial number 2
+Now there exist Only irreducible sets of bonds with undecided bond-orders
+Bond-orders of All bonds are the following 
+Bond 0 of atom N and O1
+The bond order is 1
+Bond 1 of atom N and O2
+The bond order is 1
+Bond 2 of atom O3 and N
+The bond order is 1
+nDone in this round : 0
+Number of atoms with free pi electrons are 0
+No further kekulization on rings are needed. 
+All  bond-orders are set.
+Kekulize done 
+atom O3 has charge of -1
+atom N has charge of 1
+atom O1 has charge of 0
+atom O2 has charge of -1
+=========END OF PROCESS INFORMATION
+ ==========

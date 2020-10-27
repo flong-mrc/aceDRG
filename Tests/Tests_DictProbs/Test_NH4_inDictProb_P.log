@@ -1,0 +1,207 @@
+=====================================================================
+|                     Main reference                                |
+| "AceDRG: a stereochemical description generator for ligands"      |
+| Fei Long, Robert A. Nicholls, Paul Emsley, Saulius Grazulis,      |
+| Andrius Merkys, Antanas Vaitkusb and Garib N. Murshudov,(2017)    |
+| Acta Crystallogr. D73, 112-122                                    |
+=====================================================================
+=====================================================================
+| ACEDRG version:     217                                           |
+| ACEDRG database:  11                                              |
+| RDKit version:  2017.03.2                                         |
+| refmac5:         5.8.0258                                         |
+=====================================================================
+=====================================================================
+| Your job is  generating the dictionary (cif) and coord(pdb) files |
+| for your ligand and/or monomer                                    |
+=====================================================================
+Input file: NH4.cif
+Output dictionary file: Test_NH4_inDictProb_P.cif
+Output coordinate file: Test_NH4_inDictProb_P.pdb
+One of output conformers will using input coordinates as initial ones
+The system contains atoms of the following elements
+H	N	
+The following atoms have charges 
+Name :  N  charge :  1.0
+The following atoms have charges 
+Name :  N  charge :  1.0
+Not _chem_comp_atom.pdbx_model_Cartn_x
+not _chem_comp_atom.model_Cartn_x_ideal
+Using _chem_comp_atom.x,y,z
+atom N serial number in mol is 1 
+atom HN4 serial number in mol is 2 
+atom HN3 serial number in mol is 3 
+atom HN2 serial number in mol is 4 
+atom HN1 serial number in mol is 5 
+The bond between HN1 of serial number 5 and N of serial number 1 is : 
+  5  1  1  0  0  0  0
+
+The bond between HN2 of serial number 4 and N of serial number 1 is : 
+  4  1  1  0  0  0  0
+
+The bond between HN3 of serial number 3 and N of serial number 1 is : 
+  3  1  1  0  0  0  0
+
+The bond between N of serial number 1 and HN4 of serial number 2 is : 
+  1  2  1  0  0  0  0
+
+atom serial number (mol format)   1 , its new id  N
+Charge  1
+A molecule with residue name NH4 is generated
+Number of atoms in the molecule is  1
+number of props in the mol  1
+H Atom  of serial number  1
+Bond atom idx 1  0
+Bond atom idx 2  1
+H Atom  of serial number  2
+Bond atom idx 1  0
+Bond atom idx 2  2
+H Atom  of serial number  3
+Bond atom idx 1  0
+Bond atom idx 2  3
+H Atom  of serial number  4
+Bond atom idx 1  0
+Bond atom idx 2  4
+Total number of H atoms is  4
+Number of initial conformers requested 1
+Number of number of opt step requested for each conformer  1000
+Number of new conformers  1
+Number of initial conformers obtained 2
+The following conformers are selected for refinement: 
+Conformer ID:  0  UFF energy :  0.6705048812770154
+Conformer ID:  1  UFF energy :  0.6705048812909056
+Number of conformers selected for refinement is  2
+Number of atoms in the molecule is  5
+
+For atom of index  0
+Its element symbol   N
+Its name  N
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  1
+Its total valence  4
+the coordinates are:
+X : -0.5810.
+Y :  0.3020
+Z : -0.7820
+It is in the following bonds: 
+Bond  0
+Its begin atom  0 of N
+Its end atom 1 of HN1 
+Bond type is  SINGLE
+Bond  1
+Its begin atom  0 of N
+Its end atom 2 of HN2 
+Bond type is  SINGLE
+Bond  2
+Its begin atom  0 of N
+Its end atom 3 of HN3 
+Bond type is  SINGLE
+Bond  3
+Its begin atom  0 of N
+Its end atom 4 of HN4 
+Bond type is  SINGLE
+
+For atom of index  1
+Its element symbol   H
+Its name  HN1
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  0
+Its begin atom  0 of N
+Its end atom 1 of HN1 
+Bond type is  SINGLE
+
+For atom of index  2
+Its element symbol   H
+Its name  HN2
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  1
+Its begin atom  0 of N
+Its end atom 2 of HN2 
+Bond type is  SINGLE
+
+For atom of index  3
+Its element symbol   H
+Its name  HN3
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  2
+Its begin atom  0 of N
+Its end atom 3 of HN3 
+Bond type is  SINGLE
+
+For atom of index  4
+Its element symbol   H
+Its name  HN4
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  3
+Its begin atom  0 of N
+Its end atom 4 of HN4 
+Bond type is  SINGLE
+Ligand ID  NH4
+Using coords  True
+N
+nNB 4
+HN1
+nNB 1
+HN2
+nNB 1
+HN3
+nNB 1
+HN4
+nNB 1
+==============================================
+| Centered atom :     N
+----------------------------------------------
+NB Atom HN1 : CIPRank 0 
+NB Atom HN2 : CIPRank 0 
+NB Atom HN3 : CIPRank 0 
+NB Atom HN4 : CIPRank 0 
+==============================================
+number of chiral center predefined  0
+ Number of chiral centers get from the conformer  0
+for atom  N
+its hyb is  SP3
+it connects to  4  NBs
+number of H atoms connected   4
+for atom  HN1
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  HN2
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  HN3
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  HN4
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+nChiBoth  0
+The system contains atoms of the following elements
+N	H	
+workMode  11
+===================================================================
+| Generate the dictionary file using the internal database        |
+===================================================================
+===================================================================
+| Geometrical Optimization                                        |
+===================================================================
+Number of atoms in molecule 1 is 5 
+Number of final output conformers for molecule 1 is 1 
+Number of intial conformers for refmac geo-opt   2
+Bug. can not find atom HN1 in Pdb file Test_NH4_inDictProb_P.pdb 

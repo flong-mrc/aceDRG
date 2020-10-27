@@ -1,0 +1,1349 @@
+=====================================================================
+|                     Main reference                                |
+| "AceDRG: a stereochemical description generator for ligands"      |
+| Fei Long, Robert A. Nicholls, Paul Emsley, Saulius Grazulis,      |
+| Andrius Merkys, Antanas Vaitkusb and Garib N. Murshudov,(2017)    |
+| Acta Crystallogr. D73, 112-122                                    |
+=====================================================================
+=====================================================================
+| ACEDRG version:     217                                           |
+| ACEDRG database:  11                                              |
+| RDKit version:  2017.03.2                                         |
+| refmac5:         5.8.0258                                         |
+=====================================================================
+=====================================================================
+| Your job is  generating the dictionary (cif) and coord(pdb) files |
+| for your ligand and/or monomer                                    |
+=====================================================================
+Input file: 824.cif
+Output dictionary file: Test_824_inDictProb_P.cif
+Output coordinate file: Test_824_inDictProb_P.pdb
+One of output conformers will using input coordinates as initial ones
+The system contains atoms of the following elements
+O	C	N	H	
+Not _chem_comp_atom.pdbx_model_Cartn_x
+not _chem_comp_atom.model_Cartn_x_ideal
+Using _chem_comp_atom.x,y,z
+atom O2 serial number in mol is 1 
+atom C6 serial number in mol is 2 
+atom N1 serial number in mol is 3 
+atom C5 serial number in mol is 4 
+atom O1 serial number in mol is 5 
+atom C3 serial number in mol is 6 
+atom C4 serial number in mol is 7 
+atom C13 serial number in mol is 8 
+atom C15 serial number in mol is 9 
+atom C17 serial number in mol is 10 
+atom C19 serial number in mol is 11 
+atom O3 serial number in mol is 12 
+atom C2 serial number in mol is 13 
+atom C7 serial number in mol is 14 
+atom C12 serial number in mol is 15 
+atom C11 serial number in mol is 16 
+atom C10 serial number in mol is 17 
+atom C9 serial number in mol is 18 
+atom C8 serial number in mol is 19 
+atom C1 serial number in mol is 20 
+atom C14 serial number in mol is 21 
+atom N2 serial number in mol is 22 
+atom C16 serial number in mol is 23 
+atom C18 serial number in mol is 24 
+atom C20 serial number in mol is 25 
+atom HN1 serial number in mol is 26 
+atom H17 serial number in mol is 27 
+atom HO3 serial number in mol is 28 
+atom H12 serial number in mol is 29 
+atom H11 serial number in mol is 30 
+atom H10 serial number in mol is 31 
+atom H9 serial number in mol is 32 
+atom H8 serial number in mol is 33 
+atom H1 serial number in mol is 34 
+atom HN2 serial number in mol is 35 
+atom H18 serial number in mol is 36 
+atom H20 serial number in mol is 37 
+The bond between O3 of serial number 12 and C19 of serial number 11 is : 
+ 12 11  1  0  0  0  0
+
+The bond between HO3 of serial number 28 and O3 of serial number 12 is : 
+ 28 12  1  0  0  0  0
+
+The bond between C19 of serial number 11 and C20 of serial number 25 is : 
+ 11 25  1  0  0  0  0
+
+The bond between C19 of serial number 11 and C17 of serial number 10 is : 
+ 11 10  2  0  0  0  0
+
+The bond between C20 of serial number 25 and C18 of serial number 24 is : 
+ 25 24  2  0  0  0  0
+
+The bond between H20 of serial number 37 and C20 of serial number 25 is : 
+ 37 25  1  0  0  0  0
+
+The bond between C18 of serial number 24 and C16 of serial number 23 is : 
+ 24 23  1  0  0  0  0
+
+The bond between H18 of serial number 36 and C18 of serial number 24 is : 
+ 36 24  1  0  0  0  0
+
+The bond between C16 of serial number 23 and C15 of serial number 9 is : 
+ 23  9  2  0  0  0  0
+
+The bond between C16 of serial number 23 and N2 of serial number 22 is : 
+ 23 22  1  0  0  0  0
+
+The bond between C17 of serial number 10 and C15 of serial number 9 is : 
+ 10  9  1  0  0  0  0
+
+The bond between C15 of serial number 9 and C13 of serial number 8 is : 
+  9  8  1  0  0  0  0
+
+The bond between H17 of serial number 27 and C17 of serial number 10 is : 
+ 27 10  1  0  0  0  0
+
+The bond between C13 of serial number 8 and C14 of serial number 21 is : 
+  8 21  1  0  0  0  0
+
+The bond between C13 of serial number 8 and C4 of serial number 7 is : 
+  8  7  2  0  0  0  0
+
+The bond between N2 of serial number 22 and C14 of serial number 21 is : 
+ 22 21  1  0  0  0  0
+
+The bond between C14 of serial number 21 and C1 of serial number 20 is : 
+ 21 20  2  0  0  0  0
+
+The bond between HN2 of serial number 35 and N2 of serial number 22 is : 
+ 35 22  1  0  0  0  0
+
+The bond between C4 of serial number 7 and C5 of serial number 4 is : 
+  7  4  1  0  0  0  0
+
+The bond between C4 of serial number 7 and C3 of serial number 6 is : 
+  7  6  1  0  0  0  0
+
+The bond between O1 of serial number 5 and C5 of serial number 4 is : 
+  5  4  2  0  0  0  0
+
+The bond between C5 of serial number 4 and N1 of serial number 3 is : 
+  4  3  1  0  0  0  0
+
+The bond between C3 of serial number 6 and C6 of serial number 2 is : 
+  6  2  1  0  0  0  0
+
+The bond between C2 of serial number 13 and C3 of serial number 6 is : 
+ 13  6  2  0  0  0  0
+
+The bond between C6 of serial number 2 and O2 of serial number 1 is : 
+  2  1  2  0  0  0  0
+
+The bond between N1 of serial number 3 and C6 of serial number 2 is : 
+  3  2  1  0  0  0  0
+
+The bond between HN1 of serial number 26 and N1 of serial number 3 is : 
+ 26  3  1  0  0  0  0
+
+The bond between C1 of serial number 20 and C2 of serial number 13 is : 
+ 20 13  1  0  0  0  0
+
+The bond between C7 of serial number 14 and C2 of serial number 13 is : 
+ 14 13  1  0  0  0  0
+
+The bond between H1 of serial number 34 and C1 of serial number 20 is : 
+ 34 20  1  0  0  0  0
+
+The bond between C7 of serial number 14 and C8 of serial number 19 is : 
+ 14 19  2  0  0  0  0
+
+The bond between C12 of serial number 15 and C7 of serial number 14 is : 
+ 15 14  1  0  0  0  0
+
+The bond between C8 of serial number 19 and C9 of serial number 18 is : 
+ 19 18  1  0  0  0  0
+
+The bond between H8 of serial number 33 and C8 of serial number 19 is : 
+ 33 19  1  0  0  0  0
+
+The bond between C9 of serial number 18 and C10 of serial number 17 is : 
+ 18 17  2  0  0  0  0
+
+The bond between H9 of serial number 32 and C9 of serial number 18 is : 
+ 32 18  1  0  0  0  0
+
+The bond between C10 of serial number 17 and C11 of serial number 16 is : 
+ 17 16  1  0  0  0  0
+
+The bond between H10 of serial number 31 and C10 of serial number 17 is : 
+ 31 17  1  0  0  0  0
+
+The bond between C11 of serial number 16 and C12 of serial number 15 is : 
+ 16 15  2  0  0  0  0
+
+The bond between H11 of serial number 30 and C11 of serial number 16 is : 
+ 30 16  1  0  0  0  0
+
+The bond between H12 of serial number 29 and C12 of serial number 15 is : 
+ 29 15  1  0  0  0  0
+
+A molecule with residue name 824 is generated
+Number of atoms in the molecule is  25
+number of props in the mol  1
+H Atom  of serial number  25
+Bond atom idx 1  2
+Bond atom idx 2  25
+H Atom  of serial number  26
+Bond atom idx 1  9
+Bond atom idx 2  26
+H Atom  of serial number  27
+Bond atom idx 1  11
+Bond atom idx 2  27
+H Atom  of serial number  28
+Bond atom idx 1  14
+Bond atom idx 2  28
+H Atom  of serial number  29
+Bond atom idx 1  15
+Bond atom idx 2  29
+H Atom  of serial number  30
+Bond atom idx 1  16
+Bond atom idx 2  30
+H Atom  of serial number  31
+Bond atom idx 1  17
+Bond atom idx 2  31
+H Atom  of serial number  32
+Bond atom idx 1  18
+Bond atom idx 2  32
+H Atom  of serial number  33
+Bond atom idx 1  19
+Bond atom idx 2  33
+H Atom  of serial number  34
+Bond atom idx 1  21
+Bond atom idx 2  34
+H Atom  of serial number  35
+Bond atom idx 1  23
+Bond atom idx 2  35
+H Atom  of serial number  36
+Bond atom idx 1  24
+Bond atom idx 2  36
+Total number of H atoms is  12
+atom symb  N
+number of H NB  1
+atom symb  N
+number of H NB  1
+Number of initial conformers requested 1
+Number of number of opt step requested for each conformer  1000
+Number of new conformers  1
+Number of initial conformers obtained 2
+The following conformers are selected for refinement: 
+Conformer ID:  0  UFF energy :  114.69003633435923
+Conformer ID:  1  UFF energy :  115.05187656913873
+Number of conformers selected for refinement is  2
+Number of atoms in the molecule is  37
+
+For atom of index  0
+Its element symbol   O
+Its name  O2
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  2
+the coordinates are:
+X :  0.0274.
+Y :  0.1085
+Z : -0.4426
+It is in the following bonds: 
+Bond  19
+Its begin atom  1 of C6
+Its end atom 0 of O2 
+Bond type is  DOUBLE
+
+For atom of index  1
+Its element symbol   C
+Its name  C6
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -0.9032.
+Y : -0.7341
+Z : -0.3510
+It is in the following bonds: 
+Bond  17
+Its begin atom  5 of C3
+Its end atom 1 of C6 
+Bond type is  SINGLE
+Bond  19
+Its begin atom  1 of C6
+Its end atom 0 of O2 
+Bond type is  DOUBLE
+Bond  20
+Its begin atom  2 of N1
+Its end atom 1 of C6 
+Bond type is  SINGLE
+
+For atom of index  2
+Its element symbol   N
+Its name  N1
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  3
+the coordinates are:
+X : -0.7203.
+Y : -2.1293
+Z : -0.5505
+It is in the following bonds: 
+Bond  16
+Its begin atom  3 of C5
+Its end atom 2 of N1 
+Bond type is  SINGLE
+Bond  20
+Its begin atom  2 of N1
+Its end atom 1 of C6 
+Bond type is  SINGLE
+Bond  29
+Its begin atom  2 of N1
+Its end atom 25 of HN1 
+Bond type is  SINGLE
+
+For atom of index  3
+Its element symbol   C
+Its name  C5
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -2.0385.
+Y : -2.6555
+Z : -0.4694
+It is in the following bonds: 
+Bond  13
+Its begin atom  6 of C4
+Its end atom 3 of C5 
+Bond type is  SINGLE
+Bond  15
+Its begin atom  4 of O1
+Its end atom 3 of C5 
+Bond type is  DOUBLE
+Bond  16
+Its begin atom  3 of C5
+Its end atom 2 of N1 
+Bond type is  SINGLE
+
+For atom of index  4
+Its element symbol   O
+Its name  O1
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  2
+the coordinates are:
+X : -2.3154.
+Y : -3.8605
+Z : -0.6939
+It is in the following bonds: 
+Bond  15
+Its begin atom  4 of O1
+Its end atom 3 of C5 
+Bond type is  DOUBLE
+
+For atom of index  5
+Its element symbol   C
+Its name  C3
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -2.3172.
+Y : -0.4341
+Z : -0.1090
+It is in the following bonds: 
+Bond  14
+Its begin atom  6 of C4
+Its end atom 5 of C3 
+Bond type is  DOUBLE
+Bond  17
+Its begin atom  5 of C3
+Its end atom 1 of C6 
+Bond type is  SINGLE
+Bond  18
+Its begin atom  12 of C2
+Its end atom 5 of C3 
+Bond type is  SINGLE
+
+For atom of index  6
+Its element symbol   C
+Its name  C4
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -2.9945.
+Y : -1.5846
+Z : -0.1789
+It is in the following bonds: 
+Bond  10
+Its begin atom  7 of C13
+Its end atom 6 of C4 
+Bond type is  SINGLE
+Bond  13
+Its begin atom  6 of C4
+Its end atom 3 of C5 
+Bond type is  SINGLE
+Bond  14
+Its begin atom  6 of C4
+Its end atom 5 of C3 
+Bond type is  DOUBLE
+
+For atom of index  7
+Its element symbol   C
+Its name  C13
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -4.4705.
+Y : -1.5601
+Z : -0.1385
+It is in the following bonds: 
+Bond  8
+Its begin atom  8 of C15
+Its end atom 7 of C13 
+Bond type is  SINGLE
+Bond  9
+Its begin atom  7 of C13
+Its end atom 20 of C14 
+Bond type is  DOUBLE
+Bond  10
+Its begin atom  7 of C13
+Its end atom 6 of C4 
+Bond type is  SINGLE
+
+For atom of index  8
+Its element symbol   C
+Its name  C15
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -5.5086.
+Y : -2.5958
+Z : -0.1318
+It is in the following bonds: 
+Bond  5
+Its begin atom  22 of C16
+Its end atom 8 of C15 
+Bond type is  DOUBLE
+Bond  7
+Its begin atom  9 of C17
+Its end atom 8 of C15 
+Bond type is  SINGLE
+Bond  8
+Its begin atom  8 of C15
+Its end atom 7 of C13 
+Bond type is  SINGLE
+
+For atom of index  9
+Its element symbol   C
+Its name  C17
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -5.4436.
+Y : -4.0695
+Z : -0.0673
+It is in the following bonds: 
+Bond  2
+Its begin atom  10 of C19
+Its end atom 9 of C17 
+Bond type is  DOUBLE
+Bond  7
+Its begin atom  9 of C17
+Its end atom 8 of C15 
+Bond type is  SINGLE
+Bond  30
+Its begin atom  9 of C17
+Its end atom 26 of H17 
+Bond type is  SINGLE
+
+For atom of index  10
+Its element symbol   C
+Its name  C19
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -6.5958.
+Y : -4.7623
+Z :  0.0043
+It is in the following bonds: 
+Bond  0
+Its begin atom  11 of O3
+Its end atom 10 of C19 
+Bond type is  SINGLE
+Bond  1
+Its begin atom  10 of C19
+Its end atom 24 of C20 
+Bond type is  SINGLE
+Bond  2
+Its begin atom  10 of C19
+Its end atom 9 of C17 
+Bond type is  DOUBLE
+
+For atom of index  11
+Its element symbol   O
+Its name  O3
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  2
+the coordinates are:
+X : -6.5590.
+Y : -6.1527
+Z :  0.0653
+It is in the following bonds: 
+Bond  0
+Its begin atom  11 of O3
+Its end atom 10 of C19 
+Bond type is  SINGLE
+Bond  31
+Its begin atom  11 of O3
+Its end atom 27 of HO3 
+Bond type is  SINGLE
+
+For atom of index  12
+Its element symbol   C
+Its name  C2
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -3.0147.
+Y :  0.8856
+Z :  0.0120
+It is in the following bonds: 
+Bond  18
+Its begin atom  12 of C2
+Its end atom 5 of C3 
+Bond type is  SINGLE
+Bond  21
+Its begin atom  19 of C1
+Its end atom 12 of C2 
+Bond type is  DOUBLE
+Bond  22
+Its begin atom  13 of C7
+Its end atom 12 of C2 
+Bond type is  SINGLE
+
+For atom of index  13
+Its element symbol   C
+Its name  C7
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -2.2649.
+Y :  2.1527
+Z :  0.1500
+It is in the following bonds: 
+Bond  22
+Its begin atom  13 of C7
+Its end atom 12 of C2 
+Bond type is  SINGLE
+Bond  23
+Its begin atom  13 of C7
+Its end atom 18 of C8 
+Bond type is  SINGLE
+Bond  24
+Its begin atom  14 of C12
+Its end atom 13 of C7 
+Bond type is  DOUBLE
+
+For atom of index  14
+Its element symbol   C
+Its name  C12
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -1.3093.
+Y :  2.2862
+Z :  1.0880
+It is in the following bonds: 
+Bond  24
+Its begin atom  14 of C12
+Its end atom 13 of C7 
+Bond type is  DOUBLE
+Bond  28
+Its begin atom  15 of C11
+Its end atom 14 of C12 
+Bond type is  SINGLE
+Bond  32
+Its begin atom  14 of C12
+Its end atom 28 of H12 
+Bond type is  SINGLE
+
+For atom of index  15
+Its element symbol   C
+Its name  C11
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -0.5797.
+Y :  3.5633
+Z :  1.2332
+It is in the following bonds: 
+Bond  27
+Its begin atom  16 of C10
+Its end atom 15 of C11 
+Bond type is  DOUBLE
+Bond  28
+Its begin atom  15 of C11
+Its end atom 14 of C12 
+Bond type is  SINGLE
+Bond  33
+Its begin atom  15 of C11
+Its end atom 29 of H11 
+Bond type is  SINGLE
+
+For atom of index  16
+Its element symbol   C
+Its name  C10
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -0.8750.
+Y :  4.5990
+Z :  0.4391
+It is in the following bonds: 
+Bond  26
+Its begin atom  17 of C9
+Its end atom 16 of C10 
+Bond type is  SINGLE
+Bond  27
+Its begin atom  16 of C10
+Its end atom 15 of C11 
+Bond type is  DOUBLE
+Bond  34
+Its begin atom  16 of C10
+Its end atom 30 of H10 
+Bond type is  SINGLE
+
+For atom of index  17
+Its element symbol   C
+Its name  C9
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -1.9318.
+Y :  4.4671
+Z : -0.5841
+It is in the following bonds: 
+Bond  25
+Its begin atom  18 of C8
+Its end atom 17 of C9 
+Bond type is  DOUBLE
+Bond  26
+Its begin atom  17 of C9
+Its end atom 16 of C10 
+Bond type is  SINGLE
+Bond  35
+Its begin atom  17 of C9
+Its end atom 31 of H9 
+Bond type is  SINGLE
+
+For atom of index  18
+Its element symbol   C
+Its name  C8
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -2.5929.
+Y :  3.3109
+Z : -0.7210
+It is in the following bonds: 
+Bond  23
+Its begin atom  13 of C7
+Its end atom 18 of C8 
+Bond type is  SINGLE
+Bond  25
+Its begin atom  18 of C8
+Its end atom 17 of C9 
+Bond type is  DOUBLE
+Bond  36
+Its begin atom  18 of C8
+Its end atom 32 of H8 
+Bond type is  SINGLE
+
+For atom of index  19
+Its element symbol   C
+Its name  C1
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -4.3684.
+Y :  0.8951
+Z :  0.0069
+It is in the following bonds: 
+Bond  12
+Its begin atom  20 of C14
+Its end atom 19 of C1 
+Bond type is  SINGLE
+Bond  21
+Its begin atom  19 of C1
+Its end atom 12 of C2 
+Bond type is  DOUBLE
+Bond  37
+Its begin atom  19 of C1
+Its end atom 33 of H1 
+Bond type is  SINGLE
+
+For atom of index  20
+Its element symbol   C
+Its name  C14
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -5.1013.
+Y : -0.3891
+Z : -0.0742
+It is in the following bonds: 
+Bond  9
+Its begin atom  7 of C13
+Its end atom 20 of C14 
+Bond type is  DOUBLE
+Bond  11
+Its begin atom  21 of N2
+Its end atom 20 of C14 
+Bond type is  SINGLE
+Bond  12
+Its begin atom  20 of C14
+Its end atom 19 of C1 
+Bond type is  SINGLE
+
+For atom of index  21
+Its element symbol   N
+Its name  N2
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  3
+the coordinates are:
+X : -6.5149.
+Y : -0.5517
+Z : -0.0455
+It is in the following bonds: 
+Bond  6
+Its begin atom  22 of C16
+Its end atom 21 of N2 
+Bond type is  SINGLE
+Bond  11
+Its begin atom  21 of N2
+Its end atom 20 of C14 
+Bond type is  SINGLE
+Bond  38
+Its begin atom  21 of N2
+Its end atom 34 of HN2 
+Bond type is  SINGLE
+
+For atom of index  22
+Its element symbol   C
+Its name  C16
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -6.6760.
+Y : -1.9650
+Z : -0.0819
+It is in the following bonds: 
+Bond  4
+Its begin atom  23 of C18
+Its end atom 22 of C16 
+Bond type is  SINGLE
+Bond  5
+Its begin atom  22 of C16
+Its end atom 8 of C15 
+Bond type is  DOUBLE
+Bond  6
+Its begin atom  22 of C16
+Its end atom 21 of N2 
+Bond type is  SINGLE
+
+For atom of index  23
+Its element symbol   C
+Its name  C18
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -7.9472.
+Y : -2.7019
+Z : -0.0037
+It is in the following bonds: 
+Bond  3
+Its begin atom  24 of C20
+Its end atom 23 of C18 
+Bond type is  DOUBLE
+Bond  4
+Its begin atom  23 of C18
+Its end atom 22 of C16 
+Bond type is  SINGLE
+Bond  39
+Its begin atom  23 of C18
+Its end atom 35 of H18 
+Bond type is  SINGLE
+
+For atom of index  24
+Its element symbol   C
+Its name  C20
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  4
+the coordinates are:
+X : -7.9057.
+Y : -4.0443
+Z :  0.0286
+It is in the following bonds: 
+Bond  1
+Its begin atom  10 of C19
+Its end atom 24 of C20 
+Bond type is  SINGLE
+Bond  3
+Its begin atom  24 of C20
+Its end atom 23 of C18 
+Bond type is  DOUBLE
+Bond  40
+Its begin atom  24 of C20
+Its end atom 36 of H20 
+Bond type is  SINGLE
+
+For atom of index  25
+Its element symbol   H
+Its name  HN1
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  29
+Its begin atom  2 of N1
+Its end atom 25 of HN1 
+Bond type is  SINGLE
+
+For atom of index  26
+Its element symbol   H
+Its name  H17
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  30
+Its begin atom  9 of C17
+Its end atom 26 of H17 
+Bond type is  SINGLE
+
+For atom of index  27
+Its element symbol   H
+Its name  HO3
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  31
+Its begin atom  11 of O3
+Its end atom 27 of HO3 
+Bond type is  SINGLE
+
+For atom of index  28
+Its element symbol   H
+Its name  H12
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  32
+Its begin atom  14 of C12
+Its end atom 28 of H12 
+Bond type is  SINGLE
+
+For atom of index  29
+Its element symbol   H
+Its name  H11
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  33
+Its begin atom  15 of C11
+Its end atom 29 of H11 
+Bond type is  SINGLE
+
+For atom of index  30
+Its element symbol   H
+Its name  H10
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  34
+Its begin atom  16 of C10
+Its end atom 30 of H10 
+Bond type is  SINGLE
+
+For atom of index  31
+Its element symbol   H
+Its name  H9
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  35
+Its begin atom  17 of C9
+Its end atom 31 of H9 
+Bond type is  SINGLE
+
+For atom of index  32
+Its element symbol   H
+Its name  H8
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  36
+Its begin atom  18 of C8
+Its end atom 32 of H8 
+Bond type is  SINGLE
+
+For atom of index  33
+Its element symbol   H
+Its name  H1
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  37
+Its begin atom  19 of C1
+Its end atom 33 of H1 
+Bond type is  SINGLE
+
+For atom of index  34
+Its element symbol   H
+Its name  HN2
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  38
+Its begin atom  21 of N2
+Its end atom 34 of HN2 
+Bond type is  SINGLE
+
+For atom of index  35
+Its element symbol   H
+Its name  H18
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  39
+Its begin atom  23 of C18
+Its end atom 35 of H18 
+Bond type is  SINGLE
+
+For atom of index  36
+Its element symbol   H
+Its name  H20
+Its explicit Hs  0
+Its mplicit Hs  0
+Its formal charge  0
+Its total valence  1
+It is in the following bonds: 
+Bond  40
+Its begin atom  24 of C20
+Its end atom 36 of H20 
+Bond type is  SINGLE
+Ligand ID  824
+Using coords  True
+O2
+nNB 1
+C6
+nNB 3
+N1
+nNB 3
+C5
+nNB 3
+O1
+nNB 1
+C3
+nNB 3
+C4
+nNB 3
+C13
+nNB 3
+C15
+nNB 3
+C17
+nNB 3
+C19
+nNB 3
+O3
+nNB 2
+C2
+nNB 3
+C7
+nNB 3
+C12
+nNB 3
+C11
+nNB 3
+C10
+nNB 3
+C9
+nNB 3
+C8
+nNB 3
+C1
+nNB 3
+C14
+nNB 3
+N2
+nNB 3
+C16
+nNB 3
+C18
+nNB 3
+C20
+nNB 3
+HN1
+nNB 1
+H17
+nNB 1
+HO3
+nNB 1
+H12
+nNB 1
+H11
+nNB 1
+H10
+nNB 1
+H9
+nNB 1
+H8
+nNB 1
+H1
+nNB 1
+HN2
+nNB 1
+H18
+nNB 1
+H20
+nNB 1
+==============================================
+| Centered atom :     O2
+----------------------------------------------
+NB Atom C6 : CIPRank 30 
+==============================================
+| Centered atom :     C6
+----------------------------------------------
+NB Atom C3 : CIPRank 25 
+NB Atom O2 : CIPRank 35 
+NB Atom N1 : CIPRank 33 
+==============================================
+| Centered atom :     N1
+----------------------------------------------
+NB Atom C5 : CIPRank 31 
+NB Atom C6 : CIPRank 30 
+NB Atom HN1 : CIPRank 10 
+==============================================
+| Centered atom :     C5
+----------------------------------------------
+NB Atom C4 : CIPRank 26 
+NB Atom O1 : CIPRank 36 
+NB Atom N1 : CIPRank 33 
+==============================================
+| Centered atom :     O1
+----------------------------------------------
+NB Atom C5 : CIPRank 31 
+==============================================
+| Centered atom :     C3
+----------------------------------------------
+NB Atom C4 : CIPRank 26 
+NB Atom C6 : CIPRank 30 
+NB Atom C2 : CIPRank 22 
+==============================================
+| Centered atom :     C4
+----------------------------------------------
+NB Atom C13 : CIPRank 24 
+NB Atom C5 : CIPRank 31 
+NB Atom C3 : CIPRank 25 
+==============================================
+| Centered atom :     C13
+----------------------------------------------
+NB Atom C15 : CIPRank 23 
+NB Atom C14 : CIPRank 28 
+NB Atom C4 : CIPRank 26 
+==============================================
+| Centered atom :     C15
+----------------------------------------------
+NB Atom C16 : CIPRank 27 
+NB Atom C17 : CIPRank 20 
+NB Atom C13 : CIPRank 24 
+==============================================
+| Centered atom :     C17
+----------------------------------------------
+NB Atom C19 : CIPRank 29 
+NB Atom C15 : CIPRank 23 
+NB Atom H17 : CIPRank 8 
+==============================================
+| Centered atom :     C19
+----------------------------------------------
+NB Atom O3 : CIPRank 34 
+NB Atom C20 : CIPRank 19 
+NB Atom C17 : CIPRank 20 
+==============================================
+| Centered atom :     O3
+----------------------------------------------
+NB Atom C19 : CIPRank 29 
+NB Atom HO3 : CIPRank 11 
+==============================================
+| Centered atom :     C2
+----------------------------------------------
+NB Atom C3 : CIPRank 25 
+NB Atom C1 : CIPRank 18 
+NB Atom C7 : CIPRank 21 
+==============================================
+| Centered atom :     C7
+----------------------------------------------
+NB Atom C2 : CIPRank 22 
+NB Atom C8 : CIPRank 15 
+NB Atom C12 : CIPRank 16 
+==============================================
+| Centered atom :     C12
+----------------------------------------------
+NB Atom C7 : CIPRank 21 
+NB Atom C11 : CIPRank 14 
+NB Atom H12 : CIPRank 4 
+==============================================
+| Centered atom :     C11
+----------------------------------------------
+NB Atom C10 : CIPRank 12 
+NB Atom C12 : CIPRank 16 
+NB Atom H11 : CIPRank 2 
+==============================================
+| Centered atom :     C10
+----------------------------------------------
+NB Atom C9 : CIPRank 13 
+NB Atom C11 : CIPRank 14 
+NB Atom H10 : CIPRank 0 
+==============================================
+| Centered atom :     C9
+----------------------------------------------
+NB Atom C8 : CIPRank 15 
+NB Atom C10 : CIPRank 12 
+NB Atom H9 : CIPRank 1 
+==============================================
+| Centered atom :     C8
+----------------------------------------------
+NB Atom C7 : CIPRank 21 
+NB Atom C9 : CIPRank 13 
+NB Atom H8 : CIPRank 3 
+==============================================
+| Centered atom :     C1
+----------------------------------------------
+NB Atom C14 : CIPRank 28 
+NB Atom C2 : CIPRank 22 
+NB Atom H1 : CIPRank 6 
+==============================================
+| Centered atom :     C14
+----------------------------------------------
+NB Atom C13 : CIPRank 24 
+NB Atom N2 : CIPRank 32 
+NB Atom C1 : CIPRank 18 
+==============================================
+| Centered atom :     N2
+----------------------------------------------
+NB Atom C16 : CIPRank 27 
+NB Atom C14 : CIPRank 28 
+NB Atom HN2 : CIPRank 9 
+==============================================
+| Centered atom :     C16
+----------------------------------------------
+NB Atom C18 : CIPRank 17 
+NB Atom C15 : CIPRank 23 
+NB Atom N2 : CIPRank 32 
+==============================================
+| Centered atom :     C18
+----------------------------------------------
+NB Atom C20 : CIPRank 19 
+NB Atom C16 : CIPRank 27 
+NB Atom H18 : CIPRank 5 
+==============================================
+| Centered atom :     C20
+----------------------------------------------
+NB Atom C19 : CIPRank 29 
+NB Atom C18 : CIPRank 17 
+NB Atom H20 : CIPRank 7 
+==============================================
+number of chiral center predefined  0
+ Number of chiral centers get from the conformer  0
+for atom  O2
+its hyb is  SP2
+it connects to  1  NBs
+for atom  C6
+its hyb is  SP2
+it connects to  3  NBs
+for atom  N1
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C5
+its hyb is  SP2
+it connects to  3  NBs
+for atom  O1
+its hyb is  SP2
+it connects to  1  NBs
+for atom  C3
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C4
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C13
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C15
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C17
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C19
+its hyb is  SP2
+it connects to  3  NBs
+for atom  O3
+its hyb is  SP2
+it connects to  2  NBs
+for atom  C2
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C7
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C12
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C11
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C10
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C9
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C8
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C1
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C14
+its hyb is  SP2
+it connects to  3  NBs
+for atom  N2
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C16
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C18
+its hyb is  SP2
+it connects to  3  NBs
+for atom  C20
+its hyb is  SP2
+it connects to  3  NBs
+for atom  HN1
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H17
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  HO3
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H12
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H11
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H10
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H9
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H8
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H1
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  HN2
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H18
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+for atom  H20
+its hyb is  UNSPECIFIED
+it connects to  1  NBs
+nChiBoth  0
+The system contains atoms of the following elements
+O	C	N	H	
+workMode  11
+===================================================================
+| Generate the dictionary file using the internal database        |
+===================================================================
+===================================================================
+| Geometrical Optimization                                        |
+===================================================================
+Number of atoms in molecule 1 is 37 
+Number of final output conformers for molecule 1 is 1 
+Number of intial conformers for refmac geo-opt   2
+Out cif name  Test_824_inDictProb_P.cif

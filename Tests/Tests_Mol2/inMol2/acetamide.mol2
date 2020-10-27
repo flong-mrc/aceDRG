@@ -1,0 +1,37 @@
+#	Name: NoName
+#	Creating user name:	gbunkocz
+#	Creation time:	15. 11. 2016 11:45
+
+#	Modifying user name:	gbunkocz
+#	Modification time:	15. 11. 2016 11:45
+
+#	Program:	corina 3.60 0026  27.01.2015
+
+@<TRIPOS>MOLECULE
+NoName
+   9    8    0    0    0
+SMALL
+NO_CHARGES
+
+
+@<TRIPOS>ATOM
+   1 C1            -0.0184     1.5028     0.0103 C.3     
+   2 C2             0.0021    -0.0041     0.0020 C.2     
+   3 O3             0.0203    -0.6160     1.0489 O.2     
+   4 N4             0.0001    -0.6716    -1.1688 N.am    
+   5 H5             1.0042     1.8801     0.0026 H       
+   6 H6            -0.5455     1.8639    -0.8728 H       
+   7 H7            -0.5286     1.8543     0.9071 H       
+   8 H8            -0.0145    -0.1822    -2.0061 H       
+   9 H9             0.0132    -1.6415    -1.1742 H       
+@<TRIPOS>BOND
+   1    1    2 1
+   2    1    5 1
+   3    1    6 1
+   4    1    7 1
+   5    2    3 2
+   6    2    4 am
+   7    4    8 1
+   8    4    9 1
+
+

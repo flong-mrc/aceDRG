@@ -1,0 +1,12 @@
+==============================================================
+|  run those cif in CCP4 monomer lib which had some problems |
+==============================================================
+acedrg -c /Users/flong/NetBeansProjects/Acedrg_P3/py3/Tests/Tests_DictProbs/inDictProbs/824.cif -o Test_824_inDictProb_P -p > Test_824_inDictProb_P.log
+acedrg -c /Users/flong/NetBeansProjects/Acedrg_P3/py3/Tests/Tests_DictProbs/inDictProbs/NH3.cif -o Test_NH3_inDictProb_P -p > Test_NH3_inDictProb_P.log
+acedrg -c /Users/flong/NetBeansProjects/Acedrg_P3/py3/Tests/Tests_DictProbs/inDictProbs/NH4.cif -o Test_NH4_inDictProb_P -p > Test_NH4_inDictProb_P.log
+acedrg -c /Users/flong/NetBeansProjects/Acedrg_P3/py3/Tests/Tests_DictProbs/inDictProbs/NO3.cif -o Test_NO3_inDictProb_P -p > Test_NO3_inDictProb_P.log
+Total Number of jobs running 4
+Total Number of job successfully finished 2
+Total Number of job failed 2. They are: 
+Test_NH3_inDictProb_P
+Test_NH4_inDictProb_P

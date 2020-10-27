@@ -1,0 +1,268 @@
+global_
+_lib_name         ?
+_lib_version      ?
+_lib_update       ?
+# ------------------------------------------------
+#
+# ---   LIST OF MONOMERS ---
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+exa  exa '.                                   ' .                  29  20 .
+# ------------------------------------------------------
+# ------------------------------------------------------
+#
+# --- DESCRIPTION OF MONOMERS ---
+#
+data_comp_exa
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.partial_charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+ exa       O1     O    OS        0.000      0.000    0.000    0.000
+ exa       S      S    ST        0.000      1.102    0.958    0.252
+ exa       O      O    OS        0.000      1.207    0.978    1.740
+ exa       C8     C    CR5       0.000      2.241    0.149   -0.750
+ exa       S1     S    S2        0.000      3.041    1.378   -1.752
+ exa       C10    C    CR15      0.000      3.875    0.244   -2.755
+ exa       H8     H    H         0.000      4.205    0.282   -3.786
+ exa       N3     N    NRD5      0.000      3.977   -0.759   -1.749
+ exa       C9     C    CR15      0.000      3.255   -0.867   -0.504
+ exa       H7     H    H         0.000      3.417   -1.508    0.353
+ exa       N2     N    N         0.000      0.467    2.321   -0.343
+ exa       C7     C    CH3       0.000     -1.022    2.431   -0.171
+ exa       H6     H    H         0.000     -1.507    1.626   -0.667
+ exa       H5     H    H         0.000     -1.274    2.401    0.861
+ exa       H4     H    H         0.000     -1.370    3.348   -0.583
+ exa       C6     C    CR5       0.000      1.339    3.348   -0.459
+ exa       N      N    NR56      0.000      1.882    2.564    0.510
+ exa       C3     C    CR16      0.000      2.981    2.017    1.051
+ exa       H2     H    H         0.000      3.955    2.486    1.105
+ exa       C2     C    CR16      0.000      2.651    0.683    1.558
+ exa       H1     H    H         0.000      3.366    0.266    2.257
+ exa       C1     C    CR16      0.000      1.467   -0.197    1.253
+ exa       H      H    H         0.000      1.475   -1.277    1.332
+ exa       C5     C    CR15      0.000      0.627    4.103    0.530
+ exa       H3     H    H         0.000      0.435    5.166    0.459
+ exa       N1     N    NRD5      0.000      0.203    3.287    1.614
+ exa       C4     C    CR56      0.000      0.696    2.098    1.158
+ exa       C      C    CR6       0.000      0.293    0.597    0.832
+ exa       BR     BR   BR        0.000     -0.393    0.246   -0.974
+loop_
+_chem_comp_tree.comp_id
+_chem_comp_tree.atom_id
+_chem_comp_tree.atom_back
+_chem_comp_tree.atom_forward
+_chem_comp_tree.connect_type
+ exa  O1     n/a    S      START
+ exa  S      O1     N2     .
+ exa  O      S      .      .
+ exa  C8     S      S1     .
+ exa  S1     C8     C10    .
+ exa  C10    S1     N3     .
+ exa  H8     C10    .      .
+ exa  N3     C10    C9     .
+ exa  C9     N3     H7     .
+ exa  H7     C9     .      .
+ exa  N2     S      C6     .
+ exa  C7     N2     H4     .
+ exa  H6     C7     .      .
+ exa  H5     C7     .      .
+ exa  H4     C7     .      .
+ exa  C6     N2     C5     .
+ exa  N      C6     C3     .
+ exa  C3     N      C2     .
+ exa  H2     C3     .      .
+ exa  C2     C3     C1     .
+ exa  H1     C2     .      .
+ exa  C1     C2     H      .
+ exa  H      C1     .      .
+ exa  C5     C6     N1     .
+ exa  H3     C5     .      .
+ exa  N1     C5     C4     .
+ exa  C4     N1     C      .
+ exa  C      C4     BR     .
+ exa  BR     C      .      END
+ exa  C      C1     .    ADD
+ exa  N      C4     .    ADD
+ exa  C8     C9     .    ADD
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+ exa  BR     C         single      1.890    0.020
+ exa  C      C1        double      1.390    0.020
+ exa  C1     C2        single      1.390    0.020
+ exa  C2     C3        double      1.390    0.020
+ exa  C3     N         single      1.337    0.020
+ exa  N      C4        single      1.337    0.020
+ exa  C      C4        single      1.490    0.020
+ exa  C4     N1        double      1.350    0.020
+ exa  N1     C5        single      1.350    0.020
+ exa  C5     C6        double      1.387    0.020
+ exa  N      C6        single      1.337    0.020
+ exa  C6     N2        single      1.365    0.020
+ exa  C7     N2        single      1.455    0.020
+ exa  N2     S         single      1.520    0.020
+ exa  O      S         double      1.436    0.020
+ exa  C8     S         single      1.645    0.020
+ exa  C8     C9        double      1.387    0.020
+ exa  C9     N3        single      1.350    0.020
+ exa  N3     C10       double      1.350    0.020
+ exa  C10    S1        single      1.745    0.020
+ exa  S1     C8        single      1.745    0.020
+ exa  S      O1        double      1.436    0.020
+ exa  H      C1        single      1.083    0.020
+ exa  H1     C2        single      1.083    0.020
+ exa  H2     C3        single      1.083    0.020
+ exa  H3     C5        single      1.083    0.020
+ exa  H4     C7        single      1.059    0.020
+ exa  H5     C7        single      1.059    0.020
+ exa  H6     C7        single      1.059    0.020
+ exa  H7     C9        single      1.083    0.020
+ exa  H8     C10       single      1.083    0.020
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+ exa  O1     S      O       109.500    3.000
+ exa  O1     S      C8      109.500    3.000
+ exa  O1     S      N2      109.500    3.000
+ exa  O      S      C8      109.500    3.000
+ exa  O      S      N2      109.500    3.000
+ exa  C8     S      N2      109.500    3.000
+ exa  S      C8     S1      108.000    3.000
+ exa  S      C8     C9      108.000    3.000
+ exa  S1     C8     C9      108.000    3.000
+ exa  C8     S1     C10     109.470    3.000
+ exa  S1     C10    H8      108.000    3.000
+ exa  S1     C10    N3      108.000    3.000
+ exa  H8     C10    N3      126.000    3.000
+ exa  C10    N3     C9      108.000    3.000
+ exa  N3     C9     H7      126.000    3.000
+ exa  N3     C9     C8      108.000    3.000
+ exa  H7     C9     C8      126.000    3.000
+ exa  S      N2     C7      120.000    3.000
+ exa  S      N2     C6      120.000    3.000
+ exa  C7     N2     C6      120.000    3.000
+ exa  N2     C7     H6      109.470    3.000
+ exa  N2     C7     H5      109.470    3.000
+ exa  N2     C7     H4      109.470    3.000
+ exa  H6     C7     H5      109.470    3.000
+ exa  H6     C7     H4      109.470    3.000
+ exa  H5     C7     H4      109.470    3.000
+ exa  N2     C6     N       108.000    3.000
+ exa  N2     C6     C5      108.000    3.000
+ exa  N      C6     C5      108.000    3.000
+ exa  C6     N      C3      132.000    3.000
+ exa  C6     N      C4      108.000    3.000
+ exa  C3     N      C4      120.000    3.000
+ exa  N      C3     H2      120.000    3.000
+ exa  N      C3     C2      120.000    3.000
+ exa  H2     C3     C2      120.000    3.000
+ exa  C3     C2     H1      120.000    3.000
+ exa  C3     C2     C1      120.000    3.000
+ exa  H1     C2     C1      120.000    3.000
+ exa  C2     C1     H       120.000    3.000
+ exa  C2     C1     C       120.000    3.000
+ exa  H      C1     C       120.000    3.000
+ exa  C6     C5     H3      126.000    3.000
+ exa  C6     C5     N1      108.000    3.000
+ exa  H3     C5     N1      126.000    3.000
+ exa  C5     N1     C4      108.000    3.000
+ exa  N1     C4     C       132.000    3.000
+ exa  N1     C4     N       108.000    3.000
+ exa  C      C4     N       120.000    3.000
+ exa  C4     C      BR      120.000    3.000
+ exa  C4     C      C1      120.000    3.000
+ exa  BR     C      C1      120.000    3.000
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+ exa  var_1            O1     S      C8     S1               180.000           20.000   3
+ exa  CONST_1          S      C8     C9     N3                 0.000            0.000   0
+ exa  CONST_2          S      C8     S1     C10              180.000            0.000   0
+ exa  CONST_3          C8     S1     C10    N3               180.000            0.000   0
+ exa  CONST_4          S1     C10    N3     C9                 0.000            0.000   0
+ exa  CONST_5          C10    N3     C9     C8                 0.000            0.000   0
+ exa  var_2            O1     S      N2     C6               180.000           20.000   3
+ exa  var_3            S      N2     C7     H4               180.000           20.000   3
+ exa  var_4            S      N2     C6     C5               180.000           20.000   3
+ exa  CONST_6          N2     C6     N      C3               180.000            0.000   0
+ exa  CONST_7          C6     N      C4     N1               180.000            0.000   0
+ exa  CONST_8          C6     N      C3     C2               180.000            0.000   0
+ exa  CONST_9          N      C3     C2     C1                 0.000            0.000   0
+ exa  CONST_10         C3     C2     C1     C                  0.000            0.000   0
+ exa  CONST_11         N2     C6     C5     N1                 0.000            0.000   0
+ exa  CONST_12         C6     C5     N1     C4                 0.000            0.000   0
+ exa  CONST_13         C5     N1     C4     C                180.000            0.000   0
+ exa  CONST_14         N1     C4     C      BR               180.000            0.000   0
+ exa  CONST_15         C4     C      C1     C2                 0.000            0.000   0
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+ exa  chir_01          S      N2     O      C8        both
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+ exa  plan-1            C         0.020
+ exa  plan-1            BR        0.020
+ exa  plan-1            C1        0.020
+ exa  plan-1            C4        0.020
+ exa  plan-1            C2        0.020
+ exa  plan-1            C3        0.020
+ exa  plan-1            H         0.020
+ exa  plan-1            H1        0.020
+ exa  plan-1            N         0.020
+ exa  plan-1            H2        0.020
+ exa  plan-1            C6        0.020
+ exa  plan-1            N1        0.020
+ exa  plan-1            C5        0.020
+ exa  plan-1            H3        0.020
+ exa  plan-1            N2        0.020
+ exa  plan-2            N2        0.020
+ exa  plan-2            C6        0.020
+ exa  plan-2            C7        0.020
+ exa  plan-2            S         0.020
+ exa  plan-3            C8        0.020
+ exa  plan-3            S         0.020
+ exa  plan-3            C9        0.020
+ exa  plan-3            S1        0.020
+ exa  plan-3            N3        0.020
+ exa  plan-3            C10       0.020
+ exa  plan-3            H7        0.020
+ exa  plan-3            H8        0.020
+# ------------------------------------------------------

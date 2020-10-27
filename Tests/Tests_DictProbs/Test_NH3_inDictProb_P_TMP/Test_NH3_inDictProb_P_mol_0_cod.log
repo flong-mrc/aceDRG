@@ -1,0 +1,523 @@
+
+============ PROCESS INFORMATION =============
+Upper bound for b 0.020000
+low bound for b 0.010000
+Upper bound for a 3.000000
+low bound for a 1.500000
+||=====================Job description====================================||
+You will get an output cif file for a list of dictionary restraints
+based on the input cif file
+Your input cif file : Test_NH3_inDictProb_P_TMP/Test_NH3_inDictProb_P_mol_0.cif
+Your monomer name : NH3
+The output dictionary file(cif) : Test_NH3_inDictProb_P_TMP/Test_NH3_inDictProb_P_mol_0_cod.rst
+||========================================================================||
+workMode 11
+NBDepth	1
+inCifName	Test_NH3_inDictProb_P_TMP/Test_NH3_inDictProb_P_mol_0.cif
+lAS	1.500000
+lBS	0.010000
+libMolTabDir	/Users/flong/JHBUILD/ccp4-20200403/share/acedrg/tables
+monoRootName	NH3
+uAS	3.000000
+uBS	0.020000
+userOutName	Test_NH3_inDictProb_P_TMP/Test_NH3_inDictProb_P_mol_0_cod.rst
+Compound ID NH3
+Compound Code NH3
+Compound name '.             '
+Compound group non-polymer
+Number of atoms  4
+number of H atoms 1
+The following is the property of the system in the input cif: 
+The system ID NH3
+The system three-letter code NH3
+The system name  '.             '
+The system group NON-POLYMER
+Number of atoms in the system  4
+Number of H atoms in the system 1
+ Is it a peptide ?  No 
+Atom N of N connects 3 atoms 
+ and is with bond index 3
+Atom HN1 of H connects 1 atoms 
+ and is with bond index 0
+Atom HN2 of H connects 1 atoms 
+ and is with bond index 0
+Atom HN3 of H connects 1 atoms 
+ and is with bond index 0
+Atom N of N connects 3 atoms 
+ and is with bond index 3
+Atom HN1 of H connects 1 atoms 
+ and is with bond index 0
+Atom HN2 of H connects 1 atoms 
+ and is with bond index 0
+Atom HN3 of H connects 1 atoms 
+ and is with bond index 0
+Atom name N
+number of bonding 3
+The angle is 61.2269
+Atom Name N bonding index 3
+Its element type N
+
+ Its ccp4 type NT3
+Atom 0 of N is  a N atom 
+For atom N : 
+it connects 3 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+Atom 1 of HN1 is  a H atom 
+For atom HN1 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+Atom 2 of HN2 is  a H atom 
+For atom HN2 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+Atom 3 of HN3 is  a H atom 
+For atom HN3 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+
+Atom 0 : 
+Its ID : N
+Its Chemical Type : N
+Its bonding index : 3
+Its formal charge : 0
+Its CCP4 atom type : NT3
+Its residue Name: NH3
+Its connected atoms are : 
+HN1
+HN2
+HN3
+
+Atom 1 : 
+Its ID : HN1
+Its Chemical Type : H
+Its bonding index : 0
+Its formal charge : 0
+Its CCP4 atom type : H
+Its residue Name: NH3
+Its connected atoms are : 
+N
+
+Atom 2 : 
+Its ID : HN2
+Its Chemical Type : H
+Its bonding index : 0
+Its formal charge : 0
+Its CCP4 atom type : H
+Its residue Name: NH3
+Its connected atoms are : 
+N
+
+Atom 3 : 
+Its ID : HN3
+Its Chemical Type : H
+Its bonding index : 0
+Its formal charge : 0
+Its CCP4 atom type : H
+Its residue Name: NH3
+Its connected atoms are : 
+N
+Sum of number of excess electrons is 0
+Atom N of N connects 3 atoms 
+ and is with bond index 3
+Atom HN1 of H connects 1 atoms 
+ and is with bond index 0
+Atom HN2 of H connects 1 atoms 
+ and is with bond index 0
+Atom HN3 of H connects 1 atoms 
+ and is with bond index 0
+Atom name N
+number of bonding 3
+The angle is 61.2269
+Atom 0 : 
+Its ID N
+Its element type N
+Its COD root atom type N
+Its acedrg atom type N(H)3
+Its acedrg atom main type N(H)3
+Its base ring type 
+Its ccp4 atom type NT3
+Its second NB sp props H-3:H-3:H-3
+Its number of extra-electrons is 0
+Its second NB extra-electron sign is H-0:H-0:H-0
+Its hashing is 670
+Atom 1 : 
+Its ID HN1
+Its element type H
+Its COD root atom type H
+Its acedrg atom type H(NHH)
+Its acedrg atom main type H(NHH)
+Its base ring type 
+Its ccp4 atom type H
+Its second NB sp props N-0_0_0
+Its number of extra-electrons is 0
+Its second NB extra-electron sign is N-0_0_0
+Its hashing is 690
+Atom 2 : 
+Its ID HN2
+Its element type H
+Its COD root atom type H
+Its acedrg atom type H(NHH)
+Its acedrg atom main type H(NHH)
+Its base ring type 
+Its ccp4 atom type H
+Its second NB sp props N-0_0_0
+Its number of extra-electrons is 0
+Its second NB extra-electron sign is N-0_0_0
+Its hashing is 690
+Atom 3 : 
+Its ID HN3
+Its element type H
+Its COD root atom type H
+Its acedrg atom type H(NHH)
+Its acedrg atom main type H(NHH)
+Its base ring type 
+Its ccp4 atom type H
+Its second NB sp props N-0_0_0
+Its number of extra-electrons is 0
+Its second NB extra-electron sign is N-0_0_0
+Its hashing is 690
+Clustering COD org bonds started at Thu Apr  9 02:25:26 2020
+Finish clustering COD org bonds 
+finished at Thu Apr  9 02:25:26 2020
+it takes 0 seconds to finish group COD bonds 
+Group COD bonds involving metal elements 
+Search for  all target bonds started at Thu Apr  9 02:25:26 2020
+Bond between N and HN1
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+ search a organic-only bond 
+for target bond of atoms N and HN1
+The bond is not within the same ring.
+Bond order is SINGLE
+ha1 670 ha2 690
+the hybr-combination is SP-NON_SP3
+In or not in the same ring N
+ a1NB2 1:1:1: a2NB2 3:
+ a1NB1NB2 H-0:H-0:H-0 a2NB1NB2 N-0_0_0
+ a1M N(H)3 a2M H(NHH)
+ a1C N(H)3 a2C H(NHH)
+atom 1 H  atom 2 NT3
+Found all hashing codes 
+Found hybr-combination SP-NON_SP3
+Find in-ring prop N
+find 1:1:1:
+find 3:
+ find H-0:H-0:H-0
+ find N-0_0_0
+ find N(H)3
+ find H(NHH)
+ find N(H)3
+ find H(NHH)
+Found exact matches of atom cod-classes 
+Number of value associate it 109
+the table sigma 0.0693
+Finally bond sig is 0.0693
+The final target bond value is 0.928
+Its sig value is 0.0693
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Bond between N and HN2
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+ search a organic-only bond 
+for target bond of atoms N and HN2
+The bond is not within the same ring.
+Bond order is SINGLE
+ha1 670 ha2 690
+the hybr-combination is SP-NON_SP3
+In or not in the same ring N
+ a1NB2 1:1:1: a2NB2 3:
+ a1NB1NB2 H-0:H-0:H-0 a2NB1NB2 N-0_0_0
+ a1M N(H)3 a2M H(NHH)
+ a1C N(H)3 a2C H(NHH)
+atom 1 H  atom 2 NT3
+Found all hashing codes 
+Found hybr-combination SP-NON_SP3
+Find in-ring prop N
+find 1:1:1:
+find 3:
+ find H-0:H-0:H-0
+ find N-0_0_0
+ find N(H)3
+ find H(NHH)
+ find N(H)3
+ find H(NHH)
+Found exact matches of atom cod-classes 
+Number of value associate it 109
+the table sigma 0.0693
+Finally bond sig is 0.0693
+The final target bond value is 0.928
+Its sig value is 0.0693
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Bond between N and HN3
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+ search a organic-only bond 
+for target bond of atoms N and HN3
+The bond is not within the same ring.
+Bond order is SINGLE
+ha1 670 ha2 690
+the hybr-combination is SP-NON_SP3
+In or not in the same ring N
+ a1NB2 1:1:1: a2NB2 3:
+ a1NB1NB2 H-0:H-0:H-0 a2NB1NB2 N-0_0_0
+ a1M N(H)3 a2M H(NHH)
+ a1C N(H)3 a2C H(NHH)
+atom 1 H  atom 2 NT3
+Found all hashing codes 
+Found hybr-combination SP-NON_SP3
+Find in-ring prop N
+find 1:1:1:
+find 3:
+ find H-0:H-0:H-0
+ find N-0_0_0
+ find N(H)3
+ find H(NHH)
+ find N(H)3
+ find H(NHH)
+Found exact matches of atom cod-classes 
+Number of value associate it 109
+the table sigma 0.0693
+Finally bond sig is 0.0693
+The final target bond value is 0.928
+Its sig value is 0.0693
+
++++++++++++++++++++++++++++++++++++++++++++++++++++
+Number of Bonds to be found 3
+Number of Bonds found 3
+Search for all target bonds finished at Thu Apr  9 02:25:26 2020
+it takes 0 seconds to do that 
+Finish setDefaultCoordGeos() 
+Clustering all COD angles started at Thu Apr  9 02:25:26 2020
+Clustering COD org angles finished at Thu Apr  9 02:25:26 2020
+it takes 0 seconds to finish group COD angles 
+Finish groupCodOrgAngles() 
+Finish groupCodMetAngles() 
+Finish groupCodAnglesWithNonCenteredMetal() 
+Search for target angles started at Thu Apr  9 02:25:27 2020
+
+%=========================================%
+Angle between N(center) and HN2 and HN1
+
+Center Atom : N
+Its Hashing code  670
+Its root atom symbol N
+Its codNB2Symb 1:1:1:
+Its codNBSymb H-1:H-1:H-1:
+Its atom type main sec N(H)3
+Its atom type full N(H)3
+
+Atom2 : HN2
+Its Hashing code 690
+Its root atom symbol H
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section H(NHH)
+Its atom type full H(NHH)
+
+Atom3: HN1
+Its Hashing code  690
+Its root atom symbol H
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section H(NHH)
+Its atom type full H(NHH)
+
+These 3 atoms are in a ring of size 0
+The hybridization on three atoms is 0:SP3_SP-NON_SP-NON
+Find ha1 670
+Find ha2 690
+Find ha3 690
+Found 0:SP3_SP-NON_SP-NON
+Found N
+Found H
+Found H
+Found 1:1:1:
+Found 3:
+Found 3:
+Found H-1:H-1:H-1:
+Found N-3:
+Found N-3:
+Found N(H)3
+Found H(NHH)
+Found H(NHH)
+Angle value 106
+Angle siga 13.3
+Number of observations  106
+Approximation level 0
+Finally the angle value is 106
+It sig value is 13.3
+Target angle value : 106
+
+%=========================================%
+Angle between N(center) and HN3 and HN1
+
+Center Atom : N
+Its Hashing code  670
+Its root atom symbol N
+Its codNB2Symb 1:1:1:
+Its codNBSymb H-1:H-1:H-1:
+Its atom type main sec N(H)3
+Its atom type full N(H)3
+
+Atom2 : HN3
+Its Hashing code 690
+Its root atom symbol H
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section H(NHH)
+Its atom type full H(NHH)
+
+Atom3: HN1
+Its Hashing code  690
+Its root atom symbol H
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section H(NHH)
+Its atom type full H(NHH)
+
+These 3 atoms are in a ring of size 0
+The hybridization on three atoms is 0:SP3_SP-NON_SP-NON
+Find ha1 670
+Find ha2 690
+Find ha3 690
+Found 0:SP3_SP-NON_SP-NON
+Found N
+Found H
+Found H
+Found 1:1:1:
+Found 3:
+Found 3:
+Found H-1:H-1:H-1:
+Found N-3:
+Found N-3:
+Found N(H)3
+Found H(NHH)
+Found H(NHH)
+Angle value 106
+Angle siga 13.3
+Number of observations  106
+Approximation level 0
+Finally the angle value is 106
+It sig value is 13.3
+Target angle value : 106
+
+%=========================================%
+Angle between N(center) and HN3 and HN2
+
+Center Atom : N
+Its Hashing code  670
+Its root atom symbol N
+Its codNB2Symb 1:1:1:
+Its codNBSymb H-1:H-1:H-1:
+Its atom type main sec N(H)3
+Its atom type full N(H)3
+
+Atom2 : HN3
+Its Hashing code 690
+Its root atom symbol H
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section H(NHH)
+Its atom type full H(NHH)
+
+Atom3: HN2
+Its Hashing code  690
+Its root atom symbol H
+Its codNB2Symb 3:
+Its codNBSymb N-3:
+Its atom type main section H(NHH)
+Its atom type full H(NHH)
+
+These 3 atoms are in a ring of size 0
+The hybridization on three atoms is 0:SP3_SP-NON_SP-NON
+Find ha1 670
+Find ha2 690
+Find ha3 690
+Found 0:SP3_SP-NON_SP-NON
+Found N
+Found H
+Found H
+Found 1:1:1:
+Found 3:
+Found 3:
+Found H-1:H-1:H-1:
+Found N-3:
+Found N-3:
+Found N(H)3
+Found H(NHH)
+Found H(NHH)
+Angle value 106
+Angle siga 13.3
+Number of observations  106
+Approximation level 0
+Finally the angle value is 106
+It sig value is 13.3
+Target angle value : 106
+There are 0 rings 
+These are: 
+Search target angles finished at Thu Apr  9 02:25:27 2020
+it takes 0 to search for all target angles 
+Finish searching angles 
+Total number of torsions is 0
+Number of torsions in the mini-set 0
+Originally the system has 0
+Number of torsions from cod section 0
+DOUBLE CHECKing again 2
+Bond sig value 0.0693
+Bond sig value 0.0693
+Bond sig value 0.0693
+atom N has charge of 0
+atom HN1 has charge of 0
+atom HN2 has charge of 0
+atom HN3 has charge of 0
+Kekulize the system 
+Atom 0 of N is  a N atom 
+Atom 1 of HN1 is  a H atom 
+Atom 2 of HN2 is  a H atom 
+Atom 3 of HN3 is  a H atom 
+For atom N : 
+it connects 3 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+For atom HN1 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+For atom HN2 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+For atom HN3 : 
+it connects 1 atom(s) 
+its formal charge is 0
+its number of EX electrons is 0
+Atom N   0     0
+Atom HN1   1     0
+Atom HN2   2     0
+Atom HN3   3     0
+Now those atoms are considered to be with pi electrons 
+Now there exist Only irreducible sets of bonds with undecided bond-orders
+Bond-orders of All bonds are the following 
+Bond 0 of atom N and HN1
+The bond order is 1
+Bond 1 of atom N and HN2
+The bond order is 1
+Bond 2 of atom N and HN3
+The bond order is 1
+nDone in this round : 0
+Number of atoms with free pi electrons are 0
+No further kekulization on rings are needed. 
+All  bond-orders are set.
+Kekulize done 
+atom N has charge of 0
+atom HN1 has charge of 0
+atom HN2 has charge of 0
+atom HN3 has charge of 0
+=========END OF PROCESS INFORMATION
+ ==========
