@@ -83,6 +83,7 @@ class CovLink(object):
         self.stdLigand1["remainAngs"]       = []
         self.stdLigand1["remainTors"]       = []
         self.stdLigand1["remainChirs"]      = []
+        self.stdLigand1["linkChir"]         = []       # It will be [aChi, delAtmIdx]
         self.stdLigand1["remainPls"]        = []
         self.stdLigand2                     = {}
         self.stdLigand2["fromScr"]          = False
@@ -98,7 +99,8 @@ class CovLink(object):
         self.stdLigand2["remainBonds"]      = []
         self.stdLigand2["remainAngs"]       = []
         self.stdLigand2["remainTors"]       = []
-        self.stdLigand2["remainChirs"]    = []
+        self.stdLigand2["remainChirs"]      = []
+        self.stdLigand2["linkChir"]         = []       # It will be [aChi, delAtmIdx]
         self.stdLigand2["remainPls"]        = []
         self.suggestBonds                   = []
         self.combLigand                     = {}
@@ -1375,7 +1377,6 @@ class CovLinkGenerator(CExeCode):
                     self.setOneMonomer(tLinkIns.stdLigand2)
                     #print "output comp 2 ", tLinkIns.stdLigand2["outComp"]
 
-
             if not self.errLevel:
                 print("##################################################################")
                 print("#                                                                #")
@@ -1596,8 +1597,13 @@ class CovLinkGenerator(CExeCode):
         self.setAddedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
         if not self.errLevel:
             self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+            print("Here", len(tLinkedObj.stdLigand1["linkChir"]))
+            if len(tLinkedObj.stdLigand1["linkChir"]) ==2:
+                self.setLinkChir(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.stdLigand2)
             if not self.errLevel:
                 self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+                if len(tLinkedObj.stdLigand2["linkChir"]) ==2:
+                    self.setLinkChir(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.stdLigand1)
                 #if not self.errLevel:
                 #    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
                     #if not self.errLevel:
@@ -1609,6 +1615,16 @@ class CovLinkGenerator(CExeCode):
             for aL in self.errMessage[self.errLevel]:
                 print(aL)
 
+    def  setLinkChir(self, tRes, tMod, tOthRes):
+         
+         tMod["deleted"]["chirs"].append(tRes["linkChir"][0])
+         idKey = "atom_id_" + tRes["linkChir"][1]
+         print(idKey)
+         print("center ", tRes["linkChir"][0]["atom_id_centre"])
+         print("before ", tRes["linkChir"][0][idKey])
+         tRes["linkChir"][0][idKey]=tOthRes["atomName"]
+         print("after ", tRes["linkChir"][0][idKey])
+         
     def addjustFormalChargeInOneResForModification(self, tRes, tMod):
 
         changeAtms = []
@@ -1941,27 +1957,44 @@ class CovLinkGenerator(CExeCode):
         # where one of NB atoms replaced.
         if "chirs" in tRes["comp"]:
             for aChi in tRes["comp"]["chirs"]:
-                #print "center atom ", aChi["atom_id_centre"], " in chir ", aChi['id']
-                #print "atom ", aChi["atom_id_1"], " in chir ", aChi['id']
-                #print "atom ", aChi["atom_id_2"], " in chir ", aChi['id']
-                #print "atom ", aChi["atom_id_3"], " in chir ", aChi['id']
-                if aChi["atom_id_centre"].upper() in delAtomIdSet\
-                   or aChi["atom_id_1"].upper() in delAtomIdSet\
-                   or aChi["atom_id_2"].upper() in delAtomIdSet\
-                   or aChi["atom_id_3"].upper() in delAtomIdSet:
-                    tMod["deleted"]["chirs"].append(aChi)
-                    if aChi["atom_id_centre"].upper() in delAtomIdSet:
-                        print("atom ", aChi["atom_id_centre"], " in chir ", aChi['id'], " is deleted ")
-                    elif aChi["atom_id_1"].upper() in delAtomIdSet:
-                        print("atom ", aChi["atom_id_1"], " in chir ", aChi['id'], " is deleted ")
-                    elif aChi["atom_id_2"].upper() in delAtomIdSet:
-                        print("atom ", aChi["atom_id_2"], " in chir ", aChi['id'], " is deleted ")
-                    elif aChi["atom_id_3"].upper() in delAtomIdSet:
-                        print("atom ", aChi["atom_id_3"], " in chir ", aChi['id'], " is deleted ")
-                    print("Chiral center ", aChi['id'], " is deleted ")
+                if aChi["atom_id_centre"] != tRes["atomName"]:
+                    if aChi["atom_id_centre"].upper() in delAtomIdSet\
+                       or aChi["atom_id_1"].upper() in delAtomIdSet\
+                       or aChi["atom_id_2"].upper() in delAtomIdSet\
+                       or aChi["atom_id_3"].upper() in delAtomIdSet:
+                        tMod["deleted"]["chirs"].append(aChi)
+                        if aChi["atom_id_centre"].upper() in delAtomIdSet:
+                            print("atom ", aChi["atom_id_centre"], " in chir ", aChi['id'], " is deleted ")
+                        elif aChi["atom_id_1"].upper() in delAtomIdSet:
+                            print("atom ", aChi["atom_id_1"], " in chir ", aChi['id'], " is deleted ")
+                        elif aChi["atom_id_2"].upper() in delAtomIdSet:
+                            print("atom ", aChi["atom_id_2"], " in chir ", aChi['id'], " is deleted ")
+                        elif aChi["atom_id_3"].upper() in delAtomIdSet:
+                            print("atom ", aChi["atom_id_3"], " in chir ", aChi['id'], " is deleted ")
+                        print("Chiral center ", aChi['id'], " is deleted ")
+                    else:
+                        tRes["remainChirs"].append(aChi)
+                        print("remain chiral center")
+                        print ("center atom ", aChi["atom_id_centre"], " in chir ", aChi['id'])
+                        print ("atom ", aChi["atom_id_1"], " in chir ", aChi['id'])
+                        print ("atom ", aChi["atom_id_2"], " in chir ", aChi['id'])
+                        print ("atom ", aChi["atom_id_3"], " in chir ", aChi['id'])
                 else:
-                    tRes["remainChirs"].append(aChi)
-                       
+                    delIdSet = []
+                    if aChi["atom_id_1"].upper() in delAtomIdSet:
+                         delIdSet.append("1")
+                    if aChi["atom_id_2"].upper() in delAtomIdSet:
+                         delIdSet.append("2")
+                    if aChi["atom_id_3"].upper() in delAtomIdSet:
+                         delIdSet.append("3")
+                    if len(delIdSet) !=1 :
+                        # Original chiral center destroyed. Let combo-conformer to determine if a chir exists.
+                        tMod["deleted"]["chirs"].append(aChi)
+                    else :
+                        tRes["linkChir"].append(aChi)
+                        tRes["linkChir"].append(delIdSet[0])
+
+
         # Delete the deleted atom from a plane and even delete a plane 
         # if number of atoms in a plane smaller then 3 (after deleting the assigned atom)
         if "planes" in tRes["comp"]:
@@ -2347,7 +2380,24 @@ class CovLinkGenerator(CExeCode):
             aChir["atom_id_3_alias"]      = self.getAtomAlias(aChir["atom_id_3"], tLinkedObj.stdLigand1["remainAtoms"])
             if aChir["atom_id_centre_alias"] and aChir["atom_id_1_alias"] and aChir["atom_id_2_alias"] and aChir["atom_id_3_alias"]:
                 tLinkedObj.combLigand["chirs"].append(aChir)
-            
+        if len(tLinkedObj.stdLigand1["linkChir"]) ==2:
+            tLinkedObj.stdLigand1["linkChir"][0]["atom_id_centre_alias"] =\
+                             self.getAtomAlias(tLinkedObj.stdLigand1["atomName"], tLinkedObj.stdLigand1["remainAtoms"])
+            print ("link atom, centre alias : ", tLinkedObj.stdLigand1["linkChir"][0]["atom_id_centre_alias"])
+            otherId = "atom_id_" + tLinkedObj.stdLigand1["linkChir"][1]
+            idKey = "atom_id_" + tLinkedObj.stdLigand1["linkChir"][1] + "_alias"
+            nN =0
+            for aC in ["1","2", "3"]:
+                curKey1 = "atom_id_" + aC
+                curKey2 = curKey1 + "_alias"
+                if curKey2 != idKey:
+                    tLinkedObj.stdLigand1["linkChir"][0][curKey2]  = \
+                                  self.getAtomAlias(tLinkedObj.stdLigand1["linkChir"][0][curKey1], tLinkedObj.stdLigand1["remainAtoms"])   
+                else:
+                    tLinkedObj.stdLigand1["linkChir"][0][curKey2]  = \
+                                  self.getAtomAlias(tLinkedObj.stdLigand1["linkChir"][0][curKey1], tLinkedObj.stdLigand2["remainAtoms"])   
+                print(curKey2,  tLinkedObj.stdLigand1["linkChir"][0][curKey2])
+            tLinkedObj.combLigand["chirs"].append(tLinkedObj.stdLigand1["linkChir"][0])
         for aChir in  tLinkedObj.stdLigand2["remainChirs"]:
             aChir["atom_id_centre_alias"] = self.getAtomAlias(aChir["atom_id_centre"], tLinkedObj.stdLigand2["remainAtoms"])
             aChir["atom_id_1_alias"] = self.getAtomAlias(aChir["atom_id_1"], tLinkedObj.stdLigand2["remainAtoms"])
@@ -2356,6 +2406,25 @@ class CovLinkGenerator(CExeCode):
             if aChir["atom_id_centre_alias"] and aChir["atom_id_1_alias"] and aChir["atom_id_2_alias"] and aChir["atom_id_3_alias"]:
                 tLinkedObj.combLigand["chirs"].append(aChir)
 
+        if len(tLinkedObj.stdLigand2["linkChir"]) ==2:
+            tLinkedObj.stdLigand2["linkChir"][0]["atom_id_centre_alias"] =\
+                             self.getAtomAlias(tLinkedObj.stdLigand2["atomName"], tLinkedObj.stdLigand2["remainAtoms"])
+            print ("link atom, centre alias : ", tLinkedObj.stdLigand2["linkChir"][0]["atom_id_centre_alias"])
+            otherId = "atom_id_" + tLinkedObj.stdLigand2["linkChir"][1]
+            idKey = "atom_id_" + tLinkedObj.stdLigand2["linkChir"][1] + "_alias"
+            for aC in ["1","2", "3"]:
+                curKey1 = "atom_id_" + aC
+                curKey2 = curKey1 + "_alias"
+                
+                if curKey2 != idKey:
+                    tLinkedObj.stdLigand2["linkChir"][0][curKey2]  =  \
+                                        self.getAtomAlias(tLinkedObj.stdLigand2["linkChir"][0][curKey1], tLinkedObj.stdLigand2["remainAtoms"])  
+                else:
+                    tLinkedObj.stdLigand2["linkChir"][0][curKey2]  = \
+                                        self.getAtomAlias(tLinkedObj.stdLigand2["linkChir"][0][curKey1], tLinkedObj.stdLigand1["remainAtoms"])
+                print(curKey2,  tLinkedObj.stdLigand2["linkChir"][0][curKey2])
+            tLinkedObj.combLigand["chirs"].append(tLinkedObj.stdLigand2["linkChir"][0])
+  
         self.outAtomNameMapToJSon(tLinkedObj)
 
     def outAtomNameMapToJSon(self, tLinkedObj):
@@ -2641,6 +2710,7 @@ class CovLinkGenerator(CExeCode):
                     print("The cif file of the combo-ligand for input ", tLinkedObj.combLigand["inCif"])
                     self.comboLigToSimplifiedMmcif(tLinkedObj.combLigand, tLinkedObj.combLigand["inCif"])
                     self.setOneMonomer(tLinkedObj.combLigand)
+                    
                     if not self.errLevel:
                         tLinkedObj.outCombLigand["name"] = tLinkedObj.combLigand["name"]
                         tLinkedObj.outCombLigand["cifObj"] = Ccp4MmCifObj(tLinkedObj.combLigand["outCif"])["ccp4CifObj"]            

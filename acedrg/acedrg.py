@@ -2217,8 +2217,8 @@ class Acedrg(CExeCode ):
         for aL in t3Bs[0]:
             fO.write(aL)
 
-        fO.write("_chem_comp_bond.value_dist_prot\n")
-        fO.write("_chem_comp_bond.value_dist_prot_esd\n")
+        fO.write("_chem_comp_bond.value_dist_nucleus\n")
+        fO.write("_chem_comp_bond.value_dist_nucleus_esd\n")
         aIDList = list(tBondSet.keys())
         print(aIDList)
 

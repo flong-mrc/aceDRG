@@ -7901,8 +7901,8 @@ namespace LIBMOL
                           << "_chem_comp_bond.atom_id_2" << std::endl
                           << "_chem_comp_bond.type" << std::endl
                           << "_chem_comp_bond.aromatic"  << std::endl
-                          << "_chem_comp_bond.value_dist_prot" << std::endl
-                          << "_chem_comp_bond.value_dist_prot_esd" << std::endl
+                          << "_chem_comp_bond.value_dist_nucleus" << std::endl
+                          << "_chem_comp_bond.value_dist_nucleus_esd" << std::endl
                           << "_chem_comp_bond.value_dist"<< std::endl
                           << "_chem_comp_bond.value_dist_esd" << std::endl;
                           // << "_chem_comp_bond.exact_cod_dist" << std::endl;
