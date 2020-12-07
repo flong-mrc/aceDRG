@@ -1114,7 +1114,7 @@ class Acedrg(CExeCode ):
         if self.workMode == 80 :
            
             self._cmdline += " -R yes -c %s -D %s  -o %s "%(tIn, self.acedrgTables, self.outProtDistTable)
-            print(self._cmdline)
+            #print(self._cmdline)
             self.subExecute()
 
         if self.workMode ==900:
@@ -2102,28 +2102,51 @@ class Acedrg(CExeCode ):
             aMmCif.write("#\n")
         
             # Atom section
+            lCP = False
+            for aAtom in allAtoms: 
+                if "partial_charge" in list(aAtom.keys()):
+                    lCP = True
+                break
+
             aMmCif.write("loop_\n")
             aMmCif.write("_chem_comp_atom.comp_id\n")
             aMmCif.write("_chem_comp_atom.atom_id\n")
             aMmCif.write("_chem_comp_atom.type_symbol\n")
             aMmCif.write("_chem_comp_atom.type_energy\n")
-            aMmCif.write("_chem_comp_atom.charge\n")
+            if not lCP:
+                aMmCif.write("_chem_comp_atom.charge\n")
+            else:
+                aMmCif.write("_chem_comp_atom.partial_charge\n")
             aMmCif.write("_chem_comp_atom.x\n")
             aMmCif.write("_chem_comp_atom.y\n")
             aMmCif.write("_chem_comp_atom.z\n")
             #nTetraChi = 0 
             for aAtom in allAtoms:
-                aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
-                             %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
-                               aAtom["type_energy"], float(aAtom["charge"]), 
-                               float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                if not lCP:
+                    aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                                  %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                    aAtom["type_energy"], float(aAtom["charge"]), 
+                                    float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                else :
+                    aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                                  %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                    aAtom["type_energy"], float(aAtom["partial_charge"]), 
+                                    float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                   
             # Bond section
+            lAR = True
+            for aBond in allBonds:
+                if not "aromatic" in list(aBond.keys()):
+                    lAR = False
+                break
+
             aMmCif.write("#\n")
             aMmCif.write("_chem_comp_bond.comp_id\n")
             aMmCif.write("_chem_comp_bond.atom_id_1\n")
             aMmCif.write("_chem_comp_bond.atom_id_2\n")
             aMmCif.write("_chem_comp_bond.type\n")
-            aMmCif.write("_chem_comp_bond.aromatic\n")
+            if lAR:
+                aMmCif.write("_chem_comp_bond.aromatic\n")
             aMmCif.write("_chem_comp_bond.value_dist\n")
             aMmCif.write("_chem_comp_bond.value_dist_esd\n")
             for aBond in allBonds:
@@ -2131,12 +2154,20 @@ class Acedrg(CExeCode ):
                 name2 = aBond["atom_id_2"]
 
                 bType = aBond["type"]
-                isAro = aBond["aromatic"]
+                isAro =""
+                if lAR:
+                    isAro = aBond["aromatic"]
+                
                 bLen  = float(aBond["value_dist"])
                 dBlen = float(aBond["value_dist_esd"])
-                aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
-                              %(tMonoName, name1, name2,  bType, \
-                                isAro, bLen, dBlen))
+                if lAR:
+                    aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
+                                  %(tMonoName, name1, name2,  bType, \
+                                    isAro, bLen, dBlen))
+                else:
+                    aMmCif.write("%s       %s       %s       %s       %5.4f     %5.4f\n" \
+                                  %(tMonoName, name1, name2,  bType, bLen, dBlen))
+
             aMmCif.close()
             
     def addProtCols(self):
@@ -2177,22 +2208,23 @@ class Acedrg(CExeCode ):
         lB2 = False
         aBl = []
         for aL in allLs:
-         
-            if aL.find("_chem_comp_bond.aromatic") !=-1:
-                aBl.append(aL)
+            if aL.find("_chem_comp_bond.value_dist") !=-1 and aL.find("_chem_comp_bond.value_dist_")==-1:
                 t3B.append(aBl)
-                aBl = []
                 lB1 = False
-            elif not lB1 and aL.find("loop_") != -1 and not lB2 :
-                t3B.append(aBl)
+                lB2 = True
                 aBl = []
                 aBl.append(aL)
-                lB2 = True
-                aBl.append(aL)
+            elif  lB2 :
+                if aL.find("loop_") != -1  :
+                    t3B.append(aBl)
+                    lB2= False
+                    aBl = []
+                    aBl.append(aL)
+                else:
+                    aBl.append(aL)
             else:    
                 aBl.append(aL)
-        t3B.append(aBl)
-  
+        t3B.append(aBl) 
 
     def readProTab(self, tBondSet):
  
@@ -2214,37 +2246,50 @@ class Acedrg(CExeCode ):
 
         fO = open(tCif, "w")
 
+        lFN = False
         for aL in t3Bs[0]:
             fO.write(aL)
+            if aL.find("_chem_comp_bond.value_dist_nucleus") != -1:
+                lFN = True  
 
-        fO.write("_chem_comp_bond.value_dist_nucleus\n")
-        fO.write("_chem_comp_bond.value_dist_nucleus_esd\n")
+        if not lFN:
+            fO.write("_chem_comp_bond.value_dist_nucleus\n")
+            fO.write("_chem_comp_bond.value_dist_nucleus_esd\n")
+
         aIDList = list(tBondSet.keys())
         print(aIDList)
-
         for aL in t3Bs[1]:
+            outL = ""
             strs = aL.strip().split()
+            nStrs = len(strs)
             if len(strs)==1:
                 fO.write(aL)
-            elif len(strs)==7:
+            elif not lFN:
                 id1 = strs[1]
                 id2 = strs[2]
-                compId = id1 + "_" + id2
-                if compId in aIDList:
-                    v  = "%4.3f"%float(tBondSet[compId]["prot_h"])
-                    vs = "%4.3f"%float(tBondSet[compId]["prot_h_s"])
-                    outL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(12), strs[1].ljust(12),
-                                                   strs[2].ljust(9), strs[3].ljust(13),
-                                                   strs[4].ljust(6), v.ljust(8),
-                                                   vs.ljust(8), strs[5].ljust(8), strs[6].ljust(8))
+                compId1 = id1 + "_" + id2
+                compId2 = id2 + "_" + id1
+                if compId1 in aIDList or compId2 in aIDList:
+                    if compId1 in aIDList:
+                        v  = "%4.3f"%float(tBondSet[compId1]["prot_h"])
+                        vs = "%4.3f"%float(tBondSet[compId1]["prot_h_s"])
+                    elif compId2 in aIDList:
+                        v  = "%4.3f"%float(tBondSet[compId2]["prot_h"])
+                        vs = "%4.3f"%float(tBondSet[compId2]["prot_h_s"])
+                    for i in range(nStrs-2):
+                        outL += "%s"%(strs[i].ljust(10))
+                    outL+="%s%s%s%s\n"%(v.ljust(10), vs.ljust(10), strs[-2].ljust(10), strs[-1].ljust(10))
+                    print(outL)
                     fO.write(outL)
                 else:
-                    outL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(12), strs[1].ljust(12),
-                                                   strs[2].ljust(9), strs[3].ljust(13),
-                                                   strs[4].ljust(6), strs[5].ljust(8),
-                                                   strs[6].ljust(8), strs[5].ljust(8), strs[6].ljust(8))
-
+                    for i in range(nStrs):
+                        outL += "%s"%(strs[i].ljust(10))
+                    outL+="%s%s\n"%(strs[-2].ljust(10), strs[-1].ljust(10))
                     fO.write(outL)
+            else :
+                for i in range(nStrs):
+                    outL += "%s"%(strs[i].ljust(10))
+                fO.write(outL)
                     
         for aL in t3Bs[2]:
             fO.write(aL)

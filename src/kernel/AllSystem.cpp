@@ -4662,6 +4662,14 @@ namespace LIBMOL
                 //          << "_chem_comp_bond.value_dist_prot_esd" 
                 //          << std::endl;
                
+                for (std::vector<AtomDict>::iterator iAt=tMonomer.allAtoms.begin();
+                      iAt != tMonomer.allAtoms.end(); iAt++)
+                {
+                    if (iAt->id.find("\'") !=std::string::npos)
+                    {
+                        iAt->id = "\"" + iAt->id + "\"";
+                    }
+                }
                 
                 for (std::vector<BondDict>::iterator iB=tMonomer.allBonds.begin();
                           iB !=tMonomer.allBonds.end(); iB++)
@@ -4680,7 +4688,15 @@ namespace LIBMOL
                         idxH = iB->atomsIdx[1];
                         idxX = iB->atomsIdx[0];
                     }
-                    
+                    std::cout << "atom 1 " << tMonomer.allAtoms[iB->atomsIdx[0]].id 
+                              << " of element " 
+                              <<  tMonomer.allAtoms[iB->atomsIdx[0]].chemType 
+                              << std::endl;
+                    std::cout << "atom 2 " << tMonomer.allAtoms[iB->atomsIdx[1]].id 
+                              << " of element " 
+                              <<  tMonomer.allAtoms[iB->atomsIdx[1]].chemType 
+                              << std::endl;
+                    std::cout << "idxH = " << idxH << std::endl;
                     double aProtD      = 0.0;
                     double aProtD_siga = 0.0;
                             

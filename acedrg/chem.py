@@ -133,11 +133,10 @@ class ChemCheck(object):
             print("The input ligands/molecules contains metal or other heavier atoms ")
             print("Acedrg currently deals with ligands/molecules with following elements only ")
             print("C, N, O, S, P, B, F, Cl, Br, I, H")
+            print("The job finishes succesfully")
         if len(allAtomElems) ==0:
-            print("The input ligands/molecules contains metal or other heavier atoms ")
-            print("Acedrg currently deals with ligands/molecules with following elements only ")
-            print("C, N, O, S, P, B, F, Cl, Br, I, H")
-            #print "Can not get the element symbols of atoms. Check input file format"
+            print ("Can not get the element symbols of atoms. Check input file format")
+            print("Error : The job stops because of errors")
             organicOnly = False
 
         return organicOnly 

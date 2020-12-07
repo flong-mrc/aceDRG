@@ -149,17 +149,20 @@ namespace LIBMOL
         bool inBonds(int tIdx1, int tIdx2, 
                      std::vector<BondDict> & tBonds);
         void getUniqueBonds(PeriodicTable & tPTab);
-        void getUniqueAtomLinks(PeriodicTable & tPTab,
+        void getUniqueAtomLinks(double   &    tRadFac,
+                                PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        void getUniqueAtomLinks2(PeriodicTable & tPTab,
-                                std::vector<CrystInfo>::iterator tCryst);
+        void getUniqueAtomLinks2(double   &    tRadFac,
+                                 PeriodicTable & tPTab,
+                                 std::vector<CrystInfo>::iterator tCryst);
         void getUniqueAtomLinksNeuD(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
         
-        void getUniqueAtomLinksMet(PeriodicTable & tPTab,
-                            std::vector<CrystInfo>::iterator tCryst);
-        void getUniqueAtomLinksMet2(PeriodicTable & tPTab,
-                                    std::vector<CrystInfo>::iterator tCryst);
+        void getUniqueAtomLinksMet(double        &    tRadFac,
+                                   double        &  tAngCut,
+                                   PeriodicTable & tPTab,
+                                   std::vector<CrystInfo>::iterator tCryst);
+        
         
         void setAssymCellAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
@@ -168,7 +171,10 @@ namespace LIBMOL
         
         void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
         
-        void checkAtomLinksByAngles(std::vector<CrystInfo>::iterator tCryst);
+        void checkAtomLinksByAngles(double  & tAngCut,
+                                    std::vector<CrystInfo>::iterator tCryst);
+        void checkAtomLinksByAngles2(double  & tAngCut,
+                                     std::vector<CrystInfo>::iterator tCryst);
         
         void getUniqueBondsMols(Molecule    & tMol, 
                                 std::vector<CrystInfo>::iterator tCryst);
@@ -311,6 +317,10 @@ namespace LIBMOL
                          std::vector<std::string> & tOrgTab);
         double getStdDistFromPTable(PeriodicTable & tPTab,
                                     ID elem1, ID elem2);
+        void setMetalBondRangeFromTable(double   &    tRadFac);
+        void setMetalBondRangeFromPeriodicTable(double   &    tRadFac,
+                                                PeriodicTable  & tPTab);
+        
         void buildMetalSph(double & tRadFac,
                            PeriodicTable & tPTab,
                            std::vector<CrystInfo>::iterator tCryst,
@@ -333,11 +343,19 @@ namespace LIBMOL
                           std::map<std::string, double> & tUserParas);
         
         
-        void execute(FileName tOutName);
-        void execute1(FileName tOutName);
+        void execute( FileName tInParaName,
+                      FileName tOutName);
+        
+        void execute1(FileName tInParaName,
+                      FileName tOutName);
+        
         void executeNeuD(FileName tOutName);
-        void executeMet(FileName tOutName);
-        void executeMetRange(FileName tInParaName, FileName tOutName);
+        
+        void executeMet(FileName tInParaName, FileName tOutName);
+        
+        void executeMetRange(FileName tInParaName,
+                             FileName tOutName);
+        
         void executeSelectedAtomRange(FileName tInParaName,
                                       FileName tOutName);
         
@@ -388,6 +406,9 @@ namespace LIBMOL
         std::map<std::string, std::map<
         std::string, std::map<std::string,
         REAL> > >                               metalBondRange;
+        std::map<std::string, std::map<
+        std::string, std::map<std::string,
+        REAL> > >                               metalBondRange2;
         
         std::map<std::string, std::map<REAL,
         std::vector<std::vector<std::string > > > >     
@@ -398,6 +419,7 @@ namespace LIBMOL
         
     private :
         
+        REAL                                                myNBCut;
         int                                                 myNBDepth;
         std::map<std::string, std::map<std::string, REAL> > shortLenList;
                 

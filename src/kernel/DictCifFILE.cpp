@@ -883,7 +883,7 @@ namespace LIBMOL
             for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
             {
-                if (iAt->fromCalc && iAt->chemType !="H")
+                if (iAt->fromCalc && iAt->chemType !="H" && iAt->chemType !="D")
                 {
                     hasHeavyCalcAtoms = true;
                     //std::cout << iAt->id << " iAt->fromCalc " 
@@ -911,9 +911,11 @@ namespace LIBMOL
     bool GenCifFile::checkOverAll(int tWorkMode)
     {
         bool aRet= true;
-        //std::cout << "not neutron diffr " << notNeuD << std::endl;
-        //std::cout << "not powder diffr " << notPowder << std::endl;
-        //std::cout << "RFactorOK " << RFactorOK << std::endl;
+        std::cout << "not neutron diffr " << notNeuD << std::endl;
+        std::cout << "not powder diffr " << notPowder << std::endl;
+        std::cout << "colidOK " << colidOK << std::endl;
+        std::cout << "hasHeavyCalcAtoms " << hasHeavyCalcAtoms << std::endl;
+        std::cout << "RFactorOK " << RFactorOK << std::endl;
         
         if (tWorkMode==3111)
         {
@@ -939,7 +941,7 @@ namespace LIBMOL
                 aRet=false;
             }
         }
-        
+        std::cout << aRet << std::endl;
         return aRet;
     }
     
@@ -2098,7 +2100,20 @@ namespace LIBMOL
                     StrTokenize((*iOps), tBuf1);
                 }
                 
+                for (unsigned i=0; i < tBuf1.size(); i++)
+                {
+                    std::cout  << tBuf1[i] << std::endl;
+                }
+                
+               
+                
                 StrTokenize(tBuf1[aPos], tBuf2,',');
+                
+                for (unsigned i=0; i < tBuf2.size(); i++)
+                {
+                    tBuf2[i] = TrimSpaces(tBuf2[i]);
+                    //std::cout << "tBuf2 " << i << "  " << tBuf2[i] << std::endl;
+                }
                 
                 StrToSymmOps(tBuf2, itsCurCryst->itsSpaceGroup->sgOp[(*iOps)]);
             }
@@ -2740,7 +2755,7 @@ namespace LIBMOL
         {
             errMsg.push_back("REJECTED STRUCTURE: Non-H atoms have less than 1.0 occp.\n");
         }
-        else if (!hasHeavyCalcAtoms)
+        else if (hasHeavyCalcAtoms)
         {
             errMsg.push_back("REJECTED STRUCTURE: Atoms of theoretically calculated found.\n");
         }

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env ccp4-python
 
 from __future__ import division
 from __future__ import print_function

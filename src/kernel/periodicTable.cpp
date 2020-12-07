@@ -504,6 +504,7 @@ namespace LIBMOL
         //elements["Sg"]["cova"]      = 1.50;
         elemProps["Sg"]["vdw"]      = 1.35;
         elemProps["Sg"]["cova"]     = 1.50;
+        elemProps["Sg"]["ionM+"]    = 0.79;
 
         elements["Mn"]["row"]       = 4;
         elements["Mn"]["group"]     = 7;
@@ -556,6 +557,7 @@ namespace LIBMOL
         //elements["Bh"]["cova"]      = 1.50;
         elemProps["Bh"]["vdw"]      = 1.35;   // Need to find it out
         elemProps["Bh"]["cova"]     = 1.50;
+        elemProps["Bh"]["ionM+"]    = 0.77;
         
         
         elements["Fe"]["row"]       = 4;
@@ -583,7 +585,6 @@ namespace LIBMOL
         //elements["Ru"]["cova"]      = 1.40;
         elemProps["Ru"]["vdw"]      = 1.30;
         elemProps["Ru"]["cova"]     = 1.46;
-        
         elemProps["Ru"]["ionM+"]   = 0.82;
         //elemProps["Ru4+"]["cova"]   = 0.76;
         //elemProps["Ru5+"]["cova"]   = 0.705;
@@ -614,6 +615,7 @@ namespace LIBMOL
         //elements["Hs"]["cova"]      = 1.50;
         elemProps["Hs"]["vdw"]      = 1.30;   // Need to find it out
         elemProps["Hs"]["cova"]     = 1.50;
+        elemProps["Hs"]["ionM+"]   = 0.805;
         
         elements["Co"]["row"]       = 4;
         elements["Co"]["group"]     = 9;
@@ -663,6 +665,7 @@ namespace LIBMOL
         //elements["Mt"]["cova"]      = 1.21;
         elemProps["Mt"]["vdw"]      = 1.35;   // Need to find it out
         elemProps["Mt"]["cova"]      = 1.21;
+        elemProps["Mt"]["ionM+"]    = 0.82;
         
         elements["Ni"]["row"]       = 4;
         elements["Ni"]["group"]     = 10;
@@ -713,6 +716,7 @@ namespace LIBMOL
         //elements["Ds"]["cova"]      = 1.50;
         elemProps["Ds"]["vdw"]      = 1.75;
         elemProps["Ds"]["cova"]      = 1.50;
+        elemProps["Ds"]["ionM+"]    = 0.94;
         
         elements["Cu"]["row"]       = 4;
         elements["Cu"]["group"]     = 11;
@@ -762,6 +766,7 @@ namespace LIBMOL
         //elements["Rg"]["cova"]      = 1.50;
         elemProps["Rg"]["vdw"]      = 1.66;   // Need to find it out 
         elemProps["Rg"]["cova"]     = 1.50;
+        elemProps["Rg"]["ionM+"]    = 0.94;
         
         elements["Zn"]["row"]       = 4;
         elements["Zn"]["group"]     = 12;
@@ -1633,9 +1638,10 @@ namespace LIBMOL
                                           REAL> > >  & tAllowedRangeDists,
                                           double tDelta)
     {
+        // This function is for metal related bonds
         
         //std::ofstream compTab("idealComp.table");
-        
+        tDelta = tDelta/10.0;
         std::vector<ID>  metTab, metLoidTab;
         
         initMetalTab(metTab);
@@ -1724,15 +1730,15 @@ namespace LIBMOL
             for (std::map<std::string, std::map<std::string, REAL> >::iterator
                  iR2=iR1->second.begin(); iR2 !=iR1->second.end(); iR2++)
             {
-                compTab << iR1->first << "\t"
-                        << iR2->first << "\t"
-                        << iR2->second["min"] << "\t"
-                        << iR2->second["max"] << "\n";
+                std::cout << iR1->first << "\t"
+                          << iR2->first << "\t"
+                          << iR2->second["min"] << "\t"
+                          << iR2->second["max"] << "\n";
             }
         }
+        */
         
-        compTab.close();
-         */
+        
     }
     
     void PeriodicTable::construAtomIdealDists(std::map<std::string,

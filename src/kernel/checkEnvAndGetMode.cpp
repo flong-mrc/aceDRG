@@ -83,7 +83,7 @@ namespace LIBMOL
         
         int c, index; 
         while ((c = getopt (numArg, ArgVars, 
-         "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:M:N:O:P:R:S:T:U:X:Y:Z:1:2:3:4:"))
+         "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:L:M:N:O:P:R:S:T:U:X:Y:Z:1:2:3:4:"))
                != -1)
         {
             switch (c)
@@ -181,6 +181,9 @@ namespace LIBMOL
                     //std::cout << "Libmol table directory is  : " 
                     //          << IOEntries["libMolTabDir"] 
                     //          << std::endl;
+                    break;
+                case 'L':
+                    IOEntries["MetalRange"] = optarg;
                     break;
                 case 'M':
                     IOEntries["MetalEnable"] = optarg;
@@ -458,7 +461,7 @@ namespace LIBMOL
             }
             else if (IOEntries.find("inCifNameB")!=IOEntries.end())
             {
-                if (IOEntries.find("UserParaFile")!=IOEntries.end())
+                if (IOEntries.find("MetalRange")!=IOEntries.end())
                 {
                     workMode = 313;
                 }

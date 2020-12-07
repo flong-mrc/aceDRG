@@ -2408,6 +2408,8 @@ namespace LIBMOL
             tV.push_back(0.0);
             tV.push_back(0.0);
             StrToSymmOneRow3(*iS, tV);
+            
+            std::cout << std::endl;
             tMat.push_back(tV);
         }
         

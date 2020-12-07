@@ -341,7 +341,8 @@ int main(int argc, char** argv) {
                 
                 if (AJob.workMode==31 || AJob.workMode==311)
                 {
-                    aMolCreator.execute1(AJob.IOEntries["userOutName"].c_str());
+                    aMolCreator.execute1(AJob.IOEntries["UserParaFile"].c_str(),
+                                         AJob.IOEntries["userOutName"].c_str());
                 }
                 else if (AJob.workMode==3111)
                 {
@@ -353,17 +354,7 @@ int main(int argc, char** argv) {
                     
                     if (dataFromCif.hasMetal)
                     {
-                        LIBMOL::PeriodicTable aPTab;
-                        double aDDelta = 0.3;
-                        if (AJob.IOEntries.find("distDelta") 
-                            !=AJob.IOEntries.end())
-                        {
-                            aDDelta = 
-                            LIBMOL::StrToReal(AJob.IOEntries["distDelta"]);
-                        }
                         
-                        aPTab.compareIdealDists(aMolCreator.metalBondRange,
-                                                aDDelta);
                         
                         std::cout << "The system contain metal atoms " << std::endl;
                         std::cout << "Those metal atoms are : " << std::endl;
@@ -385,7 +376,8 @@ int main(int argc, char** argv) {
                         //std::cout << "R factor satisfies the requirement" << std::endl;
                         if (AJob.workMode==312)
                         {
-                            aMolCreator.executeMet(AJob.IOEntries["userOutName"].c_str());
+                            aMolCreator.executeMet(AJob.IOEntries["UserParaFile"].c_str(),
+                                                   AJob.IOEntries["userOutName"].c_str());
                         }
                         else if (AJob.workMode==313)
                         {
@@ -452,7 +444,8 @@ int main(int argc, char** argv) {
             std::cout << "Input cif " << AJob.IOEntries["inCifName"] << std::endl;
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-            aMolCreator.execute(AJob.IOEntries["userOutName"].c_str());
+            aMolCreator.execute(AJob.IOEntries["UserParaFile"].c_str(),
+                                AJob.IOEntries["userOutName"].c_str());
         }
         else if (AJob.workMode==33)
         {
@@ -552,6 +545,7 @@ int main(int argc, char** argv) {
                                           AJob.lowBondSig, 
                                           AJob.upperAngleSig,
                                           AJob.lowAngleSig);
+        
         
         LIBMOL::outProElecDistances(AJob.IOEntries["userOutName"].c_str(),
                                     aTargetSystem);        
