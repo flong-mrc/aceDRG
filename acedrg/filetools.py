@@ -40,6 +40,7 @@ from . utility  import listComp
 from . utility  import listComp2
 from . utility  import listCompDes
 from . utility  import listCompAcd
+from . utility  import countPrime
 from . utility  import setBoolDict
 from . utility  import splitLineSpa
 from . utility  import splitLineSpa2
@@ -841,7 +842,7 @@ class FileTransformer(object) :
                         aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.model_Cartn_z"]
                        
             if not self.mmCifHasCoords :
-                print("Not _chem_comp_atom.pdbx_model_Cartn_x")
+                #print("Not _chem_comp_atom.pdbx_model_Cartn_x")
                 if "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in self.atoms[0]\
                    and "_chem_comp_atom.pdbx_model_Cartn_y_ideal" in self.atoms[0]\
                    and "_chem_comp_atom.pdbx_model_Cartn_z_ideal" in self.atoms[0]:
@@ -860,7 +861,7 @@ class FileTransformer(object) :
                             aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
 
             if not self.mmCifHasCoords :
-                print("not _chem_comp_atom.model_Cartn_x_ideal")
+                #print("not _chem_comp_atom.model_Cartn_x_ideal")
                 if "_chem_comp_atom.x" in self.atoms[0] and\
                    "_chem_comp_atom.y" in self.atoms[0] and\
                    "_chem_comp_atom.z" in self.atoms[0]:
@@ -871,11 +872,11 @@ class FileTransformer(object) :
                             lq3 = True
                             break
                     if not lq3:
-                        print("Using _chem_comp_atom.x,y,z")
+                        #print("Using _chem_comp_atom.x,y,z")
                         self.mmCifHasCoords   = True
                     else:
-                        print("not _chem_comp_atom.x")
-                        print("No original coordinates will be used for conformer generations")
+                        #print("not _chem_comp_atom.x")
+                        #print("No original coordinates will be used for conformer generations")
                         self.mmCifHasCoords = False  
 
     def MmCifToMolFile(self, tInFileName, tOutMolName, tMode=0):
@@ -1559,7 +1560,7 @@ class Ccp4MmCifObj (dict) :
             lCifBegin = False
             aDataHead = ""
             for aL in allLs:
-                if len(aL.strip()) !=0:
+                if len(aL.strip()) !=0 and aL.find("#")==-1:
                     if aL.find("data_") !=-1:
                         aDataHead = aL.strip()
                         # print aDataHead
@@ -1671,7 +1672,7 @@ class Ccp4MmCifObj (dict) :
             if "comps" in self["ccp4CifObj"]:
                 for aComp in self["ccp4CifObj"]["comps"]:
                     self.setPlaneAtmGroupInOneComp(aComp)
- 
+
     def setupOneLoop(self, tDict, tLoop, tKW=""):
 
         aKeySet   = []
@@ -1683,7 +1684,13 @@ class Ccp4MmCifObj (dict) :
                 if tKW =="list":
                     aLineToAlist(aL, aStrSet)
                 else:
-                    aStrSet = splitLineSpa(aL)
+                    aPr = countPrime(aL)
+                    if not aPr:
+                        aStrSet = aL.split()
+                    else:
+                        #aLineToAlist(aL, aStrSet)
+                        aStrSet = splitLineSpa(aL)
+                    print(aStrSet)
                 for aStr in aStrSet:
                     if aStr.strip()[0] =="_":
                         aKeySet.append(aStr)

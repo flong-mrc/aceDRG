@@ -196,7 +196,7 @@ class ChemCheck(object):
             print(aLine)
 
     def getAtomElemsFromMmcif(self, tInFileName, tAtomElems):
-
+        print(tInFileName)
         try :
             inFile = open(tInFileName, "r")
         except IOError :
@@ -233,7 +233,7 @@ class ChemCheck(object):
                         pass 
                         #print "Definition error in the input cif file %s"%tInFileName
                         #print "The entry is ", aL
-                    
+
     def getAtomElemsFromMdl(self, tInFileName, tAtomElems):
 
         try :

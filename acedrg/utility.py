@@ -154,6 +154,22 @@ def splitLineSpa(tLine):
 
     return reStrs 
 
+def countPrime(tL):
+
+    lCount = False
+    nCount = 0
+    nCount = 0
+    aSep = "\""
+
+    for aC in tL.strip():
+        if aC.find(aSep) !=-1:
+            nCount +=1
+   
+    if nCount > 1 :
+        lCount = True
+
+    return lCount 
+ 
 def aLineToAlist(tL, tList):
 
     aTS = ""

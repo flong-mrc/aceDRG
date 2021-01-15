@@ -320,6 +320,8 @@ namespace LIBMOL
         void setMetalBondRangeFromTable(double   &    tRadFac);
         void setMetalBondRangeFromPeriodicTable(double   &    tRadFac,
                                                 PeriodicTable  & tPTab);
+        void setMetalBondRange(std::string tElem1, std::string tElem2,
+                               std::vector<double> & tBondRange);
         
         void buildMetalSph(double & tRadFac,
                            PeriodicTable & tPTab,
@@ -409,6 +411,9 @@ namespace LIBMOL
         std::map<std::string, std::map<
         std::string, std::map<std::string,
         REAL> > >                               metalBondRange2;
+        std::map<std::string, std::map<
+        std::string, std::map<std::string,
+        REAL> > >                               metalBondRange3;
         
         std::map<std::string, std::map<REAL,
         std::vector<std::vector<std::string > > > >     

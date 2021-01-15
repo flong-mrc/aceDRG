@@ -795,6 +795,8 @@ namespace LIBMOL {
     
     void  MolGenerator::setMetalBondRangeFromTable(double  & tRadFac)
     {
+        // two tables
+        // Table 1
         std::string fName = aLibmolTabDir + "/Metal_Org_Type1_stats.table";
         std::cout << "table name " << fName << std::endl;
        
@@ -852,6 +854,60 @@ namespace LIBMOL {
             metBondRangeFile.close(); 
         }
         
+        // Table 2
+        fName = aLibmolTabDir + "/Metal_Org_Type1_stats_2.table";
+        std::cout << "table name " << fName << std::endl;
+       
+        std::ifstream metBondRangeFile2(fName.c_str());
+        
+        if (metBondRangeFile2.is_open())
+        {
+            std::string tRecord="";
+            while(!metBondRangeFile2.eof())
+            {
+                std::getline(metBondRangeFile2, tRecord);
+                std::cout << tRecord << std::endl;
+                tRecord = TrimSpaces(tRecord);
+                std::vector<std::string> tBuf;
+                StrTokenize(tRecord, tBuf);
+                if (tBuf.size()==5)
+                {
+                    std::string metElem = TrimSpaces(tBuf[0]);
+                    std::string orgElem = TrimSpaces(tBuf[1]);
+                    double aL     = StrToReal(tBuf[3]);
+                    double aStdev = StrToReal(tBuf[4]);
+                    
+                    float  aFac   = tRadFac;
+                    float  aDelta = aFac/10.0;
+                    float  aFS    = aFac*aStdev;
+                    //if ( aFS>= aDelta*aL)
+                    //{
+                    //    aFac      = aFac-1;
+                    //    aFS       = aFac*aStdev;
+                    //}
+                    
+                    
+                    
+                    metalBondRange3[metElem][orgElem]["min"] 
+                                        = 0.0;
+                    metalBondRange3[metElem][orgElem]["max"] 
+                                        = aL + aFS;
+                    std::cout << "aFac " << aFac << " and stdev "
+                              << aStdev  << std::endl;
+                    std::cout << metElem << " and " 
+                              << orgElem << " range:  low B-- " 
+                              << metalBondRange3[metElem][orgElem]["min"]
+                              << " high B-- " 
+                              << metalBondRange3[metElem][orgElem]["max"]
+                    //          << " Sample number : " 
+                    //          << metalBondRange2[metElem][orgElem]["num"]
+                              << std::endl;
+                    
+                }
+            }
+            
+            metBondRangeFile2.close(); 
+        }
         
     }
     
@@ -2029,7 +2085,7 @@ namespace LIBMOL {
 
         
         //std::cout << "NB list for allAtoms set " << std::endl;   
-        
+        /*
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
@@ -2053,9 +2109,9 @@ namespace LIBMOL {
                               << " and NB atom " << allAtoms[*iNB].id 
                               << std::endl;
                     std::cout << "Range 1 low bound : " 
-                              << metalBondRange2[elemM][elemN]["min"]
+                              << metalBondRange3[elemM][elemN]["min"]
                               << " high bound  : "
-                              << metalBondRange2[elemM][elemN]["max"]
+                              << metalBondRange3[elemM][elemN]["max"]
                               << std::endl;
                     std::cout << "Range 2 low bound : " 
                               << metalBondRange[elemM][elemN]["min"]
@@ -2068,7 +2124,8 @@ namespace LIBMOL {
                 }
                 
             }
-        }
+         
+        }*/
         
         // Get Bonding atoms 
                 
@@ -2090,10 +2147,11 @@ namespace LIBMOL {
             //std::cout << "Look for bonds to atom " << allAtoms[i].id
             //          << "(serial number  " << allAtoms[i].seriNum
             //          << ") " << std::endl;
-            bool lMetal = false;
+            bool lMetal1 = false;
+            
             if (allAtoms[i].isMetal)
             {
-                lMetal = true;
+                lMetal1 = true;
                 
             }
             
@@ -2102,12 +2160,16 @@ namespace LIBMOL {
             for (std::vector<int>::iterator iNB = allAtoms[i].neighbAtoms.begin();
                     iNB != allAtoms[i].neighbAtoms.end(); iNB++) 
             {
+                bool lMetal2 = false;
                 //if(allAtoms[i].isInPreCell && lMetal)
                 //{
                 //    std::cout << "check NB atom " << allAtoms[(*iNB)].id 
                 //              << std::endl;
                 //}
-
+                if (allAtoms[(*iNB)].isMetal)
+                {
+                    lMetal2 = true;
+                }
                 ID elem2 = allAtoms[(*iNB)].chemType;
                 REAL rD = getBondLenFromFracCoords(allAtoms[i].fracCoords, 
                         allAtoms[(*iNB)].fracCoords,
@@ -2155,7 +2217,7 @@ namespace LIBMOL {
                         distsNBs[elem1][elem2][rD].push_back(aCombID);
                     }
                     
-                    if (lMetal && rD < 4.0)
+                    if (lMetal1 && rD < 5.0)
                     {
                         metalNBs[i].push_back(*iNB);
                     }
@@ -2190,68 +2252,46 @@ namespace LIBMOL {
                         covalent_sensitivity, tPTab,
                         bondRange);
                 
-                if (lMetal)
+                if (lMetal1)
                 {
-                    
-                    
-                    if (metalBondRange2.find(elem1)!=metalBondRange2.end())
-                    {
-                        if (metalBondRange2[elem1].find(elem2)
-                             !=metalBondRange2[elem1].end())
-                        {
-                            
-                            if (metalBondRange2[elem1][elem2]["num"] > 20)
-                            {
-                                bondRange[0] = metalBondRange2[elem1][elem2]["min"];
-                            
-                                bondRange[1] = metalBondRange2[elem1][elem2]["max"];
-                            }
-                            else
-                            {
-                                bondRange[0] = metalBondRange[elem1][elem2]["min"];
-                            
-                                bondRange[1] = metalBondRange[elem1][elem2]["max"];
-                            }
-                            
-                        }
-                        else
-                        {
-                            bondRange[0] = metalBondRange[elem1][elem2]["min"];
-                            
-                            bondRange[1] = metalBondRange[elem1][elem2]["max"];
-                            
-                        }
-                    }
-                    else
-                    {
-                        bondRange[0] = metalBondRange[elem1][elem2]["min"];
-                            
-                        bondRange[1] = metalBondRange[elem1][elem2]["max"];
-                    }
-                    
-                    /*
-                    if(allAtoms[i].isInPreCell && lMetal)
-                    {
-                        
-                              
-                        std::cout << "Distance between: " << std::endl
-                                  << "Atom 1 " << allAtoms[i].id 
-                                  << " of serial number " 
-                                  << allAtoms[i].seriNum
-                                  << " from original atom " 
-                                  << allAtoms[allAtoms[i].fromOrig].id 
-                                  << std::endl
-                                  << "Atom 2 " << allAtoms[*iNB].id 
-                                  << " of serial number " << allAtoms[*iNB].seriNum
-                                  << " from original atom " 
-                                  << allAtoms[allAtoms[*iNB].fromOrig].id 
-                                  << " is " << rD << std::endl;
-                    }
-                    */
+                    setMetalBondRange(elem1, elem2, bondRange);
                 }
+                else if (lMetal2)
+                {
+                    setMetalBondRange(elem2, elem1, bondRange);
+                }
+                
+                if (lMetal1 || lMetal2)
+                {
+                    if (bondRange[0] >0.0)
+                    {
+                        bondRange[0] = 0.0;
+                    }
+                }
+                
+                /*
+                if(allAtoms[i].isInPreCell && (lMetal1 || lMetal2))
+                {                      
+                    std::cout << "Distance between: " << std::endl
+                              << "Atom 1 " << allAtoms[i].id 
+                              << " of serial number " 
+                              << allAtoms[i].seriNum
+                              << " from original atom " 
+                              << allAtoms[allAtoms[i].fromOrig].id 
+                              << std::endl
+                              << "Atom 2 " << allAtoms[*iNB].id 
+                              << " of serial number " << allAtoms[*iNB].seriNum
+                              << " from original atom " 
+                              << allAtoms[allAtoms[*iNB].fromOrig].id 
+                              << " is " << rD << std::endl;
+                    //std::cout << "BL " << bondRange[0] << std::endl;
+                    //std::cout << "BU " << bondRange[1] << std::endl;
+                }
+                */  
                 
                 if (bondRange[1] > myNBCut && rD > myNBCut) 
                 {
+                    
                     if (rD > bondRange[0] && rD < bondRange[1]) 
                     {
                         
@@ -2280,7 +2320,7 @@ namespace LIBMOL {
                         //if (allAtoms[i].chemType.compare("H") ==0
                         //    || allAtoms[*iNB].chemType.compare("H")==0)
                         //{
-                        if(allAtoms[i].isInPreCell && lMetal)
+                        if(allAtoms[i].isInPreCell && lMetal1)
                         {
                             //std::cout << "Its has " 
                             //          << allAtoms[i].neighbAtoms.size()
@@ -2325,7 +2365,8 @@ namespace LIBMOL {
                   << "*********************************" << std::endl;
                 
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
-                iAt != allAtoms.end(); iAt++) {
+                iAt != allAtoms.end(); iAt++) 
+        {
             if (iAt->isInPreCell) {
                 std::cout << "Atom " << iAt->id << " (serial number " << iAt->seriNum
                         << " ) bonds to " << iAt->connAtoms.size() << " atoms"
@@ -2333,7 +2374,6 @@ namespace LIBMOL {
                 // std::cout << "The NB atoms are :" << std::endl;
                 for (std::vector<int>::iterator iC = iAt->connAtoms.begin();
                         iC != iAt->connAtoms.end(); iC++) {
-                    std::cout << "A 1st NB atoms is :" << std::endl;
                     std::cout << "Atom " << allAtoms[*iC].id
                             << " of serial number " << allAtoms[*iC].seriNum
                             << std::endl;
@@ -2343,9 +2383,90 @@ namespace LIBMOL {
                 }
             }
         }
-        */
+         */
+        
      
        
+    }
+    
+    void MolGenerator::setMetalBondRange(std::string tElem1, std::string tElem2, 
+                                         std::vector<double>& tBondRange)
+    {
+        if (metalBondRange3.find(tElem1)!=metalBondRange3.end())
+        {
+            if (metalBondRange3[tElem1].find(tElem2)
+                    !=metalBondRange3[tElem1].end())
+            {
+                tBondRange[0] = metalBondRange3[tElem1][tElem2]["min"];            
+                tBondRange[1] = metalBondRange3[tElem1][tElem2]["max"];
+            }
+            else if (metalBondRange2.find(tElem1)!=metalBondRange2.end())
+            {
+                if (metalBondRange2[tElem1].find(tElem2)
+                        !=metalBondRange2[tElem1].end())
+                {
+                    if (metalBondRange2[tElem1][tElem2]["num"] > 20)
+                    {
+                        tBondRange[0] = metalBondRange2[tElem1][tElem2]["min"];    
+                        tBondRange[1] = metalBondRange2[tElem1][tElem2]["max"];
+                    }
+                    else
+                    {
+                        tBondRange[0] = metalBondRange[tElem1][tElem2]["min"];
+                            
+                        tBondRange[1] = metalBondRange[tElem1][tElem2]["max"];
+                    }
+                }
+                else
+                {
+                    tBondRange[0] = metalBondRange[tElem1][tElem2]["min"];
+                            
+                    tBondRange[1] = metalBondRange[tElem1][tElem2]["max"];
+                }
+                            
+            }
+            else
+            {
+                tBondRange[0] = metalBondRange[tElem1][tElem2]["min"];
+                            
+                tBondRange[1] = metalBondRange[tElem1][tElem2]["max"];
+                            
+            }
+        }
+        else if (metalBondRange2.find(tElem1)!=metalBondRange2.end())
+        {
+            if (metalBondRange2[tElem1].find(tElem2)
+                    !=metalBondRange2[tElem1].end())
+            {
+                            
+                if (metalBondRange2[tElem1][tElem2]["num"] > 20)
+                {
+                    tBondRange[0] = metalBondRange2[tElem1][tElem2]["min"];
+                            
+                    tBondRange[1] = metalBondRange2[tElem1][tElem2]["max"];
+                }
+                else
+                {
+                    tBondRange[0] = metalBondRange[tElem1][tElem2]["min"];
+                            
+                    tBondRange[1] = metalBondRange[tElem1][tElem2]["max"];
+                }
+                            
+            }
+            else
+            {
+                tBondRange[0] = metalBondRange[tElem1][tElem2]["min"];
+                            
+                tBondRange[1] = metalBondRange[tElem1][tElem2]["max"];
+                            
+            }
+        }
+        else
+        {
+            tBondRange[0] = metalBondRange[tElem1][tElem2]["min"];
+                            
+            tBondRange[1] = metalBondRange[tElem1][tElem2]["max"];
+        }
     }
     
     void MolGenerator::getUniqueAtomLinksNeuD(PeriodicTable& tPTab, 

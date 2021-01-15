@@ -1536,8 +1536,9 @@ class AcedrgRDKit(object):
                             print("Chiral center %s is not in predefined chiral centers"%aAtmName)
                             chiCenAtmIds2.append(aAtmName)
             nTetraChi = len(chiCenAtmIds2)
-            print(" Number of chiral centers get from the conformer ", nTetraChi)
+            #print(" Number of chiral centers get from the conformer ", nTetraChi)
             chiCenAtms3 = []
+            chiCenAtms4 = []
             for aAtom in allAtoms:
                 aElem = aAtom.GetSymbol()
                 aName=aAtom.GetProp("Name")
@@ -1549,13 +1550,16 @@ class AcedrgRDKit(object):
                 if aHyb == rdchem.HybridizationType.SP3 and not aName in chiCenAtmIds2 and aElem != "H" and aElem != "O":
                     nConnHs =  self.chemCheck.getNumNBHAtoms(aAtom)
                     #print("number of H atoms connected  ", nConnHs)
-                    if not aName in chiCenAtmIds1 and nConnHs < 2 and nNB > 2:
-                        chiCenAtms3.append(aAtom)               
+                    if not aName in chiCenAtmIds1:
+                        if nNB==3 and nConnHs==1:
+                            chiCenAtms4.append(aAtom)               
+                        elif  nConnHs < 2 and nNB > 2:
+                            chiCenAtms3.append(aAtom)               
                         print("a Center",aName)
-         
-            nChiBoth = len(chiCenAtms3)
-            print("nChi ",nChiBoth)
-            if nChiPre !=0 or nTetraChi !=0 or nChiBoth !=0 :
+            nChiWithSign = len(chiCenAtms3)
+            nChiBoth     = len(chiCenAtms4)
+            #print("nBoth ",nChiBoth)
+            if nChiPre !=0 or nTetraChi !=0 or nChiBoth !=0 or nChiWithSign:
                 # The molecule contain chiral centers
                 aMmCif.write("#\n")
                 aMmCif.write("_chem_comp_chir.comp_id\n")
@@ -1568,12 +1572,13 @@ class AcedrgRDKit(object):
 
             chiralIdx = 1
             if nChiPre:
+                print("Predefined chiral centres ", chiCenAtmIds1)
                 for aChiral in tChiDes:
                     aMmCif.write(aChiral+"\n")
                     print("aChiral ")
                     print(aChiral)
-                print("Predefined chiral centres ", chiCenAtmIds1)
             if nTetraChi : 
+                #print("Chiral centres with sign")
                 # output all chiral centers in form of mmCif
                 chiralIdx = nChiPre + 1
                 for aId in chiCenAtmIds2 :
@@ -1591,11 +1596,11 @@ class AcedrgRDKit(object):
                         print(aLine)
                         chiralIdx +=1
 
-            if nChiBoth :
+            if nChiWithSign :
+                #print("Chiral centres with sign")
                 for aAtom in chiCenAtms3 :
                     aId = aAtom.GetProp("Name")  
                     aCTName = "chir_" + str(chiralIdx)
-                    print(aId)
                     aLine = "%s%s%s%s%s%s%s\n"\
                             %(tMonoName.ljust(12), aCTName.ljust(12),\
                               aId.ljust(12),\
@@ -1606,9 +1611,24 @@ class AcedrgRDKit(object):
                     aMmCif.write(aLine)
                     print(aLine)
                     chiralIdx +=1
+            if nChiBoth :
+                #print("Chiral centres of \"both\"")
+                for aAtom in chiCenAtms4 :
+                    aId = aAtom.GetProp("Name")  
+                    aCTName = "chir_" + str(chiralIdx)
+                    print(aId)
+                    aLine = "%s%s%s%s%s%s%s\n"\
+                            %(tMonoName.ljust(12), aCTName.ljust(12),\
+                              aId.ljust(12),\
+                              atomNBCIPMap[aId][0][0].GetProp("Name").ljust(12),\
+                              atomNBCIPMap[aId][1][0].GetProp("Name").ljust(12),\
+                              atomNBCIPMap[aId][2][0].GetProp("Name").ljust(12),\
+                              "both")
+                    aMmCif.write(aLine)
+                    print(aLine)
+                    chiralIdx +=1
             aMmCif.close()
         
-
     def checkUncertainChirals(self, tNBAtoms):
         
         tPass = True

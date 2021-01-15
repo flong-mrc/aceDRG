@@ -129,7 +129,6 @@ namespace LIBMOL
         if ((int)tSS.size() !=0)
         {
             itsCurPos =0;
-            bool sqb_start = false, sqb_end=false;
             
             while (itsCurPos < (int)tSS.size())
             {

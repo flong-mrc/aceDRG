@@ -3545,17 +3545,32 @@ class CovLinkGenerator(CExeCode):
         aLID  = tLinkedObj.cLink["name"]
         aLN1  = tLinkedObj.stdLigand1["name"]
         aLMN1 = tLinkedObj.modLigand1["name"]
-        #aG1   = tLinkedObj.stdLigand1["list"]["group"]
-        aG1   = "."
+        aG1   = self.setGroupId(tLinkedObj.stdLigand1["list"]["group"])
+        print("Ligand 1 group id %s "%aG1)
+        #aG1   = "."
         aLN2  = tLinkedObj.stdLigand2["name"]
         aLMN2 = tLinkedObj.modLigand2["name"]
-        #aG2   = tLinkedObj.stdLigand2["list"]["group"]
-        aG2   = "."
+        aG2   = self.setGroupId(tLinkedObj.stdLigand2["list"]["group"])
+        print("Ligand 2 group id %s "%aG2)
+        #aG2   = "."
         aL="%s%s%s%s%s%s%s%s\n"%(aLID.ljust(15), aLN1.ljust(10), aLMN1.ljust(12), aG1.ljust(20),\
                                  aLN2.ljust(10), aLMN2.ljust(12), aG2.ljust(20), aLID.ljust(15))
         tOutFile.write(aL) 
          
         tOutFile.write("\n")
+
+    def setGroupId(self, tId):
+
+        retId = tId.lower()
+
+        if retId.find("peptide") != -1 and retId.find("-") !=-1:
+            strs = retId.strip().split("-")
+            if len(strs)==2:
+                retId = strs[0].upper() + "-" + strs[1]
+
+        return retId
+
+        
 
     def outAllComps(self, tOutFile, tLinkedObj):
         if tLinkedObj.stdLigand1["dataBlock"] and tLinkedObj.stdLigand1["outComp"] and tLinkedObj.stdLigand1["compOut"]:

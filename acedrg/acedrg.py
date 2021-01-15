@@ -2108,6 +2108,13 @@ class Acedrg(CExeCode ):
                     lCP = True
                 break
 
+            lCO = True
+            for aAtom in allAtoms: 
+                if not "x" in list(aAtom.keys()):
+                    lCO = False
+                break
+
+
             aMmCif.write("loop_\n")
             aMmCif.write("_chem_comp_atom.comp_id\n")
             aMmCif.write("_chem_comp_atom.atom_id\n")
@@ -2117,21 +2124,33 @@ class Acedrg(CExeCode ):
                 aMmCif.write("_chem_comp_atom.charge\n")
             else:
                 aMmCif.write("_chem_comp_atom.partial_charge\n")
-            aMmCif.write("_chem_comp_atom.x\n")
-            aMmCif.write("_chem_comp_atom.y\n")
-            aMmCif.write("_chem_comp_atom.z\n")
+            if lCO:
+                aMmCif.write("_chem_comp_atom.x\n")
+                aMmCif.write("_chem_comp_atom.y\n")
+                aMmCif.write("_chem_comp_atom.z\n")
             #nTetraChi = 0 
             for aAtom in allAtoms:
-                if not lCP:
-                    aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
-                                  %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
-                                    aAtom["type_energy"], float(aAtom["charge"]), 
-                                    float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                if not lCP :
+                    if lCO:
+                        aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                                      %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                      aAtom["type_energy"], float(aAtom["charge"]), 
+                                      float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                    else:
+                        aMmCif.write("%s         %s      %s    %s     %3.2f   \n"
+                                      %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                      aAtom["type_energy"], float(aAtom["charge"]) ))
+
                 else :
-                    aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
-                                  %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
-                                    aAtom["type_energy"], float(aAtom["partial_charge"]), 
-                                    float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                    if lCO:
+                        aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                                      %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                        aAtom["type_energy"], float(aAtom["partial_charge"]), 
+                                        float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                    else:
+                        aMmCif.write("%s         %s      %s    %s     %3.2f   \n"
+                                      %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                      aAtom["type_energy"], float(aAtom["partial_charge"]) ))
                    
             # Bond section
             lAR = True
@@ -2264,37 +2283,46 @@ class Acedrg(CExeCode ):
             nStrs = len(strs)
             if len(strs)==1:
                 fO.write(aL)
-            elif not lFN:
-                id1 = strs[1]
-                id2 = strs[2]
-                compId1 = id1 + "_" + id2
-                compId2 = id2 + "_" + id1
-                if compId1 in aIDList or compId2 in aIDList:
-                    if compId1 in aIDList:
-                        v  = "%4.3f"%float(tBondSet[compId1]["prot_h"])
-                        vs = "%4.3f"%float(tBondSet[compId1]["prot_h_s"])
-                    elif compId2 in aIDList:
-                        v  = "%4.3f"%float(tBondSet[compId2]["prot_h"])
-                        vs = "%4.3f"%float(tBondSet[compId2]["prot_h_s"])
-                    for i in range(nStrs-2):
-                        outL += "%s"%(strs[i].ljust(10))
-                    outL+="%s%s%s%s\n"%(v.ljust(10), vs.ljust(10), strs[-2].ljust(10), strs[-1].ljust(10))
-                    print(outL)
-                    fO.write(outL)
-                else:
+            elif len(strs) > 0:
+                if not lFN  and strs[0].find("#")==-1:
+                    id1 = strs[1]
+                    if id1.find("\'") !=-1 and id1.find("\"")==-1:
+                        id1 = "\"" + id1 + "\""
+                    id2 = strs[2]
+                    if id2.find("\'") !=-1 and id2.find("\"")==-1:
+                        id2 = "\"" + id2 + "\""
+                    compId1 = id1 + "_" + id2
+                    compId2 = id2 + "_" + id1
+                    print("Id1 ", id1)
+                    print("Id2 ", id2)
+
+                    if compId1 in aIDList or compId2 in aIDList:
+                        if compId1 in aIDList:
+                            v  = "%4.3f"%float(tBondSet[compId1]["prot_h"])
+                            vs = "%4.3f"%float(tBondSet[compId1]["prot_h_s"])
+                        elif compId2 in aIDList:
+                            v  = "%4.3f"%float(tBondSet[compId2]["prot_h"])
+                            vs = "%4.3f"%float(tBondSet[compId2]["prot_h_s"])
+                        for i in range(nStrs-2):
+                            outL += "%s"%(strs[i].ljust(10))
+                        outL+="%s%s%s%s\n"%(v.ljust(10), vs.ljust(10), strs[-2].ljust(10), strs[-1].ljust(10))
+                        fO.write(outL)
+                    else:
+                        for i in range(nStrs):
+                            outL += "%s"%(strs[i].ljust(10))
+                        outL+="%s%s\n"%(strs[-2].ljust(10), strs[-1].ljust(10))
+                        fO.write(outL)
+                else :
                     for i in range(nStrs):
                         outL += "%s"%(strs[i].ljust(10))
-                    outL+="%s%s\n"%(strs[-2].ljust(10), strs[-1].ljust(10))
-                    fO.write(outL)
-            else :
-                for i in range(nStrs):
-                    outL += "%s"%(strs[i].ljust(10))
-                fO.write(outL)
-                    
-        for aL in t3Bs[2]:
-            fO.write(aL)
+                    fO.write(outL+"\n")
+        
+        if len(t3Bs) > 2:            
+            for aL in t3Bs[2]:
+                fO.write(aL)
 
         fO.close()
+        sys.exit()
 
     def execute(self):
         
@@ -2481,12 +2509,12 @@ class Acedrg(CExeCode ):
     def executeWithRDKit(self):
  
         self.printJobs()
-
+       
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
         #elif self.workMode !=0 and self.workMode != 61 :
         #    print "Input coordinates will be ignored"
-       
+        print("workMode : ", self.workMode)
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111:
             if self.monomRoot in self.chemCheck.aminoAcids:
@@ -2496,7 +2524,7 @@ class Acedrg(CExeCode ):
                and not self.isAA:
                 # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
-
+                
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor) 
                     if self.monomRoot in self.chemCheck.aminoAcids:
@@ -2507,6 +2535,7 @@ class Acedrg(CExeCode ):
                     if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                         self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
+
                         if os.path.isfile(aIniMolName) :
                             if len(self.fileConv.chiralPre) !=0:
                             # Chiral centers defined in the original cif file
@@ -2767,7 +2796,6 @@ class Acedrg(CExeCode ):
 
         if not self.workMode in [80, 1001, 1002]:
             self.setOutCifGlobSec()
-
         if self.workMode in [11, 12, 13, 14, 15]:
             self.workMode = 11
         elif self.workMode in [111, 121, 131, 141, 151]:
@@ -2776,6 +2804,7 @@ class Acedrg(CExeCode ):
             self.workMode = 51
         if self.workMode in [11,  111, 51] and not self.isAA :
             #print len(self.rdKit.molecules)
+
             if len(self.rdKit.molecules):
                 print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
@@ -2788,7 +2817,6 @@ class Acedrg(CExeCode ):
                 #else:
                 if self.workMode in [11,  111]:
                     print("Using coords ", self.rdKit.useExistCoords)
- 
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
