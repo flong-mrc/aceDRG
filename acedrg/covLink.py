@@ -832,6 +832,7 @@ class CovLinkGenerator(CExeCode):
                 self.errMessage[self.errLevel] = []
             self.errMessage[self.errLevel].append("The input instruction file is empty\n")
 
+
     def getInstructionsForLinkFreeFormat2(self):
 
         allLs = ""
@@ -2922,7 +2923,6 @@ class CovLinkGenerator(CExeCode):
             print("Number of deleted chirs in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["chirs"])) 
          
         # Planes
-
         self.checkPlModFromCombo(tLinkedObj)
         self.checkPlModFromOrig(tLinkedObj)
      
@@ -2965,7 +2965,6 @@ class CovLinkGenerator(CExeCode):
                     print("%s    %s  "%(aPlAtm["plane_id"], aPlAtm["atom_id"]))
             print("------------------ -------------")
 
-        
     def checkAtomMod(self, tOriAtoms, tAtom, tModAtoms, tExistChangedAtoms):
 
         aId = tAtom["atom_id"]
@@ -3102,15 +3101,18 @@ class CovLinkGenerator(CExeCode):
 
     def checkPlMod(self, tOrigPls,  tPl, tModDelPls, tModAddPls):
 
-        nAtoms = len(tPl)
         tPlAtmIds = []
+        #print("Atoms in tPl : ")
         for aAtm in tPl:
-            tPlAtmIds.append(aAtm["atom_id"])
+            if aAtm["atom_id"][0] != "H":
+                tPlAtmIds.append(aAtm["atom_id"])
+                #print(aAtm["atom_id"])
+        nAtoms = len(tPlAtmIds)
         for aPl in tOrigPls:
             tOrigPlAtmIds = []
             for aPlAtm in aPl:
-                #if aPlAtm["atom_id"][0] != "H":
-                tOrigPlAtmIds.append(aPlAtm["atom_id"])
+                if aPlAtm["atom_id"][0] != "H":
+                    tOrigPlAtmIds.append(aPlAtm["atom_id"])
             nOrigAtoms = len(tOrigPlAtmIds)
             if nAtoms > nOrigAtoms: 
                 overlapAtms = []
@@ -3121,7 +3123,7 @@ class CovLinkGenerator(CExeCode):
                 if len(overlapAtms) == nOrigAtoms:
                     tModDelPls.append(aPl) 
                     tModAddPls.append(tPl)
-                    print("orignal plane deleted")
+                    #print("orignal plane deleted")
                     break
             elif nAtoms < nOrigAtoms: 
                 overlapAtms = []
@@ -3129,9 +3131,12 @@ class CovLinkGenerator(CExeCode):
                     if aOId in tOrigPlAtmIds:
                         overlapAtms.append(aOId)
                 if len(overlapAtms) == nAtoms:
+                    #print ("overlaped atoms ",  len(overlapAtms))
+                    #for aId in overlapAtms:
+                    #    print ("overlaped atom : %s "%aId)
                     tModDelPls.append(aPl) 
                     tModAddPls.append(tPl)
-                    print("orignal plane deleted")
+                    #print("orignal plane deleted")
                     break
 
         """
@@ -3154,17 +3159,18 @@ class CovLinkGenerator(CExeCode):
 
     def checkPlMod2(self, tPl, tComboPls, tModDelPls):
 
-        nAtom = len(tPl)
         tPlAtmIds = []
         for aAtm in tPl:
-            tPlAtmIds.append(aAtm["atom_id"])
+            if aAtm["atom_id"][0] != "H":
+                tPlAtmIds.append(aAtm["atom_id"])
 
         lOverlapPls = False
         for aPl in tComboPls:
             overlapAtms = []
             for aPlAtm in tComboPls[aPl]:
-                if aPlAtm["atom_id"] in tPlAtmIds:
-                    overlapAtms.append(aPlAtm["atom_id"])
+                if aPlAtm["atom_id"][0] != "H":
+                    if aPlAtm["atom_id"] in tPlAtmIds:
+                        overlapAtms.append(aPlAtm["atom_id"])
             if len(overlapAtms) == len(tPlAtmIds):
                 lOverlapPls = True
                 break
@@ -3300,10 +3306,10 @@ class CovLinkGenerator(CExeCode):
                         if len(aRes) > 0:
                             allAtoms = aRes
                             for aAtom in allAtoms:
-                                print("atom name before: %s"%aAtom.name)
+                                #print("atom name before: %s"%aAtom.name)
                                 if aAtom.name in tLinkedObj.atomMap:
                                     aAtom.name = tLinkedObj.atomMap[aAtom.name][1]
-                                print("atom name after: %s"%aAtom.name)
+                                #print("atom name after: %s"%aAtom.name)
                         else:
                             print("Residues in the combo-ligand have no atom ")
                             self.errLevel = 32
