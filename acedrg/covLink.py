@@ -1598,7 +1598,6 @@ class CovLinkGenerator(CExeCode):
         self.setAddedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
         if not self.errLevel:
             self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
-            print("Here", len(tLinkedObj.stdLigand1["linkChir"]))
             if len(tLinkedObj.stdLigand1["linkChir"]) ==2:
                 self.setLinkChir(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.stdLigand2)
             if not self.errLevel:
@@ -1617,14 +1616,19 @@ class CovLinkGenerator(CExeCode):
                 print(aL)
 
     def  setLinkChir(self, tRes, tMod, tOthRes):
-         
-         tMod["deleted"]["chirs"].append(tRes["linkChir"][0])
+        
+         #print("Here 1") 
          idKey = "atom_id_" + tRes["linkChir"][1]
          print(idKey)
          print("center ", tRes["linkChir"][0]["atom_id_centre"])
          print("before ", tRes["linkChir"][0][idKey])
          tRes["linkChir"][0][idKey]=tOthRes["atomName"]
          print("after ", tRes["linkChir"][0][idKey])
+         print("deleted chiral center")
+         print ("center atom ", tMod["deleted"]["chirs"][-1]["atom_id_centre"], " in chir ", tMod["deleted"]["chirs"][-1]['id'])
+         print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_1"], " in chir ", tMod["deleted"]["chirs"][-1]['id'])
+         print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_2"], " in chir ", tMod["deleted"]["chirs"][-1]['id'])
+         print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_3"], " in chir ", tMod["deleted"]["chirs"][-1]['id'])
          
     def addjustFormalChargeInOneResForModification(self, tRes, tMod):
 
@@ -1975,11 +1979,11 @@ class CovLinkGenerator(CExeCode):
                         print("Chiral center ", aChi['id'], " is deleted ")
                     else:
                         tRes["remainChirs"].append(aChi)
-                        print("remain chiral center")
-                        print ("center atom ", aChi["atom_id_centre"], " in chir ", aChi['id'])
-                        print ("atom ", aChi["atom_id_1"], " in chir ", aChi['id'])
-                        print ("atom ", aChi["atom_id_2"], " in chir ", aChi['id'])
-                        print ("atom ", aChi["atom_id_3"], " in chir ", aChi['id'])
+                        #print("remain chiral center")
+                        #print ("center atom ", aChi["atom_id_centre"], " in chir ", aChi['id'])
+                        #print ("atom ", aChi["atom_id_1"], " in chir ", aChi['id'])
+                        #print ("atom ", aChi["atom_id_2"], " in chir ", aChi['id'])
+                        #print ("atom ", aChi["atom_id_3"], " in chir ", aChi['id'])
                 else:
                     delIdSet = []
                     if aChi["atom_id_1"].upper() in delAtomIdSet:
@@ -1992,10 +1996,15 @@ class CovLinkGenerator(CExeCode):
                         # Original chiral center destroyed. Let combo-conformer to determine if a chir exists.
                         tMod["deleted"]["chirs"].append(aChi)
                     else :
-                        tRes["linkChir"].append(aChi)
+                        tMod["deleted"]["chirs"].append(aChi)
+                        tRes["linkChir"].append(self.copyChi(aChi))
                         tRes["linkChir"].append(delIdSet[0])
-
-
+                        print("deleted chiral center")
+                        print ("center atom ", tMod["deleted"]["chirs"][-1]["atom_id_centre"], " in chir ", aChi['id'])
+                        print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_1"], " in chir ", aChi['id'])
+                        print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_2"], " in chir ", aChi['id'])
+                        print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_3"], " in chir ", aChi['id'])
+        #print("Here 0")
         # Delete the deleted atom from a plane and even delete a plane 
         # if number of atoms in a plane smaller then 3 (after deleting the assigned atom)
         if "planes" in tRes["comp"]:
@@ -2011,6 +2020,13 @@ class CovLinkGenerator(CExeCode):
                     tMod["deleted"]["planes"].append(tRes["comp"]["planes"][aPl])
                 else:
                     tRes["remainPls"].append(aPlGrp)
+
+    def copyChi(self, tChi):
+
+        aChi = {}
+        for aKey in list(tChi.keys()):
+            aChi[aKey] = tChi[aKey]
+        return aChi
 
     def resetChargeForLinkedNAtom(self,  tRes, tMod, tLinkBonds, tDelAtomIds):
         # For atoms of type_symbol "N"  only at the moment.
@@ -2728,6 +2744,7 @@ class CovLinkGenerator(CExeCode):
        
     def getChangesInModificationFromCombLigand(self, tLinkedObj):
 
+  
         #for aAtom in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]:
         #    print(aAtom.keys())
         #    print aAtom["atom_id"]
@@ -2797,9 +2814,9 @@ class CovLinkGenerator(CExeCode):
         tLinkedObj.modLigand2["changed"]["bonds"] = []
         
         for aBond in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["bonds"]:
-            print("A bond ")
-            print("atom %s in residue %d "%(aBond["atom_id_1"], aBond["atom_id_1_resNum"]))
-            print("atom %s in residue %d "%(aBond["atom_id_2"], aBond["atom_id_2_resNum"]))
+            #print("A bond ")
+            #print("atom %s in residue %d "%(aBond["atom_id_1"], aBond["atom_id_1_resNum"]))
+            #print("atom %s in residue %d "%(aBond["atom_id_2"], aBond["atom_id_2_resNum"]))
             if aBond["atom_id_1_resNum"]==1 and aBond["atom_id_2_resNum"]==1:
                 # In residue 1
                 if not aBond["atom_id_1"] in addedSet1 and not aBond["atom_id_2"] in addedSet1:
@@ -2841,10 +2858,10 @@ class CovLinkGenerator(CExeCode):
                 addedSet2.append(aAtom["atom_id"])
         # Angles
         for aAng in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["angles"]:
-            print("A angle ")
-            print("atom %s in residue %d "%(aAng["atom_id_1"], aAng["atom_id_1_resNum"]))
-            print("atom %s in residue %d "%(aAng["atom_id_2"], aAng["atom_id_2_resNum"]))
-            print("atom %s in residue %d "%(aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
+            #print("A angle ")
+            #print("atom %s in residue %d "%(aAng["atom_id_1"], aAng["atom_id_1_resNum"]))
+            #print("atom %s in residue %d "%(aAng["atom_id_2"], aAng["atom_id_2_resNum"]))
+            #print("atom %s in residue %d "%(aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
             if aAng["atom_id_1_resNum"]==1 and aAng["atom_id_2_resNum"]==1 and aAng["atom_id_3_resNum"]==1:
                 if not aAng["atom_id_1"] in addedSet1 and not aAng["atom_id_2"] in addedSet1 and not aAng["atom_id_3"] in addedSet1:
                     self.checkAngMod(tLinkedObj.stdLigand1["remainAngs"], aAng, tLinkedObj.modLigand1["changed"]["angles"]) 
@@ -2865,11 +2882,11 @@ class CovLinkGenerator(CExeCode):
         # Torsions
         if "tors" in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]:
             for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
-                print("A torsion ")
-                print("atom %s in residue %d "%(aTor["atom_id_1"], aTor["atom_id_1_resNum"]))   
-                print("atom %s in residue %d "%(aTor["atom_id_2"], aTor["atom_id_2_resNum"]))   
-                print("atom %s in residue %d "%(aTor["atom_id_3"], aTor["atom_id_3_resNum"]))  
-                print("atom %s in residue %d "%(aTor["atom_id_4"], aTor["atom_id_4_resNum"]))  
+                #print("A torsion ")
+                #print("atom %s in residue %d "%(aTor["atom_id_1"], aTor["atom_id_1_resNum"]))   
+                #print("atom %s in residue %d "%(aTor["atom_id_2"], aTor["atom_id_2_resNum"]))   
+                #print("atom %s in residue %d "%(aTor["atom_id_3"], aTor["atom_id_3_resNum"]))  
+                #print("atom %s in residue %d "%(aTor["atom_id_4"], aTor["atom_id_4_resNum"]))  
                 if aTor["atom_id_1_resNum"]==1 and aTor["atom_id_2_resNum"]==1\
                    and aTor["atom_id_3_resNum"]==1 and aTor["atom_id_4_resNum"]==1:
                     if not aTor["atom_id_1"] in addedSet1 and not aTor["atom_id_2"] in addedSet1\
