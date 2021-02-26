@@ -103,6 +103,22 @@ namespace LIBMOL
         
     }
     
+    
+    void Molecule::setAtomCartCoordFromFracCoord(
+                                      std::vector<CrystInfo>::iterator tCryst)
+    {
+        for (std::vector<AtomDict>::iterator iAtm=atoms.begin();
+                iAtm != atoms.end(); iAtm++)
+        {
+            if (iAtm->fracCoords.size()==3)
+            {
+                FractToOrtho(iAtm->fracCoords, iAtm->coords, 
+                             tCryst->itsCell->a, tCryst->itsCell->b,
+                             tCryst->itsCell->c, tCryst->itsCell->alpha,
+                             tCryst->itsCell->beta, tCryst->itsCell->gamma);
+            }
+        }
+    }
     void Molecule::setFormula()
     {
         std::map<ID, int> fmap;

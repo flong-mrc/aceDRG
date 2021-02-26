@@ -16,11 +16,17 @@
 #include "atom.h"
 #endif
 
+#ifndef BOND_H
+#include "bond.h"
+#endif
+
 namespace LIBMOL
 {
     
     class Atom;
     class AtomDict;
+    class Bond;
+    class BondDict;
     
     /* class Torsion describes torsion angles formed by 4 atoms
      *
@@ -144,7 +150,9 @@ namespace LIBMOL
         ID                    id;
         
         std::vector<int>      atoms;
+        std::vector<AtomDict> fullAtoms;
         std::vector<ID>       atomCodClasses;
+        std::vector<BondDict> bonds;
         std::vector<REAL>     codTorsionValues;  
         
     };

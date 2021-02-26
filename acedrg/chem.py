@@ -580,8 +580,8 @@ class ChemCheck(object):
                     symb = aNB.GetSymbol().strip()
                     if len(symb)==1 and symb.find("H") !=-1:
                         nHs +=1            
-                print("atom symb ", aSymb)
-                print("number of H NB ", nHs)
+                #print("atom symb ", aSymb)
+                #print("number of H NB ", nHs)
                 if not lSP2 and nHs < 2:
                     # TEMP, re-calculated when the coordinates are available
                     #tCenAtm.SetChiralTag(rdchem.ChiralType.CHI_TETRAHEDRAL_CW)            
@@ -648,9 +648,9 @@ class ChemCheck(object):
                if nL==1:
                    aId1 = "H"
                    aId2 = "H" + tHConnAtom["type_symbol"]
-                   if not aI1 in tAllHIds: 
+                   if not aId1 in tAllHIds: 
                        reName = aId1
-                   elif not aI2 in tAllHIds:
+                   elif not aId2 in tAllHIds:
                        reName = aId2
         elif nH==1:
              aId = hIds[0] + "2"

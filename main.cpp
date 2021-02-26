@@ -478,7 +478,9 @@ int main(int argc, char** argv) {
             LIBMOL::setAtomFormTypes(aCodSystem.allAtoms);
             LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
                                                aCodSystem.allAtoms,
-                                               aCodSystem.allBonds);
+                                               aCodSystem.allBonds,
+                                               aCodSystem.allRingsV);
+            
         }
     }
     else if (AJob.workMode == 43)
@@ -555,8 +557,11 @@ int main(int argc, char** argv) {
         if (AJob.IOEntries.find("Type1") !=AJob.IOEntries.end()
             and AJob.IOEntries.find("Type2") !=AJob.IOEntries.end())
         {   
+            
             LIBMOL::isomorGraph graphTool;
             LIBMOL::Graph  g1, g2;
+            
+            
             
             std::vector<std::map<int, int> > matchedList;
             
@@ -566,6 +571,7 @@ int main(int argc, char** argv) {
                                      g2,
                                      matchedList,
                                      1);
+            
             if (matchedList.size()>0)
             {
                 graphTool.outputMatchedGraphs(g1, g2, matchedList, 1,
@@ -576,7 +582,9 @@ int main(int argc, char** argv) {
             {
                 std::cout << "No matched graphs found. " << std::endl;
             }
+            
         }
+          
     }
     else if (AJob.workMode == 910)
     {

@@ -1098,10 +1098,21 @@ namespace LIBMOL
     void GenCifFile::setAtomsMetalType()
     {
         std::vector<ID>  allMetals;
+        std::vector<ID>  pureMetals;
         std::vector<ID>  allMetalloids;
         
-        initMetalTab(allMetals);
+        initMetalTab(pureMetals);
         initMetalloidTab(allMetalloids);
+        for (std::vector<ID>::iterator iM=pureMetals.begin();
+                iM !=pureMetals.end(); iM++)
+        {
+            allMetals.push_back(*iM);
+        }
+        for (std::vector<ID>::iterator iM=allMetalloids.begin();
+                iM !=allMetalloids.end(); iM++)
+        {
+            allMetals.push_back(*iM);
+        }
         
         //std::cout << "Number of metal in the table " << allMetals.size() 
         //          << std::endl;
@@ -1111,7 +1122,7 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                      iA !=allAtoms.end(); iA++)
         {
-            if (isMetal(allMetals, iA->chemType))
+            if (isMetal(pureMetals, iA->chemType))
             {
                 iA->matType = 1;
             }
@@ -4370,8 +4381,19 @@ namespace LIBMOL
         // necessary
         PeriodicTable   aPTab; 
         
-        std::vector<ID> allMetals;
-        initMetalTab(allMetals);
+        std::vector<ID> allMetals, pureMetals, metalloids;
+        initMetalTab(pureMetals);
+        initMetalloidTab(metalloids);
+        for (std::vector<ID>::iterator iM=pureMetals.begin();
+                iM !=pureMetals.end(); iM++)
+        {
+            allMetals.push_back(*iM);
+        }
+        for (std::vector<ID>::iterator iM=metalloids.begin();
+                iM !=metalloids.end(); iM++)
+        {
+            allMetals.push_back(*iM);
+        }
         
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
@@ -9011,8 +9033,9 @@ namespace LIBMOL
     }
     
     extern void outAtomTypesAndConnections(FileName tFName,
-                                           std::vector<LIBMOL::AtomDict>& tAtoms,
-                                           std::vector<LIBMOL::BondDict>& tBonds)
+                                        std::vector<LIBMOL::AtomDict>& tAtoms,
+                                        std::vector<LIBMOL::BondDict>& tBonds,
+                                        std::vector<LIBMOL::RingDict> & tRings)
     {
         
         if (tAtoms.size() !=0 && tBonds.size())
@@ -9069,6 +9092,44 @@ namespace LIBMOL
                              << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[1]].seriNum]
                              << std::endl;
                 }
+                
+                if (tRings.size() > 0)
+                {
+                    outTempF << "Ring Information: " << std::endl;
+                    int  idxR = 1;
+                    std::string aR = "RING_";
+                    for (std::vector<RingDict>::iterator iR=tRings.begin();
+                          iR !=tRings.end(); iR++)
+                    {
+                        std::string aro ="";
+                        if (iR->isAromatic)
+                        {
+                            aro = "Aromatic";
+                        }
+                        else if(iR->isPlanar)
+                        {
+                            aro = "Anti-Aromatic";
+                        }
+                        else
+                        {
+                            aro = "Non-Aromatic";
+                        }
+                        
+                        std::string aLab = aR + IntToStr(idxR);
+                        idxR++;
+                        for (std::vector<AtomDict>::iterator 
+                                iA=iR->atoms.begin();
+                                iA !=iR->atoms.end(); iA++)
+                        {
+                            outTempF << std::setw(12) << aLab
+                                     << std::setw(12) << iA->id
+                                     << std::setw(20) << aro
+                                     << std::endl;
+                        }
+                        
+                    }
+                }
+                
                 outTempF.close();  
             } 
         }

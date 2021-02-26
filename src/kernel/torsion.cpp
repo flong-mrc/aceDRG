@@ -11,7 +11,9 @@ namespace LIBMOL
 {
     
     class Atom;
+    class AtomDict;
     class Bond;
+    class BondDict;
     class Angle;
     
     Torsion::Torsion(): varFlag(ZeroInt),
@@ -247,6 +249,18 @@ namespace LIBMOL
             atoms.push_back(*iAt);
         }
         
+        for (std::vector<AtomDict>::const_iterator iFA=tTorsion.fullAtoms.begin();
+                iFA !=tTorsion.fullAtoms.end(); iFA++)
+        {
+            fullAtoms.push_back(*iFA);
+        }
+        
+        for (std::vector<BondDict>::const_iterator iBo = tTorsion.bonds.begin();
+                iBo != tTorsion.bonds.end(); iBo++)
+        {
+            bonds.push_back(*iBo);
+        }
+        
         for (std::vector<ID>::const_iterator iAt = tTorsion.atomCodClasses.begin();
                 iAt != tTorsion.atomCodClasses.end(); iAt++)
         {
@@ -269,6 +283,12 @@ namespace LIBMOL
             period(1),
             id(NullString)
     {
+        
+        for (std::vector<AtomDict>::const_iterator iFA=tAtoms.begin();
+                iFA !=tAtoms.end(); iFA++)
+        {
+            fullAtoms.push_back(*iFA);
+        }
         
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)

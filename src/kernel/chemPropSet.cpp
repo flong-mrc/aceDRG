@@ -335,7 +335,7 @@ namespace LIBMOL
                 }
             }
 
-            if (iAt->chemType.compare("O")==0)
+            if (iAt->chemType.compare("O")==0 || iAt->chemType.compare("S")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
                 
@@ -2274,8 +2274,6 @@ namespace LIBMOL
         {
             ID aElm = iAt->chemType;
             StrUpper(aElm);
-            std::cout << "Atom " << iAt->seriNum << " of " << iAt->id
-                      << " is  a " << iAt->chemType << " atom " << std::endl;
             
             if (std::find(orgTab.begin(), orgTab.end(), aElm) != orgTab.end())
             {
@@ -2330,12 +2328,12 @@ namespace LIBMOL
                     iAt->excessElec = nExEls;
                 }
             
-                std::cout << "For atom " << iAt->id << " : " << std::endl
-                          << "it connects " << iAt->connAtoms.size() 
-                          << " atom(s) " << std::endl
-                          << "its formal charge is " << iAt->formalCharge << std::endl 
-                          << "its number of EX electrons is " << iAt->excessElec 
-                          << std::endl;
+                //std::cout << "For atom " << iAt->id << " : " << std::endl
+                //          << "it connects " << iAt->connAtoms.size() 
+                //          << " atom(s) " << std::endl
+                //          << "its formal charge is " << iAt->formalCharge << std::endl 
+                //          << "its number of EX electrons is " << iAt->excessElec 
+                //          << std::endl;
             }   
         }  
     }
@@ -2375,8 +2373,6 @@ namespace LIBMOL
         {
             ID aElm = iAt->chemType;
             StrUpper(aElm);
-            std::cout << "Atom " << iAt->seriNum << " of " << iAt->id
-                      << " is  a " << iAt->chemType << " atom " << std::endl;
             
             if (std::find(orgTab.begin(), orgTab.end(), aElm) != orgTab.end())
             {

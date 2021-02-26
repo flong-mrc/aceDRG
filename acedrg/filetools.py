@@ -45,6 +45,7 @@ from . utility  import setBoolDict
 from . utility  import splitLineSpa
 from . utility  import splitLineSpa2
 from . utility  import aLineToAlist
+from . utility  import aLineToAList2
 
 class FileTransformer(object) :
 
@@ -1682,7 +1683,10 @@ class Ccp4MmCifObj (dict) :
             if len(aL) !=0:
                 aStrSet = [] 
                 if tKW =="list":
-                    aLineToAlist(aL, aStrSet)
+                    if aL.find("\'") !=-1 and aL.find("\"") ==-1:
+                        aLineToAList2(aL, aStrSet)
+                    else: 
+                        aLineToAlist(aL, aStrSet)
                 else:
                     aPr = countPrime(aL)
                     if not aPr:

@@ -34,6 +34,10 @@
 #include "bond.h"
 #endif
 
+#ifndef TORSION_H
+#include "torsion.h"
+#endif
+
 #ifndef CRYSTINFO_H
 #include "crystInfo.h"
 #endif
@@ -206,6 +210,14 @@ namespace LIBMOL
         
         void checkBondOneForming(PeriodicTable & tPTab);
         
+        // convFracToCartCoords used only in torsion calculations.
+        // For bond calculations, getBondLenFromFracCoords is used.
+        // For angle calculations, getAngleValueFromFracCoords is used.
+        bool convFracToCartCoords3D(std::vector<REAL> & tCartCoord, 
+                                  std::vector<REAL> & tFracCoord,
+                                  REAL a, REAL b, REAL c, 
+                                  REAL alpha, REAL beta, REAL gamma);             
+        
         REAL getBondLenFromFracCoords(std::vector<REAL> & tCoord1, std::vector<REAL> & tCoord2,
                                       REAL a, REAL b, REAL c, REAL alpha, REAL beta, REAL gamma);
         
@@ -285,6 +297,8 @@ namespace LIBMOL
         void getOverallBondAndAngles();
         void getOverallBondAndAnglesNew();
         void getHRelatedBondsNeuD();
+        void getSPRelatedTorsions(std::vector<Molecule>::iterator tMol,
+                                  std::vector<BondDict>::iterator tBo);
         
         void outTableMols(std::ofstream & tMolTabs, 
                           Molecule & tMol);
@@ -383,6 +397,7 @@ namespace LIBMOL
         
         std::vector<BondDict>           bonds;
         std::vector<AngleDict>          angles;
+        std::vector<TorsionDict>        torsions;
    
         
         std::map<unsigned, std::vector<int> >   moleculesInCell;

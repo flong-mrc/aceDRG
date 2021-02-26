@@ -2736,25 +2736,26 @@ namespace LIBMOL
                              REAL a, REAL b, REAL c,
                              REAL alpha, REAL beta, REAL gamma)
     {
-        if (tOrthoCoords.size()==0)
+        tOrthoCoords.clear();
+        if (tFractCoords.size()==3)
         {
             for (unsigned i=0; i < tFractCoords.size(); i++)
             {
                 tOrthoCoords.push_back(0.0);
             }
-        }
-        
-        REAL coA   = cos(alpha*PI180);
-        REAL coB   = cos(beta*PI180);
-        REAL coG   = cos(gamma*PI180);
-        REAL siG   = sin(gamma*PI180);
         
         
-        tOrthoCoords[0] = tFractCoords[0]*a + tFractCoords[1]*b*coG + tFractCoords[2]*c*coB;
-        tOrthoCoords[1] = tFractCoords[1]*b*siG + tFractCoords[2]*c*(coA-coB*coG)/siG;
-        tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*coA*coB*coG)/siG;
+            REAL coA   = cos(alpha*PI180);
+            REAL coB   = cos(beta*PI180);
+            REAL coG   = cos(gamma*PI180);
+            REAL siG   = sin(gamma*PI180);
         
         
+            tOrthoCoords[0] = tFractCoords[0]*a + tFractCoords[1]*b*coG + tFractCoords[2]*c*coB;
+            tOrthoCoords[1] = tFractCoords[1]*b*siG + tFractCoords[2]*c*(coA-coB*coG)/siG;
+            tOrthoCoords[2] = tFractCoords[2]*c*sqrt(pow(siG,2.0) - pow(coB,2.0) - pow(coA,2.0) + 2*coA*coB*coG)/siG;
+        
+        } 
     }
     
     extern void OrthoToFract(std::vector<REAL> tOrthoCoords,

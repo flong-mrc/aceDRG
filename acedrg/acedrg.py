@@ -59,6 +59,7 @@ from . utility    import setBoolDict
 from . utility    import splitLineSpa
 from . utility    import splitLineSpa2
 from . utility    import aLineToAlist
+from . utility    import checkRepAtomTypes
 
 if os.name != 'nt':
     import fcntl
@@ -136,6 +137,7 @@ class Acedrg(CExeCode ):
         self.neuDif           = False
 
         self.HMO              = False
+        self.raS              = 0.5
         
         self.testMode         = False
 
@@ -713,7 +715,7 @@ class Acedrg(CExeCode ):
         elif t_inputOptionsP.typeOut:
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
-                self.workMode    = 31
+                self.workMode    = 311
             elif t_inputOptionsP.inSmiName:
                 self.inSmiName = t_inputOptionsP.inSmiName
                 self.workMode    = 32
@@ -972,7 +974,6 @@ class Acedrg(CExeCode ):
             print("=====================================================================") 
 
     def runLibmol(self, tIn=None, tIdxMol=-1):
-        print("workMode ", self.workMode)
         self._cmdline = self.libmol
         if tIdxMol !=-1: 
             self._log_name       = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.log")
@@ -1074,11 +1075,8 @@ class Acedrg(CExeCode ):
                     for aExCif in tExcludedCif:
                         print(aExCif)
 
-        if self.workMode == 31 or self.workMode == 32 or self.workMode == 33 or self.workMode == 34 or self.workMode == 35 : 
-            #print "===================================================================" 
-            #print "| Generate atom types of Acedrg style                             |"
-            #print "===================================================================" 
-            if self.workMode == 31 or self.workMode == 32 or self.workMode==33:
+        if self.workMode == 31 or self.workMode ==311 or self.workMode == 32 or self.workMode == 33 or self.workMode == 34 or self.workMode == 35 : 
+            if self.workMode == 31 or self.workMode == 311 or self.workMode == 32 or self.workMode==33:
                 if tIn:
                     inFileName    = tIn
                 else:
@@ -1089,13 +1087,10 @@ class Acedrg(CExeCode ):
                     else:
                         aStr = "2"
                     self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
-                elif self.workMode == 33:
-                    print("===================================================================") 
-                    print("| Generate atom types of Acedrg style                             |")
-                    print("===================================================================") 
+                elif self.workMode == 311:
                     self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
+                    print("Output file name : %s "%self.outAtmTypeName)
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
-                #print self._cmdline
                 self.subExecute()
                 
         if self.workMode == 41 :
@@ -2253,16 +2248,19 @@ class Acedrg(CExeCode ):
 
         for aL in allLs:
             strGrp = aL.strip().split()
-            if len(strGrp)== 4:
+            if len(strGrp)== 6:
                 combo_ID = strGrp[0] + "_" + strGrp[1]
                 tBondSet[combo_ID] = {}
                 tBondSet[combo_ID]["atom_id_1"] = strGrp[0]
                 tBondSet[combo_ID]["atom_id_2"] = strGrp[1]
                 tBondSet[combo_ID]["prot_h"]    = strGrp[2]
-                tBondSet[combo_ID]["prot_h_s"]   = strGrp[3]
+                tBondSet[combo_ID]["prot_h_s"]  = strGrp[3]
+                tBondSet[combo_ID]["e_h"]       = strGrp[4]
+                tBondSet[combo_ID]["e_h_s"]     = strGrp[5]
 
     def getNewCif(self, tCif, tBondSet, t3Bs):
 
+        sys.exit()
         fO = open(tCif, "w")
 
         lFN = False
@@ -2322,7 +2320,21 @@ class Acedrg(CExeCode ):
                 fO.write(aL)
 
         fO.close()
-        sys.exit()
+
+    def tmpCifInitMol(self):
+
+        aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+        self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
+
+        if os.path.isfile(aIniMolName) :
+            if len(self.fileConv.chiralPre) !=0:
+                # Chiral centers defined in the original cif file
+                self.rdKit.chiralPre =[]
+                for aChi in self.fileConv.chiralPre:
+                    self.rdKit.chiralPre.append(aChi)
+                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
+                                        self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
+                                        self.fileConv.nameMapingCifMol, self.fileConv.inputCharge)
 
     def execute(self):
         
@@ -2439,8 +2451,10 @@ class Acedrg(CExeCode ):
             else:
                 print("Can not find the input directory ", self.inStdCifDir)
                 
-        if self.workMode == 31:
-            print("work mode ", self.workMode)
+        if self.workMode == 31 or self.workMode == 311:
+            print ("===================================================================") 
+            print ("| Generate atom types of Acedrg style                             |")
+            print ("===================================================================") 
             if os.path.isfile(self.inMmCifName):
                 self.runLibmol()    
         
@@ -2483,7 +2497,10 @@ class Acedrg(CExeCode ):
                 print("acedrg failed to generate a dictionary file")       
     
     def getAAOut(self):
-      
+    
+        ccpMonLib   = os.getenv("CLIBD_MON") 
+        aSub        = self.monomRoot[0].lower() 
+        aaDirC = os.path.join(ccpMonLib, aSub)       
         aaDir = os.path.join(self.acedrgTables, "AminoAcids")       
         iniPdb = os.path.join(aaDir, self.monomRoot + ".pdb")
         #print "iniPdb ", iniPdb
@@ -2493,12 +2510,16 @@ class Acedrg(CExeCode ):
         else:
             print("Error in dealing with the pdb of amino acid %s "%self.monomRoot) 
             sys.exit(1)
-        iniCif = os.path.join(aaDir, self.monomRoot + ".cif")
+        iniCif = ""
+        if os.path.isdir(aaDirC):
+            iniCif = os.path.join(aaDirC, self.monomRoot + ".cif")
+        else:
+            iniCif = os.path.join(aaDir, self.monomRoot + ".cif")
         finCif = self.outRoot + ".cif"
         if os.path.isfile(iniCif):
             shutil.copy(iniCif, finCif)
         else:
-            print("Error in dealing with the cif of amino acid %s "%self.monomRoot) 
+            print("Can not find the cif file for  amino acid %s "%self.monomRoot) 
             sys.exit(1)
         if os.path.isfile(finPdb) and os.path.isfile(finCif):
            print("=====================================================================")
@@ -2522,6 +2543,10 @@ class Acedrg(CExeCode ):
                 self.getAAOut()
             elif os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode)\
                and not self.isAA:
+                tmpWorkMode = self.workMode
+                self.workMode = 311
+                self.runLibmol()
+                self.workMode = tmpWorkMode
                 # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
                 
@@ -2629,6 +2654,7 @@ class Acedrg(CExeCode ):
                                             lSmi = True    
                                             aSmi = strGrp[iDes][1:-1]
                                             break
+        
                         if lSmi :
                             print("Smiles str  ", aSmi)
                             aIniSmiName = os.path.join(self.scrDir, self.baseRoot + "_init.smi")
@@ -2660,16 +2686,21 @@ class Acedrg(CExeCode ):
                             self.libmolAT1     = os.path.join(self.scrDir, "atomTypes_1.txt")
                             self.libmolAT2     = os.path.join(self.scrDir, "atomTypes_2.txt")
                             self.libmolMatched = os.path.join(self.scrDir, "matchedType.txt")
-
-                            if os.path.isfile(self.libmolAT1) and os.path.isfile(self.libmolAT2):
-                                 self.workMode = 900
-                                 self.runLibmol()
-                                 self.rdKit.reSetSmi = True
-                                 self.rdKit.molecules = []
-                                 self.rdKit.initMols("smi", aIniSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)  
-                                 self.fileConv.mergeAtomNames(self.libmolMatched, self.rdKit.molecules[0])
-                                 self.fileConv.addAtomOrigChiralSign(self.rdKit.molecules[0])
-                                 self.useCifCoords = True
+                            if os.path.isfile(self.libmolAT1):
+                                if not checkRepAtomTypes(self.libmolAT1, self.raS):
+                                    self.tmpCifInitMol()
+                                else:
+                                    if os.path.isfile(self.libmolAT2):
+                                        self.workMode = 900
+                                        self.runLibmol()
+                                        self.rdKit.reSetSmi = True
+                                        self.rdKit.molecules = []
+                                        self.rdKit.initMols("smi", aIniSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)  
+                                        self.fileConv.mergeAtomNames(self.libmolMatched, self.rdKit.molecules[0])
+                                        self.fileConv.addAtomOrigChiralSign(self.rdKit.molecules[0])
+                                        self.useCifCoords = True
+                                    else:
+                                        self.tmpCifInitMol()
                             self.workMode = 11
                     else:
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -2901,8 +2932,10 @@ class Acedrg(CExeCode ):
             else:
                 print("Can not find the input directory ", self.inStdCifDir)
                 
-        if self.workMode == 31:
-            print("work mode ", self.workMode)
+        if self.workMode == 31 or self.workMode==311:
+            print ("===================================================================") 
+            print ("| Generate atom types of Acedrg style                             |")
+            print ("===================================================================") 
             if os.path.isfile(self.inMmCifName):
                 self.runLibmol()    
         
@@ -2940,7 +2973,8 @@ class Acedrg(CExeCode ):
                 self.runLibmol()    
         
         if self.workMode == 61:
-            aAAdir = os.path.join(self.acedrgTables, "AminoAcids")
+            
+            aAAdir      = os.path.join(self.acedrgTables, "AminoAcids")
             if not self.testMode: 
                 aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
             else:

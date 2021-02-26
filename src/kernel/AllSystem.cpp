@@ -4699,7 +4699,8 @@ namespace LIBMOL
                     std::cout << "idxH = " << idxH << std::endl;
                     double aProtD      = 0.0;
                     double aProtD_siga = 0.0;
-                            
+                    double aHD         = 0.0;
+                    double aHD_siga    = 0.0;
                                
                     if (idxH > -1)
                     {
@@ -4710,6 +4711,9 @@ namespace LIBMOL
                             aProtD = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["pDistNeu"];
                             aProtD_siga 
                             = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["pDistSigaNeu"];
+                            aHD    = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["eDistQM"];
+                            aHD_siga 
+                            = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["eDistSigaQM"];
                         }
                         else if (tMonomer.HydrDistTable[1].find(tMonomer.allAtoms[idxX].chemType)
                              !=tMonomer.HydrDistTable[1].end())
@@ -4717,11 +4721,16 @@ namespace LIBMOL
                             aProtD = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["pDist"];
                             aProtD_siga 
                             = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["pDistSiga"];
+                            aHD = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["eDist"];
+                            aHD_siga 
+                            = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["eDistSiga"];
                         }
                         else
                         {
-                            aProtD = iB->value;
+                            aProtD      = iB->value;
                             aProtD_siga = iB->sigValue;
+                            aHD         = iB->value;
+                            aHD_siga    = iB->sigValue;
                         }
                         
                         outBTab << std::setw(12)  
@@ -4731,7 +4740,12 @@ namespace LIBMOL
                             << std::setw(12) 
                             << aProtD
                             << std::setw(8) << std::setprecision(4)
-                            << aProtD_siga << std::endl;
+                            << aProtD_siga 
+                            << std::setw(12) 
+                            << aHD
+                            << std::setw(12) << std::setprecision(4)
+                            << aHD_siga
+                            << std::endl;
                           
                     }
                     

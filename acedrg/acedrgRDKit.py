@@ -365,7 +365,6 @@ class AcedrgRDKit(object):
                     i = i+1
 
             for aAtom in tMol.GetAtoms():
-                print(dictAtomNames[aAtom.GetIdx()])
                 aS = str(dictAtomNames[aAtom.GetIdx()])
                 aAtom.SetProp("Name", aS) 
         else:
@@ -1113,7 +1112,6 @@ class AcedrgRDKit(object):
 
         #if self.reSetChirals:
         #    self.reAssignChirals(aMol) 
-    
         allAtoms = aMol.GetAtoms()
         for aAtom in allAtoms:
             aIdx = aAtom.GetIdx()
@@ -1555,7 +1553,7 @@ class AcedrgRDKit(object):
                             chiCenAtms4.append(aAtom)               
                         elif  nConnHs < 2 and nNB > 2:
                             chiCenAtms3.append(aAtom)               
-                        print("a Center",aName)
+                        #print("a Center",aName)
             nChiWithSign = len(chiCenAtms3)
             nChiBoth     = len(chiCenAtms4)
             #print("nBoth ",nChiBoth)
@@ -1722,7 +1720,7 @@ class AcedrgRDKit(object):
         tmpBadCid = []
         if len(self.selecConformerIds):
             for aCid in self.selecConformerIds:
-                print("aCid ", aCid)
+                #print("aCid ", aCid)
                 try:
                     rdmolops.AssignAtomChiralTagsFromStructure(tMol, confId=aCid)
                 except:

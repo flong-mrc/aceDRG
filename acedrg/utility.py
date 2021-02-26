@@ -169,7 +169,48 @@ def countPrime(tL):
         lCount = True
 
     return lCount 
- 
+
+def aLineToAList2(tL, tList):
+
+    tL = tL.strip()
+
+    lP = False
+     
+    str1 = ""
+    str2 = ""
+    str3 = ""
+
+    sep  = "\'"
+    b   = 0
+    e   = 0
+    lP  = False
+   
+    pos =0
+    for aS in tL:
+        if lP:
+           if aS.find(sep) !=-1:
+              e = pos
+        elif aS.find(sep) !=-1:
+           lP = True
+           b  = pos
+           e  = pos    
+        pos +=1
+    if b==e:
+        tList = aL.strip().split()
+    else:
+        strs1 = tL[0:b].split()
+        str2  = tL[b:e+1]
+        strs3 = tL[e+1:len(tL)].split()
+    
+        for aE in strs1:
+            tList.append(aE)
+
+        tList.append(str2)
+
+        for aE in strs3:
+            tList.append(aE)
+
+        print(tList)
 def aLineToAlist(tL, tList):
 
     aTS = ""
@@ -295,3 +336,54 @@ def BondOrderS2N(tBS):
         aBN = 3
 
     return aBN
+
+
+def checkRepAtomTypes(tFileName, tS):
+
+    aRet = True
+    aFile = open(tFileName, "r")
+    allLs = aFile.readlines()
+    aFile.close()
+   
+    nAllTP = 0
+    allAtmTP = {}
+    lAtmSec = False
+    for aL in allLs:
+        if aL.find("H FormType:") !=-1:
+            lAtmSec = False
+        elif aL.find("ATOMS:") != -1:
+            lAtmSec = True
+        elif lAtmSec:
+            strgrp = aL.strip().split()
+            if len(strgrp)==4:
+                if strgrp[1].find("H")==-1:
+                    nAllTP +=1
+                    aTP = strgrp[3].strip()
+                    if not aTP in allAtmTP.keys():
+                        allAtmTP[aTP] = 1
+                    else:
+                        allAtmTP[aTP] += 1
+
+    
+    nMax = 0
+    maxTP = ""
+    if nAllTP > 0:
+        for aTP in allAtmTP.keys():
+            if allAtmTP[aTP] > nMax:
+                nMax = allAtmTP[aTP]
+                maxTP = aTP
+        r = float(nMax)/nAllTP
+
+        if r >= tS :
+            aRet = False    
+        print ("number of All non-H atoms %d "%nAllTP)
+        print ("Largest repeated type %s with %d atoms"%(maxTP, nMax))
+        print("RatioMax is  %f "%r) 
+        print("All Atom types : ")
+        for aK in allAtmTP.keys():
+            print("%s    %d"%(aK, allAtmTP[aK]))
+
+    else:
+        aRet = False
+
+    return aRet

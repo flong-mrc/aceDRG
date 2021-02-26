@@ -94,6 +94,8 @@ namespace LIBMOL
         // Destructor
         ~Molecule();
         
+        void setAtomCartCoordFromFracCoord(std::vector<CrystInfo>::iterator tCryst);
+        
         void setFormula();
         void calcSumExcessElecs();
         void calcSumCharges();

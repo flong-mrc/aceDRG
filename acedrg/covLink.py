@@ -701,20 +701,18 @@ class CovLinkGenerator(CExeCode):
             aNS = aLink.stdLigand1["name"][0].lower()
             aNL = aLink.stdLigand1["name"].upper()
             if not aLink.stdLigand1["userIn"]:
-                if aNL in self.chemCheck.aminoAcids :
-                    aLink.stdLigand1["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
-                    aLink.stdLigand1["userIn"] = True
-                else :
-                    aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                aLink.stdLigand1["userIn"] = True
+                #if aNL in self.chemCheck.aminoAcids :
+                #    aLink.stdLigand1["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
 
             aNS = aLink.stdLigand2["name"][0].lower()
             aNL = aLink.stdLigand2["name"].upper()
             if not aLink.stdLigand2["userIn"]:
-                if aNL in self.chemCheck.aminoAcids :
-                    aLink.stdLigand2["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
-                    aLink.stdLigand2["userIn"] = True
-                else :
-                    aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                aLink.stdLigand2["userIn"] = True
+                #if aNL in self.chemCheck.aminoAcids :
+                #    aLink.stdLigand2["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
 
             if aLink.checkInPara() and not self.errLevel:
                 self.cLinks.append(aLink)
@@ -1192,20 +1190,14 @@ class CovLinkGenerator(CExeCode):
                 aNS = aLink.stdLigand1["name"][0].lower()
                 aNL = aLink.stdLigand1["name"].upper()
                 if not aLink.stdLigand1["userIn"]:
-                    if aNL in self.chemCheck.aminoAcids :
-                        aLink.stdLigand1["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
-                        aLink.stdLigand1["userIn"] = True
-                    else :
-                        aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                    aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                    aLink.stdLigand1["userIn"] = True
 
                 aNS = aLink.stdLigand2["name"][0].lower()
                 aNL = aLink.stdLigand2["name"].upper()
                 if not aLink.stdLigand2["userIn"]:
-                    if aNL in self.chemCheck.aminoAcids :
-                        aLink.stdLigand2["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
-                        aLink.stdLigand2["userIn"] = True
-                    else :
-                        aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                    aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
+                    aLink.stdLigand2["userIn"] = True
 
                 if aLink.checkInPara() and not self.errLevel:
                     self.cLinks.append(aLink)
@@ -1335,12 +1327,10 @@ class CovLinkGenerator(CExeCode):
                 for aKey in list(self.errMessage.keys()):
                     for aLine in self.errMessage[aKey]:
                         print(aLine)
-        
 	#print "User input cif for L 1 ", aLink.stdLigand1["compOut"]
         #print "User input cif for L 2 ", aLink.stdLigand2["compOut"]
 
     def processOneLink(self, tLinkIns):
-        
         if not self.errLevel:
             if not tLinkIns.stdLigand1["fromScr"]:
                 self.setOneCompFromCif(tLinkIns.stdLigand1["inCif"], tLinkIns.stdLigand1)
@@ -1420,8 +1410,7 @@ class CovLinkGenerator(CExeCode):
                 if (not tMonomer["userIn"]) and (tMonomer["name"].upper() in self.chemCheck.aminoAcids):
                     self.chemCheck.tmpModiN_in_AA(tMonomer["name"].upper(), tMonomer["comp"])
                 self.selectHAtoms(tMonomer["comp"])   
-                #print aMmcifObj["ccp4CifObj"]["lists"]["comp"].keys()
-    
+                print(aMmcifObj["ccp4CifObj"]["lists"]["comp"].keys())
                 tMonomer["list"] = aMmcifObj["ccp4CifObj"]["lists"]["comp"][tMonomer["name"]]
                 #print tMonomer["list"]
                 dataHead = "data_comp_%s"%tMonomer["name"]
@@ -1554,9 +1543,9 @@ class CovLinkGenerator(CExeCode):
 
         if os.path.isfile(tMonomer["inCif"]):
             #print(tMonomer["inCif"])
-            aNL = tMonomer["name"].upper()
-            if len(aNL) > 3:
-                aNL = "UNL"
+            #aNL = tMonomer["name"].upper()
+            #if len(aNL) > 3:
+            aNL = "UNL"
             self._log_name  = os.path.join(self.scrDir, aNL + "_for_link.log")
             self.subRoot    = os.path.join(self.scrDir, aNL + "_for_link")
             self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)   
@@ -1992,10 +1981,10 @@ class CovLinkGenerator(CExeCode):
                          delIdSet.append("2")
                     if aChi["atom_id_3"].upper() in delAtomIdSet:
                          delIdSet.append("3")
-                    if len(delIdSet) !=1 :
+                    if len(delIdSet) > 1 :
                         # Original chiral center destroyed. Let combo-conformer to determine if a chir exists.
                         tMod["deleted"]["chirs"].append(aChi)
-                    else :
+                    elif len(delIdSet)==1 :
                         tMod["deleted"]["chirs"].append(aChi)
                         tRes["linkChir"].append(self.copyChi(aChi))
                         tRes["linkChir"].append(delIdSet[0])
@@ -2004,6 +1993,10 @@ class CovLinkGenerator(CExeCode):
                         print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_1"], " in chir ", aChi['id'])
                         print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_2"], " in chir ", aChi['id'])
                         print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_3"], " in chir ", aChi['id'])
+                    else:
+                        tRes["remainChirs"].append(aChi)
+                        tRes["linkChir"].append(self.copyChi(aChi))
+
         #print("Here 0")
         # Delete the deleted atom from a plane and even delete a plane 
         # if number of atoms in a plane smaller then 3 (after deleting the assigned atom)
@@ -2727,12 +2720,11 @@ class CovLinkGenerator(CExeCode):
                     print("The cif file of the combo-ligand for input ", tLinkedObj.combLigand["inCif"])
                     self.comboLigToSimplifiedMmcif(tLinkedObj.combLigand, tLinkedObj.combLigand["inCif"])
                     self.setOneMonomer(tLinkedObj.combLigand)
-                    
                     if not self.errLevel:
                         tLinkedObj.outCombLigand["name"] = tLinkedObj.combLigand["name"]
                         tLinkedObj.outCombLigand["cifObj"] = Ccp4MmCifObj(tLinkedObj.combLigand["outCif"])["ccp4CifObj"]            
                         print("output comboLigand name ", tLinkedObj.outCombLigand["name"])
-                        print("Number of atoms in the comboLigand : ", len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]))
+                        #print("Number of atoms in the comboLigand : ", len(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["atoms"]))
                         comboScrDN = self.subRoot + "_TMP"
                         if os.path.isdir(comboScrDN) and not self.testMode:
                             #print "Delete the tempo dir ", comboScrDN
@@ -3409,8 +3401,12 @@ class CovLinkGenerator(CExeCode):
         if "chirs" in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]:
             for aChi in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["chirs"]:
                 if aChi["atom_id_centre_alias"] ==atm1:
+                    if len(tLinkedObj.stdLigand1["linkChir"])==0:
+                        aChi["volume_sign"] = "both"
                     tLinkedObj.cLink["chirals"].append(aChi)
                 elif aChi["atom_id_centre_alias"] ==atm2:
+                    if len(tLinkedObj.stdLigand2["linkChir"])==0:
+                        aChi["volume_sign"] = "both"
                     tLinkedObj.cLink["chirals"].append(aChi)
             print("Number of Link chirals ", len(tLinkedObj.cLink["chirals"]))
             print("They are :")
@@ -3446,7 +3442,6 @@ class CovLinkGenerator(CExeCode):
 
         #aOutCifName = tLinkedObj.combLigand["name"] + "_link.cif"
         aOutCifName = self.outRoot + "_link.cif"
-        
         
         try: 
             aOutCif = open(aOutCifName, "w")
