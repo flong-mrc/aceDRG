@@ -3111,19 +3111,22 @@ class CovLinkGenerator(CExeCode):
     def checkPlMod(self, tOrigPls,  tPl, tModDelPls, tModAddPls):
 
         tPlAtmIds = []
-        #print("Atoms in tPl : ")
+        print("Atoms in tPl : ")
         for aAtm in tPl:
-            if aAtm["atom_id"][0] != "H":
-                tPlAtmIds.append(aAtm["atom_id"])
-                #print(aAtm["atom_id"])
+            #if aAtm["atom_id"][0] != "H":
+            tPlAtmIds.append(aAtm["atom_id"])
+            print(aAtm["atom_id"])
         nAtoms = len(tPlAtmIds)
         for aPl in tOrigPls:
+            print("Atoms in aPl : ")
             tOrigPlAtmIds = []
             for aPlAtm in aPl:
-                if aPlAtm["atom_id"][0] != "H":
-                    tOrigPlAtmIds.append(aPlAtm["atom_id"])
+                #if aPlAtm["atom_id"][0] != "H":
+                tOrigPlAtmIds.append(aPlAtm["atom_id"])
+                print(aPlAtm["atom_id"])
             nOrigAtoms = len(tOrigPlAtmIds)
             if nAtoms > nOrigAtoms: 
+                print("here1")
                 overlapAtms = []
                 for aOId in tOrigPlAtmIds:
                     if aOId in tPlAtmIds:
@@ -3132,20 +3135,21 @@ class CovLinkGenerator(CExeCode):
                 if len(overlapAtms) == nOrigAtoms:
                     tModDelPls.append(aPl) 
                     tModAddPls.append(tPl)
-                    #print("orignal plane deleted")
+                    print("orignal plane deleted")
                     break
             elif nAtoms < nOrigAtoms: 
+                print("here2")
                 overlapAtms = []
                 for aOId in tPlAtmIds:
                     if aOId in tOrigPlAtmIds:
                         overlapAtms.append(aOId)
                 if len(overlapAtms) == nAtoms:
-                    #print ("overlaped atoms ",  len(overlapAtms))
-                    #for aId in overlapAtms:
-                    #    print ("overlaped atom : %s "%aId)
+                    print ("overlaped atoms ",  len(overlapAtms))
+                    for aId in overlapAtms:
+                        print ("overlaped atom : %s "%aId)
                     tModDelPls.append(aPl) 
                     tModAddPls.append(tPl)
-                    #print("orignal plane deleted")
+                    print("orignal plane deleted")
                     break
 
         """

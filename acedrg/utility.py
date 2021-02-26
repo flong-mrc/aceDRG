@@ -332,7 +332,7 @@ def BondOrderS2N(tBS):
         aBN = 1      
     elif aBS.find("DOUB") !=-1:
         aBN = 2
-    elif aBS.find("TRIB") !=-1:
+    elif aBS.find("TRIP") !=-1:
         aBN = 3
 
     return aBN
