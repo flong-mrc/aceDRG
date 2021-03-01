@@ -2923,6 +2923,11 @@ namespace LIBMOL
                     lA=false;
                     lC=true;
                 }
+                else if (tRecord.find("Ring Information:") !=std::string::npos )
+                {
+                    lA=false;
+                    lC=false;
+                }
                 else if(lA)
                 {
                     StrTokenize(tRecord, tBuf);

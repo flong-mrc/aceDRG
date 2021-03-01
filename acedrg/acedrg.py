@@ -329,9 +329,9 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,  
                                     help="The option to look into structures (represented by cif files) determined by neutron diffraction")
 
-        self.inputParser.add_option("--prot", dest="protCol",
+        self.inputParser.add_option("--nucl", dest="protCol",
                                     action="store_true",  default=False,
-                                    help="The option to add proton columns in mmcif (dictionary) files")
+                                    help="The option to add nucleus columns in mmcif (dictionary) files")
 
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
@@ -1109,7 +1109,6 @@ class Acedrg(CExeCode ):
         if self.workMode == 80 :
            
             self._cmdline += " -R yes -c %s -D %s  -o %s "%(tIn, self.acedrgTables, self.outProtDistTable)
-            #print(self._cmdline)
             self.subExecute()
 
         if self.workMode ==900:
@@ -2260,7 +2259,6 @@ class Acedrg(CExeCode ):
 
     def getNewCif(self, tCif, tBondSet, t3Bs):
 
-        sys.exit()
         fO = open(tCif, "w")
 
         lFN = False
@@ -2298,12 +2296,16 @@ class Acedrg(CExeCode ):
                         if compId1 in aIDList:
                             v  = "%4.3f"%float(tBondSet[compId1]["prot_h"])
                             vs = "%4.3f"%float(tBondSet[compId1]["prot_h_s"])
+                            e  = "%4.3f"%float(tBondSet[compId1]["e_h"])
+                            es = "%4.3f"%float(tBondSet[compId1]["e_h_s"])
                         elif compId2 in aIDList:
                             v  = "%4.3f"%float(tBondSet[compId2]["prot_h"])
                             vs = "%4.3f"%float(tBondSet[compId2]["prot_h_s"])
+                            e  = "%4.3f"%float(tBondSet[compId2]["e_h"])
+                            es = "%4.3f"%float(tBondSet[compId2]["e_h_s"])
                         for i in range(nStrs-2):
                             outL += "%s"%(strs[i].ljust(10))
-                        outL+="%s%s%s%s\n"%(v.ljust(10), vs.ljust(10), strs[-2].ljust(10), strs[-1].ljust(10))
+                        outL+="%s%s%s%s\n"%(v.ljust(10), vs.ljust(10), e.ljust(10), es.ljust(10))
                         fO.write(outL)
                     else:
                         for i in range(nStrs):

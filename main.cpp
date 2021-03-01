@@ -539,6 +539,8 @@ int main(int argc, char** argv) {
     }
     else if (AJob.workMode == 800)
     {
+        
+        
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
         
         LIBMOL::AllSystem   aTargetSystem(dataFromCif, 

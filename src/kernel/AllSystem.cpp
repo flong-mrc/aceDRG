@@ -4653,6 +4653,7 @@ namespace LIBMOL
         std::ofstream outBTab(tOutFName);
         if (outBTab.is_open())
         {
+            
             if (tMonomer.allBonds.size() >0)
             {   
                 // Bond sections 
@@ -4745,19 +4746,11 @@ namespace LIBMOL
                             << aHD
                             << std::setw(12) << std::setprecision(4)
                             << aHD_siga
-                            << std::endl;
-                          
+                            << std::endl;     
                     }
-                    
-                    
-                    
-                    
-                    
-
-                    
-                    
                 }
             }
         }
+        
     }
 }
