@@ -248,6 +248,7 @@ namespace LIBMOL
         
         void setupSystem();
         void setupSystem2();
+        void setupSystem3();
         
         // get CCP4 energy lib 
         void getCCP4BondAndAngles();

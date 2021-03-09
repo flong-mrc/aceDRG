@@ -374,7 +374,15 @@ namespace LIBMOL
         }
         
         // setupSystem();
-        setupSystem2();
+        
+        if (nTM==3)
+        {
+            setupSystem3();
+        }
+        else
+        {
+            setupSystem2();
+        }
         
         
     }
@@ -508,8 +516,6 @@ namespace LIBMOL
         // std::vector<RingDict>          tmpRings;
         // std::vector<std::vector<int> > tmpAtoms;
         
-        
-        
         if (allRings.size() !=0)
         {
             for (std::map<ID, std::vector<RingDict> >::iterator iMr=allRings.begin();
@@ -564,13 +570,175 @@ namespace LIBMOL
                       << allAtoms[iTor->atoms[3]].id << ", value is: "
                       << iTor->value << std::endl;
         }
-        */
-        
-        
-        
+        */   
     }
     
     void CodClassify::setupSystem2()
+    {
+        
+        int cLev = 2;      // should be a constant from an input file
+       
+        // codAtomClassify(cLev);
+        
+        codAtomClassifyNew2(cLev);
+        
+        setAtomsBondingAndChiralCenter(allAtoms);
+        
+        getCCP4BondAndAngles();
+        
+        // std::vector<RingDict>          tmpRings;
+        // std::vector<std::vector<int> > tmpAtoms;
+        
+        if (allRings.size() !=0)
+        {
+            for (std::map<ID, std::vector<RingDict> >::iterator iMr=allRings.begin();
+                    iMr !=allRings.end(); iMr++)
+            {
+                for(std::vector<RingDict>::iterator iR=iMr->second.begin();
+                        iR !=iMr->second.end(); iR++)
+                {
+                    // tmpRings.push_back(*iR);
+                    
+                    iR->setPlaneProp();
+                    
+                    //setSugarRingInitComf(allAtoms, allTorsions, iR);
+                    
+                    checkOneSugarRing(allAtoms, iR);
+                    if (iR->isSugar.compare("pyranose")==0)
+                    {    
+                        std::cout << "Find one pyranose ring " << std::endl;
+                        // A pyranose ring, set torsions within the ring    
+                        setPyranoseChairComf(allAtoms, iR, allTorsions);
+                    }
+                   
+                    /*
+                    std::string PL("No");
+                    if (iR->isPlanar)
+                    {
+                        PL = "Yes";
+                    }
+                    
+                    std::cout << "Is ring, " << iMr->first << ", a planar ring? "
+                              <<  PL << std::endl;
+                    */
+                }
+            }
+        }
+        
+        // Ring aromaticity has been set, put that and other in atom properties
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            //std::cout << "Atom ID " << iAt->id << std::endl; 
+            //std::cout << "atom type " << iAt->id << std::endl;
+            iAt->setBaseRingProps();
+            //std::cout << "base ring prop " << iAt->baseRingProp["aroma"] << std::endl;
+        }
+        
+        // set ring properties of all bonds and angles
+        reIndexAtomInRing(allAtoms, allRingsV);
+        
+        for (std::vector<BondDict>::iterator iB=allBonds.begin();
+                iB !=allBonds.end(); iB++)
+        {
+            iB->isInSameRing = checkIfBondInSameRing(allAtoms, 
+                                                     iB->atomsIdx[0], iB->atomsIdx[1]);
+        }
+        
+        for (std::vector<AngleDict>::iterator iAn=allAngles.begin();
+               iAn !=allAngles.end(); iAn++)
+        {
+            iAn->isInSameRing = checkIfAngleInSameRing(allAtoms, 
+                                                       allRingsV,
+                                                       iAn->atoms[0],
+                                                       iAn->atoms[1], iAn->atoms[2]);
+        }
+        
+        
+        
+        modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
+        
+        //if (!hasCCP4Type)
+        //{
+        //    setAtomsCCP4Type();
+        //}
+        
+        // setupMiniTorsions();
+        
+        setAtomsNB1NB2_SP(allAtoms);
+        
+        setAtomsNB1NB2_exElectrons(allAtoms);
+        
+        hashingAtoms2();
+        
+        
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            std::cout << "Atom " << iAt->seriNum << " : " << std::endl
+                      << "Its ID " << iAt->id << std::endl
+                      << "Its element type " << iAt->chemType << std::endl
+                      << "Its COD root atom type " << iAt->codAtmRoot << std::endl
+                      << "Its acedrg atom type " << iAt->codClass << std::endl
+                      << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
+                      << "Its base ring type " << iAt->baseRingProp["aroma"] << std::endl
+                      << "Its ccp4 atom type " << iAt->ccp4Type << std::endl
+                      << "Its second NB sp props " << iAt->codNB1NB2_SP << std::endl
+                      << "Its number of extra-electrons is " << iAt->excessElec << std::endl
+                      << "Its second NB extra-electron sign is " << iAt->codNB1NB2_ExElec << std::endl
+                      << "Its hashing is " << iAt->hashingValue << std::endl; 
+                    
+        }
+        
+        /*
+        for (std::vector<BondDict>::iterator iB = allBonds.begin();
+                iB !=allBonds.end(); iB++)
+        {
+            std::cout << "For the bond between atoms " << iB->atoms[0] 
+                      << " and " << iB->atoms[1] << std::endl;
+            if (iB->isInSameRing)
+            {
+                std::cout << "It is in the same ring " << std::endl;
+            }
+            else
+            {
+                std::cout << "It is not in the same ring" << std::endl;
+            }
+        }
+        
+        
+        for (std::vector<AngleDict>::iterator iA=allAngles.begin(); 
+                iA !=allAngles.end(); iA++)
+        {
+            std::cout << "For the angle between atom  " << allAtoms[iA->atoms[0]].id
+                      << "(center), " <<  allAtoms[iA->atoms[1]].id 
+                      << " and " << allAtoms[iA->atoms[2]].id << std::endl;
+            if (iA->isInSameRing)
+            {
+                std::cout << "It is in the same ring " << std::endl;
+            }
+            else
+            {
+                std::cout << "It is not in the same ring" << std::endl;
+            }
+        }
+        
+       
+        std::cout << "Torsion angles are : " << std::endl;
+        for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor !=allTorsions.end(); iTor++)
+        {
+            std::cout << "Formed by " << allAtoms[iTor->atoms[0]].id 
+                      << "_" << allAtoms[iTor->atoms[1]].id  << "_"
+                      << allAtoms[iTor->atoms[2]].id << "_" 
+                      << allAtoms[iTor->atoms[3]].id << ", value is: "
+                      << iTor->value << std::endl;
+        }
+        */
+        
+    }
+    
+    void CodClassify::setupSystem3()
     {
         
         int cLev = 2;      // should be a constant from an input file
@@ -1013,7 +1181,7 @@ namespace LIBMOL
         
         if (allRingsV.size())
         {
-            checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
+            checkAndSetupPlanes2(allRingsV, allPlanes, allAtoms, allBonds);
         }
             
         aRingTool.setAtomsRingRepreS(allAtoms, allRingsV);

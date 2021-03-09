@@ -407,7 +407,7 @@ namespace LIBMOL
         }
         else if(tOrder ==3.0)
         {
-            tBond.orderNK = "TRIBLE";
+            tBond.orderNK = "TRIPLE";
         }
         else
         {

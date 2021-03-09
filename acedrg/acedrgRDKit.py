@@ -838,7 +838,7 @@ class AcedrgRDKit(object):
                 self.molecules.append(aM) 
            
     def setInitConformersOneMol(self, tMol):
-            
+           
         #  Setup conformers for the molecules
         if self.useExistCoords:
             confIds =AllChem.EmbedMultipleConfs(tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=False)
@@ -849,6 +849,7 @@ class AcedrgRDKit(object):
                 confIds =AllChem.EmbedMultipleConfs(tMol, tReq, maxAttempts=0, randomSeed=-1, clearConfs=False)
                 nNewCon = len(confIds)             
                 print(tReq)
+            print("Here ",nNewCon)
             #for aConf in tMol.GetConformers():
             #    print "!!!!!!!!!! Conf ", aConf.GetId()
             #    for aAtom in tMol.GetAtoms():
@@ -862,6 +863,7 @@ class AcedrgRDKit(object):
             #        print "z:  ", aPos.z           
         else:
             confIds = self.generateMultiComformersByRDKit(tMol)
+
         if confIds:
             print("Number of initial conformers requested", self.numInitConformers)
             print("Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps)
@@ -1512,7 +1514,7 @@ class AcedrgRDKit(object):
                     print("==============================================")
                     print("| Centered atom :     %s with no C sign "%aId)
                     print("----------------------------------------------")
-
+            
             chiCenAtmIds1     = []
             nChiPre = 0
             if tChiDes:
@@ -1575,7 +1577,8 @@ class AcedrgRDKit(object):
                     aMmCif.write(aChiral+"\n")
                     print("aChiral ")
                     print(aChiral)
-            if nTetraChi : 
+            nID = len(aChiralSignMap.keys())
+            if nTetraChi and nID > 0 : 
                 #print("Chiral centres with sign")
                 # output all chiral centers in form of mmCif
                 chiralIdx = nChiPre + 1
@@ -1594,10 +1597,11 @@ class AcedrgRDKit(object):
                         print(aLine)
                         chiralIdx +=1
 
-            if nChiWithSign :
+            if nChiWithSign and nID > 0:
                 #print("Chiral centres with sign")
                 for aAtom in chiCenAtms3 :
                     aId = aAtom.GetProp("Name")  
+                    print("atom name ", aId)
                     aCTName = "chir_" + str(chiralIdx)
                     aLine = "%s%s%s%s%s%s%s\n"\
                             %(tMonoName.ljust(12), aCTName.ljust(12),\

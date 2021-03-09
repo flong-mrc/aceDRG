@@ -58,6 +58,7 @@ namespace LIBMOL
     //Another ring class for the dictionary
     RingDict::RingDict():isPlanar(false),
             isAromatic(false),
+            isAntiAroma(false),
             isSugar(NullString),
             rep(NullString)
     {
@@ -65,6 +66,7 @@ namespace LIBMOL
     
     RingDict::RingDict(const RingDict& tR):isPlanar(tR.isPlanar),
             isAromatic(tR.isAromatic),
+            isAntiAroma(tR.isAntiAroma),
             isSugar(tR.isSugar),
             rep(tR.rep),
             sRep(tR.sRep)
@@ -725,7 +727,6 @@ namespace LIBMOL
         
     }
     
-    
     extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
                               std::vector<AtomDict> & tAtoms)
     {
@@ -743,11 +744,17 @@ namespace LIBMOL
             //}
             //else
             //{    
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            
             numOneAtm = setPiForOneAtom(*iAt, tAtoms);
             //}
             
-            //std::cout << "Atom " << tAtoms[*iAt].id 
-            //          << " add " << numOneAtm << " pi atoms" << std::endl;
+            
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
             if (numOneAtm > 0.0)
             {
                 numPiAll +=numOneAtm;
@@ -766,13 +773,105 @@ namespace LIBMOL
         
     }
     
+    extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms)
+    {
+        
+        REAL numPiAll=0.0;
+        
+        for (std::vector<int>::iterator iAt=tSubAtoms.begin();
+                iAt !=tSubAtoms.end(); iAt++)
+        {
+            REAL numOneAtm =0.0;
+            //if(tAtoms[*iAt].chemType=="S" 
+            //   && tAtoms[*iAt].connAtoms.size()==4)
+            //{
+            //    numOneAtm = setPiForOne_S_Sp3_Atom(*iAt, tSubAtoms, tAtoms);
+            //}
+            //else
+            //{    
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            
+            numOneAtm = setPiForOneAtom(*iAt, tAtoms);
+            //}
+            
+            
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            if (numOneAtm > 0.0)
+            {
+                numPiAll +=numOneAtm;
+            }
+        }       
+        
+        //std::cout << "number of pi electron in the system is " 
+        //          <<  numPiAll << std::endl;
+        
+        return numPiAll;
+        
+    }
+    
+    
+    extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms, 
+                              std::vector<BondDict> & tBonds)
+    {
+        bool lAr=false;
+        REAL numPiAll=0.0;
+        
+        for (std::vector<int>::iterator iAt=tSubAtoms.begin();
+                iAt !=tSubAtoms.end(); iAt++)
+        {
+            REAL numOneAtm =0.0;
+            //if(tAtoms[*iAt].chemType=="S" 
+            //   && tAtoms[*iAt].connAtoms.size()==4)
+            //{
+            //    numOneAtm = setPiForOne_S_Sp3_Atom(*iAt, tSubAtoms, tAtoms);
+            //}
+            //else
+            //{    
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            
+            numOneAtm = setPiForOneAtom(*iAt, tAtoms, tBonds);
+            //}
+            
+            
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            if (numOneAtm > 0.0)
+            {
+                numPiAll +=numOneAtm;
+            }
+        }       
+        
+        //std::cout << "number of pi electron in the system is " 
+        //          <<  numPiAll << std::endl;
+        
+        if (numPiAll > 0.0 && fabs(fmod(numPiAll, 4.0)-2.0) < 0.001)
+        {
+            lAr = true;
+        }
+        
+        return lAr;
+        
+    }
+    
+    
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms)
     {
         REAL aN=0.0;
-        
-        if (tAtoms[tIdx].bondingIdx ==2 && tAtoms[tIdx].formalCharge==0.0)
+        std::cout << "Here charge is " << tAtoms[tIdx].charge << std::endl;
+        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+                  << std::endl;
+        if (tAtoms[tIdx].bondingIdx ==2)
         {
-            if (tAtoms[tIdx].formalCharge==0.0)
+            if (tAtoms[tIdx].charge==0.0)
             {
             if (tAtoms[tIdx].chemType.compare("C") ==0)
             {           
@@ -785,7 +884,8 @@ namespace LIBMOL
                         // check if there is a double bonded atom outside the ring 
                         int aNbIdx = tAtoms[tIdx].connAtoms[i];
                         if (tAtoms[aNbIdx].chemType.compare("O")==0 
-                              && tAtoms[aNbIdx].connAtoms.size()==1)
+                              && tAtoms[aNbIdx].connAtoms.size()==1
+                              && tAtoms[aNbIdx].charge ==0)
                         {
                             // double bonded Oxy 
                             aD = true;
@@ -874,7 +974,7 @@ namespace LIBMOL
             {
                 if (tAtoms[tIdx].chemType.compare("C") ==0)
                 {           
-                    if (tAtoms[tIdx].formalCharge==-1.0)
+                    if (tAtoms[tIdx].charge==-1.0)
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==3)
                         {
@@ -889,7 +989,7 @@ namespace LIBMOL
                 }
                 else if (tAtoms[tIdx].chemType.compare("N") ==0)
                 {           
-                    if (tAtoms[tIdx].formalCharge==-1.0)
+                    if (tAtoms[tIdx].charge==-1.0)
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==2)
                         {
@@ -935,7 +1035,24 @@ namespace LIBMOL
         {
             if (tAtoms[tIdx].chemType.compare("N")==0)
             {
-                aN=2.0;
+                if (tAtoms[tIdx].formalCharge==-1.0)
+                {               
+                    if (tAtoms[tIdx].connAtoms.size() ==2)
+                    {
+                            aN =2.0;
+                        }
+                    }
+                else if (tAtoms[tIdx].formalCharge==1.0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size() ==3)
+                    {                        // Place holder in case for future. 
+                        aN=1.0;
+                    }
+                }
+                else
+                {
+                    aN=2.0;
+                }
             }
             else if (tAtoms[tIdx].chemType.compare("B")==0)
             {
@@ -957,10 +1074,22 @@ namespace LIBMOL
                 }
             }
         }
-        
+        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
+        std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
         
         return aN;
     }
+    
+    extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
+                                std::vector<BondDict> & tBonds)
+    {
+        REAL aN=0.0;
+        
+
+        
+        return aN;
+    }
+    
     
     extern REAL setPiForOne_S_Sp3_Atom(int tIdx, std::vector<int>  & tAtmIdx,
                                       std::vector<AtomDict> & tAtoms)
@@ -1014,6 +1143,129 @@ namespace LIBMOL
     {
         
         // Check aromaticity for individual rings
+        
+        std::vector<RingDict> tAroRings;
+        // std::cout << "\nCheck aromaticity for individual ring " << std::endl;
+        for (std::vector<RingDict>::iterator iR=tAllRings.begin();
+                iR !=tAllRings.end(); iR++)
+        {
+            // bool lS_sp3 = false;
+            
+            std::vector<int> atmIdx;
+            for (std::vector<AtomDict>::iterator iAt=iR->atoms.begin();
+                    iAt !=iR->atoms.end(); iAt++)
+            {
+                atmIdx.push_back(iAt->seriNum);
+                // std::cout << iAt->id << std::endl;
+                
+            }    
+            
+            
+            
+            if (iR->isPlanar)
+            {
+                std::cout << "One Planar Ring! It contains " << iR->atoms.size()
+                          << " atoms. They are : " << std::endl;
+                    
+                
+                bool lAro = checkAromaSys(atmIdx, tAtoms);
+                if (lAro)
+                {
+                    iR->isAromatic = true;
+                    tAroRings.push_back(*iR);
+                    // std::cout << "It is an aromatic ring " << std::endl;
+                }
+                else
+                {
+                    iR->isAromatic = false;
+                    REAL numPi = getTotalPiElec(atmIdx, tAtoms);
+                    if (numPi > 0.0 && fabs(fmod(numPi, 4.0)) < 0.001)
+                    {
+                        
+                        iR->isAntiAroma = true;
+                        
+                    }
+                    std::cout << "number of pi elecs is "
+                                  <<numPi << std::endl;
+                    std::cout << fabs(fmod(numPi, 4.0)) << std::endl;
+                    std::cout << iR->isAntiAroma << std::endl;
+                    // std::cout << "It is not an aromatic ring " << std::endl;
+                }
+                
+                //std::cout << std::endl;
+            }
+            else
+            {
+                
+                bool lNBUnR=checkUndRing(atmIdx, tAtoms);
+                // std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
+               
+                if (lNBUnR)
+                {
+                    bool lAro = checkAromaSys(atmIdx, tAtoms);
+                       
+                    if (lAro)
+                    {
+                        iR->isAromatic = true;
+                        iR->isPlanar   = true;
+                        tAroRings.push_back(*iR);
+                    }
+                    else
+                    {
+                        iR->isAromatic = false;
+                    }
+                }
+                else
+                {
+                    iR->isAromatic =false;
+                }
+            }
+            
+            // std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;    
+        }
+        
+        //std::cout << "A: Number of rings " 
+        //          << tAllRings.size() << std::endl;
+        std::vector<std::vector<int> >  mergedRingSets;
+        mergePlaneRings(tAllRings, mergedRingSets, tAtoms);
+      
+        //std::cout << "B: Number of rings " 
+        //          << tAllRings.size() << std::endl;
+        
+        tPlanes.clear();
+        
+        // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
+        setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
+        //std::cout << "Here 4 for planes " << std::endl;
+        
+        setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
+        /*
+        std::cout << "There are "         << tPlanes.size() 
+                  << " planes. They are " << std::endl;
+        
+        
+        for (std::vector<PlaneDict>::iterator iPl= tPlanes.begin();
+                iPl !=tPlanes.end(); iPl++)
+        {
+            std::cout << "One Plane with " << iPl->atoms.size() 
+                      << " atoms " << std::endl;
+            for (std::map<ID, int>::iterator iAt=iPl->atoms.begin();
+                    iAt !=iPl->atoms.end(); iAt++)
+            {
+                std::cout << iAt->first << std::endl;
+            }
+            std::cout << std::endl;
+        }
+        */
+    }
+    
+    extern void checkAndSetupPlanes2(std::vector<RingDict>  & tAllRings,
+                                     std::vector<PlaneDict> & tPlanes,
+                                     std::vector<AtomDict>  & tAtoms,
+                                     std::vector<BondDict>  & tBonds)
+    {
+        
+        // Check aromaticity for individual rings
         std::vector<RingDict> tAroRings;
         // std::cout << "\nCheck aromaticity for individual ring " << std::endl;
         for (std::vector<RingDict>::iterator iR=tAllRings.begin();
@@ -1038,7 +1290,7 @@ namespace LIBMOL
                 //          << " atoms. They are : " << std::endl;
                     
                 
-                bool lAro = checkAromaSys(atmIdx, tAtoms);
+                bool lAro = checkAromaSys(atmIdx, tAtoms, tBonds);
                 if (lAro)
                 {
                     iR->isAromatic = true;
@@ -1061,7 +1313,7 @@ namespace LIBMOL
                
                 if (lNBUnR)
                 {
-                    bool lAro = checkAromaSys(atmIdx, tAtoms);
+                    bool lAro = checkAromaSys(atmIdx, tAtoms, tBonds);
                        
                     if (lAro)
                     {
@@ -1119,6 +1371,7 @@ namespace LIBMOL
         }
         */
     }
+    
     
     extern bool checkUndRing(std::vector<int>     &  tAtmIdxs, 
                             std::vector<AtomDict> & tAtoms)

@@ -4653,9 +4653,13 @@ namespace LIBMOL
         std::ofstream outBTab(tOutFName);
         if (outBTab.is_open())
         {
+            std::cout << "Here : Number of atoms " 
+                      << tMonomer.allAtoms.size() << std::endl;
             
             if (tMonomer.allBonds.size() >0)
             {   
+                std::cout << "Number of bonds " << tMonomer.allBonds.size()
+                          << std::endl;
                 // Bond sections 
                 //outBTab   << "_chem_comp_bond.atom_id_1" << std::endl
                 //          << "_chem_comp_bond.atom_id_2" << std::endl

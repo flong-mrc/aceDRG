@@ -1559,6 +1559,51 @@ namespace LIBMOL
         
         return tVal;
     }
+        
+    extern REAL getTotalBondOrder(std::vector<BondDict>   & tBonds, 
+                                  std::vector<AtomDict>   & tAtoms,
+                                  int                          tIA)
+    {
+        REAL tVal = 0.0;
+        std::cout << "Check  atom " << tAtoms[tIA].id << std::endl;
+        
+        std::cout << "It connected " << tAtoms[tIA].connAtoms.size() 
+                  << " atoms " << std::endl;
+        
+        for (std::vector<int>::iterator iNB=tAtoms[tIA].connAtoms.begin();
+                    iNB !=tAtoms[tIA].connAtoms.end(); iNB++)
+        {  
+            std::cout << "connected atom " << *iNB << std::endl;
+            
+            REAL aOrd = getBondOrder(tBonds, tIA, *iNB);
+            std::cout << "bond order between atom " 
+                      << tAtoms[tIA].id 
+                      << " and " << tAtoms[*iNB].id 
+                      << " is " << aOrd << std::endl;
+            if (aOrd >0)
+            {
+                tVal +=aOrd;
+                //std::cout << "total order now " << tVal << std::endl;
+            }
+            else
+            {
+                std::cout << "Can not find the bond between atoms " 
+                          << tAtoms[tIA].id 
+                          << " serial number " << tIA
+                          << " and " << tAtoms[*iNB].id 
+                          << " serial number " << tAtoms[*iNB].seriNum
+                          << std::endl;
+                std::cout << "Some thing is wrong in the Bond list " << std::endl;
+                exit(1);
+            }
+        }
+        
+        tVal = tVal -tAtoms[tIA].charge;
+        std::cout << "Total val is " << tVal << std::endl;
+        std::cout << "Charge is " << tAtoms[tIA].charge
+                  << std::endl;
+        return tVal;
+    }
     
     extern void modifyBondOrderAR(std::vector<BondDict> & tBonds,
                                   std::vector<AtomDict>  & tAtoms,

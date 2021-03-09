@@ -328,7 +328,7 @@ namespace LIBMOL
         baseRingProp["size"]  ="";
         baseRingProp["aroma"] ="";
         
-        
+        formalCharge = charge; 
     }
     
     AtomDict::AtomDict(const AtomDict& tAtom) : seriNum(tAtom.seriNum), 
@@ -506,6 +506,8 @@ namespace LIBMOL
         {
             formType.push_back(*iFMType);
         }
+        
+        formalCharge = charge;
     }
     
     AtomDict::~AtomDict()

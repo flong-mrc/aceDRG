@@ -103,6 +103,7 @@ namespace LIBMOL
         
         bool                                     isPlanar;
         bool                                     isAromatic;
+        bool                                     isAntiAroma;
         std::string                              isSugar;
         std::string                              rep;
         std::string                              sRep;
@@ -144,17 +145,28 @@ namespace LIBMOL
                                              std::vector<int>                   & curLinkedRing);
     
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms);
+    extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
+                                std::vector<BondDict>  & tBonds);
     
     extern REAL setPiForOne_S_Sp3_Atom(int tIdx, std::vector<int>  & tAtmIdx,
                                       std::vector<AtomDict> & tAtoms);
     
     extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
-                              std::vector<AtomDict> & tAtoms);
+                              std::vector<AtomDict> & tAtoms);   
+    extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms); 
+    extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms,
+                              std::vector<BondDict> & tBonds);
     
   
     extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
                                     std::vector<PlaneDict> & tPlanes,
                                     std::vector<AtomDict>  & tAtoms);
+    extern void checkAndSetupPlanes2(std::vector<RingDict>  & tAllRings,
+                                    std::vector<PlaneDict> & tPlanes,
+                                    std::vector<AtomDict>  & tAtoms,
+                                    std::vector<BondDict> & tBonds);
     
     extern bool checkUndRing(std::vector<int>   &    tAtmIdxs, 
                             std::vector<AtomDict> & tAtoms);

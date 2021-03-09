@@ -131,6 +131,7 @@ class Acedrg(CExeCode ):
         self.workMode         = 0
         self.useExistCoords   = False
         self.isAA             = False
+        self.isNA             = False
 
         self.molGen           = False
         self.repCrds          = False
@@ -156,6 +157,8 @@ class Acedrg(CExeCode ):
         self.allBondsAndAngles["atomClasses"] = {}
         self.allBondsAndAngles["bonds"]       = {}
         self.allBondsAndAngles["angles"]      = {}
+
+        self.naTorsList                       = {}
 
         self.acedrg    = os.path.abspath(sys.argv[0])
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
@@ -608,7 +611,56 @@ class Acedrg(CExeCode ):
         if len(self.monomRoot) < 3:
             self.monomRoot = "UNL"
 
+    def checkNAFromMmcif(self, tDataDesc=None):
 
+        aRet = False
+        if tDataDesc:
+            for aK in tDataDesc.keys():
+                if len(tDataDesc[aK])==2: 
+                    if tDataDesc[aK][0].find("_chem_comp.type") !=-1 \
+                       and (tDataDesc[aK][1].upper().find("DNA") !=-1 \
+                            or tDataDesc[aK][1].upper().find("RNA") !=-1):
+                        aRet = True 
+                        break
+        return aRet    
+
+    def getNATors(self):
+
+        torsFN = os.path.join(self.acedrgTables, "nucl_tors.table")
+        if os.path.isfile(torsFN):
+            torsF = open(torsFN, "r")
+            allLs = torsF.readlines()
+            torsF.close()
+            
+            if len(allLs) > 0:
+                for aL in allLs:
+                    aL = aL.strip()
+                    print(aL)
+                    if len(aL) > 0:
+                        if aL[0].find("#") ==-1:
+                            strgrp = aL.split()
+                            if len(strgrp)==9:
+                                print("here ")
+                                torKey = strgrp[0].strip()
+                                if not torKey in self.naTorsList.keys():
+                                    self.naTorsList[torKey]    = {}
+                                     
+                                self.naTorsList[torKey][strgrp[1].strip()] = \
+                                      [strgrp[2].strip(), strgrp[3].strip(), strgrp[4].strip(), strgrp[5].strip(),\
+                                       strgrp[6].strip(), strgrp[7].strip(), strgrp[8].strip()]                           
+
+        if len(self.naTorsList.keys()) > 0:
+            print("special torsion angles for NA:")
+            for aK in sorted(self.naTorsList.keys()):
+                print("==========================")
+                print("torsion key : %s "%aK)
+                for aId in self.naTorsList[aK].keys():
+                    print("ID          : %s "%aId)
+                    print("atom Ids    :  ",self.naTorsList[aK][aId])
+                    print("value       : %s "%self.naTorsList[aK][aId][4])
+                    print("std_dev     : %s "%self.naTorsList[aK][aId][5])
+                    print("period      : %s "%self.naTorsList[aK][aId][6])
+        
     def setWorkMode(self, t_inputOptionsP = None):
 
         #print "acedrg is in ", self.acedrgDir
@@ -1616,7 +1668,6 @@ class Acedrg(CExeCode ):
             aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
             #print "PDB root ", tPdbRoot
             #print aConfPdb
-
             self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign)
             if os.path.isfile(aConfPdb):
                 inPdbNamesRoot.append(tPdbRoot)
@@ -1624,8 +1675,8 @@ class Acedrg(CExeCode ):
         aLibCifIn = self.outRstCifName 
         for aFRoot in inPdbNamesRoot: 
             aPdbIn    = os.path.join(self.scrDir, aFRoot + "_init.pdb")
-            #print "|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53))
-            #print "|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53))
+            #print ("|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53)))
+            #print ("|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53)))
             self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
             if  self.runExitCode :
                 print("Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn)
@@ -1901,7 +1952,7 @@ class Acedrg(CExeCode ):
                                  aB+="\n"
                                  break
                         cifCont["bonds"].append(aB)
-                                  
+                
                 try:
                     tOutCif = open(tCifOutName, "w")
                     print("Out cif name ", tCifOutName)
@@ -1915,35 +1966,42 @@ class Acedrg(CExeCode ):
                     for aL in cifCont['atoms']:
                         tOutCif.write(aL)
                     if tDataDescriptor:
-                        for aL in cifCont['others1']:
-                            strGrp = aL.strip().split()
-                            if len(strGrp)==1:
-                                tOutCif.write(aL)
-                            else:
-                                aL1 = monoId + aL[3:]
-                                tOutCif.write(aL1)
-                        if 'bonds' in cifCont:
-                            for aL in  cifCont['bonds']:
+                        if not self.isNA:
+                            for aL in cifCont['others1']:
+                                strGrp = aL.strip().split()
+                                if len(strGrp)==1:
+                                    tOutCif.write(aL)
+                                    print(aL)
+                                else:
+                                    aL1 = monoId + aL[3:]
+                                    tOutCif.write(aL1)
+                                    print(aL1)
+                            if 'bonds' in cifCont:
+                                for aL in  cifCont['bonds']:
+                                    strGrp = aL.strip().split()
+                                    if len(strGrp)==1:
+                                        tOutCif.write(aL)
+                                    else:
+                                        aL1 = monoId + aL[3:]
+                                        tOutCif.write(aL1)
+                            for aL in cifCont['others2']:
                                 strGrp = aL.strip().split()
                                 if len(strGrp)==1:
                                     tOutCif.write(aL)
                                 else:
                                     aL1 = monoId + aL[3:]
                                     tOutCif.write(aL1)
-                        for aL in cifCont['others2']:
-                            strGrp = aL.strip().split()
-                            if len(strGrp)==1:
-                                tOutCif.write(aL)
-                            else:
-                                aL1 = monoId + aL[3:]
-                                tOutCif.write(aL1)
+                        else:
+                            self.naCorr(cifCont['others1'], tOutCif) 
                     else:
+                        print("Here 2")
                         for aL in cifCont["others"]:
                             strGrp = aL.strip().split()
                             if len(strGrp)==1:
                                 tOutCif.write(aL)
                             else:
                                 aL1 = monoId + aL[3:]
+                                print(aL1)
                                 tOutCif.write(aL1)
                     
                     aPos = len(monoId)   
@@ -1982,7 +2040,57 @@ class Acedrg(CExeCode ):
                             tOutCif.write(aL)
 
                     tOutCif.close()
-                        
+    
+    def naCorr(self, tCifCont, tOutF):
+
+        lTor = False
+        speTors   = {}
+        otherTors = []
+        for aL in tCifCont:
+            if aL.find("_chem_comp_tor.period") != -1:
+                tOutF.write(aL)
+                lTor = True
+            elif lTor and aL.find("loop_")==-1:
+                if len(aL) >0:
+                    if aL[0].find("#") == -1:
+                        strs = aL.strip().split()
+                        if len(strs)==9:
+                            id1 = strs[2] + "_" + strs[3]  + "_" + strs[4] + "_" + strs[5]                      
+                            id2 = strs[5] + "_" + strs[4]  + "_" + strs[3] + "_" + strs[2] 
+                            id  = ""
+                            if id1 in self.naTorsList.keys():
+                                id = id1
+                            elif id2 in self.naTorsList.keys():
+                                id = id2
+                            else:
+                                otherTors.append(aL)
+                            print("id1 is ", id1)
+                            print("id2 is ", id2)
+                            print("id is ",  id)
+                            if len(id) > 0:
+                                for aId in sorted(self.naTorsList[id].keys()):
+                                    aTorL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(8), aId.ljust(16),\
+                                        self.naTorsList[id][aId][0].ljust(10), self.naTorsList[id][aId][1].ljust(10),\
+                                        self.naTorsList[id][aId][2].ljust(10), self.naTorsList[id][aId][3].ljust(10),\
+                                        self.naTorsList[id][aId][4].ljust(14), self.naTorsList[id][aId][5].ljust(10),\
+                                        self.naTorsList[id][aId][6].ljust(6))
+                                    speTors[aId]= aTorL
+                        else:
+                            otherTors.append(aL)
+            elif lTor and aL.find("loop_") !=-1:
+                for aId in sorted(speTors.keys()):
+                    tOutF.write(speTors[aId])
+                for aTorL in otherTors:
+                    tOutF.write(aTorL)
+                print("Here 4")
+                print(aL)
+                lTor = False
+                tOutF.write(aL)
+            else:
+                print("Here 5")
+                print(aL)
+                tOutF.write(aL)
+                
     def outTorsionRestraints(self, tCifInName, tTorOutName):
 
         if os.path.isfile(tCifInName):
@@ -2249,6 +2357,7 @@ class Acedrg(CExeCode ):
             strGrp = aL.strip().split()
             if len(strGrp)== 6:
                 combo_ID = strGrp[0] + "_" + strGrp[1]
+                print(combo_ID)
                 tBondSet[combo_ID] = {}
                 tBondSet[combo_ID]["atom_id_1"] = strGrp[0]
                 tBondSet[combo_ID]["atom_id_2"] = strGrp[1]
@@ -2256,6 +2365,7 @@ class Acedrg(CExeCode ):
                 tBondSet[combo_ID]["prot_h_s"]  = strGrp[3]
                 tBondSet[combo_ID]["e_h"]       = strGrp[4]
                 tBondSet[combo_ID]["e_h_s"]     = strGrp[5]
+                print("EL = %s"%tBondSet[combo_ID]["e_h"])   
 
     def getNewCif(self, tCif, tBondSet, t3Bs):
 
@@ -2553,7 +2663,10 @@ class Acedrg(CExeCode ):
                 self.fileConv.mmCifReader(self.inMmCifName)
                 
                 if len(self.fileConv.dataDescriptor):
-                    self.setMonoRoot(self.fileConv.dataDescriptor) 
+                    self.setMonoRoot(self.fileConv.dataDescriptor)
+                    self.isNA=self.checkNAFromMmcif(self.fileConv.dataDescriptor)
+                    if self.isNA:
+                        self.getNATors()
                     if self.monomRoot in self.chemCheck.aminoAcids:
                         self.isAA = True
                         self.getAAOut()

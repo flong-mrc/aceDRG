@@ -264,7 +264,10 @@ namespace LIBMOL
     extern REAL  getTotalBondOrder(std::vector<BondDict>   & tBonds, 
                                    std::vector<AtomDict>   & tAtoms,
                                    std::vector<AtomDict>::iterator tIA);
-    
+    extern REAL  getTotalBondOrder(std::vector<BondDict>   & tBonds, 
+                                   std::vector<AtomDict>   & tAtoms,
+                                   int                       tIA);
+        
     extern void modifyBondOrderAR(std::vector<BondDict> & tBonds,
                                   std::vector<AtomDict>  & tAtoms,
                                   int  tIdxB1, int tIdxB2,

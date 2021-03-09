@@ -9106,7 +9106,7 @@ namespace LIBMOL
                         {
                             aro = "Aromatic";
                         }
-                        else if(iR->isPlanar)
+                        else if(iR->isAntiAroma)
                         {
                             aro = "Anti-Aromatic";
                         }
