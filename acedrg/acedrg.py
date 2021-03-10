@@ -2661,7 +2661,6 @@ class Acedrg(CExeCode ):
                 self.workMode = tmpWorkMode
                 # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
-                
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)
                     self.isNA=self.checkNAFromMmcif(self.fileConv.dataDescriptor)
@@ -2687,6 +2686,7 @@ class Acedrg(CExeCode ):
                                                 self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
                     elif "props" in self.fileConv.strDescriptors \
                        and "entries" in self.fileConv.strDescriptors:
+
                         iProp = 0
                         iType = -1
                         iDes  = -1
@@ -2817,6 +2817,22 @@ class Acedrg(CExeCode ):
                                     else:
                                         self.tmpCifInitMol()
                             self.workMode = 11
+                        else:
+                            aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                            if os.path.isfile(self.inMmCifName):
+                                aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                                self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 1)
+                                if os.path.isfile(aIniMolName) :
+                                    if len(self.fileConv.chiralPre) !=0:
+                                        # Chiral centers defined in the original cif file
+                                        self.rdKit.chiralPre =[]
+                                        for aChi in self.fileConv.chiralPre:
+                                            self.rdKit.chiralPre.append(aChi) 
+                                        #self.rdKit.reSetChirals = True
+                                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
+                                                        self.numConformers, 0, self.fileConv.nameMapingCifMol,\
+                                                        self.fileConv.inputCharge) 
+                    
                     else:
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                         if os.path.isfile(self.inMmCifName):
@@ -2950,7 +2966,6 @@ class Acedrg(CExeCode ):
             self.workMode = 51
         if self.workMode in [11,  111, 51] and not self.isAA :
             #print len(self.rdKit.molecules)
-
             if len(self.rdKit.molecules):
                 print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
