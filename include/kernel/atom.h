@@ -356,7 +356,8 @@ namespace LIBMOL // temp
         std::vector<int>           inBonds;
         std::vector<REAL>          bondLengths;
         std::vector<AngleDict>     inAngles;
-        std::vector<int>           inRings; 
+        std::vector<int>           inRings;
+        std::vector<RingDict>      inRingsFull;
         std::vector<int>           inChirals;
         std::vector< std::string > nbRep;
         std::map<std::string, int> ringRep;

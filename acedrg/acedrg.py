@@ -27,6 +27,8 @@ import math
 import select
 import random
 
+from functools  import cmp_to_key
+
 from rdkit      import rdBase
 
 from rdkit      import Chem
@@ -1682,9 +1684,10 @@ class Acedrg(CExeCode ):
                 print("Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn)
         if len(self.refmacMinFValueList) > 0 :
             #self.refmacMinFValueList.sort(listComp2)
-            #for aPair in self.refmacMinFValueList:
-            #    print "======"
-            #    print "FValue: ", aPair[0], "  File name ", aPair[1]  
+            self.refmacMinFValueList=sorted(self.refmacMinFValueList, key=cmp_to_key(listComp2))
+            for aPair in self.refmacMinFValueList:
+                print("======")
+                print("FValue: ", aPair[0], "  File name ", aPair[1])  
             if self.numConformers==1: 
                 #print "Come to output final info"
                
@@ -2655,10 +2658,10 @@ class Acedrg(CExeCode ):
                 self.getAAOut()
             elif os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode)\
                and not self.isAA:
-                tmpWorkMode = self.workMode
-                self.workMode = 311
-                self.runLibmol()
-                self.workMode = tmpWorkMode
+                #tmpWorkMode = self.workMode
+                #self.workMode = 311
+                #self.runLibmol()
+                #self.workMode = tmpWorkMode
                 # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
                 if len(self.fileConv.dataDescriptor):
@@ -2674,7 +2677,6 @@ class Acedrg(CExeCode ):
                     if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                         self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
-
                         if os.path.isfile(aIniMolName) :
                             if len(self.fileConv.chiralPre) !=0:
                             # Chiral centers defined in the original cif file

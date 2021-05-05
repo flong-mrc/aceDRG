@@ -213,6 +213,7 @@ namespace LIBMOL
         // convFracToCartCoords used only in torsion calculations.
         // For bond calculations, getBondLenFromFracCoords is used.
         // For angle calculations, getAngleValueFromFracCoords is used.
+        
         bool convFracToCartCoords3D(std::vector<REAL> & tCartCoord, 
                                   std::vector<REAL> & tFracCoord,
                                   REAL a, REAL b, REAL c, 
@@ -299,6 +300,7 @@ namespace LIBMOL
         void getHRelatedBondsNeuD();
         void getSPRelatedTorsions(std::vector<Molecule>::iterator tMol,
                                   std::vector<BondDict>::iterator tBo);
+        void getSPRelatedTorsions(std::vector<Molecule>::iterator tMol);
         
         void outTableMols(std::ofstream & tMolTabs, 
                           Molecule & tMol);

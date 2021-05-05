@@ -3319,10 +3319,12 @@ class CovLinkGenerator(CExeCode):
                         if len(aRes) > 0:
                             allAtoms = aRes
                             for aAtom in allAtoms:
-                                #print("atom name before: %s"%aAtom.name)
+                                print("atom name before: %s"%aAtom.name)
                                 if aAtom.name in tLinkedObj.atomMap:
                                     aAtom.name = tLinkedObj.atomMap[aAtom.name][1]
-                                #print("atom name after: %s"%aAtom.name)
+                                    if aAtom.name.count("\"")==2:
+                                        aAtom.name=aAtom.name.strip("\"")
+                                print("atom name after: %s"%aAtom.name)
                         else:
                             print("Residues in the combo-ligand have no atom ")
                             self.errLevel = 32

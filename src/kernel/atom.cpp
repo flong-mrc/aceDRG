@@ -451,6 +451,13 @@ namespace LIBMOL
             inRings.push_back((*iR));
         }
         
+        for (std::vector<RingDict>::const_iterator 
+                iRF=tAtom.inRingsFull.begin();
+                iRF != tAtom.inRingsFull.end(); iRF++)
+        {
+            inRingsFull.push_back(*iRF);
+        }
+        
         for(std::vector<int>::const_iterator iCh=tAtom.inChirals.begin();
                 iCh!=tAtom.inChirals.end(); iCh++)
         {
