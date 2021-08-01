@@ -33,13 +33,17 @@ namespace LIBMOL {
         // std::cout << "Number of crystals " << tCifObj.allCryst.size() << std::endl;
 
 
-        for (std::vector<CrystInfo>::const_iterator iC = tCifObj.allCryst.begin();
-                iC != tCifObj.allCryst.end(); iC++) {
+        for (std::vector<CrystInfo>::const_iterator 
+                iC = tCifObj.allCryst.begin();
+                iC != tCifObj.allCryst.end(); iC++) 
+        {
             allCryst.push_back(*iC);
         }
 
-        for (std::vector<AtomDict>::const_iterator iA = tCifObj.allAtoms.begin();
-                iA != tCifObj.allAtoms.end(); iA++) {
+        for (std::vector<AtomDict>::const_iterator 
+                iA = tCifObj.allAtoms.begin();
+                iA != tCifObj.allAtoms.end(); iA++) 
+        {
             initAtoms.push_back(*iA);
         }
         //std::cout << "number of initial atoms " << initAtoms.size() << std::endl;

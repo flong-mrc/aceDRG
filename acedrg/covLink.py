@@ -1606,7 +1606,6 @@ class CovLinkGenerator(CExeCode):
 
     def  setLinkChir(self, tRes, tMod, tOthRes):
         
-         #print("Here 1") 
          idKey = "atom_id_" + tRes["linkChir"][1]
          print(idKey)
          print("center ", tRes["linkChir"][0]["atom_id_centre"])
@@ -1997,7 +1996,6 @@ class CovLinkGenerator(CExeCode):
                         tRes["remainChirs"].append(aChi)
                         tRes["linkChir"].append(self.copyChi(aChi))
 
-        #print("Here 0")
         # Delete the deleted atom from a plane and even delete a plane 
         # if number of atoms in a plane smaller then 3 (after deleting the assigned atom)
         if "planes" in tRes["comp"]:
@@ -2803,8 +2801,18 @@ class CovLinkGenerator(CExeCode):
             aStr2 = aList2[0] + "_" + aList2[1]
             aTmpChBonds_2[aStr2] = [aB]
             i2= i2 + 1
+
+        if len(tLinkedObj.modLigand1["added"]["atoms"]) > 0:
+            for aAtom in tLinkedObj.modLigand1["added"]["atoms"]:
+                addedSet1.append(aAtom["atom_id"])
+        if len(tLinkedObj.modLigand2["added"]["atoms"]) > 0:
+            for aAtom in tLinkedObj.modLigand2["added"]["atoms"]:
+                addedSet2.append(aAtom["atom_id"])
+
         tLinkedObj.modLigand2["changed"]["bonds"] = []
-        
+        tLinkedObj.modLigand1["added"]["bonds"]   = []
+        tLinkedObj.modLigand2["added"]["bonds"]   = []
+
         for aBond in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["bonds"]:
             #print("A bond ")
             #print("atom %s in residue %d "%(aBond["atom_id_1"], aBond["atom_id_1_resNum"]))
@@ -2823,18 +2831,19 @@ class CovLinkGenerator(CExeCode):
                     tLinkedObj.modLigand1["added"]["bonds"].append(aBond)
 
             elif aBond["atom_id_1_resNum"]==2 and aBond["atom_id_2_resNum"]==2:
-                # In residue 2
-                if not aBond["atom_id_1"] in addedSet2 and not aBond["atom_id_2"] in addedSet2:
-                    aList = [aBond["atom_id_1"], aBond["atom_id_2"]]
-                    aList.sort()
-                    aStr = aList[0] + "_" + aList[1]
-                    if not aStr in list(aTmpChBonds_2.keys()):
-                        self.checkBondMod(tLinkedObj.stdLigand2["remainBonds"], aBond, tLinkedObj.modLigand2["changed"]["bonds"])
+                    # In residue 2
+                    if not aBond["atom_id_1"] in addedSet2 and not aBond["atom_id_2"] in addedSet2:
+                        aList = [aBond["atom_id_1"], aBond["atom_id_2"]]
+                        aList.sort()
+                        aStr = aList[0] + "_" + aList[1]
+                        if not aStr in list(aTmpChBonds_2.keys()):
+                            self.checkBondMod(tLinkedObj.stdLigand2["remainBonds"], aBond, tLinkedObj.modLigand2["changed"]["bonds"])
+                        else:
+                            tLinkedObj.modLigand2["changed"]["bonds"].append(aBond) 
                     else:
-                        tLinkedObj.modLigand2["changed"]["bonds"].append(aBond) 
-                else:
-                    tLinkedObj.modLigand2["added"]["bonds"].append(aBond)
-
+                        print("added bond between atom1 %s atom2 %s "%(aBond["atom_id_1"], aBond["atom_id_2"])) 
+                        tLinkedObj.modLigand2["added"]["bonds"].append(aBond)
+                
         print("Number of changed bonds in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["bonds"]))  
         print("Number of added bonds in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["bonds"]))  
         print("Number of deleted bonds in residue 1 is %d "%len(tLinkedObj.modLigand1["deleted"]["bonds"]))  
@@ -2842,12 +2851,6 @@ class CovLinkGenerator(CExeCode):
         print("Number of added bonds in residue 2 is %d "%len(tLinkedObj.modLigand2["added"]["bonds"]))  
         print("Number of deleted bonds in residue 2 is %d "%len(tLinkedObj.modLigand2["deleted"]["bonds"]))  
 
-        if len(tLinkedObj.modLigand1["added"]["atoms"]) > 0:
-            for aAtom in tLinkedObj.modLigand1["added"]["atoms"]:
-                addedSet1.append(aAtom["atom_id"])
-        if len(tLinkedObj.modLigand2["added"]["atoms"]) > 0:
-            for aAtom in tLinkedObj.modLigand2["added"]["atoms"]:
-                addedSet2.append(aAtom["atom_id"])
         # Angles
         for aAng in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["angles"]:
             #print("A angle ")
@@ -3000,14 +3003,13 @@ class CovLinkGenerator(CExeCode):
 
         id1 = tBond["atom_id_1"]
         id2 = tBond["atom_id_2"]
-        
         for aB in tOrigBonds:
             if (aB["atom_id_1"]==id1 and aB["atom_id_2"]==id2) or\
                (aB["atom_id_2"]==id1 and aB["atom_id_1"]==id2):
                 if self.compare2Bonds(aB, tBond):
                     tModBonds.append(tBond)
                 break
-
+        
     def compare2Bonds(self, tOriBond, tBond):
    
         lChanged = False
@@ -3015,6 +3017,7 @@ class CovLinkGenerator(CExeCode):
             lChanged = True
         if float(tOriBond["value_dist"]) != float(tBond["value_dist"]):
             lChanged = True
+         
         return lChanged
    
     def checkAngMod(self, tOrigAngs, tAng, tModAngs):
@@ -3701,13 +3704,15 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_mod_bond.new_type\n")
             tOutFile.write("_chem_mod_bond.new_value_dist\n")
             tOutFile.write("_chem_mod_bond.new_value_dist_esd\n")               
+            tOutFile.write("_chem_mod_bond.new_value_dist_nucleus\n")
+            tOutFile.write("_chem_mod_bond.new_value_dist_esd_nucleus_esd\n")               
          
             if nDB !=0:
                 for aBond in tModLigand["deleted"]["bonds"]:
                     aBT = aBond["type"].lower()
-                    aL = "%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "delete".ljust(15), aBond["atom_id_1"].ljust(10),\
+                    aL = "%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "delete".ljust(15), aBond["atom_id_1"].ljust(10),\
                                              aBond["atom_id_2"].ljust(10), aBT.ljust(15), ".".ljust(15),\
-                                             ".".ljust(10))
+                                             ".".ljust(10), ".".ljust(10), ".".ljust(10))
                     tOutFile.write(aL)
                     
             
@@ -3718,17 +3723,26 @@ class CovLinkGenerator(CExeCode):
                     #print aBond["atom_id_1"]
                     #print aBond["atom_id_2"]
                     #print aBond["value_dist"]
-                    aL = "%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "change".ljust(15), aBond["atom_id_1"].ljust(10),\
+                    aL = "%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "change".ljust(15), aBond["atom_id_1"].ljust(10),\
                                              aBond["atom_id_2"].ljust(10), aBT.ljust(15), aBond["value_dist"].ljust(15),\
-                                             aBond["value_dist_esd"].ljust(10))
+                                             aBond["value_dist_esd"].ljust(10), aBond["value_dist_nucleus"].ljust(15),\
+                                             aBond["value_dist_nucleus_esd"].ljust(10))
                     tOutFile.write(aL)
                     
             if nAB !=0:
                 for aBond in tModLigand["added"]["bonds"]:
+                    print(aBond.keys())
                     aBT = aBond["type"].lower()
-                    aL = "%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15), aBond["atom_id_1"].ljust(10),\
+                    if not "value_dist_nucleus" in aBond.keys():
+                        print("No n-dist for bond between %s and %s "%(aBond["atom_id_1"].ljust(10), aBond["atom_id_2"].ljust(10)))
+                        print("in ligand %s\n"%tModLigand["name"])
+                        sys.exit()
+                    else:
+                        aL = "%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15), aBond["atom_id_1"].ljust(10),\
                                              aBond["atom_id_2"].ljust(10), aBT.ljust(15), str(aBond["value_dist"]).ljust(15),\
-                                             str(aBond["value_dist_esd"]).ljust(10))
+                                             aBond["value_dist_esd"].ljust(10), aBond["value_dist_nucleus"].ljust(15),\
+                                             aBond["value_dist_nucleus_esd"].ljust(10))
+                      
                     tOutFile.write(aL)
                     
             

@@ -1579,13 +1579,13 @@ class Ccp4MmCifObj (dict) :
             for aKey in list(self["ccp4CifBlocks"].keys()):        
                 if aKey != "head_sec":
                     self.setupOneBlock(aKey, self["ccp4CifBlocks"])
+
             """
             if len(self["ccp4CifObj"]["comps"].keys()):
-                print "Number of comps ", len(self["ccp4CifObj"]["comps"].keys())
+                print("Number of comps ", len(self["ccp4CifObj"]["comps"].keys()))
                 for aKey in sorted(self["ccp4CifObj"]["comps"].iterkeys()):
                     self.printOneComp(aKey)
             """
-
  
     def setupOneBlock(self, tKey, tBlock):
         
@@ -1826,7 +1826,7 @@ class Ccp4MmCifObj (dict) :
                 for aChi in  self["ccp4CifObj"]["comps"][tName]["chirs"]:
                     print("For chiral center ", i)
                     i+=1
-                    for aKey in list(achi.keys()):
+                    for aKey in list(aChi.keys()):
                         print("%s   :   %s  "%(aKey, aChi[aKey]))
  
             if "plane_atoms" in self["ccp4CifObj"]["comps"][tName]:
