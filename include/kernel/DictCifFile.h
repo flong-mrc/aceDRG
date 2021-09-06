@@ -370,6 +370,7 @@ namespace LIBMOL
         bool                       hasCoords;
         bool                       hasH;
         bool                       hasMetal;
+        bool                       symmOprOK;
         bool                       notPowder;
         bool                       notNeuD;
         bool                       resolOK;

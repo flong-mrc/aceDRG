@@ -299,8 +299,12 @@ namespace LIBMOL
         void getOverallBondAndAnglesNew();
         void getHRelatedBondsNeuD();
         void getSPRelatedTorsions(std::vector<Molecule>::iterator tMol,
-                                  std::vector<BondDict>::iterator tBo);
-        void getSPRelatedTorsions(std::vector<Molecule>::iterator tMol);
+                                  std::vector<BondDict>::iterator tBo,
+                                  std::map<std::string, 
+                                  std::vector<REAL> >  & tTorM);
+        void getSPRelatedTorsions(std::map<std::string, 
+                                  std::vector<REAL> >    &        tTorM,
+                                  std::vector<Molecule>::iterator tMol);
         
         void outTableMols(std::ofstream & tMolTabs, 
                           Molecule & tMol);
@@ -317,6 +321,9 @@ namespace LIBMOL
         void outMsg(FileName tOutName);
         void getOutFileRoot(FileName tOutName, Name & tRootName);
         void outMolsInfo(std::ofstream & tMolTabs,
+                         std::vector<Molecule> & tFinMols,
+                         std::vector<Molecule> & tInfMols);
+        void outMolsInfo(std::string   & tRootName,
                          std::vector<Molecule> & tFinMols,
                          std::vector<Molecule> & tInfMols);
         void outHRelatedBonds(FileName tOutName);

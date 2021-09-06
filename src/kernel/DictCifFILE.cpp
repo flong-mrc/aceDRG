@@ -17,6 +17,7 @@ namespace LIBMOL
             hasCoords(false),
             hasH(false),
             hasMetal(false),
+            symmOprOK(true),
             notPowder(true),
             notNeuD(true),
             resolOK(true),
@@ -38,6 +39,7 @@ namespace LIBMOL
                            hasCoords(false),
                            hasH(false),
                            hasMetal(false),
+                           symmOprOK(true),
                            notPowder(true),
                            notNeuD(true),
                            resolOK(true),
@@ -81,6 +83,7 @@ namespace LIBMOL
                            hasCoords(false),
                            hasH(false),
                            hasMetal(false),
+                           symmOprOK(true),
                            notPowder(true),
                            notNeuD(true),
                            resolOK(true),
@@ -320,12 +323,12 @@ namespace LIBMOL
                     if (tBuf.size()==2)
                     {
                         tROK3=StrToReal(tBuf[1]);
-                        if (tROK2 >=1.0)
+                        if (tROK3 >=1.0)
                         {
-                            tROK2 = tROK2/100.0;
+                            tROK3 = tROK3/100.0;
                         }
                         std::cout << "_refine_ls_R_factor_all="
-                                  << tROK2 << std::endl;
+                                  << tROK3 << std::endl;
           
                     }
                 }
@@ -358,12 +361,14 @@ namespace LIBMOL
                 tBlocLines.clear();
             }
             
-            if (tROK1 > 0.0 && (tROK2 > 0.0 || tROK3 >0.0))
+            if ((tROK1 > 0.0 && tROK2 > 0.0) || tROK3 >0.0)
             {
+                
                 if (tROK1 <RTHRESHOLD && 
                     (tROK2 < RTHRESHOLD || tROK3 < RTHRESHOLD))
                 {
                     RFactorOK = true;
+                    
                 }
             }
             else if (tROK1 > 0.0 && tROK2 < 0.0)
@@ -396,8 +401,6 @@ namespace LIBMOL
             {
                 return ;
             }
-            
-            
             
             
             // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
@@ -562,6 +565,7 @@ namespace LIBMOL
                 }
             }
        }
+      
     }
     
     
@@ -674,7 +678,7 @@ namespace LIBMOL
             }
             
             inFile.close();
-            
+           
             checkPowder(tAllLines);
             checkNeutronD(tAllLines);
             
@@ -682,10 +686,12 @@ namespace LIBMOL
             {
                 return ;
             }
-            // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
+            // std::cout << "Number of data blocks in the cif file is "
+            // << tBlocs.size() << std::endl;
             
             /*
-            for (std::vector<std::vector<std::string> >::iterator iBloc=tBlocs.begin();
+            for (std::vector<std::vector<std::string> >::iterator 
+                    iBloc=tBlocs.begin();
                     iBloc !=tBlocs.end(); iBloc++)
             {
                 std::cout << "====One block lines " << std::endl;
@@ -753,7 +759,7 @@ namespace LIBMOL
                 }
                 */
                
-                
+               
                 // Now select what we need from the input cif file.
                 selectPropsToMaps(rowProps, colProps);
                 
@@ -834,6 +840,7 @@ namespace LIBMOL
                 }
             }
        }
+       std::cout << "Here " <<std::endl;
     }
     
     void GenCifFile::checkPowder(std::vector<std::string>& tLines)
@@ -921,7 +928,7 @@ namespace LIBMOL
         {
             
             if (!notPowder || notNeuD
-                || !colidOK || hasHeavyCalcAtoms || lErr)
+                || !colidOK || hasHeavyCalcAtoms ||!symmOprOK|| lErr)
             {
                 aRet=false;
             }
@@ -936,12 +943,12 @@ namespace LIBMOL
         {
             if (!notPowder || !resolOK
                 || !RFactorOK || !colidOK 
-                || hasHeavyCalcAtoms || lErr)
+                || hasHeavyCalcAtoms ||!symmOprOK|| lErr)
             {
                 aRet=false;
             }
         }
-        std::cout << aRet << std::endl;
+        //std::cout << aRet << std::endl;
         return aRet;
     }
     
@@ -1307,8 +1314,10 @@ namespace LIBMOL
         } 
     }
     
-    void GenCifFile::selectPropsToMaps(std::map<std::string,std::string> & tRowProps, 
-                                       std::map<int,std::map<ID,std::vector<std::string> > > & tColProps)
+    void GenCifFile::selectPropsToMaps(std::map<std::string,std::string> 
+                                       & tRowProps, 
+                                       std::map<int,std::map<ID,
+                                       std::vector<std::string> > > & tColProps)
     {   
         
         getCifCrystInfo(tRowProps, tColProps);
@@ -1382,12 +1391,14 @@ namespace LIBMOL
         
         if (!lSymOps)
         {
+            symmOprOK = false;
             std::cout << "No symmetry operators, can not generator molecules "
                       << std::endl;
             errMsg.push_back("No symmetry operators, can not generator molecules \n");
             lErr = true;
         }
     }
+    
     void GenCifFile::initAllCifKeys()
     {
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
@@ -1947,7 +1958,8 @@ namespace LIBMOL
             else
             {
                 resolOK = false;
-                ID aErr= "UNDEFINITED RESOLUTION: Theta_max or x-ray wavelength is wrong\n";
+                ID aErr= 
+                "UNDEFINITED RESOLUTION: Theta_max or x-ray wavelength is wrong\n";
                 errMsg.push_back(aErr);
             }
         }
@@ -2335,10 +2347,12 @@ namespace LIBMOL
                         }
                         else
                         {
-                            std::cout << "the string for coordinate y is " << tSY << std::endl;
+                            std::cout << "the string for coordinate y is " 
+                                      << tSY << std::endl;
                         }
                     }
-                    std::cout << "Its (fractional) coord y : " << itsCurAtom->fracCoords[1] << std::endl;
+                    std::cout << "Its (fractional) coord y : " 
+                              << itsCurAtom->fracCoords[1] << std::endl;
                     
                 }
                 if (hasProps["atom"].find("fract_z") != hasProps["atom"].end())
@@ -2359,22 +2373,29 @@ namespace LIBMOL
                         }
                         else
                         {
-                            std::cout << "the string for coordinate z is " << tSZ << std::endl;
+                            std::cout << "the string for coordinate z is " 
+                                      << tSZ << std::endl;
                         }
                     }
-                    std::cout << "Its (fractional) coord z : " << itsCurAtom->fracCoords[2] << std::endl;
+                    std::cout << "Its (fractional) coord z : " 
+                              << itsCurAtom->fracCoords[2] << std::endl;
                     
                     getCoords = true;
                     
                 }
                
-                if (itsCurAtom->existProps.find("fract_x") !=itsCurAtom->existProps.end()
+                if (itsCurAtom->existProps.find("fract_x") 
+                    !=itsCurAtom->existProps.end()
                     && getCoords)
                 {
                     // TranslateIntoUnitCell(itsCurAtom->fracCoords);
-                    FractToOrtho(itsCurAtom->fracCoords, itsCurAtom->coords, itsCurCryst->itsCell->a, 
-                            itsCurCryst->itsCell->b, itsCurCryst->itsCell->c, itsCurCryst->itsCell->alpha,
-                            itsCurCryst->itsCell->beta, itsCurCryst->itsCell->gamma);
+                    FractToOrtho(itsCurAtom->fracCoords, itsCurAtom->coords, 
+                                 itsCurCryst->itsCell->a, 
+                                 itsCurCryst->itsCell->b, 
+                                 itsCurCryst->itsCell->c, 
+                                 itsCurCryst->itsCell->alpha,
+                                 itsCurCryst->itsCell->beta, 
+                                 itsCurCryst->itsCell->gamma);
                     hasCoords = true;
                 }
                 else if (itsCurAtom->existProps.find("x") !=itsCurAtom->existProps.end())
@@ -2769,6 +2790,10 @@ namespace LIBMOL
         else if (hasHeavyCalcAtoms)
         {
             errMsg.push_back("REJECTED STRUCTURE: Atoms of theoretically calculated found.\n");
+        }
+        else if (!symmOprOK)
+        {
+            errMsg.push_back("REJECTED STRUCTURE: No symmetry operators, can not generator molecules \n");
         }
         else if (lErr)
         {

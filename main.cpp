@@ -338,6 +338,7 @@ int main(int argc, char** argv) {
                     //aMolCreator.getMetalBondRange();
                 }
                
+                std::cout << "Here " << std::endl;
                 
                 if (AJob.workMode==31 || AJob.workMode==311)
                 {
@@ -398,7 +399,7 @@ int main(int argc, char** argv) {
                     
                     std::cout << "Studies of neighbor distribution of "
                                 "certain non-metal atoms " << std::endl;
-                    
+                    /*
                     LIBMOL::PeriodicTable aPTab;
                     double aDDelta = 0.3;
                     
@@ -409,6 +410,7 @@ int main(int argc, char** argv) {
                         aDDelta = 
                         LIBMOL::StrToReal(AJob.IOEntries["distDelta"]);
                     }
+                    */
                     
                     aMolCreator.executeSelectedAtomRange(
                                         AJob.IOEntries["UserParaFile"].c_str(),

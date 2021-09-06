@@ -284,14 +284,15 @@ namespace LIBMOL {
                         iA->sId = "555";
                         allAtoms.push_back(*iA);
                         refAtoms.push_back(*iA);
-                        // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
+                        // std::cout << "Is in preCell " 
+                        //<< iA->isInPreCell << std::endl;
                     }
                 }
 
                 //outPDB("initAtoms.pdb", "UNL", initAtoms);
 
                 std::cout << "Number of atoms read from the input file "
-                        << initAtoms.size() << std::endl;
+                          << initAtoms.size() << std::endl;
 
                 symmAtomGen(iCryst, aPTable);
 
@@ -328,9 +329,12 @@ namespace LIBMOL {
                         iMol->setAtomCartCoordFromFracCoord(iCryst);
                         allMolecules.push_back(*iMol);
                     }
+                    
                     std::cout << "numb of moles after checking inf-moles "
-                              <<allMolecules.size() 
+                              << allMolecules.size() 
                               << std::endl;
+                    
+                    
                     /*
                     HuckelMOSuite aMoTool;
                     aMoTool.setWorkMode(2);
@@ -1918,6 +1922,9 @@ namespace LIBMOL {
                         covalent_sensitivity, tPTab,
                         bondRange);
                 
+                
+                
+                
                 if (lMetal)
                 {
                     
@@ -1974,7 +1981,24 @@ namespace LIBMOL {
                 
                 
                 if (bondRange[0] > 0.20 && bondRange[1] > 0.20) 
-                {
+                {  
+                    /*
+                    std::cout << "Distance between: " << std::endl
+                                      << "Atom 1 " << allAtoms[i].id 
+                                      << " of serial number " 
+                                      << allAtoms[i].seriNum
+                                      << " from original atom " 
+                                      << allAtoms[allAtoms[i].fromOrig].id 
+                                      << std::endl
+                                      << "Atom 2 " << allAtoms[*iNB].id 
+                                      << " of serial number " << allAtoms[*iNB].seriNum
+                                      << " from original atom " 
+                                      << allAtoms[allAtoms[*iNB].fromOrig].id 
+                                      << " is " << rD << std::endl;
+                    std::cout << "Range between " << bondRange[0]
+                                      << " and " << bondRange[1] << std::endl;
+                    
+                    */  
                     if (rD > bondRange[0] && rD < bondRange[1]) 
                     {
                         
@@ -2000,7 +2024,7 @@ namespace LIBMOL {
                         }
                         /*
                         if (allAtoms[i].chemType.compare("C") ==0
-                            || allAtoms[*iNB].chemType.compare("C")==0)
+                            || allAtoms[*iNB].chemType.compare("H")==0)
                         {
                             
                             //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
@@ -2031,7 +2055,7 @@ namespace LIBMOL {
                                       << std::endl;
                          
                         }
-                         */
+                        */
                     }
                 }
             }
@@ -3288,7 +3312,8 @@ namespace LIBMOL {
     }
     
     void MolGenerator::getUniqueBondsMols(Molecule& tMol,
-            std::vector<CrystInfo>::iterator tCryst) {
+            std::vector<CrystInfo>::iterator tCryst) 
+    {
         std::map<std::string, int> aMA;
         std::vector<REAL> aV;
 
@@ -3300,7 +3325,9 @@ namespace LIBMOL {
                     std::string str1 = iAt->id + "_" + tMol.atoms[(*iCo)].id;
                     std::string str2 = tMol.atoms[(*iCo)].id + "_" + iAt->id;
                     if ((*iCo) > iAt->seriNum &&
-                            (aMA.find(str1) == aMA.end() && aMA.find(str2) == aMA.end())) {
+                            (aMA.find(str1) == aMA.end() && 
+                             aMA.find(str2) == aMA.end())) 
+                    {
                         aMA[str1] = 1;
                         REAL rD = getBondLenFromFracCoords(iAt->fracCoords, tMol.atoms[(*iCo)].fracCoords,
                                 tCryst->itsCell->a, tCryst->itsCell->b,
@@ -3316,21 +3343,29 @@ namespace LIBMOL {
                         //          << tMol.atoms[(*iCo)].id << " is added to the bond_list_cell " 
                         //          << std::endl << "Its bond length is " << aBond.value 
                         //          << std::endl;
-                    } else {
-                        REAL rD = getBondLenFromFracCoords(iAt->fracCoords, tMol.atoms[(*iCo)].fracCoords,
+                    } 
+                    else 
+                    {
+                        REAL rD = getBondLenFromFracCoords(iAt->fracCoords, 
+                                tMol.atoms[(*iCo)].fracCoords,
                                 tCryst->itsCell->a, tCryst->itsCell->b,
                                 tCryst->itsCell->c, tCryst->itsCell->alpha,
                                 tCryst->itsCell->beta, tCryst->itsCell->gamma);
-                        if (!inVectABS(aV, rD, 0.000002)) {
+                        if (!inVectABS(aV, rD, 0.000002)) 
+                        {
                             BondDict aBond;
                             aBond.atomsIdx.push_back(iAt->seriNum);
                             aBond.atomsIdx.push_back(*iCo);
                             aBond.value = rD;
                             tMol.bonds.push_back(aBond);
                             aV.push_back(aBond.value);
-                            //std::cout << "a bond between " << iAt->id << " and "
-                            //          << tMol.atoms[(*iCo)].id << " is added to the bond_list_cell " 
-                            //          << std::endl << "Its bond length is(unique) " << aBond.value 
+                            //std::cout << "a bond between " << iAt->id 
+                            //          << " and "
+                            //          << tMol.atoms[(*iCo)].id 
+                            //          << " is added to the bond_list_cell " 
+                            //          << std::endl 
+                            //          << "Its bond length is(unique) " 
+                            //          << aBond.value 
                             //          << std::endl;
                         }
 
@@ -3436,8 +3471,6 @@ namespace LIBMOL {
         setBondsAndAngles_NB1NB2_EE(tMol.atoms, tMol.allBonds, tMol.angles);
 
         getUniqueBondsMols2(tMol);
-        
-       
 
     }
 
@@ -3445,7 +3478,8 @@ namespace LIBMOL {
             AtomDict & tAtm2,
             REAL tSens,
             PeriodicTable & tPTab,
-            std::vector<REAL> & tRange) {
+            std::vector<REAL> & tRange) 
+    {
         tRange.clear();
         tRange.push_back(-1.0);
         tRange.push_back(-1.0);
@@ -3606,6 +3640,19 @@ namespace LIBMOL {
             std::cout << "tSen "    << tSens << std::endl;
             std::cout << "tExtraD " << std::endl;
             */
+            
+            if (tAtm1.chemType == "H"
+                || tAtm2.chemType == "H")
+            {
+                    
+                double aHD=tRange[0]*0.98;
+                    
+                if (aHD > 0.80)
+                {
+                    tRange[0] = aHD;
+                }       
+            }
+            
         } 
         else 
         {
@@ -3826,10 +3873,14 @@ namespace LIBMOL {
          */
     }
 
-    void MolGenerator::getUniqAngles(std::vector<CrystInfo>::iterator tCryst) {
-        for (int i = 0; i < (int) allAtoms.size(); i++) {
-            for (int j = 0; j < (int) allAtoms[i].connAtoms.size(); j++) {
-                for (int k = j + 1; k < (int) allAtoms[i].connAtoms.size(); k++) {
+    void MolGenerator::getUniqAngles(std::vector<CrystInfo>::iterator tCryst) 
+    {
+        for (int i = 0; i < (int) allAtoms.size(); i++) 
+        {
+            for (int j = 0; j < (int) allAtoms[i].connAtoms.size(); j++) 
+            {
+                for (int k = j + 1; k < (int) allAtoms[i].connAtoms.size(); k++) 
+                {
                     int i1 = allAtoms[i].connAtoms[j];
                     int i2 = allAtoms[i].connAtoms[k];
                     //std::cout << "Angle between " << allAtoms[i].id 
@@ -3884,14 +3935,20 @@ namespace LIBMOL {
     }
 
     void MolGenerator::getUniqAngleMols(Molecule & tMol,
-            std::vector<CrystInfo>::iterator tCryst) {
+            std::vector<CrystInfo>::iterator tCryst) 
+    {
         std::map<std::string, int> aMM;
         std::vector<REAL> aV;
 
-        for (int i = 0; i < (int) tMol.atoms.size(); i++) {
-            if (tMol.atoms[i].isInPreCell) {
-                for (int j = 0; j < (int) tMol.atoms[i].connAtoms.size(); j++) {
-                    for (int k = j + 1; k < (int) tMol.atoms[i].connAtoms.size(); k++) {
+        for (int i = 0; i < (int) tMol.atoms.size(); i++) 
+        {
+            //if (tMol.atoms[i].isInPreCell) 
+            //{
+                for (int j = 0; j < (int) tMol.atoms[i].connAtoms.size(); j++) 
+                {
+                    for (int k = j + 1; 
+                         k < (int) tMol.atoms[i].connAtoms.size(); k++) 
+                    {
 
                         int i1 = tMol.atoms[i].connAtoms[j];
                         int i2 = tMol.atoms[i].connAtoms[k];
@@ -3961,14 +4018,17 @@ namespace LIBMOL {
                                 aAng.numCodValues = 0;
                                 tMol.angles.push_back(aAng);
                                 aV.push_back(aAng.value);
-                            } else {
+                            } 
+                            else 
+                            {
                                 REAL rD = getAngleValueFromFracCoords(tMol.atoms[i],
                                         tMol.atoms[i1], tMol.atoms[i2],
                                         tCryst->itsCell->a, tCryst->itsCell->b,
                                         tCryst->itsCell->c, tCryst->itsCell->alpha,
                                         tCryst->itsCell->beta, tCryst->itsCell->gamma);
                                 // std::cout << "rD " << rD << std::endl;
-                                if (!inVectABS(aV, rD, 0.0001)) {
+                                if (!inVectABS(aV, rD, 0.0001)) 
+                                {
                                     aMM[str1] = 1;
                                     AngleDict aAng;
                                     aAng.anchorID = tMol.atoms[i].id;
@@ -3978,14 +4038,17 @@ namespace LIBMOL {
                                     aAng.atomsCodClasses.push_back(tMol.atoms[i].codClass); // this for the overall file
 
                                     if ((int) tMol.atoms[i1].connAtoms.size() >=
-                                            (int) tMol.atoms[i2].connAtoms.size()) {
+                                            (int) tMol.atoms[i2].connAtoms.size()) 
+                                    {
                                         aAng.atoms.push_back(i1);
                                         aAng.atoms.push_back(i2);
                                         aAng.atomChemTypes.push_back(tMol.atoms[i1].chemType);
                                         aAng.atomChemTypes.push_back(tMol.atoms[i2].chemType);
                                         aAng.atomsCodClasses.push_back(tMol.atoms[i1].codClass);
                                         aAng.atomsCodClasses.push_back(tMol.atoms[i2].codClass);
-                                    } else {
+                                    } 
+                                    else 
+                                    {
                                         aAng.atoms.push_back(i2);
                                         aAng.atoms.push_back(i1);
                                         aAng.atomChemTypes.push_back(tMol.atoms[i2].chemType);
@@ -4004,7 +4067,7 @@ namespace LIBMOL {
                         }
                     }
                 }
-            }
+            //}
         }
 
         /*
@@ -5736,9 +5799,12 @@ namespace LIBMOL {
 
     void MolGenerator::getOverallBondAndAnglesNew() 
     {
-        std::map<std::string, std::vector<REAL> > aBM, aAM;
-
+        std::map<std::string, std::vector<REAL> > aBM, aAM, aTorM;
+        
+        bonds.clear();
+        angles.clear();
         torsions.clear();
+        
         std::cout << "Number of molecules used "
                   << allMolecules.size() << std::endl;
         
@@ -5750,49 +5816,63 @@ namespace LIBMOL {
                       << iMol->atoms.size()  << " atoms " << std::endl
                       << iMol->bonds.size()  << " bonds " << std::endl
                       << iMol->allBonds.size() << " bonds_2 " << std::endl
-                      << iMol->angles.size() << " angles " << std::endl
-                      << iMol->torsions.size() << " torsions "
+                      << iMol->angles.size()   << " angles " << std::endl
+                      //<< iMol->torsions.size() << " torsions "
                       <<std::endl;
             
             int nP =0;
+            std::cout << "Check " << std::endl;
             for (std::vector<AtomDict>::iterator iAt=iMol->atoms.begin();
                     iAt != iMol->atoms.end(); iAt++)
             {
+                std::cout << "atom " << iAt->id << std::endl
+                          << "connections " << iAt->connAtoms.size()
+                          << " atom(s). They are: " << std::endl;
+                for (std::vector<int>::iterator iC=iAt->connAtoms.begin();
+                      iC != iAt->connAtoms.end(); iC++)
+                {
+                    std::cout << " atom " << iMol->atoms[*iC].id  << std::endl;
+                }
+                
                 if (iAt->isInPreCell)
                 {
                     nP++;
                 }
             }
+            
             std::cout << "The molecule contains " 
                       << nP << " prem cell atoms "
                       << std::endl;
            
             
-            getSPRelatedTorsions(iMol);
             
             int nVB = 0, nPB = 0;
             for (std::vector<BondDict>::iterator iBo = iMol->allBonds.begin();
                     iBo != iMol->allBonds.end(); iBo++) 
             {
-                if (iMol->atoms[iBo->atomsIdx[0]].isInPreCell
-                        || iMol->atoms[iBo->atomsIdx[1]].isInPreCell) 
-                {
+                //if (iMol->atoms[iBo->atomsIdx[0]].isInPreCell
+                //        || iMol->atoms[iBo->atomsIdx[1]].isInPreCell) 
+                //{
                     nVB++;
                     std::vector<int> aIdxSet;
                     aIdxSet.push_back(iBo->atomsIdx[0]);
                     aIdxSet.push_back(iBo->atomsIdx[1]);
-                    /*
+                    
                     std::cout << "Check a bond " << std::endl;
                     std::cout << "atom 1 "       << iMol->atoms[iBo->atomsIdx[0]].id
-                              << " with type "   << iMol->atoms[iBo->atomsIdx[0]].codClass
+                              << " with type "   
+                              << iMol->atoms[iBo->atomsIdx[0]].codClass
                               << std::endl 
                               << "atom 2 " << iMol->atoms[iBo->atomsIdx[1]].id
-                              << " with type " << iMol->atoms[iBo->atomsIdx[1]].codClass
-                              << std::endl << "OrderN " << iBo->orderN << std::endl;
-                     */
+                              << " with type " 
+                              << iMol->atoms[iBo->atomsIdx[1]].codClass
+                              //<< std::endl << "OrderN " << iBo->orderN 
+                              << std::endl;
+                    
                     if (!connMetal2ndNB(aIdxSet, iMol->atoms)) 
                     {
-                        //std::cout << "bond contains no metal up to the 2NB " << std::endl;
+                        std::cout << "bond contains no metal up to the 2NB " 
+                                  << std::endl;
                         std::vector<sortMap3> tVec;
                         struct sortMap3 tMap;
                         tMap.key = iMol->atoms[iBo->atomsIdx[0]].codClass;
@@ -5804,24 +5884,28 @@ namespace LIBMOL {
                         std::sort(tVec.begin(), tVec.end(), desSortMapKey3);
                         std::string tKey = tVec[0].key + "_" + tVec[1].key;
 
-                        if (aBM.find(tKey) == aBM.end()) {
-                            //std::cout << "new key " << tKey << std::endl
-                            //          << "value is " << iBo->value << std::endl;
+                        if (aBM.find(tKey) == aBM.end()) 
+                        {
+                            std::cout << "new key " << tKey << std::endl
+                                      << "value is " << iBo->value << std::endl;
                             iBo->atoms.clear();
                             iBo->atomsCodClasses.clear();
                             for (std::vector<sortMap3>::iterator iAt = tVec.begin();
-                                    iAt != tVec.end(); iAt++) {
+                                    iAt != tVec.end(); iAt++) 
+                            {
                                 iBo->atoms.push_back(iAt->val);
                                 iBo->atomsCodClasses.push_back(iAt->key);
                             }
                             bonds.push_back(*iBo);
+                            std::cout << "The bond is included " << std::endl;
                             aBM[tKey].push_back(iBo->value);
 
                         }
                         else if (!inVectABS(aBM[tKey], iBo->value, 0.00001)) 
                         {
-                            // std::cout << "new value " << iBo->value << std::endl
-                            //          << "Key is " << tKey << std::endl;
+                            std::cout << "new value " << iBo->value 
+                                      << std::endl
+                                      << "Key is "    << tKey << std::endl;
                             iBo->atoms.clear();
                             iBo->atomsCodClasses.clear();
                             for (std::vector<sortMap3>::iterator iAt = tVec.begin();
@@ -5832,6 +5916,7 @@ namespace LIBMOL {
                             }
                             bonds.push_back(*iBo);
                             aBM[tKey].push_back(iBo->value);
+                            std::cout << "The bond is included " << std::endl;
                         }
                         
                         
@@ -5844,7 +5929,7 @@ namespace LIBMOL {
                     
                     //getSPRelatedTorsions(iMol, iBo);
 
-                }
+                //}
             }
             if (nPB == nVB) 
             {
@@ -5856,14 +5941,17 @@ namespace LIBMOL {
             //          << " angles " << std::endl;
 
             for (std::vector<AngleDict>::iterator iAn = iMol->angles.begin();
-                    iAn != iMol->angles.end(); iAn++) {
-                if (iMol->atoms[iAn->atoms[0]].isInPreCell
-                        || iMol->atoms[iAn->atoms[1]].isInPreCell
-                        || iMol->atoms[iAn->atoms[2]].isInPreCell) {
+                    iAn != iMol->angles.end(); iAn++) 
+            {
+                //if (iMol->atoms[iAn->atoms[0]].isInPreCell
+                //        || iMol->atoms[iAn->atoms[1]].isInPreCell
+                //        || iMol->atoms[iAn->atoms[2]].isInPreCell) 
+                //{
                     std::vector<int> aIdxSet;
                     aIdxSet.push_back(iAn->atoms[0]);
 
-                    if (!connMetal2ndNB(aIdxSet, iMol->atoms)) {
+                    if (!connMetal2ndNB(aIdxSet, iMol->atoms)) 
+                    {
                         std::vector<sortMap3> tVec;
                         struct sortMap3 tMap;
                         tMap.key = iMol->atoms[iAn->atoms[1]].codClass;
@@ -5875,7 +5963,8 @@ namespace LIBMOL {
                         std::sort(tVec.begin(), tVec.end(), desSortMapKey3);
                         std::string tKey = iMol->atoms[iAn->atoms[0]].codClass
                                 + "_" + tVec[0].key + "_" + tVec[1].key;
-                        if (aAM.find(tKey) == aAM.end()) {
+                        if (aAM.find(tKey) == aAM.end()) 
+                        {
                             iAn->atomChemTypes.clear();
                             iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].id);
                             iAn->atomsCodClasses.clear();
@@ -5887,13 +5976,16 @@ namespace LIBMOL {
                             }
                             angles.push_back(*iAn);
                             aAM[tKey].push_back(iAn->value);
-                        } else if (!inVectABS(aAM[tKey], iAn->value, 0.0001)) {
+                        } 
+                        else if (!inVectABS(aAM[tKey], iAn->value, 0.0001)) 
+                        {
                             iAn->atomChemTypes.clear();
                             iAn->atomChemTypes.push_back(iMol->atoms[iAn->atoms[0]].id);
                             iAn->atomsCodClasses.clear();
                             iAn->atomsCodClasses.push_back(iMol->atoms[iAn->atoms[0]].codClass);
                             for (std::vector<sortMap3>::iterator iAt = tVec.begin();
-                                    iAt != tVec.end(); iAt++) {
+                                    iAt != tVec.end(); iAt++) 
+                            {
                                 iAn->atomChemTypes.push_back(iAt->val);
                                 iAn->atomsCodClasses.push_back(iAt->key);
                             }
@@ -5905,26 +5997,20 @@ namespace LIBMOL {
                     {
                         anglesMetal2NB[iMol->seriNum].push_back(iAn->seriNum);
                     }
-                }
+                // }
             }
+            getSPRelatedTorsions(aTorM, iMol);
         }
 
         std::cout << "Total Number of unique bonds are " 
                   << bonds.size() << std::endl;
-        /*
-        for (std::vector<BondDict>::iterator iBo=bonds.begin();
-                iBo !=bonds.end(); iBo++)
-        {
-            std::cout << "Order N is " << iBo->orderN << std::endl;
-        }
-         */
         
         std::cout << "Total number of unique angles are " 
                   << angles.size() << std::endl;
         
         std::cout << "Total number of unique torsions " 
-                  << torsions.size() << std::endl;
-        exit(1);
+                  << torsions.size() << std::endl; 
+        
     }
 
     
@@ -6018,8 +6104,9 @@ namespace LIBMOL {
     }
     
     void MolGenerator::getSPRelatedTorsions(
-                                         std::vector<Molecule>::iterator tMol, 
-                                         std::vector<BondDict>::iterator tBo)
+                        std::vector<Molecule>::iterator tMol, 
+                        std::vector<BondDict>::iterator tBo,
+                        std::map<std::string, std::vector<REAL> > &  tTorM)
     {
         
         std::string atm0Sp = tBo->atomSPs[tBo->atoms[0]];
@@ -6063,6 +6150,17 @@ namespace LIBMOL {
         
         if (lToDo)
         {
+            std::vector<sortMap3> tVec23;
+            struct sortMap3 tMap;
+            tMap.key = tMol->atoms[tBo->atomsIdx[0]].codClass;
+            tMap.val = tMol->atoms[tBo->atomsIdx[0]].id;
+            tVec23.push_back(tMap);
+            tMap.key = tMol->atoms[tBo->atomsIdx[1]].codClass;
+            tMap.val = tMol->atoms[tBo->atomsIdx[1]].id;
+            tVec23.push_back(tMap);
+            std::sort(tVec23.begin(), tVec23.end(), desSortMapKey3);
+            std::string tKey23 = tVec23[0].key + "_" + tVec23[1].key;
+            
             if (tMol->atoms[tBo->atomsIdx[0]].connAtoms.size() >0
                 && tMol->atoms[tBo->atomsIdx[1]].connAtoms.size() >0)
             {
@@ -6083,7 +6181,24 @@ namespace LIBMOL {
                             if (!tMol->atoms[*iN1].isMetal
                                 && tMol->atoms[*iN1].id != tMol->atoms[tBo->atomsIdx[0]].id
                                 && tMol->atoms[*iN1].chemType.compare("H") !=0)
-                            {               
+                            {    
+                                
+                                std::vector<sortMap3> tVec14;
+                                struct sortMap3 tMap2;
+                                tMap2.key = tMol->atoms[*iN0].codClass;
+                                tMap2.val = tMol->atoms[*iN0].id;
+                                tVec14.push_back(tMap2);
+                                tMap2.key = tMol->atoms[*iN1].codClass;
+                                tMap2.val = tMol->atoms[*iN1].id;
+                                tVec14.push_back(tMap2);
+                                std::sort(tVec14.begin(), tVec14.end(), 
+                                          desSortMapKey3);
+                                std::string tKeyAll = tVec14[0].key + "_"
+                                                     + tKey23 + "_"
+                                                     + tVec14[1].key;
+                                std::cout << "Torsion key is "
+                                          << tKeyAll << std::endl;
+                                
                                 std::vector<AtomDict> torAtms;
                                 torAtms.push_back(tMol->atoms[*iN0]);
                                 torAtms.push_back(tMol->atoms[tBo->atomsIdx[0]]);
@@ -6097,7 +6212,23 @@ namespace LIBMOL {
                                                         torAtms[2],
                                                         torAtms[3]);
                                 aTor.bonds.push_back(*tBo);
-                                torsions.push_back(aTor);
+                                
+                                if (tTorM.find(tKeyAll)==tTorM.end())
+                                {
+                                    
+                                    torsions.push_back(aTor);
+                                    tTorM[tKeyAll].push_back(aTor.value);
+                                    std::cout << "The torsion is included "
+                                              << std::endl;
+                                }
+                                else if (!inVectABS(tTorM[tKeyAll], 
+                                                    aTor.value, 0.0001)) 
+                                {
+                                    torsions.push_back(aTor);
+                                    tTorM[tKeyAll].push_back(aTor.value);
+                                    std::cout << "The torsion is included "
+                                              << std::endl;
+                                }
                             }
                         }
                     }
@@ -6153,11 +6284,15 @@ namespace LIBMOL {
     
     
     void MolGenerator::getSPRelatedTorsions(
-                                        std::vector<Molecule>::iterator tMol)
+                            std::map<std::string, std::vector<REAL> > &  tTorM,
+                            std::vector<Molecule>::iterator              tMol)
     {
+        std::map<std::string, std::vector<REAL> > aTorM;
+        
         for (std::vector<BondDict>::iterator iBo = tMol->allBonds.begin();
                     iBo != tMol->allBonds.end(); iBo++) 
         {
+            /*
             int idx0 = allAtoms[iBo->atomsIdx[0]].fromOrig;
             int idx1 = allAtoms[iBo->atomsIdx[1]].fromOrig;
             std::string id0 = allAtoms[idx0].id;
@@ -6165,7 +6300,9 @@ namespace LIBMOL {
             
             std::string atm0Sp = iBo->atomSPs[iBo->atoms[0]];
             std::string atm1Sp = iBo->atomSPs[iBo->atoms[1]];
+            */
             
+            getSPRelatedTorsions(tMol, iBo, tTorM);
             
             
         }
@@ -6177,7 +6314,15 @@ namespace LIBMOL {
         if (tMol.atoms.size() > 0) {
             tMol.calcSumExcessElecs();
             tMol.calcSumCharges();
-
+            std::map<std::string, std::vector<std::string> > metAtms;
+            for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
+                    iAt != tMol.atoms.end(); iAt++)
+            {
+                if (iAt->matType > 0)
+                {
+                    metAtms[iAt->chemType].push_back(iAt->id);
+                }
+            }
             tMolTabs << "data_mol_" << IntToStr(tMol.seriNum)
                     << std::endl;
             tMolTabs << "loop_" << std::endl
@@ -6190,15 +6335,38 @@ namespace LIBMOL {
             tMolTabs << std::endl;
             tMolTabs << "total_number_of_atoms\t"
                     << tMol.atoms.size() << std::endl;
-            tMolTabs << "total_number_of_excess_electrons\t" << tMol.sumExcessElecs
-                    << std::endl;
-            tMolTabs << "total_number_of_charges\t" << tMol.sumCharges
-                    << std::endl;
+            if (metAtms.size() > 0)
+            {
+                tMolTabs << "loop_" << std::endl
+                         << "metal_type " << std::endl
+                         << "atom_id " << std::endl;
+                for (std::map<std::string, std::vector< std::string> >::iterator
+                      iMet=metAtms.begin(); iMet != metAtms.end();
+                      iMet++)
+                {
+                    for (std::vector<std::string>::iterator 
+                         iMAtm=iMet->second.begin();
+                         iMAtm !=iMet->second.end(); iMAtm++)
+                    {
+                        tMolTabs << std::setw(6) <<iMet->first
+                                 << std::setw(8) << *iMAtm 
+                                 << std::endl;
+                    }
+                }
+                        
+            }
+            //tMolTabs << "total_number_of_excess_electrons\t" << tMol.sumExcessElecs
+            //        << std::endl;
+            //tMolTabs << "total_number_of_charges\t" << tMol.sumCharges
+            //        << std::endl;
 
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_atom.serial_number" << std::endl
                     << "_chem_comp_atom.atom_id " << std::endl
                     << "_chem_comp_atom.element_symbol" << std::endl
+                    << "_chem_comp_atom.x" << std::endl
+                    << "_chem_comp_atom.y" << std::endl
+                    << "_chem_comp_atom.z" << std::endl
                     << "_chem_comp_atom.formal_charge" << std::endl
                     << "_chem_comp_atom.hybr" << std::endl
                     << "_chem_comp_atom.nb1_nb2_sp" << std::endl
@@ -6207,42 +6375,57 @@ namespace LIBMOL {
                     << "_chem_comp_atom.cod_type" << std::endl;
 
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
-                    iAt != tMol.atoms.end(); iAt++) {
+                    iAt != tMol.atoms.end(); iAt++) 
+            {
 
                 tMolTabs << std::setw(6) << iAt->seriNum + 1
-                        << std::setw(6) << iAt->id
-                        << std::setw(4) << iAt->chemType
-                        << std::setw(6) << iAt->formalCharge
+                        << std::setw(6)  << iAt->id
+                        << std::setw(4)  << iAt->chemType
+                        << std::setw(12) << iAt->coords[0]
+                        << std::setw(12) << iAt->coords[1]
+                        << std::setw(12) << iAt->coords[2]
+                        << std::setw(6)  << iAt->formalCharge
                         << std::setw(10) << iAt->hybrid << "    "
-                        << std::setw(iAt->codNB1NB2_SP.size() + 4) << iAt->codNB1NB2_SP << "    "
+                        << std::setw(iAt->codNB1NB2_SP.size() + 4) 
+                        << iAt->codNB1NB2_SP << "    "
                         << std::setw(5) << iAt->excessElec << "    "
                         << std::setw(iAt->codNB1NB2_ExElec.size() + 4)
                         << iAt->codNB1NB2_ExElec << "    "
                         << iAt->codClass << std::endl;
             }
             tMolTabs << std::endl;
-        } else {
+        } else 
+        {
             std::cout << "There is no atoms in the molecule" << std::endl;
         }
 
-        if (tMol.allBonds.size() > 0) {
+        // The following one does not includes bonds in which composite atoms 
+        // are connected to metal atoms, or within the 2nd NB of metal atoms 
+        
+        if (tMol.allBonds.size() > 0) 
+        {
             std::cout << std::endl;
+            /*
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_bond.bond_serial_number" << std::endl
                     << "_chem_comp_bond.atom1_serial_number" << std::endl
                     << "_chem_comp_bond.atom2_serial_number" << std::endl
                     << "_chem_comp_bond.atom1_id" << std::endl
                     << "_chem_comp_bond.atom2_id" << std::endl
-                    << "_chem_comp_bond.value_dist" << std::endl
-                    << "_chem_comp_bond.is_in_same_ring" << std::endl
-                    << "_chem_comp_bond.order" << std::endl;
+                    << "_chem_comp_bond.atom1_element_symbol" << std::endl
+                    << "_chem_comp_bond.atom2_element_symbol" << std::endl
+                    //<< "_chem_comp_bond.value_dist" << std::endl
+                    << "_chem_comp_bond.is_in_same_ring" << std::endl;
+                    // << "_chem_comp_bond.order" << std::endl;
             int nBo = 1;
             for (std::vector<BondDict>::iterator iBo = tMol.allBonds.begin();
-                    iBo != tMol.allBonds.end(); iBo++) {
+                    iBo != tMol.allBonds.end(); iBo++) 
+            {
                 std::vector<int> aIdxSet;
                 aIdxSet.push_back(iBo->atomsIdx[0]);
                 aIdxSet.push_back(iBo->atomsIdx[1]);
-                if (!connMetal2ndNB(aIdxSet, tMol.atoms)) {
+                if (!connMetal2ndNB(aIdxSet, tMol.atoms)) 
+                {
                     std::string tStr;
                     if (iBo->isInSameRing) {
                         tStr = "Y";
@@ -6253,18 +6436,60 @@ namespace LIBMOL {
                     tMolTabs << std::setw(6) << nBo
                             << std::setw(6) << iBo->atomsIdx[0] + 1
                             << std::setw(6) << iBo->atomsIdx[1] + 1
+                            << std::setw(8) << tMol.atoms[iBo->atomsIdx[0]].id
+                            << std::setw(8) << tMol.atoms[iBo->atomsIdx[1]].id
                             << std::setw(4) << tMol.atoms[iBo->atomsIdx[0]].chemType
                             << std::setw(4) << tMol.atoms[iBo->atomsIdx[1]].chemType
-                            << std::setw(10) << iBo->value
-                            << std::setw(6) << tStr
-                            << std::setw(10) << iBo->orderN << std::endl;
+                            //<< std::setw(10) << iBo->value
+                            << std::setw(6) << tStr << std::endl;
+                            //<< std::setw(10) << iBo->orderN << std::endl;
                     nBo++;
                 }
-
             }
+             */
 
+            // The following one includes all connections within a molecules.
+            // That means bond values may be repeated because, e.g. they are
+            // from symmetry-generated atoms. But this one shows how the 
+            // the molecule is connected
+            tMolTabs << "loop_" << std::endl
+                    << "_chem_comp_bond.bond_serial_number" << std::endl
+                    << "_chem_comp_bond.atom1_serial_number" << std::endl
+                    << "_chem_comp_bond.atom2_serial_number" << std::endl
+                    << "_chem_comp_bond.atom1_id" << std::endl
+                    << "_chem_comp_bond.atom2_id" << std::endl
+                    << "_chem_comp_bond.atom1_element_symbol" << std::endl
+                    << "_chem_comp_bond.atom2_element_symbol" << std::endl;
+            
+                    //<< "_chem_comp_bond.value_dist" << std::endl
+                    //<< "_chem_comp_bond.is_in_same_ring" << std::endl;
+                    
+            int nBo = 1;
+            for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
+                    iAt != tMol.atoms.end(); iAt++) 
+            {
+                for (unsigned i=0; i < iAt->connAtoms.size(); i++)
+                {
+                    if (iAt->connAtoms[i] > iAt->seriNum)
+                    {
+                        tMolTabs << std::setw(6) << nBo
+                                 << std::setw(6) << iAt->seriNum
+                                 << std::setw(6) << iAt->connAtoms[i]
+                                 << std::setw(8) << iAt->id
+                                 << std::setw(8) 
+                                 << tMol.atoms[iAt->connAtoms[i]].id
+                                 << std::setw(4) << iAt->chemType
+                                 << std::setw(4) 
+                                 << tMol.atoms[iAt->connAtoms[i]].chemType
+                                 << std::endl;
+                        nBo++;
+                    }
+                }
+            }
             std::cout << std::endl;
-        } else {
+        } 
+        else 
+        {
             std::cout << "There is no bonds in the molecule" << std::endl;
         }
 
@@ -6279,9 +6504,11 @@ namespace LIBMOL {
                     << "_chem_comp_angle.atom3_id" << std::endl
                     << "_chem_comp_angle.value_angle" << std::endl
                     << "_chem_comp_angle.ring_size_of_angle" << std::endl;
+            
             int nAn = 1;
             for (std::vector<AngleDict>::iterator iAn = tMol.angles.begin();
-                    iAn != tMol.angles.end(); iAn++) {
+                    iAn != tMol.angles.end(); iAn++) 
+            {
 
 
                 tMolTabs << std::setw(6) << nAn
@@ -6693,24 +6920,21 @@ namespace LIBMOL {
             msg.close();
         }
 
-        if (bonds.size() != 0) {
+        if (bonds.size() != 0) 
+        {
             Name bondAndAngleFName(rootFName);
             bondAndAngleFName.append("_unique_bond_and_angles.txt");
             outTableBAndA(bondAndAngleFName.c_str());
         }
 
-        if (allMolecules.size() != 0) {
-            Name allMolsFName(rootFName);
-            allMolsFName.append("_all_mols.txt");
-            std::ofstream aMolTable(allMolsFName.c_str());
-            if (aMolTable.is_open()) {
-                outMolsInfo(aMolTable, tFinMols, tInfMols);
-            }
-            else {
-                std::cout << allMolsFName << " can not be open for writing "
-                        << std::endl;
-            }
-
+        if (allMolecules.size() != 0) 
+        {
+            //Name allMolsFName(rootFName);
+            //allMolsFName.append("_all_mols.txt");
+            //std::ofstream aMolTable(allMolsFName.c_str());
+            
+            outMolsInfo(rootFName, tFinMols, tInfMols);
+            
             std::map<std::string, std::map< std::string, std::map<std::string,
                     std::map<std::string, REAL> > > >atomSpAndChMap;
             
@@ -6748,8 +6972,9 @@ namespace LIBMOL {
             }
             else 
             {
-                std::cout << allMolsFName << " can not be open for writing "
-                        << std::endl;
+                std::cout <<  atomSpAndChMapFName 
+                          << " can not be open for writing "
+                          << std::endl;
             }
         }
     }
@@ -6796,30 +7021,45 @@ namespace LIBMOL {
         }
     }
 
-    void MolGenerator::outMolsInfo(std::ofstream & tMolTabs,
+    void MolGenerator::outMolsInfo(//std::ofstream & tMolTabs,
+            std::string          & tRootName,
             std::vector<Molecule>& tFinMols,
-            std::vector<Molecule>& tInfMols) {
+            std::vector<Molecule>& tInfMols) 
+    {
+        
+        if (tFinMols.size() > 0) 
+        {
+            Name allMolsFName(tRootName);
+            allMolsFName.append("_all_mols.txt");
+            std::ofstream aMolTable(allMolsFName.c_str());
+            std::string aMolRootName(tRootName);
+            aMolRootName.append("_mol_");
 
-
-        if (tMolTabs.is_open()) {
-
-            tMolTabs << "loop_" << std::endl
+            aMolTable << "loop_" << std::endl
                     << "num_finite_mols\t" << tFinMols.size() << std::endl
                     << "num_infinite_mols\t" << tInfMols.size() << std::endl;
 
 
-            if (tFinMols.size() > 0) {
-                for (unsigned i = 0; i < tFinMols.size(); i++) {
-                    outTableMols(tMolTabs, tFinMols[i]);
+            if (tFinMols.size() > 0) 
+            {
+                for (unsigned i = 0; i < tFinMols.size(); i++) 
+                {
+                    std::string aMolIdx(IntToStr(i+1));
+                    outTableMols(aMolTable, tFinMols[i]);
+                    std::string aMolName(aMolRootName);
+                    aMolName.append(aMolIdx);
+                    outPDB(aMolName.c_str(), "UNL", tFinMols[i].atoms);
                 }
             }
 
+            /*
             if (tInfMols.size() > 0) {
                 for (unsigned i = 0; i < tInfMols.size(); i++) {
-                    outTableMols(tMolTabs, tInfMols[i]);
+                    outTableMols(aMolTable, tInfMols[i]);
                 }
             }
-            tMolTabs.close();
+             */
+            aMolTable.close();
         }
     }
     

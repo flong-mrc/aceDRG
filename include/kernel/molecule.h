@@ -95,6 +95,7 @@ namespace LIBMOL
         ~Molecule();
         
         void setAtomCartCoordFromFracCoord(std::vector<CrystInfo>::iterator tCryst);
+        void setAllBondsFromCartCoord();
         
         void setFormula();
         void calcSumExcessElecs();

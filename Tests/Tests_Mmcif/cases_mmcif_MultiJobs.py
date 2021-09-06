@@ -87,7 +87,7 @@ for aCif in glob.glob(indir2):
               %(aCif, outRoot,  logName)
     print(cmdLine)
     numAllJobs += 1
-    os.system(cmdLine)
+    lRun = os.system(cmdLine)
     if lRun :
         print("%s runtime error "%outRoot)
     outCif = "%s.cif"%outRoot

@@ -350,7 +350,7 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,
                                     help="The option for checking version information of acedrg")
 
-        self.inputParser.add_option("-x",  "--pdb", dest="inLigandPdbName", metavar="FILE", 
+        self.inputParser.add_option("-x",  "--pdb", dest="inPdbName", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File of PDB format containing coordinates of the ligand")
 

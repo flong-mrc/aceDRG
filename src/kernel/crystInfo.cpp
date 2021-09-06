@@ -174,7 +174,7 @@ namespace LIBMOL
     }
  
    
-    Resolution::Resolution(): resolLimit(0.841), 
+    Resolution::Resolution(): resolLimit(RESOLTHRESHOLD), 
                               dMax(-1.0),
                               thetaMax(0.0),
                               wavLen(-1.0),

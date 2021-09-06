@@ -3705,7 +3705,7 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_mod_bond.new_value_dist\n")
             tOutFile.write("_chem_mod_bond.new_value_dist_esd\n")               
             tOutFile.write("_chem_mod_bond.new_value_dist_nucleus\n")
-            tOutFile.write("_chem_mod_bond.new_value_dist_esd_nucleus_esd\n")               
+            tOutFile.write("_chem_mod_bond.new_value_dist_nucleus_esd\n")               
          
             if nDB !=0:
                 for aBond in tModLigand["deleted"]["bonds"]:

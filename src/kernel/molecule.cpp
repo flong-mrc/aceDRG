@@ -119,6 +119,26 @@ namespace LIBMOL
             }
         }
     }
+    
+    void Molecule::setAllBondsFromCartCoord()
+    {
+        for (std::vector<AtomDict>::iterator iAtm=atoms.begin();
+                iAtm != atoms.end(); iAtm++)
+        {
+            for (unsigned i=0; i < iAtm->connAtoms.size(); i++)
+            {
+                for (unsigned j=i+1; j <iAtm->connAtoms.size(); j++)
+                {
+                    if (iAtm->connAtoms[j] > iAtm->connAtoms[i])
+                    {
+                        
+                        
+                    }
+                }
+            }
+        }
+    }
+    
     void Molecule::setFormula()
     {
         std::map<ID, int> fmap;

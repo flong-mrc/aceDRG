@@ -88,6 +88,7 @@ namespace LIBMOL
             }
         }
          */
+         
           
     }
     
@@ -473,6 +474,7 @@ namespace LIBMOL
   
         // Check
         
+        
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -484,10 +486,7 @@ namespace LIBMOL
                       << " and is with bond index "
                       << iAt->bondingIdx << std::endl;
         }
-        
         /*
-        
-        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
