@@ -7,6 +7,9 @@
 #include "codClassify.h"
 #include "PDBFile.h"
 #include "TransCoord.h"
+#ifdef _MSC_VER
+#include <ciso646>
+#endif
 
 namespace LIBMOL
 {   
@@ -15833,7 +15836,7 @@ namespace LIBMOL
         
         int dim = (int)allAtoms.size();
        
-        REAL tDistMat[dim][dim];
+        std::vector<std::vector<REAL> > tDistMat(dim,std::vector<REAL>(dim) );
         
         for (int i=0; i < dim; i++)
         {

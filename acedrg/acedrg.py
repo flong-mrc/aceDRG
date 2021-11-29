@@ -1466,7 +1466,7 @@ class Acedrg(CExeCode ):
 
     def setRefmacCom1(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
      
-        self._cmdline = self.refmac 
+        self._cmdline = "\""+self.refmac+"\""
         self._cmdline += "  xyzin %s libin %s xyzout %s"%(tPdbIn, tLibIn, tPdbOut)
         if platform.system()!="Windows": self._cmdline += " <<eof\n"
         if tStage==0:
