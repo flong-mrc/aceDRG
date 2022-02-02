@@ -83,7 +83,7 @@ namespace LIBMOL
         
         int c, index; 
         while ((c = getopt (numArg, ArgVars, 
-         "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:D:L:M:N:O:P:R:S:T:U:X:Y:Z:1:2:3:4:"))
+"a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:C:D:H:L:M:N:O:P:Q:R:S:T:U:X:Y:Z:1:2:3:4:"))
                != -1)
         {
             switch (c)
@@ -176,11 +176,17 @@ namespace LIBMOL
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
                     break;
+                case 'C':
+                    IOEntries["PeptidesOnly"] = optarg;
+                    break;
                 case 'D':
                     IOEntries["libMolTabDir"] = optarg;
                     //std::cout << "Libmol table directory is  : " 
                     //          << IOEntries["libMolTabDir"] 
                     //          << std::endl;
+                    break;
+                case 'H':
+                    IOEntries["HBondDetect"] = optarg;
                     break;
                 case 'L':
                     IOEntries["MetalRange"] = optarg;
@@ -199,6 +205,12 @@ namespace LIBMOL
                     IOEntries["UserParaFile"] = optarg;
                     std::cout << "The param file from the user : " 
                               << IOEntries["UserParaFile"] << std::endl;
+                    break;
+                case 'Q':
+                    IOEntries["MolGenParaFile"] = optarg;
+                    std::cout << "The param file for MolGen : " 
+                              << IOEntries["MolGenParaFile"] 
+                              << std::endl;
                     break;
                 case 'R':
                     IOEntries["addProtCol"] = optarg;
@@ -295,6 +307,7 @@ namespace LIBMOL
                 IOEntries["monoRootName"] ="UNL";
             }
         }
+        
         
         
         setBandASiga();
@@ -481,6 +494,13 @@ namespace LIBMOL
                 }
             }
         }
+        else if (IOEntries.find("HBondDetect")!=IOEntries.end())
+        {
+            if (IOEntries.find("inCifNameB")!=IOEntries.end())
+            {
+                workMode = 315;
+            }
+        }
         else if (IOEntries.find("addProtCol") != IOEntries.end() )
         {
             workMode = 800;
@@ -572,6 +592,20 @@ namespace LIBMOL
             else if (IOEntries.find("tabGen") != IOEntries.end())
             {
                 workMode = 33;
+            }
+            else if ( IOEntries.find("AtomTypeOutName")!=IOEntries.end())
+            {
+                if (!IOEntries["AtomTypeOutName"].empty())
+                {
+                    // This mode outputs COD atom type only
+                    workMode =42;
+                }
+                else
+                {
+                    std::cout << "You need to enter the name of"
+                              << " the output file containing atom types"
+                              << std::endl;
+                }
             }
         }
         else if (IOEntries.find("inSdfName") !=IOEntries.end())

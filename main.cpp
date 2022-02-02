@@ -137,14 +137,19 @@ int main(int argc, char** argv) {
                                               AJob.lowBondSig, 
                                               AJob.upperAngleSig,
                                               AJob.lowAngleSig); 
+            if (AJob.IOEntries.find("PeptidesOnly") !=  AJob.IOEntries.end())
+            {
+                aTargetSystem.isPeptide = true;
+            }
                   
             if ( (int)aTargetSystem.allAtoms.size() > 0)
             {   
-                 aTargetSystem.setupAllTargetValuesFromCOD2(AJob.IOEntries["userOutName"].c_str(), 
-                                                            AJob.IOEntries["monoRootName"], 
-                                                            AJob.IOEntries["libMolTabDir"]);
+                 aTargetSystem.setupAllTargetValuesFromCOD2(
+                                AJob.IOEntries["userOutName"].c_str(), 
+                                AJob.IOEntries["monoRootName"], 
+                                AJob.IOEntries["libMolTabDir"]);
                  
-                 
+                 std::cout << "Passed here22" << std::endl;
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                   AJob.IOEntries["monoRootName"], 
                                   aTargetSystem.propComp,
@@ -162,7 +167,7 @@ int main(int argc, char** argv) {
                                   aTargetSystem.lowAngleSig,
                                   aTargetSystem.HydrDistTable);
                                 
-                 
+                
                 LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
                                AJob.IOEntries["monoRootName"], 
                                aTargetSystem.allAtoms);
@@ -282,6 +287,7 @@ int main(int argc, char** argv) {
              || AJob.workMode ==312
              || AJob.workMode ==313 
              || AJob.workMode ==314
+             || AJob.workMode ==315
              || AJob.workMode==32 
              || AJob.workMode==33)
     {
@@ -293,16 +299,31 @@ int main(int argc, char** argv) {
             || AJob.workMode==3111
             || AJob.workMode ==312
             || AJob.workMode ==313
-            || AJob.workMode ==314)
+            || AJob.workMode ==314
+            || AJob.workMode ==315)
         {
+            /*
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
-            LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
+            if (AJob.IOEntries.find("MolGenParaFile")==
+                AJob.IOEntries.end())
+            {
+                LIBMOL::GenCifFile  
+                dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
+                std::cout << "Number of crystal in the system is " 
+                      << dataFromCif.allCryst.size() << std::endl;
+            }
+             */
+               
+            LIBMOL::GenCifFile  
+            dataFromCif(AJob.IOEntries["inCifNameB"],
+                        AJob.IOEntries["MolGenParaFile"],         
+                        std::ios::in);
             std::cout << "Number of crystal in the system is " 
                       << dataFromCif.allCryst.size() << std::endl;
-          
+           
             // TEMP, CSD do not provide several parameters. Rely on CSD
             // search criteria.
-            
+             
             
             
             //if (dataFromCif.notPowder && dataFromCif.resolOK
@@ -338,7 +359,6 @@ int main(int argc, char** argv) {
                     //aMolCreator.getMetalBondRange();
                 }
                
-                std::cout << "Here " << std::endl;
                 
                 if (AJob.workMode==31 || AJob.workMode==311)
                 {
@@ -414,7 +434,12 @@ int main(int argc, char** argv) {
                     
                     aMolCreator.executeSelectedAtomRange(
                                         AJob.IOEntries["UserParaFile"].c_str(),
-                                        AJob.IOEntries["userOutName"].c_str());
+                                        AJob.IOEntries["userOutName"].c_str());    
+                }
+                else if (AJob.workMode==315)
+                {
+                    std::cout << "Detect possible H-bond candidates "
+                              << std::endl;
                     
                     
                 }
@@ -484,6 +509,10 @@ int main(int argc, char** argv) {
                                                aCodSystem.allRingsV);
             
         }
+    }
+    else if (AJob.workMode == 43)
+    {
+        
     }
     else if (AJob.workMode == 43)
     {

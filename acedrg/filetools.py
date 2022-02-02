@@ -142,23 +142,72 @@ class FileTransformer(object) :
         else:
             tAllLs = tFile.readlines()
             tFile.close()
-
             self.allBolcLs = []
             aBlockLs     = []
+            allContLinesList1 = {}
+            allContLinesList2 = {}
             all2ColLines = []
             filtedAllLines = []
-            for aL in tAllLs:
-                aL = aL.strip()
-                if len(aL):
-                    if aL[0].find("_") !=-1:
-                        a2ColList = []
-                        self.aLineToAlist(aL,a2ColList)
-                        if len(a2ColList)==2:
-                            all2ColLines.append(a2ColList)
+  
+            numLs = len(tAllLs)
+            i=0
+            while i < numLs:
+                tAllLs[i] = tAllLs[i].strip()
+                if len(tAllLs[i]):
+                    if tAllLs[i][0].find("#")==-1:
+                        if tAllLs[i][0].find("_") !=-1:
+                            a2ColList = []
+                            self.aLineToAlist(tAllLs[i],a2ColList)
+                            if len(a2ColList)==2: 
+                                all2ColLines.append([1, a2ColList[0], a2ColList[1]])
+                                i = i + 1
+                            elif len(a2ColList)== 1:
+                                j = i + 1
+                                if len(tAllLs[j]) and tAllLs[j][0].find("#")==-1:
+                                    if tAllLs[j][0].find(";") !=-1:
+                                        aTmpLine=tAllLs[j].strip(";").strip()
+                                        lBr = True
+                                        while lBr:
+                                            j = j+1
+                                            if j > numLs :
+                                                print("mmCif file %s format error? check the line after %s. "%(tFileName,tAllLs[i]))
+                                                sys.exit(1)
+                                            else:
+                                                aTmpLine=aTmpLine+tAllLs[j].strip(";").strip()
+                                                if tAllLs[j].find(";") !=-1:
+                                                    lBr = False
+                                        if len(aTmpLine) > 30 and aTmpLine.find("\"") ==-1:
+                                            aTmpLine = "\"" + aTmpLine + "\""
+                                        all2ColLines.append([2, tAllLs[i], aTmpLine]) 
+                                        i = j+1
+                                    else:
+                                        filtedAllLines.append(tAllLs[i])
+                                        i = i + 1          
+                                else : 
+                                    i = i + 1            
+                            else :
+                                filtedAllLines.append(tAllLs[i])
+                                i = i + 1          
                         else:
-                            filtedAllLines.append(aL)
-                    else:
-                        filtedAllLines.append(aL)
+                            filtedAllLines.append(tAllLs[i])
+                            i = i + 1          
+                    else :
+                        i = i + 1          
+                else:
+                    i = i + 1          
+
+            #for aL in tAllLs:
+            #    aL = aL.strip()
+            #    if len(aL):
+            #        if aL[0].find("_") !=-1:
+            #            a2ColList = []
+            #            self.aLineToAlist(aL,a2ColList)
+            #            if len(a2ColList)==2:
+            #                all2ColLines.append(a2ColList)
+            #            else:
+            #                filtedAllLines.append(aL)
+            #        else:
+            #            filtedAllLines.append(aL)
 
             for aL in filtedAllLines :
                 #if aL.find("data_") != -1 and aL.find("#") ==-1:
@@ -182,18 +231,22 @@ class FileTransformer(object) :
                 for aBlk in self.allBlockLs:
                     self.parseOneMmCifBlk(aBlk)
 
+            #for a3 in all2ColLines:
+            #    print("%s%s"%(a3[1].ljust(60), a3[2].ljust(40)))
+           
             if len(all2ColLines) !=0:
                 self.parserAll2Cols(all2ColLines)
             self.TmpChemCheck()
+
             
             self.selectAtomCoordinates()
  
-            # check
             """
+            # check
             if len(self.dataDescriptor.keys()):
                 for aK in self.dataDescriptor.keys():
-                    print "Key : ", aK
-                    print "values ", self.dataDescriptor[aK]
+                    print("Key : ", aK)
+                    print("values ", self.dataDescriptor[aK])
             idKey = "_chem_comp_atom.atom_id"
             for aAtom in self.atoms:
                 if aAtom.has_key(idKey):
@@ -269,15 +322,15 @@ class FileTransformer(object) :
         atomProp = {}
         bondProp = {}
         for aPair in t2ColLines:
-            if aPair[0].find("_chem_comp.") !=-1:
-               self.dataDescriptor[iC]=[aPair[0], aPair[1]]
-               #print "aPair[0] ", aPair[0]
-               #print "aPair[1] ", aPair[1]    
+            if aPair[1].find("_chem_comp.") !=-1:
+               self.dataDescriptor[iC]=[aPair[1], aPair[2]]
+               #print "aPair[1] ", aPair[1]
+               #print "aPair[2] ", aPair[2]    
                iC+=1
-            elif aPair[0].find("_chem_comp_atom.") !=-1:
-                atomProp[aPair[0]] = aPair[1]
-            elif aPair[0].find("_chem_comp_bond.") !=-1:
-                bondProp[aPair[0]] = aPair[1]
+            elif aPair[1].find("_chem_comp_atom.") !=-1:
+                atomProp[aPair[1]] = aPair[2]
+            elif aPair[1].find("_chem_comp_bond.") !=-1:
+                bondProp[aPair[1]] = aPair[2]
   
         if len(atomProp) !=0:
             self.atoms.append(atomProp)
@@ -311,7 +364,7 @@ class FileTransformer(object) :
         nAll = 0;
         nC   = 0
         l2  = False
-
+        #print(tBlk)
         for aL in tBlk:
             if aL.find("_chem_comp.") !=-1:
                 nAll+=1
@@ -326,28 +379,27 @@ class FileTransformer(object) :
  
         if nC==nAll:
            l2 = False
-
         if l2: # 2 col format
             iC =0
             for aL in tBlk:
-                print(aL) 
+                #print(aL) 
                 if aL.find("\"") !=-1:
                     strGrp = aL.strip().split("\"")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\""+ strGrp[1] + "\""]
-                        print(self.dataDescriptor[iC])
+                        #print(self.dataDescriptor[iC])
                         iC +=1
                 elif aL.find("\'") !=-1 :
                     strGrp = aL.strip().split("\'")
                     if len(strGrp) >= 2: 
                         self.dataDescriptor[iC]=[strGrp[0], "\'"+ strGrp[1] + "\'"]
-                        print(self.dataDescriptor[iC])
+                        #print(self.dataDescriptor[iC])
                         iC +=1
                 else:
                     strGrp = aL.strip().split()
                     if len(strGrp) == 2:
                         self.dataDescriptor[iC]=[strGrp[0], strGrp[1]]
-                        print(self.dataDescriptor[iC])
+                        #print(self.dataDescriptor[iC])
                         iC +=1
                                            
         else:   # multiple col format          
@@ -386,6 +438,9 @@ class FileTransformer(object) :
                     strGrp = aL.strip().split()
                     if len(strGrp) == 1:
                         colIdx.append(strGrp[0])
+                    elif len(strGrp)==len(colIdx):
+                        for i in range(len(strGrp)):
+                            self.dataDescriptor[i]=[colIdx[i], strGrp[i]]
         """
         # Check
         print "Two  colum format :"
@@ -393,15 +448,15 @@ class FileTransformer(object) :
             print "%s%s"%(self.dataDescriptor[i][0].ljust(60), self.dataDescriptor[i][1].ljust(40))
         print "\n"
 
-        print "Multple  colum format :"
+        """
+        print ("Multple  colum format :")
         for i in sorted(self.dataDescriptor.iterkeys()):
-            print self.dataDescriptor[i][0]
+            print (self.dataDescriptor[i][0])
         aSt = ""
         for i in sorted(self.dataDescriptor.iterkeys()):
             aSt+=(self.dataDescriptor[i][1].strip() + "\t")
-        print aSt
-        print "\n" 
-        """
+        print (aSt)
+        print ("\n") 
        
 
     def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):
@@ -835,7 +890,6 @@ class FileTransformer(object) :
                         lq1 = True
                         break
                 if not lq1 : 
-                    print("Using _chem_comp_atom.pdbx_model_Cartn_x")
                     self.mmCifHasCoords   = True
                     for aAtom in self.atoms:
                         aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.model_Cartn_x"]

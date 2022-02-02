@@ -531,7 +531,7 @@ namespace LIBMOL
                     //setSugarRingInitComf(allAtoms, allTorsions, iR);
                     
                     checkOneSugarRing(allAtoms, iR);
-                    if (iR->isSugar.compare("pyranose")==0)
+                    if (iR->sugarType.compare("pyranose")==0)
                     {    
                         std::cout << "Find one pyranose ring " << std::endl;
                         // A pyranose ring, set torsions within the ring    
@@ -604,7 +604,7 @@ namespace LIBMOL
                     //setSugarRingInitComf(allAtoms, allTorsions, iR);
                     
                     checkOneSugarRing(allAtoms, iR);
-                    if (iR->isSugar.compare("pyranose")==0)
+                    if (iR->sugarType.compare("pyranose")==0)
                     {    
                         std::cout << "Find one pyranose ring " << std::endl;
                         // A pyranose ring, set torsions within the ring    
@@ -769,7 +769,7 @@ namespace LIBMOL
                     //setSugarRingInitComf(allAtoms, allTorsions, iR);
                     
                     checkOneSugarRing(allAtoms, iR);
-                    if (iR->isSugar.compare("pyranose")==0)
+                    if (iR->sugarType.compare("pyranose")==0)
                     {    
                         std::cout << "Find one pyranose ring " << std::endl;
                         // A pyranose ring, set torsions within the ring    

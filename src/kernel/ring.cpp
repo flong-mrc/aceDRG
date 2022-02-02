@@ -59,8 +59,11 @@ namespace LIBMOL
     RingDict::RingDict():isPlanar(false),
             isAromatic(false),
             isAntiAroma(false),
-            isSugar(NullString),
-            rep(NullString)
+            isSugar(false),
+            sugarType(NullString),
+            rep(NullString),
+            sRep(NullString),
+            extId(NullString)
     {
     }
     
@@ -68,8 +71,10 @@ namespace LIBMOL
             isAromatic(tR.isAromatic),
             isAntiAroma(tR.isAntiAroma),
             isSugar(tR.isSugar),
+            sugarType(tR.sugarType),
             rep(tR.rep),
-            sRep(tR.sRep)
+            sRep(tR.sRep),
+            extId(tR.extId)
     {
         for (std::vector<AtomDict>::const_iterator iA=tR.atoms.begin();
                 iA != tR.atoms.end(); iA++)
@@ -107,6 +112,13 @@ namespace LIBMOL
                 iBo != tR.bondIdxs.end(); iBo++)
         {
             bondIdxs.push_back(*iBo);
+        }
+        
+        for (std::vector<AtomDict>::const_iterator 
+             iSeqAtm=tR.seqedAtoms.begin(); iSeqAtm!=tR.seqedAtoms.end();
+             iSeqAtm++)
+        {
+            seqedAtoms.push_back(*iSeqAtm);
         }
         
     }
@@ -1525,7 +1537,7 @@ namespace LIBMOL
                                      std::vector<RingDict>::iterator tRing)
     {
         checkOneSugarRing(tAtoms, tRing);
-        if (tRing->isSugar.compare("pyranose")==0)
+        if (tRing->sugarType.compare("pyranose")==0)
         {    
             std::cout << "Find one pyranose ring " << std::endl;
             // A pyranose ring, set torsions within the ring    
@@ -1617,18 +1629,18 @@ namespace LIBMOL
             if (rAtmFormat["O"]==1 && rAtmFormat["C"]==5
                 && rAtmFormat["connectO"] >1)
             {
-                tRing->isSugar = "pyranose";
+                tRing->sugarType = "pyranose";
             }
             else if (rAtmFormat["O"]==1 && rAtmFormat["C"]==4
                 && rAtmFormat["connectO"]==3 && rAtmFormat["connectC"]==2 )
             {
-                tRing->isSugar = "furanose";
+                tRing->sugarType = "furanose";
             }
         }
         /*
-        if (tRing->isSugar.size() !=0)
+        if (tRing->sugarType.size() !=0)
         {
-            std::cout << "The ring is " << tRing->isSugar << std::endl;
+            std::cout << "The ring is " << tRing->sugarType << std::endl;
         }
         else
         {

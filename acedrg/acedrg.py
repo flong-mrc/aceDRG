@@ -133,6 +133,7 @@ class Acedrg(CExeCode ):
         self.workMode         = 0
         self.useExistCoords   = False
         self.isAA             = False
+        self.isPEP            = False     # keep here temporarily
         self.isNA             = False
 
         self.molGen           = False
@@ -514,31 +515,33 @@ class Acedrg(CExeCode ):
            
              
     def setOutCifGlobSec(self):
-        
-        if not self.fileConv.hasStrDescriptors:
-           for aL in self.fileConv.strDescriptors["defProps"]:
-               self.outCifGlobSect.append(aL + "\n") 
-        #self.outCifGlobSect.append("#loop_\n")
-        #self.outCifGlobSect.append("#_software\n")
-        #self.outCifGlobSect.append("#_version\n")
+       
+        #if not self.fileConv.hasStrDescriptors:
+        #   for aL in self.fileConv.strDescriptors["defProps"]:
+        #       self.outCifGlobSect.append(aL + "\n") 
+        self.outCifGlobSect.append("loop_\n")
+        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.comp_id\n")
+        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.program_name\n")
+        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.program_version\n")
+        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.descriptor\n")
         #self.outCifGlobSect.append("#_purpose\n")
         if "ACEDRG_VERSION" in self.versionInfo:
-            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg".ljust(21), "?".ljust(12), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg".ljust(21), "?".ljust(12), '\"dictionary generator\"'.ljust(40)))
         
         if "DATABASE_VERSION" in self.versionInfo:
-            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg_database".ljust(21), self.versionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg_database".ljust(21), self.versionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "acedrg_database".ljust(21), "?".ljust(12), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg_database".ljust(21), "?".ljust(12), '\"data source\"'.ljust(40)))
 
-        self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17) ,"rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
+        self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
   
         if "REFMAC_NAME" in self.versionInfo:
-            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
                                        '\"optimization tool\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s%s%s\n"%(self.monomRoot.ljust(4), "?".ljust(17), "refmac".ljust(21), "?".ljust(12), '\"optimization tool\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "refmac".ljust(21), "?".ljust(12), '\"optimization tool\"'.ljust(40)))
         
          
     def checInputFormat(self):
@@ -624,11 +627,66 @@ class Acedrg(CExeCode ):
                             or tDataDesc[aK][1].upper().find("RNA") !=-1):
                         aRet = True 
                         break
-        return aRet    
+        return aRet 
+
+    def checkPeptidesFromMmcif(self, tDataDesc=None):
+
+        aRet = False
+        if tDataDesc:
+            for aK in tDataDesc.keys():
+                if len(tDataDesc[aK])==2:
+                    if tDataDesc[aK][0].find("_chem_comp.type") !=-1 \
+                       and tDataDesc[aK][1].upper().find("PEPTIDE") !=-1:
+                        print(tDataDesc[aK][0], " : ", tDataDesc[aK][1])
+                        aRet = True
+                        break
+                    elif tDataDesc[aK][0].find("_chem_comp.group") !=-1 \
+                       and tDataDesc[aK][1].upper().find("PEPTIDE") !=-1:
+                        print(tDataDesc[aK][0], " : ", tDataDesc[aK][1])
+                        aRet = True
+                        break
+        return aRet
+   
 
     def getNATors(self):
 
         torsFN = os.path.join(self.acedrgTables, "nucl_tors.table")
+        if os.path.isfile(torsFN):
+            torsF = open(torsFN, "r")
+            allLs = torsF.readlines()
+            torsF.close()
+            
+            if len(allLs) > 0:
+                for aL in allLs:
+                    aL = aL.strip()
+                    print(aL)
+                    if len(aL) > 0:
+                        if aL[0].find("#") ==-1:
+                            strgrp = aL.split()
+                            if len(strgrp)==9:
+                                torKey = strgrp[0].strip()
+                                if not torKey in self.naTorsList.keys():
+                                    self.naTorsList[torKey]    = {}
+                                     
+                                self.naTorsList[torKey][strgrp[1].strip()] = \
+                                      [strgrp[2].strip(), strgrp[3].strip(), strgrp[4].strip(), strgrp[5].strip(),\
+                                       strgrp[6].strip(), strgrp[7].strip(), strgrp[8].strip()]                           
+
+        if len(self.naTorsList.keys()) > 0:
+            print("special torsion angles for NA:")
+            for aK in sorted(self.naTorsList.keys()):
+                print("==========================")
+                print("torsion key : %s "%aK)
+                for aId in self.naTorsList[aK].keys():
+                    print("ID          : %s "%aId)
+                    print("atom Ids    :  ",self.naTorsList[aK][aId])
+                    print("value       : %s "%self.naTorsList[aK][aId][4])
+                    print("std_dev     : %s "%self.naTorsList[aK][aId][5])
+                    print("period      : %s "%self.naTorsList[aK][aId][6])
+        
+    def getPEPTors(self):
+
+        torsFN = os.path.join(self.acedrgTables, "pep_tors.table")
         if os.path.isfile(torsFN):
             torsF = open(torsFN, "r")
             allLs = torsF.readlines()
@@ -663,6 +721,7 @@ class Acedrg(CExeCode ):
                     print("std_dev     : %s "%self.naTorsList[aK][aId][5])
                     print("period      : %s "%self.naTorsList[aK][aId][6])
         
+
     def setWorkMode(self, t_inputOptionsP = None):
 
         #print "acedrg is in ", self.acedrgDir
@@ -1036,7 +1095,8 @@ class Acedrg(CExeCode ):
 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 \
            or self.workMode==15 or self.workMode ==16\
-           or self.workMode == 111 or self.workMode == 121 or self.workMode == 131 \
+           or self.workMode == 111 or self.workMode==112\
+           or self.workMode == 121 or self.workMode == 131 \
            or self.workMode==141 or self.workMode==151 or self.workMode==161:
             self._cmdline += " -1 %f -2 %f -3 %f -4 %f "\
                             %(self.upperSigForBonds, self.lowSigForBonds,\
@@ -1054,12 +1114,15 @@ class Acedrg(CExeCode ):
         if self.workMode == 51:
             self.outRstCifName   =  self.baseRoot + "_bondOrder.list"
         if self.workMode == 11 or self.workMode == 12 or self.workMode==16\
-           or self.workMode == 111 or self.workMode == 121 or self.workMode==161:
+           or self.workMode == 111 or self.workMode==112\
+           or self.workMode == 121 or self.workMode==161:
             if tIn:
                 self.inMmCifName    = tIn
             self._cmdline +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
-            #print self._cmdline
+            if self.workMode==112:
+                self._cmdline +=" -C yes "
+            #print(self._cmdline)
             #os.system(self._cmdline)
             self.runExitCode = self.subExecute()
         if self.workMode == 13 or self.workMode == 14 or self.workMode == 131 or self.workMode == 141:
@@ -1141,11 +1204,12 @@ class Acedrg(CExeCode ):
                     else:
                         aStr = "2"
                     self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
-                elif self.workMode == 311:
+                elif self.workMode ==311 :
                     self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
                     print("Output file name : %s "%self.outAtmTypeName)
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
                 self.subExecute()
+            elif self.workMode == 35 :
                 
         if self.workMode == 41 :
 
@@ -1685,13 +1749,16 @@ class Acedrg(CExeCode ):
         if len(self.refmacMinFValueList) > 0 :
             #self.refmacMinFValueList.sort(listComp2)
             self.refmacMinFValueList=sorted(self.refmacMinFValueList, key=cmp_to_key(listComp2))
-            for aPair in self.refmacMinFValueList:
-                print("======")
-                print("FValue: ", aPair[0], "  File name ", aPair[1])  
+            #for aPair in self.refmacMinFValueList:
+            #    print("======")
+            #    print("FValue: ", aPair[0], "  File name ", aPair[1])  
             if self.numConformers==1: 
                 #print "Come to output final info"
                
                 self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+                print("=====================================================================")
+                print("|               Finished                                            |")
+                print("=====================================================================")
             else:
                 for i in range(self.numConformers):
                     aRoot = "Mol" + str(tIdxMol) + "_conformer" + str(i+1) 
@@ -1785,10 +1852,13 @@ class Acedrg(CExeCode ):
             cifCont['head'].append("#\n")
             cifCont['head'].append("loop_\n")
         
-        cifCont['atoms']  = []
-        cifCont['others'] = []
+        cifCont['atoms']   = []
+        cifCont['bonds']   = []
+        cifCont['tors']    = []
+        cifCont['others']  = []
         cifCont['others1'] = []
         cifCont['others2'] = []
+        cifCont['others3'] = []
         if tDelocList:
             if len(tDelocList) !=0:
                 cifCont['bonds'] = []
@@ -1823,6 +1893,7 @@ class Acedrg(CExeCode ):
                 tCifIn.close()
                 lAtom   = False
                 lBond   = False
+                lTors   = False
                 lOther  = False
                 lOther1 = False
                 lOther2 = False
@@ -1832,22 +1903,41 @@ class Acedrg(CExeCode ):
                     for aLine in allCifLines:
                         if not lAtom and aLine.find("_chem_comp_atom.comp_id") != -1:
                             lAtom  = True
-                        elif lAtom and aLine.find("loop") != -1:
+                        elif lAtom and aLine.find("loop_") != -1:
                             lAtom  = False
-                            lBond  = False
+                            lTors  = False
                             lOther1 = True
                             lOther2 = False
                             cifCont['others1'].append(aLine)
-                        elif lBond and aLine.find("loop") != -1:
+                        #elif lBond and aLine.find("loop_") != -1:
+                        #    lAtom  = False
+                        #    lBond  = False
+                        #    lOther1 = True 
+                        #    lTors  = False
+                        #    lOther2 = False
+                        #    cifCont['others1'].append(aLine)
+                        #elif tDelocList and len(tDelocList)!=0 and lOther1 and aLine.find("_chem_comp_bond.comp_id") != -1:
+                        #    lAtom  = False
+                        #    lBond  = True
+                        #    lTors  = False
+                        #    lOther1 = False
+                        #    lOther2 = False
+                        #    lOther3 = False
+                        #    cifCont['bonds'].append(aLine)
+                        elif lOther1 and aLine.find("_chem_comp_tor.period") != -1:
+                            print("Here starts of tors")
                             lAtom  = False
-                            lBond  = False
+                            lTors  = True
+                            lOther1 = False
+                            lOther2 = False
+                            cifCont['tors'].append(aLine)
+                        elif lTors and aLine.find("loop_") != -1:
+                            print("Here end of tors")
+                            lAtom  = False
+                            lTors  = False
                             lOther1 = False 
                             lOther2 = True
                             cifCont['others2'].append(aLine)
-                        elif tDelocList and len(tDelocList)!=0 and lOther1 and aLine.find("_chem_comp_bond.comp_id") != -1:
-                            lBond  = True
-                            lOther1 = False
-                            cifCont['bonds'].append(aLine)
                         elif lAtom:
                             strGrp = aLine.split()
                             if len(strGrp) ==1:
@@ -1875,6 +1965,8 @@ class Acedrg(CExeCode ):
                             cifCont['bonds'].append(aLine)
                         elif lOther1:
                             cifCont['others1'].append(aLine)
+                        elif lTors:
+                            cifCont['tors'].append(aLine)
                         elif lOther2:
                             cifCont['others2'].append(aLine)
                 else :
@@ -1884,10 +1976,21 @@ class Acedrg(CExeCode ):
                             cifCont['head'].append(aLine)
                             lStart = False
                             lAtom  = True
-                        elif lAtom and aLine.find("loop") != -1:
+                        elif lAtom and aLine.find("loop_") != -1:
                             lAtom  = False
                             lOther = True
-                            cifCont['others'].append(aLine)
+                            cifCont['others1'].append(aLine)
+                        elif lOther and aLine.find("_chem_comp_tor.period") != -1:
+                            lAtom  = False
+                            lOther = False 
+                            lTors  = True
+                            cifCont['tors'].append(aLine)
+                        elif lTor and aLine.find("loop_") != -1:
+                            lAtom   = False
+                            lOther  = False 
+                            lTors   = True
+                            lOther2 = True
+                            cifCont['others2'].append(aLine)
                         elif lStart:  
                             cifCont['head'].append(aLine)
                         elif lAtom:
@@ -1912,7 +2015,6 @@ class Acedrg(CExeCode ):
                                 sys.exit()
                         elif lOther:
                             cifCont['others'].append(aLine)
- 
                 if "bonds" in cifCont and len(cifCont['bonds']) !=0:
                     idxMap = {}
                     tHead  = []
@@ -1955,7 +2057,8 @@ class Acedrg(CExeCode ):
                                  aB+="\n"
                                  break
                         cifCont["bonds"].append(aB)
-                
+
+
                 try:
                     tOutCif = open(tCifOutName, "w")
                     print("Out cif name ", tCifOutName)
@@ -1968,36 +2071,36 @@ class Acedrg(CExeCode ):
                         tOutCif.write(aL)
                     for aL in cifCont['atoms']:
                         tOutCif.write(aL)
-                    if tDataDescriptor:
-                        if not self.isNA:
-                            for aL in cifCont['others1']:
-                                strGrp = aL.strip().split()
-                                if len(strGrp)==1:
-                                    tOutCif.write(aL)
-                                    print(aL)
-                                else:
-                                    aL1 = monoId + aL[3:]
-                                    tOutCif.write(aL1)
-                                    print(aL1)
-                            if 'bonds' in cifCont:
-                                for aL in  cifCont['bonds']:
-                                    strGrp = aL.strip().split()
-                                    if len(strGrp)==1:
-                                        tOutCif.write(aL)
-                                    else:
-                                        aL1 = monoId + aL[3:]
-                                        tOutCif.write(aL1)
-                            for aL in cifCont['others2']:
-                                strGrp = aL.strip().split()
-                                if len(strGrp)==1:
-                                    tOutCif.write(aL)
-                                else:
-                                    aL1 = monoId + aL[3:]
-                                    tOutCif.write(aL1)
+                    for aL in cifCont['others1']:
+                        strGrp = aL.strip().split()
+                        if len(strGrp)==1:
+                            tOutCif.write(aL)
                         else:
-                            self.naCorr(cifCont['others1'], tOutCif) 
+                            aL1 = monoId + aL[3:]
+                            tOutCif.write(aL1)
+                    if tDataDescriptor:
+                        #if self.isPEP or self.isAA:
+                        #    self.pepCorr(cifCont['tors'], tOutCif)
+                        if self.isNA:
+                            self.naCorr(cifCont['tors'], tOutCif) 
+                        else: 
+                            for aL in cifCont['tors']:
+                                strGrp = aL.strip().split()
+                                if len(strGrp)==1:
+                                    tOutCif.write(aL)
+                                else:
+                                    aL1 = monoId + aL[3:]
+                                    tOutCif.write(aL1)
+                             
+                        for aL in cifCont['others2']:
+                            strGrp = aL.strip().split()
+                            if len(strGrp)==1:
+                                tOutCif.write(aL)
+                            else:
+                                aL1 = monoId + aL[3:]
+                                tOutCif.write(aL1)
+
                     else:
-                        print("Here 2")
                         for aL in cifCont["others"]:
                             strGrp = aL.strip().split()
                             if len(strGrp)==1:
@@ -2041,6 +2144,7 @@ class Acedrg(CExeCode ):
                     if len(self.outCifGlobSect):
                         for aL in self.outCifGlobSect:
                             tOutCif.write(aL)
+                    
 
                     tOutCif.close()
     
@@ -2067,9 +2171,6 @@ class Acedrg(CExeCode ):
                                 id = id2
                             else:
                                 otherTors.append(aL)
-                            print("id1 is ", id1)
-                            print("id2 is ", id2)
-                            print("id is ",  id)
                             if len(id) > 0:
                                 for aId in sorted(self.naTorsList[id].keys()):
                                     aTorL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(8), aId.ljust(16),\
@@ -2085,15 +2186,58 @@ class Acedrg(CExeCode ):
                     tOutF.write(speTors[aId])
                 for aTorL in otherTors:
                     tOutF.write(aTorL)
-                print("Here 4")
-                print(aL)
                 lTor = False
                 tOutF.write(aL)
             else:
-                print("Here 5")
-                print(aL)
                 tOutF.write(aL)
-                
+
+    def pepCorr(self, tCifCont, tOutF):
+        lTor = False
+        speTors   = {}
+        otherTors = []
+        for aL in tCifCont:
+            if aL.find("_chem_comp_tor.period") != -1:
+                tOutF.write(aL)
+                lTor = True
+            elif lTor and aL.find("loop_")==-1:
+                if len(aL) >0:
+                    if aL[0].find("#") == -1:
+                        strs = aL.strip().split()
+                        if len(strs)==9:
+                            id1 = strs[2] + "_" + strs[3]  + "_" + strs[4] + "_" + strs[5]                      
+                            id2 = strs[5] + "_" + strs[4]  + "_" + strs[3] + "_" + strs[2] 
+                            print("id 1 ", id1)
+                            print("id 2 ", id2)
+                            id  = ""
+                            if id1 in self.naTorsList.keys():
+                                id = id1
+                            elif id2 in self.naTorsList.keys():
+                                id = id2
+                            else:
+                                otherTors.append(aL)
+                            print(id)
+                            if len(id) > 0:
+                                for aId in sorted(self.naTorsList[id].keys()):
+                                    aTorL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(8), aId.ljust(16),\
+                                        self.naTorsList[id][aId][0].ljust(10), self.naTorsList[id][aId][1].ljust(10),\
+                                        self.naTorsList[id][aId][2].ljust(10), self.naTorsList[id][aId][3].ljust(10),\
+                                        self.naTorsList[id][aId][4].ljust(14), self.naTorsList[id][aId][5].ljust(10),\
+                                        self.naTorsList[id][aId][6].ljust(6))
+                                    speTors[aId]= aTorL
+                                    print(aTorL)
+                        else:
+                            otherTors.append(aL)
+            elif lTor and aL.find("loop_") !=-1:
+                for aId in sorted(speTors.keys()):
+                    tOutF.write(speTors[aId])
+                for aTorL in otherTors:
+                    tOutF.write(aTorL)
+                lTor = False
+                tOutF.write(aL)
+            else:
+                tOutF.write(aL)
+
+        
     def outTorsionRestraints(self, tCifInName, tTorOutName):
 
         if os.path.isfile(tCifInName):
@@ -2648,16 +2792,14 @@ class Acedrg(CExeCode ):
        
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
-        #elif self.workMode !=0 and self.workMode != 61 :
-        #    print "Input coordinates will be ignored"
         print("workMode : ", self.workMode)
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111:
-            if self.monomRoot in self.chemCheck.aminoAcids:
-                self.isAA = True
-                self.getAAOut()
-            elif os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode)\
-               and not self.isAA:
+            #if self.monomRoot in self.chemCheck.aminoAcids:
+            #    self.isAA = True
+            #    self.getAAOut()
+            if os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
+            #   and not self.isAA:
                 #tmpWorkMode = self.workMode
                 #self.workMode = 311
                 #self.runLibmol()
@@ -2670,9 +2812,17 @@ class Acedrg(CExeCode ):
                     if self.isNA:
                         self.getNATors()
                     if self.monomRoot in self.chemCheck.aminoAcids:
-                        self.isAA = True
-                        self.getAAOut()
-                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 and not self.isAA:
+                        self.isAA = True   # Keep this temporarily 
+                        self.isPEP = True   
+                        self.rdKit.isPEP       = self.isPEP
+                        self.useExistCoords    = True
+                        #self.getAAOut()
+                    elif self.checkPeptidesFromMmcif(self.fileConv.dataDescriptor):
+			self.isPEP = True  
+                        self.rdKit.isPEP       = self.isPEP
+                        self.useExistCoords    = True
+                    print("is this monomer a peptide ", self.isPEP)
+                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 :   #and not self.isAA:
                     # Option A: 
                     if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -2961,13 +3111,17 @@ class Acedrg(CExeCode ):
         if not self.workMode in [80, 1001, 1002]:
             self.setOutCifGlobSec()
         if self.workMode in [11, 12, 13, 14, 15]:
-            self.workMode = 11
+            if self.isPEP and self.workMode==11:
+                self.workMode = 112
+            else :
+                 self.workMode = 11
         elif self.workMode in [111, 121, 131, 141, 151]:
             self.workMode = 111
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
-        if self.workMode in [11,  111, 51] and not self.isAA :
-            #print len(self.rdKit.molecules)
+        print("workMode is ",self.workMode)
+        if self.workMode in [11,  111, 112, 51] :  #  and not self.isAA :
+            print("Number of molecule ", len(self.rdKit.molecules))
             if len(self.rdKit.molecules):
                 print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
@@ -2978,7 +3132,7 @@ class Acedrg(CExeCode ):
                 #if self.monomRoot.upper() in self.chemCheck.aminoAcids:
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, "L-peptide")
                 #else:
-                if self.workMode in [11,  111]:
+                if self.workMode in [11,  111, 112]:
                     print("Using coords ", self.rdKit.useExistCoords)
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
@@ -2990,8 +3144,8 @@ class Acedrg(CExeCode ):
                 else:
                     print("The input %s does not exist"%self.inMmCifName)
                     sys.exit()
-
-                if self.workMode == 11:
+                
+                if self.workMode == 11 or self.workMode== 112:
                     if  not self.runExitCode :
                         # Stage 2: optimization
                         print("===================================================================") 
@@ -3105,7 +3259,6 @@ class Acedrg(CExeCode ):
                 self.runLibmol()    
         
         if self.workMode == 61:
-            
             aAAdir      = os.path.join(self.acedrgTables, "AminoAcids")
             if not self.testMode: 
                 aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)

@@ -235,6 +235,11 @@ namespace LIBMOL
         // These functions are  torsion angles related  
         void setOneTorsion(std::vector<int>, REAL tValue, int tPeriod);
         void setTorsionIdxFromOneBond(int tIdx1, int tIdx2);
+        void setPeptideTorsionIdxFromOneBond(int tIdx1, int tIdx2,
+             std::map<std::string, std::vector<std::string> >  tPepTorStdIds,
+             std::vector<TorsionDict> & tChiTors, 
+             std::vector<TorsionDict> & tHhTors,
+             std::vector<TorsionDict> & tCstTors);
         void setTorsionFromOneBond(int tIdx1, int tIdx2);
         void setTorsionFromOneBond(int tIdx1, int tIdx2, std::string tFlip);
         void SetOneSP1SP1Bond(int tIdx1, int tIdx2);
@@ -254,8 +259,17 @@ namespace LIBMOL
                                     std::string tF);
         void setAllTorsions();
         void setAllTorsions2();
+        void setPeptideTorsions();
         void setAllTorsionsInOneRing(std::vector<int> & tBondIdx, RingDict & tR);
-        
+        void checkSugarRings();
+        void checkOneRingSugar(std::vector<RingDict>::iterator tRing);
+        std::string getRStr(std::map<std::string, std::vector<AtomDict> > 
+                            & tOCAtms, 
+                            std::vector<RingDict>::iterator tRing);
+        void setSugarRingTors();
+        void setSugarRingTorsExtIds(
+                    std::vector<RingDict>::iterator tRing);
+        void expandTorsSet(const std::vector<TorsionDict>  & tTorsSet);
         
         /* Torsion related 
         void setAllTorsions();
@@ -325,6 +339,8 @@ namespace LIBMOL
         bool                                     hasCoords;
         bool                                     hasCCP4Type;
         bool                                     usingInChiral;
+        bool                                     isPeptide;
+        bool                                     withSugar;
         
         std::string                              libmolTabDir;
         

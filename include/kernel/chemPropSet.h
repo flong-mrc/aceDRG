@@ -338,6 +338,14 @@ namespace LIBMOL
     
     extern void setAtomFormTypes(std::vector<AtomDict> & tAtoms);
     
+    extern void getDandAPair(PeriodicTable    &              tPTab,
+                             std::vector<AtomDict>::iterator tAtm,
+                             std::vector<AtomDict>::iterator jAtm,
+                             std::map<int, std::string >    & tHPropAtom,
+                             std::map<int, std::map<int, double> >
+                             & tHCandAtom,
+                             double    tDist);
+    
     class HuckelMOSuite
     {
     public :

@@ -1363,7 +1363,7 @@ class CovLinkGenerator(CExeCode):
                             print(len(tLinkIns.stdLigand2["comp"]["chirs"]), " chiral centres.")
                         #tLinkIns.stdLigand2["ccp4MmCifObj"].printOneComp(tLinkIns.stdLigand2["name"])
                         self.selectHAtoms(tLinkIns.stdLigand2["comp"])
-                        print("Number of H atoms in residue %s is %d "%(tLinkIns.stdLigand2["name"], len(tLinkIns.stdLigand2["comp"]["hAtoms"])))
+                        #print("Number of H atoms in residue %s is %d "%(tLinkIns.stdLigand2["name"], len(tLinkIns.stdLigand2["comp"]["hAtoms"])))
                 else:
                     self.setOneMonomer(tLinkIns.stdLigand2)
                     #print "output comp 2 ", tLinkIns.stdLigand2["outComp"]
@@ -2095,6 +2095,7 @@ class CovLinkGenerator(CExeCode):
                 print("total Valence is ", nTotalVa)
                 print("atom ", aLAtmElem.upper())
                 print("Default Valence is ", self.chemCheck.defaultBo[aLAtmElem.upper()])
+                print("The charge is %s "%(tRes["comp"]["atoms"][ aLAtmSerial]["charge"]))
                 if aLAtmElem in self.chemCheck.orgVal:
                     if "charge" in tRes["comp"]["atoms"][ aLAtmSerial]:
                         allowedBO = self.chemCheck.orgVal[aLAtmElem][0] + int(tRes["comp"]["atoms"][ aLAtmSerial]["charge"])
@@ -2701,7 +2702,6 @@ class CovLinkGenerator(CExeCode):
             tLinkedObj.combLigand["name"] = tLinkedObj.stdLigand1["name"].strip() + "-" + tLinkedObj.stdLigand2["name"].strip()
             print("The name of combo-ligand : %s "%tLinkedObj.combLigand["name"])
             self.setInitComboLigand(tLinkedObj)
-           
             if not self.errLevel: 
                 print("Number of atoms in the combo-ligand is ", len(tLinkedObj.combLigand["atoms"]))
                 print("They are : ")
@@ -2726,7 +2726,8 @@ class CovLinkGenerator(CExeCode):
                         comboScrDN = self.subRoot + "_TMP"
                         if os.path.isdir(comboScrDN) and not self.testMode:
                             #print "Delete the tempo dir ", comboScrDN
-                            shutil.rmtree(comboScrDN)
+                            #shutil.rmtree(comboScrDN)
+                            pass
                         comboLigMolFileName = self.subRoot + ".mol"
                         self.fileTool.MmCifToMolFile(tLinkedObj.combLigand["outCif"], comboLigMolFileName)
             else:

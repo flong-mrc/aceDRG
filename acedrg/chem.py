@@ -52,7 +52,7 @@ class ChemCheck(object):
         self.organicSec = ["AT", "At", "at", "B", "b", "BR", "Br", "br", "C", "c", "CL", "Cl", "cl", 
                    "F", "f", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "SE", "Se", "se"]
         self.atomFileType = {}
-        self.atomFileType["mmCif"]  = [11, 111, 16, 161, 51]
+        self.atomFileType["mmCif"]  = [11, 111, 112, 16, 161, 51]
         self.atomFileType["simils"] = [12, 121, 52]
         self.atomFileType["mdl"]    = [13, 131, 14, 141, 33, 53, 54]
         self.atomFileType["mol2"]   = [15, 151, 55]

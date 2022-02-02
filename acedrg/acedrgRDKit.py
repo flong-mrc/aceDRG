@@ -56,6 +56,7 @@ class AcedrgRDKit(object):
         self.moleculesA = []
         self.moleculesB = []
 
+        self.isPEP            = False
         self.funcGroupTab     = {}
         self.stdFuncGroupMols = []
         self.funcGroups       = {}       
@@ -921,15 +922,24 @@ class AcedrgRDKit(object):
                 #        nSelect = tMol.GetNumConformers()
 
                 print("The following conformers are selected for refinement: ")
-                nID= 0
-                for aEng in sorted(self.conformerEngMap.keys()):
-                    for aCId in self.conformerEngMap[aEng]:
-                        if nID < self.numSelectForRefConfs:
-                            self.selecConformerIds.append(aCId)
-                            print("Conformer ID: ", aCId, " UFF energy : ", aEng)
-                            nID +=1
-                        else:
+                if self.isPEP:
+                    n=0
+                    for aConf in allConfs:
+                        aCId =  aConf.GetId()
+                        self.selecConformerIds.append(aCId)
+                        n=n+1
+                        if n > 0:
                             break
+                else:
+                    nID= 0
+                    for aEng in sorted(self.conformerEngMap.keys()):
+                        for aCId in self.conformerEngMap[aEng]:
+                            if nID < self.numSelectForRefConfs:
+                                self.selecConformerIds.append(aCId)
+                                print("Conformer ID: ", aCId, " UFF energy : ", aEng)
+                                nID +=1
+                            else:
+                                break
             print("Number of conformers selected for refinement is ",  len(self.selecConformerIds))
 
     def generateMultiComformersByRDKit(self, tMol):

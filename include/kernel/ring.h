@@ -104,16 +104,33 @@ namespace LIBMOL
         bool                                     isPlanar;
         bool                                     isAromatic;
         bool                                     isAntiAroma;
-        std::string                              isSugar;
+        bool                                     isSugar;
+        std::string                              sugarType;
         std::string                              rep;
         std::string                              sRep;
+        std::string                              extId;
         
         std::vector<AtomDict>                    atoms;
         std::map<int, std::map<ID, int> >        atomsLink; 
         std::map<int, std::vector<int> >         ringAtomLink;
         std::map<ID, REAL>                       sugarTors;
         std::vector<int>                         bondIdxs;
+        
+        std::vector<AtomDict>                    seqedAtoms;
               
+    };
+    
+    class sugarRing: public RingDict
+    {
+    public :
+        
+        sugarRing();
+        
+        
+        
+        std::map<std::string, std::vector<AtomDict> >                cAtoms;
+        
+        
     };
     
     // about the internal structure of a ring 

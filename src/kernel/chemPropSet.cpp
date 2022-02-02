@@ -186,8 +186,16 @@ namespace LIBMOL
                 }
                 else if (t_len ==2)
                 {
+                    if (iAt->charge==1.0)
+                    {
+                        iAt->bondingIdx = 1;
+                    }
+                    else
+                    {
+                        iAt->bondingIdx = 2;
+                    }
                     iAt->chiralIdx  = 0;
-                    iAt->bondingIdx = 2;
+                    
                 } 
                 else if (t_len==1)
                 {
@@ -3299,10 +3307,62 @@ namespace LIBMOL
                            << std::setw(12)  << iB->orderN 
                            << std::setw(12)  << iB->orderNK
                            << std::endl; 
-                }
-                
+                }    
             }
         }   
+    }
+    
+    extern void getDandAPair(PeriodicTable    &                   tPTab,
+                             std::vector<AtomDict>::iterator      tAtm,
+                             std::vector<AtomDict>::iterator      jAtm,
+                             std::map<int, std::string >   &      tHPropAtom,
+                             std::map<int, std::map<int, double> > 
+                             & tHCandAtom, 
+                             double    tDist)
+    {
+        
+        if (tAtm->chemType.compare("N")==0)
+        {
+            if (tAtm->connAtoms.size()==2)
+            {
+                tHPropAtom[tAtm->seriNum] = "ACCEPTOR";
+                tHCandAtom[tAtm->seriNum][jAtm->seriNum]
+                                          = tDist;
+                        
+            }
+            else if (tAtm->connAtoms.size()==3)
+            {
+                
+                
+            }
+        }
+        else if (tAtm->chemType.compare("O")==0)
+        {
+            if (tAtm->connAtoms.size()==2 
+                )
+            {
+                tHPropAtom[tAtm->seriNum] = "ACCEPTOR";
+                tHCandAtom[tAtm->seriNum][jAtm->seriNum]
+                                          = tDist;
+                        
+            }
+        }
+        else if (tAtm->chemType.compare("S")==0)
+        {
+            
+        }
+        else if (tAtm->chemType.compare("F")==0)
+        {
+            
+        }
+        else if (tAtm->chemType.compare("Cl")==0)
+        {
+            
+        }
+        else if (tAtm->chemType.compare("C")==0)
+        {
+            
+        }
     }
     
     HuckelMOSuite::HuckelMOSuite():lUpdate(false)

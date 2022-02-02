@@ -97,6 +97,7 @@ namespace LIBMOL
         ~Resolution();
         
         void setResol();
+        void setResolLimit(double tResolLimit);
         
         REAL                          resolLimit;
         REAL                          dMax;

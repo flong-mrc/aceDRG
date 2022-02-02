@@ -195,6 +195,7 @@ namespace LIBMOL
     {
     }
     
+    
     void Resolution::setResol()
     {
         if (wavLen >0.0 && fabs(thetaMax) > 1.0 )
@@ -203,6 +204,12 @@ namespace LIBMOL
             lSet = true;
         }
     }
+    
+    void Resolution::setResolLimit(double tResolLimit)
+    {
+        resolLimit = tResolLimit;  
+    }
+    
     
     CrystInfo::CrystInfo() : itsCell(NullPoint),
                              itsSpaceGroup(NullPoint),

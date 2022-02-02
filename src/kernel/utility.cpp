@@ -2354,6 +2354,43 @@ namespace LIBMOL
         }
     }
     
+    extern REAL getIntParts(REAL aVal)
+    {
+        
+        std::vector<REAL> aVList;
+        aVList.push_back(-180.00);
+        aVList.push_back(-120.00);
+        aVList.push_back(-90.00);
+        aVList.push_back(-60.00);
+        aVList.push_back(-45.00);
+        aVList.push_back(-30.00);
+        aVList.push_back(0.00);
+        aVList.push_back(30.00);
+        aVList.push_back(45.00);
+        aVList.push_back(60.00);
+        aVList.push_back(90.00);
+        aVList.push_back(120.00);
+        aVList.push_back(180.00);
+        
+        REAL minDV =400.00;
+        unsigned aIdx = -1;
+        for (unsigned i=0; i < aVList.size(); i++)
+        {
+            REAL aDV = fabs(aVal-aVList[i]);
+            if (aDV < minDV )
+            {
+                aIdx = i;
+                minDV = aDV;
+            }
+        }
+        if (fabs(aVList[aIdx])==180.00)
+        {
+            aVList[aIdx] = 180.00;
+        }
+        return aVList[aIdx];
+        
+    }
+    
     // formal charge conversion (mol/sdf file)
     extern REAL strToCharge(std::string & tStr)
     {

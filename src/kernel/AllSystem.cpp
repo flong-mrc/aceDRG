@@ -13,7 +13,8 @@ namespace LIBMOL
     AllSystem::AllSystem():hasCoords(false),
                            hasCCP4Type(false),
                            usingInChiral(true),
-                           
+                           isPeptide(false),
+                           withSugar(false),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -24,21 +25,24 @@ namespace LIBMOL
     {      
     }
  
-    AllSystem::AllSystem(const AllSystem& tAllSys):hasCoords(tAllSys.hasCoords),
-                                                   hasCCP4Type(tAllSys.hasCCP4Type),
-                                                   usingInChiral(tAllSys.usingInChiral),
-                                                   libmolTabDir(tAllSys.libmolTabDir),
-                                                   upperBondSig(tAllSys.upperBondSig),
-                                                   lowBondSig(tAllSys.lowBondSig),
-                                                   upperAngleSig(tAllSys.upperAngleSig),
-                                                   lowAngleSig(tAllSys.lowAngleSig),
-                                                   itsContainMetal(tAllSys.itsContainMetal),
-                                                   itsCurAngleSeriNum(ZeroInt),
-                                                   itsCurAngle(NullPoint),
-                                                   itsCurTorsionSeriNum(ZeroInt),
-                                                   itsCurTorsion(NullPoint),
-                                                   itsCurChiralSeriNum(ZeroInt),
-                                                   itsCurChiral(NullPoint)
+    AllSystem::AllSystem(const AllSystem& tAllSys):
+                                hasCoords(tAllSys.hasCoords),
+                                hasCCP4Type(tAllSys.hasCCP4Type),
+                                usingInChiral(tAllSys.usingInChiral),
+                                isPeptide(tAllSys.isPeptide),
+                                withSugar(tAllSys.withSugar),
+                                libmolTabDir(tAllSys.libmolTabDir),
+                                upperBondSig(tAllSys.upperBondSig),
+                                lowBondSig(tAllSys.lowBondSig),
+                                upperAngleSig(tAllSys.upperAngleSig),
+                                lowAngleSig(tAllSys.lowAngleSig),
+                                itsContainMetal(tAllSys.itsContainMetal),
+                                itsCurAngleSeriNum(ZeroInt),
+                                itsCurAngle(NullPoint),
+                                itsCurTorsionSeriNum(ZeroInt),
+                                itsCurTorsion(NullPoint),
+                                itsCurChiralSeriNum(ZeroInt),
+                                itsCurChiral(NullPoint)
     {      
         AddAtoms(tAllSys.allAtoms);
         AddBonds(tAllSys.allBonds);
@@ -63,6 +67,8 @@ namespace LIBMOL
                           :hasCoords(false),
                            hasCCP4Type(false),
                            usingInChiral(true),
+                           isPeptide(false),
+                           withSugar(false),
                            libmolTabDir(tLibmolTab),
                            upperBondSig(0.02),
                            lowBondSig(0.01),
@@ -99,6 +105,8 @@ namespace LIBMOL
                                                hasCoords(tCifObj.hasCoords),
                                                hasCCP4Type(tCifObj.hasCCP4Type),
                                                usingInChiral(true),
+                                               isPeptide(false),
+                                               withSugar(false),
                                                libmolTabDir(""),
                                                upperBondSig(0.02),
                                                lowBondSig(0.01),
@@ -129,6 +137,8 @@ namespace LIBMOL
                                                hasCoords(tCifObj.hasCoords),
                                                hasCCP4Type(tCifObj.hasCCP4Type),
                                                usingInChiral(true),
+                                               isPeptide(false),
+                                               withSugar(false),
                                                libmolTabDir(""),
                                                upperBondSig(tUBS),
                                                lowBondSig(tLBS),
@@ -155,6 +165,8 @@ namespace LIBMOL
     AllSystem::AllSystem(SYBLMol2File& tMol2Obj, std::string tLibmolTab):
                                                hasCoords(tMol2Obj.hasCoords),             
                                                usingInChiral(true),
+                                               isPeptide(false),
+                                               withSugar(false),
                                                libmolTabDir(""),
                                                upperBondSig(0.02),
                                                lowBondSig(0.01),
@@ -180,6 +192,8 @@ namespace LIBMOL
                                          hasCoords(tMol.hasCoords),
                                          hasCCP4Type(false),
                                          usingInChiral(true),
+                                         isPeptide(false),
+                                         withSugar(false),
                                          libmolTabDir(""),
                                          upperBondSig(0.02),
                                          lowBondSig(0.01),
@@ -293,8 +307,7 @@ namespace LIBMOL
         AddAtoms(tCodSys.allAtoms);
         AddBonds(tCodSys.allBonds);
         AddAngles(tCodSys.allAngles);
-        AddTorsions(tCodSys.allTorsions);
-        AddMiniTorsions(tCodSys.miniTorsions);
+
         AddChirals(tCodSys.allChirals);
         // AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
@@ -313,6 +326,29 @@ namespace LIBMOL
                 allRingsV.push_back(*iR);
             }
         }
+
+        if (isPeptide)
+        {
+            AddTorsions(tCodSys.allTorsions);
+            setPeptideTorsions();
+        }
+        else
+        {
+            checkSugarRings();
+            if (withSugar)
+            {
+                setSugarRingTors();
+                expandTorsSet(tCodSys.allTorsions);
+                
+            }
+            else
+            {
+                AddTorsions(tCodSys.allTorsions);
+                AddMiniTorsions(tCodSys.miniTorsions);
+            }
+        }
+        
+        
         
         // setAllRingPlanes(allRingsV, allAtoms, allPlanes);
         
@@ -326,6 +362,8 @@ namespace LIBMOL
             std::cout << "Atom " << iA->id << " of " << iA->seriNum << std::endl;
         }
          */
+        
+       
     }
     
     void AllSystem::AddAtom(const AtomDict & tAtom)
@@ -3531,6 +3569,661 @@ namespace LIBMOL
         }
     }
     
+    void AllSystem::checkSugarRings()
+    {
+        
+        for(std::vector<RingDict>::iterator iRing=allRingsV.begin();
+                iRing !=allRingsV.end(); iRing++)
+        {
+            checkOneRingSugar(iRing); 
+            if (iRing->isSugar && !withSugar)
+            {
+                withSugar = true;
+            }
+        }
+        if (withSugar)
+        {
+            std::cout << "The system is with Sugar ring " << std::endl;
+        }
+    }
+    
+    void AllSystem::checkOneRingSugar(std::vector<RingDict>::iterator tRing)
+    {
+        bool lSp3 = false;
+        int  n3   = 0;
+        std::map<std::string, std::vector<AtomDict> >   OCAtms;
+        
+        
+        std::vector<std::string>       ringAtmIds;
+        
+        for (std::vector<AtomDict>::iterator iAt=tRing->atoms.begin();
+                iAt !=tRing->atoms.end(); iAt++)
+        {
+           ringAtmIds.push_back(iAt->id);
+        }
+        
+        tRing->isSugar = false;
+        
+        for (std::vector<AtomDict>::iterator iAt=tRing->atoms.begin();
+                iAt !=tRing->atoms.end(); iAt++)
+        {
+            if (iAt->bondingIdx==3)
+            {
+                n3++;
+            }
+            
+            if (iAt->chemType.compare("C")==0)
+            {
+                OCAtms["C"].push_back(*iAt);
+                
+            }
+            else if (iAt->chemType.compare("O")==0)
+            {
+                OCAtms["O"].push_back(*iAt);
+            }
+            
+            if (n3==tRing->atoms.size())
+            {
+                std::vector<std::string>    aStrsContainer;
+                aStrsContainer.push_back("(OC2)(CCO2)(CC2O)(CC2O)(CC2O)(CC2O)");
+                aStrsContainer.push_back("(OC2)(CC2O)(CC2O)(CC2O)(CC2O)(CC2O)");
+                aStrsContainer.push_back("(OC2)(CCO2)(CC2O)(CC2O)(CC2O)(CCO)");
+                aStrsContainer.push_back("(OC2)(CCO2)(CC2O)(CC2O)(CC2O)");
+                aStrsContainer.push_back("(OC2)(CCO2)(CC2)(CC2O)(CC2O)(CC2O)");
+                
+                if (OCAtms.find("C")!=OCAtms.end() 
+                    && OCAtms.find("O") !=OCAtms.end())
+                {
+                    if ((OCAtms["C"].size()==5 && OCAtms["O"].size()==1)
+                       ||(OCAtms["C"].size()==4 && OCAtms["O"].size()==1))
+                    {
+                        std::string aSrStr=getRStr(OCAtms,tRing);
+                        std::cout << "ASrStr is " << aSrStr << std::endl;
+                        if (std::find(aStrsContainer.begin(), 
+                                      aStrsContainer.end(), aSrStr)
+                                      !=aStrsContainer.end())
+                        {
+                            tRing->isSugar=true;
+                        }
+                    }     
+                }
+            }
+        }
+        
+        if (tRing->isSugar)
+        {
+            std::cout << "Ring " << tRing->rep << " is a sugar ring "
+                      << std::endl;
+        }
+        
+        
+    }
+    
+    std::string AllSystem::getRStr(std::map<std::string,
+                            std::vector<AtomDict> > & tOCAtms,
+                            std::vector<RingDict>::iterator tRing)
+    {
+        std::string tRet = "";
+        std::vector<std::string> doneAtmIds, ringAtmIds;
+        
+        std::cout << "The ring consist of : " << std::endl;
+        for (std::map<std::string, std::vector<AtomDict> >::iterator 
+             iElem=tOCAtms.begin(); iElem !=tOCAtms.end(); iElem++)
+        {
+            for (std::vector<AtomDict>::iterator iAtm = iElem->second.begin();
+                   iAtm != iElem->second.end(); iAtm++)
+            {
+                ringAtmIds.push_back(iAtm->id);
+                std::cout << "atom " << iAtm->id << std::endl;
+            }
+        }
+        
+        if (tOCAtms.find("O")!=tOCAtms.end())
+        {
+            if (tOCAtms["O"].size()==1)
+            {
+                int iNext =-1;
+                int nC=0;
+                doneAtmIds.push_back(tOCAtms["O"][0].id);
+                tRing->seqedAtoms.push_back(tOCAtms["O"][0]);
+                std::cout << "Atom " << tOCAtms["O"][0].id << " is done " << std::endl;
+                std::vector<std::string>   tmpCOs;
+                
+                for (unsigned i=0; i <tOCAtms["O"][0].connAtoms.size(); i++)
+                {
+                    if (allAtoms[tOCAtms["O"][0].connAtoms[i]].chemType
+                        .compare("C")==0)
+                    {
+                        nC+=1;
+                    }
+                    std::cout << "atom " << tOCAtms["O"][0].id << " is done" 
+                              << std::endl;
+                    if (nC==2)
+                    {
+                        tRet.append("(OC2)");
+                        std::cout << "(OC2) is added " << std::endl; 
+                    }
+                }
+                
+                for (unsigned i=0; i <tOCAtms["O"][0].connAtoms.size(); i++)
+                {
+                    int j = tOCAtms["O"][0].connAtoms[i];
+                    std::cout << "For atom " << allAtoms[j].id << std::endl;
+                    int nC2=0, nO2=0;
+                    std::cout << "Its connected atom are " << std::endl;
+                    for (unsigned k=0; k < allAtoms[j].connAtoms.size(); 
+                             k++)
+                    {
+                        
+                        std::cout << "atom " 
+                                  << allAtoms[allAtoms[j].connAtoms[k]].id << std::endl;
+                        if (allAtoms[allAtoms[j].connAtoms[k]].chemType
+                                .compare("C")==0)
+                        {
+                            nC2++;
+                        }
+                        else if (allAtoms[allAtoms[j].connAtoms[k]].chemType
+                                 .compare("O")==0)
+                        {
+                            nO2++;
+                        }
+                    }
+                    
+                   // std::cout << "nC2=" << nC2 << std::endl;
+                    //std::cout << "nO2=" << nO2 << std::endl;
+                        
+                    if (nC2==1 && nO2==2)
+                    {
+                        tRet.append("(CCO2)");
+                        std::cout << "(CCO2) is added " << std::endl;
+                        doneAtmIds.push_back(allAtoms[j].id);
+                        tRing->seqedAtoms.push_back(allAtoms[j]);
+                        std::cout << "Atom " << allAtoms[j].id 
+                                  << " is done " << std::endl;
+                        for (unsigned m=0; 
+                             m < allAtoms[j].connAtoms.size();
+                             m++)
+                        {
+                            int n = allAtoms[j].connAtoms[m];
+                            std::string aRAtmId= allAtoms[n].id;
+                            
+                            if (std::find(doneAtmIds.begin(), 
+                                          doneAtmIds.end(), aRAtmId)
+                                          ==doneAtmIds.end() 
+                                && std::find(ringAtmIds.begin(),
+                                             ringAtmIds.end(), aRAtmId)
+                                         !=ringAtmIds.end())
+                            {
+                                iNext = n;
+                            }          
+                        }
+                    }
+                    else if (nC2==2 && nO2==1)
+                    {
+                        tmpCOs.push_back("CC2O");
+                    }
+                    
+                    if (i==tOCAtms["O"][0].connAtoms.size()-1 
+                        && tmpCOs.size()==2)
+                    {
+                        tRet.append("(CC2O)");
+                        doneAtmIds.push_back(allAtoms[j].id);
+                        tRing->seqedAtoms.push_back(allAtoms[j]);
+                        std::cout << "Atom " << allAtoms[j].id 
+                                  << " is done " << std::endl;
+                        for (unsigned m=0; 
+                             m < allAtoms[j].connAtoms.size();
+                             m++)
+                        {
+                            int n = allAtoms[j].connAtoms[m];
+                            std::string aRAtmId= allAtoms[n].id;
+                            
+                            if (std::find(doneAtmIds.begin(), 
+                                          doneAtmIds.end(), aRAtmId)
+                                          ==doneAtmIds.end() 
+                                && std::find(ringAtmIds.begin(),
+                                             ringAtmIds.end(), aRAtmId)
+                                         !=ringAtmIds.end())
+                            {
+                                iNext = n;
+                            }          
+                        }
+                    }
+                    
+                }
+                
+                while (iNext !=-1)
+                {
+                    std::cout << "iNext = " << iNext << std::endl;
+                    int iNextPre=iNext;
+                    iNext=-1;
+                
+                    if (allAtoms[iNextPre].chemType.compare("C")==0)
+                    {
+                        int nC2=0, nO2=0;
+                        for (unsigned k=0; k < allAtoms[iNextPre].connAtoms.size(); 
+                             k++)
+                        {
+                            int n= allAtoms[iNextPre].connAtoms[k];
+                            if (allAtoms[n].chemType.compare("C")==0)
+                            {
+                                nC2++;
+                            }
+                            else if (allAtoms[n].chemType.compare("O")==0)
+                            {
+                               nO2++;
+                            }
+                            
+                            std::string aRAtmId= allAtoms[n].id;
+                            
+                            if (std::find(doneAtmIds.begin(), 
+                                          doneAtmIds.end(), aRAtmId)
+                                          ==doneAtmIds.end() 
+                                && std::find(ringAtmIds.begin(),
+                                             ringAtmIds.end(), aRAtmId)
+                                         !=ringAtmIds.end())
+                            {
+                                iNext = n;
+                            }   
+                            
+                        }
+                        
+                        if (nC2==2 && nO2==1)
+                        {
+                            tRet.append("(CC2O)");
+                            doneAtmIds.push_back(allAtoms[iNextPre].id);
+                            tRing->seqedAtoms.push_back(allAtoms[iNextPre]);
+                            std::cout << "Atom " << allAtoms[iNextPre].id 
+                                     << " is done " << std::endl;
+                        }
+                        else if (nC2==1 && nO2==1)
+                        {
+                            tRet.append("(CCO)");
+                            doneAtmIds.push_back(allAtoms[iNextPre].id);
+                            tRing->seqedAtoms.push_back(allAtoms[iNextPre]);
+                            std::cout << "Atom " << allAtoms[iNextPre].id 
+                                     << " is done " << std::endl;
+                        }
+                        else if (nC2==2)
+                        {
+                            tRet.append("(CC2)");
+                            doneAtmIds.push_back(allAtoms[iNextPre].id);
+                            tRing->seqedAtoms.push_back(allAtoms[iNextPre]);
+                            std::cout << "Atom " << allAtoms[iNextPre].id 
+                                     << " is done " << std::endl;
+                        }
+                        else
+                        {
+                            iNext =-1;
+                        }
+                    }
+                    else
+                    {
+                        iNext = -1;
+                    }
+                    if(doneAtmIds.size()==ringAtmIds.size())
+                    {
+                        iNext = -1;
+                    }
+                }
+            }   
+        }
+        
+        return tRet;
+    }
+    
+    void AllSystem::setSugarRingTors()
+    {
+        miniTorsions.clear();
+        
+        int numS=0;
+        for(std::vector<RingDict>::iterator iRing=allRingsV.begin();
+                iRing !=allRingsV.end(); iRing++)
+        {
+            if (iRing->isSugar)
+            {
+                numS++;
+            }
+        }
+        
+        for(std::vector<RingDict>::iterator iRing=allRingsV.begin();
+                iRing !=allRingsV.end(); iRing++)
+        {
+            if (iRing->isSugar)
+            {
+                if (iRing->seqedAtoms.size() == iRing->atoms.size())
+                {
+                    setSugarRingTorsExtIds(iRing);
+                    
+                    if (iRing->seqedAtoms.size()==6)
+                    {
+                        
+                        
+                        TorsionDict aTor0;
+                        //mu0
+                        
+                        aTor0.atoms.push_back(iRing->seqedAtoms[5].seriNum);
+                        aTor0.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        aTor0.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        aTor0.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[5]);
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor0.value = getTorsion(iRing->seqedAtoms[5],
+                                                iRing->seqedAtoms[0],
+                                                iRing->seqedAtoms[1],
+                                                iRing->seqedAtoms[2]);
+                        aTor0.id   ="nu0";
+                        if (numS > 1)
+                        {
+                            aTor0.id.append(iRing->extId);
+                        }
+                        aTor0.period = 3;
+                        miniTorsions.push_back(aTor0);
+                        
+                        
+                        TorsionDict aTor1;
+                        //mu1
+                        
+                        aTor1.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        aTor1.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        aTor1.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        aTor1.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        
+                        aTor1.value = getTorsion(iRing->seqedAtoms[0],
+                                                iRing->seqedAtoms[1],
+                                                iRing->seqedAtoms[2],
+                                                iRing->seqedAtoms[3]);
+                        aTor1.id   ="nu1";
+                        if (numS > 1)
+                        {
+                            aTor1.id.append(iRing->extId);
+                        }
+                        aTor1.period = 3;
+                        miniTorsions.push_back(aTor1);
+                        
+                        TorsionDict aTor2;
+                        //mu2
+                        
+                        aTor2.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        aTor2.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        aTor2.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        aTor2.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        
+                        aTor2.value = getTorsion(iRing->seqedAtoms[1],
+                                                iRing->seqedAtoms[2],
+                                                iRing->seqedAtoms[3],
+                                                iRing->seqedAtoms[4]);
+                        aTor2.id   ="nu2";
+                        if (numS > 1)
+                        {
+                            aTor2.id.append(iRing->extId);
+                        }
+                        aTor2.period = 3;
+                        miniTorsions.push_back(aTor2);
+                        
+                        TorsionDict aTor3;
+                        //mu3
+                        
+                        aTor3.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        aTor3.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        aTor3.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        aTor3.atoms.push_back(iRing->seqedAtoms[5].seriNum);
+                        
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[5]);
+                        
+                        aTor3.value = getTorsion(iRing->seqedAtoms[2],
+                                                iRing->seqedAtoms[3],
+                                                iRing->seqedAtoms[4],
+                                                iRing->seqedAtoms[5]);
+                        aTor3.id   ="nu3";
+                        if (numS > 1)
+                        {
+                            aTor3.id.append(iRing->extId);
+                        }
+                        aTor3.period = 3;
+                        miniTorsions.push_back(aTor3);
+                        
+                        
+                        TorsionDict aTor4;
+                        //mu4
+                        
+                        aTor4.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        aTor4.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        aTor4.atoms.push_back(iRing->seqedAtoms[5].seriNum);
+                        aTor4.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[5]);
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        
+                        aTor4.value = getTorsion(iRing->seqedAtoms[3],
+                                                iRing->seqedAtoms[4],
+                                                iRing->seqedAtoms[5],
+                                                iRing->seqedAtoms[0]);
+                        aTor4.id   ="nu4";
+                        if (numS > 1)
+                        {
+                            aTor4.id.append(iRing->extId);
+                        }
+                        aTor4.period = 3;
+                        miniTorsions.push_back(aTor4);
+                        
+                        
+                        TorsionDict aTor5;
+                        //mu5
+                        
+                        aTor5.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        aTor5.atoms.push_back(iRing->seqedAtoms[5].seriNum);
+                        aTor5.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        aTor5.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        
+                        aTor5.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        aTor5.fullAtoms.push_back(iRing->seqedAtoms[5]);
+                        aTor5.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        aTor5.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        
+                        aTor5.value = getTorsion(iRing->seqedAtoms[4],
+                                                iRing->seqedAtoms[5],
+                                                iRing->seqedAtoms[0],
+                                                iRing->seqedAtoms[1]);
+                        aTor5.id   ="nu5";
+                        if (numS > 1)
+                        {
+                            aTor5.id.append(iRing->extId);
+                        }
+                        aTor5.period = 3;
+                        
+                        
+                        miniTorsions.push_back(aTor5);
+                        
+                    }
+                    else if (iRing->seqedAtoms.size()==5)
+                    {
+                        TorsionDict aTor0;
+                        //mu0
+                        aTor0.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        aTor0.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        aTor0.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        aTor0.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        aTor0.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor0.value = getTorsion(iRing->seqedAtoms[4],
+                                                iRing->seqedAtoms[0],
+                                                iRing->seqedAtoms[1],
+                                                iRing->seqedAtoms[2]);
+                        aTor0.id   ="nu0";
+                        if (numS > 1)
+                        {
+                            aTor0.id.append(iRing->extId);
+                        }
+                        aTor0.period = 3;
+                        miniTorsions.push_back(aTor0);
+                        
+                        
+                        TorsionDict aTor1;
+                        //mu1
+                        aTor1.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        aTor1.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        aTor1.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        aTor1.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor1.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        
+                        aTor1.value = getTorsion(iRing->seqedAtoms[0],
+                                                iRing->seqedAtoms[1],
+                                                iRing->seqedAtoms[2],
+                                                iRing->seqedAtoms[3]);
+                        aTor1.id   ="nu1";
+                        if (numS > 1)
+                        {
+                            aTor1.id.append(iRing->extId);
+                        }
+                        aTor1.period = 3;
+                        miniTorsions.push_back(aTor1);
+                        
+                        TorsionDict aTor2;
+                        //mu2
+                        aTor2.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        aTor2.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        aTor2.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        aTor2.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        aTor2.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        
+                        aTor2.value = getTorsion(iRing->seqedAtoms[1],
+                                                iRing->seqedAtoms[2],
+                                                iRing->seqedAtoms[3],
+                                                iRing->seqedAtoms[4]);
+                        aTor2.id   ="nu2";
+                        if (numS > 1)
+                        {
+                            aTor2.id.append(iRing->extId);
+                        }
+                        aTor2.period = 3;
+                        miniTorsions.push_back(aTor2);
+                        
+                        TorsionDict aTor3;
+                        //mu3
+                        
+                        aTor3.atoms.push_back(iRing->seqedAtoms[2].seriNum);
+                        aTor3.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        aTor3.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        aTor3.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[2]);
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        aTor3.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        
+                        aTor3.value = getTorsion(iRing->seqedAtoms[2],
+                                                iRing->seqedAtoms[3],
+                                                iRing->seqedAtoms[4],
+                                                iRing->seqedAtoms[0]);
+                        aTor3.id   ="nu3";
+                        if (numS > 1)
+                        {
+                            aTor3.id.append(iRing->extId);
+                        }
+                        aTor3.period = 3;
+                        miniTorsions.push_back(aTor3);
+                        
+                        TorsionDict aTor4;
+                        //mu4
+                        aTor4.atoms.push_back(iRing->seqedAtoms[3].seriNum);
+                        aTor4.atoms.push_back(iRing->seqedAtoms[4].seriNum);
+                        aTor4.atoms.push_back(iRing->seqedAtoms[0].seriNum);
+                        aTor4.atoms.push_back(iRing->seqedAtoms[1].seriNum);
+                        
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[3]);
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[4]);
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[0]);
+                        aTor4.fullAtoms.push_back(iRing->seqedAtoms[1]);
+                        
+                        aTor4.value = getTorsion(iRing->seqedAtoms[3],
+                                                iRing->seqedAtoms[4],
+                                                iRing->seqedAtoms[0],
+                                                iRing->seqedAtoms[1]);
+                        aTor4.id   ="nu4";
+                        if (numS > 1)
+                        {
+                            aTor4.id.append(iRing->extId);
+                        }
+                        aTor4.period = 3;
+                        miniTorsions.push_back(aTor4);
+                       
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    void AllSystem::setSugarRingTorsExtIds(
+                                     std::vector<RingDict>::iterator tRing)
+    {
+        std::string aName =tRing->seqedAtoms[0].id;
+        if (aName.size() > 1)
+        {
+            tRing->extId=aName[aName.size()-1];
+        }
+    }
+    
+    void AllSystem::expandTorsSet(const std::vector<TorsionDict> & tTorsSet)
+    {
+        std::vector<std::string>  existBondIds;
+        
+        for (std::vector<TorsionDict>::iterator iMT=miniTorsions.begin();
+               iMT != miniTorsions.end(); iMT++)
+        {
+            std::string aBS = iMT->fullAtoms[1].id + "_" + iMT->fullAtoms[2].id;
+            existBondIds.push_back(aBS);
+        }
+        
+        std::vector<TorsionDict> aTmpTorsSet;
+        
+        for (std::vector<TorsionDict>::const_iterator iT=tTorsSet.begin();
+                iT != tTorsSet.end(); iT++)
+        {
+            std::string id1 = allAtoms[iT->atoms[1]].id + "_"
+                             +allAtoms[iT->atoms[2]].id;
+            std::string id2 = allAtoms[iT->atoms[2]].id + "_"
+                             +allAtoms[iT->atoms[1]].id;
+            if ((std::find(existBondIds.begin(), existBondIds.end(), id1)
+                      ==existBondIds.end()) && 
+                (std::find(existBondIds.begin(), existBondIds.end(), id2)
+                      ==existBondIds.end()))
+            {
+                miniTorsions.push_back(*iT);
+            }
+        }
+    }
+    
     void AllSystem::setTorsionIdxFromOneBond(int tIdx1, int tIdx2)
     {
                 
@@ -3562,6 +4255,352 @@ namespace LIBMOL
            }
         }
         
+    }
+    
+    void AllSystem::setPeptideTorsionIdxFromOneBond(int tIdx1, int tIdx2,
+          std::map<std::string, std::vector<std::string> >  tPepTorStdIds,
+            std::vector<TorsionDict> & tChiTors, 
+             std::vector<TorsionDict> & tHhTors,
+             std::vector<TorsionDict> & tCstTors)
+    {
+        
+        std::vector<TorsionDict> aTemoTorsSet;
+        int aTorHi   = 10;
+                
+        for (std::vector<int>::iterator iAt1= allAtoms[tIdx1].connAtoms.begin();
+             iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
+       {
+           for (std::vector<int>::iterator 
+                iAt2 = allAtoms[tIdx2].connAtoms.begin();
+                iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
+           {
+                if(*iAt1 != tIdx2 && *iAt2 != tIdx1)
+                {
+                    
+                    bool lForward = true;
+                    
+                    std::string id1=allAtoms[*iAt1].id;
+                    std::string id2=allAtoms[tIdx1].id;
+                    std::string id3=allAtoms[tIdx2].id;
+                    std::string id4=allAtoms[*iAt2].id;
+                    std::string comboId1 = id1 + "_" + id2 + "_" + id3 
+                                          + "_" + id4;
+                    std::string comboId2 = id4 + "_" + id3 + "_" + id2 
+                                          + "_" + id1;
+                    std::string comboId ="";
+                    if (tPepTorStdIds.find(comboId1) !=tPepTorStdIds.end())
+                    {
+                        comboId = comboId1;
+                    }
+                    else if (tPepTorStdIds.find(comboId2) !=tPepTorStdIds.end())
+                    {
+                        comboId = comboId2;
+                        lForward = false;
+                    }
+                    
+                    if (comboId.size() > 0)
+                    {   
+                        
+                        
+                        TorsionDict aTor;
+                        if (lForward)
+                        {
+                            aTor.atoms.push_back(*iAt1);
+                            aTor.atoms.push_back(tIdx1);
+                            aTor.atoms.push_back(tIdx2);
+                            aTor.atoms.push_back(*iAt2);
+                            aTor.id   = tPepTorStdIds[comboId][0];
+                            //aTor.value  = getTorsion(allAtoms[*iAt1],
+                            //                         allAtoms[tIdx1],
+                            //                         allAtoms[tIdx2],
+                            //                         allAtoms[*iAt2]);
+                            // aTor.value = getIntParts(aTor.value);
+                            aTor.period = StrToInt(tPepTorStdIds[comboId][5]);
+                        }
+                        else
+                        {
+                            aTor.atoms.push_back(*iAt2);
+                            aTor.atoms.push_back(tIdx2);
+                            aTor.atoms.push_back(tIdx1);
+                            aTor.atoms.push_back(*iAt1);
+                            aTor.id     = tPepTorStdIds[comboId][0];
+                            //aTor.value  = getTorsion(allAtoms[*iAt2],
+                            //                     allAtoms[tIdx2],
+                            //                     allAtoms[tIdx1],
+                            //                     allAtoms[*iAt1]);
+                            //aTor.value = getIntParts(aTor.value);
+                            
+                            aTor.period = StrToInt(tPepTorStdIds[comboId][5]);
+                        }
+                        
+                        int curTorHi = StrToInt(tPepTorStdIds[comboId][6]);
+                        if (curTorHi < aTorHi)
+                        {
+                            aTorHi = curTorHi;
+                            aTemoTorsSet.clear();
+                            aTemoTorsSet.push_back(aTor);
+                        }
+                    }
+                }
+           }
+        }
+        
+        if (aTemoTorsSet.size() >0)
+        {
+            for (std::vector<TorsionDict>::iterator aTor=aTemoTorsSet.begin();
+                    aTor!=aTemoTorsSet.end(); aTor++)
+            {
+                if (aTor->id.find("chi") != aTor->id.npos)
+                {
+                    tChiTors.push_back(*aTor);
+                }
+                else if (aTor->id.find("hh") != aTor->id.npos)
+                {
+                    tHhTors.push_back(*aTor);
+                }
+                else if (aTor->id.find("CONST") != aTor->id.npos)
+                {
+                    tCstTors.push_back(*aTor);
+                }
+            }
+        }
+    }
+    
+    void AllSystem::setPeptideTorsions()
+    {
+        std::map<std::string, std::vector<std::string> >  pepTorStdIds;
+        
+        std::string pepTorIdTabFN = libmolTabDir + "/pep_tors.table";
+        std::ifstream pepTorIdTab(pepTorIdTabFN.c_str());
+        if (pepTorIdTab.is_open())
+        {
+            std::string tRecord="";
+            
+            while(!pepTorIdTab.eof())
+            {
+                std::getline(pepTorIdTab, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                std::vector<std::string> tBuf;
+                StrTokenize(tRecord, tBuf);
+                if ((int)tBuf.size() ==8)
+                {
+                    for (unsigned i=1; i < tBuf.size(); i++)
+                    {
+                        pepTorStdIds[tBuf[0]].push_back(tBuf[i]);
+                    }    
+                }
+            }
+            pepTorIdTab.close();
+        }
+        
+        std::vector<TorsionDict> chiTors, hhTors, cstTors;
+      
+        miniTorsions.clear();
+        
+        for (std::vector<BondDict>::iterator iABo= allBonds.begin();
+                iABo != allBonds.end(); iABo++)
+        {
+            std::vector<int> tPos;
+            for(std::map<ID, int>::iterator iAM=iABo->fullAtoms.begin();
+                iAM !=iABo->fullAtoms.end(); iAM++)
+            {
+                if ((int)allAtoms[iAM->second].connAtoms.size() > 1)
+                {
+                    tPos.push_back(iAM->second);
+                }
+            }
+            if((int)tPos.size() ==2)
+            {
+                //std::cout << "Set torsion angles around the bond of atom "
+                //          << allAtoms[tPos[0]].id << " and "
+                //          << allAtoms[tPos[1]].id << std::endl;                    
+                setPeptideTorsionIdxFromOneBond(tPos[0], tPos[1],
+                                                pepTorStdIds, 
+                                                chiTors, hhTors, cstTors);
+                
+            }
+        }
+        // Now sorting according to a torsion's id
+        int idx=0;
+        std::map<std::string, int> mapIdSer;
+        std::vector<std::string>   doneBonds;
+        if (chiTors.size() > 0)
+        {
+            std::map<std::string, unsigned > aSMap;
+            for (unsigned i=0; i < chiTors.size(); i++)
+            {
+                aSMap[chiTors[i].id] = i;
+            }
+            for (std::map<std::string, unsigned>::iterator iM=aSMap.begin();
+                  iM !=aSMap.end(); iM++)
+            {
+                
+                std::string aId
+                     = allAtoms[chiTors[iM->second].atoms[0]].id + "_" + 
+                       allAtoms[chiTors[iM->second].atoms[1]].id + "_" +
+                       allAtoms[chiTors[iM->second].atoms[2]].id + "_" + 
+                       allAtoms[chiTors[iM->second].atoms[3]].id;
+                mapIdSer[aId] = idx; 
+                miniTorsions.push_back(chiTors[iM->second]);
+                idx++;
+                std::string aBId = allAtoms[chiTors[iM->second].atoms[1]].id 
+                                   + "_" +
+                                   allAtoms[chiTors[iM->second].atoms[2]].id;
+                doneBonds.push_back(aBId);        
+            }
+        }
+        if (cstTors.size() >0)
+        {
+            
+            for (unsigned i=0; i < cstTors.size(); i++)
+            {
+                int addIdx = i+1;
+                cstTors[i].id = "CONST_" + IntToStr(addIdx);
+                std::string aId
+                     = allAtoms[cstTors[i].atoms[0]].id + "_" + 
+                       allAtoms[cstTors[i].atoms[1]].id + "_" +
+                       allAtoms[cstTors[i].atoms[2]].id + "_" + 
+                       allAtoms[cstTors[i].atoms[3]].id;
+                mapIdSer[aId] = idx;
+                miniTorsions.push_back(cstTors[i]);
+                idx++;
+                std::string aBId = allAtoms[cstTors[i].atoms[1]].id 
+                                   + "_" +
+                                   allAtoms[cstTors[i].atoms[2]].id;
+                doneBonds.push_back(aBId);
+            }
+        }
+        
+        if (hhTors.size() > 0)
+        {
+            for (unsigned i=0; i < hhTors.size(); i++)
+            {
+                int addIdx = i+1;
+                hhTors[i].id += IntToStr(addIdx);
+                std::string aId
+                     = allAtoms[hhTors[i].atoms[0]].id + "_" + 
+                       allAtoms[hhTors[i].atoms[1]].id + "_" +
+                       allAtoms[hhTors[i].atoms[2]].id + "_" + 
+                       allAtoms[hhTors[i].atoms[3]].id;
+                mapIdSer[aId] = idx;
+                miniTorsions.push_back(hhTors[i]);
+                idx++;
+                std::string aBId = allAtoms[hhTors[i].atoms[1]].id 
+                                   + "_" +
+                                   allAtoms[hhTors[i].atoms[2]].id;
+                doneBonds.push_back(aBId);
+            }
+        }
+        
+        
+        
+        std::vector<TorsionDict> tmpTors;
+        
+        for (std::vector<TorsionDict>::iterator iTor =allTorsions.begin();
+                iTor !=allTorsions.end(); iTor++)
+        {
+            if (iTor->atoms.size()==4)
+            {
+                std::string aBId1 = allAtoms[iTor->atoms[1]].id 
+                                   + "_" +
+                                   allAtoms[iTor->atoms[2]].id;
+                std::string aBId2 = allAtoms[iTor->atoms[2]].id 
+                                   + "_" +
+                                   allAtoms[iTor->atoms[1]].id;
+                 
+                std::string comboId = "";
+                std::string aId1, aId2;
+                aId1 = allAtoms[iTor->atoms[0]].id + "_" + 
+                       allAtoms[iTor->atoms[1]].id + "_" +
+                       allAtoms[iTor->atoms[2]].id + "_" + 
+                       allAtoms[iTor->atoms[3]].id;
+                aId2 = allAtoms[iTor->atoms[3]].id + "_" + 
+                       allAtoms[iTor->atoms[2]].id + "_" + 
+                       allAtoms[iTor->atoms[1]].id + "_" + 
+                        allAtoms[iTor->atoms[0]].id;
+                
+                if (mapIdSer.find(aId1) !=mapIdSer.end())
+                {
+                    double torVal = getTorsion(allAtoms[iTor->atoms[0]],
+                                        allAtoms[iTor->atoms[1]],
+                                        allAtoms[iTor->atoms[2]],
+                                        allAtoms[iTor->atoms[3]]);
+                    
+                    miniTorsions[mapIdSer[aId1]].value 
+                                 = getIntParts(torVal);
+                  
+                    miniTorsions[mapIdSer[aId1]].period = iTor->period;
+                }
+                else if (mapIdSer.find(aId2) !=mapIdSer.end())
+                {
+                    double torVal = getTorsion(allAtoms[iTor->atoms[3]],
+                                        allAtoms[iTor->atoms[2]],
+                                        allAtoms[iTor->atoms[1]],
+                                        allAtoms[iTor->atoms[0]]);
+                    miniTorsions[mapIdSer[aId2]].value 
+                                  = getIntParts(torVal);
+                    
+                    miniTorsions[mapIdSer[aId2]].period = iTor->period;
+                }
+                else 
+                {
+                    if (std::find(doneBonds.begin(), doneBonds.end(), aBId1)
+                            ==doneBonds.end() &&
+                        std::find(doneBonds.begin(), doneBonds.end(), aBId2)
+                            ==doneBonds.end())
+                    {
+                        tmpTors.push_back(*iTor);
+                    }
+                }  
+            }
+        } 
+        
+        PeriodicTable aPTab;
+        std::map<std::string, std::vector<TorsionDict> > mapTors2;
+        std::map<std::string, int> mapTorHi;
+        if (tmpTors.size() >0)
+        {
+            for (std::vector<TorsionDict>::iterator iTor =tmpTors.begin();
+                iTor !=tmpTors.end(); iTor++)
+            {
+                std::string elem1 = allAtoms[iTor->atoms[1]].chemType;
+                std::string elem2 = allAtoms[iTor->atoms[2]].chemType;
+                if (aPTab.elements.find(elem1) != aPTab.elements.end()
+                    && aPTab.elements.find(elem2) != aPTab.elements.end())
+                {
+                    int aV = aPTab.elements[elem1]["atomNum"]
+                             + aPTab.elements[elem2]["atomNum"];
+                    std::string aBId = allAtoms[iTor->atoms[1]].id 
+                                   + "_" +
+                                   allAtoms[iTor->atoms[2]].id;
+                    if(mapTorHi.find(aBId)==mapTorHi.end())
+                    {
+                        mapTorHi[aBId]= aV;
+                        mapTors2[aBId].push_back(*iTor);
+                    }
+                    else if (aV > mapTorHi[aBId])
+                    {
+                        mapTors2[aBId].clear();
+                        mapTorHi[aBId]= aV;
+                        mapTors2[aBId].push_back(*iTor);
+                    }
+                }
+            }
+            
+            for (std::map<std::string, std::vector<TorsionDict> >::iterator
+                   iM=mapTors2.begin(); iM !=mapTors2.end(); iM++)
+            {
+                for (std::vector<TorsionDict>::iterator iTor=iM->second.begin();
+                        iTor !=iM->second.end(); iTor++)
+                {
+                    miniTorsions.push_back(*iTor);
+                }
+            }
+                
+            
+                
+                
+        }
     }
     
         // Ring related 
@@ -4405,6 +5444,7 @@ namespace LIBMOL
         
         
         resetSystem2(aCodSystem);
+        
         
         
        /*

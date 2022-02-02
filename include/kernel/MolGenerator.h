@@ -318,6 +318,9 @@ namespace LIBMOL
                          std::vector<Molecule> & tFinMols,
                          std::vector<Molecule> & tInfMols);
         
+        void outAtomTypeTables(FileName tOutName, 
+                               std::vector<Molecule> & tFinMols);
+        
         void outMsg(FileName tOutName);
         void getOutFileRoot(FileName tOutName, Name & tRootName);
         void outMolsInfo(std::ofstream & tMolTabs,
@@ -353,8 +356,15 @@ namespace LIBMOL
         void buildSelectedAtomsSph(double                  & tRadFac,
                            PeriodicTable                   & tPTab,
                            std::vector<CrystInfo>::iterator  tCryst,
-                           std::vector<std::string>        & tElems, 
+                           std::vector<std::string>        & tElems,
                            FileName tOutName);
+        
+        void buildSelectedAtomsForH(
+                           std::map<std::string, double>    & tElemParas,
+                           PeriodicTable                    & tPTab,
+                           std::vector<CrystInfo>::iterator   tCryst,
+                           std::vector<ID>                  & tSelectedAtomIds,
+                           FileName                           tOutName);
                            
         void outMetalAtomCoordInfo(FileName tOutName);
         void outMetalClusterInfo(FileName tOutName);
@@ -374,6 +384,8 @@ namespace LIBMOL
         void execute1(FileName tInParaName,
                       FileName tOutName);
         
+        void executeAtomOut(FileName tOutName);
+        
         void executeNeuD(FileName tOutName);
         
         void executeMet(FileName tInParaName, FileName tOutName);
@@ -384,6 +396,8 @@ namespace LIBMOL
         void executeSelectedAtomRange(FileName tInParaName,
                                       FileName tOutName);
         
+        void executeHBondCands(FileName tInParaName,
+                               FileName tOutName);
         
         std::string                     aLibmolTabDir;
         bool                            lColid;

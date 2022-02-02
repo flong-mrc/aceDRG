@@ -179,7 +179,9 @@ namespace LIBMOL
         // copy constructor 
         GenCifFile(Name                    tFname, 
                    std::ios_base::openmode tOpenMode);
-        
+        GenCifFile(Name                    tFname, 
+                   std::string             tParaFName, 
+                   std::ios_base::openmode tOpenMode);
         GenCifFile(FileName                    tFname,
                    std::ios_base::openmode     tOpenMode);
         
@@ -196,10 +198,13 @@ namespace LIBMOL
                                // experiment parameters because they are 
                                // absent from the derived CSD cif files.
         
+        void checkRFact(std::vector<std::string> & tLines);
         void checkPowder(std::vector<std::string> & tLines);
         void checkNeutronD(std::vector<std::string> & tLines);
         void checkCalcAtoms();
         bool checkOverAll(int tWorkMode);
+        void setAllCrits(std::vector<std::string> & tAllLines);
+        
         void getPropsToMaps(std::vector<std::vector<std::string> >::iterator tOneBlockLines,
                             std::map<std::string, std::string>  & tRowProps,
                             std::map<int, std::map<ID, std::vector<std::string> > > & tColProps,
@@ -378,6 +383,15 @@ namespace LIBMOL
         bool                       colidOK;    // check before molecule generated
         bool                       hasOcpLab;
         bool                       hasHeavyCalcAtoms;
+        
+        bool                       checkR;
+        bool                       checkResol;
+        REAL                       RTHRESHOLD_U;     // replacement RTHRESHOLD
+                                                     // defined in constants.h
+        REAL                       RESOLTHRESHOLD_U; // replacement RESOLTHRESHOLD
+                                                     // defined in constants.h
+        
+        
         
     private:
             

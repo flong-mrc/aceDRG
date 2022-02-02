@@ -25,6 +25,10 @@ namespace LIBMOL
             colidOK(true),
             hasOcpLab(true),
             hasHeavyCalcAtoms(false),
+            checkR(true),
+            checkResol(true),
+            RTHRESHOLD_U(0.10),
+            RESOLTHRESHOLD_U(0.842),
             itsCurAtomSeriNum(ZeroInt),
             itsCurAtom(NullPoint),
             itsCurBlock(""),
@@ -47,6 +51,10 @@ namespace LIBMOL
                            colidOK(true),
                            hasOcpLab(true),
                            hasHeavyCalcAtoms(false),
+                           checkR(true),
+                           checkResol(true),
+                           RTHRESHOLD_U(0.10),
+                           RESOLTHRESHOLD_U(0.842),
                            itsCurAtomSeriNum(ZeroInt),  
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
@@ -54,6 +62,83 @@ namespace LIBMOL
     {
         
        
+        if (tOpenMode == std::ios::in)
+        {
+            inFile.open(tFname.c_str(), tOpenMode);
+            if (inFile.is_open())
+            {
+                itsCurAtom    = new AtomDict();
+                setupSystem2();
+            }
+            else
+            {
+                std::cout << tFname << " Can not be opened for reading " << std::endl;
+                errMsg.push_back("Cif file Can not be opened for reading ");
+                lErr = true;
+            }
+        }
+        else
+        {
+            outFile.open(tFname.c_str(), tOpenMode);
+        }
+        
+    }
+    
+    GenCifFile::GenCifFile(Name tFname, 
+                           std::string    tParaFName,
+                           std::ios_base::openmode tOpenMode) :
+                           curBlockLine(ZeroInt),
+                           lErr(false),
+                           hasCoords(false),
+                           hasH(false),
+                           hasMetal(false),
+                           symmOprOK(true),
+                           notPowder(true),
+                           notNeuD(true),
+                           resolOK(true),
+                           RFactorOK(false),
+                           colidOK(true),
+                           hasOcpLab(true),
+                           hasHeavyCalcAtoms(false),
+                           checkR(true),
+                           checkResol(true),
+                           RTHRESHOLD_U(0.10),
+                           RESOLTHRESHOLD_U(0.842),
+                           itsCurAtomSeriNum(ZeroInt),  
+                           itsCurAtom(NullPoint),
+                           itsCurBlock(""),
+                           itsCurCryst(NullPoint)
+    {
+         
+        std::ifstream  aFilterParaF(tParaFName.c_str());
+        if (aFilterParaF.is_open())
+        {
+            
+            std::vector<std::string>     allLines;
+            std::string                  aRecord;
+            while(!aFilterParaF.eof())
+            {   
+                std::getline(aFilterParaF, aRecord);
+                aRecord = TrimSpaces(aRecord);
+                allLines.push_back(aRecord);
+            }
+            aFilterParaF.close();
+            if (allLines.size() > 0)
+            {
+                setAllCrits(allLines);
+            }
+        }
+        
+        /*
+        else
+        {
+            std::string aErrMsg = tParaFName + " Can not be opened for reading";
+            std::cout << aErrMsg << std::endl;
+            errMsg.push_back(aErrMsg + "\n");
+            lErr = true;
+            
+        }
+         */
         if (tOpenMode == std::ios::in)
         {
             inFile.open(tFname.c_str(), tOpenMode);
@@ -91,6 +176,10 @@ namespace LIBMOL
                            colidOK(true),
                            hasOcpLab(true),
                            hasHeavyCalcAtoms(false),
+                           checkR(true),
+                           checkResol(true),
+                           RTHRESHOLD_U(0.10),
+                           RESOLTHRESHOLD_U(0.842),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurCryst(NullPoint)
@@ -265,10 +354,9 @@ namespace LIBMOL
             std::string tRecord="";
             
             std::vector<std::string>     tAllLines;
+            std::vector<std::string>     tRAllLines;
             std::vector<std::string>     tBlocLines;
-            REAL tROK1 = -1.0;
-            REAL tROK2 = -1.0;
-            REAL tROK3 = -1.0;
+            
             
             while(!inFile.eof())
             {   
@@ -276,63 +364,27 @@ namespace LIBMOL
                 tRecord = TrimSpaces(tRecord);
                 tAllLines.push_back(tRecord);
                 // std::cout <<  tRecord << std::endl;
-                std::vector<std::string> tBuf;
-                std::vector<std::string> tBuf_t;
                 // only use a few blocks in the cif file
-               
-                if (tRecord.find("_refine_ls_R_factor_all") !=std::string::npos)
+                if (checkR)
                 {
-                    std::cout << "R factor line: " << tRecord << std::endl;
-                    
-                    StrTokenize(tRecord,  tBuf);
-                    if (tBuf.size()==2)
+                    if (tRecord.find("_refine_ls_R_factor_all") !=std::string::npos)
                     {
-                        tROK1=StrToReal(tBuf[1]);
-                        if (tROK1 >=1.0)
-                        {
-                            tROK1 = tROK1/100.0;
-                        }
-                        std::cout << "_refine_ls_R_factor_all="
-                                  << tROK1 << std::endl;
+                        std::cout << "R factor line: " << tRecord << std::endl;
+                        tRAllLines.push_back(tRecord);
+                    }
+                
+                    if (tRecord.find("_refine_ls_R_factor_gt") !=std::string::npos)
+                    {
+                        std::cout << "R factor line: " << tRecord << std::endl;
+                        tRAllLines.push_back(tRecord);
+                    }
+                
+                    if (tRecord.find("_refine_ls_R_factor_obs") !=std::string::npos)
+                    {
+                        std::cout << "R factor line: " << tRecord << std::endl;
+                        tRAllLines.push_back(tRecord);
                     }
                 }
-                
-                if (tRecord.find("_refine_ls_R_factor_gt") !=std::string::npos)
-                {
-                    std::cout << "R factor line: " << tRecord << std::endl;
-                    
-                    StrTokenize(tRecord,  tBuf);
-                    if (tBuf.size()==2)
-                    {
-                        tROK2=StrToReal(tBuf[1]);
-                        if (tROK2 >=1.0)
-                        {
-                            tROK2 = tROK2/100.0;
-                        }
-                        std::cout << "_refine_ls_R_factor_gt="
-                                  << tROK2 << std::endl;
-          
-                    }
-                }
-                
-                if (tRecord.find("_refine_ls_R_factor_obs") !=std::string::npos)
-                {
-                    std::cout << "R factor line: " << tRecord << std::endl;
-                    
-                    StrTokenize(tRecord,  tBuf);
-                    if (tBuf.size()==2)
-                    {
-                        tROK3=StrToReal(tBuf[1]);
-                        if (tROK3 >=1.0)
-                        {
-                            tROK3 = tROK3/100.0;
-                        }
-                        std::cout << "_refine_ls_R_factor_all="
-                                  << tROK3 << std::endl;
-          
-                    }
-                }
-                
                 
                 if (tRecord.find("loop_") !=std::string::npos 
                     || (tRecord.find("data_") !=std::string::npos
@@ -361,37 +413,17 @@ namespace LIBMOL
                 tBlocLines.clear();
             }
             
-            if ((tROK1 > 0.0 && tROK2 > 0.0) || tROK3 >0.0)
-            {
-                
-                if (tROK1 <RTHRESHOLD && 
-                    (tROK2 < RTHRESHOLD || tROK3 < RTHRESHOLD))
-                {
-                    RFactorOK = true;
-                    
-                }
-            }
-            else if (tROK1 > 0.0 && tROK2 < 0.0)
-            {
-                if (tROK1 <RTHRESHOLD)
-                {
-                    RFactorOK = true;
-                }
-            }
-            else if (tROK1 < 0.0 && tROK2 > 0.0)
-            {
-                if (tROK2 <RTHRESHOLD)
-                {
-                    RFactorOK = true;
-                }
-            }
-            
-            if (!RFactorOK)
-            {
-                errMsg.push_back("R FACTOR IS TWO HIGH\n");
-            }
-            
             inFile.close();
+            if (checkR)
+            {
+                std::cout << "tRAllLine.size " <<  tRAllLines.size() << std::endl;
+                checkRFact(tRAllLines);
+            }
+            else
+            {
+                RFactorOK = true;
+            }
+            
             
             checkPowder(tAllLines);
             
@@ -403,11 +435,13 @@ namespace LIBMOL
             }
             
             
-            // std::cout << "Number of data blocks in the cif file is " << tBlocs.size() << std::endl;
+            // std::cout << "Number of data blocks in the cif file is " 
+            // << tBlocs.size() << std::endl;
             
             /*
-            for (std::vector<std::vector<std::string> >::iterator iBloc=tBlocs.begin();
-                    iBloc !=tBlocs.end(); iBloc++)
+            for (std::vector<std::vector<std::string> >::iterator 
+                 iBloc=tBlocs.begin();
+                 iBloc !=tBlocs.end(); iBloc++)
             {
                 std::cout << "====One block lines " << std::endl;
                 for (std::vector<std::string>::iterator iLine=iBloc->begin();
@@ -652,21 +686,21 @@ namespace LIBMOL
             
             if (tROK1 > 0.0 && tROK2 > 0.0)
             {
-                if (tROK1 <RTHRESHOLD && tROK2 < RTHRESHOLD)
+                if (tROK1 <RTHRESHOLD_U && tROK2 < RTHRESHOLD_U)
                 {
                     RFactorOK = true;
                 }
             }
             else if (tROK1 > 0.0 && tROK2 < 0.0)
             {
-                if (tROK1 <RTHRESHOLD)
+                if (tROK1 <RTHRESHOLD_U)
                 {
                     RFactorOK = true;
                 }
             }
             else if (tROK1 < 0.0 && tROK2 > 0.0)
             {
-                if (tROK2 <RTHRESHOLD)
+                if (tROK2 <RTHRESHOLD_U)
                 {
                     RFactorOK = true;
                 }
@@ -840,7 +874,103 @@ namespace LIBMOL
                 }
             }
        }
-       std::cout << "Here " <<std::endl;
+       
+    }
+    
+    
+    void GenCifFile::checkRFact(std::vector<std::string>& tLines)
+    {
+        
+        REAL tROK1 = -1.0;
+        REAL tROK2 = -1.0;
+        REAL tROK3 = -1.0;
+        
+        for (unsigned i=0; i < tLines.size(); i++)
+        {
+            std::vector<std::string> tBuf; 
+            if (tLines[i].find("_refine_ls_R_factor_all") !=std::string::npos)
+            {    
+                std::cout << "R factor line: " << tLines[i] << std::endl;
+                            
+                StrTokenize(tLines[i],  tBuf);
+                    
+                if (tBuf.size()==2)
+                {
+                    tROK1=StrToReal(tBuf[1]);
+                    if (tROK1 >=1.0)
+                    {
+                        tROK1 = tROK1/100.0;
+                    }
+                    std::cout << "_refine_ls_R_factor_all="
+                              << tROK1 << std::endl;
+                }
+            }
+            else if (tLines[i].find("_refine_ls_R_factor_gt") 
+                     !=std::string::npos)
+            {
+                std::cout << "R factor line: " << tLines[i] << std::endl;
+                StrTokenize(tLines[i],  tBuf);
+                if (tBuf.size()==2)
+                {
+                    tROK2=StrToReal(tBuf[1]);
+                    if (tROK2 >=1.0)
+                    {
+                        tROK2 = tROK2/100.0;
+                    }
+                    std::cout << "_refine_ls_R_factor_gt="
+                              << tROK2 << std::endl;
+                }
+            }
+            else if (tLines[i].find("_refine_ls_R_factor_obs") 
+                     !=std::string::npos)
+            {
+                std::cout << "R factor line: " << tLines[i] << std::endl;
+                    
+                StrTokenize(tLines[i],  tBuf);
+                if (tBuf.size()==2)
+                {
+                    tROK3=StrToReal(tBuf[1]);
+                    if (tROK3 >=1.0)
+                    {
+                        tROK3 = tROK3/100.0;
+                    }
+                    std::cout << "_refine_ls_R_factor_all="
+                              << tROK3 << std::endl;
+          
+                }
+            }
+        }
+
+        if ((tROK1 > 0.0 && tROK2 > 0.0) || tROK3 >0.0)
+        {
+                
+            if (tROK1 <RTHRESHOLD_U && 
+                (tROK2 < RTHRESHOLD_U || tROK3 < RTHRESHOLD_U))
+            {
+                    RFactorOK = true;                
+            }
+        }
+        else if (tROK1 > 0.0 && tROK2 < 0.0)
+        {
+            if (tROK1 <RTHRESHOLD_U)
+            {
+                    RFactorOK = true;
+            }
+        }
+        else if (tROK1 < 0.0 && tROK2 > 0.0)
+        {
+            if (tROK2 <RTHRESHOLD_U)
+            {
+                RFactorOK = true;
+            }
+        }
+            
+        if (!RFactorOK)
+        {
+            lErr = true;
+            errMsg.push_back("R FACTOR IS TWO HIGH\n");
+        }
+        
     }
     
     void GenCifFile::checkPowder(std::vector<std::string>& tLines)
@@ -950,6 +1080,46 @@ namespace LIBMOL
         }
         //std::cout << aRet << std::endl;
         return aRet;
+    }
+    
+    void GenCifFile::setAllCrits(std::vector<std::string>& tAllLines)
+    {
+        for (std::vector<std::string>::iterator iL=tAllLines.begin();
+               iL !=tAllLines.end(); iL++)
+        {
+            std::cout << *iL << std::endl;
+            if (iL->size() > 0)
+            {
+                std::vector<std::string> tBuf;
+                StrTokenize(*iL,  tBuf, ':');
+                if(tBuf.size()==2)
+                {
+                    StrUpper(tBuf[0]);
+                    if(tBuf[0].find("CHECKRFACT") !=tBuf[0].npos)
+                    {
+                        RTHRESHOLD_U=StrToReal(tBuf[1]);
+                        std::cout << RTHRESHOLD_U << std::endl;
+                        if (RTHRESHOLD_U < 0.0)
+                        {
+                            checkR = false;
+                        }
+                    }
+                    else if (tBuf[0].find("CHECKRESOL") !=tBuf[0].npos)
+                    {
+                        RESOLTHRESHOLD_U=StrToReal(tBuf[1]);
+                        if (RESOLTHRESHOLD_U < 0.0)
+                        {
+                            checkResol = false;
+                        }
+                        std::cout << RESOLTHRESHOLD_U << std::endl;
+                    }
+                }
+            }
+        }
+        std::cout << "check factor ? " << checkR << std::endl;
+        std::cout << "check resol ? " << checkResol << std::endl;
+        
+        
     }
     
     void GenCifFile::checkAtomElementID()
@@ -1914,53 +2084,58 @@ namespace LIBMOL
        */
         
         // Resolution related properties 
-        if (tRowProps.find("_diffrn_reflns_theta_max") ==tRowProps.end())
+        if (checkResol)
         {
-            // No way to decide the resolution
-            resolOK = false;
-            errMsg.push_back("UNDEFINITED RESOLUTION: no theta_max to decide the resolution of data\n");
-        }
-        else if(tRowProps.find("_diffrn_radiation_wavelength")==tRowProps.end())
-        {
-            // No way to decide the resolution
-            resolOK = false;
-            errMsg.push_back("UNDEFINITED RESOLUTION: no X-ray wave length to decide the resolution of data\n");
-        }
-        else
-        {
-            if (tRowProps.find("_diffrn_radiation_wavelength") !=tRowProps.end())
+            itsCurCryst->itsResolution->setResolLimit(RESOLTHRESHOLD_U);
+            
+            if (tRowProps.find("_diffrn_reflns_theta_max") ==tRowProps.end())
             {
-                //std::cout << "_diffrn_radiation_wavelength : " << tRowProps["_diffrn_radiation_wavelength"] << std::endl;
-                itsCurCryst->itsResolution->wavLen = StrToReal(tRowProps["_diffrn_radiation_wavelength"]);
+                // No way to decide the resolution
+                resolOK = false;
+                errMsg.push_back("UNDEFINITED RESOLUTION: no theta_max to decide the                      resolution of data\n");
             }
-        
-            if (tRowProps.find("_diffrn_reflns_theta_max") !=tRowProps.end())
+            else if(tRowProps.find("_diffrn_radiation_wavelength")==tRowProps.end())
             {
-                itsCurCryst->itsResolution->thetaMax = StrToReal(tRowProps["_diffrn_reflns_theta_max"]);
+                // No way to decide the resolution
+                resolOK = false;
+                errMsg.push_back("UNDEFINITED RESOLUTION: no X-ray wave length to decide the resolution of data\n");
             }
-        
-            if (itsCurCryst->itsResolution->wavLen >0.0 
-                   && fabs(itsCurCryst->itsResolution->thetaMax) > 1.0 )
+            else
             {
-                itsCurCryst->itsResolution->setResol();
-                if (itsCurCryst->itsResolution->dMax  
-                     > itsCurCryst->itsResolution->resolLimit)
+                if (tRowProps.find("_diffrn_radiation_wavelength") !=tRowProps.end())
                 {
-                    resolOK = false;
-                    ID aErr= "LOW RESOLUTION: Resolution " 
+                    //std::cout << "_diffrn_radiation_wavelength : " << tRowProps["_diffrn_radiation_wavelength"] << std::endl;
+                    itsCurCryst->itsResolution->wavLen = StrToReal(tRowProps["_diffrn_radiation_wavelength"]);
+                }
+        
+                if (tRowProps.find("_diffrn_reflns_theta_max") !=tRowProps.end())
+                {
+                    itsCurCryst->itsResolution->thetaMax = StrToReal(tRowProps["_diffrn_reflns_theta_max"]);
+                }
+        
+                if (itsCurCryst->itsResolution->wavLen >0.0 
+                    && fabs(itsCurCryst->itsResolution->thetaMax) > 1.0 )
+                {
+                    itsCurCryst->itsResolution->setResol();
+                    if (itsCurCryst->itsResolution->dMax  
+                         > itsCurCryst->itsResolution->resolLimit)
+                    {
+                        resolOK = false;
+                        ID aErr= "LOW RESOLUTION: Resolution " 
                              + RealToStr(itsCurCryst->itsResolution->dMax)
                              + " is lower than threshold " 
                              + RealToStr(itsCurCryst->itsResolution->resolLimit) 
                              + "\n";
+                        errMsg.push_back(aErr);
+                    }
+                }
+                else
+                {
+                    resolOK = false;
+                    ID aErr= 
+                    "UNDEFINITED RESOLUTION: Theta_max or x-ray wavelength is wrong\n";
                     errMsg.push_back(aErr);
                 }
-            }
-            else
-            {
-                resolOK = false;
-                ID aErr= 
-                "UNDEFINITED RESOLUTION: Theta_max or x-ray wavelength is wrong\n";
-                errMsg.push_back(aErr);
             }
         }
         
@@ -2764,17 +2939,28 @@ namespace LIBMOL
         }
         else if (!resolOK)
         {
-            std::string aMsg = "REJECTED STRUCTURE: Resolutions \n";
-            aMsg.append("(1) UNDEFINITED RESOLUTION: ");
-            aMsg.append("no theta_max to decide the resolution of data\n");
-            aMsg.append("or (2) UNDEFINITED RESOLUTION:  ");
-            aMsg.append("no X-ray wave length to decide the resolution of data\n");
-            aMsg.append("or (3) LOW RESOLUTION: ");
-            aMsg.append(RealToStr(itsCurCryst->itsResolution->dMax)
+            if (checkResol)
+            {
+                std::string aMsg = "REJECTED STRUCTURE: Resolutions \n";
+            
+                
+                if (itsCurCryst->itsResolution->dMax > 0.0)
+                {
+                    aMsg.append("LOW RESOLUTION: ");
+                    aMsg.append(RealToStr(itsCurCryst->itsResolution->dMax)
                         + " is lower than threshold " 
                         + RealToStr(itsCurCryst->itsResolution->resolLimit) 
-                        + "\n");
-            errMsg.push_back(aMsg);
+                        + "\n");  
+                }
+                else
+                {
+                    aMsg.append("(1) UNDEFINITED RESOLUTION: ");
+                    aMsg.append("no theta_max to decide the resolution of data\n");
+                    aMsg.append("or (2) UNDEFINITED RESOLUTION:  ");
+                   aMsg.append("no X-ray wave length to decide the resolution of data\n");
+                }
+                errMsg.push_back(aMsg);
+            }
         }
         else if (!RFactorOK)
         {
@@ -7776,12 +7962,12 @@ namespace LIBMOL
         // newly added 
         if(tAtoms.size()> 0 && tBonds.size() > 0)
         {
-            std::cout << "Kekulize the system " << std::endl;
+            //std::cout << "Kekulize the system " << std::endl;
             KekulizeMol aKTool;
             aKTool.execute(tAtoms, 
                            tBonds,
                            tRings);
-            std::cout << "Kekulize done " << std::endl;
+            //std::cout << "Kekulize done " << std::endl;
         }
         
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
@@ -7794,14 +7980,14 @@ namespace LIBMOL
             }
             // std::cout << iA->id << std::endl;
         }
-        
+        /*
         for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
                 iAt!=tAtoms.end(); iAt++)
         {
             std::cout << "atom " << iAt->id << " has charge of "
                       << iAt->formalCharge << std::endl;
         }
-        
+        */
         
         std::vector<std::string> aSetStrs;
         StrTokenize(tFName, aSetStrs, '.');
@@ -7836,7 +8022,7 @@ namespace LIBMOL
             for (std::vector<LIBMOL::RingDict>::iterator iR=tRings.begin();
                     iR != tRings.end(); iR++)
             {   
-                if (iR->isSugar.compare("pyranose")==0)
+                if (iR->sugarType.compare("pyranose")==0)
                 {
                     ligType = "pyranose";
                     break;
@@ -8427,7 +8613,7 @@ namespace LIBMOL
             for (std::vector<LIBMOL::RingDict>::iterator iR=tRings.begin();
                     iR != tRings.end(); iR++)
             {   
-                if (iR->isSugar.compare("pyranose")==0)
+                if (iR->sugarType.compare("pyranose")==0)
                 {
                     ligType = "pyranose";
                     break;
