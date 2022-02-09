@@ -1210,7 +1210,7 @@ class Acedrg(CExeCode ):
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
                 self.subExecute()
             elif self.workMode == 35 :
-                
+                pass       
         if self.workMode == 41 :
 
             self._cmdline += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
@@ -1925,14 +1925,12 @@ class Acedrg(CExeCode ):
                         #    lOther3 = False
                         #    cifCont['bonds'].append(aLine)
                         elif lOther1 and aLine.find("_chem_comp_tor.period") != -1:
-                            print("Here starts of tors")
                             lAtom  = False
                             lTors  = True
                             lOther1 = False
                             lOther2 = False
                             cifCont['tors'].append(aLine)
                         elif lTors and aLine.find("loop_") != -1:
-                            print("Here end of tors")
                             lAtom  = False
                             lTors  = False
                             lOther1 = False 

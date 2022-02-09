@@ -481,6 +481,10 @@ class FileTransformer(object) :
             elif self.dataDescriptor[aKey][0].find("_chem_comp.type") !=-1:
                 if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
                     s4 = "L-PEPTIDE"
+                elif self.dataDescriptor[aKey][1].upper().find("L-PEPTIDE") !=-1 :
+                    s4 = "L-PEPTIDE"
+                elif self.dataDescriptor[aKey][1].upper().find("D-PEPTIDE") !=-1 :
+                    s4 = "D-PEPTIDE"
                 elif self.dataDescriptor[aKey][1].upper().find("DNA ") !=-1 :
                     s4 = "DNA"
                 elif self.dataDescriptor[aKey][1].upper().find("RNA ") !=-1 :
