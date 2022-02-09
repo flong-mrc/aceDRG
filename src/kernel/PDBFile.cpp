@@ -36,7 +36,9 @@
 #include "secondaryStructures.h"
 #endif
 
-
+#ifdef _MSC_VER
+#include <ciso646>
+#endif
 
 namespace LIBMOL
 {

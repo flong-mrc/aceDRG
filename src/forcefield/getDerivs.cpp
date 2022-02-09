@@ -796,12 +796,8 @@ namespace FF
     {
         int dim = (int)tAt->coords.size();
         
-        LIBMOL::REAL abs_r, r_com[dim];
-        
-        for (int i = 0; i < dim; i++)
-        {
-            r_com[i] = 0.0;
-        }  
+        LIBMOL::REAL abs_r;
+        std::vector<LIBMOL::REAL>  r_com(dim,0.0);
         
         for (std::vector<int>::iterator iNB = tAt->neighbAtoms.begin();
                 iNB !=tAt->neighbAtoms.end(); iNB++)
@@ -1012,11 +1008,7 @@ namespace FF
         if ((int)tBo->atomsIdx.size() !=0)
         {
             int dim = (int)tAts[tBo->atomsIdx[0]].coords.size();
-            LIBMOL::REAL dist_comp[dim];
-            for (int i=0; i < dim; i++)
-            {
-                dist_comp[i] = 0;
-            }
+            std::vector<LIBMOL::REAL> dist_comp(dim);
             
             LIBMOL::REAL bondL=0.0;
             
@@ -1085,10 +1077,10 @@ namespace FF
         LIBMOL::REAL *a;
         LIBMOL::REAL *b;
         LIBMOL::REAL leng_a, leng_b;
-        LIBMOL::REAL d_leng_a[3*dim];
-        LIBMOL::REAL d_leng_b[3*dim];
-        LIBMOL::REAL da_dx[3*dim][dim];
-        LIBMOL::REAL db_dx[3*dim][dim];
+        std::vector<LIBMOL::REAL> d_leng_a(3*dim);
+        std::vector<LIBMOL::REAL> d_leng_b(3*dim);
+        std::vector<std::vector<LIBMOL::REAL> > da_dx(3*dim, std::vector<LIBMOL::REAL>(dim));
+        std::vector<std::vector<LIBMOL::REAL> > db_dx(3*dim, std::vector<LIBMOL::REAL>(dim));
 
         LIBMOL::REAL R, dR_dx;
 
@@ -1921,7 +1913,7 @@ namespace FF
                 LIBMOL::REAL vdwFC = 100.0;
                 LIBMOL::REAL r_nb = 0.0;
                 int dim = (int)tAt->coords.size();
-                LIBMOL::REAL r_comp [dim];
+                std::vector<LIBMOL::REAL> r_comp(dim);
                 for(int i=0; i < dim; i++)
                 {
                     r_comp[i] = 0.0;

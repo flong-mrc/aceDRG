@@ -8,6 +8,9 @@
 #include "TransCoord.h"
 #include "atomsTree.h"
 #include "GlobOpt.h"
+#ifdef _MSC_VER
+#include <ciso646>
+#endif
 
 namespace LIBMOL
 {
@@ -110,7 +113,7 @@ namespace LIBMOL
             }
         }
         
-        REAL xyz_stack[NSTLIM][dim];
+        std::vector<std::vector<REAL> > xyz_stack(NSTLIM, std::vector<REAL>(dim));
         
         REAL ** rotate_tem;
         rotate_tem = new REAL * [dim];
@@ -605,7 +608,7 @@ namespace LIBMOL
             }
         }
         
-        REAL xyz_stack[NSTLIM][dim];
+        std::vector<std::vector<REAL> > xyz_stack(NSTLIM, std::vector<REAL>(dim));
         
         REAL ** rotate_tem;
         rotate_tem = new REAL * [dim];
@@ -1436,7 +1439,7 @@ namespace LIBMOL
             }
         }
         
-        REAL xyz_stack[NSTLIM][dim];
+        std::vector<std::vector<REAL> > xyz_stack(NSTLIM, std::vector<REAL>(dim));
         
         REAL ** rotate_tem;
         rotate_tem = new REAL * [dim];

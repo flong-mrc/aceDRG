@@ -14,7 +14,11 @@
 
 
 #ifndef _GETOPT_H
+#ifndef _MSC_VER
 #include <getopt.h>
+#else
+#include "win32/getopt.h"
+#endif
 #endif
 
 #ifndef UTILITY_H

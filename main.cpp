@@ -75,6 +75,10 @@
 #include "ring.h"
 #endif
 
+#ifdef _MSC_VER
+#include <ciso646>
+#endif
+
 //using namespace GO;
 //using namespace FF;
 

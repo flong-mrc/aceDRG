@@ -6,6 +6,9 @@
  */
 
 #include "utility.h"
+#ifdef _MSC_VER
+#include <ciso646>
+#endif
 
 namespace LIBMOL
 {
@@ -1035,7 +1038,7 @@ namespace LIBMOL
         int      i;
    
         int  dim = 3;   
-        REAL v_tm[dim];
+        std::vector<REAL> v_tm(dim,0.0);
 
         for (i =0; i < dim; i++)
         {

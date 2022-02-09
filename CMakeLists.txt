@@ -1,5 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
-project(acedrg CXX)
+cmake_minimum_required(VERSION 3.12)
+project(acedrg C CXX)
+
+find_package(Python ${PYTHON_VERSION} REQUIRED COMPONENTS Interpreter)
+if(WIN32)
+        string(REPLACE "\\" "/" Python_SITELIB "${Python_SITELIB}")
+endif(WIN32)
 
 include_directories(${CMAKE_SOURCE_DIR}/include/kernel
                     ${CMAKE_SOURCE_DIR}/include/math
@@ -53,13 +58,16 @@ set(SRC
     src/kernel/MonomerLib.cpp
     src/kernel/chemPropSet.cpp
 )
+if (MSVC)
+set(SRC ${SRC} src/kernel/win32/getopt.c)
+endif (MSVC)
 
 add_executable(libmol ${SRC})
 
 install(TARGETS libmol DESTINATION libexec)
 install(DIRECTORY tables DESTINATION share/acedrg)
-install(DIRECTORY acedrg DESTINATION lib/py2)
-install(DIRECTORY utils DESTINATION lib/py2/acedrg)
+install(DIRECTORY acedrg DESTINATION ${Python_SITELIB})
+install(DIRECTORY utils DESTINATION ${Python_SITELIB}/acedrg)
 install(PROGRAMS bin/acedrg DESTINATION bin)
 if (WIN32)
     install(PROGRAMS bin/acedrg.bat DESTINATION bin)

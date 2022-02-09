@@ -52,8 +52,10 @@
 #endif
 
 //  C standard lib
+#ifndef _MSC_VER
 #ifndef __UNISTD_
 #include <unistd.h>
+#endif
 #endif
 
 #ifndef __SYS_STAT_
