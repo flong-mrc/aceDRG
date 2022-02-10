@@ -2816,7 +2816,7 @@ class Acedrg(CExeCode ):
                         self.useExistCoords    = True
                         #self.getAAOut()
                     elif self.checkPeptidesFromMmcif(self.fileConv.dataDescriptor):
-			self.isPEP = True  
+                        self.isPEP = True  
                         self.rdKit.isPEP       = self.isPEP
                         self.useExistCoords    = True
                     print("is this monomer a peptide ", self.isPEP)
