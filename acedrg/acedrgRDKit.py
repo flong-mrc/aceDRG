@@ -909,7 +909,7 @@ class AcedrgRDKit(object):
             if len(self.conformerEngMap):
                 #print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
                 #print "They are : "
-                #for aEng in sorted(self.conformerEngMap.iterkeys()):
+                #for aEng in sorted(self.conformerEngMap):
                 #    print "Energy ", aEng
                 #    for aCid in self.conformerEngMap[aEng]:
                 #        print aCid

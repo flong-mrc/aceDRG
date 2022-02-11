@@ -444,16 +444,16 @@ class FileTransformer(object) :
         """
         # Check
         print "Two  colum format :"
-        for i in sorted(self.dataDescriptor.iterkeys()):
+        for i in sorted(self.dataDescriptor):
             print "%s%s"%(self.dataDescriptor[i][0].ljust(60), self.dataDescriptor[i][1].ljust(40))
         print "\n"
 
         """
         print ("Multple  colum format :")
-        for i in sorted(self.dataDescriptor.iterkeys()):
+        for i in sorted(self.dataDescriptor):
             print (self.dataDescriptor[i][0])
         aSt = ""
-        for i in sorted(self.dataDescriptor.iterkeys()):
+        for i in sorted(self.dataDescriptor):
             aSt+=(self.dataDescriptor[i][1].strip() + "\t")
         print (aSt)
         print ("\n") 
@@ -1641,7 +1641,7 @@ class Ccp4MmCifObj (dict) :
             """
             if len(self["ccp4CifObj"]["comps"].keys()):
                 print("Number of comps ", len(self["ccp4CifObj"]["comps"].keys()))
-                for aKey in sorted(self["ccp4CifObj"]["comps"].iterkeys()):
+                for aKey in sorted(self["ccp4CifObj"]["comps"]):
                     self.printOneComp(aKey)
             """
  
