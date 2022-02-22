@@ -475,7 +475,12 @@ class FileTransformer(object) :
                 s1 = self.dataDescriptor[aKey][1]  
                 s2 = self.dataDescriptor[aKey][1]  
             elif self.dataDescriptor[aKey][0].find("_chem_comp.name") !=-1:
-                s3 = self.dataDescriptor[aKey][1]
+                temStrs = self.dataDescriptor[aKey][1].strip().split()
+                if len(temStrs)>1 and self.dataDescriptor[aKey][1].find("\"") !=2:
+                    s3 = "\"" + self.dataDescriptor[aKey][1] + "\""
+                else:
+                    s3 = self.dataDescriptor[aKey][1]
+                print(s3)
             elif self.dataDescriptor[aKey][0].find("_chem_comp.group") !=-1:
                 s4 = self.dataDescriptor[aKey][1]  
             elif self.dataDescriptor[aKey][0].find("_chem_comp.type") !=-1:
@@ -485,6 +490,8 @@ class FileTransformer(object) :
                     s4 = "L-PEPTIDE"
                 elif self.dataDescriptor[aKey][1].upper().find("D-PEPTIDE") !=-1 :
                     s4 = "D-PEPTIDE"
+                elif self.dataDescriptor[aKey][1].upper().find("PEPTIDE-") !=-1 :
+                    s4 = "PEPTIDE"
                 elif self.dataDescriptor[aKey][1].upper().find("DNA ") !=-1 :
                     s4 = "DNA"
                 elif self.dataDescriptor[aKey][1].upper().find("RNA ") !=-1 :
@@ -497,7 +504,6 @@ class FileTransformer(object) :
                                     s5.ljust(len(s5)+5), s6.ljust(len(s6)+5), \
                                     s7.ljust(len(s7)+5))
         self.ccp4DataDes.append(aLine)
-
         # set a SMILES string here from the molecule
         if tMol.HasProp("SmilesOut"):
             aSmi             = tMol.GetProp("SmilesOut")

@@ -2066,15 +2066,29 @@ namespace LIBMOL
         
         tMeTab.assign(metals, metals+159);
         
+        ID metalsA[] = {"Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", 
+                       "Te", "te", "Po", "po", "Pd", "pd", "Ga", "ga", 
+                       "In", "in",  "Sn", "sn", "Pb", "pb"};
+        std::vector<ID>  metalATab;
+        metalATab.assign(metalsA, metalsA+22);
+        
+        for (std::vector<ID>::iterator iMA=metalATab.begin();
+               iMA !=metalATab.end(); iMA++)
+        {
+            tMeTab.push_back(*iMA);
+        }
+        
         // The following are taken away from the metal element list
-        // As, Ga, Ge, In, Pd, Si, Sn
+        // As, Ga, Ge, In, Pd, Si, Sn || re-entered
         /*
         for (std::vector<ID>::iterator iM=tMeTab.begin();
                 iM !=tMeTab.end(); iM++)
         {
             std::cout << "Metal " << *iM << std::endl;
         }
-         */
+        */
+        
+        
     }
     
     extern void initMetalloidTab(std::vector<ID> & tTab)

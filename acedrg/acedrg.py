@@ -2147,7 +2147,6 @@ class Acedrg(CExeCode ):
                     tOutCif.close()
     
     def naCorr(self, tCifCont, tOutF):
-
         lTor = False
         speTors   = {}
         otherTors = []
@@ -2163,6 +2162,9 @@ class Acedrg(CExeCode ):
                             id1 = strs[2] + "_" + strs[3]  + "_" + strs[4] + "_" + strs[5]                      
                             id2 = strs[5] + "_" + strs[4]  + "_" + strs[3] + "_" + strs[2] 
                             id  = ""
+                            #print("id1=",id1)
+                            #print("id2=",id2)
+
                             if id1 in self.naTorsList.keys():
                                 id = id1
                             elif id2 in self.naTorsList.keys():
@@ -2177,17 +2179,17 @@ class Acedrg(CExeCode ):
                                         self.naTorsList[id][aId][4].ljust(14), self.naTorsList[id][aId][5].ljust(10),\
                                         self.naTorsList[id][aId][6].ljust(6))
                                     speTors[aId]= aTorL
-                        else:
-                            otherTors.append(aL)
+                            else:
+                                otherTors.append(aL)
             elif lTor and aL.find("loop_") !=-1:
-                for aId in sorted(speTors.keys()):
-                    tOutF.write(speTors[aId])
-                for aTorL in otherTors:
-                    tOutF.write(aTorL)
                 lTor = False
                 tOutF.write(aL)
             else:
                 tOutF.write(aL)
+        for aId in sorted(speTors.keys()):
+             tOutF.write(speTors[aId])
+        for aTorL in otherTors:
+                    tOutF.write(aTorL)
 
     def pepCorr(self, tCifCont, tOutF):
         lTor = False
@@ -2787,7 +2789,6 @@ class Acedrg(CExeCode ):
     def executeWithRDKit(self):
  
         self.printJobs()
-       
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
         print("workMode : ", self.workMode)
@@ -3118,6 +3119,7 @@ class Acedrg(CExeCode ):
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
         print("workMode is ",self.workMode)
+        
         if self.workMode in [11,  111, 112, 51] :  #  and not self.isAA :
             print("Number of molecule ", len(self.rdKit.molecules))
             if len(self.rdKit.molecules):

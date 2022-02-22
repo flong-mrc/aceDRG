@@ -245,13 +245,15 @@ namespace LIBMOL
     
     extern int getBond(std::vector<BondDict> & tAllBonds, int tAt1, int tAt2);
     
+    extern int getBond(std::vector<BondDict> & tAllBonds, 
+                       AtomDict & tAtm1, AtomDict & tAtm2);
+    
     extern void modifyBondOrder(std::vector<BondDict> & tAllBonds,
                                  std::vector<AtomDict> & tAllAtoms,
                                  int tAt1, int tAt2, int tOrder);
     
     extern void modifyBondOrderStr(BondDict & tBond,
                                    REAL       tOrder);
-    
     
     extern void modifyOneDelocBond(std::vector<BondDict> & tBonds,
                                  std::vector<AtomDict>   & tAtoms,

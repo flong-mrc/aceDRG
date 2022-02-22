@@ -1095,7 +1095,8 @@ namespace LIBMOL
         //          << allRings.size() << " rings. They are: "
         //          << std::endl;
         allRingsV.clear();    
-        for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator iR1=allRings.begin();
+        for (std::map<std::string, std::vector<LIBMOL::RingDict> > ::iterator 
+             iR1=allRings.begin();
                     iR1 !=allRings.end(); iR1++)
         {
             //std::cout << "(2)Ring representation " << iR1->first << std::endl;
@@ -1118,6 +1119,7 @@ namespace LIBMOL
         if (allRingsV.size())
         {
             checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
+            std::cout << "HERE2" << std::endl;
             setAromaticBonds(allRingsV, allBonds);
         }
             

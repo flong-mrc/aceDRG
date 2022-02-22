@@ -354,6 +354,7 @@ namespace LIBMOL
         
         checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
         
+        
         setAromaticBonds(allRingsV, allBonds);
         /*
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();

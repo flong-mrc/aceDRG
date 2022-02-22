@@ -1479,6 +1479,14 @@ namespace LIBMOL
     extern void setAromaticBonds(std::vector<RingDict>  & tRings,
                                  std::vector<BondDict>  & tBonds)
     {
+        std::cout << "HERE " << std::endl;
+        for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                iB !=tBonds.end(); iB++)
+        {
+            std::cout << "Bond between atom " << iB->atoms[0]
+                      << " and " << iB->atoms[1] << std::endl;
+        }
+        
         for (std::vector<RingDict>::iterator iR=tRings.begin();
                 iR !=tRings.end(); iR++)
         {

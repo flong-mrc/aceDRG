@@ -372,6 +372,35 @@ namespace LIBMOL
         return tBo;
     }
     
+    extern int getBond(std::vector<BondDict> & tBonds,
+                       AtomDict & tAtm1, AtomDict & tAtm2)
+    {
+        
+        int tBo=-1;
+        
+        for (int iBo=0; iBo < (int)tBonds.size(); iBo++)
+        {
+            if ((tBonds[iBo].atomsIdx[0] ==tAtm1.seriNum
+                 && tBonds[iBo].atomsIdx[1] ==tAtm2.seriNum)
+                || (tBonds[iBo].atomsIdx[0] ==tAtm2.seriNum
+                    && tBonds[iBo].atomsIdx[1] ==tAtm1.seriNum))
+            {
+                tBo = iBo;
+                break;
+            }
+            else if ((tBonds[iBo].atoms[0] ==tAtm1.id
+                     && tBonds[iBo].atoms[1] ==tAtm2.id)
+                    || (tBonds[iBo].atoms[0] ==tAtm2.id
+                     && tBonds[iBo].atoms[1] ==tAtm1.id))
+            {
+                tBo = iBo;
+                break;
+            }
+        }
+        
+        return tBo;
+    }    
+    
     extern void modifyBondOrder(std::vector<BondDict> & tAllBonds,
                                 std::vector<AtomDict> & tAllAtoms,
                                 int tAt1, int tAt2, int tOrder)
