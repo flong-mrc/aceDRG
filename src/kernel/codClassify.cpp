@@ -15708,6 +15708,54 @@ namespace LIBMOL
                 }
             }
         } 
+        
+        if (miniTorsions.size() > 0)
+        {
+            std::vector<TorsionDict> tmpTorsions;
+        
+            for (std::vector<TorsionDict>::iterator iTor=miniTorsions.begin();
+                iTor != miniTorsions.end(); iTor++)
+            {
+                tmpTorsions.push_back(*iTor);
+            }
+        
+            miniTorsions.clear();
+        
+            for (std::vector<TorsionDict>::iterator iTor=tmpTorsions.begin();
+                iTor != tmpTorsions.end(); iTor++)
+            {
+                if (iTor->atoms.size()==4 && 
+                    allAtoms[iTor->atoms[0]].id !=allAtoms[iTor->atoms[3]].id )
+                {
+                    miniTorsions.push_back(*iTor);
+                }
+            }
+        }
+        
+        if (allTorsions.size() > 0)
+        {
+           
+            std::vector<TorsionDict> tmpTorsions;
+        
+            for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
+                iTor != allTorsions.end(); iTor++)
+            {
+                tmpTorsions.push_back(*iTor);
+            }
+        
+            allTorsions.clear();
+        
+            for (std::vector<TorsionDict>::iterator iTor=tmpTorsions.begin();
+                iTor != tmpTorsions.end(); iTor++)
+            {
+                if (iTor->atoms.size()==4 && 
+                    allAtoms[iTor->atoms[0]].id !=allAtoms[iTor->atoms[3]].id )
+                {
+                    allTorsions.push_back(*iTor);
+                }
+            }
+        
+        }
     }
     
     void CodClassify::setupTargetTorsions()

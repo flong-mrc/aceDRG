@@ -901,21 +901,21 @@ namespace LIBMOL
     {
         setDefaultCoordGeos();
         
-        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
-                     "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
-                     "Sc", "sc", "Y",  "y",
-                     "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
-                     "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
-                     "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
-                     "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
-                     "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",  
-                     "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",   
-                     "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",  
-                     "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",  
-                     "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
-                     "Zn", "zn", "Cd", "cd", "Hg", "hg",   
-                     "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
-                     "Sn", "sn", "Pb", "pb", "Bi", "bi"};
+        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", 
+                       "cs", "Fr", "fr", "Be", "be", "Mg", "mg", "Ca", "ca", 
+                       "Sr", "sr", "Ba", "ba", "Ra", "ra", "Sc", "sc", "Y",  "y",
+                       "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", 
+                       "Po", "po", "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
+                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
+                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
+                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",  
+                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",   
+                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",  
+                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",  
+                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
+                       "Zn", "zn", "Cd", "cd", "Hg", "hg",   
+                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
+                       "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         
         MetalTable.assign(metals, metals+121);
         
@@ -1599,7 +1599,8 @@ namespace LIBMOL
                        iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
                 {
                     tS2 =-1;
-                    if (*iAt1 != tIdx2 && *iAt2 !=tIdx1)
+                    if (*iAt1 != tIdx2 && *iAt2 !=tIdx1
+                        && *iAt1 != *iAt2 )
                     {
                         if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                         {
@@ -1812,7 +1813,8 @@ namespace LIBMOL
                        iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
             {
                 tS2 =-1;
-                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1)
+                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1
+                    && *iAt1 != *iAt2)
                 {
                     if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                     {
@@ -2057,7 +2059,7 @@ namespace LIBMOL
                            iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
                 {
                     tS2 =-1;
-                    if (*iAt2 !=tIdx1)
+                    if (*iAt2 !=tIdx1 && *iAt1 != *iAt2)
                     {
                         if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                         {
@@ -2344,7 +2346,8 @@ namespace LIBMOL
                        iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
             {
                 tS2 =-1;
-                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1)
+                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1
+                    && *iAt1 != *iAt2)
                 {
                     if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                     {
@@ -2520,7 +2523,8 @@ namespace LIBMOL
                        iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
             {
                 tS2 =-1;
-                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1)
+                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1
+                    && *iAt1 != *iAt2)
                 {
                     if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                     {
@@ -2787,7 +2791,8 @@ namespace LIBMOL
             {
                 tS2 =-1;
                 // std::cout << "2 linked " << allAtoms[*iAt2].id << std::endl;
-                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1)
+                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1
+                    && *iAt1 != *iAt2)
                 {
                     if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                     {
@@ -2956,7 +2961,8 @@ namespace LIBMOL
             {
                 tS2 =-1;
                 //std::cout << "2 linked " << allAtoms[*iAt2].id << std::endl;
-                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1)
+                if (*iAt1 != tIdx2 && *iAt2 !=tIdx1
+                    && *iAt1 != *iAt2)
                 {
                     if (AtomsInSameRing(allAtoms[*iAt1], allAtoms[*iAt2], allRingsV))
                     {
@@ -3370,7 +3376,7 @@ namespace LIBMOL
         }   
         
        
-        /*
+        
         std::cout << "The torsions in following bonds are set in ring section " 
                   << std::endl;
       
@@ -3382,7 +3388,7 @@ namespace LIBMOL
             std::cout << allBonds[tDone[i]].atoms[1] << std::endl;
         }
         
-        
+        /*
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
                 iTor != allTorsions.end(); iTor++)
         {
@@ -3395,6 +3401,7 @@ namespace LIBMOL
             }
         }
         */
+        
         
         // find all torsion not involved rings
         for (std::vector<BondDict>::iterator iABo= allBonds.begin();
@@ -3427,10 +3434,9 @@ namespace LIBMOL
                 }
             }
         }
-        
-        
-        // std::cout << "Number of torsion angles is " << allTorsions.size() << std::endl;
         /*
+        // std::cout << "Number of torsion angles is " << allTorsions.size() << std::endl;
+        
         std::cout << "All torsions have been setup " << std::endl;
        
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
