@@ -922,7 +922,7 @@ class AcedrgRDKit(object):
                 #        nSelect = tMol.GetNumConformers()
 
                 print("The following conformers are selected for refinement: ")
-                if self.isPEP:
+                if self.isPEP or self.useExistCoords :
                     n=0
                     for aConf in allConfs:
                         aCId =  aConf.GetId()

@@ -2095,7 +2095,7 @@ class CovLinkGenerator(CExeCode):
                 print("total Valence is ", nTotalVa)
                 print("atom ", aLAtmElem.upper())
                 print("Default Valence is ", self.chemCheck.defaultBo[aLAtmElem.upper()])
-                print("The charge is %s "%(tRes["comp"]["atoms"][ aLAtmSerial]["charge"]))
+                #print("The charge is %s "%(tRes["comp"]["atoms"][ aLAtmSerial]["charge"]))
                 if aLAtmElem in self.chemCheck.orgVal:
                     if "charge" in tRes["comp"]["atoms"][ aLAtmSerial]:
                         allowedBO = self.chemCheck.orgVal[aLAtmElem][0] + int(tRes["comp"]["atoms"][ aLAtmSerial]["charge"])
@@ -3477,12 +3477,13 @@ class CovLinkGenerator(CExeCode):
             
   
     def outVerInfo(self, tOutFile):
-
-        tOutFile.write("#%s%s\n"%("ACEDRG_VERSION".ljust(30),    self.verInfo["ACEDRG_VERSION"].ljust(20)))
-        tOutFile.write("#%s%s\n"%("ACEDRG_DB_VERSION".ljust(30), self.verInfo["DATABASE_VERSION"].ljust(20)))
-        tOutFile.write("#%s%s\n"%("RDKit_VERSION".ljust(30),    self.verInfo["RDKit_VERSION"].ljust(20)))
-        tOutFile.write("#%s%s\n"%("REFMAC_VERSION".ljust(30),   self.verInfo["REFMAC_VERSION"].ljust(20)))
-        tOutFile.write("#\n\n")
+        
+        tOutFile.write("global_\n")
+        tOutFile.write("%s%s\n"%("_acedrg_version".ljust(30),    self.verInfo["ACEDRG_VERSION"].ljust(20)))
+        tOutFile.write("%s%s\n"%("_acedrg_db_version".ljust(30), self.verInfo["DATABASE_VERSION"].ljust(20)))
+        tOutFile.write("%s%s\n"%("_rdkit_version".ljust(30),    self.verInfo["RDKit_VERSION"].ljust(20)))
+        tOutFile.write("%s%s\n"%("_refmac_version".ljust(30),   self.verInfo["REFMAC_VERSION"].ljust(20)))
+        tOutFile.write("\n\n")
         
 
     def outCompList(self, tOutFile, tLinkedObj):
@@ -3543,16 +3544,16 @@ class CovLinkGenerator(CExeCode):
         aName   = tLinkedObj.stdLigand1["list"]["name"]
         aNameL  = len(aName) + 6
         aLN = tLinkedObj.stdLigand1["name"]
-        aGrp    = tLinkedObj.stdLigand1["list"]["group"]
-        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), ".".ljust(20))
+        aGrp    = tLinkedObj.stdLigand1["list"]["group"].upper()
+        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), aGrp.ljust(20))
         tOutFile.write(aL) 
         
         aMN     = tLinkedObj.modLigand2["name"]
         aName   = tLinkedObj.stdLigand2["list"]["name"]
         aNameL  = len(aName) + 6
         aLN     = tLinkedObj.stdLigand2["name"]
-        aGrp    = tLinkedObj.stdLigand2["list"]["group"]
-        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), ".".ljust(20))
+        aGrp    = tLinkedObj.stdLigand2["list"]["group"].upper()
+        aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), aGrp.ljust(20))
         tOutFile.write(aL) 
         
         tOutFile.write("\n")
@@ -3573,12 +3574,12 @@ class CovLinkGenerator(CExeCode):
         aLID  = tLinkedObj.cLink["name"]
         aLN1  = tLinkedObj.stdLigand1["name"]
         aLMN1 = tLinkedObj.modLigand1["name"]
-        aG1   = self.setGroupId(tLinkedObj.stdLigand1["list"]["group"])
+        aG1   = self.setGroupId(tLinkedObj.stdLigand1["list"]["group"]).upper()
         print("Ligand 1 group id %s "%aG1)
         #aG1   = "."
         aLN2  = tLinkedObj.stdLigand2["name"]
         aLMN2 = tLinkedObj.modLigand2["name"]
-        aG2   = self.setGroupId(tLinkedObj.stdLigand2["list"]["group"])
+        aG2   = self.setGroupId(tLinkedObj.stdLigand2["list"]["group"]).upper()
         print("Ligand 2 group id %s "%aG2)
         #aG2   = "."
         aL="%s%s%s%s%s%s%s%s\n"%(aLID.ljust(15), aLN1.ljust(10), aLMN1.ljust(12), aG1.ljust(20),\

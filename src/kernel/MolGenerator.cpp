@@ -6781,9 +6781,8 @@ namespace LIBMOL {
                     << "_chem_comp_bond.atom1_id" << std::endl
                     << "_chem_comp_bond.atom2_id" << std::endl
                     << "_chem_comp_bond.atom1_element_symbol" << std::endl
-                    << "_chem_comp_bond.atom2_element_symbol" << std::endl;
-            
-                    //<< "_chem_comp_bond.value_dist" << std::endl
+                    << "_chem_comp_bond.atom2_element_symbol" << std::endl
+                    << "_chem_comp_bond.value_dist" << std::endl;
                     //<< "_chem_comp_bond.is_in_same_ring" << std::endl;
                     
             int nBo = 1;
@@ -6794,6 +6793,8 @@ namespace LIBMOL {
                 {
                     if (iAt->connAtoms[i] > iAt->seriNum)
                     {
+                        REAL dist = distanceV(iAt->coords, 
+                                    tMol.atoms[iAt->connAtoms[i]].coords);
                         tMolTabs << std::setw(6) << nBo
                                  << std::setw(6) << iAt->seriNum
                                  << std::setw(6) << iAt->connAtoms[i]
@@ -6803,6 +6804,8 @@ namespace LIBMOL {
                                  << std::setw(4) << iAt->chemType
                                  << std::setw(4) 
                                  << tMol.atoms[iAt->connAtoms[i]].chemType
+                                 << std::setw(12)
+                                 << dist 
                                  << std::endl;
                         nBo++;
                     }
