@@ -208,8 +208,9 @@ class FileTransformer(object) :
             #                filtedAllLines.append(aL)
             #        else:
             #            filtedAllLines.append(aL)
-
+            #print("======== all multiple lines ==============")
             for aL in filtedAllLines :
+                #print(aL)
                 #if aL.find("data_") != -1 and aL.find("#") ==-1:
                 #    if len(aBlockLs) !=0:
                 #        self.allBlockLs.append(aBlockLs)
@@ -221,20 +222,32 @@ class FileTransformer(object) :
                 else:
                     if len(aL.strip()) >0:                   
                         if aL.strip()[0].find("#") == -1:
-                            aBlockLs.append(aL)  
-
+                            aBlockLs.append(aL) 
+ 
             # Last block
             if len(aBlockLs):
                 self.allBlockLs.append(aBlockLs)
        
-            if len(self.allBlockLs):
-                for aBlk in self.allBlockLs:
-                    self.parseOneMmCifBlk(aBlk)
+            #if len(self.allBlockLs):
+     
+            #    for aBlk in self.allBlockLs:
+            #         print("====BLOCK======")
+            #         for aLine in aBlk:
+            #            print(aLine)
 
             #for a3 in all2ColLines:
             #    print("%s%s"%(a3[1].ljust(60), a3[2].ljust(40)))
-           
-            if len(all2ColLines) !=0:
+  
+
+            if len(self.allBlockLs):
+     
+                for aBlk in self.allBlockLs:
+                    #print("====BLOCK again======")
+                    #for aLine in aBlk:
+                    #    print(aLine)
+                    self.parseOneMmCifBlk(aBlk)
+
+	    if len(all2ColLines) !=0:
                 self.parserAll2Cols(all2ColLines)
             self.TmpChemCheck()
 
@@ -250,14 +263,13 @@ class FileTransformer(object) :
             idKey = "_chem_comp_atom.atom_id"
             for aAtom in self.atoms:
                 if aAtom.has_key(idKey):
-                    print "==============================="
-                    print "For atom ", aAtom[idKey], " : "
-                    print "-------------------------------"  
+                    print ("===============================")
+                    print ("For atom ", aAtom[idKey], " : ")
+                    print ("-------------------------------")  
                     for aKey in aAtom.keys():
-                        print "label : ", aKey, " Value : ", aAtom[aKey]
-                    print "==============================="
+                        print ("label : ", aKey, " Value : ", aAtom[aKey])
+                    print ("===============================")
             """
-        
 
     def TmpChemCheck(self):
 
@@ -341,19 +353,24 @@ class FileTransformer(object) :
 
         if len(tBlk):
             for aL in tBlk:
-                if aL.find("_chem_comp.") !=-1:
+                aL = aL.strip()
+                 
+                if len(aL) > 12 and aL.find("_chem_comp.") !=-1:
                     self.getDataDescriptor(tBlk)
                     break
-                elif aL.find("_chem_comp_atom.") !=-1:
+                elif len(aL) > 16 and aL[:16].find("_chem_comp_atom.") !=-1:
+                    print("Get atom block ")
+                    print(aL)
                     self.getProp(tBlk, "atom")
                     break
-                elif aL.find("_chem_comp_bond.") !=-1:
+                elif len(aL) > 16 and aL[:16].find("_chem_comp_bond.") !=-1:
                     self.getProp(tBlk, "bond")
                     break
-                elif aL.find("_chem_comp_chir.") !=-1:
+                elif len(aL) > 16 and aL[:16].find("_chem_comp_chir.") !=-1:
+                   
                     self.getProp(tBlk, "chiral")
                     break
-                elif aL.find("_pdbx_chem_comp_descriptor") !=-1:
+                elif len(aL) > 26 and aL[:26].find("_pdbx_chem_comp_descriptor") !=-1:
                     self.getProp(tBlk, "strDescriptor")
                     self.hasStrDescriptors = True
                     break
@@ -567,6 +584,7 @@ class FileTransformer(object) :
             tAtoms = []
             tHAtoms = []
             for aAtom in self.atoms:
+                print(aAtom.keys())
                 if aAtom["_chem_comp_atom.type_symbol"] !="H":
                     tAtoms.append(aAtom)
                 else:
@@ -950,6 +968,8 @@ class FileTransformer(object) :
             self.mmCifReader(tInFileName)
 
         #print "Num of atoms ", len(self.atoms)
+        for aA in self.atoms:
+            print(aA["_chem_comp_atom.atom_id"])
         #print "Num of bonds ", len(self.bonds)
         if not len(self.atoms) or not len(self.bonds):
             print("No atoms and/or bonds from the input file, check !")
@@ -1022,11 +1042,16 @@ class FileTransformer(object) :
             for aAtom in tNonHAtoms:
                 self.atoms.append(aAtom)
                 self.nameMapingCifMol["nonH"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
-                #print "NameMap ", nAtm, " : ", self.nameMapingCifMol["nonH"][nAtm]
-                #print "NameMap ", aAtom["_chem_comp_atom.atom_id"]
+                #print("NameMap ", nAtm, " : ", self.nameMapingCifMol["nonH"][nAtm])
+                #print("NameMap ", aAtom["_chem_comp_atom.atom_id"])
                 nAtm +=1
             for aAtom in tHAtoms:
                 self.atoms.append(aAtom)
+                self.nameMapingCifMol["H"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                #print("NameMap ", nAtm, " : ", self.nameMapingCifMol["H"][nAtm])
+                #print("NameMap ", aAtom["_chem_comp_atom.atom_id"])
+                nAtm +=1
+
 
             # Set up atom seq match for bond section
             mapIdNum = {}
@@ -1150,9 +1175,9 @@ class FileTransformer(object) :
                     sys.exit()
                 aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                        sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                print("The bond between %s of serial number %s and %s of serial number %s is : "\
-                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2))
-                print(aBL)
+                #print("The bond between %s of serial number %s and %s of serial number %s is : "\
+                #      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2))
+                #print(aBL)
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
 

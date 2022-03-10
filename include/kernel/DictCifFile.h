@@ -282,6 +282,7 @@ namespace LIBMOL
         void  outSystem();
         void  outAtomBloc();
         void  outBondBloc();
+        void  outAtomElems(Name tUserOutRoot);
     
         
         /* The core member functions are that 
@@ -384,6 +385,7 @@ namespace LIBMOL
         bool                       hasOcpLab;
         bool                       hasHeavyCalcAtoms;
         
+        bool                       nonCheck;
         bool                       checkR;
         bool                       checkResol;
         REAL                       RTHRESHOLD_U;     // replacement RTHRESHOLD

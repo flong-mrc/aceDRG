@@ -211,6 +211,7 @@ def aLineToAList2(tL, tList):
             tList.append(aE)
 
         print(tList)
+
 def aLineToAlist(tL, tList):
 
     aTS = ""

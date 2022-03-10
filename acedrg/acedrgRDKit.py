@@ -375,7 +375,8 @@ class AcedrgRDKit(object):
                     if aAtom.GetSymbol() != "H":
                         aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()])
             elif tStage ==1:
-                if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
+                
+                if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids or self.isPEP:
                     self.setNamesForHAtomsInMol_PP(tMol, tChemCheck)
                 else:
                     self.setNamesForHAtomsInMol(tMol, tNameMap, tChemCheck)
@@ -603,7 +604,9 @@ class AcedrgRDKit(object):
             #elemList = ["C", "N", "S", "O"]
             elemList = ["C"]
             charList = ["A", "B", "C", "D", "E", "F"]
+            numList0  = [ "3", "2"]
             numList  = [ "3", "2", "1"]
+            numListCN0  = ["2", "3"]
             numListCN  = [ "", "2", "3"]
             numListCN2  = [ "1", "2", "3", "4", "5", "6"]
             lH       = False
@@ -612,8 +615,8 @@ class AcedrgRDKit(object):
          
             for aIdxBH in list(tIdxHs.keys()):
                 twoP = self.getTwoParts(tMol.GetAtomWithIdx(aIdxBH).GetProp("Name"))
-                #print "twoP[0] : ", twoP[0]
-                #print "twoP[1] : ", twoP[1]
+                print ("twoP[0] : ", twoP[0])
+                print ("twoP[1] : ", twoP[1])
                 #print "LH ", lH
                 aHName = ""
                 mainElem = tMol.GetAtomWithIdx(aIdxBH).GetSymbol()
@@ -678,14 +681,18 @@ class AcedrgRDKit(object):
                                 i +=1
                     elif len(twoP[0]) > 1 and len(twoP[1]) !=0:
                         name1 = tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")[1:] 
-                        #print "Name ", tMol.GetAtomWithIdx(aIdxBH).GetProp("Name")
+                        print ("Name ", tMol.GetAtomWithIdx(aIdxBH).GetProp("Name"))
                         if len(tIdxHs[aIdxBH]) ==1:
                             curIdxH= tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()][0]
                             tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + name1)
+                        elif len(tIdxHs[aIdxBH]) ==2:
+                            i=0
+                            for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
+                                tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + name1 + numListCN0[i])
+                                i +=1
                         else :
                             i=0
                             for curIdxH in tIdxHs[tMol.GetAtomWithIdx(aIdxBH).GetIdx()]:
-                                # print i
                                 tMol.GetAtomWithIdx(curIdxH).SetProp("Name", "H" + name1 + numListCN2[i])
                                 i +=1
                 else: 

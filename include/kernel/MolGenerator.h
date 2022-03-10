@@ -369,6 +369,7 @@ namespace LIBMOL
         void outMetalAtomCoordInfo(FileName tOutName);
         void outMetalClusterInfo(FileName tOutName);
         void outMetalTables(FileName tOutName);
+        void outElementsInInitAtoms(FileName tOutName);
         
         void getUserParasList(FileName tInName,
                               std::map<std::string, 

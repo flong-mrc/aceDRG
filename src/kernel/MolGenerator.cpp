@@ -637,12 +637,14 @@ namespace LIBMOL {
                                        FileName tOutName)
     {
         
+        
             
         std::map<std::string, double> userParas;
         getUserParas(tInParaName, userParas);
         
         if (initAtoms.size() > 0) 
         {
+            
             CCP4DictParas tCCP4EnergParas;
             ccp4DictParas.push_back(tCCP4EnergParas);
             PeriodicTable aPTable;
@@ -1215,8 +1217,14 @@ namespace LIBMOL {
                                   << iR->second  << std::endl;
                 }
             }
-            aMetDistListF.close();
-            
+            aMetDistListF.close();  
+        }
+        
+        if (initAtoms.size() >0)
+        {
+            Name initAtmElemsFName(tOutName);
+            initAtmElemsFName.append("_elements.list");
+            outElementsInInitAtoms(initAtmElemsFName.c_str());
         }
         
     }
@@ -8095,5 +8103,51 @@ namespace LIBMOL {
         }
     }
     
+    void MolGenerator::outElementsInInitAtoms(FileName tOutName)
+    {
+        std::map<std::string, std::vector<std::string> > initAtmElems;
+        for (std::vector<AtomDict>::iterator iA = initAtoms.begin();
+                            iA != initAtoms.end(); iA++)
+        {
+            initAtmElems[iA->chemType].push_back(iA->id);
+        }
+        
+        if (initAtmElems.size() >0)
+        {
+            std::ofstream  initAtmElemsFile(tOutName);
+            if (initAtmElemsFile.is_open())
+            {
+                initAtmElemsFile.width(30);
+                initAtmElemsFile << std::left << "ELEMENTS IN ATOM  : ";
+                for (std::map<std::string, std::vector<std::string> >
+                        ::iterator iE=initAtmElems.begin();
+                        iE != initAtmElems.end(); iE++)
+                {
+                    initAtmElemsFile.width(8);
+                    initAtmElemsFile  << std::left << iE->first;
+                }
+                initAtmElemsFile << std::endl;
+                
+                for (std::map<std::string, std::vector<std::string> >
+                        ::iterator iE=initAtmElems.begin();
+                        iE != initAtmElems.end(); iE++)
+                {
+                    initAtmElemsFile.width(30);
+                    initAtmElemsFile << std::left << "Atoms with  "
+                                     << iE->first  << "    :    ";
+                    for (std::vector<std::string>::iterator 
+                         iAId=iE->second.begin(); 
+                         iAId != iE->second.end(); iAId++ )
+                    {
+                        initAtmElemsFile.width(8);
+                        initAtmElemsFile << std::left << *iAId;
+                    }
+                    initAtmElemsFile << std::endl;   
+                }
+                
+                initAtmElemsFile.close();
+            }
+        }
+    }
 
 }

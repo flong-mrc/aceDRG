@@ -2824,7 +2824,7 @@ class Acedrg(CExeCode ):
                         self.rdKit.useExistCoords = True
                     elif self.fileConv.mmCifHasCoords:
                         self.useExistCoords    = True
-                    print("is this monomer a peptide ", self.isPEP)
+                    #print("is this monomer a peptide ", self.isPEP)
                 if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 :   #and not self.isAA:
                     # Option A: 
                     if self.useExistCoords :

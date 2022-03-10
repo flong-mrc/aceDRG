@@ -327,7 +327,11 @@ int main(int argc, char** argv) {
            
             // TEMP, CSD do not provide several parameters. Rely on CSD
             // search criteria.
-             
+            
+            if (dataFromCif.allAtoms.size() > 0)
+            {
+                dataFromCif.outAtomElems(AJob.IOEntries["userOutName"]);
+            }
             
             
             //if (dataFromCif.notPowder && dataFromCif.resolOK

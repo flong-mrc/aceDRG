@@ -28,6 +28,7 @@ namespace LIBMOL
             colidOK(true),
             hasOcpLab(true),
             hasHeavyCalcAtoms(false),
+            nonCheck(false),
             checkR(true),
             checkResol(true),
             RTHRESHOLD_U(0.10),
@@ -54,6 +55,7 @@ namespace LIBMOL
                            colidOK(true),
                            hasOcpLab(true),
                            hasHeavyCalcAtoms(false),
+                           nonCheck(false),
                            checkR(true),
                            checkResol(true),
                            RTHRESHOLD_U(0.10),
@@ -103,6 +105,7 @@ namespace LIBMOL
                            colidOK(true),
                            hasOcpLab(true),
                            hasHeavyCalcAtoms(false),
+                           nonCheck(false),
                            checkR(true),
                            checkResol(true),
                            RTHRESHOLD_U(0.10),
@@ -179,6 +182,7 @@ namespace LIBMOL
                            colidOK(true),
                            hasOcpLab(true),
                            hasHeavyCalcAtoms(false),
+                           nonCheck(false),
                            checkR(true),
                            checkResol(true),
                            RTHRESHOLD_U(0.10),
@@ -428,6 +432,7 @@ namespace LIBMOL
             }
             
             
+            
             checkPowder(tAllLines);
             
             checkNeutronD(tAllLines);
@@ -436,7 +441,7 @@ namespace LIBMOL
             {
                 return ;
             }
-            
+           
             
             // std::cout << "Number of data blocks in the cif file is " 
             // << tBlocs.size() << std::endl;
@@ -539,13 +544,17 @@ namespace LIBMOL
                     {
                         if (!assignElementType(aPTab, iA->chemType, iA))
                         {
-                            std::cout << "Warn: atom " << iA->id << " has element type "
-                                      << iA->chemType << " which is not in the Periodic Table"
+                            std::cout << "Warn: atom " << iA->id 
+                                      << " has element type "
+                                      << iA->chemType 
+                                      << " which is not in the Periodic Table"
                                       << std::endl;
                         }
                     }
                 
+                    
                     checkNonHAtomOccp();
+                   
                     setAtomsMetalType();
                     setAtomOxiType();
                     
@@ -1085,6 +1094,7 @@ namespace LIBMOL
         return aRet;
     }
     
+    
     void GenCifFile::setAllCrits(std::vector<std::string>& tAllLines)
     {
         for (std::vector<std::string>::iterator iL=tAllLines.begin();
@@ -1098,7 +1108,15 @@ namespace LIBMOL
                 if(tBuf.size()==2)
                 {
                     StrUpper(tBuf[0]);
-                    if(tBuf[0].find("CHECKRFACT") !=tBuf[0].npos)
+                    if (tBuf[0].find("NOCHECK") !=tBuf[0].npos)
+                    {
+                        StrUpper(tBuf[1]);
+                        if (tBuf[1].find("YES") !=tBuf[1].npos)
+                        {
+                          nonCheck = true;
+                        }
+                    }
+                    else if(tBuf[0].find("CHECKRFACT") !=tBuf[0].npos)
                     {
                         RTHRESHOLD_U=StrToReal(tBuf[1]);
                         std::cout << RTHRESHOLD_U << std::endl;
@@ -1118,6 +1136,12 @@ namespace LIBMOL
                     }
                 }
             }
+        }
+        
+        if (nonCheck)
+        {
+            checkR     = false;
+            checkResol = false;
         }
         std::cout << "check factor ? " << checkR << std::endl;
         std::cout << "check resol ? " << checkResol << std::endl;
@@ -2988,6 +3012,56 @@ namespace LIBMOL
         {
             errMsg.push_back("REJECTED STRUCTURE: Reasons unknown\n");
         }
+    }
+    
+    void GenCifFile::outAtomElems(Name tUserOutRoot)
+    {
+        Name initAtmElemsFName(tUserOutRoot);
+        initAtmElemsFName.append("_init_atoms.list");
+        std::map<std::string, std::vector<std::string> > initAtmElems;
+        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
+                            iA != allAtoms.end(); iA++)
+        {
+            initAtmElems[iA->chemType].push_back(iA->id);
+        }
+        
+        if (initAtmElems.size() >0)
+        {
+            std::ofstream  initAtmElemsFile(initAtmElemsFName.c_str());
+            if (initAtmElemsFile.is_open())
+            {
+                initAtmElemsFile.width(30);
+                initAtmElemsFile << std::left << "ELEMENTS IN ATOM  : ";
+                for (std::map<std::string, std::vector<std::string> >
+                        ::iterator iE=initAtmElems.begin();
+                        iE != initAtmElems.end(); iE++)
+                {
+                    initAtmElemsFile.width(8);
+                    initAtmElemsFile  << std::left << iE->first;
+                }
+                initAtmElemsFile << std::endl;
+                
+                for (std::map<std::string, std::vector<std::string> >
+                        ::iterator iE=initAtmElems.begin();
+                        iE != initAtmElems.end(); iE++)
+                {
+                    initAtmElemsFile.width(30);
+                    initAtmElemsFile << std::left << "Atoms with  "
+                                     << iE->first  << "    :    ";
+                    for (std::vector<std::string>::iterator 
+                         iAId=iE->second.begin(); 
+                         iAId != iE->second.end(); iAId++ )
+                    {
+                        initAtmElemsFile.width(8);
+                        initAtmElemsFile << std::left << *iAId;
+                    }
+                    initAtmElemsFile << std::endl;   
+                }
+                
+                initAtmElemsFile.close();
+            }
+        }
+        
     }
     
     // ################################## another class for cif files of CCP4 
