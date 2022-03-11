@@ -247,8 +247,9 @@ class FileTransformer(object) :
                     #    print(aLine)
                     self.parseOneMmCifBlk(aBlk)
 
-	    if len(all2ColLines) !=0:
+            if len(all2ColLines) !=0:
                 self.parserAll2Cols(all2ColLines)
+
             self.TmpChemCheck()
 
             
