@@ -362,8 +362,8 @@ namespace LIBMOL
                             }
                         }
                         
-                        if (nH !=1)
-                        {
+                        //if (nH !=1)
+                        //{
                             bool l_sp2 = false;
                             for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                                  iCA != iAt->connAtoms.end(); iCA++)
@@ -381,7 +381,7 @@ namespace LIBMOL
                                 iAt->chiralIdx  =  0;
                                 iAt->bondingIdx =  2;
                             }
-                        }
+                        //}/
                     }
                 } 
             }
