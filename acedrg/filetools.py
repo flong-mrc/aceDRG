@@ -255,12 +255,12 @@ class FileTransformer(object) :
             
             self.selectAtomCoordinates()
  
-            """
             # check
             if len(self.dataDescriptor.keys()):
                 for aK in self.dataDescriptor.keys():
                     print("Key : ", aK)
                     print("values ", self.dataDescriptor[aK])
+            """
             idKey = "_chem_comp_atom.atom_id"
             for aAtom in self.atoms:
                 if aAtom.has_key(idKey):
@@ -360,8 +360,8 @@ class FileTransformer(object) :
                     self.getDataDescriptor(tBlk)
                     break
                 elif len(aL) > 16 and aL[:16].find("_chem_comp_atom.") !=-1:
-                    print("Get atom block ")
-                    print(aL)
+                    #print("Get atom block ")
+                    #print(aL)
                     self.getProp(tBlk, "atom")
                     break
                 elif len(aL) > 16 and aL[:16].find("_chem_comp_bond.") !=-1:
@@ -585,7 +585,7 @@ class FileTransformer(object) :
             tAtoms = []
             tHAtoms = []
             for aAtom in self.atoms:
-                print(aAtom.keys())
+                #print(aAtom.keys())
                 if aAtom["_chem_comp_atom.type_symbol"] !="H":
                     tAtoms.append(aAtom)
                 else:

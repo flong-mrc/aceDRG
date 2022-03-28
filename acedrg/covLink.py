@@ -3544,7 +3544,7 @@ class CovLinkGenerator(CExeCode):
         aName   = tLinkedObj.stdLigand1["list"]["name"]
         aNameL  = len(aName) + 6
         aLN = tLinkedObj.stdLigand1["name"]
-        aGrp    = tLinkedObj.stdLigand1["list"]["group"].upper()
+        aGrp    = tLinkedObj.stdLigand1["list"]["group"]
         aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), aGrp.ljust(20))
         tOutFile.write(aL) 
         
@@ -3552,7 +3552,7 @@ class CovLinkGenerator(CExeCode):
         aName   = tLinkedObj.stdLigand2["list"]["name"]
         aNameL  = len(aName) + 6
         aLN     = tLinkedObj.stdLigand2["name"]
-        aGrp    = tLinkedObj.stdLigand2["list"]["group"].upper()
+        aGrp    = tLinkedObj.stdLigand2["list"]["group"]
         aL="%s%s%s%s\n"%(aMN.ljust(10), aName.ljust(aNameL), aLN.ljust(10), aGrp.ljust(20))
         tOutFile.write(aL) 
         
@@ -3574,12 +3574,12 @@ class CovLinkGenerator(CExeCode):
         aLID  = tLinkedObj.cLink["name"]
         aLN1  = tLinkedObj.stdLigand1["name"]
         aLMN1 = tLinkedObj.modLigand1["name"]
-        aG1   = self.setGroupId(tLinkedObj.stdLigand1["list"]["group"]).upper()
+        aG1   = tLinkedObj.stdLigand1["list"]["group"]
         print("Ligand 1 group id %s "%aG1)
         #aG1   = "."
         aLN2  = tLinkedObj.stdLigand2["name"]
         aLMN2 = tLinkedObj.modLigand2["name"]
-        aG2   = self.setGroupId(tLinkedObj.stdLigand2["list"]["group"]).upper()
+        aG2   = tLinkedObj.stdLigand2["list"]["group"]
         print("Ligand 2 group id %s "%aG2)
         #aG2   = "."
         aL="%s%s%s%s%s%s%s%s\n"%(aLID.ljust(15), aLN1.ljust(10), aLMN1.ljust(12), aG1.ljust(20),\
@@ -3588,18 +3588,6 @@ class CovLinkGenerator(CExeCode):
          
         tOutFile.write("\n")
 
-    def setGroupId(self, tId):
-
-        retId = tId.lower()
-
-        if retId.find("peptide") != -1 and retId.find("-") !=-1:
-            strs = retId.strip().split("-")
-            if len(strs)==2:
-                retId = strs[0].upper() + "-" + strs[1]
-
-        return retId
-
-        
 
     def outAllComps(self, tOutFile, tLinkedObj):
         if tLinkedObj.stdLigand1["dataBlock"] and tLinkedObj.stdLigand1["outComp"] and tLinkedObj.stdLigand1["compOut"]:
@@ -3917,11 +3905,11 @@ class CovLinkGenerator(CExeCode):
         if nDPls or nCPls or nAPls:
      
             tOutFile.write("loop_\n")
-            tOutFile.write("_chem_mod_plane.mod_id\n")
-            tOutFile.write("_chem_mod_plane.function\n")
-            tOutFile.write("_chem_mod_plane.plane_id\n")
-            tOutFile.write("_chem_mod_plane.atom_id\n")
-            tOutFile.write("_chem_mod_plane.dist_esd\n")
+            tOutFile.write("_chem_mod_plane_atom.mod_id\n")
+            tOutFile.write("_chem_mod_plane_atom.function\n")
+            tOutFile.write("_chem_mod_plane_atom.plane_id\n")
+            tOutFile.write("_chem_mod_plane_atom.atom_id\n")
+            tOutFile.write("_chem_mod_plane_atom.new_dist_esd\n")
 
             if nDPls: 
                 for aPl in tModLigand["deleted"]["planes"]:

@@ -666,4 +666,86 @@ class ChemCheck(object):
 
         return reName 
 
+    def confirmAAandNames(self, tAtoms, tBonds):
+      
+        lAA = False  
+        atomLinks = {}
+        baseAtomIds = []
+        atomDicts   = {}
+        hAtomNameMap = {}
+        hBondNameMap = {}
+        # Check AA atoms exist
+        i=0
+        for aAtom in tAtoms:
+            atomDicts[aAtom["_chem_comp_atom.atom_id"]] =i
+            i = i+1
+            if "_chem_comp_atom.atom_id" in aAtom.keys() and\
+               "_chem_comp_atom.type_symbol" in aAtom.keys():
+                # Check CA
+                if aAtom["_chem_comp_atom.atom_id"].strip().upper()== "CA"\
+                   and aAtom["_chem_comp_atom.type_symbol"].strip().upper()=="C":
+                    baseAtomIds.append("CA")
+                elif aAtom["_chem_comp_atom.atom_id"].strip().upper()== "C"\
+                   and aAtom["_chem_comp_atom.type_symbol"].strip().upper()=="C":
+                    baseAtomIds.append("C")
+                elif aAtom["_chem_comp_atom.atom_id"].strip().upper()== "O"\
+                   and aAtom["_chem_comp_atom.type_symbol"].strip().upper()=="O":
+                    baseAtomIds.append("O")
+                elif aAtom["_chem_comp_atom.atom_id"].strip().upper()== "OXT"\
+                   and aAtom["_chem_comp_atom.type_symbol"].strip().upper()=="O":
+                    baseAtomIds.append("OXT")
+                elif aAtom["_chem_comp_atom.atom_id"].strip().upper()== "N"\
+                   and aAtom["_chem_comp_atom.type_symbol"].strip().upper()=="N":
+                    baseAtomIds.append("N")
+        # Check connections
+        if len(baseAtomIds)==5 and "CA" in baseAtomIds and "C" in baseAtomIds\
+           and "O" in baseAtomIds and "OXT" in baseAtomIds and "N" in baseAtomIds:
+            for aAId in baseAtomIds:
+                atomLinks[aAId] = []
+                for aBond in tBonds:
+                    if "_chem_comp_bond.atom_id_1" in aBond.keys() and\
+                       "_chem_comp_bond.atom_id_2" in aBond.keys():    
+                        if aBond["_chem_comp_bond.atom_id_1"].strip().upper()==aAId:
+                            atomLinks[aAId].append(aBond["_chem_comp_bond.atom_id_2"])
+                        elif aBond["_chem_comp_bond.atom_id_2"].strip().upper()==aAId:
+                            atomLinks[aAId].append(aBond["_chem_comp_bond.atom_id_1"])
+            if "N" in atomLinks["CA"] and "C" in atomLinks["CA"] and len(atomLinks["CA"])==4\
+               and "O" in atomLinks["C"] and "OXT" in atomLinks["C"] and len(atomLinks["C"])==3\
+               and (len(atomLinks["N"])==2 or len(atomLinks["N"])==3):
+                lAA = True
+                # Check and change if required
+                hAtomNameMap["CA"]= []
+                for aId in atomLinks["CA"]:
+                    if tAtoms[atomDicts[aId]]["_chem_comp_atom.type_symbol"]=="H": 
+                        hAtomNameMap["CA"].append(tAtoms[atomDicts[aId]]["_chem_comp_atom.atom_id"])
+                if len(hAtomNameMap["CA"]) !=1:
+                    lAA = False
+                elif hAtomNameMap["CA"][0] != "HA": 
+                    lAA = False
 
+                hAtomNameMap["N"]= []
+                for aId in atomLinks["N"]:
+                    if tAtoms[atomDicts[aId]]["_chem_comp_atom.type_symbol"]=="H": 
+                        hAtomNameMap["N"].append(tAtoms[atomDicts[aId]]["_chem_comp_atom.atom_id"])
+                if len(atomLinks["N"])==3:
+                    if len(hAtomNameMap["N"]) ==0 or len(hAtomNameMap["N"])> 2 :
+                        lAA = False
+                    else:
+                        if len(hAtomNameMap["N"]) ==1 :
+                            if not "H2" in hAtomNameMap["N"] :
+                                lAA = False
+                        else:
+                            if not "H" in hAtomNameMap["N"] or not "H2" in hAtomNameMap["N"]:
+                                lAA = False 
+                             
+                elif len(atomLinks["N"])==4:
+                    if len(hAtomNameMap["N"]) != 3  :
+                        lAA = False
+                    else:
+                        if not "H" in hAtomNameMap["N"] or not "H2" in hAtomNameMap["N"] or not "H3" in hAtomNameMap["N"]:
+                            lAA = False 
+            else:
+                lAA = False
+        else:
+            lAA = False
+        return lAA         

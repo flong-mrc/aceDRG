@@ -2150,6 +2150,9 @@ class Acedrg(CExeCode ):
         lTor = False
         speTors   = {}
         otherTors = []
+        nTor = 0
+        nTorNa =0
+        nTorOthers = 0
         for aL in tCifCont:
             if aL.find("_chem_comp_tor.period") != -1:
                 tOutF.write(aL)
@@ -2157,6 +2160,7 @@ class Acedrg(CExeCode ):
             elif lTor and aL.find("loop_")==-1:
                 if len(aL) >0:
                     if aL[0].find("#") == -1:
+                        nTor+=1
                         strs = aL.strip().split()
                         if len(strs)==9:
                             id1 = strs[2] + "_" + strs[3]  + "_" + strs[4] + "_" + strs[5]                      
@@ -2169,8 +2173,6 @@ class Acedrg(CExeCode ):
                                 id = id1
                             elif id2 in self.naTorsList.keys():
                                 id = id2
-                            else:
-                                otherTors.append(aL)
                             if len(id) > 0:
                                 for aId in sorted(self.naTorsList[id].keys()):
                                     aTorL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(8), aId.ljust(16),\
@@ -2181,15 +2183,17 @@ class Acedrg(CExeCode ):
                                     speTors[aId]= aTorL
                             else:
                                 otherTors.append(aL)
+                                nTorOthers +=1
+
             elif lTor and aL.find("loop_") !=-1:
                 lTor = False
                 tOutF.write(aL)
             else:
                 tOutF.write(aL)
         for aId in sorted(speTors.keys()):
-             tOutF.write(speTors[aId])
+            tOutF.write(speTors[aId])
         for aTorL in otherTors:
-                    tOutF.write(aTorL)
+            tOutF.write(aTorL)
 
     def pepCorr(self, tCifCont, tOutF):
         lTor = False
@@ -2808,6 +2812,7 @@ class Acedrg(CExeCode ):
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)
                     self.isNA=self.checkNAFromMmcif(self.fileConv.dataDescriptor)
+                    tmpIsPep = self.checkPeptidesFromMmcif(self.fileConv.dataDescriptor)
                     if self.isNA:
                         self.getNATors()
                     if self.monomRoot in self.chemCheck.aminoAcids:
@@ -2817,11 +2822,17 @@ class Acedrg(CExeCode ):
                         self.useExistCoords    = True
                         self.rdKit.useExistCoords = True
                         #self.getAAOut()
-                    elif self.checkPeptidesFromMmcif(self.fileConv.dataDescriptor):
-                        self.isPEP = True  
+                    elif tmpIsPep:
+                        self.isPEP = self.chemCheck.confirmAAandNames(self.fileConv.atoms, self.fileConv.bonds) 
                         self.rdKit.isPEP       = self.isPEP
                         self.useExistCoords    = True
                         self.rdKit.useExistCoords = True
+                        print("is PEP ", self.isPEP)
+                        if not self.isPEP:
+                            for i in self.fileConv.dataDescriptor.keys():
+                                if self.fileConv.dataDescriptor[i][0].find("_chem_comp.type") !=-1:
+                                    self.fileConv.dataDescriptor[i][1] = "NON-POLYMER" 
+                                    break
                     elif self.fileConv.mmCifHasCoords:
                         self.useExistCoords    = True
                     #print("is this monomer a peptide ", self.isPEP)

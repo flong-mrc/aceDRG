@@ -8448,7 +8448,15 @@ namespace LIBMOL
                     //          << iT->atoms[1] << std::endl
                     //          << iT->atoms[2] << std::endl
                     //          << iT->atoms[3] << std::endl;
-                
+                    std::string aTorSiga;
+                    if (iT->id.find("sp2_sp2") !=std::string::npos)
+                    {
+                        aTorSiga = "5.0";
+                    }
+                    else
+                    {
+                        aTorSiga = "10.0";
+                    }
                     outRestrF << longName 
                               << std::setw(22) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id 
@@ -8456,7 +8464,7 @@ namespace LIBMOL
                               << std::setw(12)  << tAtoms[iT->atoms[2]].id 
                               << std::setw(12)  << tAtoms[iT->atoms[3]].id 
                               << std::setw(12) << std::setprecision(3) << iT->value  
-                              << std::setw(8)  << "10.00" 
+                              << std::setw(8)  << aTorSiga
                               << std::setw(6)  << iT->period << std::endl;
                     idxTor++;        
                 }
