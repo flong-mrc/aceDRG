@@ -141,6 +141,32 @@ class ChemCheck(object):
 
         return organicOnly 
 
+     
+    def isOrganicInCif(self, tCifAtoms):
+
+        aRet = True
+        lElem = True
+        for aAtm in tCifAtoms:
+            if "_chem_comp_atom.type_symbol" in aAtm.keys():
+                 if not aAtm["_chem_comp_atom.type_symbol"] in self.organicSec :
+                     aRet = False
+                     break
+            else:
+                 lElem = False
+
+        if not aRet :
+            print("The input ligands/molecules contains metal or other heavier atoms ")
+            print("Acedrg currently deals with ligands/molecules with following elements only ")
+            print("C, N, O, S, P, B,  Se, F, Cl, Br, I, H")
+            print("The job finishes succesfully")
+       
+        if not lElem :
+            print ("Can not get the element symbols of atoms. Check input file format")
+            print("Error : The job stops because of errors")
+            organicOnly = False
+
+        return aRet
+
     def isOrganicMol(self, tMol):
 
         pass 

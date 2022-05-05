@@ -271,6 +271,7 @@ class CovLinkGenerator(CExeCode):
         self.subRoot          = ""
         self.outRoot          = tOutRoot
         self.linkInstructions = tLinkInstructions
+        self.linkInstructionsContent   = ""
         self.ligSrcDir        = ""
 
         self.cLinks           = []
@@ -847,12 +848,17 @@ class CovLinkGenerator(CExeCode):
         else:
             allLs = aInsF.readlines()
             aInsF.close()
+            allLs2 = []
+           
             for aL in allLs:
                 strs = aL.strip().split()
                 if len(strs) !=0:
+                    allLs2.append(aL)
                     for aStr in strs:
                         if aStr.find("LINK:") == -1:
                             aList.append(aStr)
+
+            self.linkInstructionsContent = allLs2
 
         if len(aList):
             lSt  = True
@@ -3323,12 +3329,12 @@ class CovLinkGenerator(CExeCode):
                         if len(aRes) > 0:
                             allAtoms = aRes
                             for aAtom in allAtoms:
-                                print("atom name before: %s"%aAtom.name)
+                                #print("atom name before: %s"%aAtom.name)
                                 if aAtom.name in tLinkedObj.atomMap:
                                     aAtom.name = tLinkedObj.atomMap[aAtom.name][1]
                                     if aAtom.name.count("\"")==2:
                                         aAtom.name=aAtom.name.strip("\"")
-                                print("atom name after: %s"%aAtom.name)
+                                #print("atom name after: %s"%aAtom.name)
                         else:
                             print("Residues in the combo-ligand have no atom ")
                             self.errLevel = 32
@@ -3405,6 +3411,7 @@ class CovLinkGenerator(CExeCode):
             print("Torsion between atom %s in residue %d, atom %s in residue %d, atom %s in residue %d, and atom %s in residue %d "\
                  %(aTor["atom_id_1"],aTor["atom_id_1_resNum"], aTor["atom_id_2"], aTor["atom_id_2_resNum"],\
                    aTor["atom_id_3"],aTor["atom_id_3_resNum"], aTor["atom_id_4"], aTor["atom_id_4_resNum"]))
+            print("dist_esd ", aTor["value_angle_esd"])
 
         
         tLinkedObj.cLink["chirals"] = [] 
@@ -3478,12 +3485,18 @@ class CovLinkGenerator(CExeCode):
   
     def outVerInfo(self, tOutFile):
         
-        tOutFile.write("global_\n")
         tOutFile.write("%s%s\n"%("_acedrg_version".ljust(30),    self.verInfo["ACEDRG_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_acedrg_db_version".ljust(30), self.verInfo["DATABASE_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_rdkit_version".ljust(30),    self.verInfo["RDKit_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_refmac_version".ljust(30),   self.verInfo["REFMAC_VERSION"].ljust(20)))
-        tOutFile.write("\n\n")
+        if len(self.linkInstructionsContent) > 0:
+            tOutFile.write("_CCP4_AceDRG_link_generation.instruction\n")
+            tOutFile.write(";\n")
+            for aL in self.linkInstructionsContent:
+                aL = aL.strip()
+                if len(aL):
+                    tOutFile.write(aL + "\n")
+            tOutFile.write(";\n\n")
         
 
     def outCompList(self, tOutFile, tLinkedObj):

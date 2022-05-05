@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
                                 AJob.IOEntries["monoRootName"], 
                                 AJob.IOEntries["libMolTabDir"]);
                  
-                 std::cout << "Passed here22" << std::endl;
+                 
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                   AJob.IOEntries["monoRootName"], 
                                   aTargetSystem.propComp,

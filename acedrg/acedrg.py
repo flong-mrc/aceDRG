@@ -132,6 +132,8 @@ class Acedrg(CExeCode ):
 
         self.workMode         = 0
         self.useExistCoords   = False
+
+        self.isOrg            = True
         self.isAA             = False
         self.isPEP            = False     # keep here temporarily
         self.isNA             = False
@@ -370,6 +372,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-L",  "--linkInstruction", dest="linkInstructions", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File that gives the instructions to build a link")
+
+        self.inputParser.add_option("-P",  "--inLigandPdbName", dest="inLigandPdbName", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input Ligand PDB File")
 
         self.inputParser.add_option("-Q",  "--qmInstruction", dest="qmInstructions", metavar="FILE", 
                                     action="store", type="string", 
@@ -637,7 +643,7 @@ class Acedrg(CExeCode ):
                 if len(tDataDesc[aK])==2:
                     if tDataDesc[aK][0].find("_chem_comp.type") !=-1 \
                        and tDataDesc[aK][1].upper().find("PEPTIDE") !=-1:
-                        print(tDataDesc[aK][0], " : ", tDataDesc[aK][1])
+                        #print(tDataDesc[aK][0], " : ", tDataDesc[aK][1])
                         aRet = True
                         break
                     elif tDataDesc[aK][0].find("_chem_comp.group") !=-1 \
@@ -2798,17 +2804,16 @@ class Acedrg(CExeCode ):
         print("workMode : ", self.workMode)
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111:
-            #if self.monomRoot in self.chemCheck.aminoAcids:
-            #    self.isAA = True
-            #    self.getAAOut()
-            if os.path.isfile(self.inMmCifName) and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
-            #   and not self.isAA:
-                #tmpWorkMode = self.workMode
-                #self.workMode = 311
-                #self.runLibmol()
-                #self.workMode = tmpWorkMode
+            if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                 # The input file is an mmcif file 
                 self.fileConv.mmCifReader(self.inMmCifName)
+                print("Number of atoms in the cif file ", len(self.fileConv.atoms))
+                #print(self.fileConv.atoms[0])
+                if len(self.fileConv.atoms) > 0:
+                    self.lOrg = self.chemCheck.isOrganicInCif(self.fileConv.atoms)
+                else:
+                    self.lOrg = False
+            if self.lOrg and len(self.fileConv.atoms) > 1:
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)
                     self.isNA=self.checkNAFromMmcif(self.fileConv.dataDescriptor)
@@ -2836,7 +2841,7 @@ class Acedrg(CExeCode ):
                     elif self.fileConv.mmCifHasCoords:
                         self.useExistCoords    = True
                     #print("is this monomer a peptide ", self.isPEP)
-                if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 :   #and not self.isAA:
+                if  len(self.fileConv.bonds) !=0 :   #and not self.isAA:
                     # Option A: 
                     if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -3015,6 +3020,11 @@ class Acedrg(CExeCode ):
                                                 self.numConformers, 0, self.fileConv.nameMapingCifMol,\
                                                 self.fileConv.inputCharge) 
                     
+            elif len(self.fileConv.atoms) == 1:
+                finCif = self.outRoot + ".cif"
+                self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
+                    
+
         if self.workMode==51 : 
             aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
             if os.path.isfile(self.inMmCifName):
@@ -3133,10 +3143,10 @@ class Acedrg(CExeCode ):
             self.workMode = 111
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
-        print("workMode is ",self.workMode)
+        #print("workMode is ",self.workMode)
         
         if self.workMode in [11,  111, 112, 51] :  #  and not self.isAA :
-            print("Number of molecule ", len(self.rdKit.molecules))
+            #print("Number of molecule ", len(self.rdKit.molecules))
             if len(self.rdKit.molecules):
                 print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)

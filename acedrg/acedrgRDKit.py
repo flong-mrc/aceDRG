@@ -375,9 +375,8 @@ class AcedrgRDKit(object):
                     if aAtom.GetSymbol() != "H":
                         aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()])
             elif tStage ==1:
-                
-                if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids or self.isPEP:
-                    self.setNamesForHAtomsInMol_PP(tMol, tChemCheck)
+                if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids :
+                    self.setNamesForHAtomsInMol_PP(tMol, tNameMap, tChemCheck)
                 else:
                     self.setNamesForHAtomsInMol(tMol, tNameMap, tChemCheck)
 
@@ -393,7 +392,7 @@ class AcedrgRDKit(object):
                     aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()])
         elif tStage ==1:
             if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
-                self.setNamesForHAtomsInMol_PP(tMol, tChemCheck)
+                self.setNamesForHAtomsInMol_PP(tMol, tNameMap, tChemCheck)
             else:
                 self.setNamesForHAtomsInMol(tMol, tNameMap, tChemCheck)
 
@@ -560,12 +559,21 @@ class AcedrgRDKit(object):
         #        print "should be name ", tNameMap[tMol.GetAtomWithIdx(aIdxH).GetIdx()]
         #       
         #        nH += 1
-            
-    def setNamesForHAtomsInMol_PP(self, tMol, tChemCheck):
+
+        
+    def setNamesForHAtomsInMol_PP(self, tMol, tNameMap, tChemCheck):
       
         tIdxHs = {}
         tIdxHs1 = []
-        
+       
+        #print("name mapping--> ", tNameMap["H"]) 
+        #oriHNames = []
+        #for aK in tNameMap["H"]:
+        #    aKs = str(aK)
+        #    if aKs.isdigit():
+        #        print("ori H name :", tNameMap["H"][aK])
+        #        oriHNames.append(tNameMap["H"][aK])
+        # print(oriHNames)       
         for aAtom in tMol.GetAtoms():
              if not aAtom.HasProp("Name") or aAtom.GetProp("Name") =="":
                  if aAtom.GetSymbol() =="H":
@@ -615,8 +623,8 @@ class AcedrgRDKit(object):
          
             for aIdxBH in list(tIdxHs.keys()):
                 twoP = self.getTwoParts(tMol.GetAtomWithIdx(aIdxBH).GetProp("Name"))
-                print ("twoP[0] : ", twoP[0])
-                print ("twoP[1] : ", twoP[1])
+                #print ("twoP[0] : ", twoP[0])
+                #print ("twoP[1] : ", twoP[1])
                 #print "LH ", lH
                 aHName = ""
                 mainElem = tMol.GetAtomWithIdx(aIdxBH).GetSymbol()
@@ -856,27 +864,29 @@ class AcedrgRDKit(object):
                 tReq +=1
                 confIds =AllChem.EmbedMultipleConfs(tMol, tReq, maxAttempts=0, randomSeed=-1, clearConfs=False)
                 nNewCon = len(confIds)             
-                print(tReq)
+                #print(tReq)
+            #print("number of comf generated ", len(tMol.GetConformers()))
+            #print("number of confIds : ", len(confIds))
             #for aConf in tMol.GetConformers():
-            #    print "!!!!!!!!!! Conf ", aConf.GetId()
+            #    print("!!!!!!!!!! Conf ", aConf.GetId())
             #    for aAtom in tMol.GetAtoms():
             #        aIdx = aAtom.GetIdx()
             #        name  = aAtom.GetProp("Name") 
             #        aPos = aConf.GetAtomPosition(aIdx)
-            #        print "For atom ", name
-            #        print "Its coordinates are : "
-            #        print "x:  ", aPos.x           
-            #        print "y:  ", aPos.y           
-            #        print "z:  ", aPos.z           
+            #        print("For atom ", name)
+            #        print("Its coordinates are : ")
+            #        print ("x:  ", aPos.x)           
+            #        print ("y:  ", aPos.y)           
+            #        print ("z:  ", aPos.z)           
         else:
             confIds = self.generateMultiComformersByRDKit(tMol)
 
-        if confIds:
-            print("Number of initial conformers requested", self.numInitConformers)
-            print("Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps)
-            print("Number of new conformers ", len(confIds))
-            nConf = tMol.GetNumConformers()
-            print("Number of initial conformers obtained", nConf)
+        nConf = tMol.GetNumConformers()
+        if nConf:
+            #print("Number of initial conformers requested", self.numInitConformers)
+            #print("Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps)
+            #print("Number of new conformers ", len(confIds))
+            #print("Number of initial conformers obtained", nConf)
             allConfs = tMol.GetConformers()
             allAtoms = tMol.GetAtoms()
             formalE = -len(allConfs)    # Formal energy
@@ -947,7 +957,10 @@ class AcedrgRDKit(object):
                                 nID +=1
                             else:
                                 break
-            print("Number of conformers selected for refinement is ",  len(self.selecConformerIds))
+            #print("Number of conformers selected for refinement is ",  len(self.selecConformerIds))
+        else:
+            print("RDKit failed in generating initial conformers")
+            sys.exit(1)
 
     def generateMultiComformersByRDKit(self, tMol):
 
@@ -1128,6 +1141,7 @@ class AcedrgRDKit(object):
             self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
 
+
         #if self.reSetChirals:
         #    self.reAssignChirals(aMol) 
         allAtoms = aMol.GetAtoms()
@@ -1138,7 +1152,6 @@ class AcedrgRDKit(object):
             #print "Is it a temporal chiral center ", aAtom.HasProp("TmpChiral") 
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
         self.setInitConformersOneMol(aMol)
-      
         if len(aMol.GetConformers()) !=0: 
             #rdmolfiles.MolToPDBFile(aMol, "Test_2.pdb")
             aSetTorsions = []
@@ -1285,13 +1298,13 @@ class AcedrgRDKit(object):
         force=False
         flagPossibleStereoCenters=True
         rdmolops.AssignStereochemistry(tMol, cleanIt, force, flagPossibleStereoCenters)
-        allAtoms = tMol.GetAtoms()
-        for aAtom in allAtoms:
-            elem  = aAtom.GetSymbol()
-            name  = aAtom.GetProp("Name") 
-            if aAtom.HasProp('_CIPCode'):
-                print("Chiral center ", name)
-                print("CIP rank %s : Stero code %s"%(aATom.GetProp("_CIPRank"), aAtom.GetProp("_CIPCode"))) 
+        #allAtoms = tMol.GetAtoms()
+        #for aAtom in allAtoms:
+        #    elem  = aAtom.GetSymbol()
+        #    name  = aAtom.GetProp("Name") 
+        #    if aAtom.HasProp('_CIPCode'):
+        #        print("Chiral center ", name)
+        #        print("CIP rank %s : Stero code %s"%(aATom.GetProp("_CIPRank"), aAtom.GetProp("_CIPCode"))) 
 
     def mergeAtomNames(self):
 
@@ -1513,6 +1526,7 @@ class AcedrgRDKit(object):
             atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
             aChiralSignMap = self.setChiralsByMultiConformers(tChemCheck, tMol, atomNBCIPMap)
             self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
+
             for aId in sorted(aChiralSignMap.keys()):
                 if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
                     print("==============================================")
@@ -1546,11 +1560,11 @@ class AcedrgRDKit(object):
             for aAtom in allAtoms:
                 aCT = aAtom.GetChiralTag()
                 if aCT != rdchem.ChiralType.CHI_UNSPECIFIED:
-                    aAtmName=aAtom.GetProp("Name")
-                    if not aAtmName in chiCenAtmIds1:
+                    aId=aAtom.GetProp("Name")
+                    if not aId in chiCenAtmIds1:
                         if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
-                            print("Chiral center %s is not in predefined chiral centers"%aAtmName)
-                            chiCenAtmIds2.append(aAtmName)
+                            #print("Chiral center %s is not in predefined chiral centers"%aId)
+                            chiCenAtmIds2.append(aId)
             nTetraChi = len(chiCenAtmIds2)
             #print(" Number of chiral centers get from the conformer ", nTetraChi)
             chiCenAtms3 = []
@@ -1600,7 +1614,7 @@ class AcedrgRDKit(object):
                 chiralIdx = nChiPre + 1
                 for aId in chiCenAtmIds2 :
                     if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
-                        print("Chiral center %s is not in predefined chiral centers"%aId)
+                        #print("Chiral center %s is not in predefined chiral centers"%aId)
                         aCTName = "chir_" + str(chiralIdx)
                         aLine = "%s%s%s%s%s%s%s\n"\
                                 %(tMonoName.ljust(12), aCTName.ljust(12),\
@@ -1610,7 +1624,7 @@ class AcedrgRDKit(object):
                                   atomNBCIPMap[aId][2][0].GetProp("Name").ljust(12),\
                                   aChiralSignMap[aId]["finalChiVolSign"])
                         aMmCif.write(aLine)
-                        print(aLine)
+                        #print(aLine)
                         chiralIdx +=1
 
             if nChiWithSign and nID > 0:

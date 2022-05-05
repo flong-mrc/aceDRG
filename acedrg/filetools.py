@@ -254,23 +254,23 @@ class FileTransformer(object) :
 
             
             self.selectAtomCoordinates()
+
+            self.checkBondOrder()
  
             # check
-            if len(self.dataDescriptor.keys()):
-                for aK in self.dataDescriptor.keys():
-                    print("Key : ", aK)
-                    print("values ", self.dataDescriptor[aK])
-            """
-            idKey = "_chem_comp_atom.atom_id"
-            for aAtom in self.atoms:
-                if aAtom.has_key(idKey):
-                    print ("===============================")
-                    print ("For atom ", aAtom[idKey], " : ")
-                    print ("-------------------------------")  
-                    for aKey in aAtom.keys():
-                        print ("label : ", aKey, " Value : ", aAtom[aKey])
-                    print ("===============================")
-            """
+            #if len(self.dataDescriptor.keys()):
+            #    for aK in self.dataDescriptor.keys():
+            #        print("Key : ", aK)
+            #        print("values ", self.dataDescriptor[aK])
+            #idKey = "_chem_comp_atom.atom_id"
+            #for aAtom in self.atoms:
+            #    if aAtom.has_key(idKey):
+            #        print ("===============================")
+            #        print ("For atom ", aAtom[idKey], " : ")
+            #        print ("-------------------------------")  
+            #        for aKey in aAtom.keys():
+            #            print ("label : ", aKey, " Value : ", aAtom[aKey])
+            #        print ("===============================")
 
     def TmpChemCheck(self):
 
@@ -302,14 +302,15 @@ class FileTransformer(object) :
                     #print aBond["_chem_comp_bond.atom_id_1"], " : ", aOrd
                     atomVals[aBond["_chem_comp_bond.atom_id_2"]] += aOrd
                     #print aBond["_chem_comp_bond.atom_id_2"], " : ", aOrd
+            
              
             # find IDs of B, Br etc
             speAtomIds = []
             for aAtom in self.atoms:
                 if "_chem_comp_atom.atom_id" in aAtom and\
                    "_chem_comp_atom.type_symbol" in aAtom:
-                    if aAtom["_chem_comp_atom.type_symbol"].strip() =="B"\
-                       or aAtom["_chem_comp_atom.type_symbol"].strip()=="BR":
+                    #if aAtom["_chem_comp_atom.type_symbol"].strip() =="B"\
+                     if aAtom["_chem_comp_atom.type_symbol"].strip()=="BR":
                         speAtomIds.append(aAtom["_chem_comp_atom.atom_id"])
                         if "_chem_comp_atom.charge" in aAtom:
                             if aAtom["_chem_comp_atom.charge"].find(".") !=-1:
@@ -494,11 +495,11 @@ class FileTransformer(object) :
                 s2 = self.dataDescriptor[aKey][1]  
             elif self.dataDescriptor[aKey][0].find("_chem_comp.name") !=-1:
                 temStrs = self.dataDescriptor[aKey][1].strip().split()
-                if len(temStrs)>1 and self.dataDescriptor[aKey][1].find("\"") !=2:
+                tmpDD   = self.dataDescriptor[aKey][1].strip()
+                if len(temStrs)>1 and tmpDD[0] !="\"" and tmpDD[-1] !="\"":
                     s3 = "\"" + self.dataDescriptor[aKey][1] + "\""
                 else:
                     s3 = self.dataDescriptor[aKey][1]
-                print(s3)
             elif self.dataDescriptor[aKey][0].find("_chem_comp.group") !=-1:
                 s4 = self.dataDescriptor[aKey][1]  
             elif self.dataDescriptor[aKey][0].find("_chem_comp.type") !=-1:
@@ -508,8 +509,12 @@ class FileTransformer(object) :
                     s4 = "L-PEPTIDE"
                 elif self.dataDescriptor[aKey][1].upper().find("D-PEPTIDE") !=-1 :
                     s4 = "D-PEPTIDE"
+                elif self.dataDescriptor[aKey][1].upper().find("M-PEPTIDE") !=-1 :
+                    s4 = "M-PEPTIDE"
                 elif self.dataDescriptor[aKey][1].upper().find("PEPTIDE-") !=-1 :
                     s4 = "PEPTIDE"
+                elif self.dataDescriptor[aKey][1].upper().find("NON-POLYMER") !=-1 :
+                    s4 = "NON-POLYMER"
                 elif self.dataDescriptor[aKey][1].upper().find("DNA ") !=-1 :
                     s4 = "DNA"
                 elif self.dataDescriptor[aKey][1].upper().find("RNA ") !=-1 :
@@ -594,7 +599,7 @@ class FileTransformer(object) :
                 if "_chem_comp_atom.atom_id" in aAtom:
                     tCharge =0.0
                     if "_chem_comp_atom.charge" in aAtom:
-                        # print "aAtom['_chem_comp_atom.charge'] ", aAtom["_chem_comp_atom.charge"] 
+                        #print ("aAtom['_chem_comp_atom.charge'] ", aAtom["_chem_comp_atom.charge"]) 
                         if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
                             tCharge = float(aAtom["_chem_comp_atom.charge"])
                     elif "_chem_comp_atom.partial_charge" in aAtom:
@@ -624,10 +629,11 @@ class FileTransformer(object) :
         #                    print "Prop %s is %s "%(colIdx[i], aAtom[colIdx[i]].ljust(8))
 
         # Check
-        if len(self.inputCharge) !=0:
-            print("The following atoms have charges ")
-            for aName in list(self.inputCharge.keys()):
-                print("Name : ", aName, " charge : ", self.inputCharge[aName])
+        #if len(self.inputCharge) !=0:
+        #    print("inputCharge atoms: ", self.inputCharge)
+        #    print("The following atoms have charges ")
+        #    for aName in self.inputCharge.keys():
+        #        print("Name : ", aName, " charge : ", self.inputCharge[aName])
 
         if len(colIdx):
             #for i in range(len(colIdx)):
@@ -959,9 +965,82 @@ class FileTransformer(object) :
                         #print("Using _chem_comp_atom.x,y,z")
                         self.mmCifHasCoords   = True
                     else:
-                        #print("not _chem_comp_atom.x")
-                        #print("No original coordinates will be used for conformer generations")
                         self.mmCifHasCoords = False  
+
+    def checkBondOrder(self ):
+        
+        print("Here")
+        if self.atoms and self.bonds:
+
+            totalOrders = {}
+
+            for aAtm in self.atoms:
+                if "_chem_comp_atom.type_symbol" in aAtm:
+                    aAtm["_chem_comp_atom.alt_type_symbol"]= aAtm["_chem_comp_atom.type_symbol"]
+                if "_chem_comp_atom.atom_id" in aAtm:
+                    aId =  aAtm["_chem_comp_atom.atom_id"]
+                    totalOrders[aAtm["_chem_comp_atom.atom_id"]] = [aAtm, self.getTotalOrderValue(aAtm)]
+
+            for aId in totalOrders.keys():
+                if not totalOrders[aId][1]:
+                    print("atom %s has zero bond-order, check!"%aId)
+                    sys.exit(1)
+                else:
+                    self.setAlt2AtomId(totalOrders[aId]) 
+
+    def getTotalOrderValue(self, tAtm):
+        
+        aId = tAtm["_chem_comp_atom.atom_id"]
+        
+        bondSet = []
+        for aB in self.bonds:
+            if aB["_chem_comp_bond.atom_id_1"] == aId or aB["_chem_comp_bond.atom_id_2"] == aId:
+                bondSet.append(aB)
+
+        totalOrder = 0
+        if bondSet:
+            for aB in bondSet:
+                if aB["_chem_comp_bond.value_order"].upper().find("SING") !=-1:
+                    totalOrder +=1
+                elif aB["_chem_comp_bond.value_order"].upper().find("DOUB") !=-1:
+                    totalOrder +=2
+                elif aB["_chem_comp_bond.value_order"].upper().find("TRIP") !=-1:
+                    totalOrder +=3
+
+        return totalOrder
+
+
+    def setAlt2AtomId(self, aPair):
+            
+ 
+        elementSet = ["N", "O", "B", "C", "SI", "GE", "AS", "GA"]
+        
+        if aPair[0]["_chem_comp_atom.type_symbol"].upper() in elementSet:
+            if aPair[0]["_chem_comp_atom.type_symbol"].strip().upper() == "N":
+                if aPair[1] == 4:
+                    aPair[0]["_chem_comp_atom.charge"] = "1"
+            elif aPair[0]["_chem_comp_atom.type_symbol"].strip().upper() == "O":
+                if aPair[1] == 1:
+                    aPair[0]["_chem_comp_atom.charge"] = "-1"
+            elif aPair[0]["_chem_comp_atom.type_symbol"].strip().upper() == "B":
+                if aPair[1] == 4:
+                    aPair[0]["_chem_comp_atom.charge"]          = "-1"
+                    aPair[0]["_chem_comp_atom.alt_type_symbol"] = "B"
+            elif aPair[0]["_chem_comp_atom.type_symbol"].strip().upper() == "SI":
+                if aPair[1] == 4:
+                    aPair[0]["_chem_comp_atom.charge"]          = "0"
+                    aPair[0]["_chem_comp_atom.alt_type_symbol"] = "C"
+            elif aPair[0]["_chem_comp_atom.type_symbol"].strip().upper() == "GE":
+                if aPair[1] == 4:
+                    aPair[0]["_chem_comp_atom.charge"]          = "0"
+                    aPair[0]["_chem_comp_atom.alt_type_symbol"] = "C"
+            elif aPair[0]["_chem_comp_atom.type_symbol"].strip().upper() == "AS":
+                if aPair[1] == 4:
+                    aPair[0]["_chem_comp_atom.charge"]          = "1"
+                    aPair[0]["_chem_comp_atom.alt_type_symbol"] = "N"
+                                 
+            #print("atom %s has charge %s "%(aPair[0]["_chem_comp_atom.atom_id"], aPair[0]["_chem_comp_atom.charge"]))    
+                  
 
     def MmCifToMolFile(self, tInFileName, tOutMolName, tMode=0):
 
@@ -1061,7 +1140,7 @@ class FileTransformer(object) :
                 if "_chem_comp_atom.atom_id" in aAtom:
                     mapIdNum[aAtom["_chem_comp_atom.atom_id"]] = nAtm
                     nAtm +=1
-                    print("atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]]))
+                    #print("atom %s serial number in mol is %d "%(aAtom["_chem_comp_atom.atom_id"], mapIdNum[aAtom["_chem_comp_atom.atom_id"]]))
                 else:
                     print("Input file bug: no atom_id for atoms!")
                     sys.exit()
@@ -1117,8 +1196,8 @@ class FileTransformer(object) :
                     nCharge =0
                     if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
                         nCharge = int(aAtom["_chem_comp_atom.charge"])
-                    #print "Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"]
-                    #print " converted to charge symbol ", chargeMap[nCharge] 
+                        #print("Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"])
+                        #print(" converted to charge symbol ", chargeMap[nCharge]) 
                     if nCharge in list(chargeMap.keys()):
                         charge  = " %d "%chargeMap[nCharge]
                     if nCharge !=0:
@@ -1609,6 +1688,79 @@ class FileTransformer(object) :
         for aK in sorted(self.nameMapingMol2["H"].keys()):
             for aH in self.nameMapingMol2["H"][aK]:
                 print("%s  connects to %s "%(aK, aH))
+
+
+    def outputSingleAtomCif(self, tOutFileName, tVersionInfo):
+   
+        lF = False
+
+        headerSec = {}
+        for aK in self.dataDescriptor.keys():
+            if self.dataDescriptor[aK][0].find("_chem_comp.id") !=-1:
+                headerSec["_chem_comp.id"] = self.dataDescriptor[aK][1]
+            elif self.dataDescriptor[aK][0].find("_chem_comp.name") !=-1:
+                headerSec["_chem_comp.name"] = self.dataDescriptor[aK][1]
+            elif self.dataDescriptor[aK][0].find("_chem_comp.type") !=-1:
+                headerSec["_chem_comp.group"] = self.dataDescriptor[aK][1]
+
+        if not "_chem_comp.id" in headerSec.keys() or not "_chem_comp.name" in  headerSec.keys()\
+           or not "_chem_comp.group" in headerSec.keys():
+            lF = True
+
+        if not lF:
+            try:
+               aCif = open(tOutFileName, "w")
+            except IOError:
+               print("%s can not be open for writing "%tOutFileName)
+               sys.exit()
+            else:
+                aCif.write("data_comp_list\n")
+                aCif.write("loop\n")
+                aCif.write("_chem_comp.id\n")
+                aCif.write("_chem_comp.three_letter_code\n")
+                aCif.write("_chem_comp.name\n")
+                aCif.write("_chem_comp.group\n")
+                aCif.write("_chem_comp.number_atoms_all\n")
+                aCif.write("_chem_comp.number_atoms_nh\n")
+                aCif.write("_chem_comp.desc_level\n")
+                aL = "%s%s%s%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(8), headerSec["_chem_comp.id"].ljust(8),\
+                                         headerSec["_chem_comp.name"].ljust(len(headerSec["_chem_comp.name"]) + 6),\
+                                         headerSec["_chem_comp.group"].ljust(len(headerSec["_chem_comp.group"])+6),\
+                                         "1".ljust(6), "0".ljust(6), ".".ljust(4))
+                aCif.write(aL)
+
+                aCif.write("data_comp_%s\n"%headerSec["_chem_comp.id"])
+                aCif.write("_chem_comp_atom.comp_id\n")
+                aCif.write("_chem_comp_atom.atom_id\n")
+                aCif.write("_chem_comp_atom.type_symbol\n")
+                aCif.write("_chem_comp_atom.type_energy\n")
+                aCif.write("_chem_comp_atom.charge\n")
+                aCif.write("_chem_comp_atom.x\n")
+                aCif.write("_chem_comp_atom.y\n")
+                aCif.write("_chem_comp_atom.z\n")
+ 
+                for aA in self.atoms:
+                    aL = "%s%s%s%s%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(8), aA["_chem_comp_atom.atom_id"].ljust(8),\
+                                               aA["_chem_comp_atom.type_symbol"].ljust(8), aA["_chem_comp_atom.type_symbol"].ljust(8),\
+                                               aA["_chem_comp_atom.charge"].ljust(6), "0.000".ljust(10),\
+                                               "0.000".ljust(10), "0.000".ljust(10))
+                    aCif.write(aL)
+
+                aCif.write("loop_\n")
+                aCif.write("_pdbx_chem_comp_description_generator.comp_id\n")
+                aCif.write("_pdbx_chem_comp_description_generator.program_name\n")
+                aCif.write("_pdbx_chem_comp_description_generator.program_version\n")
+                aCif.write("_pdbx_chem_comp_description_generator.descriptor\n")
+                aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg".ljust(21),\
+                           tVersionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
+                aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg_database".ljust(21),\
+                           tVersionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
+                aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(4), tVersionInfo["REFMAC_NAME"].ljust(21),\
+                            tVersionInfo["REFMAC_VERSION"].ljust(12), '\"optimization tool\"'.ljust(40)))
+                aCif.close() 
+                 
+        
+        
         
 class Ccp4MmCifObj (dict) :
 

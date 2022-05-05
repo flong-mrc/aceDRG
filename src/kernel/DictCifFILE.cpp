@@ -3499,20 +3499,19 @@ namespace LIBMOL
                         << std::endl;
                
             }
-            
-            
+                        
             
             setHydroAtomConnect();
             // addMissHydroAtoms();
             
             setAtomsBondingAndChiralCenter(allAtoms);
-           
+            
             // setAllAngles();
             
             setAtomsCChemType();
             
             setAtomsMetalType();
-           
+            
             setAtomsVDWRadius();
             
             setAtomsPartialCharges();
