@@ -969,7 +969,6 @@ class FileTransformer(object) :
 
     def checkBondOrder(self ):
         
-        print("Here")
         if self.atoms and self.bonds:
 
             totalOrders = {}
@@ -983,8 +982,7 @@ class FileTransformer(object) :
 
             for aId in totalOrders.keys():
                 if not totalOrders[aId][1]:
-                    print("atom %s has zero bond-order, check!"%aId)
-                    sys.exit(1)
+                    print("atom %s has zero bond-order, aromatic bond order exists. check and change!"%aId)
                 else:
                     self.setAlt2AtomId(totalOrders[aId]) 
 
@@ -1000,12 +998,21 @@ class FileTransformer(object) :
         totalOrder = 0
         if bondSet:
             for aB in bondSet:
-                if aB["_chem_comp_bond.value_order"].upper().find("SING") !=-1:
-                    totalOrder +=1
-                elif aB["_chem_comp_bond.value_order"].upper().find("DOUB") !=-1:
-                    totalOrder +=2
-                elif aB["_chem_comp_bond.value_order"].upper().find("TRIP") !=-1:
-                    totalOrder +=3
+                if "_chem_comp_bond.value_order" in aB.keys():
+                    if aB["_chem_comp_bond.value_order"].upper().find("SING") !=-1:
+                        totalOrder +=1
+                    elif aB["_chem_comp_bond.value_order"].upper().find("DOUB") !=-1:
+                        totalOrder +=2
+                    elif aB["_chem_comp_bond.value_order"].upper().find("TRIP") !=-1:
+                        totalOrder +=3
+                elif "_chem_comp_bond.type" in aB.keys():
+                    if aB["_chem_comp_bond.type"].upper().find("SING") !=-1:
+                        totalOrder +=1
+                    elif aB["_chem_comp_bond.type"].upper().find("DOUB") !=-1:
+                        totalOrder +=2
+                    elif aB["_chem_comp_bond.type"].upper().find("TRIP") !=-1:
+                        totalOrder +=3
+                    
 
         return totalOrder
 
