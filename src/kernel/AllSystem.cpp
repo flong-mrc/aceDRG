@@ -900,7 +900,7 @@ namespace LIBMOL
     void AllSystem::setAtomsMetalType()
     {
         setDefaultCoordGeos();
-        
+        /*
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", 
                        "cs", "Fr", "fr", "Be", "be", "Mg", "mg", "Ca", "ca", 
                        "Sr", "sr", "Ba", "ba", "Ra", "ra", "Sc", "sc", "Y",  "y",
@@ -918,8 +918,27 @@ namespace LIBMOL
                        "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         
         MetalTable.assign(metals, metals+121);
+        */
         
+        
+        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", 
+                       "Cs", "cs", "Fr", "fr",  "Be", "be", "Mg", "mg", 
+                       "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
+                       "Sc", "sc", "Y",  "y",
+                       "Sb", "sb", "Te", "te", "Po", "po",
+                       "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
+                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
+                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
+                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",  
+                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",   
+                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",  
+                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",  
+                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
+                       "Zn", "zn", "Cd", "cd", "Hg", "hg",   
+                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
+                       "Sn", "sn", "Pb", "pb", "Bi", "bi"};
                 
+        MetalTable.assign(metals, metals+115);
         //std::cout << "Metal Elements :" << std::endl;
         //for (std::vector<ID>::iterator iM =MetalTable.begin();
         //       iM !=MetalTable.end(); iM++)
@@ -1061,6 +1080,7 @@ namespace LIBMOL
             }
             
             phdF.close();
+            /*
             std::cout << "H distance table done " << std::endl;
             // Check 
             std::cout << "The following are H-X distances by elements " 
@@ -1104,12 +1124,14 @@ namespace LIBMOL
                           << HydrDistTable[2][iE->first]["pDistSigaNeu"] 
                           << std::endl;
             }
+             */
         }
         else
         {
             std::cout << "Bug: Can not find " << phdFName 
                       << " to read !" << std::endl;
         }  
+        
     }
     
  

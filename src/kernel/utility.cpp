@@ -589,11 +589,16 @@ namespace LIBMOL
             {
                 if (2.0*fabs(x1-x2)/(x1+x2) > tErr)
                 {
+                    std::cout << "rel d "
+                              << 2.0*fabs(x1-x2)/(x1+x2)
+                              << std::endl;
+                    std::cout << "tErr " << tErr << std::endl;
                     return true;
                 }
             }
             else if (fabs(x1-x2) > tErr)
             {
+                std::cout << "abs d " << fabs(x1-x2) << std::endl;
                 return true;
             }
         }

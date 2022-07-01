@@ -198,6 +198,7 @@ namespace LIBMOL
         std::map<ID, int>       fullAtoms; // for atoms from SMILE, ID is chemType
         std::vector<ID>         atoms;
         std::vector<int>        atomsIdx;
+        std::vector<ID>         atomsElem;
         
         std::vector<ID>         atomsCodClasses;
         std::vector<int>        atomsHashingCodes;

@@ -185,7 +185,6 @@ namespace LIBMOL
                 }
             }
             else if (iAt->chemType.compare("N")==0 
-                    || iAt->chemType.compare("B")==0
                     || iAt->chemType.compare("AS")==0
                     || iAt->chemType.compare("As")==0)
             {
@@ -194,6 +193,37 @@ namespace LIBMOL
                 {
                     iAt->chiralIdx  = 2;
                     iAt->bondingIdx = 3;  
+                }
+                else if (t_len ==2)
+                {
+                    if (iAt->charge==1.0)
+                    {
+                        iAt->bondingIdx = 1;
+                    }
+                    else
+                    {
+                        iAt->bondingIdx = 2;
+                    }
+                    iAt->chiralIdx  = 0;
+                    
+                } 
+                else if (t_len==1)
+                {
+                    iAt->chiralIdx  = 0;
+                    iAt->bondingIdx = 1;
+                }
+            }
+            else if (iAt->chemType.compare("B")==0)
+            {
+                if(t_len==4)
+                {
+                    iAt->chiralIdx  = 2;
+                    iAt->bondingIdx = 3;  
+                }
+                else if (t_len ==3)
+                {
+                    iAt->chiralIdx  = 1;
+                    iAt->bondingIdx = 2; 
                 }
                 else if (t_len ==2)
                 {
@@ -233,8 +263,7 @@ namespace LIBMOL
                     iAt->bondingIdx = 3;
                 }
             }
-            else if (iAt->chemType.compare("SI")==0 
-                    || iAt->chemType.compare("P")==0)
+            else if (iAt->chemType.compare("P")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
                 if(t_len==4)
@@ -420,8 +449,8 @@ namespace LIBMOL
                     t_len++;
                 }
             }
-            if (iAt->chemType.compare("N")==0 || iAt->chemType.compare("B")==0
-                || iAt->chemType.compare("As")==0)
+            if (iAt->chemType.compare("N")==0 ||
+                iAt->chemType.compare("As")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
                 
@@ -494,19 +523,19 @@ namespace LIBMOL
   
         // Check
         
-        
-        //for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
-        //        iAt != tAtoms.end(); iAt++)
-        //{
-            
-        //    std::cout << "Atom " << iAt->id
-        //              << " of " << iAt->chemType
-        //              << " connects " << iAt->connAtoms.size() 
-        //              << " atoms " << std::endl
-        //              << " and is with bond index "
-        //              << iAt->bondingIdx << std::endl;
-        //}
         /*
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            
+            std::cout << "Atom " << iAt->id
+                      << " of " << iAt->chemType
+                      << " connects " << iAt->connAtoms.size() 
+                      << " atoms " << std::endl
+                      << " and is with bond index "
+                      << iAt->bondingIdx << std::endl;
+        }
+        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         
@@ -544,11 +573,11 @@ namespace LIBMOL
                                                std::vector<RingDict>  & tRings,
                                                int                      tMode)
     {
-        REAL angCri = 15.0;
+        REAL angCri = 20.0;
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
         {
-            if((iA->chemType.compare("N")==0 || iA->chemType.compare("B")==0) 
+            if((iA->chemType.compare("N")==0) 
                   && (iA->connAtoms.size() == 3))
             {
                 //std::cout << "Check " << iA->id << " now " << std::endl;
@@ -667,6 +696,9 @@ namespace LIBMOL
                         }
                     }
                 }
+                
+                
+                
                 /*
                  * else will keep its initial setting
                 else
@@ -676,6 +708,35 @@ namespace LIBMOL
                 }
                  */
                 // std::cout << "Here Its hybridization is sp" << iA->bondingIdx << std::endl; 
+            }
+            
+            if((iA->chemType.compare("N")==0) 
+                  && (iA->connAtoms.size() == 2)
+                  && iA->inRings.size()==0)
+            {
+                if (tMode==1)
+                {
+                    
+                    // Further check hybrid of non-ring atoms 
+                    // of N with 2 connections
+                    std::vector<REAL> vec1, vec2;
+                    for (unsigned i=0; i < 3; i++)
+                    {
+                        vec1.push_back(tAtoms[iA->connAtoms[0]].coords[i]-iA->coords[i]);
+                        vec2.push_back(tAtoms[iA->connAtoms[1]].coords[i]-iA->coords[i]);
+                    }
+                    REAL aAngS = 160.00;
+                    REAL aAng = getAngle2V(vec1, vec2)*PID180;
+                    aAng = fabs(aAng);
+                    if (aAng > aAngS)
+                    {
+                        iA->bondingIdx = 1;
+                    }
+                    else
+                    {
+                        iA->bondingIdx = 2;
+                    }
+                }
             }
             
             iA->hybrid = strTransSP(iA->bondingIdx);
@@ -1679,7 +1740,6 @@ namespace LIBMOL
             {
                 if (allowed >=2.0)
                 {
-                    std::cout << "HERE" << std::endl;
                     tBonds[tIdxB2].order = "DOUBLE";
                     tBonds[tIdxB2].orderN = 2.0;
                 }
@@ -6144,9 +6204,9 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iAtm=tAtoms.begin();
                     iAtm !=tAtoms.end(); iAtm++)
         {
-            std::cout << iAtm->id << std::endl;
-            std::cout << iAtm->chemType << std::endl;
-            std::cout << "Connect to " << iAtm->connAtoms.size() <<std::endl;
+            //std::cout << iAtm->id << std::endl;
+            //std::cout << iAtm->chemType << std::endl;
+            // std::cout << "Connect to " << iAtm->connAtoms.size() <<std::endl;
             iAtm->formType.clear();
             iAtm->formType.push_back(iAtm->chemType);
             if (iAtm->isInAromRing)
@@ -6204,7 +6264,7 @@ namespace LIBMOL
             
             iAtm->formType.push_back(sAll);
             
-            std::cout << iAtm->formType[1] << std::endl;
+            //std::cout << iAtm->formType[1] << std::endl;
         }
         
     }

@@ -105,6 +105,9 @@ struct sortMap3
 {
     std::string key;
     std::string val;
+    int         idx;
+    std::string elem;
+    std::string sp;
 };
 
 struct sortMap4

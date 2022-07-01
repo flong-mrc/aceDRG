@@ -3484,7 +3484,8 @@ class CovLinkGenerator(CExeCode):
             
   
     def outVerInfo(self, tOutFile):
-        
+       
+        tOutFile.write("data_program_info\n\n") 
         tOutFile.write("%s%s\n"%("_acedrg_version".ljust(30),    self.verInfo["ACEDRG_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_acedrg_db_version".ljust(30), self.verInfo["DATABASE_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_rdkit_version".ljust(30),    self.verInfo["RDKit_VERSION"].ljust(20)))

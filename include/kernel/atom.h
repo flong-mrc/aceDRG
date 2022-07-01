@@ -267,6 +267,7 @@ namespace LIBMOL // temp
         int      seriNum;
         ID       resName;
         ID       id; 
+        ID       altId;
         ID       chemType;
         Name     enerType;
         REAL     charge;
@@ -428,6 +429,7 @@ namespace LIBMOL // temp
                        int                     tSeri,
                        std::vector<AtomDict> & tAtoms);
     
+    extern void setAtomsAltId(std::vector<AtomDict> & tAtoms);
     
  
 }

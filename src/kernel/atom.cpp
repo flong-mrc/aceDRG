@@ -262,6 +262,7 @@ namespace LIBMOL
     AtomDict::AtomDict() :seriNum(ZeroInt),
             resName(NullString),
             id(NullString),
+            altId(NullString),
             chemType(NullString),
             enerType(NullString),
             charge(ZeroReal),
@@ -334,6 +335,7 @@ namespace LIBMOL
     AtomDict::AtomDict(const AtomDict& tAtom) : seriNum(tAtom.seriNum), 
             resName(tAtom.resName),
             id(tAtom.id),
+            altId(tAtom.altId),
             chemType(tAtom.chemType),
             enerType(tAtom.enerType),
             charge(tAtom.charge),
@@ -1109,5 +1111,41 @@ namespace LIBMOL
         }
         
         return lFind;
+    }
+    
+    extern void setAtomsAltId(std::vector<AtomDict> & tAtoms)
+    {
+        std::map<std::string, int> elemDistr;
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            if (elemDistr.find(iAt->chemType)==elemDistr.end())
+            {
+                elemDistr[iAt->chemType] =1;
+            }
+            else
+            {
+                elemDistr[iAt->chemType] +=1;
+            }
+        }
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            iAt->altId = iAt->chemType + IntToStr(elemDistr[iAt->chemType]);
+            elemDistr[iAt->chemType]--;
+        }
+        
+        // Check 
+        std::cout << "Now atoms are renamed " << std::endl;
+        
+        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                iAt !=tAtoms.end(); iAt++)
+        {
+            std::cout << "Original name : " << iAt->id 
+                      << "  New name : " << iAt->altId << std::endl;
+        }
+        
     }
 }

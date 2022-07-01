@@ -3420,7 +3420,7 @@ namespace LIBMOL
                     }
                     else if(lBloc["compList"])
                     {
-                        //std::cout << "get compound info" << std::endl;
+                        // std::cout << "get compound info" << std::endl;
                         getChemInfo(tRecord);
                     }
                     else if (lBloc["dataDesc"])
@@ -3429,6 +3429,7 @@ namespace LIBMOL
                     }
                     else if(lBloc["atom"])
                     {   
+                        //std::cout << "get atom info" << std::endl;
                         getAtomInfo(tBuf);
                     }
                     else if(lBloc["bond"])
@@ -3463,8 +3464,8 @@ namespace LIBMOL
             
             inFile.close();
             
-             
             
+            /*
             //std::cout << "CCP4 type " << hasCCP4Type << std::endl;
             
             
@@ -3487,7 +3488,7 @@ namespace LIBMOL
                 std::cout << " No " << std::endl;   
             }
             
-            
+            */
             // std::cout << "The system description level " << propComp.level << std::endl;
             
             // Set the bonding properties for all atoms based
@@ -3497,9 +3498,11 @@ namespace LIBMOL
             {
                 std::cout << "There is no bond defined in the cif file. Program stopped"
                         << std::endl;
-               
+                exit(1);    
             }
-                        
+            //std::cout << "Number of atoms " << allAtoms.size() << std::endl;
+            //std::cout << "Number of bonds " << allBonds.size() << std::endl;
+                      
             
             setHydroAtomConnect();
             // addMissHydroAtoms();
@@ -3510,15 +3513,19 @@ namespace LIBMOL
             
             setAtomsCChemType();
             
+            
+            
             setAtomsMetalType();
             
             setAtomsVDWRadius();
             
             setAtomsPartialCharges();
+           
             
             ringDetecting();
             
             setAtomFormTypes(allAtoms);
+            
             
             if (!hasCCP4Type)
             {
@@ -3526,7 +3533,7 @@ namespace LIBMOL
             }
             
             
-            /*
+            
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
             {
@@ -3569,7 +3576,7 @@ namespace LIBMOL
                 //std::cout << "Its sigLength : " << iBo->sigLength << std::endl;
                 std::cout << "its order : " << iBo->order << std::endl;
             } 
-            */
+            
             
         }
         
@@ -3786,6 +3793,7 @@ namespace LIBMOL
             {
                 std::vector<std::string> tF1;
                 tF1 = StrTokenize(TrimSpaces(tF[0]), '.');
+                // std::cout <<  tF[0] << std::endl;
                 
                 if((int)tF1.size() ==2)
                 {
@@ -3869,22 +3877,22 @@ namespace LIBMOL
                     if (hasProps["compoundInfo"].find("id") != hasProps["compoundInfo"].end())
                     {
                         propComp.id   = TrimSpaces(tF4[hasProps["compoundInfo"]["id"]]);
-                        std::cout << "Compound ID " << propComp.id  << std::endl;
+                        //std::cout << "Compound ID " << propComp.id  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("three_letter_code") != hasProps["compoundInfo"].end())
                     {
                         propComp.code = TrimSpaces(tF4[hasProps["compoundInfo"]["three_letter_code"]]);
-                        std::cout << "Compound Code " << propComp.code  << std::endl;
+                        //std::cout << "Compound Code " << propComp.code  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("name") != hasProps["compoundInfo"].end())
                     {
                         propComp.name = TrimSpaces(tF4[hasProps["compoundInfo"]["name"]]);
-                        std::cout << "Compound name " << propComp.name  << std::endl;
+                        //std::cout << "Compound name " << propComp.name  << std::endl;
                     }
                     if (hasProps["compoundInfo"].find("type") != hasProps["compoundInfo"].end())
                     {
                         propComp.group = TrimSpaces(tF4[hasProps["compoundInfo"]["type"]]);
-                        std::cout << "Compound type " << propComp.group  << std::endl;
+                        //std::cout << "Compound type " << propComp.group  << std::endl;
                         StrUpper(propComp.group);
                         if (propComp.group.find("PEPTIDE") !=std::string::npos)
                         {
@@ -3899,7 +3907,7 @@ namespace LIBMOL
                     if (hasProps["compoundInfo"].find("group") != hasProps["compoundInfo"].end())
                     {
                         propComp.group = TrimSpaces(tF4[hasProps["compoundInfo"]["group"]]);
-                        std::cout << "Compound group " << propComp.group  << std::endl;
+                        //std::cout << "Compound group " << propComp.group  << std::endl;
                         StrUpper(propComp.group);
                         if (propComp.group.find("PEPTIDE") !=std::string::npos)
                         {
@@ -3917,7 +3925,7 @@ namespace LIBMOL
                         if (isInt(tST1))
                         {
                             propComp.numAtoms = StrToInt(tST1);
-                            std::cout << "Number of atoms  " << propComp.numAtoms  << std::endl;
+                            //std::cout << "Number of atoms  " << propComp.numAtoms  << std::endl;
                         }
                     }
                     if (hasProps["compoundInfo"].find("number_atoms_nh") != hasProps["compoundInfo"].end())
@@ -3926,7 +3934,7 @@ namespace LIBMOL
                         if (isInt(tST2))
                         {
                             propComp.numH = StrToInt(tST2);
-                            std::cout << "number of H atoms " << propComp.numH  << std::endl;
+                            //std::cout << "number of H atoms " << propComp.numH  << std::endl;
                         }
                     }
                     if (hasProps["compoundInfo"].find("desc_level") != hasProps["compoundInfo"].end())
@@ -4081,7 +4089,7 @@ namespace LIBMOL
                 itsCurAtom->existProps["id"] =  hasProps["atom"]["id"];
                 cleanSymbol(tF[hasProps["atom"]["id"]], "\"");
                 itsCurAtom->id = TrimSpaces(tF[hasProps["atom"]["id"]]);
-                // std::cout << "Its ID: " << itsCurAtom->id << std::endl;
+                //std::cout << "Its ID: " << itsCurAtom->id << std::endl;
             }
             if (hasProps["atom"].find("chemType") != hasProps["atom"].end())
             {
@@ -4173,7 +4181,8 @@ namespace LIBMOL
                     if (tSY.find("?") == std::string::npos)
                     {
                         itsCurAtom->coords[1]=StrToReal(tSY);
-                        std::cout << "Its coord y : " << itsCurAtom->coords[1] << std::endl;
+                        // std::cout << "Its coord y : " 
+                        // << itsCurAtom->coords[1] << std::endl;
                     }
                 }
                 if (hasProps["atom"].find("model_Cartn_z") != hasProps["atom"].end())
@@ -4203,6 +4212,7 @@ namespace LIBMOL
             }
             
             allAtoms.push_back(*itsCurAtom);
+            //std::cout << "Number of atoms now " << allAtoms.size() << std::endl;
             if (itsCurAtom->chemType == "H")
             {
                 allHydroAtoms.push_back((int)allAtoms.size()-1);
@@ -4593,7 +4603,7 @@ namespace LIBMOL
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                      "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                      "Sc", "sc", "Y",  "y",
-                     "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", "Po", "po",
+                     "Sb", "sb", "Te", "te", "Po", "po",
                      "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
                      "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
                      "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
@@ -4605,8 +4615,8 @@ namespace LIBMOL
                      "Zn", "zn", "Cd", "cd", "Hg", "hg",   
                      "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
                      "Sn", "sn", "Pb", "pb", "Bi", "bi"};
-        
-        MetalTable.assign(metals, metals+121);
+        // "Si", "si", "Ge", "ge", "As", "as",
+        MetalTable.assign(metals, metals+115);
         /*
         std::cout << "Metal Elements :" << std::endl;
         for (std::vector<ID>::iterator iM =MetalTable.begin();
@@ -4660,6 +4670,20 @@ namespace LIBMOL
                           << iA->metalGeo << std::endl;
             }
         }
+        
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA != allAtoms.end(); iA++)
+        { 
+            if (iA->isMetal)
+            {
+                std::cout << iA->id << " is a metal atom " << std::endl;
+            }
+            else
+            {
+                std::cout << iA->id << " is a organic atom " << std::endl;
+            }
+        }
+        
     }
     
     void DictCifFile::addMissHydroAtoms()

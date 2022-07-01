@@ -249,8 +249,11 @@ namespace LIBMOL
         bool colidAtom(std::vector<REAL>               & tFrcX,
                        std::vector<AtomDict>  &  tRefAtoms, int tMode);
         bool isASUAtomInMol(std::map<unsigned, std::vector<int> >::iterator tMol);
+        
         bool connMetal(std::vector<int>      & tIdxs, 
                        std::vector<AtomDict> & tAtoms);
+        bool connMetal1stNB(std::vector<int>      & tIdxs, 
+                            std::vector<AtomDict> & tAtoms);
         bool connMetal2ndNB(std::vector<int>      & tIdxs, 
                        std::vector<AtomDict> & tAtoms);
         
@@ -308,6 +311,9 @@ namespace LIBMOL
         
         void outTableMols(std::ofstream & tMolTabs, 
                           Molecule & tMol);
+        void outMolMmcif(FileName tOutName,
+                         ID tMonoRootName,
+                         Molecule  & tMol);
         void outTableBAndA(FileName tBAndAFName);
         void setTableSpAndChirals(Molecule & tMol, 
                                   std::map<std::string, std::map<std::string,

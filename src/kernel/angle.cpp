@@ -212,6 +212,12 @@ namespace LIBMOL
             atoms.push_back(*iAt);
         }
         
+        for (std::vector<ID>::const_iterator iAd=tAngle.atomsId.begin();
+                iAd != tAngle.atomsId.end(); iAd++)
+        {
+            atomsId.push_back(*iAd);
+        }
+        
         for(std::vector<ID>::const_iterator iID=tAngle.atomChemTypes.begin();
                 iID !=tAngle.atomChemTypes.end(); iID++)
         {

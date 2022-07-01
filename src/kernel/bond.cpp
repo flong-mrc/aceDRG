@@ -245,12 +245,21 @@ namespace LIBMOL
         {
             atoms.push_back(*tA);
         }
+        
         for (std::vector<int>::const_iterator iI=tBond.atomsIdx.begin();
                 iI !=tBond.atomsIdx.end(); iI++)
         {
         
             atomsIdx.push_back(*iI);
         } 
+        
+        for (std::vector<ID>::const_iterator iE=tBond.atomsElem.begin();
+                iE !=tBond.atomsElem.end(); iE++)
+        {
+        
+            atomsElem.push_back(*iE);
+        } 
+        
         
         for (std::vector<ID>::const_iterator tA = tBond.atomsCodClasses.begin();
                 tA != tBond.atomsCodClasses.end(); tA++)

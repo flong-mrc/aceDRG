@@ -377,14 +377,17 @@ namespace LIBMOL
         void levelSearchBonds(std::vector<int>          &      tKeySet1,
                               std::vector<std::string>  &      tKeySet2,
                               int                              tLev,
+                              int                              tNumTh,
                               std::vector<BondDict>::iterator  iB);
         void levelSearchBondsT(std::vector<int>          &      tKeySet1,
                                std::vector<std::string>  &      tKeySet2,
                                int                              tLev,
+                               int                              tNumTh,
                                std::vector<BondDict>::iterator iB);
         void interLevelSearchBonds( std::vector<int>          &      tKeySet1,
                                     std::vector<std::string>  &      tKeySet2,
                                     int                              tStartLev,
+                                    int                              tNumTh,
                                     std::vector<BondDict>::iterator  iB);
         void exchangeSearch(std::vector<int>          &      tKeySet1,
                             std::vector<std::string>  &      tKeySet2,
@@ -469,6 +472,7 @@ namespace LIBMOL
         void levelSearchAngles( std::vector<int>          &      tKeySet,
                                 std::vector<std::string>  &      tKeySet2,
                                 int                              tLev,
+                                int                              tNumTh,
                                 std::vector<AngleDict>::iterator iAN);
         void levelSearchAnglesENG( std::vector<int>          &      tKeySet,
                                    std::vector<std::string>  &      tKeySet2,

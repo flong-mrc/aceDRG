@@ -93,6 +93,7 @@ int main(int argc, char** argv) {
     //std::cout << "user output name " << AJob.IOEntries["userOutName"] 
     //          << std::endl;
     
+    
     for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
             iKW !=AJob.IOEntries.end(); iKW++)
     {   
