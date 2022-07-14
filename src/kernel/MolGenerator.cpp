@@ -333,9 +333,7 @@ namespace LIBMOL {
                     
                     std::cout << "numb of moles after checking inf-moles "
                               << allMolecules.size() 
-                              << std::endl;
-                    
-                    
+                              << std::endl;    
                     /*
                     HuckelMOSuite aMoTool;
                     aMoTool.setWorkMode(2);

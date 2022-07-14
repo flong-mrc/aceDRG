@@ -725,7 +725,7 @@ namespace LIBMOL
                         vec1.push_back(tAtoms[iA->connAtoms[0]].coords[i]-iA->coords[i]);
                         vec2.push_back(tAtoms[iA->connAtoms[1]].coords[i]-iA->coords[i]);
                     }
-                    REAL aAngS = 160.00;
+                    REAL aAngS = 150.00;
                     REAL aAng = getAngle2V(vec1, vec2)*PID180;
                     aAng = fabs(aAng);
                     if (aAng > aAngS)
@@ -738,6 +738,13 @@ namespace LIBMOL
                     }
                 }
             }
+            
+            if((iA->chemType.compare("S")==0) 
+                  && (iA->connAtoms.size() == 2))
+            {
+                iA->bondingIdx = 3;
+            }
+            
             
             iA->hybrid = strTransSP(iA->bondingIdx);
         }

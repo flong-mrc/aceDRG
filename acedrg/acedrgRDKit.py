@@ -1884,7 +1884,8 @@ class AcedrgRDKit(object):
     # The following methods are migrated from Acedrg c++ section
 
     def setAllFormalChargeFuncGroupAtoms(self, tMol, tPH=7.0):
-      
+     
+        print("Is the molecule contains peptides %s ?"%self.isPEP) 
         self.getAllFuncGroupAtoms(tMol)
         if len (self.funcGroups):
             for aFuncG in list(self.funcGroups.keys()):
@@ -1908,8 +1909,9 @@ class AcedrgRDKit(object):
                     print("Doing ", aFuncG)
                     self.setFormalChargeV_A_T(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-LYS") !=-1:
-                    print("Doing ", aFuncG)
-                    self.setFormalChargeNH_LYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
+                    if self.isPEP:
+                        print("Doing ", aFuncG)
+                        self.setFormalChargeNH_LYS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-HIS") !=-1:
                     print("Doing ", aFuncG)
                     self.setFormalChargeNH_HIS(tMol, aFuncG, self.funcGroups[aFuncG], tPH)
