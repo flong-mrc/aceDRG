@@ -8466,13 +8466,26 @@ namespace LIBMOL
                     //idxTorStr = "tor_" + idxTorStr;
                     // std::cout << "Torsion angle " << idxTor 
                     //          << " It contains " << (int)iT->atoms.size() << std::endl;
-                          
-                    //std::cout << iT->atoms[0] << std::endl
-                    //          << iT->atoms[1] << std::endl
-                    //          << iT->atoms[2] << std::endl
-                    //          << iT->atoms[3] << std::endl;
+                     /*
+                    std::cout << "atom sp in a torsion " << std::endl;
+                    
+                    std::cout << "atom " << tAtoms[iT->atoms[1]].id
+                              << " : " << tAtoms[iT->atoms[1]].hybrid
+                              << std::endl
+                              << "atom " << tAtoms[iT->atoms[2]].id
+                              << " : " << tAtoms[iT->atoms[1]].hybrid
+                              << std::endl;
+                    */
+                    
                     std::string aTorSiga;
                     if (iT->id.find("sp2_sp2") !=std::string::npos)
+                    {
+                        aTorSiga = "5.0";
+                    }
+                    else if (tAtoms[iT->atoms[1]].hybrid.find("SP2") 
+                             !=std::string::npos
+                            && tAtoms[iT->atoms[2]].hybrid.find("SP2")
+                             !=std::string::npos)
                     {
                         aTorSiga = "5.0";
                     }
