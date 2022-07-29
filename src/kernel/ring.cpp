@@ -883,104 +883,107 @@ namespace LIBMOL
                   << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
+            
             if (tAtoms[tIdx].charge==0.0)
             {
-            if (tAtoms[tIdx].chemType.compare("C") ==0)
-            {           
-                if (tAtoms[tIdx].connAtoms.size() ==3)
-                {
-                    bool aD=false;
-                    for (unsigned i=0; i < tAtoms[tIdx].connAtoms.size();
-                           i++)
+                if (tAtoms[tIdx].chemType.compare("C") ==0)
+                {        
+                    if (tAtoms[tIdx].connAtoms.size() ==3)
                     {
-                        // check if there is a double bonded atom outside the ring 
-                        int aNbIdx = tAtoms[tIdx].connAtoms[i];
-                        if (tAtoms[aNbIdx].chemType.compare("O")==0 
-                              && tAtoms[aNbIdx].connAtoms.size()==1
-                              && tAtoms[aNbIdx].charge ==0)
+                        bool aD=false;
+                        for (unsigned i=0; i < tAtoms[tIdx].connAtoms.size();
+                           i++)
                         {
-                            // double bonded Oxy 
-                            aD = true;
-                        }
-                        else if (tAtoms[aNbIdx].chemType.compare("C")==0
-                                 && tAtoms[aNbIdx].connAtoms.size()==3)
-                        {
-                            int nH=0;
-                            for (unsigned j=0; j < tAtoms[aNbIdx].connAtoms.size(); j++)
+                            // check if there is a double bonded atom outside 
+                            // the ring 
+                            int aNbIdx = tAtoms[tIdx].connAtoms[i];
+                            if (tAtoms[aNbIdx].chemType.compare("O")==0 
+                                && tAtoms[aNbIdx].connAtoms.size()==1
+                                && tAtoms[aNbIdx].charge ==0)
                             {
-                                int bNbIdx = tAtoms[aNbIdx].connAtoms[j];
-                                if (tAtoms[bNbIdx].chemType.compare("H")==0)
+                                // double bonded Oxy 
+                                aD = true;
+                            }
+                            else if (tAtoms[aNbIdx].chemType.compare("C")==0
+                                     && tAtoms[aNbIdx].connAtoms.size()==3)
+                            {
+                                int nH=0;
+                                for (unsigned j=0; 
+                                     j < tAtoms[aNbIdx].connAtoms.size(); j++)
                                 {
-                                    nH++;
+                                    int bNbIdx = tAtoms[aNbIdx].connAtoms[j];
+                                    if (tAtoms[bNbIdx].chemType.compare("H")==0)
+                                    {
+                                        nH++;
+                                    }
+                                }
+                                if (nH >=2)
+                                {
+                                    aD=true;
                                 }
                             }
-                            if (nH >=2)
-                            {
-                                aD=true;
-                            }
+                        }
+                        if (!aD)
+                        {
+                            aN=1.0;
                         }
                     }
-                    if (!aD)
+                    else if (tAtoms[tIdx].connAtoms.size() ==2)
                     {
-                        aN=1.0;
+                        // Place holder in case for future. 
+                        aN=0.0;
                     }
                 }
-                else if (tAtoms[tIdx].connAtoms.size() ==2)
+                else if (tAtoms[tIdx].chemType.compare("N") ==0)
                 {
-                    // Place holder in case for future. 
-                    aN=0.0;
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    {
+                        // one electron becomes a pi electron.
+                        aN=1.0;
+                    }
+                    else if (tAtoms[tIdx].connAtoms.size()==3)
+                    {
+                        // the lone pair contributes two
+                        aN=2.0;
+                    }
                 }
-            }
-            else if (tAtoms[tIdx].chemType.compare("N") ==0)
-            {
-                if (tAtoms[tIdx].connAtoms.size()==2)
+                else if (tAtoms[tIdx].chemType.compare("B") ==0)
                 {
-                    // one electron becomes a pi electron.
-                    aN=1.0;
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    { 
+                        // one electron becomes a pi electron.
+                        aN=1.0;
+                    }
+                    else if (tAtoms[tIdx].connAtoms.size()==3)
+                    {
+                        // the lone pair contributes two
+                        aN=0.0;
+                    }
                 }
-                else if (tAtoms[tIdx].connAtoms.size()==3)
+                else if(tAtoms[tIdx].chemType.compare("O") ==0)
                 {
-                    // the lone pair contributes two
-                    aN=2.0;
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    {
+                        // one lone pair contributes two
+                        aN=2.0;
+                    }
                 }
-            }
-            else if (tAtoms[tIdx].chemType.compare("B") ==0)
-            {
-                if (tAtoms[tIdx].connAtoms.size()==2)
+                else if(tAtoms[tIdx].chemType.compare("S") ==0)
                 {
-                    // one electron becomes a pi electron.
-                    aN=1.0;
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    {
+                        // one lone pair contributes two
+                        aN=2.0;
+                    }
                 }
-                else if (tAtoms[tIdx].connAtoms.size()==3)
+                else if(tAtoms[tIdx].chemType.compare("P") ==0)
                 {
-                    // the lone pair contributes two
-                    aN=0.0;
+                    if (tAtoms[tIdx].connAtoms.size()==3)
+                    {
+                        // one lone pair contributes two
+                        aN=2.0;
+                    }
                 }
-            }
-            else if(tAtoms[tIdx].chemType.compare("O") ==0)
-            {
-                if (tAtoms[tIdx].connAtoms.size()==2)
-                {
-                    // one lone pair contributes two
-                    aN=2.0;
-                }
-            }
-            else if(tAtoms[tIdx].chemType.compare("S") ==0)
-            {
-                if (tAtoms[tIdx].connAtoms.size()==2)
-                {
-                    // one lone pair contributes two
-                    aN=2.0;
-                }
-            }
-            else if(tAtoms[tIdx].chemType.compare("P") ==0)
-            {
-                if (tAtoms[tIdx].connAtoms.size()==3)
-                {
-                    // one lone pair contributes two
-                    aN=2.0;
-                }
-            }
             }
             else
             {
@@ -1013,7 +1016,10 @@ namespace LIBMOL
                         if (tAtoms[tIdx].connAtoms.size() ==3)
                         {
                             // Place holder in case for future. 
-                            aN=1.0;
+                            //aN=1.0;
+                            // cancel formal charge effect 
+                            //
+                            aN = 2.0;                 
                         }
                     }
                 }

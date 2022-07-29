@@ -7252,17 +7252,21 @@ namespace LIBMOL
         }
         else if(tLev==4)
         {
+            // std::cout << "started here" << std::endl;
             // a2NB not found
             // 1 entries associated with a1NB
             std::vector<aValueSet> tBs5;
             for (std::map<ID, std::vector<aValueSet> >::iterator iB5
-                 =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]][tKeySet2[4]].begin();
-                 iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]][tKeySet2[4]].end();
-                 iB5++)
+                 =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]]
+                 [tKeySet2[1]][tKeySet2[2]][tKeySet2[3]][tKeySet2[4]].begin();
+                 iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]]
+                       [tKeySet2[1]][tKeySet2[2]][tKeySet2[3]][tKeySet2[4]].end();
+                       iB5++)
             {
                 for(std::vector<aValueSet>::iterator iB6=iB5->second.begin();
                     iB6 !=iB5->second.end(); iB6++)
                 {
+                    
                     tBs5.push_back(*iB6);
                 }
             }
