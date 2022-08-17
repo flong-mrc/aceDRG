@@ -295,7 +295,15 @@ namespace LIBMOL
             else if (iAt->chemType.compare("S")==0)
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                if(t_len==4 || t_len==3 || t_len==2)
+                if(t_len==3 || t_len==2)
+                {
+                    if (iAt->chiralIdx ==0)
+                    {
+                        iAt->chiralIdx  = 2;
+                    }
+                    iAt->bondingIdx = 2;
+                }
+                else if (t_len==4)
                 {
                     if (iAt->chiralIdx ==0)
                     {
@@ -742,7 +750,7 @@ namespace LIBMOL
             if((iA->chemType.compare("S")==0) 
                   && (iA->connAtoms.size() == 2))
             {
-                iA->bondingIdx = 3;
+                iA->bondingIdx = 2;
             }
             
             
@@ -2390,6 +2398,9 @@ namespace LIBMOL
         orgElemValMap["SE"].push_back(4);
         orgElemValMap["SE"].push_back(6);
         orgElemValMap["B"].push_back(3);
+        orgElemValMap["SI"].push_back(4);
+        orgElemValMap["GE"].push_back(4);
+        orgElemValMap["AS"].push_back(3);
         
         orgElemValMap["H"].push_back(1);
         orgElemValMap["F"].push_back(1);
@@ -2408,6 +2419,7 @@ namespace LIBMOL
             
             if (std::find(orgTab.begin(), orgTab.end(), aElm) != orgTab.end())
             {
+                std::cout << "atom  : " << iAt->id << std::endl;
                 int valSize = (int)orgElemValMap[aElm].size();
                 int orgNB =0;
                 for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
@@ -2417,11 +2429,15 @@ namespace LIBMOL
                     StrUpper(aNBElm);
                     if(std::find(orgTab.begin(), orgTab.end(), aNBElm) != orgTab.end())
                     {
+                        std::cout << tAtoms[*iNB].id << " add to OrgNB " << std::endl; 
                         orgNB++;
                     }
                 }
                 
                 int nExEls = orgElemValMap[aElm][0] + iAt->formalCharge - orgNB;
+                
+                    std::cout << "orgNB : " << orgNB   << std::endl
+                              << "EX    : " << nExEls << std::endl;  
                 if (nExEls < 0)
                 {
                     int i = 1;
@@ -2459,12 +2475,12 @@ namespace LIBMOL
                     iAt->excessElec = nExEls;
                 }
             
-                //std::cout << "For atom " << iAt->id << " : " << std::endl
-                //          << "it connects " << iAt->connAtoms.size() 
-                //          << " atom(s) " << std::endl
-                //          << "its formal charge is " << iAt->formalCharge << std::endl 
-                //          << "its number of EX electrons is " << iAt->excessElec 
-                //          << std::endl;
+                std::cout << "For atom " << iAt->id << " : " << std::endl
+                          << "it connects " << iAt->connAtoms.size() 
+                          << " atom(s) " << std::endl
+                          << "its formal charge is " << iAt->formalCharge << std::endl 
+                          << "its number of EX electrons is " << iAt->excessElec 
+                          << std::endl;
             }   
         }  
     }

@@ -7092,6 +7092,7 @@ namespace LIBMOL {
             aOutCif << "_chem_comp_atom.atom_alt_id"  << std::endl;
             aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
             aOutCif << "_chem_comp_atom.charge" << std::endl;
+            aOutCif << "_chem_comp_atom.excess_electrons" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_x" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_y" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_z" << std::endl;
@@ -7109,6 +7110,8 @@ namespace LIBMOL {
                 aOutCif << std::left << iAt->chemType;
                 aOutCif.width(10);
                 aOutCif << std::left << iAt->charge;
+                aOutCif.width(10);
+                aOutCif << std::left << iAt->excessElec;
                 aOutCif.width(10);
                 aOutCif << std::left << std::setprecision(3)
                         <<std::fixed << iAt->coords[0];
@@ -7633,11 +7636,11 @@ namespace LIBMOL {
         if (tFinMols.size() > 0) 
         {
             Name allMolsFName(tRootName);
-            allMolsFName.append("_all_mols.txt");
+            allMolsFName.append("_all_mols.cif");
             std::ofstream aMolTable(allMolsFName.c_str());
             std::string aMolRootName(tRootName);
             aMolRootName.append("_mol_");
-
+            aMolTable << "data_all_mols" << std::endl;
             aMolTable << "_num_finite_mols\t" << tFinMols.size() << std::endl
                       << "_num_infinite_mols\t" << tInfMols.size() << std::endl;
 

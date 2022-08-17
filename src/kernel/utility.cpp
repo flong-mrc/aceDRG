@@ -2007,11 +2007,11 @@ namespace LIBMOL
 
     extern void initOrgTable(std::vector<std::string> & tOrgTab)
     {
-        ID orgSet[] = {"AT", "At", "at", "B", "b", "BR", "Br", "br", 
+        ID orgSet[] = {"AS", "As", "as", "AT", "At", "at", "B", "b", "BR", "Br", "br", 
                        "C", "c", "CL", "Cl", "cl", "F", "f", "H", "h",
                        "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", 
-                       "SE", "Se", "se"};
-        tOrgTab.assign(orgSet, orgSet+30);
+                       "SE", "Se", "se", "SI", "Si", "si", "GE", "Ge", "ge"};
+        tOrgTab.assign(orgSet, orgSet+39);
         
     }
     

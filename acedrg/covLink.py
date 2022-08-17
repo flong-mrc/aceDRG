@@ -3401,10 +3401,11 @@ class CovLinkGenerator(CExeCode):
                     aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
    
         tLinkedObj.cLink["torsions"] = []
-        for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
-            if (aTor["atom_id_2_alias"] == atm1 and aTor["atom_id_3_alias"] == atm2) or\
-               (aTor["atom_id_2_alias"] == atm2 and aTor["atom_id_3_alias"] == atm1):
-                tLinkedObj.cLink["torsions"].append(aTor)
+        self.selectTors(atm1, atm2, tLinkedObj.cLink["torsions"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"])
+        #for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["tors"]:
+        #    if (aTor["atom_id_2_alias"] == atm1 and aTor["atom_id_3_alias"] == atm2) or\
+        #       (aTor["atom_id_2_alias"] == atm2 and aTor["atom_id_3_alias"] == atm1):
+        #        tLinkedObj.cLink["torsions"].append(aTor)
         print("Number of Link Torsions ", len(tLinkedObj.cLink["torsions"]))
         print("They are :")
         for aTor in tLinkedObj.cLink["torsions"]:
@@ -3454,7 +3455,31 @@ class CovLinkGenerator(CExeCode):
                 for aAtm in tLinkedObj.cLink["planes"][aPl]:
                     print("Plane %s, atom  %s in residue %d, dist_esd  %s "%(aAtm["plane_id"], aAtm["atom_id"], aAtm["atom_id_resNum"], aAtm["dist_esd"]))
 
-       
+    def selectTors(self, tAtm1Id, tAtm2Id, tLinkTors, tOutCombLigandTors):
+        
+        # Two extract loops to keep tors enter in order
+        for aTor in tOutCombLigandTors:
+            if (aTor["atom_id_2_alias"] == tAtm1Id and aTor["atom_id_3_alias"] == tAtm2Id) or\
+               (aTor["atom_id_2_alias"] == tAtm2Id and aTor["atom_id_3_alias"] == tAtm1Id):
+                if aTor["atom_id_1_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
+                    tLinkTors.append(aTor)
+
+        for aTor in tOutCombLigandTors:
+            if (aTor["atom_id_1_alias"] == tAtm1Id and aTor["atom_id_2_alias"] == tAtm2Id):
+                if aTor["atom_id_3_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
+                    tLinkTors.append(aTor)
+            elif (aTor["atom_id_4_alias"] == tAtm1Id and aTor["atom_id_3_alias"] == tAtm2Id):
+                if aTor["atom_id_2_alias"][0] !="H" and aTor["atom_id_1_alias"][0] !="H":
+                    tLinkTors.append(aTor)
+               
+        for aTor in tOutCombLigandTors:
+            if (aTor["atom_id_1_alias"] == tAtm2Id and aTor["atom_id_2_alias"] == tAtm1Id):
+                if aTor["atom_id_3_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
+                    tLinkTors.append(aTor)
+            elif (aTor["atom_id_4_alias"] == tAtm2Id and aTor["atom_id_3_alias"] == tAtm1Id):
+                if aTor["atom_id_2_alias"][0] !="H" and aTor["atom_id_1_alias"][0] !="H":
+                    tLinkTors.append(aTor)
+               
     def outOneLinkInfo(self, tLinkedObj):
 
         #aOutCifName = tLinkedObj.combLigand["name"] + "_link.cif"

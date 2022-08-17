@@ -756,9 +756,7 @@ namespace LIBMOL
             //}
             //else
             //{    
-            std::cout << "Atom " << tAtoms[*iAt].id 
-                      << " its charge " << tAtoms[*iAt].charge << std::endl
-                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            
             
             numOneAtm = setPiForOneAtom(*iAt, tAtoms);
             //}
