@@ -238,6 +238,7 @@ namespace LIBMOL {
                     
                     
                     getOverallBondAndAnglesNew();
+                    
                     outTables(tOutName, allMolecules, aSetOfInfMols);
                 } 
                 else 
@@ -314,13 +315,10 @@ namespace LIBMOL {
                     
                     buildAndValidMols(aPTable, iCryst);
                     
-                    
                     // getAtomTypeMols();
-                    
-                    
+
                     std::vector<Molecule> aSetOfFiniteMols, aSetOfInfMols;
                     checkInfMols(aSetOfInfMols, aSetOfFiniteMols);
-
                     allMolecules.clear();
                     
                     for (std::vector<Molecule>::iterator iMol
@@ -331,9 +329,20 @@ namespace LIBMOL {
                         allMolecules.push_back(*iMol);
                     }
                     
-                    std::cout << "numb of moles after checking inf-moles "
+                    std::cout << "number of moles after checking inf-moles "
                               << allMolecules.size() 
-                              << std::endl;    
+                              << std::endl; 
+                    /* 
+                    HuckelMOSuite aHuTool;
+                    for (std::vector<Molecule>::iterator iMol=allMolecules.begin();
+                    iMol !=allMolecules.end(); iMol++)
+                    {
+                        std::cout << "Note: Molecule " << iMol->seriNum 
+                                  << std::endl;
+                        
+                        setBondOrderAndFormalChargeByExcessEl((*iMol), aHuTool);
+                    }
+                    */
                     /*
                     HuckelMOSuite aMoTool;
                     aMoTool.setWorkMode(2);
@@ -361,6 +370,7 @@ namespace LIBMOL {
                     getOverallBondAndAnglesNew();
                     
                     outTables(tOutName, allMolecules, aSetOfInfMols);
+                    
                 } 
                 else 
                 {
@@ -3829,7 +3839,7 @@ namespace LIBMOL {
 
         setBondsAndAngles_NB1NB2_SP(tMol.atoms, tMol.allBonds, tMol.angles);
         setBondsAndAngles_NB1NB2_EE(tMol.atoms, tMol.allBonds, tMol.angles);
-
+        
         getUniqueBondsMols2(tMol);
 
     }
@@ -4585,6 +4595,8 @@ namespace LIBMOL {
 
         // std::vector<Molecule> tmpMols;
         
+        HuckelMOSuite  aHuTool;
+        
         int nMol = 0;
         int allAsy = 0;
         for (std::map<unsigned, std::vector<int> >::iterator 
@@ -4739,6 +4751,7 @@ namespace LIBMOL {
         std::cout << "Number of molecules in allMolecules after further check "
                   << allMolecules.size() << std::endl;
         std::cout << "Final check, whole structure finished " << std::endl;
+        
         
     }
 
@@ -5995,6 +6008,8 @@ namespace LIBMOL {
 
         setAtomsBondingAndChiralCenter(aCodSys.allAtoms);
         
+        
+        
         aCodSys.codAtomClassifyNew2(2);
         
         
@@ -6102,6 +6117,25 @@ namespace LIBMOL {
          */
     }
 
+    void MolGenerator::setBondOrderAndFormalChargeByExcessEl(Molecule& tMol,
+                                                        HuckelMOSuite & tHuTool)
+    {
+        for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
+                iAt != tMol.atoms.end(); iAt++) 
+        {
+            iAt->excessElec =0;
+        }
+        
+        setAllAtomEXcessElectrons(tMol.atoms);
+        
+        tMol.rings.clear();
+        
+        setAtomRingProps(tMol.atoms, tMol.rings);
+        
+        //tHuTool.execute3(tMol.atoms, tMol.bonds, tMol.rings);
+        
+    }
+    
     void MolGenerator::setAtomNFormalCharge(Molecule& tMol) {
         // check if the input cif file does not put formal charges in some N atoms
         // see 1000006 for example 
@@ -6843,7 +6877,8 @@ namespace LIBMOL {
                         << iAt->codClass << std::endl;
             }
             tMolTabs << std::endl;
-        } else 
+        } 
+        else 
         {
             std::cout << "There is no atoms in the molecule" << std::endl;
         }
@@ -7025,8 +7060,6 @@ namespace LIBMOL {
             tMolTabs << std::setw(6)  << sumEx << std::endl << std::endl;
         }
          */
-
-
     }
     
     void MolGenerator::outMolMmcif(FileName tOutName, 

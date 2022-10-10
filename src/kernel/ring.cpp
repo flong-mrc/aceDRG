@@ -58,6 +58,7 @@ namespace LIBMOL
     //Another ring class for the dictionary
     RingDict::RingDict():isPlanar(false),
             isAromatic(false),
+            isAromaticP(false),
             isAntiAroma(false),
             isSugar(false),
             sugarType(NullString),
@@ -69,6 +70,7 @@ namespace LIBMOL
     
     RingDict::RingDict(const RingDict& tR):isPlanar(tR.isPlanar),
             isAromatic(tR.isAromatic),
+            isAromaticP(tR.isAromaticP),
             isAntiAroma(tR.isAntiAroma),
             isSugar(tR.isSugar),
             sugarType(tR.sugarType),
@@ -782,9 +784,55 @@ namespace LIBMOL
         return lAr;
         
     }
-    
+
+    extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
+                              std::vector<AtomDict> & tAtoms,
+                              int                     tMode)
+    {
+        bool lAr=false;
+        REAL numPiAll=0.0;
+        
+        for (std::vector<int>::iterator iAt=tSubAtoms.begin();
+                iAt !=tSubAtoms.end(); iAt++)
+        {
+            REAL numOneAtm =0.0;
+            //if(tAtoms[*iAt].chemType=="S" 
+            //   && tAtoms[*iAt].connAtoms.size()==4)
+            //{
+            //    numOneAtm = setPiForOne_S_Sp3_Atom(*iAt, tSubAtoms, tAtoms);
+            //}
+            //else
+            //{    
+            
+            
+            numOneAtm = setPiForOneAtom(*iAt, tAtoms, tMode);
+            //}
+            
+            
+            std::cout << "Atom " << tAtoms[*iAt].id 
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            if (numOneAtm > 0.0)
+            {
+                numPiAll +=numOneAtm;
+            }
+        }       
+        
+        //std::cout << "number of pi electron in the system is " 
+        //          <<  numPiAll << std::endl;
+        
+        if (numPiAll > 0.0 && fabs(fmod(numPiAll, 4.0)-2.0) < 0.001)
+        {
+            lAr = true;
+        }
+        
+        return lAr;
+        
+    }
+
     extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
-                              std::vector<AtomDict> & tAtoms)
+                              std::vector<AtomDict> & tAtoms,
+                              int                     tMode)
     {
         
         REAL numPiAll=0.0;
@@ -804,7 +852,7 @@ namespace LIBMOL
                       << " its charge " << tAtoms[*iAt].charge << std::endl
                       << " add " << numOneAtm << " pi atoms" << std::endl;
             
-            numOneAtm = setPiForOneAtom(*iAt, tAtoms);
+            numOneAtm = setPiForOneAtom(*iAt, tAtoms, tMode);
             //}
             
             
@@ -1014,10 +1062,10 @@ namespace LIBMOL
                         if (tAtoms[tIdx].connAtoms.size() ==3)
                         {
                             // Place holder in case for future. 
-                            //aN=1.0;
+                            aN=1.0;
                             // cancel formal charge effect 
                             //
-                            aN = 2.0;                 
+                            //aN = 2.0;                 
                         }
                     }
                 }
@@ -1097,6 +1145,236 @@ namespace LIBMOL
     }
     
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
+                                int tMode)
+    {
+        REAL aN=0.0;
+        std::cout << "Here charge is " << tAtoms[tIdx].charge << std::endl;
+        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+                  << std::endl;
+        if (tAtoms[tIdx].bondingIdx ==2)
+        {
+            
+            if (tAtoms[tIdx].charge==0.0)
+            {
+                if (tAtoms[tIdx].chemType.compare("C") ==0)
+                {        
+                    if (tAtoms[tIdx].connAtoms.size() ==3)
+                    {
+                        bool aD=false;
+                        for (unsigned i=0; i < tAtoms[tIdx].connAtoms.size();
+                           i++)
+                        {
+                            // check if there is a double bonded atom outside 
+                            // the ring 
+                            int aNbIdx = tAtoms[tIdx].connAtoms[i];
+                            if (tAtoms[aNbIdx].chemType.compare("O")==0 
+                                && tAtoms[aNbIdx].connAtoms.size()==1
+                                && tAtoms[aNbIdx].charge ==0)
+                            {
+                                // double bonded Oxy 
+                                aD = true;
+                            }
+                            else if (tAtoms[aNbIdx].chemType.compare("C")==0
+                                     && tAtoms[aNbIdx].connAtoms.size()==3)
+                            {
+                                int nH=0;
+                                for (unsigned j=0; 
+                                     j < tAtoms[aNbIdx].connAtoms.size(); j++)
+                                {
+                                    int bNbIdx = tAtoms[aNbIdx].connAtoms[j];
+                                    if (tAtoms[bNbIdx].chemType.compare("H")==0)
+                                    {
+                                        nH++;
+                                    }
+                                }
+                                if (nH >=2)
+                                {
+                                    aD=true;
+                                }
+                            }
+                        }
+                        if (!aD)
+                        {
+                            aN=1.0;
+                        }
+                    }
+                    else if (tAtoms[tIdx].connAtoms.size() ==2)
+                    {
+                        // Place holder in case for future. 
+                        aN=0.0;
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("N") ==0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    {
+                        // one electron becomes a pi electron.
+                        aN=1.0;
+                    }
+                    else if (tAtoms[tIdx].connAtoms.size()==3)
+                    {
+                        // the lone pair contributes two
+                        aN=2.0;
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("B") ==0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    { 
+                        // one electron becomes a pi electron.
+                        aN=1.0;
+                    }
+                    else if (tAtoms[tIdx].connAtoms.size()==3)
+                    {
+                        // the lone pair contributes two
+                        aN=0.0;
+                    }
+                }
+                else if(tAtoms[tIdx].chemType.compare("O") ==0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    {
+                        // one lone pair contributes two
+                        aN=2.0;
+                    }
+                }
+                else if(tAtoms[tIdx].chemType.compare("S") ==0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size()==2)
+                    {
+                        // one lone pair contributes two
+                        aN=2.0;
+                    }
+                }
+                else if(tAtoms[tIdx].chemType.compare("P") ==0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size()==3)
+                    {
+                        // one lone pair contributes two
+                        aN=2.0;
+                    }
+                }
+            }
+            else
+            {
+                if (tAtoms[tIdx].chemType.compare("C") ==0)
+                {           
+                    if (tAtoms[tIdx].charge==-1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==3)
+                        {
+                            aN =2.0;
+                        }
+                        else if (tAtoms[tIdx].connAtoms.size() ==2)
+                        {
+                            // Place holder in case for future. 
+                            aN=1.0;
+                        }
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("N") ==0)
+                {           
+                    if (tAtoms[tIdx].charge==-1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==2)
+                        {
+                            aN =2.0;
+                        }
+                    }
+                    else if (tAtoms[tIdx].formalCharge==1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==3)
+                        {
+                            if (tMode ==1)
+                            {
+                               // For aromatic ring plane. 
+                                aN=1.0;
+                            }
+                            else 
+                            {
+                                // For atom classification. It will be 
+                                // calcelled once the charge problem in COO solved 
+                                aN = 2.0;
+                            }                 
+                        }
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("O") ==0)
+                {           
+                    if (tAtoms[tIdx].formalCharge==1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==2)
+                        {
+                            aN =1.0;
+                        }
+                    }
+                }
+                else if (tAtoms[tIdx].chemType.compare("B") ==0)
+                {           
+                    if (tAtoms[tIdx].formalCharge==-1.0)
+                    {
+                        if (tAtoms[tIdx].connAtoms.size() ==3)
+                        {
+                            aN =1.0;
+                        }
+                    }
+                }
+            }
+        }
+        else if (tAtoms[tIdx].bondingIdx ==3 
+                 && (tAtoms[tIdx].chemType.compare("N")==0 
+                     || tAtoms[tIdx].chemType.compare("B")==0))
+                     // || tAtoms[tIdx].chemType.compare("P")==0
+                     // || tAtoms[tIdx].chemType.compare("S")==0))
+        {
+            if (tAtoms[tIdx].chemType.compare("N")==0)
+            {
+                if (tAtoms[tIdx].formalCharge==-1.0)
+                {               
+                    if (tAtoms[tIdx].connAtoms.size() ==2)
+                    {
+                            aN =2.0;
+                        }
+                    }
+                else if (tAtoms[tIdx].formalCharge==1.0)
+                {
+                    if (tAtoms[tIdx].connAtoms.size() ==3)
+                    {                        // Place holder in case for future. 
+                        aN=1.0;
+                    }
+                }
+                else
+                {
+                    aN=2.0;
+                }
+            }
+            else if (tAtoms[tIdx].chemType.compare("B")==0)
+            {
+                aN=0.0;
+            }
+            else if (tAtoms[tIdx].chemType.compare("P")==0)
+            {
+                if (tAtoms[tIdx].connAtoms.size()==4)
+                {
+                    aN=1.0;
+                }
+            }
+            else if (tAtoms[tIdx].chemType.compare("S")==0)
+            {
+                if (tAtoms[tIdx].connAtoms.size()==4)
+                {
+                    
+                    aN=1.0;
+                }
+            }
+        }
+        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
+        std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
+        
+        return aN;
+    }
+
+    extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
                                 std::vector<BondDict> & tBonds)
     {
         REAL aN=0.0;
@@ -1152,7 +1430,9 @@ namespace LIBMOL
         
         return aN;
     }
-        
+
+      
+  
     extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
                                     std::vector<PlaneDict> & tPlanes,
                                     std::vector<AtomDict>  & tAtoms)
@@ -1184,7 +1464,7 @@ namespace LIBMOL
                           << " atoms. They are : " << std::endl;
                     
                 
-                bool lAro = checkAromaSys(atmIdx, tAtoms);
+                bool lAro = checkAromaSys(atmIdx, tAtoms, 0);
                 if (lAro)
                 {
                     iR->isAromatic = true;
@@ -1194,7 +1474,7 @@ namespace LIBMOL
                 else
                 {
                     iR->isAromatic = false;
-                    REAL numPi = getTotalPiElec(atmIdx, tAtoms);
+                    REAL numPi = getTotalPiElec(atmIdx, tAtoms, 0);
                     if (numPi > 0.0 && fabs(fmod(numPi, 4.0)) < 0.001)
                     {
                         
@@ -1207,7 +1487,13 @@ namespace LIBMOL
                     std::cout << iR->isAntiAroma << std::endl;
                     // std::cout << "It is not an aromatic ring " << std::endl;
                 }
-                
+                bool lAroP = checkAromaSys(atmIdx, tAtoms, 1);
+                if (lAroP)
+                {
+                    iR->isAromaticP = true;
+                    tAroRings.push_back(*iR);
+                    // std::cout << "It is an aromatic ring " << std::endl;
+                }
                 //std::cout << std::endl;
             }
             else
@@ -1218,18 +1504,31 @@ namespace LIBMOL
                
                 if (lNBUnR)
                 {
-                    bool lAro = checkAromaSys(atmIdx, tAtoms);
+                    bool lAroP = checkAromaSys(atmIdx, tAtoms,1);
+                       
+                    if (lAroP)
+                    {
+                        iR->isAromaticP = true;
+                        iR->isPlanar   = true;
+                        tAroRings.push_back(*iR);
+                    }
+                    else
+                    {
+                        iR->isAromaticP = false;
+                    }
+ 
+                    bool lAro = checkAromaSys(atmIdx, tAtoms,0);
                        
                     if (lAro)
                     {
                         iR->isAromatic = true;
-                        iR->isPlanar   = true;
                         tAroRings.push_back(*iR);
                     }
                     else
                     {
                         iR->isAromatic = false;
                     }
+
                 }
                 else
                 {

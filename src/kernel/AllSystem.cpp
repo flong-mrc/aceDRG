@@ -277,7 +277,6 @@ namespace LIBMOL
             for (std::vector<RingDict>::iterator iR=iMR->second.begin();
                         iR != iMR->second.end(); iR++)
             {
-                
                 iR->setAtmsLink(allAtoms);
                 allRingsV.push_back(*iR);
             }
@@ -630,7 +629,7 @@ namespace LIBMOL
         
         modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
          
-        
+       
         //if (!hasCCP4Type)
         //{
         //    std::cout << "Need to setup CCP4 types " << std::endl;
@@ -4389,6 +4388,7 @@ namespace LIBMOL
                 }
                 else if (aTor->id.find("CONST") != aTor->id.npos)
                 {
+                    aTor->sigValue = 0.0;
                     tCstTors.push_back(*aTor);
                 }
             }
@@ -4485,6 +4485,7 @@ namespace LIBMOL
             {
                 int addIdx = i+1;
                 cstTors[i].id = "CONST_" + IntToStr(addIdx);
+                cstTors[i].sigValue = 0.0;
                 std::string aId
                      = allAtoms[cstTors[i].atoms[0]].id + "_" + 
                        allAtoms[cstTors[i].atoms[1]].id + "_" +
@@ -5473,7 +5474,6 @@ namespace LIBMOL
         
         
         resetSystem2(aCodSystem);
-        
         
         
        /*

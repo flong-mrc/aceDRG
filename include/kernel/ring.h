@@ -103,6 +103,7 @@ namespace LIBMOL
         
         bool                                     isPlanar;
         bool                                     isAromatic;
+        bool                                     isAromaticP;
         bool                                     isAntiAroma;
         bool                                     isSugar;
         std::string                              sugarType;
@@ -170,12 +171,20 @@ namespace LIBMOL
     
     extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
                               std::vector<AtomDict> & tAtoms);   
-    extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
-                              std::vector<AtomDict> & tAtoms); 
+    //extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
+    //                          std::vector<AtomDict> & tAtoms); 
     extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
                               std::vector<AtomDict> & tAtoms,
                               std::vector<BondDict> & tBonds);
-    
+    // modified to split isAromatic and isAromaticP
+    extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
+                                int                   tMode);
+    extern bool checkAromaSys(std::vector<int>      & tSubAtoms,            
+                              std::vector<AtomDict> & tAtoms,
+                              int                     tMode); 
+    extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
+                               std::vector<AtomDict> & tAtoms,
+                               int                     tMode); 
   
     extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
                                     std::vector<PlaneDict> & tPlanes,

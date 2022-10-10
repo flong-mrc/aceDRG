@@ -67,6 +67,8 @@
 #endif
 
 
+
+
 namespace LIBMOL
 {
     class SpaceGroupMember;
@@ -293,6 +295,8 @@ namespace LIBMOL
         
         bool checkOneMolInf(std::vector<Molecule>::iterator tMol);
         
+        void setBondOrderAndFormalChargeByExcessEl(Molecule & tMol,
+                                                   HuckelMOSuite & tHuTool);
         void setAtomNFormalCharge(Molecule & tMol);
         void getAtomTypeMols();
         void getAtomTypeOneMol(Molecule    & tMol);

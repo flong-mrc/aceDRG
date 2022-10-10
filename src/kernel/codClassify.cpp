@@ -692,7 +692,8 @@ namespace LIBMOL
                       << "Its hashing is " << iAt->hashingValue << std::endl; 
                     
         }
-        
+           
+
         /*
         for (std::vector<BondDict>::iterator iB = allBonds.begin();
                 iB !=allBonds.end(); iB++)
@@ -14611,6 +14612,27 @@ namespace LIBMOL
         return false;
     }
     
+    bool CodClassify::checkATorsAtomsInAroRing(int tAtm1, int tAtm2)
+    {
+        //std::cout << "Check arom for atom " 
+        //          << allAtoms[tAtm1].id << " and "
+        //          << allAtoms[tAtm2].id << std::endl;
+        if (allAtoms[tAtm1].bondingIdx==2 
+            && allAtoms[tAtm2].bondingIdx==2)
+        {     
+            int aBIdx = getBond(allBonds, tAtm1, tAtm2);
+            std::cout << "bond " << aBIdx << std::endl;
+            if (aBIdx !=-1)
+            {
+                if (allBonds[aBIdx].isInSameRing)
+                {
+                    std::cout << "Its in the same ring" << std::endl;
+                    return true;
+                }  
+            }
+        }
+        return false;
+    }
     void CodClassify::fixTorIDs()
     {
         int idxTors  = 1, idxPTors = 1, idxSp3Sp3=1, idxSp2Sp3=1, idxSp2Sp2=1;
@@ -14621,7 +14643,8 @@ namespace LIBMOL
         for (std::vector<TorsionDict>::iterator iT=allTorsions.begin();
                         iT !=allTorsions.end(); iT++)
         {
-            // std::cout << "look at torsion " << iT->seriNum << std::endl;
+            //std::cout << "look at torsion " << iT->seriNum << std::endl;
+            
             if(checkATorsAtomsInPla(iT->atoms))
             {
                 iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
@@ -14630,6 +14653,18 @@ namespace LIBMOL
                     iT->id = "const_" + IntToStr(idxPTors);
                 }
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->sigValue =0.0;
+                idxPTors +=1;
+            }
+            else if (checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2]))
+            {
+                iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
+                if (iT->id.size() >=16 )
+                {
+                    iT->id = "const_" + IntToStr(idxPTors);
+                }
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->sigValue =0.0;
                 idxPTors +=1;
             }
             else

@@ -408,8 +408,8 @@ namespace LIBMOL
         //elements["V"]["vdw"]      = 1.35;
         //elements["V"]["cova"]     = 1.33;
         elemProps["V"]["vdw"]     = 1.35;
-        elemProps["V"]["cova"]    = 1.53;
-        elemProps["V"]["ionM+"]   = 0.68;
+        elemProps["V"]["cova"]    = 1.43;  //1.53;
+        elemProps["V"]["ionM+"]   = 0.60;  // 0.68;
         //elemProps["V3+"]["cova"]    = 0.78;
         //elemProps["V4+"]["cova"]    = 0.72;
         
@@ -1443,6 +1443,7 @@ namespace LIBMOL
         electronConf["Bh"].push_back(std::make_pair ("6d",5));
         
         electronConf["Fe"].push_back(std::make_pair ("3d",6));
+        electronConf["Fe"].push_back(std::make_pair ("4s",2));
         electronConf["Ru"].push_back(std::make_pair ("5s",1));
         electronConf["Ru"].push_back(std::make_pair ("4d",7)); 
         electronConf["Os"].push_back(std::make_pair ("5d",6)); 
@@ -1462,7 +1463,7 @@ namespace LIBMOL
         electronConf["Ds"].push_back(std::make_pair ("7s",1));
         electronConf["Ds"].push_back(std::make_pair ("6d",9));
         
-        electronConf["Cu"].push_back(std::make_pair ("6s",1));
+        electronConf["Cu"].push_back(std::make_pair ("4s",1));
         electronConf["Cu"].push_back(std::make_pair ("3d",10));
         electronConf["Ag"].push_back(std::make_pair ("5s",1));
         electronConf["Ag"].push_back(std::make_pair ("4d",10));

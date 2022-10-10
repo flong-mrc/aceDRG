@@ -259,7 +259,7 @@ namespace LIBMOL
         
         for (unsigned iRIdx=0; iRIdx < tAllRings.size(); iRIdx++)
         {
-            if (tAllRings[iRIdx].isAromatic
+            if (tAllRings[iRIdx].isAromaticP
                 && std::find(exclRings.begin(), exclRings.end(), iRIdx)
                    ==exclRings.end())
             { 
@@ -366,9 +366,10 @@ namespace LIBMOL
              
             }
         }
-         
+        std::cout << "NNN " << std::endl;     
         
     }
+    
     
 }
  

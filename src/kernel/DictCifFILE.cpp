@@ -8051,6 +8051,7 @@ namespace LIBMOL
                          &  tHDistMap)
     {
         
+        /*
         for (std::vector<AtomDict>::iterator iAt= tAtoms.begin();
                 iAt!=tAtoms.end(); iAt++)
         {
@@ -8069,7 +8070,8 @@ namespace LIBMOL
                            tRings);
             //std::cout << "Kekulize done " << std::endl;
         }
-        
+        */
+
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                 iA !=tAtoms.end(); iA++)
         {
@@ -8478,7 +8480,12 @@ namespace LIBMOL
                     */
                     
                     std::string aTorSiga;
-                    if (iT->id.find("sp2_sp2") !=std::string::npos)
+                    if (iT->id.find("const") !=std::string::npos
+                        || iT->id.find("CONST") !=std::string::npos)
+                    {
+                        aTorSiga = "0.0";
+                    }
+                    else if (iT->id.find("sp2_sp2") !=std::string::npos)
                     {
                         aTorSiga = "5.0";
                     }

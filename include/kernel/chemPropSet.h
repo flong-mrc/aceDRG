@@ -308,8 +308,9 @@ namespace LIBMOL
                                      std::vector<AtomDict>::iterator tIA);
     
     extern void setAllAtomEXcessElectrons(std::vector<AtomDict> & tAtoms);
-    extern void setAllAtomEXcessElectrons2(std::vector<AtomDict> & tAtoms);
-                
+    extern int  getOneNBAtomExContri(std::vector<AtomDict>& tAtoms, 
+                                     int tIdxAtm, int tIdxNB);
+               
     extern void setAtomRingProps(std::vector<AtomDict> & tAtoms,
                                  std::vector<RingDict> & tRings);
     
@@ -357,6 +358,9 @@ namespace LIBMOL
         void execute(std::vector<AtomDict> & tAtoms, 
                      std::vector<BondDict> & tBonds);
         void execute2(std::vector<AtomDict> & tAtoms, 
+                      std::vector<BondDict> & tBonds,
+                      std::vector<RingDict> & tRings);
+        void execute3(std::vector<AtomDict> & tAtoms, 
                       std::vector<BondDict> & tBonds,
                       std::vector<RingDict> & tRings);
         

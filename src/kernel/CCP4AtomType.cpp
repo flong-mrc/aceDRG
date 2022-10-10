@@ -25,6 +25,7 @@ namespace LIBMOL
     CCP4AtomType::CCP4AtomType(const std::vector<AtomDict>& tAllAtoms, 
                                const std::map<ID, std::vector<RingDict> > & tAllRings)
     {
+        
         for (std::vector<AtomDict>::const_iterator iA=tAllAtoms.begin();
                 iA != tAllAtoms.end(); iA++)
         {
@@ -417,11 +418,11 @@ namespace LIBMOL
                 {
                     if (R5)
                     {
-                        tAtom.ccp4Type = "NR5";
+                        tAtom.ccp4Type = "NRD5";
                     }
                     else if (R6)
                     {   
-                        tAtom.ccp4Type = "NR6";
+                        tAtom.ccp4Type = "NRD6";
                     }
                     else
                     {
@@ -543,7 +544,7 @@ namespace LIBMOL
                     }
                     else
                     {
-                        tAtom.ccp4Type = "O2";
+                        tAtom.ccp4Type = "O";
                     }
                 }  
                 else

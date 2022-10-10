@@ -1545,17 +1545,19 @@ class Acedrg(CExeCode ):
                 self._cmdline = "(ECHO ligand && ECHO ncyc 40 && ECHO make hout yes && ECHO make hydr full && ECHO end) | " + self._cmdline
             else:
                 self._cmdline += "ligand    \n"
-                self._cmdline += "ncyc 40   \n"
+                self._cmdline += "ncyc 10   \n"
                 self._cmdline += "make hout yes    \n"
                 self._cmdline += "make hydr full \n"
+                self._cmdline += "chir 4 \n"
         elif tStage==1:
             if platform.system()=="Windows":
                 self._cmdline = "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO vdwr 2.0 && ECHO end) | " + self._cmdline
             else:
+                self._cmdline += "ligand    \n"
                 self._cmdline += "make hout yes    \n"
                 self._cmdline += "make hydr full \n"
-                self._cmdline += "ncyc 40    \n"
-                self._cmdline += "vdwr 2.0    \n"
+                self._cmdline += "ncyc 30    \n"
+                self._cmdline += "vdwr 2.0   \n"
         elif tStage==2:
             if platform.system()=="Windows":
                 self._cmdline += "(ECHO mode newe && ECHO make hydr no && ECHO make news && ECHO end) | " + self._cmdline
@@ -1695,10 +1697,10 @@ class Acedrg(CExeCode ):
         if os.path.isfile(tPdbIn) and os.path.isfile(tCifLibIn):
             if os.path.getsize(tPdbIn) > 100 and os.path.getsize(tCifLibIn) > 50:
                 stageNow = 0
-                #self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
-                #tPdbIn1 = self.refmacXYZOUTName 
-                tPdbIn1 = tPdbIn 
-                #stageNow = 1
+                self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
+                tPdbIn1 = self.refmacXYZOUTName 
+                #tPdbIn1 = tPdbIn 
+                stageNow = 1
                 self.runRefmac(tPdbIn1, tCifLibIn, tRoot, stageNow)
                 #self.refmacXYZOUTName
                 if not os.path.isfile(self.refmacXYZOUTName):
@@ -2801,7 +2803,7 @@ class Acedrg(CExeCode ):
         self.printJobs()
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
-        print("workMode : ", self.workMode)
+        #print("workMode : ", self.workMode)
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111:
             if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
@@ -2813,6 +2815,7 @@ class Acedrg(CExeCode ):
                     self.lOrg = self.chemCheck.isOrganicInCif(self.fileConv.atoms)
                 else:
                     self.lOrg = False
+            
             if self.lOrg and len(self.fileConv.atoms) > 1:
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)

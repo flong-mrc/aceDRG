@@ -24,6 +24,8 @@ import time
 import math
 import random
 
+
+
 from rdkit      import rdBase
 
 from rdkit      import Chem
@@ -49,8 +51,9 @@ class ChemCheck(object):
 
     def __init__( self):
 
-        self.organicSec = ["AT", "At", "at", "B", "b", "BR", "Br", "br", "C", "c", "CL", "Cl", "cl", 
-                   "F", "f", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "SE", "Se", "se"]
+        self.organicSec = ["AS", "As", "as", "AT", "At", "at", "B", "b", "BR", "Br", "br", "C", "c", "CL", "Cl", "cl", 
+                   "F", "f", "Ge", "Ge", "ge", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "SE", "Se", 
+                   "se", "SI", "Si", "si"]
         self.atomFileType = {}
         self.atomFileType["mmCif"]  = [11, 111, 112, 16, 161, 51]
         self.atomFileType["simils"] = [12, 121, 52]
@@ -76,8 +79,11 @@ class ChemCheck(object):
         self.defaultBo["S"]  = 2
         self.defaultBo["SE"] = 2
         self.defaultBo["N"]  = 3
+        self.defaultBo["AS"] = 3
         self.defaultBo["B"]  = 3
         self.defaultBo["C"]  = 4
+        self.defaultBo["GE"] = 4
+        self.defaultBo["SI"] = 4
         self.defaultBo["P"]  = 5
 
         # Copy some data from libmol to here
@@ -132,8 +138,8 @@ class ChemCheck(object):
         if not organicOnly :
             print("The input ligands/molecules contains metal or other heavier atoms ")
             print("Acedrg currently deals with ligands/molecules with following elements only ")
-            print("C, N, O, S, P, B, F, Cl, Br, I, H")
-            print("The job finishes succesfully")
+            print("As, B, Br, C, Cl, F, Ge, H, I, N, O, P, S, Si")
+            print("The job finishes without the output cif file")
         if len(allAtomElems) ==0:
             print ("Can not get the element symbols of atoms. Check input file format")
             print("Error : The job stops because of errors")
@@ -146,19 +152,26 @@ class ChemCheck(object):
 
         aRet = True
         lElem = True
+        nonOrgSet =[]
         for aAtm in tCifAtoms:
             if "_chem_comp_atom.type_symbol" in aAtm.keys():
                  if not aAtm["_chem_comp_atom.type_symbol"] in self.organicSec :
-                     aRet = False
-                     break
+                     if not aAtm["_chem_comp_atom.type_symbol"] in nonOrgSet:
+                         nonOrgSet.append(aAtm["_chem_comp_atom.type_symbol"])
+                     
             else:
                  lElem = False
 
+        if len(nonOrgSet)> 0: 
+            aRet = False
         if not aRet :
             print("The input ligands/molecules contains metal or other heavier atoms ")
             print("Acedrg currently deals with ligands/molecules with following elements only ")
-            print("C, N, O, S, P, B,  Se, F, Cl, Br, I, H")
-            print("The job finishes succesfully")
+            print("As, B, Br, C, Cl, F, Ge, H, I, N, O, P, S, Si")
+            print ("Your molecule contains atoms of elements of the following type_symbol:")
+            for aE in nonOrgSet:
+                print(aE)
+            print("The job finishes without the output cif file.")
        
         if not lElem :
             print ("Can not get the element symbols of atoms. Check input file format")
