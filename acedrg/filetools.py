@@ -424,21 +424,21 @@ class FileTransformer(object) :
         else:   # multiple col format          
             colIdx = []
             for aL in tBlk:
-                if aL.find("\'") !=-1:
-                    strGrp1 = aL.strip().split("\'")
-                    strGrp  = []
-                    if len(strGrp1) == 3: 
-                        strGrp10 = strGrp1[0].strip().split()
-                        strGrp12 = strGrp1[2].strip().split()
-                        for aS in strGrp10:
-                            strGrp.append(aS)
-                        strGrp.append("\'" + strGrp1[1] + "\'")
-                        for aS in strGrp12:
-                            strGrp.append(aS)
-                        if len(strGrp)==len(colIdx):
-                            for i in range(len(strGrp)):
-                                self.dataDescriptor[i]=[colIdx[i], strGrp[i]]
-                elif aL.find("\"") !=-1:
+                #if aL.find("\'") !=-1:
+                #    strGrp1 = aL.strip().split("\'")
+                #    strGrp  = []
+                #    if len(strGrp1) == 3: 
+                #        strGrp10 = strGrp1[0].strip().split()
+                #        strGrp12 = strGrp1[2].strip().split()
+                #        for aS in strGrp10:
+                #            strGrp.append(aS)
+                #        strGrp.append("\'" + strGrp1[1] + "\'")
+                #        for aS in strGrp12:
+                #            strGrp.append(aS)
+                #        if len(strGrp)==len(colIdx):
+                #            for i in range(len(strGrp)):
+                #                self.dataDescriptor[i]=[colIdx[i], strGrp[i]]
+                if aL.find("\"") !=-1:
                     strGrp1 = aL.strip().split("\"")
                     strGrp  = []
                     if len(strGrp1) == 3: 
@@ -468,14 +468,14 @@ class FileTransformer(object) :
         print "\n"
 
         """
-        print ("Multple  colum format :")
-        for i in sorted(self.dataDescriptor):
-            print (self.dataDescriptor[i][0])
+        #print ("Multple  colum format :")
+        #for i in sorted(self.dataDescriptor):
+        #    print (self.dataDescriptor[i][0])
         aSt = ""
         for i in sorted(self.dataDescriptor):
             aSt+=(self.dataDescriptor[i][1].strip() + "\t")
-        print (aSt)
-        print ("\n") 
+        #print (aSt)
+        #print ("\n") 
        
 
     def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):

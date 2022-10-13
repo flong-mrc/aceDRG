@@ -23,16 +23,39 @@ numJobsF   =0
 doneNames = []
 failNames = []
 
+lib1 = "/Users/flong/DB/PDB_related/PDB_Ligands/Cif"
+lib2 = "/Users/flong/CCP4/ccp4-8.0/lib/data/monomers"
 inRoot = os.getcwd()
-indir1 = os.path.join(inRoot, "inMmcifPDB", "*.cif")
-indir2 = os.path.join(inRoot, "inMmcif", "*.cif")
 
-for aCif in glob.glob(indir1):
-    ligName = os.path.basename(aCif).strip().split(".")[0]
-    outRoot = "Test_" + ligName + "_fromMmcifPDB_usingCoords"    
+inListFN = os.path.join(inRoot, "inMmcifCCD", "in.list")
+inListF  = open(inListFN, "r")
+a        = inListF.readlines()
+inListF.close()
+inList1 = []
+for aL in a:
+    strGrp=aL.strip().split()
+    for aE in strGrp:
+        inList1.append(aE.strip())
+
+inListFN = os.path.join(inRoot, "inMmcif", "in.list")
+inListF  = open(inListFN, "r")
+b        = inListF.readlines()
+inListF.close()
+inList2 = []
+for aL in b:
+    strGrp=aL.strip().split()
+    for aE in strGrp:
+        inList2.append(aE.strip())
+
+
+for aCif in inList1:
+    ligName = aCif.strip().split(".")[0]
+    subDir = ligName[0].lower()
+    outRoot = "Test_" + ligName + "_fromMmcifCCD_usingCoords"    
     logName = outRoot + ".log"
+    inF     = os.path.join(lib1, subDir, aCif)
     cmdLine = "acedrg -c %s -o %s -p > %s"\
-              %(aCif, outRoot, logName)
+              %(inF, outRoot, logName)
     print(cmdLine)
     numAllJobs += 1
     lRun=os.system(cmdLine)
@@ -45,10 +68,10 @@ for aCif in glob.glob(indir1):
     else:
         numJobsF   +=1
         failNames.append(outRoot)
-    outRoot = "Test_" + ligName + "_fromMmcifPDB"    
+    outRoot = "Test_" + ligName + "_fromMmcifCCD"    
     logName = outRoot + ".log"
     cmdLine = "acedrg -c %s -o %s > %s"\
-              %(aCif, outRoot, logName)
+              %(inF, outRoot, logName)
     print(cmdLine)
     numAllJobs += 1
     lRun=os.system(cmdLine)
@@ -62,12 +85,14 @@ for aCif in glob.glob(indir1):
         numJobsF   +=1
         failNames.append(outRoot)
 
-for aCif in glob.glob(indir2):
-    ligName = os.path.basename(aCif).strip().split(".")[0]
+for aCif in inList2:
+    ligName = aCif.strip().split(".")[0]
+    subDir = ligName[0].lower()
     outRoot = "Test_" + ligName + "_fromMmcifCCP4_usingCoords"    
+    inF     = os.path.join(lib2, subDir, aCif)
     logName = outRoot + ".log"
     cmdLine = "acedrg -c %s -o %s -p > %s"\
-              %(aCif, outRoot, logName)
+              %(inF, outRoot, logName)
     print(cmdLine)
     numAllJobs += 1
     lRun=os.system(cmdLine)
@@ -84,7 +109,7 @@ for aCif in glob.glob(indir2):
     outRoot = "Test_" + ligName + "_fromMmcifCCP4"    
     logName = outRoot + ".log"
     cmdLine = "acedrg -c %s -o %s > %s"\
-              %(aCif, outRoot,  logName)
+              %(inF, outRoot,  logName)
     print(cmdLine)
     numAllJobs += 1
     lRun = os.system(cmdLine)

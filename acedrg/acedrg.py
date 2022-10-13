@@ -471,9 +471,9 @@ class Acedrg(CExeCode ):
             if os.path.isfile(tFuncGroupTable):
                 self.funcGroupTable = tFuncGroupTable
             
-        #print "The path to Acedrg tables is at ", self.acedrgTables
-        #print "Libmol used is at ", self.libmol
-        
+        print("The path to Acedrg tables is at ", self.acedrgTables)
+        print("Libmol used is at ", self.libmol)
+
     def checkVersionInfo(self):
   
         # Acedrg version info 
@@ -619,7 +619,7 @@ class Acedrg(CExeCode ):
                             if len(strs[2]) ==3:
                                 self.monomRoot = strs[2]
                                 break
-        if len(self.monomRoot) < 3:
+        if len(self.monomRoot) ==0:
             self.monomRoot = "UNL"
 
     def checkNAFromMmcif(self, tDataDesc=None):
@@ -2818,7 +2818,9 @@ class Acedrg(CExeCode ):
             
             if self.lOrg and len(self.fileConv.atoms) > 1:
                 if len(self.fileConv.dataDescriptor):
+                    
                     self.setMonoRoot(self.fileConv.dataDescriptor)
+                    
                     self.isNA=self.checkNAFromMmcif(self.fileConv.dataDescriptor)
                     tmpIsPep = self.checkPeptidesFromMmcif(self.fileConv.dataDescriptor)
                     if self.isNA:
