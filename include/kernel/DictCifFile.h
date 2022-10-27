@@ -227,7 +227,7 @@ namespace LIBMOL
         void getAtomInfoFromLine(std::vector<std::string> & tStrs,
                                  int tP1, int tP2, int tP3, 
                                  int tP4, int tP5, int tPOcp,
-                                 int tPCalc);
+                                 int tPCalc, int tPB);
         
         void getCifAtomOxiInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup);
         void getAtomOxiInfoFromLine(std::vector<std::string> & tStrs,

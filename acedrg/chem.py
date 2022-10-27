@@ -52,8 +52,8 @@ class ChemCheck(object):
     def __init__( self):
 
         self.organicSec = ["AS", "As", "as", "AT", "At", "at", "B", "b", "BR", "Br", "br", "C", "c", "CL", "Cl", "cl", 
-                   "F", "f", "Ge", "Ge", "ge", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s", "SE", "Se", 
-                   "se", "SI", "Si", "si"]
+                   "D", "d", "F", "f", "Ge", "Ge", "ge", "H", "h", "I", "i", "N","n",  "O", "o", "P", "p", "S", "s",  
+                   "SE", "Se", "se", "SI", "Si", "si"]
         self.atomFileType = {}
         self.atomFileType["mmCif"]  = [11, 111, 112, 16, 161, 51]
         self.atomFileType["simils"] = [12, 121, 52]
@@ -235,7 +235,7 @@ class ChemCheck(object):
             print(aLine)
 
     def getAtomElemsFromMmcif(self, tInFileName, tAtomElems):
-        print(tInFileName)
+        #print(tInFileName)
         try :
             inFile = open(tInFileName, "r")
         except IOError :

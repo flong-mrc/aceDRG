@@ -6,6 +6,7 @@
  */
 
 #include "utility.h"
+#include <vector>
 #ifdef _MSC_VER
 #include <ciso646>
 #endif
@@ -273,6 +274,13 @@ namespace LIBMOL
         {
             tV.push_back(aTS);
         }
+    }
+
+    std::string cleanBrackets(std::string & tStr)
+    {
+        std::vector<std::string> tBuf;
+        StrTokenize(tStr, tBuf, '(');
+        return tBuf[0];
     }
     
     bool compareNoCase (std::string first, std::string second)

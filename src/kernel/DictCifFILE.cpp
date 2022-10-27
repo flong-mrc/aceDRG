@@ -2380,6 +2380,7 @@ namespace LIBMOL
                 tF[0].find("_atom_site_")!=std::string::npos)
                 
             {
+                //std::cout << tF[0] << std::endl;
                 if(tF[0].find("_atom_site_label") !=std::string::npos)
                 {
                     hasProps["atom"].insert(std::pair<std::string, int>("id",curBlockLine));
@@ -2408,7 +2409,7 @@ namespace LIBMOL
                 else if(tF[0].find("_atom_site_U_iso_or_equiv") !=std::string::npos)
                 {
                     hasProps["atom"].insert(std::pair<std::string, int>("isoB",curBlockLine));
-                    //std::cout << curBlockLine << std::endl;
+                    //std::cout << "BBBB " << curBlockLine << std::endl;
                 }
                 else if(tF[0].find("_atom_site_occupancy") !=std::string::npos)
                 {
@@ -2426,7 +2427,7 @@ namespace LIBMOL
             }
             else if ((int)tF.size() >2 && tF[0].find("#") ==std::string::npos)
             {
-                std::cout << *iBl << std::endl;
+                //std::cout << *iBl << std::endl;
                 
                 itsCurAtom = new AtomDict();
                 bool getCoords = false;
@@ -2437,7 +2438,7 @@ namespace LIBMOL
                     itsCurAtom->existProps["id"] =  hasProps["atom"]["resName"];
                     cleanSymbol(tF[hasProps["atom"]["id"]], "\"");
                     itsCurAtom->id = TrimSpaces(tF[hasProps["atom"]["id"]]);
-                    std::cout << "Its ID: " << itsCurAtom->id << std::endl;
+                    // std::cout << "Its ID: " << itsCurAtom->id << std::endl;
                 }
                 if (hasProps["atom"].find("chemType") != hasProps["atom"].end())
                 {
@@ -2457,7 +2458,7 @@ namespace LIBMOL
                     }
                     // itsCurAtom->chemType = TrimSpaces(tF[hasProps["atom"]["chemType"]]);
                     itsCurAtom->chemType = tS2;;
-                    std::cout << "Its chemType : " << itsCurAtom->chemType << std::endl;
+                    // std::cout << "Its chemType : " << itsCurAtom->chemType << std::endl;
                 }
                 if (hasProps["atom"].find("isoB") != hasProps["atom"].end())
                 {
@@ -2480,7 +2481,7 @@ namespace LIBMOL
                             std::cout << "string for iso_B is " << tS << std::endl;
                         }
                     }
-                    //std::cout << "Its U_iso : " << itsCurAtom->isoB << std::endl;
+                    //std::cout << "Here: Its U_iso : " << itsCurAtom->isoB << std::endl;
                 }
                 //if (hasProps["atom"].find("parCharge") != hasProps["atom"].end())
                 //{
@@ -2527,7 +2528,7 @@ namespace LIBMOL
                         }
                     }
                    
-                    std::cout << "Its (fractional) coord x : " << itsCurAtom->fracCoords[0] << std::endl;
+                    //std::cout << "Its (fractional) coord x : " << itsCurAtom->fracCoords[0] << std::endl;
                     
                 }
                 if (hasProps["atom"].find("fract_y") != hasProps["atom"].end())
@@ -2579,8 +2580,8 @@ namespace LIBMOL
                                       << tSZ << std::endl;
                         }
                     }
-                    std::cout << "Its (fractional) coord z : " 
-                              << itsCurAtom->fracCoords[2] << std::endl;
+                    //std::cout << "Its (fractional) coord z : " 
+                    //          << itsCurAtom->fracCoords[2] << std::endl;
                     
                     getCoords = true;
                     
@@ -2630,7 +2631,7 @@ namespace LIBMOL
     void GenCifFile::getCifAtomInfo(std::map<ID,std::vector<std::string> >  & tOnePropGroup)
     {
         
-        int pos1, pos2, pos3, pos4, pos5, posOcp, posCalc;
+        int pos1, pos2, pos3, pos4, pos5, posOcp, posCalc, posB;
         pos1 = getKeyWordPos("_atom_site_type_symbol", 
                                tOnePropGroup["lab"]);
         pos2 = getKeyWordPos("_atom_site_label", tOnePropGroup["lab"]);
@@ -2645,6 +2646,9 @@ namespace LIBMOL
         
         posCalc = getKeyWordPos("_atom_site_calc_flag", tOnePropGroup["lab"]);
         
+        posB    = getKeyWordPos("_atom_site_U_iso_or_equiv", tOnePropGroup["lab"]);
+        
+
         if ((pos1 !=-1 || pos2 != -1) && pos3 !=-1
              && pos4 !=-1 && pos5 !=-1)
         {
@@ -2666,7 +2670,7 @@ namespace LIBMOL
                     }
                     if (!lCal)
                     {
-                        getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp, posCalc);
+                        getAtomInfoFromLine(tBuf, pos1, pos2, pos3, pos4, pos5, posOcp, posCalc, posB);
                     }
                 }
                 else
@@ -2693,8 +2697,8 @@ namespace LIBMOL
     }
    
     void GenCifFile::getAtomInfoFromLine(std::vector<std::string> & tStrs,
-                                         int tP1, int tP2, int tP3, 
-                                         int tP4, int tP5, int tPOcp, int tPCalc)
+                                         int tP1, int tP2, int tP3, int tP4, 
+                                         int tP5, int tPOcp, int tPCalc, int tPB)
     {
         if (itsCurAtom !=NullPoint)
         {
@@ -2843,11 +2847,13 @@ namespace LIBMOL
                 
             }
             
-            
         }    
         
-        //std::cout << "Its occupancy is : " 
-        //          << itsCurAtom->ocp << std::endl; 
+        if (tPB > -1 && tPB < (int)tStrs.size())
+        {
+
+            itsCurAtom->isoB=StrToReal(cleanBrackets(tStrs[tPB]));  
+        }
         
        
         FractToOrtho(itsCurAtom->fracCoords, itsCurAtom->coords, itsCurCryst->itsCell->a, 
@@ -4095,6 +4101,10 @@ namespace LIBMOL
             {
                 itsCurAtom->existProps["chemType"] =  hasProps["atom"]["chemType"];
                 itsCurAtom->chemType = TrimSpaces(tF[hasProps["atom"]["chemType"]]);
+                if (itsCurAtom->chemType.compare("D")==0)
+                {
+                    itsCurAtom->chemType="H";
+                }
                 
                 //std::cout << "Its chemType : " << itsCurAtom->chemType << std::endl;
             }

@@ -315,6 +315,7 @@ namespace LIBMOL
         
         void outTableMols(std::ofstream & tMolTabs, 
                           Molecule & tMol);
+        void outPreCellAtomUs(std::ofstream & tAU, Molecule & tMol);
         void outMolMmcif(FileName tOutName,
                          ID tMonoRootName,
                          Molecule  & tMol);

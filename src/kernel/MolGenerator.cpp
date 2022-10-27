@@ -10,6 +10,8 @@
 #include "MolGenerator.h"
 #include "codClassify.h"
 #include "chemPropSet.h"
+#include <iterator>
+#include <string>
 
 namespace LIBMOL {
 
@@ -7061,7 +7063,23 @@ namespace LIBMOL {
         }
          */
     }
-    
+
+    void MolGenerator::outPreCellAtomUs(std::ofstream & tAU, Molecule & tMol)
+    {
+        std::vector<std::string> allIds;
+        for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
+                    iAt != tMol.atoms.end(); iAt++)
+            {
+                if (std::find(allIds.begin(), allIds.end(), iAt->id) ==allIds.end()
+                    && iAt->chemType.compare("H") !=0)
+                {
+                    tAU << std::setw(8) << std::left<< iAt->id << std::setw(6) << iAt->chemType
+                        << std::setw(10) << std::left << std::setprecision(4)
+                        << std::fixed << iAt->isoB << std::endl;
+                    allIds.push_back(iAt->id);
+                }
+            }
+    }
     void MolGenerator::outMolMmcif(FileName tOutName, 
                                    ID tMonoRootName, 
                                    Molecule& tMol)
@@ -7107,8 +7125,26 @@ namespace LIBMOL {
             aOutCif << std::left <<  tMonoRootName1;
             aOutCif.width(8);
             aOutCif << std::left <<  tMonoRootName1;
-            std::string aSN = "\'" + TrimSpaces(parts[0]) + "\'";
-            aOutCif.width(30);
+            std::string aSN;
+            if (parts[0].find("/") !=std::string::npos)
+            {
+                std::vector<std::string> tB;
+                StrTokenize(parts[0], tB, '/');
+                if (tB.size()> 0)
+                {
+                    aSN =  "\"" + tB[tB.size()-1] +  "\"";
+                }
+                else
+                {
+                    aSN = "\"" + TrimSpaces(parts[0]) + "\"";
+                }
+            }
+            else
+            {
+                aSN = "\"" + TrimSpaces(parts[0]) + "\"";
+            }
+            
+            aOutCif.width(20);
             aOutCif << std::left << aSN;
             aOutCif.width(20);
             aOutCif << std::left <<  "NON-POLYMER";
@@ -7125,11 +7161,12 @@ namespace LIBMOL {
             aOutCif << "_chem_comp_atom.atom_alt_id"  << std::endl;
             aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
             aOutCif << "_chem_comp_atom.charge" << std::endl;
+            aOutCif << "_chem_comp_atom.U_iso_or_equiv" << std::endl;
             aOutCif << "_chem_comp_atom.excess_electrons" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_x" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_y" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_z" << std::endl;
-            
+            aOutCif << "_chem_comp_atom.atom_class" << std::endl;
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
             {
@@ -7143,6 +7180,9 @@ namespace LIBMOL {
                 aOutCif << std::left << iAt->chemType;
                 aOutCif.width(10);
                 aOutCif << std::left << iAt->charge;
+                aOutCif.width(12);
+                aOutCif << std::left << std::setprecision(4)
+                << std::fixed << iAt->isoB;
                 aOutCif.width(10);
                 aOutCif << std::left << iAt->excessElec;
                 aOutCif.width(10);
@@ -7151,10 +7191,11 @@ namespace LIBMOL {
                 aOutCif.width(10);
                 aOutCif << std::left << std::setprecision(3)
                         <<std::fixed << iAt->coords[1];
-                aOutCif.width(10);
+                aOutCif.width(12);
                 aOutCif << std::left << std::setprecision(3)
-                        <<std::fixed << iAt->coords[2]
-                        << std::endl;
+                        <<std::fixed << iAt->coords[2];
+                //aOutCif.width(iAt->codClass.size()+4);
+                aOutCif << std::left << iAt->codClass << std::endl;
             }
             
             aOutCif << "loop_" << std::endl;
@@ -7677,6 +7718,9 @@ namespace LIBMOL {
             aMolTable << "_num_finite_mols\t" << tFinMols.size() << std::endl
                       << "_num_infinite_mols\t" << tInfMols.size() << std::endl;
 
+            Name preCellAtomUName(tRootName);
+            preCellAtomUName.append("_all_pre_atoms_u.list");
+            std::ofstream preCellAtomU(preCellAtomUName.c_str());
 
             if (tFinMols.size() > 0) 
             {
@@ -7684,6 +7728,7 @@ namespace LIBMOL {
                 {
                     std::string aMolIdx(IntToStr(i+1));
                     outTableMols(aMolTable, tFinMols[i]);
+                    outPreCellAtomUs(preCellAtomU, tFinMols[i]);
                     std::string aMolName(aMolRootName);
                     aMolName.append(aMolIdx);
                     outMolMmcif(aMolName.c_str(), "UNL", tFinMols[i]);
@@ -7701,6 +7746,7 @@ namespace LIBMOL {
             aMolTable.close();
         }
     }
+
     
     void MolGenerator::outHRelatedBonds(FileName tOutName)
     {

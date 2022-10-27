@@ -98,6 +98,7 @@ namespace LIBMOL
     
     extern void StrTokenizeGen(const std::string, 
                                std::vector<std::string>  & tV);
+    extern std::string cleanBrackets(std::string & tStr);
     
     // sort-related functions
     extern bool compareNoCase (std::string first, std::string second);

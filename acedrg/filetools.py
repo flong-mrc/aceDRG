@@ -591,9 +591,11 @@ class FileTransformer(object) :
             tHAtoms = []
             for aAtom in self.atoms:
                 #print(aAtom.keys())
-                if aAtom["_chem_comp_atom.type_symbol"] !="H":
+                if aAtom["_chem_comp_atom.type_symbol"] !="H" and aAtom["_chem_comp_atom.type_symbol"] !="D":
                     tAtoms.append(aAtom)
                 else:
+                    if aAtom["_chem_comp_atom.type_symbol"] =="D":
+                        aAtom["_chem_comp_atom.type_symbol"] = "H"
                     tHAtoms.append(aAtom)
 
                 if "_chem_comp_atom.atom_id" in aAtom:
