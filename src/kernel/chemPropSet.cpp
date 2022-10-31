@@ -536,14 +536,13 @@ namespace LIBMOL
                 iAt != tAtoms.end(); iAt++)
         {
             
-            std::cout << "Atom " << iAt->id
+            std::cout << "HERE Atom " << iAt->id
                       << " of " << iAt->chemType
                       << " connects " << iAt->connAtoms.size() 
                       << " atoms " << std::endl
                       << " and is with bond index "
                       << iAt->bondingIdx << std::endl;
         }
-        
         std::cout << "Chiral and plane feather for atoms in the system" 
                   << std::endl;
         

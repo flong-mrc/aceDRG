@@ -1054,7 +1054,11 @@ namespace LIBMOL
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==2)
                         {
-                            aN =2.0;
+                            // Place holder in case for future. 
+                            aN=1.0;
+                            // cancel formal charge effect
+                            //
+                            // aN =2.0;
                         }
                     }
                     else if (tAtoms[tIdx].formalCharge==1.0)
@@ -1138,9 +1142,6 @@ namespace LIBMOL
                 }
             }
         }
-        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
-        std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
-        
         return aN;
     }
     
@@ -1148,9 +1149,6 @@ namespace LIBMOL
                                 int tMode)
     {
         REAL aN=0.0;
-        std::cout << "Here charge is " << tAtoms[tIdx].charge << std::endl;
-        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
-                  << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
             
@@ -1278,7 +1276,9 @@ namespace LIBMOL
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==2)
                         {
-                            aN =2.0;
+                            aN = 1.0;
+                            //Cancel the charge effect
+                            // aN =2.0;
                         }
                     }
                     else if (tAtoms[tIdx].formalCharge==1.0)
@@ -1334,8 +1334,8 @@ namespace LIBMOL
                     if (tAtoms[tIdx].connAtoms.size() ==2)
                     {
                             aN =2.0;
-                        }
                     }
+                }
                 else if (tAtoms[tIdx].formalCharge==1.0)
                 {
                     if (tAtoms[tIdx].connAtoms.size() ==3)
@@ -1368,9 +1368,16 @@ namespace LIBMOL
                 }
             }
         }
+
+        /*
         std::cout << "atom " << tAtoms[tIdx].id << std::endl;
         std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
-        
+        std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
+        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+                  << std::endl;
+        std::cout << "HERE Pi atom added " << aN  << std::endl;
+        */
+
         return aN;
     }
 
