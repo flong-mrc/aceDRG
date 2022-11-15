@@ -70,6 +70,7 @@ class AcedrgRDKit(object):
         self.maxNumInitConformers    = 10000
         self.numConformers           = 1
         self.useExistCoords          = False
+        self.useExistCoords2          = False
         self.noProtonation           = False
         self.conformerEngMap         = {}
         self.numSelectForRefConfs    = 25
@@ -247,7 +248,11 @@ class AcedrgRDKit(object):
                 #print "Molecule name:  ", aMolName
                 # self.reSetChirals     =    True
                 aMolT                   =    Chem.MolFromMolFile(tFileName)
+                self.initCoords = []
+                self.getInitCoordsInMolFile(tFileName)
+                self.checkAndSetInitAtomPos(aMolT)
                 #aMolT = Chem.AddHs(aMolT1)
+                
             else:
                 print("File %s does not exist "%tFileName)
                 sys.exit()
@@ -347,6 +352,45 @@ class AcedrgRDKit(object):
                 self.molecules = []
             """
 
+    def getInitCoordsInMolFile(self, tFileName):
+        
+        f = open(tFileName, "r")
+        aLs = f.readlines()
+        f.close()
+        nA = aLs[3].strip().split()[0]
+        if nA.isdigit():
+            numA = int(nA)
+        else:
+            print("Format errors in file %s :"%tFileName)
+            print("The first column in line %s should be number of atoms"%aLs[3])
+            sys.exit(1)
+        for aL in aLs[4:4+numA]:
+            strs = aL.strip().split()
+            if strs[3].find("H")==-1:
+                xyz = [float(strs[0]), float(strs[1]), float(strs[2])]
+                self.initCoords.append(xyz)
+     
+    def checkAndSetInitAtomPos(self, tMol):
+        
+        aSetAtoms = tMol.GetAtoms()
+        aMaxConns = 0
+        for aA in aSetAtoms:
+            nC = len(aA.GetNeighbors())
+            if nC > aMaxConns:
+                aMaxConns = nC
+        if aMaxConns > 4:
+            self.useExistCoords2 = True
+            conf = Chem.Conformer(tMol.GetNumAtoms())
+            for i in range(tMol.GetNumAtoms()):
+                conf.SetAtomPosition(i,self.initCoords[i])
+            for aA in aSetAtoms:
+                print("atom element type: ", aA.GetSymbol())
+                print("It connects to ", len(aA.GetNeighbors()))
+                pos =conf.GetAtomPosition(aA.GetIdx())
+                print("x=%5.4f y=%5.4f z=%5.4f"%(pos.x, pos.y, pos.z))
+                
+            
+        
     def setNamesForAtomsInMol(self, tMol, tChemCheck, tNameMap, tStage=0):
    
         dictAtomTypes = {}
@@ -958,6 +1002,7 @@ class AcedrgRDKit(object):
                             else:
                                 break
             #print("Number of conformers selected for refinement is ",  len(self.selecConformerIds))
+            
         else:
             print("RDKit failed in generating initial conformers")
             sys.exit(1)
@@ -1145,16 +1190,27 @@ class AcedrgRDKit(object):
         #if self.reSetChirals:
         #    self.reAssignChirals(aMol) 
         allAtoms = aMol.GetAtoms()
+        print("number of atom now ", len(allAtoms))
+        
         for aAtom in allAtoms:
             aIdx = aAtom.GetIdx()
             tChemCheck.checkChiralCenters(aMol,aIdx)
             #print "Atom ", aAtom.GetProp("Name")
             #print "Is it a temporal chiral center ", aAtom.HasProp("TmpChiral") 
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
-        self.setInitConformersOneMol(aMol)
+        if not self.useExistCoords2:
+            self.setInitConformersOneMol(aMol)
+        else:
+            confId = aMol.GetConformer()
+            self.selecConformerIds.append(confId)
+        print("AAA: Number of conformers selected for refinement is ",  len(self.selecConformerIds))
+        nConf = aMol.GetNumConformers()
+        print("number of conformers in Conf", nConf)
         
         if len(aMol.GetConformers()) !=0: 
+            
             #rdmolfiles.MolToPDBFile(aMol, "Test_2.pdb")
+               
             aSetTorsions = []
             self.assignTorsions(aMol, aSetTorsions)
 
@@ -1388,7 +1444,6 @@ class AcedrgRDKit(object):
         # (3) Description of bonds in the molecule
         # (4) Description of torsion angles in the molecules
         # (5) Description of chiral centers in the molecules 
-    
         # This file is mainly used as an input file for Acedrg
         print("Ligand ID ", tMonoName)
         print("Group Name ", tGroupName) 
@@ -1455,7 +1510,7 @@ class AcedrgRDKit(object):
         
             aConformer =  tMol.GetConformer(tIdxConform)
             rdmolops.AssignAtomChiralTagsFromStructure(tMol, confId=tIdxConform)
-
+    
             # Atom section
             aMmCif.write("loop_\n")
             aMmCif.write("_chem_comp_atom.comp_id\n")
@@ -1522,29 +1577,31 @@ class AcedrgRDKit(object):
                 aMmCif.write("%s       %s       %s       %s      %s     %5.4f     %5.4f\n" \
                               %(tMonoName, name1, name2,  bType, \
                                 isAro, bLen, dBlen))
-
+            
             # chiral center section
             atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
-            aChiralSignMap = self.setChiralsByMultiConformers(tChemCheck, tMol, atomNBCIPMap)
-            self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
-
-            for aId in sorted(aChiralSignMap.keys()):
-                if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
-                    print("==============================================")
-                    print("| Centered atom :     %s"%aId)
-                    print("----------------------------------------------")
-                    for aPair in atomNBCIPMap[aId]:
-                        print("NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1]))
-                    print("----------------------------------------------")
-                    print("Its output chiral volume sign   %s"%aChiralSignMap[aId]["finalChiVolSign"])
-                    for aCid in list(aChiralSignMap[aId].keys()):
-                        if aCid != "isChiraled" and aCid != "finalChiVolSign" and "confSign" in aChiralSignMap[aId][aCid]:
-                            print("In conformer %d, its chiral volume sign is %s "%(aCid, aChiralSignMap[aId][aCid]["confSign"]))
-                    print("==============================================\n")
-                elif aChiralSignMap[aId]["isChiraled"]:
-                    print("==============================================")
-                    print("| Centered atom :     %s with no C sign "%aId)
-                    print("----------------------------------------------")
+            if not self.useExistCoords2 :
+                aChiralSignMap = self.setChiralsByMultiConformers(tChemCheck, tMol, atomNBCIPMap)
+                self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
+                for aId in sorted(aChiralSignMap.keys()):
+                    if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
+                        print("==============================================")
+                        print("| Centered atom :     %s"%aId)
+                        print("----------------------------------------------")
+                        for aPair in atomNBCIPMap[aId]:
+                            print("NB Atom %s : CIPRank %s "%(aPair[0].GetProp("Name"), aPair[1]))
+                        print("----------------------------------------------")
+                        print("Its output chiral volume sign   %s"%aChiralSignMap[aId]["finalChiVolSign"])
+                        for aCid in list(aChiralSignMap[aId].keys()):
+                            if aCid != "isChiraled" and aCid != "finalChiVolSign" and "confSign" in aChiralSignMap[aId][aCid]:
+                                print("In conformer %d, its chiral volume sign is %s "%(aCid, aChiralSignMap[aId][aCid]["confSign"]))
+                        print("==============================================\n")
+                    elif aChiralSignMap[aId]["isChiraled"]:
+                        print("==============================================")
+                        print("| Centered atom :     %s with no C sign "%aId)
+                        print("----------------------------------------------")
+            else:
+                aChiralSignMap = {}
             
             chiCenAtmIds1     = []
             nChiPre = 0
@@ -1567,6 +1624,7 @@ class AcedrgRDKit(object):
                             chiCenAtmIds2.append(aId)
             nTetraChi = len(chiCenAtmIds2)
             #print(" Number of chiral centers get from the conformer ", nTetraChi)
+            
             chiCenAtms3 = []
             chiCenAtms4 = []
             for aAtom in allAtoms:
@@ -1599,7 +1657,6 @@ class AcedrgRDKit(object):
                 aMmCif.write("_chem_comp_chir.atom_id_2\n")
                 aMmCif.write("_chem_comp_chir.atom_id_3\n")
                 aMmCif.write("_chem_comp_chir.volume_sign\n")
-
             chiralIdx = 1
             if nChiPre:
                 print("Predefined chiral centres ", chiCenAtmIds1)

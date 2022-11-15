@@ -1,5 +1,4 @@
-
-/* 
+/*
  * File:   AllSystem.cpp
  * Author: flong
  *
@@ -7,6 +6,8 @@
  */
 
 #include "AllSystem.h"
+#include <iterator>
+#include <vector>
 
 namespace LIBMOL
 {
@@ -22,9 +23,9 @@ namespace LIBMOL
                            itsCurTorsion(NullPoint),
                            itsCurChiralSeriNum(ZeroInt),
                            itsCurChiral(NullPoint)
-    {      
+    {
     }
- 
+
     AllSystem::AllSystem(const AllSystem& tAllSys):
                                 hasCoords(tAllSys.hasCoords),
                                 hasCCP4Type(tAllSys.hasCCP4Type),
@@ -43,7 +44,7 @@ namespace LIBMOL
                                 itsCurTorsion(NullPoint),
                                 itsCurChiralSeriNum(ZeroInt),
                                 itsCurChiral(NullPoint)
-    {      
+    {
         AddAtoms(tAllSys.allAtoms);
         AddBonds(tAllSys.allBonds);
         AddAngles(tAllSys.allAngles);
@@ -53,15 +54,15 @@ namespace LIBMOL
         AddRings(tAllSys.allRings);
         setAtomsMetalType();
     }
-    
-    
+
+
     AllSystem::AllSystem(const std::vector<AtomDict>& tAllAtoms,
                          const std::vector<int> &  tAllHAtomIdx,
-                         const std::vector<BondDict>& tAllBonds, 
-                         const std::vector<AngleDict>& tAllAngles, 
-                         const std::vector<TorsionDict>& tAllTorsions, 
-                         const std::vector<ChiralDict>& tAllChirals, 
-                         const std::vector<PlaneDict>& tAllPlanes, 
+                         const std::vector<BondDict>& tAllBonds,
+                         const std::vector<AngleDict>& tAllAngles,
+                         const std::vector<TorsionDict>& tAllTorsions,
+                         const std::vector<ChiralDict>& tAllChirals,
+                         const std::vector<PlaneDict>& tAllPlanes,
                          const std::map<ID, std::vector<RingDict> >& tAllRings,
                          std::string tLibmolTab)
                           :hasCoords(false),
@@ -82,14 +83,14 @@ namespace LIBMOL
                            itsCurChiralSeriNum(ZeroInt),
                            itsCurChiral(NullPoint)
     {
-        
+
         AddAtoms(tAllAtoms);
         for (std::vector<int>::const_iterator iH = tAllHAtomIdx.begin();
                 iH != tAllHAtomIdx.end(); iH++)
         {
             allHAtomIdx.push_back(*iH);
         }
-        
+
         AddBonds(tAllBonds);
         AddAngles(tAllAngles);
         AddTorsions(tAllTorsions);
@@ -97,10 +98,10 @@ namespace LIBMOL
         AddPlanes(tAllPlanes);
         AddRings(tAllRings);
         setAtomsMetalType();
-        
+
     }
-    
-    
+
+
     AllSystem::AllSystem(DictCifFile & tCifObj, std::string tLibmolTab):
                                                hasCoords(tCifObj.hasCoords),
                                                hasCCP4Type(tCifObj.hasCCP4Type),
@@ -127,10 +128,10 @@ namespace LIBMOL
         AddChirals(tCifObj.allChirals);
         AddPropComp(tCifObj.propComp);
         setSysProps();
-        
+
     }
-    
-    
+
+
     AllSystem::AllSystem(DictCifFile & tCifObj, std::string tLibmolTab,
                          const double tUBS,  const double tLBS,
                          const double tUAS,  const double tLAS):
@@ -159,11 +160,11 @@ namespace LIBMOL
         AddChirals(tCifObj.allChirals);
         AddPropComp(tCifObj.propComp);
         setSysProps();
-        
+
     }
-    
+
     AllSystem::AllSystem(SYBLMol2File& tMol2Obj, std::string tLibmolTab):
-                                               hasCoords(tMol2Obj.hasCoords),             
+                                               hasCoords(tMol2Obj.hasCoords),
                                                usingInChiral(true),
                                                isPeptide(false),
                                                withSugar(false),
@@ -186,7 +187,7 @@ namespace LIBMOL
         // AddTorsions(tCifObj.allTorsions);
         AddChirals(tMol2Obj.chirals);
         setSysProps();
-        
+
     }
     AllSystem::AllSystem(Molecule& tMol, std::string tLibmolTab):
                                          hasCoords(tMol.hasCoords),
@@ -213,7 +214,7 @@ namespace LIBMOL
         AddChirals(tMol.chirals);
         setSysProps();
     }
-    
+
     AllSystem::AllSystem(const CodClassify & tProCodSys, std::string tLibmolTab)
                           :itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -231,9 +232,9 @@ namespace LIBMOL
         AddPlanes(tProCodSys.allPlanes);
         AddRings(tProCodSys.allRings);
     }
-    
+
     AllSystem::~AllSystem()
-    {        
+    {
         if(itsCurAngle)
         {
             delete itsCurAngle;
@@ -250,10 +251,10 @@ namespace LIBMOL
             itsCurChiral = NULL;
         }
     }
-   
+
     void AllSystem::resetSystem(CodClassify& tCodSys)
     {
-        
+
         allAtoms.clear();
         allBonds.clear();
         allAngles.clear();
@@ -262,7 +263,7 @@ namespace LIBMOL
         allPlanes.clear();
         allRings.clear();
         allRingsV.clear();
-        
+
         AddAtoms(tCodSys.allAtoms);
         AddBonds(tCodSys.allBonds);
         AddAngles(tCodSys.allAngles);
@@ -270,7 +271,7 @@ namespace LIBMOL
         AddChirals(tCodSys.allChirals);
         AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
-        
+
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
         {
@@ -281,15 +282,15 @@ namespace LIBMOL
                 allRingsV.push_back(*iR);
             }
         }
-        
+
     }
-    
+
     void AllSystem::resetSystem2(CodClassify & tCodSys)
     {
-        
-        std::cout << "Originally the system has " 
+
+        std::cout << "Originally the system has "
                   << allTorsions.size() << std::endl;
-        
+
         allAtoms.clear();
         allBonds.clear();
         allAngles.clear();
@@ -299,10 +300,10 @@ namespace LIBMOL
         allPlanes.clear();
         allRings.clear();
         allRingsV.clear();
-        
+
         std::cout << "Number of torsions from cod section "
                   << tCodSys.allTorsions.size() << std::endl;
-        
+
         AddAtoms(tCodSys.allAtoms);
         AddBonds(tCodSys.allBonds);
         AddAngles(tCodSys.allAngles);
@@ -310,17 +311,17 @@ namespace LIBMOL
         AddChirals(tCodSys.allChirals);
         // AddPlanes(tCodSys.allPlanes);
         AddRings(tCodSys.allRings);
-        
-        //std::cout << "Now the system has " 
+
+        //std::cout << "Now the system has "
         //          << allTorsions.size() << std::endl;
-        
+
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
         {
             for (std::vector<RingDict>::iterator iR=iMR->second.begin();
                         iR != iMR->second.end(); iR++)
             {
-                
+
                 iR->setAtmsLink(allAtoms);
                 allRingsV.push_back(*iR);
             }
@@ -338,7 +339,7 @@ namespace LIBMOL
             {
                 setSugarRingTors();
                 expandTorsSet(tCodSys.allTorsions);
-                
+
             }
             else
             {
@@ -346,14 +347,14 @@ namespace LIBMOL
                 AddMiniTorsions(tCodSys.miniTorsions);
             }
         }
-        
-        
-        
+
+
+
         // setAllRingPlanes(allRingsV, allAtoms, allPlanes);
-        
+
         checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
-        
-        
+
+
         setAromaticBonds(allRingsV, allBonds);
         /*
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
@@ -362,15 +363,15 @@ namespace LIBMOL
             std::cout << "Atom " << iA->id << " of " << iA->seriNum << std::endl;
         }
          */
-        
-       
+
+
     }
-    
+
     void AllSystem::AddAtom(const AtomDict & tAtom)
     {
         allAtoms.push_back(tAtom);
     }
-    
+
     void AllSystem::AddAtoms(const std::vector<AtomDict>& tAllAtoms)
     {
         for (std::vector<AtomDict>::const_iterator iA=tAllAtoms.begin();
@@ -379,7 +380,7 @@ namespace LIBMOL
             allAtoms.push_back(*iA);
         }
     }
-    
+
     void AllSystem::AddBonds(const std::vector<BondDict>& tAllBonds)
     {
         for (std::vector<BondDict>::const_iterator iB=tAllBonds.begin();
@@ -388,12 +389,12 @@ namespace LIBMOL
             allBonds.push_back(*iB);
         }
     }
-    
+
     void AllSystem::AddBond(const BondDict& tBond)
     {
         allBonds.push_back(tBond);
     }
-    
+
     void AllSystem::AddAngles(const std::vector<AngleDict>& tAllAngles)
     {
         for (std::vector<AngleDict>::const_iterator iA=tAllAngles.begin();
@@ -402,36 +403,36 @@ namespace LIBMOL
             allAngles.push_back(*iA);
         }
     }
-    
+
     void AllSystem::AddAngle(const AngleDict& tAngle)
     {
         allAngles.push_back(tAngle);
     }
-    
-    
+
+
     void AllSystem::AddTorsions(const std::vector<TorsionDict>& tAllTorsions)
     {
         for (std::vector<TorsionDict>::const_iterator iT=tAllTorsions.begin();
                 iT != tAllTorsions.end(); iT++)
         {
-            allTorsions.push_back(*iT);        
+            allTorsions.push_back(*iT);
         }
     }
-    
+
     void AllSystem::AddMiniTorsions(const std::vector<TorsionDict>& tMiniTorsions)
     {
         for (std::vector<TorsionDict>::const_iterator iT=tMiniTorsions.begin();
                 iT !=tMiniTorsions.end(); iT++)
         {
             miniTorsions.push_back(*iT);
-        }           
+        }
     }
-    
+
     void AllSystem::AddTorsion(const TorsionDict& tTorsion)
     {
         allTorsions.push_back(tTorsion);
     }
-    
+
     void AllSystem::AddChirals(const std::vector<ChiralDict>& tAllChirals)
     {
         for (std::vector<ChiralDict>::const_iterator iC=tAllChirals.begin();
@@ -440,12 +441,12 @@ namespace LIBMOL
             allChirals.push_back(*iC);
         }
     }
-    
+
     void AllSystem::AddChiral(const ChiralDict& tChiral)
     {
         allChirals.push_back(tChiral);
     }
-    
+
     void AllSystem::AddPlanes(const std::vector<PlaneDict>& tAllPlanes)
     {
         for(std::vector<PlaneDict>::const_iterator iP=tAllPlanes.begin();
@@ -454,15 +455,15 @@ namespace LIBMOL
             allPlanes.push_back(*iP);
         }
     }
-    
+
     void AllSystem::AddPlane(const PlaneDict& tPlane)
     {
         allPlanes.push_back(tPlane);
     }
-    
+
     void AllSystem::AddRings(const std::map<ID, std::vector<RingDict> > & tAllRings)
     {
-        
+
         for (std::map<ID, std::vector<RingDict> >::const_iterator iM=tAllRings.begin();
                 iM!=tAllRings.end(); iM++)
         {
@@ -473,12 +474,12 @@ namespace LIBMOL
             }
         }
     }
-    
+
     void AllSystem::AddRing(const RingDict& tRing)
     {
         allRingsV.push_back(tRing);
     }
-    
+
     void AllSystem::AddPropComp(const ChemComp& tPropComp)
     {
         propComp.id    = tPropComp.id;
@@ -489,12 +490,12 @@ namespace LIBMOL
         propComp.numH     = tPropComp.numH;
         propComp.level    = tPropComp.level;
     }
-    
+
     bool AllSystem::isOrgSys()
     {
         std::vector<std::string> aOrgTab;
         initOrgTable(aOrgTab);
-        
+
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
@@ -505,7 +506,7 @@ namespace LIBMOL
         }
         return true;
     }
-    
+
     int AllSystem::atomPosition(ID tID)
     {
         for (int i=0; i<(int)allAtoms.size(); i++)
@@ -515,51 +516,51 @@ namespace LIBMOL
                 return i;
             }
         }
-        
+
         return -1;
-        
+
     }
-    
-    
+
+
     void AllSystem::setSysProps()
     {
         // setHydroAtomConnect();
-        
+
         setAtomsBondingAndChiralCenter(allAtoms);
-        
+
         //setAllAddedHAtomCoords(allAtoms, addHAtmIdxs);
-        
+
         setAtomsCChemType();
-            
+
         setAtomsMetalType();
-        
+
         // setAtomsPartialCharges();
         setHDists();
-        
+
         setAllAngles();
-           
+
         ringDetecting();
-        
-        
+
+
         for (std::map<ID, std::vector<RingDict> >::iterator iMR=allRings.begin();
                     iMR != allRings.end(); iMR++)
         {
             for (std::vector<RingDict>::iterator iR=iMR->second.begin();
                         iR != iMR->second.end(); iR++)
-            {       
+            {
                 iR->setAtmsLink(allAtoms);
                 checkOneSugarRing(allAtoms, iR);
                 allRingsV.push_back(*iR);
             }
         }
-        
+
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                iA !=allAtoms.end(); iA++)
         {
             iA->inRings.clear();
         }
-        
-            
+
+
         for (int i=0; i < (int)allRingsV.size(); i++)
         {
             for (std::vector<AtomDict>::iterator iA=allRingsV[i].atoms.begin();
@@ -572,14 +573,14 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "The atom " << iA->id 
-                              << " in ring " << allRingsV[i].rep 
+                    std::cout << "The atom " << iA->id
+                              << " in ring " << allRingsV[i].rep
                               << " does not exists, bug !"
                               << std::endl;
                 }
             }
         }
-       
+
         /*
         std::cout << "There are " << allRingsV.size() << " rings " << std::endl
                   << "These are: " << std::endl;
@@ -591,7 +592,7 @@ namespace LIBMOL
                     iRV !=iR->second.end(); iRV++)
             {
                 std::cout << "Ring size:  " << iRV->atoms.size() << std::endl;;
-                for (std::vector<AtomDict>::iterator iA=iRV->atoms.begin(); 
+                for (std::vector<AtomDict>::iterator iA=iRV->atoms.begin();
                         iA != iRV->atoms.end(); iA++)
                 {
                     std::cout<< "Atom " << iA->id << std::endl;
@@ -599,15 +600,15 @@ namespace LIBMOL
             }
         }
         */
-        // Double check 
+        // Double check
         /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
             if ((int)iA->inRings.size() !=0)
             {
-                std::cout << "Atom " << iA->id << " is in " 
-                          << (int)iA->inRings.size() 
+                std::cout << "Atom " << iA->id << " is in "
+                          << (int)iA->inRings.size()
                           << " ring(s) " << std::endl;
                 for (std::vector<int>::iterator iR=iA->inRings.begin();
                         iR != iA->inRings.end(); iR++)
@@ -617,19 +618,19 @@ namespace LIBMOL
             }
         }
          */
-              
-        detectPlaneGroups(); 
-         
-        
-       
+
+        detectPlaneGroups();
+
+
+
         setAllTorsions2();
-        
-        
+
+
         reIndexAtomInRing(allAtoms, allRingsV);
-        
+
         modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
-         
-       
+
+
         //if (!hasCCP4Type)
         //{
         //    std::cout << "Need to setup CCP4 types " << std::endl;
@@ -639,9 +640,9 @@ namespace LIBMOL
         //{
         //    std::cout << "CCP4 types already set " << std::endl;
         //}
-           
+
         setAllAtomEXcessElectrons(allAtoms);
-       
+
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
         {
@@ -650,7 +651,7 @@ namespace LIBMOL
                       << "Its Chemical Type : " << iA->chemType << std::endl
                       << "Its bonding index : "   << iA->bondingIdx << std::endl
                       << "Its formal charge : " << iA->formalCharge << std::endl
-                      << "Its CCP4 atom type : "  << iA->ccp4Type << std::endl 
+                      << "Its CCP4 atom type : "  << iA->ccp4Type << std::endl
                       << "Its residue Name: " << iA->resName<< std::endl;
             std::cout << "Its connected atoms are : " << std::endl;
             for (std::vector<int>::iterator iSer= iA->connAtoms.begin();
@@ -659,13 +660,13 @@ namespace LIBMOL
                 std::cout << allAtoms[*iSer].id << std::endl;
             }
         }
-       
+
         int tSum = sumExElectrons(allAtoms);
-        std::cout << "Sum of number of excess electrons is " 
+        std::cout << "Sum of number of excess electrons is "
                   << tSum << std::endl;
-        
+
         /*
-        for (std::vector<BondDict>::iterator iB=allBonds.begin(); 
+        for (std::vector<BondDict>::iterator iB=allBonds.begin();
                 iB !=allBonds.end(); iB++)
         {
             std::cout << "\nBond " << iB->seriNum << " : " << std::endl
@@ -674,10 +675,10 @@ namespace LIBMOL
                       << "Its bond order : " << iB->order << std::endl;
         }
         */
-        
-        
+
+
     }
-    
+
     int AllSystem::getNumSpecAtomConnect(int idxAtm, ID tChemType)
     {
         int nA=0;
@@ -691,7 +692,7 @@ namespace LIBMOL
         }
         return nA;
     }
-    
+
     int AllSystem::getNumSpecAtomConnect(std::vector<AtomDict>::iterator iA,
                                     ID tChemType)
     {
@@ -706,7 +707,7 @@ namespace LIBMOL
         }
         return nO;
     }
-    
+
     int AllSystem::getNumOxyConnect(std::vector<AtomDict>::iterator iA)
     {
         int nO=0;
@@ -720,7 +721,7 @@ namespace LIBMOL
         }
         return nO;
     }
-    
+
     REAL AllSystem::getTotalOrderOneAtom(std::vector<AtomDict>::iterator iA)
     {
         REAL nBO=0;
@@ -729,29 +730,29 @@ namespace LIBMOL
         {
             nBO+=(allBonds[*iB].orderN);
         }
-        
+
         return nBO;
     }
-    
+
     void AllSystem::addMissHydroAtoms()
     {
         std::vector<AtomDict> extHAtoms;
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
-            
-            
+
+
         }
     }
-    
+
     void AllSystem::setHydroAtomConnect()
     {
         // Check incomplete ligand(with H atom miss) and add the miss H
         if (isOrgSys())
         {
-            
+
         }
-        
+
         for(std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA!=allAtoms.end(); iA++)
         {
@@ -771,20 +772,20 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         // Check
         /*
         for (std::vector<AtomDict>::iterator iHA=allHAtomIdx.begin();
                 iHA !=allHAtomIdx.end(); iHA++)
         {
-            std::cout << "Atom " << iHA->seriNum << "its element ID " 
+            std::cout << "Atom " << iHA->seriNum << "its element ID "
                     << iHA->chemType << std::endl;
         }
-        
+
         for(std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA!=allAtoms.end(); iA++)
         {
-            std::cout << "Atom " << iA->seriNum << " connects to " 
+            std::cout << "Atom " << iA->seriNum << " connects to "
                     << (int)iA->connHAtoms.size() << " H atoms " << std::endl;
             if ((int)iA->connHAtoms.size() !=0)
             {
@@ -797,12 +798,12 @@ namespace LIBMOL
             }
         }
         */
-        
+
     }
-    
+
     void AllSystem::setAtomsCChemType()
     {
-        
+
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA != allAtoms.end(); iA++)
         {
@@ -813,35 +814,35 @@ namespace LIBMOL
                 StrLower(tS);
                 iA->chemType = iA->chemType[0] + tS;
             }
-            
-            // Embed planar info into the chemType to match COD definition 
+
+            // Embed planar info into the chemType to match COD definition
             iA->cChemType = iA->chemType;
             if (iA->bondingIdx ==2)
             {
                  StrLower(iA->cChemType);
             }
-            
+
             //std::cout << "Atom ID: " << iA->id << std::endl
             //          << "Atom chemType: " << iA->chemType << std::endl
             //          << "Atom chemType of COD classes: " << iA->cChemType << std::endl;
         }
     }
-    
+
     void AllSystem::setAtomsCCP4Type()
     {
         // should be done after rings and chiral centers are detected
-        
+
         CCP4AtomType  aCPP4TypeTool(allAtoms, allRings);
         aCPP4TypeTool.setAllAtomsCCP4Type();
         for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
         {
             allAtoms[i].ccp4Type = aCPP4TypeTool.allAtoms[i].ccp4Type;
-            //std::cout << "Atom " << allAtoms[i].id 
-            //          << " Its sp idx " << allAtoms[i].bondingIdx 
-            //          << " CCP4 atom type is " << allAtoms[i].ccp4Type 
+            //std::cout << "Atom " << allAtoms[i].id
+            //          << " Its sp idx " << allAtoms[i].bondingIdx
+            //          << " CCP4 atom type is " << allAtoms[i].ccp4Type
             //          << std::endl;
         }
-      
+
     }
     void AllSystem::setDefaultCoordGeos()
     {
@@ -856,28 +857,28 @@ namespace LIBMOL
         DefaultCoordGeos[10] = "BICAPPED-SQUARE-ANTIPRISMATIC";
         DefaultCoordGeos[11] = "ALL-FACE-CAPPED-TRIGONAL-PRISMATIC";
         DefaultCoordGeos[12] = "CUBOCTAHEDRON";
-        
+
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string metDefCoordGeoFileName = clibMonDir + "/allMetalDefCoordGeos.table";
         // std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
         std::string metDefCoordGeoFileName = libmolTabDir + "/allMetalDefCoordGeos.table";
         std::ifstream metDefCoordGeoFile(metDefCoordGeoFileName.c_str());
-        
+
         if(metDefCoordGeoFile.is_open())
         {
             std::string tRecord="";
-            
+
             while(!metDefCoordGeoFile.eof())
             {
                 std::getline(metDefCoordGeoFile, tRecord);
                 tRecord = TrimSpaces(tRecord);
                 std::vector<std::string> tBuf;
                 StrTokenize(tRecord, tBuf);
-                
+
                 if ((int)tBuf.size() ==3)
                 {
                     int cn = StrToInt(TrimSpaces(tBuf[1]));
-                    
+
                     DefaultCoordGeos2[TrimSpaces(tBuf[0])][cn]=TrimSpaces(tBuf[2]);
                 }
             }
@@ -885,58 +886,58 @@ namespace LIBMOL
         }
         else
         {
-            std::cout << "Bug: Can not find " << metDefCoordGeoFileName 
+            std::cout << "Bug: Can not find " << metDefCoordGeoFileName
                       << " to read !" << std::endl;
         }
-        
-    }   
-    
+
+    }
+
     const bool AllSystem::containMetal()
     {
         return itsContainMetal;
     }
-    
+
     void AllSystem::setAtomsMetalType()
     {
         setDefaultCoordGeos();
         /*
-        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", 
-                       "cs", "Fr", "fr", "Be", "be", "Mg", "mg", "Ca", "ca", 
+        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs",
+                       "cs", "Fr", "fr", "Be", "be", "Mg", "mg", "Ca", "ca",
                        "Sr", "sr", "Ba", "ba", "Ra", "ra", "Sc", "sc", "Y",  "y",
-                       "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te", 
+                       "Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", "Te", "te",
                        "Po", "po", "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
-                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
-                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
-                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",  
-                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",   
-                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",  
-                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",  
-                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
-                       "Zn", "zn", "Cd", "cd", "Hg", "hg",   
-                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
+                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db",
+                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg",
+                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",
+                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",
+                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",
+                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",
+                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",
+                       "Zn", "zn", "Cd", "cd", "Hg", "hg",
+                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti",
                        "Sn", "sn", "Pb", "pb", "Bi", "bi"};
-        
+
         MetalTable.assign(metals, metals+121);
         */
-        
-        
-        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", 
-                       "Cs", "cs", "Fr", "fr",  "Be", "be", "Mg", "mg", 
+
+
+        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb",
+                       "Cs", "cs", "Fr", "fr",  "Be", "be", "Mg", "mg",
                        "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                        "Sc", "sc", "Y",  "y",
                        "Sb", "sb", "Te", "te", "Po", "po",
                        "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
-                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db", 
-                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg", 
-                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",  
-                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",   
-                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",  
-                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",  
-                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",   
-                       "Zn", "zn", "Cd", "cd", "Hg", "hg",   
-                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti", 
+                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db",
+                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg",
+                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",
+                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",
+                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",
+                       "Ni", "ni", "Pd", "pd", "Pt", "pt", "Ds", "ds",
+                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",
+                       "Zn", "zn", "Cd", "cd", "Hg", "hg",
+                       "Al", "al", "Ga", "ga", "In", "in", "Ti", "ti",
                        "Sn", "sn", "Pb", "pb", "Bi", "bi"};
-                
+
         MetalTable.assign(metals, metals+115);
         //std::cout << "Metal Elements :" << std::endl;
         //for (std::vector<ID>::iterator iM =MetalTable.begin();
@@ -950,24 +951,24 @@ namespace LIBMOL
         //{
         //    std::cout << *iM << std::endl;
         //}
-        
+
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA != allAtoms.end(); iA++)
-        { 
-            std::vector<ID>::iterator iFind = std::find(MetalTable.begin(), 
+        {
+            std::vector<ID>::iterator iFind = std::find(MetalTable.begin(),
                                                         MetalTable.end(), iA->chemType);
             if (iFind !=MetalTable.end())
             {
                 iA->isMetal = true;
                 std::cout <<iA->id << " is a metal atom." << std::endl;
                 itsContainMetal = true;
-                
+
                 int cn = (int)iA->connAtoms.size();
                 ID  ct = iA->chemType;
-       
+
                 if (iA->metalGeo.empty())
                 {
-                    std::map<ID, std::map<int,ID> >::iterator iFind1 
+                    std::map<ID, std::map<int,ID> >::iterator iFind1
                                         =DefaultCoordGeos2.find(ct);
                     if (iFind1 !=DefaultCoordGeos2.end())
                     {
@@ -987,25 +988,25 @@ namespace LIBMOL
                         iA->metalGeo = DefaultCoordGeos[cn];
                     }
                 }
-                
+
                 std::cout << "Its coordination number is set to " << cn << std::endl
-                          << "its default coordination geometry is set to " 
+                          << "its default coordination geometry is set to "
                           << iA->metalGeo << std::endl;
             }
-        }        
-        
+        }
+
     }
-    
+
     void AllSystem::setAtomsPartialCharges()
     {
-        // Need to use bond-order or valence in p-table later on 
-        
+        // Need to use bond-order or valence in p-table later on
+
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
             if (iA->parCharge == -1.0)
             {
-                // make the charges dislocated 
+                // make the charges dislocated
                 if (iA->chemType =="O" && (int)iA->connAtoms.size()==1)
                 {
                     int tRoot = iA->connAtoms[0];
@@ -1019,18 +1020,18 @@ namespace LIBMOL
                             iOs.push_back(*iNA);
                         }
                     }
-                    
+
                     if ((int)iOs.size()==1)
                     {
                         iA->parCharge              = 0.5;
                         allAtoms[iOs[0]].parCharge = 0.5;
                     }
                 }
-                
+
             }
         }
     }
-    
+
     void AllSystem::setHDists()
     {
         std::string phdFName = libmolTabDir + "/prot_hydr_dists.table";
@@ -1038,17 +1039,17 @@ namespace LIBMOL
         if(phdF.is_open())
         {
             std::string tRecord="";
-            
+
             while(!phdF.eof())
             {
                 std::getline(phdF, tRecord);
                 tRecord = TrimSpaces(tRecord);
                 std::vector<std::string> tBuf;
                 StrTokenize(tRecord, tBuf);
-                
+
                 if ((int)tBuf.size() ==13)
                 {
-                    
+
                     std::string elem2            = TrimSpaces(tBuf[1]);
                     std::string atmTypeH         = TrimSpaces(tBuf[2]);
                     double      pDistNeu         = StrToReal(tBuf[3]);
@@ -1061,101 +1062,101 @@ namespace LIBMOL
                     double      sigaPDistQM_elm  = StrToReal(tBuf[10]);
                     double      eDistQM_elm      = StrToReal(tBuf[11]);
                     double      sigaEDistQM_elm  = StrToReal(tBuf[12]);
-                    
+
                     HydrDistTable[1][elem2]["pDist"]        = pDistQM_elm;
                     HydrDistTable[1][elem2]["pDistSiga"]    = sigaPDistQM_elm;
                     HydrDistTable[1][elem2]["eDist"]        = eDistQM_elm;
                     HydrDistTable[1][elem2]["eDistSiga"]    = sigaEDistQM_elm;
-                    
+
                     HydrDistTable[2][atmTypeH]["pDistNeu"]     = pDistNeu;
                     HydrDistTable[2][atmTypeH]["pDistSigaNeu"] = sigaPDistNeu;
-                   
+
                     HydrDistTable[2][atmTypeH]["pDistQM"]      = pDistQM;
                     HydrDistTable[2][atmTypeH]["pDistSigaQM"]  = sigaPDistQM;
                     HydrDistTable[2][atmTypeH]["eDistQM"]      = eDistQM;
                     HydrDistTable[2][atmTypeH]["eDistSigaQM"]  = sigaEDistQM;
-                    
+
                 }
             }
-            
+
             phdF.close();
             /*
             std::cout << "H distance table done " << std::endl;
-            // Check 
-            std::cout << "The following are H-X distances by elements " 
+            // Check
+            std::cout << "The following are H-X distances by elements "
                      << std::endl;
             for (std::map<std::string, std::map<std::string, double> >::iterator
-                 iE = HydrDistTable[1].begin(); 
+                 iE = HydrDistTable[1].begin();
                  iE != HydrDistTable[1].end(); iE++)
             {
                 std::cout << "Distance Proton and " << iE->first << " is : "
                           <<  HydrDistTable[1][iE->first]["pDist"]
-                          << " by QM with siga " 
-                          << HydrDistTable[1][iE->first]["pDistSiga"] 
+                          << " by QM with siga "
+                          << HydrDistTable[1][iE->first]["pDistSiga"]
                           << std::endl;
                 std::cout << "Distance electron and " << iE->first << " is : "
                           <<  HydrDistTable[1][iE->first]["eDist"]
-                          << " by QM with siga " 
+                          << " by QM with siga "
                           << HydrDistTable[1][iE->first]["eDistSiga"]
                           << std::endl;
             }
-            
-            std::cout << "The following are H-X distances by atom types " 
+
+            std::cout << "The following are H-X distances by atom types "
                      << std::endl;
-            
+
             for (std::map<std::string, std::map<std::string, double> >::iterator
-                 iE = HydrDistTable[2].begin(); 
+                 iE = HydrDistTable[2].begin();
                  iE != HydrDistTable[2].end(); iE++)
             {
                 std::cout << "Distance Proton and " << iE->first << " is : "
                           <<  HydrDistTable[2][iE->first]["pDistQM"]
-                          << " by QM with siga " 
-                          << HydrDistTable[2][iE->first]["pDistSigaQM"] 
+                          << " by QM with siga "
+                          << HydrDistTable[2][iE->first]["pDistSigaQM"]
                           << std::endl;
                 std::cout << "Distance electron and " << iE->first << " is : "
                           <<  HydrDistTable[2][iE->first]["eDistQM"]
-                          << " by QM with siga " 
+                          << " by QM with siga "
                           << HydrDistTable[2][iE->first]["eDistSigaQM"]
                           << std::endl;
                 std::cout << "Distance Proton and " << iE->first << " is : "
                           <<  HydrDistTable[2][iE->first]["pDistNeu"]
-                          << " by netron data with siga " 
-                          << HydrDistTable[2][iE->first]["pDistSigaNeu"] 
+                          << " by netron data with siga "
+                          << HydrDistTable[2][iE->first]["pDistSigaNeu"]
                           << std::endl;
             }
              */
         }
         else
         {
-            std::cout << "Bug: Can not find " << phdFName 
+            std::cout << "Bug: Can not find " << phdFName
                       << " to read !" << std::endl;
-        }  
-        
+        }
+
     }
-    
- 
+
+
     // setAllAngles() may not needed in the future
     void AllSystem::setAllAngles()
     {
-  
+
          for(int i=0; i < (int)allAtoms.size(); i++)
-        {   
+        {
             for (int j=0; j < (int)allAtoms[i].connAtoms.size(); j++)
             {
                 for (int k=j+1; k < (int)allAtoms[i].connAtoms.size(); k++)
                 {
                     int i1 = allAtoms[i].connAtoms[j];
                     int i2 = allAtoms[i].connAtoms[k];
-                    //std::cout << "Angle between " << allAtoms[i].id 
+                    //std::cout << "Angle between " << allAtoms[i].id
                     //          << "(center) and " << allAtoms[i1].id
                     //          << " and " << allAtoms[i2].id << std::endl;
-                        
+
                     AngleDict aAng;
                     std::vector<int> tVec;
                     aAng.anchorID  = allAtoms[i].id;
                     aAng.anchorPos = i;
                     aAng.atoms.push_back(i);
-                       
+
                     if ((int) allAtoms[i1].connAtoms.size() >=
                         (int) allAtoms[i1].connAtoms.size())
                     {
@@ -1171,7 +1172,7 @@ namespace LIBMOL
                         tVec.push_back(i1);
                         tVec.push_back(i2);
                     }
-                        
+
                     aAng.value        = 0.0;
                     aAng.sigValue     = 3.0;
                     aAng.numCodValues = 0;
@@ -1179,27 +1180,27 @@ namespace LIBMOL
                     allAnglesIdxs[i].push_back(tVec);
                 }
             }
-        }       
+        }
 
-        // Check 
+        // Check
          /*
-        std::cout << "There are " << (int)allAngles.size() 
+        std::cout << "There are " << (int)allAngles.size()
                   << " angles in the system " << std::endl;
-        
+
         std::cout << "These angles are : " << std::endl;
-        
-        for (std::map<int, std::vector<std::vector<int> > >::iterator tAG 
+
+        for (std::map<int, std::vector<std::vector<int> > >::iterator tAG
                =allAnglesIdxs.begin(); tAG != allAnglesIdxs.end(); tAG++)
         {
-            std::cout << "There are " << (int)tAG->second.size() 
+            std::cout << "There are " << (int)tAG->second.size()
             << " Angles centered on atom " << allAtoms[tAG->first].id << std::endl
                     << "They are " << std::endl;
-                    
+
             for(std::vector<std::vector<int> >::iterator iAN =tAG->second.begin();
                     iAN != tAG->second.end(); iAN++)
             {
                 std::cout << "atoms: " << allAtoms[tAG->first].id <<",  ";
-                for (std::vector<int>::iterator iAt = iAN->begin(); 
+                for (std::vector<int>::iterator iAt = iAN->begin();
                         iAt !=iAN->end(); iAt++)
                 {
                   std::cout << allAtoms[*iAt].id << ", ";
@@ -1209,13 +1210,13 @@ namespace LIBMOL
         }
           */
     }
-   
+
     void AllSystem::checkAngConstraints()
     {
         std::map<int, std::vector<int> >  tSP2Angs, tSP3Angs;
-        
+
         // Get all sp2 and sp3 angles centered at different atoms
-        
+
         for (unsigned i=0;  i < allAngles.size(); i++)
         {
             int iCenAtom= allAngles[i].atoms[0];
@@ -1228,14 +1229,14 @@ namespace LIBMOL
                 tSP3Angs[iCenAtom].push_back(i);
             }
         }
-        
+
         // check all sp2 atoms
         for (std::map<int, std::vector<int> >::iterator iSetAngs=tSP2Angs.begin();
                 iSetAngs !=tSP2Angs.end(); iSetAngs++)
         {
             checkSP2Constraints(iSetAngs->second);
         }
-        
+
         // check all sp3 atoms
         for (std::map<int, std::vector<int> >::iterator iSetAngs=tSP3Angs.begin();
                 iSetAngs !=tSP3Angs.end(); iSetAngs++)
@@ -1243,7 +1244,7 @@ namespace LIBMOL
             checkSP3Constraints(iSetAngs->second);
         }
     }
-    
+
     void AllSystem::checkSP2Constraints(std::vector<int> tAngIdxs)
     {
         REAL sp2Sum  =360.00;
@@ -1256,13 +1257,13 @@ namespace LIBMOL
             {
                 tAngSum+=(allAngles[*iA].value);
             }
-            
+
             sp2Diff = sp2Sum - tAngSum;
-            
+
             if (fabs(sp2Diff) >0.01)
             {
                 sp2Diff= sp2Diff/3.0;
-            
+
                 // add the diff to individual angles
                 tAngSum=0.0;
                 for (std::vector<int>::iterator iA=tAngIdxs.begin();
@@ -1271,18 +1272,18 @@ namespace LIBMOL
                     allAngles[*iA].value +=sp2Diff;
                     tAngSum+=(allAngles[*iA].value);
                 }
-                
-                // Further check.  
+
+                // Further check.
                 sp2Diff = sp2Sum - tAngSum;
                 //  Now sp2Diff should be negligible small, add it to an angle
                 allAngles[tAngIdxs[0]].value += sp2Diff;
             }
-            else 
+            else
             {
-                // very small, just add it to an angle 
+                // very small, just add it to an angle
                 allAngles[tAngIdxs[0]].value += sp2Diff;
             }
-            
+
             //Debug, output  the modified sum, should be 360.00
             tAngSum=0.0;
             for (std::vector<int>::iterator iA=tAngIdxs.begin();
@@ -1290,60 +1291,60 @@ namespace LIBMOL
             {
                 tAngSum+=(allAngles[*iA].value);
             }
-            
-            std::cout << "Sum of values for angles centered at atom " 
-                      << allAtoms[allAngles[tAngIdxs[0]].atoms[0]].id 
+
+            std::cout << "Sum of values for angles centered at atom "
+                      << allAtoms[allAngles[tAngIdxs[0]].atoms[0]].id
                       << " is " << tAngSum << std::endl;
         }
     }
-    
+
     void AllSystem::checkSP3Constraints(std::vector<int> tAngIdxs)
     {
-        
+
     }
-    
+
     /*
     void AllSystem::setOneTorsion(std::vector<int> tAV, REAL tValue,
                                     int tPeriod)
     {
-        
+
         TorsionDict tTor;
-      
-        for (int i=0; i <(int)tAV.size(); i++) 
+
+        for (int i=0; i <(int)tAV.size(); i++)
         {
             tTor.atoms.push_back(tAV[i]);
         }
-        
+
         tTor.value  = tValue;
         tTor.period = tPeriod;
-        
+
         allTorsions.push_back(tTor);
-        
+
     }
-    
+
     */
-    
+
     void AllSystem::setOneTorsion(std::vector<int> tAV, REAL tValue,
                                     int tPeriod)
     {
-        
+
         TorsionDict tTor;
-      
+
         tTor.seriNum = itsCurTorsionSeriNum;
-        for (int i=0; i <(int)tAV.size(); i++) 
+        for (int i=0; i <(int)tAV.size(); i++)
         {
             tTor.atoms.push_back(tAV[i]);
         }
-        
+
         tTor.value  = tValue;
         tTor.valueST = tValue;
         tTor.period = tPeriod;
-        
+
         allTorsions.push_back(tTor);
         itsCurTorsionSeriNum++;
-        
+
     }
-    
+
     void AllSystem::SetOneSP1SP1Bond(int tIdx1, int tIdx2)
     {
         std::vector<int> aTS;
@@ -1357,7 +1358,7 @@ namespace LIBMOL
                 break;
             }
         }
-            
+
         if (i1 !=-1)
         {
             aTS.push_back(i1);
@@ -1370,10 +1371,10 @@ namespace LIBMOL
                       << std::endl;
             return;
         }
-             
+
         aTS.push_back(tIdx1);
         aTS.push_back(tIdx2);
-            
+
         for(std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                 iA2 !=allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -1382,8 +1383,8 @@ namespace LIBMOL
                 i2= *iA2;
                 break;
             }
-        }    
-          
+        }
+
         if (i2 !=-1)
         {
             aTS.push_back(i2);
@@ -1396,16 +1397,16 @@ namespace LIBMOL
                       << std::endl;
             return;
         }
-        
+
         setOneTorsion(aTS, 180.0, 1);
-         
+
         std::cout << "Torsion on  " << allAtoms[allTorsions[itsCurTorsionSeriNum-1].atoms[0]].id
                 << " --> " << allAtoms[allTorsions[itsCurTorsionSeriNum-1].atoms[1]].id
                 << " --> " << allAtoms[allTorsions[itsCurTorsionSeriNum-1].atoms[2]].id
                 << " --> " << allAtoms[allTorsions[itsCurTorsionSeriNum-1].atoms[3]].id
                 << " is " << allTorsions[itsCurTorsionSeriNum-1].valueST << std::endl;
     }
-    
+
     void AllSystem::SetOneSP1SP2Bond(int tIdx1, int tIdx2)
     {
         int i1=-1;
@@ -1418,20 +1419,20 @@ namespace LIBMOL
                 break;
             }
         }
-            
+
         if (i1 ==-1)
         {
-         
+
             std::cout << "No torsion angles for the bond of atom "
                       << allAtoms[tIdx1].id << " and " << allAtoms[tIdx2].id
                       << " because " << allAtoms[tIdx1].id << " has one connection"
                       << std::endl;
             return;
         }
-             
-        
-        std::vector<int> tV2; 
-        // Ring atom first 
+
+
+        std::vector<int> tV2;
+        // Ring atom first
         for(std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                 iA2 !=allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -1441,7 +1442,7 @@ namespace LIBMOL
                 break;
             }
         }
-        
+
         for(std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                 iA2 !=allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -1449,8 +1450,8 @@ namespace LIBMOL
             {
                 tV2.push_back(*iA2);
             }
-        }    
-          
+        }
+
         if ((int)tV2.size() < 1)
         {
             std::cout << "No torsion angles for the bond of atom "
@@ -1467,11 +1468,11 @@ namespace LIBMOL
                       << std::endl;
             return;
         }
-        
+
         REAL va[1][2];
         int per = 1;
         if(AtomsInSameRing(allAtoms[i1], allAtoms[tV2[0]], allRingsV))
-        {   
+        {
             va[0][0] =        0.0;
             va[0][1] =      180.0;
         }
@@ -1480,8 +1481,8 @@ namespace LIBMOL
             va[0][0] =        90.0;
             va[0][1] =       -90.0;
         }
-        
-        int i=0;        
+
+        int i=0;
         for (std::vector<int>::iterator iA2=tV2.begin();
                 iA2 !=tV2.end(); iA2++)
         {
@@ -1493,43 +1494,43 @@ namespace LIBMOL
             setOneTorsion(aTS, va[0][i], per);
             i++;
         }
-         
+
     }
-   
+
     void AllSystem::SetOneSP1SP3Bond(int tIdx1, int tIdx2)
     {
         int i1=-1;
-        
+
         for(std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                 iA1 !=allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
-            
+
             if(*iA1 !=tIdx2)
             {
                 i1= *iA1;
                 break;
             }
         }
-            
+
         if (i1 ==-1)
         {
-         
+
             std::cout << "No torsion angles for the bond of atom "
                       << allAtoms[tIdx1].id << " and " << allAtoms[tIdx2].id
                       << " because " << allAtoms[tIdx1].id << " has one connection"
                       << std::endl;
             return;
         }
-             
-        
-        std::vector<int> tV2; 
+
+
+        std::vector<int> tV2;
         //std::cout << "root atom is " << allAtoms[tIdx1].id << std::endl;
-        // Ring atom first 
+        // Ring atom first
         for(std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                 iA2 !=allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
             if(AtomsInSameRing(allAtoms[i1], allAtoms[*iA2], allRingsV)
-               && *iA2 != tIdx1 
+               && *iA2 != tIdx1
               &&  std::find(tV2.begin(), tV2.end(), *iA2)==tV2.end())
             {
                 // std::cout << "Atom " << allAtoms[*iA2].id << " for Tor " << allAtoms[tIdx2].id << std::endl;
@@ -1537,7 +1538,7 @@ namespace LIBMOL
                 break;
             }
         }
-        
+
         for(std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                 iA2 !=allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -1546,9 +1547,9 @@ namespace LIBMOL
                 // std::cout << "Atom " << allAtoms[*iA2].id << " for Tor " << allAtoms[tIdx2].id << std::endl;
                 tV2.push_back(*iA2);
             }
-        }   
-        
-        
+        }
+
+
         if ((int)tV2.size() == 0)
         {
             std::cout << "No torsion angles for the bond of atom "
@@ -1565,15 +1566,15 @@ namespace LIBMOL
                       << std::endl;
             return;
         }
-        
+
         REAL va[1][3];
         int per = 3;
-        
+
         if(AtomsInSameRing(allAtoms[i1], allAtoms[tV2[0]], allRingsV))
         {
             va[0][0] =       0.0;
             va[0][1] =     120.0;
-            va[0][2] =    -120.0;  
+            va[0][2] =    -120.0;
         }
         else
         {
@@ -1581,12 +1582,12 @@ namespace LIBMOL
             va[0][1] =     -60.0;
             va[0][2] =      60.0;
         }
-        
-        int i=0; 
+
+        int i=0;
         //need to use chiral properties
         if ((int)allAtoms[tIdx2].chiralIdx !=0)
         {
-            
+
         }
         else
         {
@@ -1600,18 +1601,18 @@ namespace LIBMOL
                 aTS.push_back(*iA2);
                 setOneTorsion(aTS, va[0][i], per);
                 i++;
-            }    
+            }
         }
     }
-    
-    
+
+
     void AllSystem::SetOneSP2SP2Bond(int tIdx1, int tIdx2)
     {
             // two sp2 atoms
             std::vector<int> tV1, tV2;
-            
+
             int tS1=-1, tS2=-1;
-        
+
             for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
             {
@@ -1630,19 +1631,19 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             // std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //         << std::endl;
                             break;
                         }
                     }
                 }
-                
+
                 if(tS1 !=-1 && tS2 !=-1)
                 {
                     break;
                 }
             }
-            
+
             for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                     iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
             {
@@ -1651,7 +1652,7 @@ namespace LIBMOL
                     tV1.push_back(*iA1);
                 }
             }
-            
+
             for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                     iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
             {
@@ -1660,8 +1661,8 @@ namespace LIBMOL
                     tV2.push_back(*iA2);
                 }
             }
-            
-            if (tS1 ==-1 && tS2 ==-1 
+
+            if (tS1 ==-1 && tS2 ==-1
                 && (int)tV1.size()==2 && (int)tV2.size()==2)
             {
                 int tm;
@@ -1685,7 +1686,7 @@ namespace LIBMOL
                         break;
                     }
                 }
-                
+
                 /*
                 if (tH0)
                 {
@@ -1703,7 +1704,7 @@ namespace LIBMOL
                     tV1[1] = tm;
                 }
                 */
-                
+
                 if (tH0 && !tH1)
                 {
                     tm     = tV1[0];
@@ -1716,8 +1717,8 @@ namespace LIBMOL
                     tV1[0] = tV1[1];
                     tV1[1] = tm;
                 }
-                
-                
+
+
                 tH0=true, tH1=true;
                 for (std::vector<int>::iterator iConn=allAtoms[tV2[0]].connAtoms.begin();
                         iConn != allAtoms[tV2[0]].connAtoms.end(); iConn++)
@@ -1737,7 +1738,7 @@ namespace LIBMOL
                         break;
                     }
                 }
-                
+
                 // std::cout << "tV2[0]: " << allAtoms[tV2[0]].id << " tV2[1] " << allAtoms[tV2[1]].id << std::endl;
                 if (tH0)
                 {
@@ -1756,9 +1757,9 @@ namespace LIBMOL
                 }
                 // std::cout << "tV2: " << " tH0-> " << tH0 << " tH1 " << tH1 << std::endl;
             }
-            
-            
-            
+
+
+
             REAL va[2][2];
             int per = 2;
             if (tS1 !=-1 && tS2 !=-1)
@@ -1786,28 +1787,28 @@ namespace LIBMOL
                     aTS.push_back(tV2[j]);
                     setOneTorsion(aTS, va[i][j], per);
                 }
-            } 
-            
+            }
+
             /*
-            std::cout << "id1 " << allAtoms[tIdx1].id 
+            std::cout << "id1 " << allAtoms[tIdx1].id
                   << " and id2 " << allAtoms[tIdx2].id << std::endl;
-            
+
             if ((allAtoms[tIdx1].id=="C14" && allAtoms[tIdx2].id=="C23")
                  || (allAtoms[tIdx2].id=="C23" && allAtoms[tIdx1].id=="C14"))
             {
                 std::cout << "tS1 = " << tS1 << std::endl
                           << "tS2 = " << tS2 << std::endl;
-                
+
             }
             */
-        /*   
+        /*
         std::cout << "excluded " << allAtoms[tIdx2].id << ", atom "
                 << allAtoms[tIdx1].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV1.begin(); iA !=tV1.end(); iA++)
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
@@ -1816,16 +1817,16 @@ namespace LIBMOL
         }
          */
     }
-    
+
     void AllSystem::SetOneSP2SP3Bond(int tIdx1, int tIdx2, std::string tF)
     {
-                
-        
+
+
         // one sp2 atom and one sp3 atom
         std::vector<int> tV1, tV2;
-        
+
         int tS1=-1, tS2=-1;
-        
+
         for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
         {
@@ -1844,32 +1845,32 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             //std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //          << std::endl;
                             break;
-                            
+
                     }
                 }
             }
             if(tS1 !=-1 && tS2 !=-1)
             {
-                
+
                 break;
-                
+
             }
         }
-            
+
         REAL va1  =   0.0;
         REAL va2  =  60.0;
         int  per  =     6;
-        
+
         REAL va[2][3];
         if (tS1 !=-1 && tS2 !=-1)
         {
             va[0][0] =    va1;
             va[0][1] =  2*va2;
             va[0][2] = -2*va2;
-        
+
             va[1][0] =  3*va2;
             va[1][1] =  -va2;
             va[1][2] =   va2;
@@ -1879,7 +1880,7 @@ namespace LIBMOL
                 va[0][0] =    va2;
                 va[0][1] =  3*va2;
                 va[0][2] =   -va2;
-        
+
                 va[1][0] =  -2*va2;
                 va[1][1] =     va1;
                 va[1][2] =   2*va2;
@@ -1889,7 +1890,7 @@ namespace LIBMOL
                 va[0][0] =   -va2;
                 va[0][1] =    va2;
                 va[0][2] =   3*va2;
-        
+
                 va[1][0] =   2*va2;
                 va[1][1] =  -2*va2;
                 va[1][2] =     va1;
@@ -1901,22 +1902,22 @@ namespace LIBMOL
             va[0][0] =    va1;
             va[0][1] =  2*va2;
             va[0][2] = -2*va2;
-        
+
             va[1][0] =  3*va2;
             va[1][1] =  -va2;
             va[1][2] =   va2;
-           */  
-            
+           */
+
             va[0][0] =  3*va2;
             va[0][1] =  -va2;
             va[0][2] =   va2;
-            
+
             va[1][0] =    va1;
             va[1][1] =  2*va2;
             va[1][2] = -2*va2;
         }
-        
-        
+
+
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -1925,14 +1926,14 @@ namespace LIBMOL
                 tV1.push_back(*iA1);
             }
         }
-        
+
         // for sp3 atoms
         if ((int)allAtoms[tIdx2].inChirals.size() !=0)
         {
-            
+
             int iCh = allAtoms[tIdx2].inChirals[0];
-            
-            
+
+
             /*
             if(tS1 !=-1 && tS2 !=-1)
             {
@@ -1943,7 +1944,7 @@ namespace LIBMOL
                     std::cout << allAtoms[allChirals[iCh].atoms[i]].id << std::endl;
                 }
                 exit(1);
-                        
+
             }
             */
             // buildChiralCluster2(allChirals[iCh], tV2, tIdx1, allAtoms[tIdx2].connAtoms);
@@ -1951,18 +1952,18 @@ namespace LIBMOL
            /*
             //if(allAtoms[tIdx2].id =="C15" || allAtoms[tIdx2].id =="C9")
             //{
-             std::cout << "Chiral serial number is " << iCh << std::endl;   
+             std::cout << "Chiral serial number is " << iCh << std::endl;
              std::cout << "root atom is  " << allAtoms[tIdx1].id << std::endl;
              std::cout << "atom  " << allAtoms[tIdx2].id << " mutable size is "
                       << (int)allChirals[iCh].mutTable.size() << std::endl
                       << std::endl << allChirals[iCh].mutTable[tIdx1][0]
                       << " and " << allChirals[iCh].mutTable[tIdx1][1] << std::endl
-                      << " chiral atom seq is " << std::endl; 
+                      << " chiral atom seq is " << std::endl;
              for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
              {
                  std::cout << "atom " << allAtoms[*iA].id << std::endl;
              }
-           
+
             //}
             */
         }
@@ -1970,8 +1971,8 @@ namespace LIBMOL
         {
             int nH = getNumSpecAtomConnect(tIdx2, "H");
             if (allAtoms[tIdx1].chemType.compare("H") !=0 && nH==2)
-            {   
-  
+            {
+
                 for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                         iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
                 {
@@ -1982,7 +1983,7 @@ namespace LIBMOL
                         break;
                     }
                 }
-                
+
                 for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                         iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
                 {
@@ -1995,10 +1996,10 @@ namespace LIBMOL
                 }
             }
         }
-        
-        // put those atoms which are not, such as H atoms, in chiral 
+
+        // put those atoms which are not, such as H atoms, in chiral
         // list into the output list
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2007,7 +2008,7 @@ namespace LIBMOL
                 tV2.push_back(*iA2);
             }
         }
-        
+
         if ((int)tV1.size() <=(int)tV2.size())
         {
             for (int i =0; i < (int)tV1.size(); i++)
@@ -2036,9 +2037,9 @@ namespace LIBMOL
                     aTS.push_back(tV1[j]);
                     setOneTorsion(aTS, va[i][j], per);
                 }
-            }   
+            }
         }
-        
+
         /*
         std::cout << "excluded " << allAtoms[tIdx2].id << ", atom "
                 << allAtoms[tIdx1].id << " form torsion using " << std::endl;
@@ -2046,7 +2047,7 @@ namespace LIBMOL
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
@@ -2054,21 +2055,21 @@ namespace LIBMOL
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
         */
-       
+
     }
-    
-    
+
+
     void AllSystem::SetOneSP2SP3Bond(int tIdx1, int tIdx2)
     {
-                
-        
-        
+
+
+
         // one sp2 atom and one sp3 atom
         std::vector<int> tV1, tV2;
-        
+
         int tS1=-1, tS2=-1;
         std::vector<int> tS3;
-        
+
         for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
         {
@@ -2089,35 +2090,35 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             //std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //          << std::endl;
-                            break;   
+                            break;
                         }
                     }
                 }
             }
             if(tS1 !=-1 && tS2 !=-1)
             {
-                
+
                 break;
-                
+
             }
         }
-            
+
         REAL va1;
         REAL va2;
         int  per  =     6;
-        
+
         REAL va[2][3];
         if (tS1 !=-1 && tS2 !=-1)
         {
             va1  =   0.0;
             va2  =  60.0;
-            
+
             va[0][0] =    va1;
             va[0][1] =  2*va2;
             va[0][2] = -2*va2;
-        
+
             va[1][0] =  3*va2;
             va[1][1] =  -va2;
             va[1][2] =   va2;
@@ -2125,7 +2126,7 @@ namespace LIBMOL
             va[0][0] =    va2;
             va[0][1] =  3*va2;
             va[0][2] =   -va2;
-        
+
             va[1][0] =  -2*va2;
             va[1][1] =     va1;
             va[1][2] =   2*va2;
@@ -2135,11 +2136,11 @@ namespace LIBMOL
         {
             va1      =   90.0;
             va2      =   30.0;
-            
+
             va[0][0] =  2*va1-va2;
             va[0][1] =  -va1;
             va[0][2] =   va2;
-        
+
             va[1][0] =  -va2;
             va[1][1] =   va1;
             va[1][2] = -(2*va1-va2);
@@ -2148,30 +2149,30 @@ namespace LIBMOL
         {
             va1  =   0.0;
             va2  =  60.0;
-            
+
             va[0][0] =    va1;
             va[0][1] =  2*va2;
             va[0][2] = -2*va2;
-        
+
             va[1][0] =  3*va2;
             va[1][1] =  -va2;
             va[1][2] =   va2;
-            
+
             /*
-            
-           
+
+
             va[0][0] =    va1;
             va[0][1] =  -(2*va1-va2);
             va[0][2] =   -va2;
-        
+
             va[1][0] =  -va1;
             va[1][1] =   va2;
             va[1][2] =   2*va1-va2;
-            
+
             va[0][0] =    va1;
             va[0][1] =  2*va2;
             va[0][2] = -2*va2;
-        
+
             va[1][0] =  3*va2;
             va[1][1] =  -va2;
             va[1][2] =   va2;
@@ -2179,14 +2180,14 @@ namespace LIBMOL
             va[0][0] =  3*va2;
             va[0][1] =  -va2;
             va[0][2] =   va2;
-            
+
             va[1][0] =    va1;
             va[1][1] =  2*va2;
             va[1][2] = -2*va2;
             */
         }
-        
-        
+
+
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -2195,14 +2196,14 @@ namespace LIBMOL
                 tV1.push_back(*iA1);
             }
         }
-        
+
         // for sp3 atoms
         if ((int)allAtoms[tIdx2].inChirals.size() !=0)
         {
-            
+
             int iCh = allAtoms[tIdx2].inChirals[0];
-            
-            
+
+
             /*
             if(tS1 !=-1 && tS2 !=-1)
             {
@@ -2213,7 +2214,7 @@ namespace LIBMOL
                     std::cout << allAtoms[allChirals[iCh].atoms[i]].id << std::endl;
                 }
                 exit(1);
-                        
+
             }
             */
             // buildChiralCluster2(allChirals[iCh], tV2, tIdx1, allAtoms[tIdx2].connAtoms);
@@ -2221,18 +2222,18 @@ namespace LIBMOL
            /*
             //if(allAtoms[tIdx2].id =="C15" || allAtoms[tIdx2].id =="C9")
             //{
-             std::cout << "Chiral serial number is " << iCh << std::endl;   
+             std::cout << "Chiral serial number is " << iCh << std::endl;
              std::cout << "root atom is  " << allAtoms[tIdx1].id << std::endl;
              std::cout << "atom  " << allAtoms[tIdx2].id << " mutable size is "
                       << (int)allChirals[iCh].mutTable.size() << std::endl
                       << std::endl << allChirals[iCh].mutTable[tIdx1][0]
                       << " and " << allChirals[iCh].mutTable[tIdx1][1] << std::endl
-                      << " chiral atom seq is " << std::endl; 
+                      << " chiral atom seq is " << std::endl;
              for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
              {
                  std::cout << "atom " << allAtoms[*iA].id << std::endl;
              }
-           
+
             //}
             */
         }
@@ -2249,10 +2250,10 @@ namespace LIBMOL
                 }
             }
         }
-        
-        // put those atoms which are not, such as H atoms, in chiral 
+
+        // put those atoms which are not, such as H atoms, in chiral
         // list into the output list
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2261,7 +2262,7 @@ namespace LIBMOL
                 tV2.push_back(*iA2);
             }
         }
-        
+
         if ((int)tV1.size() <=(int)tV2.size())
         {
             for (int i =0; i < (int)tV1.size(); i++)
@@ -2290,7 +2291,7 @@ namespace LIBMOL
                     aTS.push_back(tV1[j]);
                     setOneTorsion(aTS, va[i][j], per);
                 }
-            }   
+            }
         }
         /*
         std::cout << "excluded " << allAtoms[tIdx2].id << ", atom "
@@ -2299,66 +2300,66 @@ namespace LIBMOL
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-        
+
        */
-       
+
     }
-    
-    
-    
+
+
+
     void AllSystem::SetOneSP3SP3Bond(int tIdx1, int tIdx2)
     {
-        
+
         REAL va[3][3];
-        
-        
-        
-        
+
+
+
+
         /*
         va[0][0] = 60.0;
         va[0][1] = 180.0;
         va[0][2] = -60.0;
-        
+
         va[1][0] = -60.0;
         va[1][1] =  60.0;
         va[1][2] = 180.0;
-        
+
         va[2][0] = 180.0;
         va[2][1] = -60.0;
         va[2][2] =  60.0;
         */
-        
-        
+
+
         va[0][0] = 180.0;
         va[0][1] = -60.0;
         va[0][2] =  60.0;
-        
+
         va[1][0] =  60.0;
         va[1][1] = 180.0;
         va[1][2] = -60.0;
-        
+
         va[2][0] = -60.0;
         va[2][1] =  60.0;
         va[2][2] = 180.0;
-       
-        
+
+
         int  per =     3;
-        
+
         // One sp3 atom and one sp3 atom
         // Several procedures
         // 1. if there are two atoms in the same ring
-        
+
         std::vector<int> tV1, tV2;
-        
+
         int tS1=-1, tS2=-1;
-        
+
         for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
         {
@@ -2377,7 +2378,7 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             //std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //          << std::endl;
                             break;
                     }
@@ -2388,14 +2389,14 @@ namespace LIBMOL
                 break;
             }
         }
-        
-        // 2. take consider of chirals 
+
+        // 2. take consider of chirals
         // std::cout << "tS1 " << tS1 << " tS2 " << tS2 << std::endl;
-        
+
         if ((int)allAtoms[tIdx1].inChirals.size() !=0)
         {
             int iCh = allAtoms[tIdx1].inChirals[0];
-            
+
             // buildChiralCluster2(allChirals[iCh], tV1, tIdx2, allAtoms[tIdx1].connAtoms);
             buildChiralCluster2(allChirals[iCh], tV1, tIdx2);
         }
@@ -2412,12 +2413,12 @@ namespace LIBMOL
                 }
             }
         }
-        
-       
+
+
         if ((int)allAtoms[tIdx2].inChirals.size() !=0)
         {
             int iCh = allAtoms[tIdx2].inChirals[0];
-            
+
             //buildChiralCluster2(allChirals[iCh], tV2, tIdx1, allAtoms[tIdx2].connAtoms);
             buildChiralCluster2(allChirals[iCh], tV2, tIdx1);
         }
@@ -2434,11 +2435,11 @@ namespace LIBMOL
                 }
             }
         }
-       
-        
-       
-           
-        // the rest atoms not included in the chiral atom cluster 
+
+
+
+
+        // the rest atoms not included in the chiral atom cluster
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -2447,7 +2448,7 @@ namespace LIBMOL
                 tV1.push_back(*iA1);
             }
         }
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2456,7 +2457,7 @@ namespace LIBMOL
                 tV2.push_back(*iA2);
             }
         }
-        
+
         /*
         std::cout << "excluded " << allAtoms[tIdx2].id << " and atom "
                 << allAtoms[tIdx1].id << " form torsion using " << std::endl;
@@ -2464,7 +2465,7 @@ namespace LIBMOL
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
@@ -2472,7 +2473,7 @@ namespace LIBMOL
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
         */
-        
+
         for (int i =0; i < (int)tV1.size(); i++)
         {
             for (int j=0; j < (int)tV2.size(); j++)
@@ -2486,21 +2487,21 @@ namespace LIBMOL
             }
         }
     }
-    
+
     void AllSystem::SetOneSP3SP3Bond(int tIdx1, int tIdx2, std::string tF)
     {
-        
+
         REAL va[3][3];
         if (tF=="even")
         {
             va[0][0] =  60.0;
             va[0][1] = 180.0;
             va[0][2] = -60.0;
-        
+
             va[1][0] = -60.0;
             va[1][1] =  60.0;
             va[1][2] = 180.0;
-        
+
             va[2][0] = 180.0;
             va[2][1] = -60.0;
             va[2][2] =  60.0;
@@ -2510,11 +2511,11 @@ namespace LIBMOL
             va[0][0] = -60.0;
             va[0][1] =  60.0;
             va[0][2] = 180.0;
-        
+
             va[1][0] = 180.0;
             va[1][1] = -60.0;
             va[1][2] =  60.0;
-        
+
             va[2][0] =  60.0;
             va[2][1] = 180.0;
             va[2][2] = -60.0;
@@ -2525,17 +2526,17 @@ namespace LIBMOL
                     << std::endl;
             exit(1);
         }
-        
+
         int  per =     3;
-        
+
         // One sp3 atom and one sp3 atom
         // Several procedures
         // 1. if there are two atoms in the same ring
-        
+
         std::vector<int> tV1, tV2;
-        
+
         int tS1=-1, tS2=-1;
-        
+
         for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
         {
@@ -2554,7 +2555,7 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             // std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //          << std::endl;
                             break;
                     }
@@ -2565,21 +2566,21 @@ namespace LIBMOL
                 break;
             }
         }
-        
-        // 2. take consider of chirals 
+
+        // 2. take consider of chirals
         // std::cout << "tS1 " << tS1 << " tS2 " << tS2 << std::endl;
-        
+
         if ((int)allAtoms[tIdx1].inChirals.size() !=0)
         {
-            
+
             int iCh = allAtoms[tIdx1].inChirals[0];
-            
+
             // buildChiralCluster2(allChirals[iCh], tV1, tIdx2, allAtoms[tIdx1].connAtoms);
             buildChiralCluster2(allChirals[iCh], tV1, tIdx2);
         }
         else
         {
-            
+
             for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
             {
@@ -2591,12 +2592,12 @@ namespace LIBMOL
                 }
             }
         }
-        
-       
+
+
         if ((int)allAtoms[tIdx2].inChirals.size() !=0)
         {
             int iCh = allAtoms[tIdx2].inChirals[0];
-            
+
             //buildChiralCluster2(allChirals[iCh], tV2, tIdx1, allAtoms[tIdx2].connAtoms);
             buildChiralCluster2(allChirals[iCh], tV2, tIdx1);
         }
@@ -2613,9 +2614,9 @@ namespace LIBMOL
                 }
             }
         }
-        
-           
-        // the rest atoms not included in the chiral atom cluster 
+
+
+        // the rest atoms not included in the chiral atom cluster
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -2624,7 +2625,7 @@ namespace LIBMOL
                 tV1.push_back(*iA1);
             }
         }
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2640,7 +2641,7 @@ namespace LIBMOL
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
@@ -2648,7 +2649,7 @@ namespace LIBMOL
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
         */
-        
+
         for (int i =0; i < (int)tV1.size(); i++)
         {
             for (int j=0; j < (int)tV2.size(); j++)
@@ -2662,29 +2663,29 @@ namespace LIBMOL
             }
         }
     }
-    
+
     void AllSystem::SetOneSP3SP3Bond4H(int tIdx1, int tIdx2)
     {
         // Each sp3 center atoms connected two H atoms
         // Two sp3 center atoms are not in the same ring
-        
+
         REAL va[3][3];
         va[0][0] = 180.0;
         va[0][1] = -60.0;
         va[0][2] =  60.0;
-        
+
         va[1][0] =  60.0;
         va[1][1] =  180.0;
         va[1][2] = -60.0;
-        
+
         va[2][0] = -60.0;
         va[2][1] =  60.0;
         va[2][2] = 180.0;
-        
+
         int  per =     3;
-        
+
         std::vector<int> tV1, tV2;
-        
+
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -2695,7 +2696,7 @@ namespace LIBMOL
                 break;
             }
         }
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2706,8 +2707,8 @@ namespace LIBMOL
                 break;
             }
         }
-        
-        // the rest atoms not included in the chiral atom cluster 
+
+        // the rest atoms not included in the chiral atom cluster
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -2716,7 +2717,7 @@ namespace LIBMOL
                 tV1.push_back(*iA1);
             }
         }
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2725,8 +2726,8 @@ namespace LIBMOL
                 tV2.push_back(*iA2);
             }
         }
-        
-        
+
+
         /*
         std::cout << "excluded " << allAtoms[tIdx2].id << " and atom "
                 << allAtoms[tIdx1].id << " form torsion using " << std::endl;
@@ -2734,16 +2735,16 @@ namespace LIBMOL
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-        
+
          */
-        
+
         for (int i =0; i < (int)tV1.size(); i++)
         {
             for (int j=0; j < (int)tV2.size(); j++)
@@ -2756,15 +2757,15 @@ namespace LIBMOL
                 setOneTorsion(aTS, va[i][j], per);
             }
         }
-   
+
     }
-    
+
     bool AllSystem::checkSP3SP34H(int tIdx1, int tIdx2)
     {
         int  n1  = 0;
         int  n2  = 0;
         bool h4  = false;
-        
+
         for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
         {
@@ -2773,7 +2774,7 @@ namespace LIBMOL
                 n1++;
             }
         }
-        
+
         for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
         {
@@ -2782,31 +2783,31 @@ namespace LIBMOL
                 n2++;
             }
         }
-        
+
         if (n1==2 && n2==2)
         {
             h4 = true;
         }
-        
+
         return h4;
     }
-    
-    void AllSystem::SetOneSP3OxyColumnBond(int tIdx1, int tIdx2, 
+
+    void AllSystem::SetOneSP3OxyColumnBond(int tIdx1, int tIdx2,
                                              int tPer, REAL tIniValue)
     {
         // atoms connected to atoms tIdx1, tIdx2
         int iS=-1;
         std::vector<int> tV1, tV2;
         int tS1=-1, tS2=-1;
-        //std::cout << "For atom " << allAtoms[tIdx1].id << " and atom " 
+        //std::cout << "For atom " << allAtoms[tIdx1].id << " and atom "
         //          << allAtoms[tIdx2].id << "connected atoms are " << std::endl;
-        
+
         for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
         {
             tS1 =-1;
             //std::cout << "1 linked " << allAtoms[*iAt1].id << std::endl;
-            
+
             for (std::vector<int>::iterator iAt2=allAtoms[tIdx2].connAtoms.begin();
                        iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
             {
@@ -2822,7 +2823,7 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             //std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //          << std::endl;
                             break;
                     }
@@ -2833,11 +2834,11 @@ namespace LIBMOL
                 break;
             }
         }
-        
+
         if(tS1 ==-1 && tS2 ==-1)
         {
             //First find a atom which is not H as a start atom
-            
+
             for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                     iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
             {
@@ -2847,16 +2848,16 @@ namespace LIBMOL
                     break;
                 }
             }
-            
+
             // if in some cases, only H has involved, use them.
             if (iS==-1)
             {
                 iS=allAtoms[tIdx1].connAtoms[0];
             }
-            
+
             tV1.push_back(iS);
         }
-        
+
             if ((int)allAtoms[tIdx1].inChirals.size() !=0)
             {
                 int iCh = allAtoms[tIdx1].inChirals[0];
@@ -2864,7 +2865,7 @@ namespace LIBMOL
                 //std::cout << "buildChiralCluster2 " << std::endl;
                 buildChiralCluster2(allChirals[iCh], tV1, tIdx2);
             }
-            
+
         // std::cout << "tV1 " << (int)tV1.size() << std::endl;
         /*
         for(std::vector<int>::iterator iV1=tV1.begin(); iV1 != tV1.end();
@@ -2872,8 +2873,8 @@ namespace LIBMOL
         {
             std::cout << allAtoms[*iV1].id  << std::endl;
         }
-         */ 
-                
+         */
+
             for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
             {
@@ -2882,7 +2883,7 @@ namespace LIBMOL
                     tV1.push_back(*iA1);
                 }
             }
-           
+
             for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                     iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
             {
@@ -2891,14 +2892,14 @@ namespace LIBMOL
                     tV2.push_back(*iA2);
                 }
             }
-            
+
            // std::cout << "number of tV2 " << (int)tV2.size() << std::endl;
-            
+
             REAL perValue = 360.0/tPer;
             REAL iniValue;
-            
+
             int n = 0;
-            
+
             for (int i=0; i <(int)tV1.size(); i++)
             {
                 if(tS1 !=-1 && tS2 !=-1)
@@ -2910,7 +2911,7 @@ namespace LIBMOL
                     iniValue=tIniValue + n*perValue;
                 }
                 // std::cout << "iniValue " << iniValue << std::endl;
-                
+
                 int m =0;
                 for (int j=0; j < (int)tV2.size(); j++)
                 {
@@ -2921,10 +2922,10 @@ namespace LIBMOL
                     TS.push_back(tIdx1);
                     TS.push_back(tIdx2);
                     TS.push_back(tV2[j]);
-                    
-                 
+
+
                     REAL curValue = iniValue +m*perValue;
-                  
+
                     if (curValue > 360.0)
                     {
                         curValue = curValue -360.0;
@@ -2941,7 +2942,7 @@ namespace LIBMOL
                 }
                 n++;
             }
-            
+
             /*
             std::cout << "excluded " << allAtoms[tIdx2].id << ", atom "
                 << allAtoms[tIdx1].id << " form torsion using " << std::endl;
@@ -2949,7 +2950,7 @@ namespace LIBMOL
             {
                 std::cout << "atom " << allAtoms[*iA].id << std::endl;
             }
-                
+
             std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                       << allAtoms[tIdx2].id << " form torsion using " << std::endl;
             for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
@@ -2957,26 +2958,26 @@ namespace LIBMOL
                 std::cout << "atom " << allAtoms[*iA].id << std::endl;
             }
              */
-            
+
     }
-    
-    void AllSystem::SetOneSP3OxyColumnBond(int tIdx1, int tIdx2, 
-                                             int tPer, REAL tIniValue, 
+
+    void AllSystem::SetOneSP3OxyColumnBond(int tIdx1, int tIdx2,
+                                             int tPer, REAL tIniValue,
                                              std::string tF)
     {
         // atoms connected to atoms tIdx1, tIdx2
         int iS=-1;
         std::vector<int> tV1, tV2;
         int tS1=-1, tS2=-1;
-        //std::cout << "For atom " << allAtoms[tIdx1].id << " and atom " 
+        //std::cout << "For atom " << allAtoms[tIdx1].id << " and atom "
         //          << allAtoms[tIdx2].id << "connected atoms are " << std::endl;
-        
+
         for (std::vector<int>::iterator iAt1=allAtoms[tIdx1].connAtoms.begin();
                iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
         {
             tS1 =-1;
             //std::cout << "1 linked " << allAtoms[*iAt1].id << std::endl;
-            
+
             for (std::vector<int>::iterator iAt2=allAtoms[tIdx2].connAtoms.begin();
                        iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
             {
@@ -2992,7 +2993,7 @@ namespace LIBMOL
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
                             //std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring " 
+                            //          << allAtoms[*iAt2].id  << " is in the same ring "
                             //          << std::endl;
                             break;
                     }
@@ -3003,11 +3004,11 @@ namespace LIBMOL
                 break;
             }
         }
-        
+
         if(tS1 ==-1 && tS2 ==-1)
         {
             //First find a atom which is not H as a start atom
-            
+
             for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                     iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
             {
@@ -3017,16 +3018,16 @@ namespace LIBMOL
                     break;
                 }
             }
-            
+
             // if in some cases, only H has involved, use them.
             if (iS==-1)
             {
                 iS=allAtoms[tIdx1].connAtoms[0];
             }
-            
+
             tV1.push_back(iS);
         }
-        
+
             if ((int)allAtoms[tIdx1].inChirals.size() !=0)
             {
                 int iCh = allAtoms[tIdx1].inChirals[0];
@@ -3034,7 +3035,7 @@ namespace LIBMOL
                 //std::cout << "buildChiralCluster2 " << std::endl;
                 buildChiralCluster2(allChirals[iCh], tV1, tIdx2);
             }
-            
+
         // std::cout << "tV1 " << (int)tV1.size() << std::endl;
         /*
         for(std::vector<int>::iterator iV1=tV1.begin(); iV1 != tV1.end();
@@ -3043,7 +3044,7 @@ namespace LIBMOL
             std::cout << allAtoms[*iV1].id  << std::endl;
         }
          */
-            
+
             for (std::vector<int>::iterator iA1=allAtoms[tIdx1].connAtoms.begin();
                iA1 != allAtoms[tIdx1].connAtoms.end(); iA1++)
             {
@@ -3052,7 +3053,7 @@ namespace LIBMOL
                     tV1.push_back(*iA1);
                 }
             }
-           
+
             for (std::vector<int>::iterator iA2=allAtoms[tIdx2].connAtoms.begin();
                     iA2 != allAtoms[tIdx2].connAtoms.end(); iA2++)
             {
@@ -3061,14 +3062,14 @@ namespace LIBMOL
                     tV2.push_back(*iA2);
                 }
             }
-            
+
            // std::cout << "number of tV2 " << (int)tV2.size() << std::endl;
-            
+
             REAL perValue = 360.0/tPer;
             REAL iniValue;
-            
+
             int n = 0;
-            
+
             for (int i=0; i <(int)tV1.size(); i++)
             {
                 if(tS1 !=-1 && tS2 !=-1)
@@ -3077,7 +3078,7 @@ namespace LIBMOL
                     {
                         iniValue= 60.0 +  n*perValue;
                     }
-                    else 
+                    else
                     {
                         iniValue= -60.0 +  n*perValue;
                     }
@@ -3087,7 +3088,7 @@ namespace LIBMOL
                     iniValue=tIniValue + n*perValue;
                 }
                 // std::cout << "iniValue " << iniValue << std::endl;
-                
+
                 int m =0;
                 for (int j=0; j < (int)tV2.size(); j++)
                 {
@@ -3098,10 +3099,10 @@ namespace LIBMOL
                     TS.push_back(tIdx1);
                     TS.push_back(tIdx2);
                     TS.push_back(tV2[j]);
-                    
-                 
+
+
                     REAL curValue = iniValue +m*perValue;
-                  
+
                     if (curValue > 360.0)
                     {
                         curValue = curValue -360.0;
@@ -3118,7 +3119,7 @@ namespace LIBMOL
                 }
                 n++;
             }
-            
+
             /*
             std::cout << "excluded " << allAtoms[tIdx2].id << ", atom "
                 << allAtoms[tIdx1].id << " form torsion using " << std::endl;
@@ -3126,7 +3127,7 @@ namespace LIBMOL
         {
             std::cout << "atom " << allAtoms[*iA].id << std::endl;
         }
-                
+
         std::cout << "excluded " << allAtoms[tIdx1].id << " and atom "
                 << allAtoms[tIdx2].id << " form torsion using " << std::endl;
         for (std::vector<int>::iterator iA=tV2.begin(); iA !=tV2.end(); iA++)
@@ -3135,53 +3136,53 @@ namespace LIBMOL
         }
              */
     }
-    
-    
+
+
     void AllSystem::setTorsionFromOneBond(int tIdx1, int tIdx2)
     {
         int bIdx1 =  allAtoms[tIdx1].bondingIdx;
         ID  id1   =  allAtoms[tIdx1].chemType;
-        
+
         int bIdx2 =  allAtoms[tIdx2].bondingIdx;
         ID  id2   =  allAtoms[tIdx2].chemType;
         /*
-        std::cout << "id1 "    << allAtoms[tIdx1].id << " serial num " << tIdx1 
+        std::cout << "id1 "    << allAtoms[tIdx1].id << " serial num " << tIdx1
                   << " bIdx1 " << bIdx1
                   << " and id2 " << allAtoms[tIdx2].id  << " serial num " << tIdx2
                   << " bIdx2 "   << bIdx2 << std::endl;
         */
         std::vector<ID> OxyCol;
-        
+
         OxyCol.push_back("O");
         OxyCol.push_back("S");
         OxyCol.push_back("Se");
         OxyCol.push_back("Te");
         OxyCol.push_back("Po");
-        
+
         std::vector<ID>::iterator iFind1 = std::find(OxyCol.begin(), OxyCol.end(), id1);
         std::vector<ID>::iterator iFind2 = std::find(OxyCol.begin(), OxyCol.end(), id2);
-        
-        if ((iFind1 != OxyCol.end() && bIdx1==2) && 
+
+        if ((iFind1 != OxyCol.end() && bIdx1==2) &&
                 (iFind2 != OxyCol.end() && bIdx2==3))
         {
             // two Oxy column atoms with sp3 orbiting
             //std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 2, 90.0)" << std::endl;
-            //std::cout << "atom 1 "  << allAtoms[tIdx1].id 
+            //std::cout << "atom 1 "  << allAtoms[tIdx1].id
             //          << " atom 2 " << allAtoms[tIdx2].id << std::endl;
-            SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 90.0);   
+            SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 90.0);
         }
-        else if ((iFind1 != OxyCol.end() && bIdx1==2) && bIdx2==3)  
+        else if ((iFind1 != OxyCol.end() && bIdx1==2) && bIdx2==3)
         {
             //std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 12, 180.0)" << std::endl;
-            //std::cout << "atom 1 sp2 " << allAtoms[tIdx1].id 
+            //std::cout << "atom 1 sp2 " << allAtoms[tIdx1].id
             //        << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 180.0);
-            
+
         }
-        else if ((iFind2 != OxyCol.end() && bIdx2==2) && bIdx1==3)  
+        else if ((iFind2 != OxyCol.end() && bIdx2==2) && bIdx1==3)
         {
             //std::cout << "SetOneSP3OxyColumnBond" << std::endl;
-            // std::cout << "atom 1 sp3 " << allAtoms[tIdx1].id 
+            // std::cout << "atom 1 sp3 " << allAtoms[tIdx1].id
             //          << "atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx1, tIdx2, 3, 180.0);
         }
@@ -3189,28 +3190,28 @@ namespace LIBMOL
         {
             //std::cout << "SetOneSP2SP2Bond" << std::endl;
             SetOneSP2SP2Bond(tIdx1, tIdx2);
-            
+
         }
         else if ((bIdx1==2 && bIdx2==3) || (bIdx1==3 && bIdx2==2))
         {
             if (bIdx1==2 && bIdx2==3)
             {
                 //std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
-                // std::cout << " atom 1 sp2 " << allAtoms[tIdx1].id 
+                // std::cout << " atom 1 sp2 " << allAtoms[tIdx1].id
                 //          << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
                 SetOneSP2SP3Bond(tIdx1, tIdx2);
             }
             else
-            {  
+            {
                 //std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
-                // std::cout << " atom 1 sp3 " << allAtoms[tIdx1].id 
+                // std::cout << " atom 1 sp3 " << allAtoms[tIdx1].id
                 //           << " atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
                 SetOneSP2SP3Bond(tIdx2, tIdx1);
             }
         }
         else if (bIdx1==3 && bIdx2==3)
         {
-            
+
             if (!AtomsInSameRing(allAtoms[tIdx1], allAtoms[tIdx2], allRingsV)
                  && checkSP3SP34H(tIdx1, tIdx2))
             {
@@ -3239,7 +3240,7 @@ namespace LIBMOL
         {
             SetOneSP1SP2Bond(tIdx2, tIdx1);
         }
-       
+
         else if((bIdx1==0 ||bIdx1==1) && bIdx2==3)
         {
             SetOneSP1SP3Bond(tIdx1, tIdx2);
@@ -3247,54 +3248,54 @@ namespace LIBMOL
         else if((bIdx2==0||bIdx2==1) && bIdx1==3)
         {
             SetOneSP1SP3Bond(tIdx2, tIdx1);
-        }    
+        }
     }
-     
+
     void AllSystem::setTorsionFromOneBond(int tIdx1, int tIdx2, std::string tF)
     {
         int bIdx1 =  allAtoms[tIdx1].bondingIdx;
         ID  id1   =  allAtoms[tIdx1].chemType;
-        
+
         int bIdx2 =  allAtoms[tIdx2].bondingIdx;
         ID  id2   =  allAtoms[tIdx2].chemType;
         /*
-        std::cout << "id1 "    << allAtoms[tIdx1].id << " serial num " << tIdx1 
+        std::cout << "id1 "    << allAtoms[tIdx1].id << " serial num " << tIdx1
                   << " bIdx1 " << bIdx1
                   << " and id2 " << allAtoms[tIdx2].id  << " serial num " << tIdx2
                   << " bIdx2 "   << bIdx2 << std::endl;
         */
         std::vector<ID> OxyCol;
-        
+
         OxyCol.push_back("O");
         OxyCol.push_back("S");
         OxyCol.push_back("Se");
         OxyCol.push_back("Te");
         OxyCol.push_back("Po");
-        
+
         std::vector<ID>::iterator iFind1 = std::find(OxyCol.begin(), OxyCol.end(), id1);
         std::vector<ID>::iterator iFind2 = std::find(OxyCol.begin(), OxyCol.end(), id2);
-        
-        if ((iFind1 != OxyCol.end() && bIdx1==2) && 
+
+        if ((iFind1 != OxyCol.end() && bIdx1==2) &&
                 (iFind2 != OxyCol.end() && bIdx2==3))
         {
             // two Oxy column atoms with sp3 orbiting
             //std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 2, 90.0)" << std::endl;
-            //std::cout << "atom 1 "  << allAtoms[tIdx1].id 
+            //std::cout << "atom 1 "  << allAtoms[tIdx1].id
             //          << " atom 2 " << allAtoms[tIdx2].id << std::endl;
-            SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 90.0);   
+            SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 90.0);
         }
-        else if ((iFind1 != OxyCol.end() && bIdx1==2) && bIdx2==3)  
+        else if ((iFind1 != OxyCol.end() && bIdx1==2) && bIdx2==3)
         {
             //std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 12, 180.0)" << std::endl;
-            // std::cout << "atom 1 sp2 " << allAtoms[tIdx1].id 
+            // std::cout << "atom 1 sp2 " << allAtoms[tIdx1].id
             //         << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 180.0, tF);
-            
+
         }
-        else if ((iFind2 != OxyCol.end() && bIdx2==2) && bIdx1==3)  
+        else if ((iFind2 != OxyCol.end() && bIdx2==2) && bIdx1==3)
         {
             //std::cout << "SetOneSP3OxyColumnBond" << std::endl;
-            // std::cout << "atom 1 sp3 " << allAtoms[tIdx1].id 
+            // std::cout << "atom 1 sp3 " << allAtoms[tIdx1].id
             //           << "atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx1, tIdx2, 3, 180.0, tF);
         }
@@ -3302,21 +3303,21 @@ namespace LIBMOL
         {
             //std::cout << "SetOneSP2SP2Bond" << std::endl;
             SetOneSP2SP2Bond(tIdx1, tIdx2);
-            
+
         }
         else if ((bIdx1==2 && bIdx2==3) || (bIdx1==3 && bIdx2==2))
         {
             if (bIdx1==2 && bIdx2==3)
             {
                 // std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
-                // std::cout << " atom 1 sp2 " << allAtoms[tIdx1].id 
+                // std::cout << " atom 1 sp2 " << allAtoms[tIdx1].id
                 //           << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
                 SetOneSP2SP3Bond(tIdx1, tIdx2);
             }
             else
-            {  
+            {
                 // std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
-                // std::cout << " atom 1 sp3 " << allAtoms[tIdx1].id 
+                // std::cout << " atom 1 sp3 " << allAtoms[tIdx1].id
                 //           << " atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
                 SetOneSP2SP3Bond(tIdx2, tIdx1);
             }
@@ -3341,7 +3342,7 @@ namespace LIBMOL
         else if((bIdx2==0 ||bIdx2==1) && bIdx1==2)
         {
             SetOneSP1SP2Bond(tIdx2, tIdx1);
-        }  
+        }
         else if(bIdx1==0  && bIdx2==3)
         {
             SetOneSP1SP3Bond(tIdx1, tIdx2);
@@ -3351,7 +3352,7 @@ namespace LIBMOL
             SetOneSP1SP3Bond(tIdx2, tIdx1);
         }
     }
-    
+
     void AllSystem::setAllTorsions()
     {
         // loop over all bonds to get the torsion angles
@@ -3379,28 +3380,28 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         std::cout << "All torsions have been setup " << std::endl;
-       
+
     }
-        
+
     void AllSystem::setAllTorsions2()
     {
-        
+
         std::vector<int>  tDone;
-        
+
         // First set all torsion within all rings
         for (std::vector<RingDict>::iterator iR=allRingsV.begin();
                 iR != allRingsV.end(); iR++)
         {
             setAllTorsionsInOneRing(tDone, *iR);
-        }   
-        
-       
-        
-        std::cout << "The torsions in following bonds are set in ring section " 
+        }
+
+
+
+        std::cout << "The torsions in following bonds are set in ring section "
                   << std::endl;
-      
+
         for (unsigned i=0; i < tDone.size(); i++)
         {
             std::cout << "Bond : " << allBonds[tDone[i]].seriNum << std::endl;
@@ -3408,7 +3409,7 @@ namespace LIBMOL
             std::cout << allBonds[tDone[i]].atoms[0] << std::endl;
             std::cout << allBonds[tDone[i]].atoms[1] << std::endl;
         }
-        
+
         /*
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
                 iTor != allTorsions.end(); iTor++)
@@ -3422,8 +3423,8 @@ namespace LIBMOL
             }
         }
         */
-        
-        
+
+
         // find all torsion not involved rings
         for (std::vector<BondDict>::iterator iABo= allBonds.begin();
                 iABo != allBonds.end(); iABo++)
@@ -3431,7 +3432,7 @@ namespace LIBMOL
             if (std::find(tDone.begin(), tDone.end(), iABo->seriNum)==tDone.end())
             {
                 // std::cout << "Set torsions for current bond " << iABo->seriNum << std::endl;
-                
+
                 std::vector<int> tPos;
                 for(std::map<ID, int>::iterator iAM=iABo->fullAtoms.begin();
                         iAM !=iABo->fullAtoms.end(); iAM++)
@@ -3450,16 +3451,16 @@ namespace LIBMOL
                     //std::cout << "Set torsion angles around the bond of atom "
                     //          << allAtoms[tPos[0]].id << " and "
                     //          << allAtoms[tPos[1]].id << std::endl;
-                    
+
                     setTorsionFromOneBond(tPos[0], tPos[1]);
                 }
             }
         }
         /*
         // std::cout << "Number of torsion angles is " << allTorsions.size() << std::endl;
-        
+
         std::cout << "All torsions have been setup " << std::endl;
-       
+
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
                 iTor != allTorsions.end(); iTor++)
         {
@@ -3472,15 +3473,15 @@ namespace LIBMOL
             }
         }
         */
-        
+
     }
-    
-    void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs, 
+
+    void AllSystem::setAllTorsionsInOneRing(std::vector<int> & tBs,
                                               RingDict & tR)
     {
-        
+
         std::vector<int> tAs, tLinkA, tBos;
-        
+
         // A list of idx of atoms in the ring
         // std::cout << " atoms in the ring are: " << std::endl;
         for (int i=0; i < (int)tR.atoms.size(); i++)
@@ -3488,26 +3489,26 @@ namespace LIBMOL
             tAs.push_back(tR.atoms[i].seriNum);
             // std::cout << tR.atoms[i].seriNum << std::endl;
         }
-        
+
         tLinkA.push_back(tR.atoms[0].seriNum);
-        
+
         int iCur   =tR.atoms[0].seriNum;
         int iLoop  =1;
         //std::cout << "ring rep " << tR.rep << " size " << (int)tAs.size() << std::endl;
-       
-        
+
+
         while ((int)tLinkA.size() < (int)tAs.size()
                && iLoop < (int)tAs.size())
-        {   
+        {
             // std::cout << "atom " << allAtoms[iCur].id << std::endl;
-            for (std::vector<int>::iterator iC=allAtoms[iCur].connAtoms.begin();  
+            for (std::vector<int>::iterator iC=allAtoms[iCur].connAtoms.begin();
                     iC!=allAtoms[iCur].connAtoms.end(); iC++)
             {
                 // std::cout << "connection " << allAtoms[*iC].id << std::endl;
                 if(std::find(tAs.begin(), tAs.end(), *iC) !=tAs.end()
                    && std::find(tLinkA.begin(), tLinkA.end(), *iC) ==tLinkA.end())
                 {
-                    
+
                     int iB=getBond(allBonds, allAtoms[iCur].seriNum, allAtoms[*iC].seriNum);
                     if (iB >=0)
                     {
@@ -3519,14 +3520,14 @@ namespace LIBMOL
                     }
                 }
             }
-            
-            //double protection 
+
+            //double protection
             iLoop++;
         }
         // Last bond
         /*
         int idxL = (int)tLinkA.size()-1;
-        int iB=getBond(allBonds, allAtoms[tLinkA[0]].seriNum, 
+        int iB=getBond(allBonds, allAtoms[tLinkA[0]].seriNum,
                        allAtoms[tLinkA[idxL]].seriNum);
         if (iB >=0 && std::find(tBos.begin(), tBos.end(), iB)==tBos.end())
         {
@@ -3538,15 +3539,15 @@ namespace LIBMOL
             /*
             std::cout << "could not all linked atoms in ring " << tR.rep << std::endl;
             std::cout << "atoms in the ring are : " << std::endl;
-            for (std::vector<AtomDict>::iterator iA=tR.atoms.begin(); 
+            for (std::vector<AtomDict>::iterator iA=tR.atoms.begin();
                     iA !=tR.atoms.end(); iA++)
             {
                 std::cout << iA->id << ",\t";
             }
             std::cout << std::endl;
             std::cout << "the links (bonds) found: " << std::endl;
-             
-            for (std::vector<int>::iterator iL=tLinkA.begin(); 
+
+            for (std::vector<int>::iterator iL=tLinkA.begin();
                     iL != tLinkA.end(); iL++)
             {
                 std::cout << allAtoms[*iL].id << std::endl;
@@ -3556,7 +3557,7 @@ namespace LIBMOL
         //std::cout << "ring reps : " << tR.rep << std::endl;
         //std::cout << "it has " << (int)tBos.size() << std::endl;
         // Now we have bonds in the ring in sequence
-       
+
         for (int i=0; i < (int)tBos.size(); i++)
         {
             std::string flip;
@@ -3584,26 +3585,26 @@ namespace LIBMOL
                 }
                 // std::cout << "tPos.size() " << (int)tPos.size() << std::endl;
                 if((int)tPos.size() ==2)
-                { 
+                {
                     //std::cout << "set torsion angles for the bond of atoms "
-                    //          << allAtoms[tPos[0]].id << " and " 
-                    //          << allAtoms[tPos[1]].id 
+                    //          << allAtoms[tPos[0]].id << " and "
+                    //          << allAtoms[tPos[1]].id
                     //          << " with " << flip << std::endl;
-                       
+
                     setTorsionFromOneBond(tPos[0], tPos[1], flip);
                     tBs.push_back(tBos[i]);
                 }
             }
         }
     }
-    
+
     void AllSystem::checkSugarRings()
     {
-        
+
         for(std::vector<RingDict>::iterator iRing=allRingsV.begin();
                 iRing !=allRingsV.end(); iRing++)
         {
-            checkOneRingSugar(iRing); 
+            checkOneRingSugar(iRing);
             if (iRing->isSugar && !withSugar)
             {
                 withSugar = true;
@@ -3614,24 +3615,24 @@ namespace LIBMOL
             std::cout << "The system is with Sugar ring " << std::endl;
         }
     }
-    
+
     void AllSystem::checkOneRingSugar(std::vector<RingDict>::iterator tRing)
     {
         bool lSp3 = false;
         int  n3   = 0;
         std::map<std::string, std::vector<AtomDict> >   OCAtms;
-        
-        
+
+
         std::vector<std::string>       ringAtmIds;
-        
+
         for (std::vector<AtomDict>::iterator iAt=tRing->atoms.begin();
                 iAt !=tRing->atoms.end(); iAt++)
         {
            ringAtmIds.push_back(iAt->id);
         }
-        
+
         tRing->isSugar = false;
-        
+
         for (std::vector<AtomDict>::iterator iAt=tRing->atoms.begin();
                 iAt !=tRing->atoms.end(); iAt++)
         {
@@ -3639,17 +3640,17 @@ namespace LIBMOL
             {
                 n3++;
             }
-            
+
             if (iAt->chemType.compare("C")==0)
             {
                 OCAtms["C"].push_back(*iAt);
-                
+
             }
             else if (iAt->chemType.compare("O")==0)
             {
                 OCAtms["O"].push_back(*iAt);
             }
-            
+
             if (n3==tRing->atoms.size())
             {
                 std::vector<std::string>    aStrsContainer;
@@ -3658,8 +3659,8 @@ namespace LIBMOL
                 aStrsContainer.push_back("(OC2)(CCO2)(CC2O)(CC2O)(CC2O)(CCO)");
                 aStrsContainer.push_back("(OC2)(CCO2)(CC2O)(CC2O)(CC2O)");
                 aStrsContainer.push_back("(OC2)(CCO2)(CC2)(CC2O)(CC2O)(CC2O)");
-                
-                if (OCAtms.find("C")!=OCAtms.end() 
+
+                if (OCAtms.find("C")!=OCAtms.end()
                     && OCAtms.find("O") !=OCAtms.end())
                 {
                     if ((OCAtms["C"].size()==5 && OCAtms["O"].size()==1)
@@ -3667,35 +3668,35 @@ namespace LIBMOL
                     {
                         std::string aSrStr=getRStr(OCAtms,tRing);
                         std::cout << "ASrStr is " << aSrStr << std::endl;
-                        if (std::find(aStrsContainer.begin(), 
+                        if (std::find(aStrsContainer.begin(),
                                       aStrsContainer.end(), aSrStr)
                                       !=aStrsContainer.end())
                         {
                             tRing->isSugar=true;
                         }
-                    }     
+                    }
                 }
             }
         }
-        
+
         if (tRing->isSugar)
         {
             std::cout << "Ring " << tRing->rep << " is a sugar ring "
                       << std::endl;
         }
-        
-        
+
+
     }
-    
+
     std::string AllSystem::getRStr(std::map<std::string,
                             std::vector<AtomDict> > & tOCAtms,
                             std::vector<RingDict>::iterator tRing)
     {
         std::string tRet = "";
         std::vector<std::string> doneAtmIds, ringAtmIds;
-        
+
         std::cout << "The ring consist of : " << std::endl;
-        for (std::map<std::string, std::vector<AtomDict> >::iterator 
+        for (std::map<std::string, std::vector<AtomDict> >::iterator
              iElem=tOCAtms.begin(); iElem !=tOCAtms.end(); iElem++)
         {
             for (std::vector<AtomDict>::iterator iAtm = iElem->second.begin();
@@ -3705,7 +3706,7 @@ namespace LIBMOL
                 std::cout << "atom " << iAtm->id << std::endl;
             }
         }
-        
+
         if (tOCAtms.find("O")!=tOCAtms.end())
         {
             if (tOCAtms["O"].size()==1)
@@ -3716,7 +3717,7 @@ namespace LIBMOL
                 tRing->seqedAtoms.push_back(tOCAtms["O"][0]);
                 std::cout << "Atom " << tOCAtms["O"][0].id << " is done " << std::endl;
                 std::vector<std::string>   tmpCOs;
-                
+
                 for (unsigned i=0; i <tOCAtms["O"][0].connAtoms.size(); i++)
                 {
                     if (allAtoms[tOCAtms["O"][0].connAtoms[i]].chemType
@@ -3724,26 +3725,26 @@ namespace LIBMOL
                     {
                         nC+=1;
                     }
-                    std::cout << "atom " << tOCAtms["O"][0].id << " is done" 
+                    std::cout << "atom " << tOCAtms["O"][0].id << " is done"
                               << std::endl;
                     if (nC==2)
                     {
                         tRet.append("(OC2)");
-                        std::cout << "(OC2) is added " << std::endl; 
+                        std::cout << "(OC2) is added " << std::endl;
                     }
                 }
-                
+
                 for (unsigned i=0; i <tOCAtms["O"][0].connAtoms.size(); i++)
                 {
                     int j = tOCAtms["O"][0].connAtoms[i];
                     std::cout << "For atom " << allAtoms[j].id << std::endl;
                     int nC2=0, nO2=0;
                     std::cout << "Its connected atom are " << std::endl;
-                    for (unsigned k=0; k < allAtoms[j].connAtoms.size(); 
+                    for (unsigned k=0; k < allAtoms[j].connAtoms.size();
                              k++)
                     {
-                        
-                        std::cout << "atom " 
+
+                        std::cout << "atom "
                                   << allAtoms[allAtoms[j].connAtoms[k]].id << std::endl;
                         if (allAtoms[allAtoms[j].connAtoms[k]].chemType
                                 .compare("C")==0)
@@ -3756,80 +3757,80 @@ namespace LIBMOL
                             nO2++;
                         }
                     }
-                    
+
                    // std::cout << "nC2=" << nC2 << std::endl;
                     //std::cout << "nO2=" << nO2 << std::endl;
-                        
+
                     if (nC2==1 && nO2==2)
                     {
                         tRet.append("(CCO2)");
                         std::cout << "(CCO2) is added " << std::endl;
                         doneAtmIds.push_back(allAtoms[j].id);
                         tRing->seqedAtoms.push_back(allAtoms[j]);
-                        std::cout << "Atom " << allAtoms[j].id 
+                        std::cout << "Atom " << allAtoms[j].id
                                   << " is done " << std::endl;
-                        for (unsigned m=0; 
+                        for (unsigned m=0;
                              m < allAtoms[j].connAtoms.size();
                              m++)
                         {
                             int n = allAtoms[j].connAtoms[m];
                             std::string aRAtmId= allAtoms[n].id;
-                            
-                            if (std::find(doneAtmIds.begin(), 
+
+                            if (std::find(doneAtmIds.begin(),
                                           doneAtmIds.end(), aRAtmId)
-                                          ==doneAtmIds.end() 
+                                          ==doneAtmIds.end()
                                 && std::find(ringAtmIds.begin(),
                                              ringAtmIds.end(), aRAtmId)
                                          !=ringAtmIds.end())
                             {
                                 iNext = n;
-                            }          
+                            }
                         }
                     }
                     else if (nC2==2 && nO2==1)
                     {
                         tmpCOs.push_back("CC2O");
                     }
-                    
-                    if (i==tOCAtms["O"][0].connAtoms.size()-1 
+
+                    if (i==tOCAtms["O"][0].connAtoms.size()-1
                         && tmpCOs.size()==2)
                     {
                         tRet.append("(CC2O)");
                         doneAtmIds.push_back(allAtoms[j].id);
                         tRing->seqedAtoms.push_back(allAtoms[j]);
-                        std::cout << "Atom " << allAtoms[j].id 
+                        std::cout << "Atom " << allAtoms[j].id
                                   << " is done " << std::endl;
-                        for (unsigned m=0; 
+                        for (unsigned m=0;
                              m < allAtoms[j].connAtoms.size();
                              m++)
                         {
                             int n = allAtoms[j].connAtoms[m];
                             std::string aRAtmId= allAtoms[n].id;
-                            
-                            if (std::find(doneAtmIds.begin(), 
+
+                            if (std::find(doneAtmIds.begin(),
                                           doneAtmIds.end(), aRAtmId)
-                                          ==doneAtmIds.end() 
+                                          ==doneAtmIds.end()
                                 && std::find(ringAtmIds.begin(),
                                              ringAtmIds.end(), aRAtmId)
                                          !=ringAtmIds.end())
                             {
                                 iNext = n;
-                            }          
+                            }
                         }
                     }
-                    
+
                 }
-                
+
                 while (iNext !=-1)
                 {
                     std::cout << "iNext = " << iNext << std::endl;
                     int iNextPre=iNext;
                     iNext=-1;
-                
+
                     if (allAtoms[iNextPre].chemType.compare("C")==0)
                     {
                         int nC2=0, nO2=0;
-                        for (unsigned k=0; k < allAtoms[iNextPre].connAtoms.size(); 
+                        for (unsigned k=0; k < allAtoms[iNextPre].connAtoms.size();
                              k++)
                         {
                             int n= allAtoms[iNextPre].connAtoms[k];
@@ -3841,27 +3842,27 @@ namespace LIBMOL
                             {
                                nO2++;
                             }
-                            
+
                             std::string aRAtmId= allAtoms[n].id;
-                            
-                            if (std::find(doneAtmIds.begin(), 
+
+                            if (std::find(doneAtmIds.begin(),
                                           doneAtmIds.end(), aRAtmId)
-                                          ==doneAtmIds.end() 
+                                          ==doneAtmIds.end()
                                 && std::find(ringAtmIds.begin(),
                                              ringAtmIds.end(), aRAtmId)
                                          !=ringAtmIds.end())
                             {
                                 iNext = n;
-                            }   
-                            
+                            }
+
                         }
-                        
+
                         if (nC2==2 && nO2==1)
                         {
                             tRet.append("(CC2O)");
                             doneAtmIds.push_back(allAtoms[iNextPre].id);
                             tRing->seqedAtoms.push_back(allAtoms[iNextPre]);
-                            std::cout << "Atom " << allAtoms[iNextPre].id 
+                            std::cout << "Atom " << allAtoms[iNextPre].id
                                      << " is done " << std::endl;
                         }
                         else if (nC2==1 && nO2==1)
@@ -3869,7 +3870,7 @@ namespace LIBMOL
                             tRet.append("(CCO)");
                             doneAtmIds.push_back(allAtoms[iNextPre].id);
                             tRing->seqedAtoms.push_back(allAtoms[iNextPre]);
-                            std::cout << "Atom " << allAtoms[iNextPre].id 
+                            std::cout << "Atom " << allAtoms[iNextPre].id
                                      << " is done " << std::endl;
                         }
                         else if (nC2==2)
@@ -3877,7 +3878,7 @@ namespace LIBMOL
                             tRet.append("(CC2)");
                             doneAtmIds.push_back(allAtoms[iNextPre].id);
                             tRing->seqedAtoms.push_back(allAtoms[iNextPre]);
-                            std::cout << "Atom " << allAtoms[iNextPre].id 
+                            std::cout << "Atom " << allAtoms[iNextPre].id
                                      << " is done " << std::endl;
                         }
                         else
@@ -3894,16 +3895,16 @@ namespace LIBMOL
                         iNext = -1;
                     }
                 }
-            }   
+            }
         }
-        
+
         return tRet;
     }
-    
+
     void AllSystem::setSugarRingTors()
     {
         miniTorsions.clear();
-        
+
         int numS=0;
         for(std::vector<RingDict>::iterator iRing=allRingsV.begin();
                 iRing !=allRingsV.end(); iRing++)
@@ -3913,7 +3914,7 @@ namespace LIBMOL
                 numS++;
             }
         }
-        
+
         for(std::vector<RingDict>::iterator iRing=allRingsV.begin();
                 iRing !=allRingsV.end(); iRing++)
         {
@@ -3922,19 +3923,19 @@ namespace LIBMOL
                 if (iRing->seqedAtoms.size() == iRing->atoms.size())
                 {
                     setSugarRingTorsExtIds(iRing);
-                    
+
                     if (iRing->seqedAtoms.size()==6)
                     {
-                        
-                        
+
+
                         TorsionDict aTor0;
                         //mu0
-                        
+
                         aTor0.atoms.push_back(iRing->seqedAtoms[5].seriNum);
                         aTor0.atoms.push_back(iRing->seqedAtoms[0].seriNum);
                         aTor0.atoms.push_back(iRing->seqedAtoms[1].seriNum);
                         aTor0.atoms.push_back(iRing->seqedAtoms[2].seriNum);
-                        
+
                         aTor0.fullAtoms.push_back(iRing->seqedAtoms[5]);
                         aTor0.fullAtoms.push_back(iRing->seqedAtoms[0]);
                         aTor0.fullAtoms.push_back(iRing->seqedAtoms[1]);
@@ -3950,21 +3951,21 @@ namespace LIBMOL
                         }
                         aTor0.period = 3;
                         miniTorsions.push_back(aTor0);
-                        
-                        
+
+
                         TorsionDict aTor1;
                         //mu1
-                        
+
                         aTor1.atoms.push_back(iRing->seqedAtoms[0].seriNum);
                         aTor1.atoms.push_back(iRing->seqedAtoms[1].seriNum);
                         aTor1.atoms.push_back(iRing->seqedAtoms[2].seriNum);
                         aTor1.atoms.push_back(iRing->seqedAtoms[3].seriNum);
-                        
+
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[0]);
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[1]);
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[2]);
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[3]);
-                        
+
                         aTor1.value = getTorsion(iRing->seqedAtoms[0],
                                                 iRing->seqedAtoms[1],
                                                 iRing->seqedAtoms[2],
@@ -3976,20 +3977,20 @@ namespace LIBMOL
                         }
                         aTor1.period = 3;
                         miniTorsions.push_back(aTor1);
-                        
+
                         TorsionDict aTor2;
                         //mu2
-                        
+
                         aTor2.atoms.push_back(iRing->seqedAtoms[1].seriNum);
                         aTor2.atoms.push_back(iRing->seqedAtoms[2].seriNum);
                         aTor2.atoms.push_back(iRing->seqedAtoms[3].seriNum);
                         aTor2.atoms.push_back(iRing->seqedAtoms[4].seriNum);
-                        
+
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[1]);
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[2]);
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[3]);
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[4]);
-                        
+
                         aTor2.value = getTorsion(iRing->seqedAtoms[1],
                                                 iRing->seqedAtoms[2],
                                                 iRing->seqedAtoms[3],
@@ -4001,20 +4002,20 @@ namespace LIBMOL
                         }
                         aTor2.period = 3;
                         miniTorsions.push_back(aTor2);
-                        
+
                         TorsionDict aTor3;
                         //mu3
-                        
+
                         aTor3.atoms.push_back(iRing->seqedAtoms[2].seriNum);
                         aTor3.atoms.push_back(iRing->seqedAtoms[3].seriNum);
                         aTor3.atoms.push_back(iRing->seqedAtoms[4].seriNum);
                         aTor3.atoms.push_back(iRing->seqedAtoms[5].seriNum);
-                        
+
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[2]);
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[3]);
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[4]);
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[5]);
-                        
+
                         aTor3.value = getTorsion(iRing->seqedAtoms[2],
                                                 iRing->seqedAtoms[3],
                                                 iRing->seqedAtoms[4],
@@ -4026,21 +4027,21 @@ namespace LIBMOL
                         }
                         aTor3.period = 3;
                         miniTorsions.push_back(aTor3);
-                        
-                        
+
+
                         TorsionDict aTor4;
                         //mu4
-                        
+
                         aTor4.atoms.push_back(iRing->seqedAtoms[3].seriNum);
                         aTor4.atoms.push_back(iRing->seqedAtoms[4].seriNum);
                         aTor4.atoms.push_back(iRing->seqedAtoms[5].seriNum);
                         aTor4.atoms.push_back(iRing->seqedAtoms[0].seriNum);
-                        
+
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[3]);
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[4]);
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[5]);
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[0]);
-                        
+
                         aTor4.value = getTorsion(iRing->seqedAtoms[3],
                                                 iRing->seqedAtoms[4],
                                                 iRing->seqedAtoms[5],
@@ -4052,21 +4053,21 @@ namespace LIBMOL
                         }
                         aTor4.period = 3;
                         miniTorsions.push_back(aTor4);
-                        
-                        
+
+
                         TorsionDict aTor5;
                         //mu5
-                        
+
                         aTor5.atoms.push_back(iRing->seqedAtoms[4].seriNum);
                         aTor5.atoms.push_back(iRing->seqedAtoms[5].seriNum);
                         aTor5.atoms.push_back(iRing->seqedAtoms[0].seriNum);
                         aTor5.atoms.push_back(iRing->seqedAtoms[1].seriNum);
-                        
+
                         aTor5.fullAtoms.push_back(iRing->seqedAtoms[4]);
                         aTor5.fullAtoms.push_back(iRing->seqedAtoms[5]);
                         aTor5.fullAtoms.push_back(iRing->seqedAtoms[0]);
                         aTor5.fullAtoms.push_back(iRing->seqedAtoms[1]);
-                        
+
                         aTor5.value = getTorsion(iRing->seqedAtoms[4],
                                                 iRing->seqedAtoms[5],
                                                 iRing->seqedAtoms[0],
@@ -4077,10 +4078,10 @@ namespace LIBMOL
                             aTor5.id.append(iRing->extId);
                         }
                         aTor5.period = 3;
-                        
-                        
+
+
                         miniTorsions.push_back(aTor5);
-                        
+
                     }
                     else if (iRing->seqedAtoms.size()==5)
                     {
@@ -4090,7 +4091,7 @@ namespace LIBMOL
                         aTor0.atoms.push_back(iRing->seqedAtoms[0].seriNum);
                         aTor0.atoms.push_back(iRing->seqedAtoms[1].seriNum);
                         aTor0.atoms.push_back(iRing->seqedAtoms[2].seriNum);
-                        
+
                         aTor0.fullAtoms.push_back(iRing->seqedAtoms[4]);
                         aTor0.fullAtoms.push_back(iRing->seqedAtoms[0]);
                         aTor0.fullAtoms.push_back(iRing->seqedAtoms[1]);
@@ -4106,20 +4107,20 @@ namespace LIBMOL
                         }
                         aTor0.period = 3;
                         miniTorsions.push_back(aTor0);
-                        
-                        
+
+
                         TorsionDict aTor1;
                         //mu1
                         aTor1.atoms.push_back(iRing->seqedAtoms[0].seriNum);
                         aTor1.atoms.push_back(iRing->seqedAtoms[1].seriNum);
                         aTor1.atoms.push_back(iRing->seqedAtoms[2].seriNum);
                         aTor1.atoms.push_back(iRing->seqedAtoms[3].seriNum);
-                        
+
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[0]);
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[1]);
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[2]);
                         aTor1.fullAtoms.push_back(iRing->seqedAtoms[3]);
-                        
+
                         aTor1.value = getTorsion(iRing->seqedAtoms[0],
                                                 iRing->seqedAtoms[1],
                                                 iRing->seqedAtoms[2],
@@ -4131,19 +4132,19 @@ namespace LIBMOL
                         }
                         aTor1.period = 3;
                         miniTorsions.push_back(aTor1);
-                        
+
                         TorsionDict aTor2;
                         //mu2
                         aTor2.atoms.push_back(iRing->seqedAtoms[1].seriNum);
                         aTor2.atoms.push_back(iRing->seqedAtoms[2].seriNum);
                         aTor2.atoms.push_back(iRing->seqedAtoms[3].seriNum);
                         aTor2.atoms.push_back(iRing->seqedAtoms[4].seriNum);
-                        
+
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[1]);
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[2]);
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[3]);
                         aTor2.fullAtoms.push_back(iRing->seqedAtoms[4]);
-                        
+
                         aTor2.value = getTorsion(iRing->seqedAtoms[1],
                                                 iRing->seqedAtoms[2],
                                                 iRing->seqedAtoms[3],
@@ -4155,20 +4156,20 @@ namespace LIBMOL
                         }
                         aTor2.period = 3;
                         miniTorsions.push_back(aTor2);
-                        
+
                         TorsionDict aTor3;
                         //mu3
-                        
+
                         aTor3.atoms.push_back(iRing->seqedAtoms[2].seriNum);
                         aTor3.atoms.push_back(iRing->seqedAtoms[3].seriNum);
                         aTor3.atoms.push_back(iRing->seqedAtoms[4].seriNum);
                         aTor3.atoms.push_back(iRing->seqedAtoms[0].seriNum);
-                        
+
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[2]);
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[3]);
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[4]);
                         aTor3.fullAtoms.push_back(iRing->seqedAtoms[0]);
-                        
+
                         aTor3.value = getTorsion(iRing->seqedAtoms[2],
                                                 iRing->seqedAtoms[3],
                                                 iRing->seqedAtoms[4],
@@ -4180,19 +4181,19 @@ namespace LIBMOL
                         }
                         aTor3.period = 3;
                         miniTorsions.push_back(aTor3);
-                        
+
                         TorsionDict aTor4;
                         //mu4
                         aTor4.atoms.push_back(iRing->seqedAtoms[3].seriNum);
                         aTor4.atoms.push_back(iRing->seqedAtoms[4].seriNum);
                         aTor4.atoms.push_back(iRing->seqedAtoms[0].seriNum);
                         aTor4.atoms.push_back(iRing->seqedAtoms[1].seriNum);
-                        
+
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[3]);
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[4]);
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[0]);
                         aTor4.fullAtoms.push_back(iRing->seqedAtoms[1]);
-                        
+
                         aTor4.value = getTorsion(iRing->seqedAtoms[3],
                                                 iRing->seqedAtoms[4],
                                                 iRing->seqedAtoms[0],
@@ -4204,14 +4205,14 @@ namespace LIBMOL
                         }
                         aTor4.period = 3;
                         miniTorsions.push_back(aTor4);
-                       
+
                     }
                 }
             }
         }
-        
+
     }
-    
+
     void AllSystem::setSugarRingTorsExtIds(
                                      std::vector<RingDict>::iterator tRing)
     {
@@ -4221,20 +4222,20 @@ namespace LIBMOL
             tRing->extId=aName[aName.size()-1];
         }
     }
-    
+
     void AllSystem::expandTorsSet(const std::vector<TorsionDict> & tTorsSet)
     {
         std::vector<std::string>  existBondIds;
-        
+
         for (std::vector<TorsionDict>::iterator iMT=miniTorsions.begin();
                iMT != miniTorsions.end(); iMT++)
         {
             std::string aBS = iMT->fullAtoms[1].id + "_" + iMT->fullAtoms[2].id;
             existBondIds.push_back(aBS);
         }
-        
+
         std::vector<TorsionDict> aTmpTorsSet;
-        
+
         for (std::vector<TorsionDict>::const_iterator iT=tTorsSet.begin();
                 iT != tTorsSet.end(); iT++)
         {
@@ -4243,7 +4244,7 @@ namespace LIBMOL
             std::string id2 = allAtoms[iT->atoms[2]].id + "_"
                              +allAtoms[iT->atoms[1]].id;
             if ((std::find(existBondIds.begin(), existBondIds.end(), id1)
-                      ==existBondIds.end()) && 
+                      ==existBondIds.end()) &&
                 (std::find(existBondIds.begin(), existBondIds.end(), id2)
                       ==existBondIds.end()))
             {
@@ -4251,15 +4252,15 @@ namespace LIBMOL
             }
         }
     }
-    
+
     void AllSystem::setTorsionIdxFromOneBond(int tIdx1, int tIdx2)
     {
-                
-        //std::cout << "For the bond consisting of atoms  " << allAtoms[tIdx1].id 
+
+        //std::cout << "For the bond consisting of atoms  " << allAtoms[tIdx1].id
         //          << " and " << allAtoms[tIdx2].id << std::endl
-        //          << "It has following torsion angles: " << std::endl; 
-                
-                
+        //          << "It has following torsion angles: " << std::endl;
+
+
        for (std::vector<int>::iterator iAt1= allAtoms[tIdx1].connAtoms.begin();
             iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
        {
@@ -4268,52 +4269,52 @@ namespace LIBMOL
            {
                if (*iAt1 != tIdx2 && *iAt2 != tIdx1)
                {
-                   TorsionDict aTorsion;         
+                   TorsionDict aTorsion;
                    aTorsion.atoms.push_back(*iAt1);
                    aTorsion.atoms.push_back(tIdx1);
                    aTorsion.atoms.push_back(tIdx2);
                    aTorsion.atoms.push_back(*iAt2);
-                   //std::cout << "Torsion: " << allAtoms[*iAt1].id 
-                   //          << ", " << allAtoms[tIdx1].id 
+                   //std::cout << "Torsion: " << allAtoms[*iAt1].id
+                   //          << ", " << allAtoms[tIdx1].id
                    //          << ", " << allAtoms[tIdx2].id
-                   //          << ", " << allAtoms[*iAt2].id << std::endl; 
-                                    
+                   //          << ", " << allAtoms[*iAt2].id << std::endl;
+
                    allTorsions.push_back(aTorsion);
                }
            }
         }
-        
+
     }
-    
+
     void AllSystem::setPeptideTorsionIdxFromOneBond(int tIdx1, int tIdx2,
           std::map<std::string, std::vector<std::string> >  tPepTorStdIds,
-            std::vector<TorsionDict> & tChiTors, 
+            std::vector<TorsionDict> & tChiTors,
              std::vector<TorsionDict> & tHhTors,
              std::vector<TorsionDict> & tCstTors)
     {
-        
+
         std::vector<TorsionDict> aTemoTorsSet;
         int aTorHi   = 10;
-                
+
         for (std::vector<int>::iterator iAt1= allAtoms[tIdx1].connAtoms.begin();
              iAt1 != allAtoms[tIdx1].connAtoms.end(); iAt1++)
        {
-           for (std::vector<int>::iterator 
+           for (std::vector<int>::iterator
                 iAt2 = allAtoms[tIdx2].connAtoms.begin();
                 iAt2 != allAtoms[tIdx2].connAtoms.end(); iAt2++)
            {
                 if(*iAt1 != tIdx2 && *iAt2 != tIdx1)
                 {
-                    
+
                     bool lForward = true;
-                    
+
                     std::string id1=allAtoms[*iAt1].id;
                     std::string id2=allAtoms[tIdx1].id;
                     std::string id3=allAtoms[tIdx2].id;
                     std::string id4=allAtoms[*iAt2].id;
-                    std::string comboId1 = id1 + "_" + id2 + "_" + id3 
+                    std::string comboId1 = id1 + "_" + id2 + "_" + id3
                                           + "_" + id4;
-                    std::string comboId2 = id4 + "_" + id3 + "_" + id2 
+                    std::string comboId2 = id4 + "_" + id3 + "_" + id2
                                           + "_" + id1;
                     std::string comboId ="";
                     if (tPepTorStdIds.find(comboId1) !=tPepTorStdIds.end())
@@ -4325,11 +4326,11 @@ namespace LIBMOL
                         comboId = comboId2;
                         lForward = false;
                     }
-                    
+
                     if (comboId.size() > 0)
-                    {   
-                        
-                        
+                    {
+
+
                         TorsionDict aTor;
                         if (lForward)
                         {
@@ -4357,10 +4358,10 @@ namespace LIBMOL
                             //                     allAtoms[tIdx1],
                             //                     allAtoms[*iAt1]);
                             //aTor.value = getIntParts(aTor.value);
-                            
+
                             aTor.period = StrToInt(tPepTorStdIds[comboId][5]);
                         }
-                        
+
                         int curTorHi = StrToInt(tPepTorStdIds[comboId][6]);
                         if (curTorHi < aTorHi)
                         {
@@ -4372,7 +4373,7 @@ namespace LIBMOL
                 }
            }
         }
-        
+
         if (aTemoTorsSet.size() >0)
         {
             for (std::vector<TorsionDict>::iterator aTor=aTemoTorsSet.begin();
@@ -4394,17 +4395,17 @@ namespace LIBMOL
             }
         }
     }
-    
+
     void AllSystem::setPeptideTorsions()
     {
         std::map<std::string, std::vector<std::string> >  pepTorStdIds;
-        
+
         std::string pepTorIdTabFN = libmolTabDir + "/pep_tors.table";
         std::ifstream pepTorIdTab(pepTorIdTabFN.c_str());
         if (pepTorIdTab.is_open())
         {
             std::string tRecord="";
-            
+
             while(!pepTorIdTab.eof())
             {
                 std::getline(pepTorIdTab, tRecord);
@@ -4416,16 +4417,16 @@ namespace LIBMOL
                     for (unsigned i=1; i < tBuf.size(); i++)
                     {
                         pepTorStdIds[tBuf[0]].push_back(tBuf[i]);
-                    }    
+                    }
                 }
             }
             pepTorIdTab.close();
         }
-        
+
         std::vector<TorsionDict> chiTors, hhTors, cstTors;
-      
+
         miniTorsions.clear();
-        
+
         for (std::vector<BondDict>::iterator iABo= allBonds.begin();
                 iABo != allBonds.end(); iABo++)
         {
@@ -4442,11 +4443,11 @@ namespace LIBMOL
             {
                 //std::cout << "Set torsion angles around the bond of atom "
                 //          << allAtoms[tPos[0]].id << " and "
-                //          << allAtoms[tPos[1]].id << std::endl;                    
+                //          << allAtoms[tPos[1]].id << std::endl;
                 setPeptideTorsionIdxFromOneBond(tPos[0], tPos[1],
-                                                pepTorStdIds, 
+                                                pepTorStdIds,
                                                 chiTors, hhTors, cstTors);
-                
+
             }
         }
         // Now sorting according to a torsion's id
@@ -4463,44 +4464,44 @@ namespace LIBMOL
             for (std::map<std::string, unsigned>::iterator iM=aSMap.begin();
                   iM !=aSMap.end(); iM++)
             {
-                
+
                 std::string aId
-                     = allAtoms[chiTors[iM->second].atoms[0]].id + "_" + 
+                     = allAtoms[chiTors[iM->second].atoms[0]].id + "_" +
                        allAtoms[chiTors[iM->second].atoms[1]].id + "_" +
-                       allAtoms[chiTors[iM->second].atoms[2]].id + "_" + 
+                       allAtoms[chiTors[iM->second].atoms[2]].id + "_" +
                        allAtoms[chiTors[iM->second].atoms[3]].id;
-                mapIdSer[aId] = idx; 
+                mapIdSer[aId] = idx;
                 miniTorsions.push_back(chiTors[iM->second]);
                 idx++;
-                std::string aBId = allAtoms[chiTors[iM->second].atoms[1]].id 
+                std::string aBId = allAtoms[chiTors[iM->second].atoms[1]].id
                                    + "_" +
                                    allAtoms[chiTors[iM->second].atoms[2]].id;
-                doneBonds.push_back(aBId);        
+                doneBonds.push_back(aBId);
             }
         }
         if (cstTors.size() >0)
         {
-            
+
             for (unsigned i=0; i < cstTors.size(); i++)
             {
                 int addIdx = i+1;
                 cstTors[i].id = "CONST_" + IntToStr(addIdx);
                 cstTors[i].sigValue = 0.0;
                 std::string aId
-                     = allAtoms[cstTors[i].atoms[0]].id + "_" + 
+                     = allAtoms[cstTors[i].atoms[0]].id + "_" +
                        allAtoms[cstTors[i].atoms[1]].id + "_" +
-                       allAtoms[cstTors[i].atoms[2]].id + "_" + 
+                       allAtoms[cstTors[i].atoms[2]].id + "_" +
                        allAtoms[cstTors[i].atoms[3]].id;
                 mapIdSer[aId] = idx;
                 miniTorsions.push_back(cstTors[i]);
                 idx++;
-                std::string aBId = allAtoms[cstTors[i].atoms[1]].id 
+                std::string aBId = allAtoms[cstTors[i].atoms[1]].id
                                    + "_" +
                                    allAtoms[cstTors[i].atoms[2]].id;
                 doneBonds.push_back(aBId);
             }
         }
-        
+
         if (hhTors.size() > 0)
         {
             for (unsigned i=0; i < hhTors.size(); i++)
@@ -4508,57 +4509,57 @@ namespace LIBMOL
                 int addIdx = i+1;
                 hhTors[i].id += IntToStr(addIdx);
                 std::string aId
-                     = allAtoms[hhTors[i].atoms[0]].id + "_" + 
+                     = allAtoms[hhTors[i].atoms[0]].id + "_" +
                        allAtoms[hhTors[i].atoms[1]].id + "_" +
-                       allAtoms[hhTors[i].atoms[2]].id + "_" + 
+                       allAtoms[hhTors[i].atoms[2]].id + "_" +
                        allAtoms[hhTors[i].atoms[3]].id;
                 mapIdSer[aId] = idx;
                 miniTorsions.push_back(hhTors[i]);
                 idx++;
-                std::string aBId = allAtoms[hhTors[i].atoms[1]].id 
+                std::string aBId = allAtoms[hhTors[i].atoms[1]].id
                                    + "_" +
                                    allAtoms[hhTors[i].atoms[2]].id;
                 doneBonds.push_back(aBId);
             }
         }
-        
-        
-        
+
+
+
         std::vector<TorsionDict> tmpTors;
-        
+
         for (std::vector<TorsionDict>::iterator iTor =allTorsions.begin();
                 iTor !=allTorsions.end(); iTor++)
         {
             if (iTor->atoms.size()==4)
             {
-                std::string aBId1 = allAtoms[iTor->atoms[1]].id 
+                std::string aBId1 = allAtoms[iTor->atoms[1]].id
                                    + "_" +
                                    allAtoms[iTor->atoms[2]].id;
-                std::string aBId2 = allAtoms[iTor->atoms[2]].id 
+                std::string aBId2 = allAtoms[iTor->atoms[2]].id
                                    + "_" +
                                    allAtoms[iTor->atoms[1]].id;
-                 
+
                 std::string comboId = "";
                 std::string aId1, aId2;
-                aId1 = allAtoms[iTor->atoms[0]].id + "_" + 
+                aId1 = allAtoms[iTor->atoms[0]].id + "_" +
                        allAtoms[iTor->atoms[1]].id + "_" +
-                       allAtoms[iTor->atoms[2]].id + "_" + 
+                       allAtoms[iTor->atoms[2]].id + "_" +
                        allAtoms[iTor->atoms[3]].id;
-                aId2 = allAtoms[iTor->atoms[3]].id + "_" + 
-                       allAtoms[iTor->atoms[2]].id + "_" + 
-                       allAtoms[iTor->atoms[1]].id + "_" + 
+                aId2 = allAtoms[iTor->atoms[3]].id + "_" +
+                       allAtoms[iTor->atoms[2]].id + "_" +
+                       allAtoms[iTor->atoms[1]].id + "_" +
                         allAtoms[iTor->atoms[0]].id;
-                
+
                 if (mapIdSer.find(aId1) !=mapIdSer.end())
                 {
                     double torVal = getTorsion(allAtoms[iTor->atoms[0]],
                                         allAtoms[iTor->atoms[1]],
                                         allAtoms[iTor->atoms[2]],
                                         allAtoms[iTor->atoms[3]]);
-                    
-                    miniTorsions[mapIdSer[aId1]].value 
+
+                    miniTorsions[mapIdSer[aId1]].value
                                  = getIntParts(torVal);
-                  
+
                     miniTorsions[mapIdSer[aId1]].period = iTor->period;
                 }
                 else if (mapIdSer.find(aId2) !=mapIdSer.end())
@@ -4567,12 +4568,12 @@ namespace LIBMOL
                                         allAtoms[iTor->atoms[2]],
                                         allAtoms[iTor->atoms[1]],
                                         allAtoms[iTor->atoms[0]]);
-                    miniTorsions[mapIdSer[aId2]].value 
+                    miniTorsions[mapIdSer[aId2]].value
                                   = getIntParts(torVal);
-                    
+
                     miniTorsions[mapIdSer[aId2]].period = iTor->period;
                 }
-                else 
+                else
                 {
                     if (std::find(doneBonds.begin(), doneBonds.end(), aBId1)
                             ==doneBonds.end() &&
@@ -4581,10 +4582,10 @@ namespace LIBMOL
                     {
                         tmpTors.push_back(*iTor);
                     }
-                }  
+                }
             }
-        } 
-        
+        }
+
         PeriodicTable aPTab;
         std::map<std::string, std::vector<TorsionDict> > mapTors2;
         std::map<std::string, int> mapTorHi;
@@ -4600,7 +4601,7 @@ namespace LIBMOL
                 {
                     int aV = aPTab.elements[elem1]["atomNum"]
                              + aPTab.elements[elem2]["atomNum"];
-                    std::string aBId = allAtoms[iTor->atoms[1]].id 
+                    std::string aBId = allAtoms[iTor->atoms[1]].id
                                    + "_" +
                                    allAtoms[iTor->atoms[2]].id;
                     if(mapTorHi.find(aBId)==mapTorHi.end())
@@ -4616,7 +4617,7 @@ namespace LIBMOL
                     }
                 }
             }
-            
+
             for (std::map<std::string, std::vector<TorsionDict> >::iterator
                    iM=mapTors2.begin(); iM !=mapTors2.end(); iM++)
             {
@@ -4626,14 +4627,14 @@ namespace LIBMOL
                     miniTorsions.push_back(*iTor);
                 }
             }
-                
-            
-                
-                
+
+
+
+
         }
     }
-    
-        // Ring related 
+
+        // Ring related
     void AllSystem::ringDetecting()
     {
         // tempo, set ring size to 6
@@ -4641,21 +4642,21 @@ namespace LIBMOL
         // std::vector<AtomDict> atomsInPath;
         std::map<int, ID>  atomsInPath;
         std::map<int, ID>  atomsSeen;
-       
+
         // 1. loops beginning from all atoms in the system
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
-   
+
             //std::cout << "-----------------" << std::endl;
             //std::cout << "starting atom  " << iA->id << std::endl;
             //std::cout << "-----------------" << std::endl;
-            
+
             //if((int)tempIDs.size() !=0)
             //{
             //    tempIDs.clear();
             //}
-            
+
             int preSeriNum = -999;
             int startLev   = 1;
             atomsInPath.clear();
@@ -4663,42 +4664,42 @@ namespace LIBMOL
             // atomsInPath.push_back((*iA));
             // atomsInPath.insert(std::pair<int, ID>(iA->seriNum, iA->chemType))
             // tempIDs.insert(std::pair<int, ID>(iA->seriNum, iA->id));
-            
+
             // 2. loop from its bonded atoms recursively
             // checkOnePathSec(atomsInPath, tempIDs, *iA, maxSize, iA);
             // checkOnePathSec(atomsInPath, *iA, maxSize, iA);
             checkOnePathSec(*iA, maxSize, iA, preSeriNum,  startLev, atomsSeen, atomsInPath);
-            
+
             /*
             if ((int)iA->ringRep.size() >0)
             {
-                
+
                 std::cout << "\nAtom " << iA->id << " is in "
                         << (int)iA->ringRep.size() << " rings "
                         << std::endl;
                 for (std::map<std::string, int>::iterator iMa = iA->ringRep.begin();
                        iMa != iA->ringRep.end(); iMa++ )
                 {
-                    std::cout << "Ring: " << iMa->first << "; Size " << iMa->second 
+                    std::cout << "Ring: " << iMa->first << "; Size " << iMa->second
                             <<std::endl;
-                } 
-            } 
+                }
+            }
             else
             {
                 std::cout << "\nAtom " << iA->id << " is in no ring" <<std::endl;
             }
             */
-           
+
             // std::cout << "finish atom  " << iA->seriNum << std::endl;
         }
-        
+
         /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
             if ((int)iA->ringRep.size() >0)
             {
-                std::cout << "\nAtom " << iA->id << " is in  " 
+                std::cout << "\nAtom " << iA->id << " is in  "
                         << (int)iA->ringRep.size() << " ring(s)" << std::endl;
                 for (std::map<std::string, int>::iterator iRR=iA->ringRep.begin();
                         iRR != iA->ringRep.end(); iRR++)
@@ -4710,71 +4711,71 @@ namespace LIBMOL
         }
          */
     }
-    
- 
+
+
     // Version 2
     void AllSystem::checkOnePathSec(AtomDict                & curAto,
                                       int                       iMax,
                                       std::vector<AtomDict>::iterator iOriAto,
-                                      int                       SeriNumPreAto,  
+                                      int                       SeriNumPreAto,
                                       int                       curLev,
                                       std::map<int, ID>       & seenAtomIDs,
                                       std::map<int, ID>       & atomIDsInPath)
     {
-       
+
         if ( curLev <iMax )
-        {  
+        {
             int NachbarpunkteDetected = 0;
-            
+
             // Check Nachbarpunkte
             for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
                     tNBA != curAto.connAtoms.end(); tNBA++)
             {
                 int tSeriNum = allAtoms[*tNBA].seriNum;
-                
+
                 // Find  Nachbarpunkte of the current path if the current atom
                 // (1) should not be the the atom beginning the path. (it is a ring)
                 // (2) should not be the one just walked through in the last step
                 // (3) is in a list of atoms we have seen
-                if (tSeriNum != iOriAto->seriNum && tSeriNum != SeriNumPreAto 
+                if (tSeriNum != iOriAto->seriNum && tSeriNum != SeriNumPreAto
                         && seenAtomIDs.find(tSeriNum) !=seenAtomIDs.end())
                 {
-                    
+
                     NachbarpunkteDetected = 1;
-                    
+
                     // found Nachbarpunkte, stop this path
                     /*
-                    
+
                     std::cout << "atom : " <<  allAtoms[*tNBA].id << std::endl;
-                    
+
                     std::cout << "Nachbarpunkte found, stop this path " << std::endl;
                     for (std::map<int, ID>::iterator iS=seenAtomIDs.begin();
                             iS != seenAtomIDs.end(); iS++)
                     {
-                        std::cout << "atom : " << iS->first 
+                        std::cout << "atom : " << iS->first
                                 << " : " << iS ->second << std::endl;
                     }
-                    */              
-                }  
+                    */
+                }
             }
-            
-            // check if a ring is formed 
+
+            // check if a ring is formed
             if (!NachbarpunkteDetected)
             {
                 for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
                     tNBA != curAto.connAtoms.end(); tNBA++)
                 {
                     int tSeriNum = allAtoms[*tNBA].seriNum;
-                    
+
                     if (tSeriNum == iOriAto->seriNum && tSeriNum != SeriNumPreAto
                         && curLev > 2)
                     {
                         //std::cout << iOriAto->id << " : "
                         //          << curAto.id << " : " << allAtoms[*tNBA].id
-                        //          << " : " << SeriNumPreAto 
-                        //          << " Find a ring." << std::endl;    
-                        //   sort the atoms in the seenAtom vector and 
-                        //   check if this ring is already found (the same 
+                        //          << " : " << SeriNumPreAto
+                        //          << " Find a ring." << std::endl;
+                        //   sort the atoms in the seenAtom vector and
+                        //   check if this ring is already found (the same
                         //   ring of the same atom should be found twice at
                         //   least because of the walking algorithm.
                         // FIND A RING !
@@ -4790,11 +4791,11 @@ namespace LIBMOL
                             int posIdx = atomPosition(iSee->second);
                             ttAtoms.push_back(allAtoms[posIdx]);
                                 // tRing.atoms.push_back(*tAt);
-                                //std::cout << iSee->second << std::endl;   
+                                //std::cout << iSee->second << std::endl;
                             //}
                         }
-                        RingDict aRingDict(ttAtoms);                 
-                        
+                        RingDict aRingDict(ttAtoms);
+
                         tAllIds.sort(compareNoCase);
                         //std::string tRepStr(iOriAto->id);
                         std::string tRepStr;
@@ -4803,42 +4804,42 @@ namespace LIBMOL
                         {
                             tRepStr.append(*iAI);
                         }
-                            
+
                         iOriAto->ringRep[tRepStr] = (int)atomIDsInPath.size();
-                        
+
                         aRingDict.rep = tRepStr;
                         std::map<ID, std::vector<RingDict> >::iterator iFindRing=allRings.find(tRepStr);
                         if (iFindRing == allRings.end())
                         {
                             allRings[tRepStr].push_back(aRingDict);
                         }
-                        
-                        atomIDsInPath.erase(curAto.seriNum);  
+
+                        atomIDsInPath.erase(curAto.seriNum);
                         NachbarpunkteDetected = 1;
-                        
+
                     }
-                    
+
                 }
             }
-              
+
             if (! NachbarpunkteDetected)
             {
                 // found no Nachbarpunkte and no ring
                 // descend the new path in the neighborhood graph:
-                
-                
+
+
                 int tNewLev = curLev + 1;
                 seenAtomIDs.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
                 if (tNewLev < iMax)
                 {
                    /*
-                        std::cout << "atom " << curAto.id 
-                                  << " finds no Nachbarpunkte in it neighbor  " 
+                        std::cout << "atom " << curAto.id
+                                  << " finds no Nachbarpunkte in it neighbor  "
                                   << std::endl << "Descend into the next atom "
                                   << std::endl;
-                    
+
                     */
-                    
+
                     atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
                     for (std::vector<int>::iterator tNBA=curAto.connAtoms.begin();
                          tNBA != curAto.connAtoms.end(); tNBA++)
@@ -4854,7 +4855,7 @@ namespace LIBMOL
                             {
                                 atomIDsInPath.clear();
                             }
-                            //std::cout << "after clear, the size is " 
+                            //std::cout << "after clear, the size is "
                             //          << (int)seenAtomIDs.size() << std::endl;
                             seenAtomIDs.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
                             atomIDsInPath.insert(std::pair<int,ID>(curAto.seriNum,curAto.id));
@@ -4865,14 +4866,14 @@ namespace LIBMOL
                                 std::cout << std::endl << "Current size " << curLev << std::endl;
                                 std::cout << "Orig atom : " << iOriAto->id
                                           << " Prev atom : " << SeriNumPreAto
-                                          << " Curent atom :  " << curAto.id 
+                                          << " Curent atom :  " << curAto.id
                                           << std::endl << std::endl;
-                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;  
+                                std::cout << "NB atom : " << allAtoms[*tNBA].id << std::endl;
                             */
                             // This is a new atom and append the atom to seen-atom list
                             // and call function checkOnePathSec() recursively
-                            int tPreSeriNum = curAto.seriNum; 
-                            checkOnePathSec(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum, 
+                            int tPreSeriNum = curAto.seriNum;
+                            checkOnePathSec(allAtoms[*tNBA], iMax, iOriAto, tPreSeriNum,
                                             tNewLev, seenAtomIDs, atomIDsInPath);
                         }
                     }
@@ -4889,18 +4890,18 @@ namespace LIBMOL
             seenAtomIDs.erase(curAto.seriNum);
         }
     }
-    
-    
+
+
     void AllSystem::outRingSec(AtomDict &tAtom)
     {
         int numRings = (int)tAtom.ringRep.size();
-       
+
         if (numRings)
         {
-            
+
             std::map<int, int> sizeMap;
-            
-            
+
+
             for (std::map<std::string, int>::iterator iMR=tAtom.ringRep.begin();
                     iMR != tAtom.ringRep.end(); iMR++)
             {
@@ -4911,9 +4912,9 @@ namespace LIBMOL
                 else
                 {
                     sizeMap[iMR->second]++;
-                }   
+                }
             }
-            
+
             tAtom.codClass.append("[");
             int i =0;
             int j = (int)sizeMap.size();
@@ -4922,7 +4923,7 @@ namespace LIBMOL
             {
                 std::string tSize = IntToStr(iSMa->first);
                 std::string tNum  = IntToStr(iSMa->second);
-                
+
                 if(iSMa->second >= 3)
                 {
                     tAtom.codClass.append(tNum + "x" + tSize);
@@ -4930,13 +4931,13 @@ namespace LIBMOL
                 else if (iSMa->second==2)
                 {
                     tAtom.codClass.append( tSize + "," + tSize);
-                }   
+                }
                 else if (iSMa->second==1)
                 {
                     tAtom.codClass.append(tSize);
                 }
-                       
-                
+
+
                 if(i != j-1)
                 {
                     tAtom.codClass.append(",");
@@ -4945,23 +4946,23 @@ namespace LIBMOL
                 {
                     tAtom.codClass.append("]");
                 }
-                    
+
                 i++;
             }
         }
     }
-    
+
     std::string  AllSystem::outRingSecStr(AtomDict &tAtom)
     {
         std::string tS1 = "";
         int numRings = (int)tAtom.ringRep.size();
-        
+
         if (numRings)
         {
-            
+
             std::map<int, int> sizeMap;
-            
-            
+
+
             for (std::map<std::string, int>::iterator iMR=tAtom.ringRep.begin();
                     iMR != tAtom.ringRep.end(); iMR++)
             {
@@ -4972,9 +4973,9 @@ namespace LIBMOL
                 else
                 {
                     sizeMap[iMR->second]++;
-                }   
+                }
             }
-            
+
             tS1.append("[");
             int i =0;
             int j = (int)sizeMap.size();
@@ -4983,7 +4984,7 @@ namespace LIBMOL
             {
                 std::string tSize = IntToStr(iSMa->first);
                 std::string tNum  = IntToStr(iSMa->second);
-               
+
                 if(iSMa->second !=1)
                 {
                     tS1.append(tNum + "x" + tSize);
@@ -4992,7 +4993,7 @@ namespace LIBMOL
                 {
                     tS1.append(tSize);
                 }
-                
+
                 if(i != j-1)
                 {
                     tS1.append(",");
@@ -5001,36 +5002,36 @@ namespace LIBMOL
                 {
                     tS1.append("]");
                 }
-                    
+
                 i++;
             }
         }
-        
+
         return tS1;
-        
+
     }
-    
+
     void AllSystem::chiralExch()
     {
-        
+
     }
-    
-    
-    // Plane related 
+
+
+    // Plane related
     void AllSystem::detectPlaneGroups()
     {
-        
+
         groupOrgAtomsToPlanes();
         //groupMetAndLigandAtomsToPlanes();
-   
+
         //Check
         /*
-        std::cout<< "There are " << (int)allPlanes.size() 
+        std::cout<< "There are " << (int)allPlanes.size()
                 <<" Planes in the system" << std::endl;
         for (int i=0; i < (int)allPlanes.size(); i++)
         {
             std::cout<<"Plane " <<i+1 << " contains "
-                    << (int)allPlanes[i].atoms.size() 
+                    << (int)allPlanes[i].atoms.size()
                     << " atoms. They are: "<< std::endl;
             for (std::map<ID, int>::iterator iAt=allPlanes[i].atoms.begin();
                     iAt!=allPlanes[i].atoms.end(); iAt++)
@@ -5041,22 +5042,22 @@ namespace LIBMOL
         }
         */
     }
-    
+
     void AllSystem::groupOrgAtomsToPlanes()
     {
         std::vector<PlaneDict> smalPls;
-        
+
         // Find the smallest planes
         setSmallestPLs(smalPls);
-        
+
         // Merge the above planes to the large plane groups
         mergeLargePLGroups(smalPls);
-        
+
     }
-    
+
     void AllSystem::setSmallestPLs(std::vector<PlaneDict>& tSmaPls)
     {
-        
+
         for (int i=0; i < (int)allAtoms.size(); i++)
         {
             if (allAtoms[i].bondingIdx == 2)
@@ -5066,7 +5067,7 @@ namespace LIBMOL
                 tSmaPl.archID  = aID;
                 tSmaPl.archPos = i;
                 tSmaPl.atoms[aID] = i;
-                
+
                 for (int j=0; j< (int)allAtoms[i].connAtoms.size(); j++)
                 {
                     int tPos  = allAtoms[i].connAtoms[j];
@@ -5080,7 +5081,7 @@ namespace LIBMOL
             }
         }
         /*
-        std::cout <<"There are " << (int)tSmaPls.size() 
+        std::cout <<"There are " << (int)tSmaPls.size()
                   << " sp2 planes " << std::endl;
         for (std::vector<PlaneDict>::iterator iP=tSmaPls.begin();
                 iP !=tSmaPls.end(); iP++)
@@ -5096,18 +5097,18 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         */
     }
-    
+
     void AllSystem::mergeLargePLGroups(std::vector<PlaneDict>& tSmaPls)
     {
-        //std::cout <<"There are " << (int)tSmaPls.size() 
+        //std::cout <<"There are " << (int)tSmaPls.size()
         //          << " sp2 planes " << std::endl;
         std::map<int, std::vector<int> > allPlsClasses;
-        
+
         // assign a e-id to each plane set
-        // allPlsClasses[e-classId] = vector of small plane indexes 
+        // allPlsClasses[e-classId] = vector of small plane indexes
         for (int i=0; i < (int)tSmaPls.size(); i++)
         {
             for (std::map<ID,int>::iterator iSA=tSmaPls[i].atoms.begin();
@@ -5116,9 +5117,9 @@ namespace LIBMOL
                 allPlsClasses[i].push_back(iSA->second);
             }
         }
-             
+
         // get equiv-class by ring-relation
-        
+
         for (int i=0; i < (int)tSmaPls.size(); i++)
         {
             bool iMerge = false;
@@ -5132,7 +5133,7 @@ namespace LIBMOL
             }
             std::cout<<std::endl;
             */
-            
+
             for (int j=i+1; j <(int)tSmaPls.size(); j++)
             {
                 /*
@@ -5144,46 +5145,46 @@ namespace LIBMOL
                     std::cout << iSA2->first << "\t";
                 }
                 std::cout<<std::endl;
-                
+
                  */
-                
+
                 std::map<int, std::vector<int> >::iterator tFindM;
                 tFindM = allPlsClasses.find(i);
-                
+
                 if (tFindM != allPlsClasses.end())
                 {
                     //std::cout << "test ring-related " << std::endl;
                     //std::cout << isInSameRing(tSmaPls[i],tSmaPls[j]) << std::endl;
-                   
+
                     if(isInSameRing(tSmaPls[i],tSmaPls[j]))
-                    {   
+                    {
                         // std::cout << "Merged planes " << i <<"  "<< j << std::endl;
                         for (std::vector<int>::iterator iI = allPlsClasses[i].begin();
                                 iI !=allPlsClasses[i].end(); iI++ )
                         {
                             std::vector<int>::iterator tFindV;
-                            tFindV = std::find(allPlsClasses[j].begin(), 
+                            tFindV = std::find(allPlsClasses[j].begin(),
                             allPlsClasses[j].end(), *iI);
                             if (tFindV ==allPlsClasses[j].end())
                             {
-                                allPlsClasses[j].push_back(*iI); 
+                                allPlsClasses[j].push_back(*iI);
                             }
                         }
-                        //std::cout << "Plane " << j << "now has atoms " 
+                        //std::cout << "Plane " << j << "now has atoms "
                         //          << (int)allPlsClasses[j].size() << std::endl;
-                        iMerge = true;        
-                    }    
+                        iMerge = true;
+                    }
                 }
             }
-            
+
             if (iMerge)
             {
                 allPlsClasses.erase(i);
             }
-        }  
-        
+        }
+
         // Further
-        
+
         std::vector<int> delKeys;
         for(std::map<int, std::vector<int> >::iterator iPl1=allPlsClasses.begin();
                 iPl1!=allPlsClasses.end(); iPl1++)
@@ -5192,25 +5193,25 @@ namespace LIBMOL
                 iPl2!=allPlsClasses.end(); iPl2++)
             {
                 if (iPl1->first < iPl2->first)
-                {   
+                {
                     if(furtherM(iPl1->second, iPl2->second))
-                    {    
-                        
+                    {
+
                         if((int)iPl1->second.size() >= (int)iPl2->second.size())
                         {
                             for (std::vector<int>::iterator iV=iPl2->second.begin();
                                     iV!=iPl2->second.end(); iV++)
                             {
-                                
+
                                 std::vector<int>::iterator tFindV;
-                                tFindV = std::find(iPl1->second.begin(), 
+                                tFindV = std::find(iPl1->second.begin(),
                                          iPl1->second.end(), *iV);
                                 if (tFindV ==iPl1->second.end())
                                 {
-                                    iPl1->second.push_back(*iV); 
+                                    iPl1->second.push_back(*iV);
                                 }
                             }
-                            delKeys.push_back(iPl2->first);   
+                            delKeys.push_back(iPl2->first);
                         }
                         else
                         {
@@ -5218,11 +5219,11 @@ namespace LIBMOL
                                     iV!=iPl1->second.end(); iV++)
                             {
                                 std::vector<int>::iterator tFindV;
-                                tFindV = std::find(iPl2->second.begin(), 
+                                tFindV = std::find(iPl2->second.begin(),
                                          iPl2->second.end(), *iV);
                                 if (tFindV ==iPl2->second.end())
                                 {
-                                    iPl2->second.push_back(*iV); 
+                                    iPl2->second.push_back(*iV);
                                 }
                             }
                             delKeys.push_back(iPl1->first);
@@ -5231,7 +5232,7 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         for(std::vector<int>::iterator iDel=delKeys.begin();
                 iDel!=delKeys.end(); iDel++)
         {
@@ -5240,16 +5241,16 @@ namespace LIBMOL
                 allPlsClasses.erase(*iDel);
             }
         }
-       
-        
-        // Put equiv-classes in a vector of planeDicts 
+
+
+        // Put equiv-classes in a vector of planeDicts
         for (std::map<int, std::vector<int> >::iterator iPC=allPlsClasses.begin();
                 iPC!=allPlsClasses.end(); iPC++ )
         {
             if (iPC->second.size() >3 )
             {
                 PlaneDict aPl;
-            
+
                 for (std::vector<int>::iterator iId=iPC->second.begin();
                        iId !=iPC->second.end(); iId++ )
                 {
@@ -5257,24 +5258,24 @@ namespace LIBMOL
                 }
                 allPlanes.push_back(aPl);
             }
-        } 
-        
+        }
+
         // comment out later on
         // doubleCheckM();
     }
 
-    
-    
+
+
     bool AllSystem::isInSameRing(PlaneDict & tP1, PlaneDict & tP2)
     {
         if (std::find(allAtoms[tP1.archPos].connAtoms.begin(),
                 allAtoms[tP1.archPos].connAtoms.end(), tP2.archPos)
                 ==allAtoms[tP1.archPos].connAtoms.end())
         {
-            // std::cout << "Not in " << tP1.archID << "Neighbor " << std::endl; 
+            // std::cout << "Not in " << tP1.archID << "Neighbor " << std::endl;
             return false;
-        } 
-        
+        }
+
         if ((int)allAtoms[tP1.archPos].ringRep.size())
         {
                 for (std::map<std::string, int>::iterator iM1=allAtoms[tP1.archPos].ringRep.begin();
@@ -5283,14 +5284,14 @@ namespace LIBMOL
                     // std::cout<< "1: " << iM1->first << std::endl;
                     if ((int)allAtoms[tP2.archPos].ringRep.size())
                     {
-                       /* 
+                       /*
                         for (std::map<std::string, int>::iterator iM2=allAtoms[tP2.archPos].ringRep.begin();
                                  iM2 !=allAtoms[tP2.archPos].ringRep.end(); iM2++)
                         {
                             std::cout<< "2: " << iM2->first << std::endl;
                         }
                         */
-                            
+
                         if(allAtoms[tP2.archPos].ringRep.find(iM1->first) !=
                                    allAtoms[tP2.archPos].ringRep.end())
                         {
@@ -5301,12 +5302,12 @@ namespace LIBMOL
                         }
                     }
                 }
-            
+
         }
-        
-        return false;   
+
+        return false;
     }
-    
+
     bool AllSystem::furtherM(std::vector<int> &tV1, std::vector<int> &tV2)
     {
         int nFind = 0;
@@ -5317,10 +5318,10 @@ namespace LIBMOL
            tFindV = std::find(tV2.begin(), tV2.end(), *iV);
            if (tFindV !=tV2.end())
            {
-               nFind++; 
-           } 
+               nFind++;
+           }
         }
-        
+
         if (nFind >=3)
         {
             return true;
@@ -5330,14 +5331,14 @@ namespace LIBMOL
             return false;
         }
     }
-        
-    
+
+
     void AllSystem::doubleCheckM()
     {
         std::cout << "Originally total number of planes is " << allPlanes.size()
                   << std::endl;
         std::vector<PlaneDict>  tmpPls;
-        
+
         std::map<int, std::vector<int> > setPlAtms;
         std::map<int, int> aMap;
         for (unsigned iP=0; iP < allPlanes.size(); iP++)
@@ -5349,7 +5350,7 @@ namespace LIBMOL
                 setPlAtms[iP].push_back(iA->second);
             }
         }
-        
+
         for (unsigned iP=0; iP < allPlanes.size(); iP++)
         {
             for (unsigned jP=iP+1; jP < allPlanes.size(); jP++)
@@ -5361,17 +5362,17 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         std::map<int, std::vector<int> > aReMap;
-        
+
         for (std::map<int, int>::iterator iRM=aMap.begin();
                 iRM !=aMap.end(); iRM++)
         {
             aReMap[iRM->second].push_back(iRM->first);
         }
-        
+
         std::vector<int> delPls;
-        
+
         for (std::map<int, std::vector<int> >::iterator iBack=aReMap.begin();
                 iBack !=aReMap.end(); iBack++)
         {
@@ -5379,14 +5380,14 @@ namespace LIBMOL
             {
                 PlaneDict aTmpPl(allPlanes[iBack->second[0]]);
                 delPls.push_back(iBack->second[0]);
-                std::cout << "the following planes will be merged: " 
+                std::cout << "the following planes will be merged: "
                           << std::endl;
                 std::cout << "plane " << iBack->second[0] << std::endl;
-                
+
                 for (unsigned iP2=iBack->second[1]; iP2 < iBack->second.size();
                        iP2++)
                 {
-                    for (std::map<ID,int>::iterator 
+                    for (std::map<ID,int>::iterator
                          iA=allPlanes[iP2].atoms.begin();
                             iA !=allPlanes[iP2].atoms.end(); iA++)
                     {
@@ -5401,7 +5402,7 @@ namespace LIBMOL
                 tmpPls.push_back(aTmpPl);
             }
         }
-        
+
         for (unsigned iP3=0; iP3 < allPlanes.size(); iP3++)
         {
             if (std::find(delPls.begin(), delPls.end(), iP3)
@@ -5410,18 +5411,18 @@ namespace LIBMOL
                     tmpPls.push_back(allPlanes[iP3]);
             }
         }
-            
+
         allPlanes.clear();
-            
+
         for (unsigned iP4=0; iP4 < tmpPls.size(); iP4++)
         {
             allPlanes.push_back(tmpPls[iP4]);
         }
-     
+
         std::cout << "Now total number of planes is " << allPlanes.size()
                   << std::endl;
         std::cout << "They are : " << std::endl;
-        
+
         for (unsigned iP5=0; iP5 < allPlanes.size(); iP5++)
         {
             std::cout << "Plane " << iP5+1 << std::endl;
@@ -5431,114 +5432,114 @@ namespace LIBMOL
                 std::cout << "Atom " << iA->first << std::endl;
             }
         }
-        
+
     }
-    
-    void AllSystem::setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName, 
+
+    void AllSystem::setupAllTargetValuesFromCOD(ID tOutName, ID tMonoName,
                                                 ID tLibmolDir)
     {
-       CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles, 
+       CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles,
                                allTorsions, allChirals, allPlanes, allRings,
                                tLibmolDir);
-      
-      
-       
+
+
+
        aCodSystem.setupAllTargetValues();
-       
+
        //resetSystem(aCodSystem);
        resetSystem2(aCodSystem);
        /*
        for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
-            std::cout << "Atom " << iAt->id << " is in " 
+            std::cout << "Atom " << iAt->id << " is in "
                       << (int)iAt->ringRep.size() << std::endl;
         }
-        
-        */ 
-       
+
+        */
+
     }
-    
-    
-    void AllSystem::setupAllTargetValuesFromCOD2(ID tOutName, ID tMonoName, 
+
+
+    void AllSystem::setupAllTargetValuesFromCOD2(ID tOutName, ID tMonoName,
                                                 ID tLibmolDir)
     {
-        
-        
-        CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles, 
+
+
+        CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles,
                                 allTorsions, allChirals, allPlanes, allRings,
                                 tLibmolDir, 2);
-      
-        
-        aCodSystem.setupAllTargetValues2();  
-        
-        
+
+
+        aCodSystem.setupAllTargetValues2();
+
+
         resetSystem2(aCodSystem);
-        
-        
+
+
        /*
        for(std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
-            //std::cout << "Atom " << iAt->id << " is in " 
+            //std::cout << "Atom " << iAt->id << " is in "
             //<< (int)iAt->ringRep.size() << std::endl;
            //std::cout << "Atom " << iAt->id << " has the charge of "
-           //          << iAt->charge << " or formal charge " 
+           //          << iAt->charge << " or formal charge "
            //          << iAt->formalCharge << std::endl;
         }
         */
-        
-        
-       
+
+
+
     }
-    
+
     void AllSystem::OutputRestraintCif(FileName tCifName)
     {
         /*
         std::ofstream outCif(tCifName);
-        
+
         if (outCif.is_open())
         {
             OutputRestraintCifHead(outCif);
-            
+
             if ((int)allBonds.size())
             {
                 OutputRestraintCifBonds(outCif);
             }
-            
+
             if ((int)allAngles.size())
             {
                 OutputRestraintCifAngles(outCif);
             }
-            
+
             if ((int)allTorsions.size())
             {
                 OutputRestraintCifTosions(outCif);
             }
-            
+
             if((int)allPlanes.size())
             {
                 OutputRestraintCifPlanes(outCif);
             }
-            
+
             if((int)allChirals.size())
             {
                 OutputRestraintCifChirals(outCif);
             }
-            
+
             if ((int)allRings.size())
             {
                 OutputRestraintCifRings(outCif);
             }
         }
          */
-        
+
     }
-    
+
     /*
     void AllSystem::OutputRestraintCifHead(std::ofstream& tCifFile)
     {
-        // Tempo 
+        // Tempo
         tCifFile << "global_  " << std::endl;
         tCifFile << "_entry.id  XXXXXX" << std::endl;
         tCifFile << "_struct.keywords   '----' " << std::endl;
@@ -5549,7 +5550,7 @@ namespace LIBMOL
         tCifFile << "_lib.update   XX/XX/XX  " << std::endl;
         tCifFile << "# ------------------------------------------------" << std::endl;
         tCifFile << "data_restraints " << std::endl << "# " << std::endl;
-        
+
         tCifFile << "#" << std::endl << "loop_" << std::endl <<"#" << std::endl;
         tCifFile << "_restr.record"  << std::endl;
         tCifFile << "_restr.number"  << std::endl;
@@ -5565,24 +5566,24 @@ namespace LIBMOL
         tCifFile << "_restr.dist"       << std::endl;
         tCifFile << "_restr.dist_dev"   << std::endl;
         tCifFile << "_restr.econst"     << std::endl;
-        
+
     }
-    
+
     void AllSystem::OutputRestraintCifBonds(std::ofstream  & tCifFile)
     {
 
-        
+
         int i =1;
         tCifFile.precision(3);
-        
+
         for (std::vector<BondDict>::iterator iB=allBonds.begin();
                 iB !=allBonds.end(); iB++)
         {
             int j = iB->fullAtoms[iB->atoms[0]];
             int k = iB->fullAtoms[iB->atoms[1]];
-            
+
             tCifFile  << std::fixed << "BOND"  << "\t" << i  <<  "\t"
-                      << iB->order  << "\t" << "."  << "\t" << j  
+                      << iB->order  << "\t" << "."  << "\t" << j
                       <<  "\t" << k << "\t" << "."  << "\t"
                       <<  "."  << iB->value   << "\t" << iB->sigValue
                       <<  "."  << "\t" << "."  << "\t" << "." << "."
@@ -5590,9 +5591,9 @@ namespace LIBMOL
                       << std::endl;
             i++;
         }
-        
+
     }
-    
+
     void AllSystem::OutputRestraintCifAngles(std::ofstream & tCifFile)
     {
         int i =1;
@@ -5601,59 +5602,59 @@ namespace LIBMOL
                 iA!=allAngles.end(); iA++)
         {
             tCifFile  << std::fixed << "ANGL"  << "\t" << i  <<  "\t"
-                      << "."  << "\t" << "."   << "\t" << iA->atoms[0] 
-                      <<  "\t" << iA->atoms[1] << "\t" << iA->atoms[2]  
+                      << "."  << "\t" << "."   << "\t" << iA->atoms[0]
+                      <<  "\t" << iA->atoms[1] << "\t" << iA->atoms[2]
                       << "\t"  <<  "."  << iA->value   << "\t" << iA->sigValue
                       <<  "."  << "\t" << "."  << "\t" << "."  << "\t" << "."
-                      <<  "#    " << allAtoms[iA->atoms[0]].id 
+                      <<  "#    " << allAtoms[iA->atoms[0]].id
                       << "   " << allAtoms[iA->atoms[1]].id
                       << "   " << allAtoms[iA->atoms[2]].id << std::endl;
             i++;
         }
-        
+
     }
-    
+
     void AllSystem::OutputRestraintCifTosions(std::ofstream & tCifFile)
     {
         int i =1;
         tCifFile.precision(3);
-        
+
         for (std::vector<TorsionDict>::iterator iT=allTorsions.begin();
                 iT != allTorsions.end(); iT++)
         {
             i++;
         }
     }
-    
+
     void AllSystem::OutputRestraintCifChirals(std::ofstream & tCifFile)
     {
         int i =1;
         tCifFile.precision(3);
-        
+
         for (std::vector<ChiralDict>::iterator iCh = allChirals.begin();
                 iCh != allChirals.end(); iCh++)
         {
-            
+
             tCifFile  << std::fixed << "CHIR"  << "\t" << i  <<  "\t"
-                      << iCh->value << "\t" << "." << "\t" << iCh->atoms[0]  
+                      << iCh->value << "\t" << "." << "\t" << iCh->atoms[0]
                       << "\t" << iCh->atoms[1]  << "\t" << iCh->atoms[2]
                       << iCh->value   << "\t" << "."
                       <<  "."  << "\t" << "."  << "\t" << "."  << "\t" << "."
-                      <<  "#    " << allAtoms[iCh->atoms[0]].id 
+                      <<  "#    " << allAtoms[iCh->atoms[0]].id
                       << "   " << allAtoms[iCh->atoms[1]].id
-                      << "   " << allAtoms[iCh->atoms[2]].id 
+                      << "   " << allAtoms[iCh->atoms[2]].id
                       << std::endl;
             i++;
         }
-        
-        
+
+
     }
-        
+
     void AllSystem::OutputRestraintCifPlanes(std::ofstream & tCifFile)
     {
         int i =1;
         tCifFile.precision(3);
-        
+
         for (std::vector<PlaneDict>::iterator iP=allPlanes.begin();
                 iP != allPlanes.end(); iP++)
         {
@@ -5661,21 +5662,21 @@ namespace LIBMOL
                     iA != iP->atoms.end(); iA++)
             {
                 tCifFile  << std::fixed << "PLAN"  << "\t" << i  <<  "\t"
-                          << "." << "\t" << "." << "\t" << iA->second  
-                          << "\t" << "."  << "\t" << "." << "\t"  
-                          << "\t" << "0.020"   << "\t" << "." << "\t" 
+                          << "." << "\t" << "." << "\t" << iA->second
+                          << "\t" << "."  << "\t" << "." << "\t"
+                          << "\t" << "0.020"   << "\t" << "." << "\t"
                           <<  "."  << "\t" << "."  << "\t" << "."  << "\t" << "."
                           <<  "#    " << iA->first << std::endl;
             }
         }
-        
+
     }
-    
+
     void AllSystem::OutputRestraintCifRings(std::ofstream  & tCifFile)
-    {   
+    {
     }
      */
-    
+
     void extern outCodAndCcp4AtomTypes(FileName                 tFName,
                                        std::vector<AtomDict>  & tAtoms)
     {
@@ -5684,19 +5685,19 @@ namespace LIBMOL
         {
             if (tAtoms.size() > 0)
             {
-                
+
                 ouAtmTypes.width(15);
                 ouAtmTypes << std::left << "AtomName: ";
                 ouAtmTypes.width(40);
                 ouAtmTypes << std::left << "Acedrg atom types: ";
                 ouAtmTypes.width(40);
                 ouAtmTypes << std::left << "CCP4 atom types: " << std::endl;
-                
+
                 for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                         iA !=tAtoms.end(); iA++)
                 {
                     ouAtmTypes.width(15);
-                    ouAtmTypes << std::left << iA->id; 
+                    ouAtmTypes << std::left << iA->id;
                     unsigned len = iA->codClass.size();
                     if (len <=40)
                     {
@@ -5711,31 +5712,31 @@ namespace LIBMOL
                     ouAtmTypes << std::left << iA->ccp4Type << std::endl;
                 }
             }
-                       
+
             ouAtmTypes.close();
         }
     }
-    
-    void extern outProElecDistances(FileName         tOutFName, 
+
+    void extern outProElecDistances(FileName         tOutFName,
                                     AllSystem      & tMonomer  )
     {
         std::ofstream outBTab(tOutFName);
         if (outBTab.is_open())
         {
-            std::cout << "Here : Number of atoms " 
+            std::cout << "Here : Number of atoms "
                       << tMonomer.allAtoms.size() << std::endl;
-            
+
             if (tMonomer.allBonds.size() >0)
-            {   
+            {
                 std::cout << "Number of bonds " << tMonomer.allBonds.size()
                           << std::endl;
-                // Bond sections 
+                // Bond sections
                 //outBTab   << "_chem_comp_bond.atom_id_1" << std::endl
                 //          << "_chem_comp_bond.atom_id_2" << std::endl
                 //          << "_chem_comp_bond.value_dist_prot" << std::endl
-                //          << "_chem_comp_bond.value_dist_prot_esd" 
+                //          << "_chem_comp_bond.value_dist_prot_esd"
                 //          << std::endl;
-               
+
                 for (std::vector<AtomDict>::iterator iAt=tMonomer.allAtoms.begin();
                       iAt != tMonomer.allAtoms.end(); iAt++)
                 {
@@ -5744,14 +5745,14 @@ namespace LIBMOL
                         iAt->id = "\"" + iAt->id + "\"";
                     }
                 }
-                
+
                 for (std::vector<BondDict>::iterator iB=tMonomer.allBonds.begin();
                           iB !=tMonomer.allBonds.end(); iB++)
                 {
-                    
+
                     // Add Proton-X distances if they exist
                     int idxH = -1, idxX=-1;
-                    
+
                     if (tMonomer.allAtoms[iB->atomsIdx[0]].chemType.compare("H")==0)
                     {
                         idxH = iB->atomsIdx[0];
@@ -5762,41 +5763,41 @@ namespace LIBMOL
                         idxH = iB->atomsIdx[1];
                         idxX = iB->atomsIdx[0];
                     }
-                    std::cout << "atom 1 " << tMonomer.allAtoms[iB->atomsIdx[0]].id 
-                              << " of element " 
-                              <<  tMonomer.allAtoms[iB->atomsIdx[0]].chemType 
+                    std::cout << "atom 1 " << tMonomer.allAtoms[iB->atomsIdx[0]].id
+                              << " of element "
+                              <<  tMonomer.allAtoms[iB->atomsIdx[0]].chemType
                               << std::endl;
-                    std::cout << "atom 2 " << tMonomer.allAtoms[iB->atomsIdx[1]].id 
-                              << " of element " 
-                              <<  tMonomer.allAtoms[iB->atomsIdx[1]].chemType 
+                    std::cout << "atom 2 " << tMonomer.allAtoms[iB->atomsIdx[1]].id
+                              << " of element "
+                              <<  tMonomer.allAtoms[iB->atomsIdx[1]].chemType
                               << std::endl;
                     std::cout << "idxH = " << idxH << std::endl;
                     double aProtD      = 0.0;
                     double aProtD_siga = 0.0;
                     double aHD         = 0.0;
                     double aHD_siga    = 0.0;
-                               
+
                     if (idxH > -1)
                     {
-                        
+
                         if (tMonomer.HydrDistTable[2].find(tMonomer.allAtoms[idxH].formType[1])
                              !=tMonomer.HydrDistTable[2].end())
                         {
                             aProtD = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["pDistNeu"];
-                            aProtD_siga 
+                            aProtD_siga
                             = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["pDistSigaNeu"];
                             aHD    = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["eDistQM"];
-                            aHD_siga 
+                            aHD_siga
                             = tMonomer.HydrDistTable[2][tMonomer.allAtoms[idxH].formType[1]]["eDistSigaQM"];
                         }
                         else if (tMonomer.HydrDistTable[1].find(tMonomer.allAtoms[idxX].chemType)
                              !=tMonomer.HydrDistTable[1].end())
                         {
                             aProtD = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["pDist"];
-                            aProtD_siga 
+                            aProtD_siga
                             = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["pDistSiga"];
                             aHD = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["eDist"];
-                            aHD_siga 
+                            aHD_siga
                             = tMonomer.HydrDistTable[1][tMonomer.allAtoms[idxX].chemType]["eDistSiga"];
                         }
                         else
@@ -5806,24 +5807,24 @@ namespace LIBMOL
                             aHD         = iB->value;
                             aHD_siga    = iB->sigValue;
                         }
-                        
-                        outBTab << std::setw(12)  
-                            << tMonomer.allAtoms[iB->atomsIdx[0]].id  
-                            << std::setw(12)  
-                            << tMonomer.allAtoms[iB->atomsIdx[1]].id  
-                            << std::setw(12) 
+
+                        outBTab << std::setw(12)
+                            << tMonomer.allAtoms[iB->atomsIdx[0]].id
+                            << std::setw(12)
+                            << tMonomer.allAtoms[iB->atomsIdx[1]].id
+                            << std::setw(12)
                             << aProtD
                             << std::setw(8) << std::setprecision(4)
-                            << aProtD_siga 
-                            << std::setw(12) 
+                            << aProtD_siga
+                            << std::setw(12)
                             << aHD
                             << std::setw(12) << std::setprecision(4)
                             << aHD_siga
-                            << std::endl;     
+                            << std::endl;
                     }
                 }
             }
         }
-        
+
     }
 }

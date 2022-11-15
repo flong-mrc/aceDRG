@@ -142,6 +142,7 @@ int main(int argc, char** argv) {
                                               AJob.lowBondSig, 
                                               AJob.upperAngleSig,
                                               AJob.lowAngleSig); 
+            
             if (AJob.IOEntries.find("PeptidesOnly") !=  AJob.IOEntries.end())
             {
                 aTargetSystem.isPeptide = true;

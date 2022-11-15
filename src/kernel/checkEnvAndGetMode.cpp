@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   CheckEnvAndGetMode.cpp
  * Author: flong
  *
@@ -9,11 +9,11 @@
 
 namespace LIBMOL
 {
-    
+
     CheckEnvAndGetMode::CheckEnvAndGetMode():workMode(0)
     {
-        
-        // Currently CCP4 suite is the only requited thing 
+
+        // Currently CCP4 suite is the only requited thing
         char * pClibdMon = std::getenv("CLIBD_MON");
         if (pClibdMon !=NULL)
         {
@@ -28,12 +28,12 @@ namespace LIBMOL
             std::cerr << "You need to setup CCP4 suite first " << std::endl;
             exit(1);
         }
-        
+
     }
-    
+
     CheckEnvAndGetMode::CheckEnvAndGetMode(int numArg, char** ArgVars) :workMode(0)
     {
-        // Currently CCP4 suite is the only requited thing 
+        // Currently CCP4 suite is the only requited thing
         char * pClibdMon = std::getenv("CLIBD_MON");
         if (pClibdMon !=NULL)
         {
@@ -48,7 +48,7 @@ namespace LIBMOL
             std::cerr << "You need to setup CCP4 suite first " << std::endl;
             exit(1);
         }
-       
+
         /*
         char * pLibMon = std::getenv("LIBMOL_ROOT");
         if (pLibMon !=NULL)
@@ -65,24 +65,24 @@ namespace LIBMOL
             exit(1);
         }
         */
-        
+
         // do not need the following declarations, put here in case......
         //extern char *optarg;
         // extern int optind, opterr, optopt;
-        
+
         // opterr = 0;
-         
+
         if (numArg  < 5)
         {
-            // temporarily interface 
+            // temporarily interface
             std::cerr << "Command line syntax: " << std::endl
-                      << "libmol -c CIFFILE -r monomer_name -o outputRestraintFile " 
+                      << "libmol -c CIFFILE -r monomer_name -o outputRestraintFile "
                       << std::endl;
-            exit(1);     
+            exit(1);
         }
-        
-        int c, index; 
-        while ((c = getopt (numArg, ArgVars, 
+
+        int c, index;
+        while ((c = getopt (numArg, ArgVars,
 "a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:C:D:H:L:M:N:O:P:Q:R:S:T:U:X:Y:Z:1:2:3:4:"))
                != -1)
         {
@@ -93,43 +93,43 @@ namespace LIBMOL
                     break;
                 case 'b':
                     IOEntries["inCifNameB"] = optarg;
-                    break;    
+                    break;
                 case 'c':
                     IOEntries["inCifName"]  =  optarg;
                     //std::cout << "Input cif file is : " << IOEntries["inCifName"]
-                    //          << std::endl; 
-                    break;     
+                    //          << std::endl;
+                    break;
                 case 'd':
                     IOEntries["CodBondFileName"] = optarg;
                     break;
                 case 'i':
                     IOEntries["inSmiName"] =  optarg;
-                    // std::cout << "The input files are in " 
+                    // std::cout << "The input files are in "
                     //          <<  IOEntries["inFileDir"] << std::endl;
-                    break;    
+                    break;
                 case 'j':
                     IOEntries["inFileDir"] =  optarg;
-                    // std::cout << "The input files are in " 
+                    // std::cout << "The input files are in "
                     //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
                 case 'k':
                     IOEntries["inMol2Name"] =  optarg;
-                    //std::cout << "The input Mol2 files are in " 
+                    //std::cout << "The input Mol2 files are in "
                     //          <<  IOEntries["inMol2Name"] << std::endl;
                     break;
                 case 'l':
                     IOEntries["enableNeu"] =  optarg;
-                    // std::cout << "The input files are in " 
+                    // std::cout << "The input files are in "
                     //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
                 case 'm':
                     IOEntries["molGen"] =  optarg;
-                    // std::cout << "The input files are in " 
+                    // std::cout << "The input files are in "
                     //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
                 case 'n':
                     IOEntries["NBDepth"] =  optarg;
-                    // std::cout << "The input files are in " 
+                    // std::cout << "The input files are in "
                     //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
                 case 'o':
@@ -138,7 +138,7 @@ namespace LIBMOL
                     break;
                 case 'p':
                     IOEntries["inPdbName"] = optarg;
-                    //std::cout << "Input PDB file is : " 
+                    //std::cout << "Input PDB file is : "
                     //          << IOEntries["inPdbName"] << std::endl;
                     break;
                 case 'r':
@@ -151,28 +151,28 @@ namespace LIBMOL
                     {
                         IOEntries["monoRootName"] ="UNL";
                     }
-                    
-                    //std::cout << "Monomer root name is : " 
+
+                    //std::cout << "Monomer root name is : "
                     //          << IOEntries["monoRootName"] << std::endl;
                     break;
                  case 's':
                     IOEntries["inSdfName"] = optarg;
-                    //std::cout << "Monomer root name is : " 
+                    //std::cout << "Monomer root name is : "
                     //          << IOEntries["monoRootName"] << std::endl;
-                    break; 
+                    break;
                  case 't':
                     IOEntries["tabGen"] = optarg;
-                    std::cout << "Table generator mode :  " 
+                    std::cout << "Table generator mode :  "
                               << IOEntries["tabGen"] << std::endl;
                     break;
                 case 'y':
                     IOEntries["transCoords"] = optarg;
                     StrLower(IOEntries["transCoords"]);
-                    break;                          
+                    break;
                 case 'z':
                     IOEntries["transAngles"] = optarg;
                     StrLower(IOEntries["transAngles"]);
-                    break;                    
+                    break;
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
                     break;
@@ -181,8 +181,8 @@ namespace LIBMOL
                     break;
                 case 'D':
                     IOEntries["libMolTabDir"] = optarg;
-                    //std::cout << "Libmol table directory is  : " 
-                    //          << IOEntries["libMolTabDir"] 
+                    //std::cout << "Libmol table directory is  : "
+                    //          << IOEntries["libMolTabDir"]
                     //          << std::endl;
                     break;
                 case 'H':
@@ -203,31 +203,31 @@ namespace LIBMOL
                     break;
                 case 'P':
                     IOEntries["UserParaFile"] = optarg;
-                    std::cout << "The param file from the user : " 
+                    std::cout << "The param file from the user : "
                               << IOEntries["UserParaFile"] << std::endl;
                     break;
                 case 'Q':
                     IOEntries["MolGenParaFile"] = optarg;
-                    std::cout << "The param file for MolGen : " 
-                              << IOEntries["MolGenParaFile"] 
+                    std::cout << "The param file for MolGen : "
+                              << IOEntries["MolGenParaFile"]
                               << std::endl;
                     break;
                 case 'R':
                     IOEntries["addProtCol"] = optarg;
-                    std::cout << "Job to add proton distances : " 
+                    std::cout << "Job to add proton distances : "
                               << IOEntries["addProtCol"] << std::endl;
                     break;
                 case 'S':
                     IOEntries["codAtomStr"] = optarg;
-                    //std::cout << "COD atom types are output to : " 
+                    //std::cout << "COD atom types are output to : "
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
                     break;
                 case 'T':
                     IOEntries["GraphTests"] = optarg;
                     StrLower(IOEntries["GraphTests"]);
-                    //std::cout << "COD atom types are output to : " 
+                    //std::cout << "COD atom types are output to : "
                     //          << IOEntries["AtomTypeOutName"] << std::endl;
-                    break;  
+                    break;
                 case 'U':
                     IOEntries["TempTests"] = optarg;
                     std::cout << "You are in temporally test mode "
@@ -245,7 +245,7 @@ namespace LIBMOL
                     break;
                 case 'Z':
                     IOEntries["HUMO"] = optarg;
-                    break;    
+                    break;
                 case '1':
                     IOEntries["uBS"] = optarg;
                     std::cout << "Upper bound for b " << IOEntries["uBS"]
@@ -255,7 +255,7 @@ namespace LIBMOL
                     IOEntries["lBS"] = optarg;
                     std::cout << "low bound for b " << IOEntries["lBS"]
                               << std::endl;
-                    break;      
+                    break;
                 case '3':
                     IOEntries["uAS"] = optarg;
                     std::cout << "Upper bound for a " << IOEntries["uAS"]
@@ -272,28 +272,28 @@ namespace LIBMOL
                         std::cerr <<  "command line arguments are not match at "
                                   << char(optopt) << std::endl;
                     }
-                    else 
+                    else
                     {
-                        std::cerr << "Unknown option character: " << optopt 
+                        std::cerr << "Unknown option character: " << optopt
                                   << std::endl;
                     }
                 default:
                     continue;
             }
         }
-        
+
         // Non-option arguments remained
         for (index = optind; index < numArg; index++)
         {
-            std::cout << "Non-option argument " << ArgVars[index] 
+            std::cout << "Non-option argument " << ArgVars[index]
                       << std::endl;
         }
-        
+
         if(IOEntries.find("NBDepth") == IOEntries.end())
         {
             IOEntries["NBDepth"] = "1";
         }
-        
+
         std::map<ID,ID>::iterator iKeyFinder;
         iKeyFinder = IOEntries.find("monoRootName");
         if (iKeyFinder ==IOEntries.end())
@@ -307,39 +307,39 @@ namespace LIBMOL
                 IOEntries["monoRootName"] ="UNL";
             }
         }
-        
-        
-        
+
+
+
         setBandASiga();
-         
+
         SetWorkMode();
-           
+
     }
-    
+
     CheckEnvAndGetMode::~CheckEnvAndGetMode()
     {
     }
-    
+
     void CheckEnvAndGetMode::parseArgs(int numArg, char** argVars)
     {
         static int verbose_flag;
-        
+
         static struct option longOptions[] =
         {
             /* These options set a flag. */
             {"verbose", noArgument,       &verbose_flag, 1},
             {"brief",   noArgument,       &verbose_flag, 0},
             /* These options don't set a flag.
-               We distinguish them by their indices. 
+               We distinguish them by their indices.
             {"add",     noArgument,       0, 'a'}, */
-            {"help",  noArgument,       0, 'h'}, 
-            
+            {"help",  noArgument,       0, 'h'},
+
             /* input files, keys are self-explained */
             {"cifin",  optionalArgument, 0, 'c'},
             {"pdbin",  optionalArgument, 0, 'p'},
             {"sdfin",  optionalArgument, 0, 'd'},
-            {"smiin",  optionalArgument, 0, 'i'},  // the input smile string 
-            /* output files, output pdb has the same name 
+            {"smiin",  optionalArgument, 0, 'i'},  // the input smile string
+            /* output files, output pdb has the same name
              * root as that of output cif  */
             {"cifout", optionalArgument, 0, 'o'},
             /* monomer name in output files */
@@ -347,13 +347,13 @@ namespace LIBMOL
             {"codatm",  optionalArgument, 0, 'A'},
             {0, 0, 0, 0}
         };
-        
-        int c=0; 
+
+        int c=0;
         while (c !=-1)
         {
             int optIndex=0;
             c = getopt_long(numArg, argVars, "c:d:h:i:o:p:r:A:", longOptions, &optIndex);
-            
+
             switch (c)
             {
                 case 'h':
@@ -367,17 +367,17 @@ namespace LIBMOL
                     break;
                 case 'd':
                     IOEntries["inSdfName"] =  optarg;
-                    break; 
+                    break;
                 case 'i':
                     IOEntries["inSmiStr"]  =  optarg;
-                    break; 
+                    break;
                 case 'o':
                     IOEntries["userOutName"] = optarg;
                     //IOEntries["outCifName"]  =  optarg; // should be that
-                    break; 
+                    break;
                 case 'r':
                     IOEntries["monoRootName"] = optarg;
-                    break; 
+                    break;
                 case 'A':
                     IOEntries["AtomTypeOutName"] = optarg;
                     break;
@@ -387,52 +387,52 @@ namespace LIBMOL
                         std::cerr <<  "command line arguments are not match at "
                                   << char(optopt) << std::endl;
                     }
-                    else 
+                    else
                     {
-                        std::cerr << "Unknown option character: " << optopt 
+                        std::cerr << "Unknown option character: " << optopt
                                   << std::endl;
                     }
                 default:
                     std::abort();
-                    
+
             }
-            
-            
+
+
         }
     }
-    
+
     void CheckEnvAndGetMode::printManual()
     {
-        
+
     }
-    
+
     void CheckEnvAndGetMode::setBandASiga()
     {
         if (IOEntries.find("uBS")==IOEntries.end())
         {
             IOEntries["uBS"] = "0.02";
         }
-        
+
         if (IOEntries.find("lBS")==IOEntries.end())
         {
             IOEntries["lBS"] = "0.01";
         }
-        
+
         if (IOEntries.find("uAS")==IOEntries.end())
         {
             IOEntries["uAS"] = "3.00";
         }
-        
+
         if (IOEntries.find("lAS")==IOEntries.end())
         {
             IOEntries["lAS"] = "1.5";
         }
-        
+
         upperBondSig  = StrToReal(IOEntries["uBS"]);
         lowBondSig    = StrToReal(IOEntries["lBS"]);
         upperAngleSig = StrToReal(IOEntries["uAS"]);
-        lowAngleSig   = StrToReal(IOEntries["lAS"]);         
-        
+        lowAngleSig   = StrToReal(IOEntries["lAS"]);
+
     }
     void CheckEnvAndGetMode::SetWorkMode()
     {
@@ -519,9 +519,9 @@ namespace LIBMOL
                     {
                         if (!IOEntries["inPdbName"].empty() && IOEntries["transCoords"] =="y" )
                         {
-                            // This mode read the input cif file and PDB file 
+                            // This mode read the input cif file and PDB file
                             // replace the coordinates in the cif with the corresponding ones in the PDB
-                            // which have been refined 
+                            // which have been refined
                             workMode = 21;
                             std::cout << "Coords transforming mode " << std::endl;
                         }
@@ -535,7 +535,7 @@ namespace LIBMOL
                     {
                         if (!IOEntries["inPdbName"].empty() && IOEntries["transAngles"] =="y" )
                         {
-                            // This mode read the input cif file and PDB file 
+                            // This mode read the input cif file and PDB file
                             // replace the angles in the cif with the ones calculated from PDB
                             workMode = 22;
                         }
@@ -565,10 +565,10 @@ namespace LIBMOL
                     {
                         // This is default restraint generation mode
                         workMode = 11;
-                         
+
                         if (IOEntries.find("userOutName") ==IOEntries.end())
                         {
-                            IOEntries["userOutName"] = "libmol.out"; 
+                            IOEntries["userOutName"] = "libmol.out";
                         }
                     }
                 }
@@ -578,7 +578,7 @@ namespace LIBMOL
         {
             if (IOEntries.find("molGen") != IOEntries.end())
             {
-                // This mode takes a general cif file and generate a whole molecule 
+                // This mode takes a general cif file and generate a whole molecule
                 // and unique bonds and angles within the molecule
                 if (IOEntries.find("enableNeu") != IOEntries.end())
                 {
@@ -610,7 +610,7 @@ namespace LIBMOL
         }
         else if (IOEntries.find("inSdfName") !=IOEntries.end())
         {
-            
+
             if(IOEntries.find("AtomTypeOutName") !=IOEntries.end())
             {
                 if (!IOEntries["AtomTypeOutName"].empty())
@@ -654,17 +654,17 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         else
         {
             std::cout << "what is the input file ? " << std::endl;
         }
-        
-        
+
+
         printVarAndMode();
-        
+
     }
-    
+
     void CheckEnvAndGetMode::printVarAndMode()
     {
         std::cout << "||=====================Job description====================================||"
@@ -675,7 +675,7 @@ namespace LIBMOL
                     << std::endl << "based on the input cif file" << std::endl
                     << "Your input cif file : " << IOEntries["inCifName"] << std::endl
                     << "Your monomer name : "   << IOEntries["monoRootName"]  << std::endl
-                    << "The output dictionary file(cif) : " << IOEntries["userOutName"] 
+                    << "The output dictionary file(cif) : " << IOEntries["userOutName"]
                     << std::endl;
         }
         else if (workMode==12)
@@ -684,7 +684,7 @@ namespace LIBMOL
                     << std::endl << "based on the input SMILE file" << std::endl
                     << "Your input SMILE file : " << IOEntries["inSmiStr"]      << std::endl
                     << "Your monomer name : "     << IOEntries["monoRootName"]  << std::endl
-                    << "The output dictionary file(cif) : " << IOEntries["userOutName"] 
+                    << "The output dictionary file(cif) : " << IOEntries["userOutName"]
                     << std::endl;
         }
         else if (workMode==13)
@@ -693,7 +693,7 @@ namespace LIBMOL
                     << std::endl << "based on the input MOL/SDF file"          << std::endl
                     << "Your input MOL/SDF file : " <<  IOEntries["inSdfName"] << std::endl
                     << "Your monomer name : "   << IOEntries["monoRootName"]   << std::endl
-                    << "The output dictionary file(cif) : " << IOEntries["userOutName"] 
+                    << "The output dictionary file(cif) : " << IOEntries["userOutName"]
                     << std::endl;
         }
         else if (workMode==2)
@@ -708,10 +708,10 @@ namespace LIBMOL
         }
         else if (workMode==21)
         {
-            std::cout << "The current job is coordinate transform in the dictionary file " 
+            std::cout << "The current job is coordinate transform in the dictionary file "
                       << std::endl;
         }
-        else if (workMode==31 || workMode==311 
+        else if (workMode==31 || workMode==311
                  || workMode==312 || workMode==32)
         {
             std::cout << "Your job is to deduce values of bond and bond-angle"
@@ -731,7 +731,7 @@ namespace LIBMOL
                 std::cout << "The job will handle with atoms of metal elements"
                           << std::endl;
             }
-        }   
+        }
         else if (workMode==41)
         {
             std::cout << "Your job is to look at atom types of COD format"
@@ -755,7 +755,7 @@ namespace LIBMOL
             std::cout << "The Mode for HUMO applications is activated "
                       << std::endl;
         }
-                  
+
         std::cout << "||========================================================================||"
                   << std::endl;
     }

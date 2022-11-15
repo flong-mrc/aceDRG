@@ -132,6 +132,7 @@ class Acedrg(CExeCode ):
 
         self.workMode         = 0
         self.useExistCoords   = False
+        self.useExistCoords2  = False
 
         self.isOrg            = True
         self.isAA             = False
@@ -1729,9 +1730,8 @@ class Acedrg(CExeCode ):
         tmpStr = ""
         if self.numConformers == 1:
             tmpStr = "_tmp"
-        #nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
-        #print "Number of intial conformers for the molecule  ", nConf
-        print("Number of intial conformers for refmac geo-opt  ", len(self.rdKit.selecConformerIds))
+        nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
+        print("Number of intial conformers for the molecule  ", nConf)
 
         inPdbNamesRoot =[]
         #for idxConf in range(nConf): 
@@ -1742,7 +1742,8 @@ class Acedrg(CExeCode ):
             aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
             #print "PDB root ", tPdbRoot
             #print aConfPdb
-            self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign)
+            print("idxConf=", idxConf)
+            self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign, self.rdKit.useExistCoords2)
             if os.path.isfile(aConfPdb):
                 inPdbNamesRoot.append(tPdbRoot)
             idxC+=1
@@ -3036,6 +3037,8 @@ class Acedrg(CExeCode ):
                 aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                 self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName)
                 if os.path.isfile(aIniMolName) :
+                    self.useCifCoords = True
+                    self.rdKit.useExistCoords = True
                     self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
                                          self.numConformers, 0, self.fileConv.nameMapingCifMol,\
                                          self.fileConv.inputCharge) 
@@ -3148,7 +3151,7 @@ class Acedrg(CExeCode ):
             self.workMode = 111
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
-        #print("workMode is ",self.workMode)
+        print("workMode is ",self.workMode)
         
         if self.workMode in [11,  111, 112, 51] :  #  and not self.isAA :
             #print("Number of molecule ", len(self.rdKit.molecules))
@@ -3165,16 +3168,18 @@ class Acedrg(CExeCode ):
                 if self.workMode in [11,  111, 112]:
                     print("Using coords ", self.rdKit.useExistCoords)
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
+
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                         print("The input system contains metal or other heavier element")
                         print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
+                    
                     self.runLibmol(self.inMmCifName, iMol)
                 else:
                     print("The input %s does not exist"%self.inMmCifName)
                     sys.exit()
-                
+            
                 if self.workMode == 11 or self.workMode== 112:
                     if  not self.runExitCode :
                         # Stage 2: optimization

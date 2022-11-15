@@ -3504,7 +3504,7 @@ namespace LIBMOL {
     void MolGenerator::checkAtomLinksByAngles2(double& tAngCut, 
                                       std::vector<CrystInfo>::iterator tCryst)
     {
-        std::cout << "angle thres " << tAngCut << std::endl;
+        // std::cout << "angle thres " << tAngCut << std::endl;
         
         std::map<int, std::vector<int> > tmpExc;
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();

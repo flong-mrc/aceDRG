@@ -1364,7 +1364,7 @@ class FileTransformer(object) :
 
        
 
-    def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="UNL", idxConf=0, tDelSign=""):
+    def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="UNL", idxConf=0, tDelSign="", tUsingCoords=False):
 
         try:
             tPDB = open(tOutFileName, "w")
@@ -1397,7 +1397,11 @@ class FileTransformer(object) :
             tPDB.write("CRYST1  100.000  100.000  100.000  90.00  90.00  90.00 P 1\n")
             # Atom section 
             # print idxConf
-            aConf  =  tMol.GetConformer(idxConf)
+            if not tUsingCoords:
+                aConf  =  tMol.GetConformer(idxConf)
+            else:
+                aConf  =  tMol.GetConformer()
+                
             atoms      =  tMol.GetAtoms()
             for aAtom in atoms:
                 idxA  = aAtom.GetIdx() 
