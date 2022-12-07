@@ -811,8 +811,32 @@ class PeriodicTab(dict):
         return aEl
 
                 
-                 
+class AminoAcidsSmas(dict):
+
+    def __init__(self):
+        
+        self["GLY"] = "C(C(=O)O)N"                         # GLY
+        self["ALA"] = "CC(C(=O)O)N"                        # ALA
+        self["VAL"] = "CC(C)C(C(=O)O)N"                    # VAL 
+        self["ILE"] = "CCC(C)C(C(=O)O)N"                   # ILE
+        self["LYS"] = "C(CCN)CC(C(=O)O)N"                  # LYS  C(CC[NH3+])CC(C(=O)O)N
+        self["ASN"] = "C(C(C(=O)O)N)C(=O)N"                # ASN
+        self["GLN"] = "C(CC(=O)N)C(C(=O)O)N"               # GLN
+        self["GLU"] = "C(CC(=O)O)C(C(=O)O)N"               # GLU
+        self["HIS"] = "c1c([nH+]c[nH]1)CC(C(=O)O)N"        # HIS   c1c([nH+]c[nH]1)CC(C(=O)O)N
+        self["LEU"] = "CC(C)CC(C(=O)O)N"                   # LEU
+        self["PHE"] = "c1ccc(cc1)CC(C(=O)O)N"              # PHE
+        self["MET"] = "CSCCC(C(=O)O)N"                     # MET
+        self["ASP"] = "C(C(C(=O)O)N)C(=O)O"                # ASP
+        self["PRO"] = "C1CC(NC1)C(=O)O"                    # PRO
+        self["ARG"] = "C(CC(C(=O)O)N)CNC(=N)N"             # ARG  C(CC(C(=O)O)N)CNC(=[NH2+])N
+        self["CYS"] = "C(C(C(=O)O)N)S"                     # CYS
+        self["SER"] = "C(C(C(=O)O)N)O"                     # SER
+        self["THR"] = "CC(C(C(=O)O)N)O"                    # THR
+        self["TRP"] = "c1ccc2c(c1)c(c[nH]2)CC(C(=O)O)N"    # TRP
+        self["TYR"] = "c1cc(ccc1CC(C(=O)O)N)O"             # TYR
                 
+ 
                 
                 
  

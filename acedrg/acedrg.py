@@ -1742,7 +1742,7 @@ class Acedrg(CExeCode ):
             aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
             #print "PDB root ", tPdbRoot
             #print aConfPdb
-            print("idxConf=", idxConf)
+            # print("idxConf=", idxConf)
             self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign, self.rdKit.useExistCoords2)
             if os.path.isfile(aConfPdb):
                 inPdbNamesRoot.append(tPdbRoot)

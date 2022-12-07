@@ -306,7 +306,8 @@ int main(int argc, char** argv) {
             || AJob.workMode ==312
             || AJob.workMode ==313
             || AJob.workMode ==314
-            || AJob.workMode ==315)
+            || AJob.workMode ==315
+            || AJob.workMode ==316)
         {
             /*
             std::cout << "Input cif " << AJob.IOEntries["inCifNameB"] << std::endl;
@@ -326,7 +327,7 @@ int main(int argc, char** argv) {
                         std::ios::in);
             std::cout << "Number of crystal in the system is " 
                       << dataFromCif.allCryst.size() << std::endl;
-           
+            
             // TEMP, CSD do not provide several parameters. Rely on CSD
             // search criteria.
             
@@ -350,15 +351,18 @@ int main(int argc, char** argv) {
                 }
                 else
                 {
-                    std::cout << "The structure is from single crystallographic x-ray "
-                              << std::endl;
-                    std::cout << "R factor satisfies the requirement" << std::endl;
+                    //std::cout << "The structure is from single crystallographic x-ray "
+                    //          << std::endl;
+                    //std::cout << "R factor satisfies the requirement" << std::endl;
+                    std::cout << "Pass temporarily" << std::endl;
                 }
                 
                 //std::cout << "workMode " << AJob.workMode << std::endl;
                 //std::cout << "LibmolTabDir " << AJob.IOEntries["libMolTabDir"]
                 //          << std::endl;
-                
+                  
+                dataFromCif.outCrystInfo(AJob.IOEntries["userOutName"]);
+
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
                 
                 if (AJob.IOEntries.find("libMolTabDir")
@@ -409,6 +413,29 @@ int main(int argc, char** argv) {
                         {
                             aMolCreator.executeMet(AJob.IOEntries["UserParaFile"].c_str(),
                                                    AJob.IOEntries["userOutName"].c_str());
+
+                            if(dataFromCif.errMsg.size() !=0)
+                            {
+                                dataFromCif.reOrdErrMsg();
+                                if (aMolCreator.allMsg.size() !=0)
+                                {
+                                    for (std::vector<std::string>::iterator 
+                                        iErr=aMolCreator.allMsg.begin(); 
+                                        iErr!=aMolCreator.allMsg.end(); iErr++)
+                                        {
+                                            dataFromCif.errMsg.push_back(*iErr);
+                                        }
+
+                                }
+                                LIBMOL::writeMsgFile(AJob.IOEntries["userOutName"],
+                                                   dataFromCif.errMsg);
+                                for (std::vector<std::string>::iterator 
+                                     iErr=dataFromCif.errMsg.begin(); 
+                                     iErr!=dataFromCif.errMsg.end(); iErr++)
+                                {
+                                    std::cout <<(*iErr) << std::endl;
+                                }
+                            }
                         }
                         else if (AJob.workMode==313)
                         {

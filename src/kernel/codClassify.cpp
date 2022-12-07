@@ -7532,6 +7532,11 @@ namespace LIBMOL
         else if (tLev==9)
         {
             // both a1NB2 and a2NB2 not found
+            std::cout <<tKeySet1[0] << std::endl;
+            std::cout <<tKeySet1[1] << std::endl;
+            std::cout <<tKeySet2[0] << std::endl;
+            std::cout <<tKeySet2[1] << std::endl;
+            std::cout << allHaAndSpBonds[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]].size() << std::endl;
             if (allHaAndSpBonds[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]].size() >0)
             {
                 // allHaAndSpBonds[ha1][ha2][hybrComb][tInR] contains
@@ -7754,7 +7759,9 @@ namespace LIBMOL
                                             std::vector<BondDict>::iterator  iB)
     {
         int aLev = tStartLev;
+        std::cout << "start level is " << aLev << std::endl;
         std::cout << "tNumTh is " << tNumTh << std::endl;
+        std::cout << iB->numCodValues << std::endl;
         do
         {
             if (iB->numCodValues >=tNumTh)
@@ -7765,6 +7772,7 @@ namespace LIBMOL
             }
             levelSearchBondsT(tKeySet1, tKeySet2, aLev, tNumTh, iB);
             aLev++;
+            std::cout << "the level is now " << aLev << std::endl;
         }while(aLev < 12);
     }
 

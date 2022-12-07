@@ -283,6 +283,7 @@ namespace LIBMOL
         void  outAtomBloc();
         void  outBondBloc();
         void  outAtomElems(Name tUserOutRoot);
+        void  outCrystInfo(Name tUserOutRoot);
     
         
         /* The core member functions are that 
@@ -388,6 +389,13 @@ namespace LIBMOL
         bool                       nonCheck;
         bool                       checkR;
         bool                       checkResol;
+
+        REAL                       allR;
+        REAL                       gtR;
+        REAL                       obsR;
+        REAL                       allWR;
+        REAL                       gtWR;
+        REAL                       resol; 
         REAL                       RTHRESHOLD_U;     // replacement RTHRESHOLD
                                                      // defined in constants.h
         REAL                       RESOLTHRESHOLD_U; // replacement RESOLTHRESHOLD
