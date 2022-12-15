@@ -570,7 +570,6 @@ namespace LIBMOL
                     }
                     else
                     {
-                        if (tAtom.conn)
                         tAtom.ccp4Type = "O";
                     }
                 }
