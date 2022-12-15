@@ -2635,7 +2635,7 @@ class CovLinkGenerator(CExeCode):
             if aCharge != 0: 
                 nTotalVa = nTotalVa - aCharge
             #print("atom ", atmId, "charge ", aCharge, " equiv bond-order ", nTotalVa)
-            if atmElm in self.chemCheck.orgVal:
+            if atmElm in self.chemCheck.orgVal and atmElm !="H":
                 if not nTotalVa in self.chemCheck.orgVal[atmElm]:
                     self.errLevel    = 45
                     if self.errLevel not in self.errMessage:

@@ -254,6 +254,7 @@ class AcedrgRDKit(object):
                 # print "Molecule name:  ", aMolName
                 # self.reSetChirals     =    True
                 aMolT = Chem.MolFromMolFile(tFileName)
+                
                 self.initCoords = []
                 self.getInitCoordsInMolFile(tFileName)
                 self.checkAndSetInitAtomPos(aMolT)
@@ -988,20 +989,25 @@ class AcedrgRDKit(object):
         f = open(tFileName, "r")
         aLs = f.readlines()
         f.close()
-        nA = aLs[3].strip().split()[0]
-        if nA.isdigit():
-            numA = int(nA)
+        headL = aLs[3].strip()
+        if len(headL) > 6:
+            nA = headL[:3].strip()
+            if nA.isdigit():
+                numA = int(nA)
+            else:
+                print("Format errors in file %s :" % tFileName)
+                print("The first column in line %s should be number of atoms" %
+                       aLs[3])
+                sys.exit(1)
+            for aL in aLs[4:4+numA]:
+                strs = aL.strip().split()
+                print("mol Line = ", aL)
+                if strs[3].find("H") == -1:
+                    xyz = [float(strs[0]), float(strs[1]), float(strs[2])]
+                    self.initCoords.append(xyz)
         else:
-            print("Format errors in file %s :" % tFileName)
-            print("The first column in line %s should be number of atoms" %
-                  aLs[3])
+            print("Bug: format errors in the initial mol file by aceDRG ")
             sys.exit(1)
-        for aL in aLs[4:4+numA]:
-            strs = aL.strip().split()
-            if strs[3].find("H") == -1:
-                xyz = [float(strs[0]), float(strs[1]), float(strs[2])]
-                self.initCoords.append(xyz)
-    
     
     def checkAndSetInitAtomPos(self, tMol):
 

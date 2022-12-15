@@ -1,37 +1,37 @@
-/* 
+/*
  * File:   CCP4AtomType.cpp
  * Author: flong
  *
  * Created on September 6, 2012, 11:32 AM
- * 
+ *
  */
 
 #include "CCP4AtomType.h"
 
 namespace LIBMOL
 {
-    /* CPP4 atom energy types are built after atomic connections, whether they are in rings, 
+    /* CPP4 atom energy types are built after atomic connections, whether they are in rings,
      * and whether they are metal elements, have been determined.
      */
-    
+
     CCP4AtomType::CCP4AtomType()
     {
     }
-    
+
     CCP4AtomType::CCP4AtomType(const CCP4AtomType & tC)
-    {     
+    {
     }
-    
-    CCP4AtomType::CCP4AtomType(const std::vector<AtomDict>& tAllAtoms, 
+
+    CCP4AtomType::CCP4AtomType(const std::vector<AtomDict>& tAllAtoms,
                                const std::map<ID, std::vector<RingDict> > & tAllRings)
     {
-        
+
         for (std::vector<AtomDict>::const_iterator iA=tAllAtoms.begin();
                 iA != tAllAtoms.end(); iA++)
         {
             allAtoms.push_back(*iA);
         }
-        
+
         for (std::map<ID, std::vector<RingDict> >::const_iterator iR=tAllRings.begin();
                 iR !=tAllRings.end(); iR++)
         {
@@ -42,8 +42,8 @@ namespace LIBMOL
             }
         }
     }
-    
-    CCP4AtomType::CCP4AtomType(const std::vector<AtomDict>& tAllAtoms, 
+
+    CCP4AtomType::CCP4AtomType(const std::vector<AtomDict>& tAllAtoms,
                                const std::vector<RingDict>& tAllRingsV)
     {
         for (std::vector<AtomDict>::const_iterator iA=tAllAtoms.begin();
@@ -51,31 +51,31 @@ namespace LIBMOL
         {
             allAtoms.push_back(*iA);
         }
-        
-        
+
+
         for (std::vector<RingDict>::const_iterator iR=tAllRingsV.begin();
                  iR !=tAllRingsV.end(); iR++)
         {
             allRingsV.push_back(*iR);
         }
-        
+
     }
-    
+
     CCP4AtomType::~CCP4AtomType()
     {
     }
-    
+
     void CCP4AtomType::setAllAtomsCCP4Type()
     {
         PeriodicTable aPeriTab;
-        
-        // Three rounds (1) basic, (2) ring and chiral modify, 
-        // (3) neighbor atom combination. 
-        
-        
+
+        // Three rounds (1) basic, (2) ring and chiral modify,
+        // (3) neighbor atom combination.
+
+
         // CCP4 types for H atoms are not setup in the first round
         // Other atom will be considered with ring and chiral information
-        
+
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
@@ -84,23 +84,23 @@ namespace LIBMOL
             {
                 iA->ccp4Type=iA->chemType;
             }
-            
+
             // set atom ccp4 types to be individual one
             if (aPeriTab.elements[iA->chemType]["matType"] !=1)
             {
                 setOneAtomCCP4Type(aPeriTab, *iA);
             }
         }
-        
-        
-        
+
+
+
         // Combining all neighboring atoms information
         // But do not do anything on metal atoms at present.
         /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
-            if (aPeriTab.elements[iA->chemType]["matType"] ==2 
+            if (aPeriTab.elements[iA->chemType]["matType"] ==2
                     || aPeriTab.elements[iA->chemType]["matType"]==8)
             {
                 setOneAtomCCP4Type(aPeriTab, *iA);
@@ -111,18 +111,18 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA !=allAtoms.end(); iA++)
         {
-            if (aPeriTab.elements[iA->chemType]["matType"] ==1) 
+            if (aPeriTab.elements[iA->chemType]["matType"] ==1)
             {
                 setOneAtomCCP4Type(aPeriTab, *iA);
             }
         }
     }
-    
-    void CCP4AtomType::setOneAtomCCP4Type(PeriodicTable & tP, 
+
+    void CCP4AtomType::setOneAtomCCP4Type(PeriodicTable & tP,
                                           AtomDict& tAtom)
     {
         int nType = tP.elements[tAtom.chemType]["matType"];
-        
+
         switch(nType)
         {
             case 1:
@@ -157,24 +157,24 @@ namespace LIBMOL
                 break;
             default:
                 std::cout << "Error: Which material type is this element,  "
-                        << "Atom ID: " << tAtom.id 
+                        << "Atom ID: " << tAtom.id
                         << " its material type (should be smaller than 10) : "
                         << nType << std::endl;
-                exit(1);        
+                exit(1);
         }
-        
+
         StrUpper(tAtom.ccp4Type);
     }
-    
+
     void CCP4AtomType::setHydroAtomCCP4Type(AtomDict& tAtom)
     {
         // Hydrogen atom types are decided in the last step.
-        // Only covalence bonds to H are considered for CCP4 type 
+        // Only covalence bonds to H are considered for CCP4 type
         //in this stage. Hydrogen bonds will be added in sometime later
-        
+
         tAtom.ccp4Type = "H";
-        
-        if ((int)tAtom.connAtoms.size() == 1)   
+
+        if ((int)tAtom.connAtoms.size() == 1)
         {
             int i = tAtom.connAtoms[0];
             //std::cout << "NB atom id " << allAtoms[i].id << std::endl;
@@ -185,28 +185,28 @@ namespace LIBMOL
             }
         }
         /*
-        if ((int)tAtom.connAtoms.size() == 1 && (int)tAtom.ccp4Type.size()==0)   
+        if ((int)tAtom.connAtoms.size() == 1 && (int)tAtom.ccp4Type.size()==0)
         {
             int i = tAtom.connAtoms[0];
-            
+
             if (allAtoms[i].chemType.compare("C")==0)
             {
-                ID cNum=allAtoms[i].id.substr(1); // e.g. 11 for C11, 25 for C25 
+                ID cNum=allAtoms[i].id.substr(1); // e.g. 11 for C11, 25 for C25
                 if (allAtoms[i].connHAtoms.size()==1)
                 {
-                    tAtom.ccp4Type = tAtom.chemType +  cNum; 
+                    tAtom.ccp4Type = tAtom.chemType +  cNum;
                 }
                 else
                 {
                     // C allows max 6 NB Hs
                     std::vector<ID> letts;
-                    letts.push_back("A"); 
+                    letts.push_back("A");
                     letts.push_back("B");
                     letts.push_back("C");
                     letts.push_back("D");
                     letts.push_back("E");
                     letts.push_back("F");
-                    
+
                     for (int nNB=0; nNB <(int)allAtoms[i].connHAtoms.size();
                             nNB++)
                     {
@@ -215,14 +215,14 @@ namespace LIBMOL
                     }
                 }
             }
-            tAtom.ccp4Type = tAtom.chemType + allAtoms[i].ccp4Type; 
+            tAtom.ccp4Type = tAtom.chemType + allAtoms[i].ccp4Type;
         }
         else
         {
             int i = tAtom.connAtoms[0];
             if (allAtoms[i].connHAtoms.size()==1)
             {
-                tAtom.ccp4Type = tAtom.chemType + allAtoms[i].id; 
+                tAtom.ccp4Type = tAtom.chemType + allAtoms[i].id;
             }
             else
             {
@@ -235,19 +235,19 @@ namespace LIBMOL
             }
         }
         */
-        
-        
+
+
     }
-    
+
     void CCP4AtomType::setOrgAtomCCP4Type(AtomDict& tAtom)
     {
         // Residues of charged group
         std::map<ID, REAL> chargedGrp;
         chargedGrp["ARG"] = 0.0;   // value of charge
-        
+
         int R5 = 0;
         int R6 = 0;
-            
+
         for (std::map<ID, int>::iterator iR=tAtom.ringRep.begin();
                     iR!=tAtom.ringRep.end(); iR++)
         {
@@ -265,7 +265,7 @@ namespace LIBMOL
                   << "it is ring 5 " << R5 << std::endl
                   << " it is ring 6 " << R6 << std::endl
                   << "its bond-idx " << tAtom.bondingIdx << std::endl
-                  << "its connect to " << (int)tAtom.connHAtoms.size() 
+                  << "its connect to " << (int)tAtom.connHAtoms.size()
                   << " H atoms " << std::endl;
         */
         // C atom
@@ -343,7 +343,7 @@ namespace LIBMOL
                 else if ((int)tAtom.connHAtoms.size() == 3)
                 {
                     tAtom.ccp4Type = "CH3";
-                } 
+                }
             }
             else if (tAtom.bondingIdx==1)
             {
@@ -353,13 +353,13 @@ namespace LIBMOL
         else if (tAtom.chemType.compare("N")==0)
         {
             // PI bonding
-            
+
             // SP2 bonding
             if (tAtom.bondingIdx==2)
             {
                 std::map<ID, REAL>::iterator iFC;
                 iFC = chargedGrp.find(tAtom.resName);
-                
+
                 if (tAtom.connAtoms.size() == 3 )
                 {
                     if (R5)
@@ -376,7 +376,7 @@ namespace LIBMOL
                     else if (R6)
                     {
                         if (tAtom.connHAtoms.size() == 1)
-                        {  
+                        {
                             tAtom.ccp4Type = "NR16";
                         }
                         else
@@ -411,7 +411,7 @@ namespace LIBMOL
                         else
                         {
                             tAtom.ccp4Type = "N";
-                        }   
+                        }
                     }
                 }
                 else if (tAtom.connAtoms.size() == 2)
@@ -421,7 +421,7 @@ namespace LIBMOL
                         tAtom.ccp4Type = "NRD5";
                     }
                     else if (R6)
-                    {   
+                    {
                         tAtom.ccp4Type = "NRD6";
                     }
                     else
@@ -442,7 +442,7 @@ namespace LIBMOL
                 //    }
                 //    else if (tAtom.connAtoms.size() == 2 && R5)
                 //    {
-                //        
+                //
                 //    }
                 //    else
                 //    {
@@ -472,8 +472,8 @@ namespace LIBMOL
             {
                 tAtom.ccp4Type = "NSP";
             }
-            
-        }  
+
+        }
         else if (tAtom.chemType.compare("P")==0)
         {
             if((int)tAtom.connAtoms.size() ==4)
@@ -504,7 +504,7 @@ namespace LIBMOL
                     lB=true;
                 }
             }
-            
+
             // SP2 bonding
             if (tAtom.bondingIdx==2)
             {
@@ -512,7 +512,7 @@ namespace LIBMOL
                 //std::cout << "O atom " << " charge " << tAtom.parCharge << std::endl
                 //          << "connections " << tAtom.connAtoms.size() << std::endl;
                 if (tAtom.parCharge)
-                { 
+                {
                     if(lP)
                     {
                         tAtom.ccp4Type = "OP";
@@ -539,14 +539,14 @@ namespace LIBMOL
                     }
                     else if ((int)tAtom.connHAtoms.size()==2)
                     {
-                        // O in for example water molecules 
+                        // O in for example water molecules
                         tAtom.ccp4Type = "OH2";
                     }
                     else
                     {
                         tAtom.ccp4Type = "O";
                     }
-                }  
+                }
                 else
                 {
                     if (tAtom.formalCharge)
@@ -570,6 +570,7 @@ namespace LIBMOL
                     }
                     else
                     {
+                        if (tAtom.conn)
                         tAtom.ccp4Type = "O";
                     }
                 }
@@ -585,7 +586,7 @@ namespace LIBMOL
                         lC=true;
                     }
                 }
-                if (lC && (int)tAtom.connHAtoms.size()==1 
+                if (lC && (int)tAtom.connHAtoms.size()==1
                        && (int)tAtom.connAtoms.size()==2)
                 {
                     // O in alcohol groups
@@ -612,7 +613,7 @@ namespace LIBMOL
                     {
                         tAtom.ccp4Type = "O2";
                     }
-                }  
+                }
             }
             else if ((int)tAtom.connAtoms.size() ==1)
             {
@@ -633,9 +634,9 @@ namespace LIBMOL
                     {
                         lB=true;
                     }
-                    
+
                 }
-                        
+
                 if(lP)
                 {
                     tAtom.ccp4Type = "OP";
@@ -677,7 +678,7 @@ namespace LIBMOL
                         tAtom.ccp4Type = "O";
                     }
             }
-            
+
             else
             {
                 tAtom.ccp4Type = "O";
@@ -706,7 +707,7 @@ namespace LIBMOL
                 {
                     tAtom.ccp4Type = "SH1";
                 }
-                
+
                 // should not have the case that 2 connections, both of them H atoms
             }
             else if ((int)tAtom.connAtoms.size() ==1)
@@ -730,90 +731,90 @@ namespace LIBMOL
         }
         else
         {
-            // elements have no special treatment at the moment 
-            tAtom.ccp4Type = tAtom.chemType;   
+            // elements have no special treatment at the moment
+            tAtom.ccp4Type = tAtom.chemType;
             StrUpper(tAtom.ccp4Type);
         }
-        
-        
-        std::cout << "Atom Name " << tAtom.id << " bonding index " 
+
+
+        std::cout << "Atom Name " << tAtom.id << " bonding index "
                       << tAtom.bondingIdx << std::endl;
         std::cout << "Its element type " << tAtom.chemType << std::endl;
-        
+
         if (!tAtom.codClass.empty())
         {
-            std::cout << " Cod type" << tAtom.codClass << std::endl; 
+            std::cout << " Cod type" << tAtom.codClass << std::endl;
         }
         else
         {
             std::cout << std::endl;
         }
         std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
-        
+
     }
-    
+
     void CCP4AtomType::SetAlkaliMetalsAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of metal elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetAlkalineEarthMetalsAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of metal elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetTransitionMetalsAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of metal elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetOtherMetalAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of metal elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetSemimetallicsAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of metal elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetHalogensAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of metal elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetRareEarthAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of Rare-Earth elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     void CCP4AtomType::SetInertGasesAtomCCP4Type(AtomDict& tAtom)
     {
         // Currently atoms of Inert-Gases elements just take their chemType as CCP4 type
         // Should do more later on
         tAtom.ccp4Type = tAtom.chemType;
     }
-    
+
     CCP4DictParas::CCP4DictParas()
     {
         std::string clibMonDir(std::getenv("CLIBD_MON"));
         std::string fName(clibMonDir);
         fName.append("ener_lib.cif");
-        
+
         std::ifstream fParams(fName.c_str());
         if (fParams.is_open())
         {
@@ -824,7 +825,7 @@ namespace LIBMOL
             while (!fParams.eof())
             {
                 std::getline(fParams, tRecord);
-                
+
                 if (tRecord.find("loop_") !=std::string::npos)
                 {
                     if (tBLs.size() !=0)
@@ -846,9 +847,9 @@ namespace LIBMOL
             {
                 tBs.push_back(tBLs);
             }
-            
+
             fParams.close();
-            
+
             if (tBs.size() !=0)
             {
                 for (std::vector<std::vector<std::string> >::iterator iBLs=tBs.begin();
@@ -858,9 +859,9 @@ namespace LIBMOL
                             iL!=iBLs->end(); iL++)
                     {
                         // std::cout << *iL << std::endl;
-                   
+
                         if (iL->find("_lib_atom.") != std::string::npos)
-                        {   
+                        {
                             getAtomPropsTable(iBLs);
                             break;
                         }
@@ -871,13 +872,13 @@ namespace LIBMOL
                         }
                         else if (iL->find("_lib_angle.") != std::string::npos)
                         {
-                            
+
                             getAnglePropsTable(iBLs);
                             break;
                         }
                     }
                 }
-                
+
             }
         }
         else
@@ -886,11 +887,11 @@ namespace LIBMOL
             exit(1);
         }
     }
-    
+
     CCP4DictParas::~CCP4DictParas()
     {
     }
-    
+
     void CCP4DictParas::getAtomPropsTable(std::vector<std::vector<std::string> >::iterator tLines)
     {
         // value -1 means parameter value not available
@@ -902,7 +903,7 @@ namespace LIBMOL
         {
             std::vector<std::string>            tBuf;
             StrTokenize(TrimSpaces(*iLi), tBuf);
-            // std::cout << *iLi << std::endl; 
+            // std::cout << *iLi << std::endl;
             if (tBuf.size()==1 && tBuf[0] !="#")
             {
                 std::vector<std::string>      tBuf2;
@@ -913,7 +914,7 @@ namespace LIBMOL
                     iLine++;
                 }
             }
-            else if (tBuf.size() >= 2 && tBuf.size() == propIdxs.size() 
+            else if (tBuf.size() >= 2 && tBuf.size() == propIdxs.size()
                      && tBuf[0] != ".")
             {
                 for (std::map<std::string, int>::iterator iP=propIdxs.begin();
@@ -921,7 +922,7 @@ namespace LIBMOL
                 {
                     if (iP->first !="type"&& iP->first !="element")
                     {
-                        if (tBuf[iP->second] =="." || tBuf[iP->second] =="N")     
+                        if (tBuf[iP->second] =="." || tBuf[iP->second] =="N")
                         {
                             atomPropsTable[tBuf[0]][iP->first] = a;
                         }
@@ -951,7 +952,7 @@ namespace LIBMOL
                         atomTypeElementTable[tBuf[0]] = tBuf[iP->second];
                     }
                 }
-            }  
+            }
         }
         /*
         std::cout << "The following properties are associated with CCP4 atom types " << std::endl;
@@ -967,15 +968,15 @@ namespace LIBMOL
             }
             std::cout << std::endl;
         }
-        */        
-        
+        */
+
     }
-    
+
     void CCP4DictParas::getBondPropsTable(std::vector<std::vector<std::string> >::iterator tLines)
     {
         // value -1 means parameter value not available
         REAL a =-1.0;
-        
+
         std::map<std::string, int> propIdxs;
         int iLine =0;
         for (std::vector<std::string>::iterator iLi=tLines->begin();
@@ -993,7 +994,7 @@ namespace LIBMOL
                     iLine++;
                 }
             }
-            else if (tBuf.size() >= 2 && tBuf.size() == propIdxs.size() 
+            else if (tBuf.size() >= 2 && tBuf.size() == propIdxs.size()
                      && tBuf[0] != ".")
             {
                 if (tBuf[propIdxs["type"]]=="single")
@@ -1026,8 +1027,8 @@ namespace LIBMOL
                 }
                 bondPropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
                        ["type"] = a;
-                
-                
+
+
                 a = -1.0;
                 if (tBuf[propIdxs["const"]] != ".")
                 {
@@ -1039,7 +1040,7 @@ namespace LIBMOL
                     bondPropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
                                   ["const"] = a;
                 }
-                
+
                 if (tBuf[propIdxs["length"]] != ".")
                 {
                     bondPropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
@@ -1050,7 +1051,7 @@ namespace LIBMOL
                     bondPropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
                                   ["length"] = a;
                 }
-                
+
                 if (tBuf[propIdxs["value_esd"]] != ".")
                 {
                     bondPropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
@@ -1061,19 +1062,19 @@ namespace LIBMOL
                     bondPropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
                                   ["value_esd"] = a;
                 }
-                
+
             }
         }
-        
-        
-        
+
+
+
     }
-    
+
     void CCP4DictParas::getAnglePropsTable(std::vector<std::vector<std::string> >::iterator tLines)
     {
         // value -1 means parameter value not available
         REAL a =-1.0;
-        
+
         std::map<std::string, int> propIdxs;
         int iLine =0;
         for (std::vector<std::string>::iterator iLi=tLines->begin();
@@ -1091,7 +1092,7 @@ namespace LIBMOL
                     iLine++;
                 }
             }
-            else if (tBuf.size() >= 2 && tBuf.size() == propIdxs.size() 
+            else if (tBuf.size() >= 2 && tBuf.size() == propIdxs.size()
                      && tBuf[0] != ".")
             {
                 if (tBuf[propIdxs["const"]] != ".")
@@ -1104,7 +1105,7 @@ namespace LIBMOL
                     anglePropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
                      [tBuf[propIdxs["atom_type_3"]]]["const"] = a;
                 }
-                
+
                 if (tBuf[propIdxs["const"]] != ".")
                 {
                     anglePropsTable[tBuf[propIdxs["atom_type_1"]]][tBuf[propIdxs["atom_type_2"]]]
@@ -1118,24 +1119,24 @@ namespace LIBMOL
             }
         }
     }
-    
-    
-        
+
+
+
     AtomTypeTool::AtomTypeTool()
     {
     }
-    
+
     AtomTypeTool::AtomTypeTool(FileName tFname, FileType tFType)
     {
         if (tFType==CIF)
         {
-            
+
         }
-        
+
     }
-    
-    AtomTypeTool::AtomTypeTool(std::vector<AtomDict>& tAtoms, 
-                               std::vector<BondDict>& tBonds, 
+
+    AtomTypeTool::AtomTypeTool(std::vector<AtomDict>& tAtoms,
+                               std::vector<BondDict>& tBonds,
                                std::map<ID,std::vector<RingDict> > & tRings)
     {
         for (std::vector<AtomDict>::const_iterator iAt=tAtoms.begin();
@@ -1143,13 +1144,13 @@ namespace LIBMOL
         {
             allAtoms.push_back(*iAt);
         }
-        
+
         for (std::vector<BondDict>::const_iterator iBo=tBonds.begin();
                 iBo !=tBonds.end(); iBo++)
         {
             allBonds.push_back(*iBo);
         }
-        
+
         for (std::map<ID, std::vector<RingDict> > ::const_iterator iRS=tRings.begin();
                 iRS !=tRings.end(); iRS++)
         {
@@ -1159,12 +1160,12 @@ namespace LIBMOL
                 allRings[iRS->first].push_back(*iR);
             }
         }
-        
+
     }
-    
+
     AtomTypeTool::~AtomTypeTool()
     {
     }
-    
-    
+
+
 }
