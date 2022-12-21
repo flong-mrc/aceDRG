@@ -14682,6 +14682,7 @@ namespace LIBMOL
                         iT !=allTorsions.end(); iT++)
         {
             //std::cout << "look at torsion " << iT->seriNum << std::endl;
+            
 
             if(checkATorsAtomsInPla(iT->atoms))
             {
@@ -14719,8 +14720,18 @@ namespace LIBMOL
                 }
                 else if (iT->period == 2)
                 {
-                    iT->id = "sp2_sp2_"+IntToStr(idxSp2Sp2);
-                    idxSp2Sp2+=1;
+                    if ((allAtoms[iT->atoms[1]].chemType!="O"  && allAtoms[iT->atoms[2]].chemType !="O" )
+                       && (allAtoms[iT->atoms[1]].chemType!="S"  && allAtoms[iT->atoms[2]].chemType !="S"))
+                    {
+                        iT->id = "sp2_sp2_"+IntToStr(idxSp2Sp2);
+                        idxSp2Sp2+=1;
+                    }
+                    else
+                    {
+                        iT->id = "other_tor_"+IntToStr(idxSp2Sp2);
+                        idxTors++;
+                    }
+                    std::cout << "Torsion label " << iT->id << std::endl;
 
                 }
                 else
