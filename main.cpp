@@ -369,8 +369,6 @@ int main(int argc, char** argv) {
                       != AJob.IOEntries.end())
                 {
                     aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
-                    
-                    //aMolCreator.getMetalBondRange();
                 }
                
                 
@@ -389,8 +387,6 @@ int main(int argc, char** argv) {
                     
                     if (dataFromCif.hasMetal)
                     {
-                        
-                        
                         std::cout << "The system contain metal atoms " << std::endl;
                         std::cout << "Those metal atoms are : " << std::endl;
                         for (std::vector<LIBMOL::AtomDict>::iterator 

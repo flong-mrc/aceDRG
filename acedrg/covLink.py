@@ -162,7 +162,7 @@ class CovLink(object):
         self.bondMap                          = {}
         
         self.delSections                      = []
-
+        self.delSectionsBonds                 = []
         self.errLevel                         = 0
         self.errMessage                       = []
 
@@ -1004,8 +1004,9 @@ class CovLinkGenerator(CExeCode):
                                 aBond["atom_id_1"] = aList[i+1]
                                 aBond["atom_id_2"] = aList[i+2]
                                 aNum  = int(aList[i+3])
-                                aBond["comp_serial_num_1"] = aNum 
-                                aBond["comp_serial_num_2"] = aNum 
+                                aBond["comp_serial_num"] = aNum 
+                                aBond["type"] = "SING"
+                                aLink.delSectionsBonds.append(aBond)
                                 if aNum == 1:
                                     aLink.modLigand1["deleted"]["bonds"].append(aBond)
                                 elif aNum == 2:
@@ -1647,7 +1648,8 @@ class CovLinkGenerator(CExeCode):
     def checkAssocHAtoms(self, tRes, tMod, tAt):
         
         tDelAtomIds = []
-        allHIds = []
+        allHIds     = []
+        iH          = 0
         for idxA in range(len(tRes["remainAtoms"])): 
             if tRes["remainAtoms"][idxA]["type_symbol"] == "H":        
                 allHIds.append(tRes["remainAtoms"][idxA]["atom_id"])
@@ -1659,18 +1661,46 @@ class CovLinkGenerator(CExeCode):
             aCharge = int(tAt["charge"])
         if aCharge != 0: 
             nTotalVa = nTotalVa - aCharge
-        #print("atom ",tAt["atom_id"] , "charge ", aCharge, " equiv bond-order ", nTotalVa)
+        print("atom ",tAt["atom_id"] , "charge ", aCharge, " equiv bond-order ", nTotalVa)
+        if tAt["type_symbol"] in self.chemCheck.orgVal:
+            if not nTotalVa in self.chemCheck.orgVal[tAt["type_symbol"]]:
+                nVDiff = nTotalVa - self.chemCheck.orgVal[tAt["type_symbol"]][0]
+                nAbs   = abs(nVDiff)
+                if nVDiff < 0: 
+                    while iH < nAbs:
+                        self.addOneHInRes(tAt, bondAtomSet, allHIds, tRes, tMod) 
+                        iH+=1
+        
+        return iH            
+                    
+    def checkAssocHAtoms2(self, tRes, tMod, tAt, tDelBAtmIds):
+        
+        allHIds     = []
+        iH          = 0
+        for idxA in range(len(tRes["comp"]["atoms"])): 
+            if tRes["comp"]["atoms"][idxA]["type_symbol"] == "H":        
+                allHIds.append(tRes["comp"]["atoms"][idxA]["atom_id"])
+                
+        [bondAtomSet, aLABonds] =  self.getBondSetForOneAtomById2(tAt["atom_id"], 
+                                   tRes["comp"]["atoms"], tRes["comp"]["bonds"], tDelBAtmIds)
+        nTotalVa=self.getTotalBondOrderInOneMmcifAtom(tAt["atom_id"], aLABonds)  
+        aCharge = 0
+        if "charge" in tAt:
+            aCharge = int(tAt["charge"])
+        if aCharge != 0: 
+            nTotalVa = nTotalVa - aCharge
+        print("atom ",tAt["atom_id"] , "charge ", aCharge, " equiv bond-order ", nTotalVa)
         if tAt["type_symbol"] in self.chemCheck.orgVal:
             if not nTotalVa in self.chemCheck.orgVal[tAt["type_symbol"]]:
                 nVDiff = nTotalVa - self.chemCheck.orgVal[tAt["type_symbol"]][0]
                 nAbs   = abs(nVDiff)
                 if nVDiff < 0:
-                    iH = 0
+                    
                     while iH < nAbs:
-                        self.addOneHInRes(tAt, bondAtomSet, allHIds, tRes, tMod) 
+                        self.addOneHInRes2(tAt, bondAtomSet, allHIds, tRes, tMod) 
                         iH+=1
-                    
-                    
+        return iH        
+    
     def setChargeInLinkAtom(self, tRes, tMod, tLinkBonds):
 
         for idxA in range(len(tRes["remainAtoms"])):
@@ -1860,7 +1890,12 @@ class CovLinkGenerator(CExeCode):
                         break
 
     def setDeletedInOneResForModification(self, tRes, tMod, tLinkBonds):
-
+        
+        # Delecte bonds as instructed directly by the input file
+        
+        self.setDeletedBondInOneResForModification(tRes, tMod)
+        
+        # Delecte atoms 
         print("For residue ", tRes["name"])
         delAtomIdSet =[]
         for aAtom in tMod["deleted"]["atoms"]:
@@ -1908,10 +1943,12 @@ class CovLinkGenerator(CExeCode):
             print("Atom ", aAtom["atom_id"])
    
         # Delete all bonds that contains the deleted atom, change the bond-order for those changed bonds
+        
         tmpRemBs = []
         for aB in tRes["remainBonds"]:
             tmpRemBs.append(aB)
         tRes["remainBonds"] = []
+        
         i = 0
         chBondIdMap = {}
         print(" changed bonds  ", len(tMod["changed"]["bonds"]))
@@ -1921,7 +1958,8 @@ class CovLinkGenerator(CExeCode):
             aStr = aList[0] + "_" + aList[1]
             chBondIdMap[aStr] = i  
             i = i+1
-        for aBond in tRes["comp"]["bonds"]:
+        #for aBond in tRes["comp"]["bonds"]:
+        for aBond in tmpRemBs:
             if (aBond["atom_id_1"].upper() in delAtomIdSet) or (aBond["atom_id_2"].upper() in delAtomIdSet):
                 tMod["deleted"]["bonds"].append(aBond)
             else:
@@ -1932,10 +1970,8 @@ class CovLinkGenerator(CExeCode):
                     tRes["remainBonds"].append(tMod["changed"]["bonds"][chBondIdMap[bStr]])
                 else:
                     tRes["remainBonds"].append(aBond)
-
-        for aB in tmpRemBs:
-            tRes["remainBonds"].append(aB)
-
+                    
+       
         print("Number of remained bonds : ", len(tRes["remainBonds"]))
         print("They are : ")
         for aBond in tRes["remainBonds"]:
@@ -1947,6 +1983,9 @@ class CovLinkGenerator(CExeCode):
             for aBond in tMod["deleted"]["bonds"]: 
                 print("Bond between atom %s and %s "%(aBond["atom_id_1"], aBond["atom_id_2"]))      
                 print("Bond-order is %s "%aBond["type"])  
+
+
+        
  
         # Delete all angles that contain the deleted atom
         for aAng in tRes["comp"]["angles"]:
@@ -2043,7 +2082,82 @@ class CovLinkGenerator(CExeCode):
                     tMod["deleted"]["planes"].append(tRes["comp"]["planes"][aPl])
                 else:
                     tRes["remainPls"].append(aPlGrp)
-
+                    
+                    
+    def setDeletedBondInOneResForModification(self, tRes, tMod):
+        
+        tmpRemBs = []
+        for aB in tRes["comp"]["bonds"]:
+            tmpRemBs.append(aB)
+        
+        if len(tMod["added"]["bonds"]) > 0:
+            for aB in tMod["added"]["bonds"]:
+                tmpRemBs.append(aB)
+            
+        #print("Number of tmpB is ", len(tmpRemBs))
+        
+        tRes["remainBonds"] = []
+        
+        dBIDs = []
+        for aDB in tMod["deleted"]["bonds"]:
+            
+            atm1DB = aDB["atom_id_1"]
+            atm2DB = aDB["atom_id_2"]
+            print("deleted bond between atom  %s and %s "%(atm1DB, atm2DB))
+            aList = [atm1DB, atm2DB]
+            aList.sort()
+            aStr = aList[0] + "_" + aList[1]
+            dBIDs.append(aStr)
+        
+        if len(dBIDs) > 0:
+            print ("deleted bond IDs :")
+            print (dBIDs)
+        
+        for aB in tmpRemBs:
+            atm1 = aB["atom_id_1"]
+            atm2 = aB["atom_id_2"]
+            bList = [atm1, atm2]
+            bList.sort()
+            bStr = bList[0] + "_" + bList[1]
+            
+            if not bStr in dBIDs:
+                print("Bond id ", bStr)
+                print("Bond included")
+                tRes["remainBonds"].append(aB)
+        
+        print("The following bonds are kept:")  
+        
+        for aB in tRes["remainBonds"]:
+            print("Bond between %s and %s "%(aB["atom_id_1"], aB["atom_id_2"]))
+        
+        # check and add H atom to those atoms involved in deleted bonds
+        for aDB in tMod["deleted"]["bonds"]:    
+            atm1DB = aDB["atom_id_1"]
+            atm2DB = aDB["atom_id_2"] 
+            self.addjustAtomInDeletedBondInOneResForModification(tRes, tMod, atm1DB, dBIDs)
+            self.addjustAtomInDeletedBondInOneResForModification(tRes, tMod, atm2DB, dBIDs)
+    
+    def addjustAtomInDeletedBondInOneResForModification(self, tRes, tMod, tAtmId, tDelBAtmIds):
+        
+        
+        changeAtms = []
+        if len(tMod["changed"]["atoms"]) > 0:
+            for aA in tMod["changed"]["atoms"]:
+                changeAtms.append(aA["atom_id"].strip().upper())
+        print("Check atom ", tAtmId)
+        for aAt in tRes["comp"]["atoms"]:
+            if aAt["atom_id"].strip().upper() ==tAtmId:
+                
+                if aAt["atom_id"] != tRes["atomName"]:
+                    
+                    addedHs=self.checkAssocHAtoms2(tRes, tMod, aAt, tDelBAtmIds)
+                    
+                    if addedHs >0 and not tAtmId in changeAtms :
+                        print("number of added H is ", addedHs)
+                        tMod["changed"]["atoms"].append(aAt)
+                        print("the State of Atom %s is changed because of bond deletion"%tAtmId)
+    
+    
     def copyChi(self, tChi):
 
         aChi = {}
@@ -2073,6 +2187,7 @@ class CovLinkGenerator(CExeCode):
                     print("Charges in atom %s is set to 0 "%aLAtmId)  
            
     def adjustAtomsAroundOneAtom(self, tCenAtomId, tRes, tMod, tLinkBonds, tDelAtomIds, tMode):
+        
         #aLAtmId = tRes["atomName"]
         aLAtmId  = tCenAtomId
         aLAtmSerial = self.getOneAtomSerialById(aLAtmId, tRes["comp"]["atoms"])
@@ -2088,25 +2203,43 @@ class CovLinkGenerator(CExeCode):
             # Atoms and bonds around the linked atom
             [aLAAtoms,aTmpLABonds] =  self.getBondSetForOneLinkedAtom(aLAtmId, tRes["comp"]["atoms"], tRes["comp"]["bonds"], tDelAtomIds)
             print("connected atoms", len(aTmpLABonds))
-            aLABonds = []    
-            if len(tMod["changed"]["bonds"]) > 0:
-                # Consider the effect of bond-order changes for some bonds
-                aChBonds = {}
-                for aB in tMod["changed"]["bonds"]:
-                    tBIdList1 = [aB["atom_id_1"], aB["atom_id_2"]]
-                    tBIdList1.sort()
-                    aStr = tBIdList1[0] + "_" + tBIdList1[1]
-                    aChBonds[aStr] = []
-                    aChBonds[aStr].append(aB)
-                for aB in aTmpLABonds:
-                    tBIdList2 = [aB["atom_id_1"], aB["atom_id_2"]]
-                    tBIdList2.sort()
-                    bStr = tBIdList2[0] + "_" + tBIdList2[1]
-                    print(bStr)
-                    if bStr in list(aChBonds.keys()):
-                        aLABonds.append(aChBonds[bStr][0])
-                    else:
-                        aLABonds.append(aB) 
+            aLABonds = []   
+            print("XXXXX ", len(tMod["deleted"]["bonds"]) )
+            if len(tMod["changed"]["bonds"]) > 0 or len(tMod["deleted"]["bonds"]) > 0:
+                if len(tMod["changed"]["bonds"]) > 0:
+                    # Consider the effect of bond-order changes for some bonds
+                    aChBonds = {}
+                    for aB in tMod["changed"]["bonds"]:
+                        tBIdList1 = [aB["atom_id_1"], aB["atom_id_2"]]
+                        tBIdList1.sort()
+                        aStr = tBIdList1[0] + "_" + tBIdList1[1]
+                        aChBonds[aStr] = []
+                        aChBonds[aStr].append(aB)
+                    for aB in aTmpLABonds:
+                        tBIdList2 = [aB["atom_id_1"], aB["atom_id_2"]]
+                        tBIdList2.sort()
+                        bStr = tBIdList2[0] + "_" + tBIdList2[1]
+                        print(bStr)
+                        if bStr in list(aChBonds.keys()):
+                            aLABonds.append(aChBonds[bStr][0])
+                        else:
+                            aLABonds.append(aB) 
+                if len(tMod["deleted"]["bonds"]) > 0:
+                    # Consider the effect of bond-order changes for some bonds
+                    aDelBondIds = []
+                    for aB in tMod["deleted"]["bonds"]:
+                        tBIdList1 = [aB["atom_id_1"], aB["atom_id_2"]]
+                        tBIdList1.sort()
+                        aStr = tBIdList1[0] + "_" + tBIdList1[1]
+                        aDelBondIds.append(aStr)
+                    for aB in aTmpLABonds:
+                        tBIdList2 = [aB["atom_id_1"], aB["atom_id_2"]]
+                        tBIdList2.sort()
+                        bStr = tBIdList2[0] + "_" + tBIdList2[1]
+                        print(bStr)
+                        if not bStr in aDelBondIds:
+                            aLABonds.append(aB)
+                    
             else:
                 for aB in aTmpLABonds:
                     aLABonds.append(aB)
@@ -2279,6 +2412,33 @@ class CovLinkGenerator(CExeCode):
         #print("Number of bonds found ", len(aBondSet))
         return [aAtomSet, aBondSet]      
         
+    def getBondSetForOneAtomById2(self, tAtomId, tAtoms, tBonds, tDelBAtmIds):
+
+        aAtomSet = []
+        aBondSet = []
+        #print("atom ", tAtomId)
+        #print("Number of bonds ", len(tBonds))
+        for aBond in tBonds:
+            aId1 = aBond["atom_id_1"].strip()
+            aId2 = aBond["atom_id_2"].strip()
+            aList = [aId1, aId2]
+            aList.sort()
+            aStr = aList[0] + "_" + aList[1] 
+            if aId1 == tAtomId and not aStr in tDelBAtmIds:
+                aIdx = self.getOneAtomSerialById(aId2, tAtoms)
+                aAtomSet.append(tAtoms[aIdx])
+                aBondSet.append(aBond)
+                #print("bond between atom ", aId1, " and atom  ", aId2)
+                #print("a bond found ")
+            if aId2 == tAtomId and not aStr in tDelBAtmIds:
+                aIdx = self.getOneAtomSerialById(aId1, tAtoms)
+                aAtomSet.append(tAtoms[aIdx])
+                aBondSet.append(aBond)
+                #print("bond between atom ", aId1, " and atom  ", aId2)
+                #print("a bond found ")
+        #print("Number of bonds found ", len(aBondSet))
+        return [aAtomSet, aBondSet]  
+    
     def getTotalBondOrderInOneMmcifAtom(self, tAtomId, tBonds):
         # tBonds is prefilted in getBondSetForOneMmcifAtom() and other
         totalOr = 0
@@ -2314,6 +2474,30 @@ class CovLinkGenerator(CExeCode):
         tRes["remainBonds"].append(aBond)
         tMod["added"]["bonds"].append(aBond)
         print("a bond between  %s and %s is added into bonds in %s"%(aBond["atom_id_1"], aBond["atom_id_2"], aBond["comp_id"]))                 
+
+
+    def addOneHInRes2(self, tHConnAtom, tOtheAtmSet, tAllAtmIds, tRes, tMod):
+
+        aAtom = {}
+        aAtom["comp_id"]     = tRes["name"]
+        aAtom["atom_id"]     = self.chemCheck.setHName2(tHConnAtom, tOtheAtmSet, tAllAtmIds)         
+        aAtom["type_symbol"] = "H"
+        aAtom["type_energy"] = "H"
+        aAtom["charge"]      = "0"
+        tRes["remainAtoms"].append(aAtom)
+        tMod["added"]["atoms"].append(aAtom)
+        print("an H atom %s is added into %s"%(aAtom["atom_id"], aAtom["comp_id"]))                 
+        aBond = {}
+        aBond["comp_id"]         = tRes["name"]
+        aBond["atom_id_1"]       = tHConnAtom["atom_id"]
+        aBond["atom_id_2"]       = aAtom["atom_id"]
+        aBond["type"]            = "single"
+        aBond["value_dist"]      = "0.860"
+        aBond["value_dist_esd"]  = "0.02"
+        tRes["remainBonds"].append(aBond)
+        tMod["added"]["bonds"].append(aBond)
+        print("a bond between  %s and %s is added into bonds in %s"%(aBond["atom_id_1"], aBond["atom_id_2"], aBond["comp_id"]))                 
+    
     
     def modOneChir(self, tLinkBonds, tCenAtmID, tKw, tChir, tResChirs):
 
@@ -2621,6 +2805,7 @@ class CovLinkGenerator(CExeCode):
 
     def checkChemInMonomer(self, tMonomer, tMode):
 
+        
         tDelAtomIds = []
         for aAtom in tMonomer["atoms"]:
             atmId = aAtom["atom_id"]
@@ -2634,7 +2819,7 @@ class CovLinkGenerator(CExeCode):
                 aCharge = int(aAtom["charge"])
             if aCharge != 0: 
                 nTotalVa = nTotalVa - aCharge
-            #print("atom ", atmId, "charge ", aCharge, " equiv bond-order ", nTotalVa)
+            print("atom ", atmId, "charge ", aCharge, " equiv bond-order ", nTotalVa)
             if atmElm in self.chemCheck.orgVal and atmElm !="H":
                 if not nTotalVa in self.chemCheck.orgVal[atmElm]:
                     self.errLevel    = 45
@@ -3186,7 +3371,6 @@ class CovLinkGenerator(CExeCode):
                 #print(aPlAtm["atom_id"])
             nOrigAtoms = len(tOrigPlAtmIds)
             if nAtoms > nOrigAtoms: 
-                print("here1")
                 overlapAtms = []
                 for aOId in tOrigPlAtmIds:
                     if aOId in tPlAtmIds:
@@ -3198,7 +3382,6 @@ class CovLinkGenerator(CExeCode):
                     print("orignal plane deleted")
                     break
             elif nAtoms < nOrigAtoms: 
-                print("here2")
                 overlapAtms = []
                 for aOId in tPlAtmIds:
                     if aOId in tOrigPlAtmIds:

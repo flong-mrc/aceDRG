@@ -704,6 +704,13 @@ class ChemCheck(object):
                     reName = aId 
 
         return reName 
+    
+    def setHName2(self, tHConnAtom, tOtheAtmSet, tAllHIds):
+
+        nAllH =len(tAllHIds)
+        reName = "H" + str(nAllH +1)
+        print("HHHH ", reName)
+        return reName 
 
     def confirmAAandNames(self, tAtoms, tBonds):
       

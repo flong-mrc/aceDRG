@@ -1149,11 +1149,11 @@ namespace LIBMOL
                 aRet=false;
             }
         }
-        else if (tWorkMode==31
-             || tWorkMode==311
+        else if (//tWorkMode==31
+             //|| tWorkMode==311
              // || tWorkMode ==312
              // || tWorkMode ==313
-             || tWorkMode ==314
+             tWorkMode ==314
              || tWorkMode==32
              || tWorkMode==33)
         {
