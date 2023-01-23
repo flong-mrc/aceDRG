@@ -3267,12 +3267,13 @@ class CovLinkGenerator(CExeCode):
         id1 = tAng["atom_id_1"]
         id2 = tAng["atom_id_2"]
         id3 = tAng["atom_id_3"]
-        
+        print("combo angle between %s - %s -%s "%(id1, id2, id3))
         for aAng in tOrigAngs:
             if aAng["atom_id_2"]==id2:
                 if (aAng["atom_id_1"]==id1 and aAng["atom_id_3"]==id3) or\
                    (aAng["atom_id_1"]==id3 and aAng["atom_id_3"]==id1):
                     if self.compare2Angs(aAng, tAng):
+                        print("the angle is included")
                         tModAngs.append(tAng)
                     break
 
@@ -4039,8 +4040,7 @@ class CovLinkGenerator(CExeCode):
         if len(tModLigand["changed"]["angles"]) != 0:
             for aAng in tModLigand["changed"]["angles"]:
                 if tLevel ==1:
-                    if aAng["atom_id_2"] in tPoolAtoms and not aAng["atom_id_1"] in tPoolAtoms\
-                        and not aAng["atom_id_3"] in tPoolAtoms:
+                    if aAng["atom_id_1"] in tPoolAtoms or aAng["atom_id_2"] in tPoolAtoms or aAng["atom_id_3"] in tPoolAtoms:
                          CA_Angs.append(aAng)
             nCAngs = len(CA_Angs)
         
