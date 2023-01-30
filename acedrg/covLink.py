@@ -2204,7 +2204,7 @@ class CovLinkGenerator(CExeCode):
             [aLAAtoms,aTmpLABonds] =  self.getBondSetForOneLinkedAtom(aLAtmId, tRes["comp"]["atoms"], tRes["comp"]["bonds"], tDelAtomIds)
             print("connected atoms", len(aTmpLABonds))
             aLABonds = []   
-            print("XXXXX ", len(tMod["deleted"]["bonds"]) )
+            
             if len(tMod["changed"]["bonds"]) > 0 or len(tMod["deleted"]["bonds"]) > 0:
                 if len(tMod["changed"]["bonds"]) > 0:
                     # Consider the effect of bond-order changes for some bonds
@@ -4192,7 +4192,7 @@ class CovLinkGenerator(CExeCode):
         nDPls  = len(tModLigand["deleted"]["planes"])
         nCPls  = len(tModLigand["changed"]["planes"])
         nAPls  = len(tModLigand["added"]["planes"])
-         
+        
         if nDPls or nCPls or nAPls:
      
             tOutFile.write("loop_\n")
@@ -4207,7 +4207,12 @@ class CovLinkGenerator(CExeCode):
                     for aPlAtm in aPl:
                         aL ="%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "delete".ljust(15),\
                             aPlAtm["plane_id"].ljust(15), aPlAtm["atom_id"].ljust(15), aPlAtm["dist_esd"]) 
-                             
+                        tOutFile.write(aL)
+            if nAPls:
+                for aPl in tModLigand["added"]["planes"]:
+                    for aPlAtm in aPl:
+                        aL ="%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15),\
+                            aPlAtm["plane_id"].ljust(15), aPlAtm["atom_id"].ljust(15), aPlAtm["dist_esd"]) 
                         tOutFile.write(aL)
 
         tOutFile.write("\n")
