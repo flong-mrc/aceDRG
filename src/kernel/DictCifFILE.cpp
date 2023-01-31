@@ -8740,7 +8740,7 @@ namespace LIBMOL
                     }
                     else if (iT->id.find("sp2_sp2") !=std::string::npos)
                     {
-                        aTorSiga = "5.0";
+                        aTorSiga = "1.0";
                     }
                     else if (iT->id.find("other_tor") !=std::string::npos)
                     {
