@@ -242,7 +242,7 @@ class AcedrgRDKit(object):
         aTmpMode = 0
         aMolT = None
         aMolName = ""
-        print("File type is ", tFileName)
+        print("Input File for rdkit is ", tFileName)
         if tFileType == "mol":
             if os.path.isfile(tFileName):
                 if platform.system() == "Windows":
@@ -255,12 +255,16 @@ class AcedrgRDKit(object):
                 # self.reSetChirals     =    True
                 aMolT = Chem.MolFromMolFile(tFileName)
                 
-                self.initCoords = []
-                self.getInitCoordsInMolFile(tFileName)
-                self.checkAndSetInitAtomPos(aMolT)
-                aMolT.SetProp("fixedName", "NO")
-                #aMolT = Chem.AddHs(aMolT1)
-
+                if aMolT:
+                    self.initCoords = []
+                    self.getInitCoordsInMolFile(tFileName)
+                    self.checkAndSetInitAtomPos(aMolT)
+                    aMolT.SetProp("fixedName", "NO")
+                    #aMolT = Chem.AddHs(aMolT1)
+                else:
+                    print("Stage 1 : Molecules can not generated  from file %s ! " % tFileName)
+                    print("Check your file format ")
+                    sys.exit()
             else:
                 print("File %s does not exist " % tFileName)
                 sys.exit()
@@ -1594,22 +1598,22 @@ class AcedrgRDKit(object):
                     tMol, tReq, maxAttempts=0, randomSeed=-1, clearConfs=False)
                 nNewCon = len(confIds)
                 # print(tReq)
-            #print("number of comf generated ", len(tMol.GetConformers()))
-            #print("number of confIds : ", len(confIds))
-            # for aConf in tMol.GetConformers():
-            #    print("!!!!!!!!!! Conf ", aConf.GetId())
-            #    for aAtom in tMol.GetAtoms():
-            #        aIdx = aAtom.GetIdx()
-            #        name  = aAtom.GetProp("Name")
-            #        aPos = aConf.GetAtomPosition(aIdx)
-            #        print("For atom ", name)
-            #        print("Its coordinates are : ")
-            #        print ("x:  ", aPos.x)
-            #        print ("y:  ", aPos.y)
-            #        print ("z:  ", aPos.z)
+            print("number of comf generated ", len(tMol.GetConformers()))
+            print("number of confIds : ", len(confIds))
+            for aConf in tMol.GetConformers():
+                print("!!!!!!!!!! Conf ", aConf.GetId())
+                for aAtom in tMol.GetAtoms():
+                    aIdx = aAtom.GetIdx()
+                    name  = aAtom.GetProp("Name")
+                    aPos = aConf.GetAtomPosition(aIdx)
+                    print("For atom ", name)
+                    print("Its coordinates are : ")
+                    print ("x:  ", aPos.x)
+                    print ("y:  ", aPos.y)
+                    print ("z:  ", aPos.z)
         else:
             confIds = self.generateMultiComformersByRDKit(tMol)
-
+        
         nConf = tMol.GetNumConformers()
         if nConf:
             #print("Number of initial conformers requested", self.numInitConformers)
@@ -1623,6 +1627,18 @@ class AcedrgRDKit(object):
             iFormalE = 0
             for aConf in allConfs:
                 aCIdx = aConf.GetId()
+                print("!!!!!!!!!! Conf ", aCIdx)
+                for aAtom in tMol.GetAtoms():
+                    aIdx = aAtom.GetIdx()
+                    name  = aAtom.GetProp("Name")
+                    aPos = aConf.GetAtomPosition(aIdx)
+                    print("For atom ", name)
+                    print("Its coordinates are : ")
+                    print ("x:  ", aPos.x)
+                    print ("y:  ", aPos.y)
+                    print ("z:  ", aPos.z)
+                #rdmolfiles.MolToPDBFile(tMol, "Test_initConformers.pdb")
+                
                 aWCoordList = []
                 lNorm = self.checkH_Abnormal(aConf, allAtoms, aWCoordList)
                 if not lNorm:
@@ -1785,14 +1801,14 @@ class AcedrgRDKit(object):
         print("number of props in the mol ", len(tMol.GetPropNames()))
         if not len(elemList):
             print("No atoms in from your file, check your file format")
-        elif not tChemCheck.isOrganic1(elemList):
-            print("Your molecule contains METAL or other NON-ORGANIC elements ")
-            print("The molecule contains atoms of the following elements ")
-            aLine = ""
-            for aElem in elemList:
-                aLine.append(aElem + "   ")
-            print(aLine)
-            sys.exit()
+        #elif not tChemCheck.isOrganic1(elemList):
+        #    print("Your molecule contains METAL or other NON-ORGANIC elements ")
+        #    print("The molecule contains atoms of the following elements ")
+        #    aLine = ""
+        #    for aElem in elemList:
+        #        aLine.append(aElem + "   ")
+        #    print(aLine)
+        #    sys.exit()
         # print "Number of atoms in this molecule is initially ", nAtoms
         # self.showInfoAboutAtomsAndBonds(aMol, 0)
 
@@ -1823,7 +1839,8 @@ class AcedrgRDKit(object):
         aErrDict["wrongOrder"] = []
         aErrDict["needMod"] = []
         aErrDict["unMod"] = []
-        self.furtherCheckValForAllAtoms(tMol, aErrDict)
+        
+        #self.furtherCheckValForAllAtoms(tMol, aErrDict)
         if len(aErrDict["wrongOrder"]) > 0:
             for aErr in aErrDict["wrongOrder"]:
                 print(aErr)
@@ -1890,7 +1907,7 @@ class AcedrgRDKit(object):
         #    self.reAssignChirals(aMol)
         allAtoms = aMol.GetAtoms()
         print("number of atom now ", len(allAtoms))
-
+        
         for aAtom in allAtoms:
             aIdx = aAtom.GetIdx()
             tChemCheck.checkChiralCenters(aMol, aIdx)
@@ -1906,7 +1923,7 @@ class AcedrgRDKit(object):
               len(self.selecConformerIds))
         nConf = aMol.GetNumConformers()
         print("number of conformers in Conf", nConf)
-
+        
         if len(aMol.GetConformers()) != 0:
 
             #rdmolfiles.MolToPDBFile(aMol, "Test_2.pdb")
@@ -2108,6 +2125,10 @@ class AcedrgRDKit(object):
                         # print "AList: new name ", aList[iP][2].GetProp("Name")
                         # print "BList: atom ", bList[iP][2].GetProp("Name"), " is with CIPRank ", bList[iP][1]
 
+    #def setEquiAtomType(self, tMol, tEquivAtomSet):
+        
+        
+        
     def modifyMol(self, tMol, tAllAtoms, tAllBonds, tAllChirals, tDelAtomIdxs, tAtomsBondedToDel):
 
         allAtoms1 = tMol.GetAtoms()

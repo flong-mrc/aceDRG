@@ -14650,27 +14650,41 @@ namespace LIBMOL
         return false;
     }
 
-    bool CodClassify::checkATorsAtomsInAroRing(int tAtm1, int tAtm2)
+    int CodClassify::checkATorsAtomsInAroRing(int tAtm1, int tAtm2)
     {
         //std::cout << "Check arom for atom "
         //          << allAtoms[tAtm1].id << " and "
         //          << allAtoms[tAtm2].id << std::endl;
+        int aRet  = 0;                      // not in any ring
         if (allAtoms[tAtm1].bondingIdx==2
             && allAtoms[tAtm2].bondingIdx==2)
         {
+
             int aBIdx = getBond(allBonds, tAtm1, tAtm2);
-            std::cout << "bond " << aBIdx << std::endl;
+            //std::cout << "bond " << aBIdx << std::endl;
             if (aBIdx !=-1)
             {
                 if (allBonds[aBIdx].isInSameRing)
                 {
-                    std::cout << "Its in the same ring" << std::endl;
-                    return true;
+                    std::cout << "It is in the same ring" << std::endl;
+                    if (allBonds[aBIdx].order.find("arom") !=allBonds[aBIdx].order.npos)
+                    {
+                        aRet = 3;
+                    }
+                    else
+                    {
+                        aRet = 2;
+                    }
+                }
+                else
+                {
+                    aRet=1;
                 }
             }
         }
-        return false;
+        return aRet;
     }
+
     void CodClassify::fixTorIDs()
     {
         int idxTors  = 1, idxPTors = 1, idxSp3Sp3=1, idxSp2Sp3=1, idxSp2Sp2=1;
@@ -14681,22 +14695,23 @@ namespace LIBMOL
         for (std::vector<TorsionDict>::iterator iT=allTorsions.begin();
                         iT !=allTorsions.end(); iT++)
         {
-            //std::cout << "look at torsion " << iT->seriNum << std::endl;
-
-
-            if(checkATorsAtomsInPla(iT->atoms))
+            std::cout << "look at torsion " << iT->seriNum << std::endl;
+            int aFlag =checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2]);
+            if (aFlag == 3)
             {
-                iT->id = "sp2_sp2_" + IntToStr(idxPTors);
-                //if (iT->id.size() >=16 )
-                //{
-                //    iT->id = "const_" + IntToStr(idxPTors);
-                //}
+                // in a aromatic ring
+                iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
+                if (iT->id.size() >=16 )
+                {
+                    iT->id = "const_" + IntToStr(idxPTors);
+                }
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
-                iT->sigValue =1.0;
+                iT->sigValue =0.0;
                 idxPTors +=1;
             }
-            else if (checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2]))
+            else if (aFlag == 2)
             {
+                // in an all-sp2 ring
                 iT->id = "sp2_sp2_" + IntToStr(idxPTors);
                 //if (iT->id.size() >=16 )
                 //{
@@ -14704,6 +14719,29 @@ namespace LIBMOL
                 //}
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
                 iT->sigValue =1.0;
+                idxPTors +=1;
+            }
+            else if (aFlag == 1)
+            {
+                iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                //if (iT->id.size() >=16 )
+                //{
+                    //iT->id = "const_" + IntToStr(idxPTors);
+                //}
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->sigValue =5.0;
+                idxPTors +=1;
+            }
+            else if(checkATorsAtomsInPla(iT->atoms))
+            {
+                iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+
+                //if (iT->id.size() >=16 )
+                //{
+                //    iT->id = "const_" + IntToStr(idxPTors);
+                //}
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->sigValue =5.0;
                 idxPTors +=1;
             }
             else

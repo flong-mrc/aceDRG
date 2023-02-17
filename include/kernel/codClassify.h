@@ -338,7 +338,7 @@ namespace LIBMOL
         void setSmallestPLs(std::vector<PlaneDict> & tSmaPls);
         void mergeLargePLGroups(std::vector<PlaneDict> & tSmaPls);
         bool checkATorsAtomsInPla(std::vector<int> & tAtms);
-        bool checkATorsAtomsInAroRing(int tAtm1, int tAtm2);
+        int  checkATorsAtomsInAroRing(int tAtm1, int tAtm2);
         // Ring-related 
         bool furtherM(std::vector<int> &tV1, std::vector<int> &tV2);
         bool isInSameRing(PlaneDict & tP1, PlaneDict & tP2);

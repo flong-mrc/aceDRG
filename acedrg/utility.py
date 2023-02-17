@@ -335,6 +335,10 @@ def BondOrderS2N(tBS):
         aBN = 2
     elif aBS.find("TRIP") !=-1:
         aBN = 3
+    elif aBS.find("AROM") !=-1:
+        aBN =1.5
+    else:
+        aBN = 1   # e.g. metal coordination bonds
 
     return aBN
 

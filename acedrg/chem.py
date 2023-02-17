@@ -794,4 +794,54 @@ class ChemCheck(object):
                 lAA = False
         else:
             lAA = False
-        return lAA         
+        return lAA
+        
+    def containAROMA(self, tBonds):
+        
+        aRet = False
+        
+        for aB in tBonds:
+        
+            if "_chem_comp_bond.value_order" in aB.keys():
+                if aB["_chem_comp_bond.value_order"].upper()[:4]=="AROM":
+                    aRet=True
+                    break
+        return aRet
+        
+    def addjustAtomsAndBonds(self, tAtoms, tBonds):
+        
+        # For molecules contain bonds called explicitly aromatic bonds
+        
+        
+        aCurVaMap    = {}
+        adefVaMap   = {}
+        for aAtm in tAtoms:
+            aCurVaMap[aAtm["_chem_comp_atom.atom_id"]] = 0
+            if "_chem_comp_atom.charge" in aAtm.keys():
+                aCurVaMap[aAtm["_chem_comp_atom.atom_id"]]+=(aAtm["_chem_comp_atom.charge"])
+            if aAtm["_chem_comp_atom.type_symbol"].upper() in self.defaultBo.keys():
+                adefVaMap[aAtm["_chem_comp_atom.atom_id"]] = self.defaultBo[aAtm["_chem_comp_atom.type_symbol"]]
+            else:
+                print("The input molecule contains atom %s of element %s, which acedrg can not deal with at the moment.")
+                sys.exit(1)
+            
+        for aB in tBonds:
+            if "_chem_comp_bond.value_order" in aB.keys():
+                atm1Id = aB["_chem_comp_bond.atom_id_1"].strip()
+                atm2Id = aB["_chem_comp_bond.atom_id_2"].strip()
+                aBO    = aB["_chem_comp_bond.value_order"].strip().upper()
+                if len(aBO) > 4:
+                    aBO = aBO[:4]
+                aBON = BondOrderS2N(aBO)
+                aCurVaMap[atm1Id] +=aBON
+                aCurVaMap[atm2Id] +=aBON
+                
+        # Now check if H atoms should be added
+        addedHAtms = []
+        for aAtm in tAtoms: 
+            pass
+                
+                
+                
+        
+        

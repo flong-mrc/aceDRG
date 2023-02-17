@@ -1558,7 +1558,8 @@ namespace LIBMOL
         tPlanes.clear();
 
         // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
-        setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
+        //setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
+        setAllRingPlanes3(tAllRings, tAtoms, tPlanes);
         //std::cout << "Here 4 for planes " << std::endl;
 
         setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
@@ -1671,7 +1672,8 @@ namespace LIBMOL
         tPlanes.clear();
 
         // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
-        setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
+        // setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
+        setAllRingPlanes3(tAllRings, tAtoms, tPlanes);
         //std::cout << "Here 4 for planes " << std::endl;
 
         setAllOtherPlanes(tAllRings, tAtoms, tPlanes);

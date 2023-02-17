@@ -754,11 +754,11 @@ namespace LIBMOL
                 }
             }
 
-            if((iA->chemType.compare("S")==0)
-                  && (iA->connAtoms.size() == 2))
-            {
-                iA->bondingIdx = 2;
-            }
+            //if((iA->chemType.compare("S")==0)
+            //      && (iA->connAtoms.size() == 2))
+            //{
+            //    iA->bondingIdx = 2;
+            //}
 
 
             iA->hybrid = strTransSP(iA->bondingIdx);

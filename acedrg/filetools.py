@@ -984,7 +984,8 @@ class FileTransformer(object) :
 
             for aId in totalOrders.keys():
                 if not totalOrders[aId][1]:
-                    print("atom %s has zero bond-order, aromatic bond order exists. check and change!"%aId)
+                   # print("atom %s has zero bond-order, aromatic bond order exists. check and change!"%aId)
+                   pass 
                 else:
                     self.setAlt2AtomId(totalOrders[aId]) 
 
@@ -1265,9 +1266,9 @@ class FileTransformer(object) :
                     sys.exit()
                 aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                        sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                #print("The bond between %s of serial number %s and %s of serial number %s is : "\
-                #      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2))
-                #print(aBL)
+                print("The bond between %s of serial number %s and %s of serial number %s is : %s"\
+                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2, bt))
+                print(aBL)
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
 
@@ -1297,6 +1298,7 @@ class FileTransformer(object) :
                 tOutFile.write(aL + "\n")          
    
             tOutFile.write("M  END\n")
+            
 
     # Mol files related 
     def CheckElemSymbolsInMolFile(self, tInFileName, tOutFileName):

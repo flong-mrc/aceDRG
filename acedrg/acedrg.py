@@ -2172,6 +2172,7 @@ class Acedrg(CExeCode ):
                         nTor+=1
                         strs = aL.strip().split()
                         if len(strs)==9:
+                            idSet =[]
                             id1 = strs[2] + "_" + strs[3]  + "_" + strs[4] + "_" + strs[5]                      
                             id2 = strs[5] + "_" + strs[4]  + "_" + strs[3] + "_" + strs[2] 
                             id  = ""
@@ -2180,15 +2181,22 @@ class Acedrg(CExeCode ):
 
                             if id1 in self.naTorsList.keys():
                                 id = id1
+                                idSet =[strs[2], strs[3],  strs[4], strs[5]]
                             elif id2 in self.naTorsList.keys():
                                 id = id2
+                                idSet=[strs[5], strs[4], strs[3], strs[2]]
+                            print("id1=",id1)
+                            print("id2=",id2)
+                            print("id=", id)
                             if len(id) > 0:
                                 for aId in sorted(self.naTorsList[id].keys()):
                                     aTorL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(8), aId.ljust(16),\
-                                        self.naTorsList[id][aId][0].ljust(10), self.naTorsList[id][aId][1].ljust(10),\
-                                        self.naTorsList[id][aId][2].ljust(10), self.naTorsList[id][aId][3].ljust(10),\
+                                        #self.naTorsList[id][aId][0].ljust(10), self.naTorsList[id][aId][1].ljust(10),\
+                                        #self.naTorsList[id][aId][2].ljust(10), self.naTorsList[id][aId][3].ljust(10),\
+                                        idSet[0].ljust(10), idSet[1].ljust(10), idSet[2].ljust(10), idSet[3].ljust(10),
                                         self.naTorsList[id][aId][4].ljust(14), self.naTorsList[id][aId][5].ljust(10),\
                                         self.naTorsList[id][aId][6].ljust(6))
+                                    print("aTorL=", aTorL)
                                     speTors[aId]= aTorL
                             else:
                                 otherTors.append(aL)
@@ -2817,7 +2825,11 @@ class Acedrg(CExeCode ):
                 else:
                     self.lOrg = False
             
-            if self.lOrg and len(self.fileConv.atoms) > 1:
+            if  len(self.fileConv.atoms) > 1 and self.lOrg :
+                if self.chemCheck.containAROMA(self.fileConv.bonds):
+                    print("found aromatic bonds")
+                    self.chemCheck.addjustAtomsAndBonds(self.fileConv.atoms, 
+                                                        self.fileConv.bonds)
                 if len(self.fileConv.dataDescriptor):
                     
                     self.setMonoRoot(self.fileConv.dataDescriptor)
@@ -3046,7 +3058,7 @@ class Acedrg(CExeCode ):
         if self.workMode == 12 or self.workMode == 121 or self.workMode==52 :
           
             # The input file is  a SMILES file
-            if os.path.isfile(self.inSmiName) and self.chemCheck.isOrganic(self.inSmiName, self.workMode):
+            if os.path.isfile(self.inSmiName) : # and self.chemCheck.isOrganic(self.inSmiName, self.workMode):
                 self.rdKit.reSetSmi = True
                 self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
                 if len(self.rdKit.monoName) !=0:

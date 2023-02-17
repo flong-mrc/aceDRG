@@ -8735,12 +8735,13 @@ namespace LIBMOL
                     if (iT->id.find("const") !=std::string::npos
                         || iT->id.find("CONST") !=std::string::npos)
                     {
-                        std::cout << "X1 " << std::endl;
+                        // std::cout << "X1 " << std::endl;
                         aTorSiga = "0.0";
                     }
                     else if (iT->id.find("sp2_sp2") !=std::string::npos)
                     {
-                        aTorSiga = "1.0";
+                        aTorSiga = "5.0";
+                        // aTorSiga = iT->sigValue;
                     }
                     else if (iT->id.find("other_tor") !=std::string::npos)
                     {

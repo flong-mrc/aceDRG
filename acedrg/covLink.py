@@ -3899,11 +3899,25 @@ class CovLinkGenerator(CExeCode):
         aPoolAtoms1 = []
         if "atomName" in tLinkedObj.stdLigand1:
             aPoolAtoms1.append(tLinkedObj.stdLigand1["atomName"])
+            for aBond in tLinkedObj.stdLigand1["remainBonds"]:
+                if aBond["atom_id_1"]==tLinkedObj.stdLigand1["atomName"]:
+                    if not aBond["atom_id_2"] in aPoolAtoms1:
+                        aPoolAtoms1.append(aBond["atom_id_2"])
+                elif  aBond["atom_id_2"]==tLinkedObj.stdLigand1["atomName"]:
+                    if not aBond["atom_id_1"] in aPoolAtoms1:
+                        aPoolAtoms1.append(aBond["atom_id_1"])
         self.outOneMod(tOutFile, tLinkedObj.modLigand1, tLinkedObj.describLevel, aPoolAtoms1)
         
         aPoolAtoms2 = []
         if "atomName" in tLinkedObj.stdLigand2:
             aPoolAtoms2.append(tLinkedObj.stdLigand2["atomName"])
+            for aBond in tLinkedObj.stdLigand2["remainBonds"]:
+                if aBond["atom_id_1"]==tLinkedObj.stdLigand2["atomName"]:
+                    if not aBond["atom_id_2"] in aPoolAtoms2:
+                        aPoolAtoms1.append(aBond["atom_id_2"])
+                elif  aBond["atom_id_2"]==tLinkedObj.stdLigand2["atomName"]:
+                    if not aBond["atom_id_1"] in aPoolAtoms2:
+                        aPoolAtoms2.append(aBond["atom_id_1"])
         self.outOneMod(tOutFile, tLinkedObj.modLigand2, tLinkedObj.describLevel, aPoolAtoms2)
 
         
@@ -4088,11 +4102,11 @@ class CovLinkGenerator(CExeCode):
         if len(tModLigand["changed"]["tors"]) !=0:
             for aTor in tModLigand["changed"]["tors"]:
                 if tLevel == 1:
-                    if aTor["atom_id_2"] in tPoolAtoms and not aTor["atom_id_1"] in tPoolAtoms\
-                       and not aTor["atom_id_3"] in tPoolAtoms and not aTor["atom_id_4"] in tPoolAtoms:
-                        CT_Tors.append(aTor)
-                    elif aTor["atom_id_3"] in tPoolAtoms and not aTor["atom_id_1"] in tPoolAtoms\
-                       and not aTor["atom_id_2"] in tPoolAtoms and not aTor["atom_id_4"] in tPoolAtoms:
+                    if aTor["atom_id_2"] in tPoolAtoms or aTor["atom_id_3"] in tPoolAtoms:
+                       #and not aTor["atom_id_3"] in tPoolAtoms and not aTor["atom_id_4"] in tPoolAtoms:
+                       # CT_Tors.append(aTor)
+                       #elif aTor["atom_id_3"] in tPoolAtoms and not aTor["atom_id_1"] in tPoolAtoms\
+                       #and not aTor["atom_id_2"] in tPoolAtoms and not aTor["atom_id_4"] in tPoolAtoms:
                         CT_Tors.append(aTor)
             nCTors = len(CT_Tors)
 
@@ -4106,31 +4120,37 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_mod_tor.atom_id_2\n")
             tOutFile.write("_chem_mod_tor.atom_id_3\n")
             tOutFile.write("_chem_mod_tor.atom_id_4\n")
+            tOutFile.write("_chem_link_tor.new_id\n")
             tOutFile.write("_chem_mod_tor.new_value_angle\n")
             tOutFile.write("_chem_mod_tor.new_value_angle_esd\n")
+            tOutFile.write("_chem_link_tor.new_period\n")
    
             if nDTors !=0: 
                 for aTor in tModLigand["deleted"]["tors"]:
-                    aL ="%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "delete".ljust(15), \
+                    aL ="%s%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "delete".ljust(15), \
                                               aTor["atom_id_1"].ljust(10), aTor["atom_id_2"].ljust(10),\
                                               aTor["atom_id_3"].ljust(10), aTor["atom_id_4"].ljust(10),\
-                                              ".".ljust(15), ".".ljust(15))                  
+                                              ".".ljust(12), ".".ljust(12), ".".ljust(12), ".".ljust(15))                  
                     tOutFile.write(aL)
            
             if nCTors !=0: 
                 for aTor in CT_Tors:
-                    aL ="%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "change".ljust(15), \
+                    aL ="%s%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "change".ljust(15), \
                                               aTor["atom_id_1"].ljust(10), aTor["atom_id_2"].ljust(10),\
                                               aTor["atom_id_3"].ljust(10), aTor["atom_id_4"].ljust(10),\
-                                              aTor["value_angle"].ljust(15), aTor["value_angle_esd"].ljust(15))                  
+                                              aTor["id"].ljust(18),\
+                                              aTor["value_angle"].ljust(15), aTor["value_angle_esd"].ljust(15),\
+                                              aTor["period"].ljust(6))                  
                     tOutFile.write(aL)
    
             if nATors !=0: 
                 for aTor in tModLigand["added"]["tors"]:
-                    aL ="%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15), \
+                    aL ="%s%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15), \
                                               aTor["atom_id_1"].ljust(10), aTor["atom_id_2"].ljust(10),\
                                               aTor["atom_id_3"].ljust(10), aTor["atom_id_4"].ljust(10),\
-                                              aTor["value_angle"].ljust(15), aTor["value_angle_esd"].ljust(15))                  
+                                              aTor["id"].ljust(18),\
+                                              aTor["value_angle"].ljust(15), aTor["value_angle_esd"].ljust(15),
+                                              aTor["period"].ljust(6))                  
                     tOutFile.write(aL)
    
             tOutFile.write("\n")
