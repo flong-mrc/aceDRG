@@ -4119,10 +4119,10 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_mod_tor.atom_id_2\n")
             tOutFile.write("_chem_mod_tor.atom_id_3\n")
             tOutFile.write("_chem_mod_tor.atom_id_4\n")
-            tOutFile.write("_chem_link_tor.new_id\n")
+            tOutFile.write("_chem_mod_tor.new_id\n")
             tOutFile.write("_chem_mod_tor.new_value_angle\n")
             tOutFile.write("_chem_mod_tor.new_value_angle_esd\n")
-            tOutFile.write("_chem_link_tor.new_period\n")
+            tOutFile.write("_chem_mod_tor.new_period\n")
    
             if nDTors !=0: 
                 for aTor in tModLigand["deleted"]["tors"]:
