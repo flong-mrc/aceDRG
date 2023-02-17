@@ -3985,10 +3985,9 @@ class CovLinkGenerator(CExeCode):
         if len(tModLigand["changed"]["bonds"]) !=0:
             for aBond in tModLigand["changed"]["bonds"]:
                 if tLevel ==1:
-                    if aBond["atom_id_1"] in tPoolAtoms and not aBond["atom_id_2"] in tPoolAtoms:
+                    if aBond["atom_id_1"] in tPoolAtoms or aBond["atom_id_2"] in tPoolAtoms:
                         CB_Bonds.append(aBond)
-                    elif aBond["atom_id_2"] in tPoolAtoms and not aBond["atom_id_1"] in tPoolAtoms:
-                        CB_Bonds.append(aBond)
+                        
             nCB = len(CB_Bonds)
          
         if nDB !=0 or nCB !=0 or nAB !=0:
