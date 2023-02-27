@@ -805,7 +805,7 @@ namespace LIBMOL
             //else
             //{
 
-
+            std::cout << "tMode " << tMode << std::endl;
             numOneAtm = setPiForOneAtom(*iAt, tAtoms, tMode);
             //}
 
@@ -1560,10 +1560,10 @@ namespace LIBMOL
         // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
         //setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
         setAllRingPlanes3(tAllRings, tAtoms, tPlanes);
-        //std::cout << "Here 4 for planes " << std::endl;
+
 
         setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
-        /*
+
         std::cout << "There are "         << tPlanes.size()
                   << " planes. They are " << std::endl;
 
@@ -1580,7 +1580,7 @@ namespace LIBMOL
             }
             std::cout << std::endl;
         }
-        */
+        
     }
 
     extern void checkAndSetupPlanes2(std::vector<RingDict>  & tAllRings,
@@ -1792,18 +1792,19 @@ namespace LIBMOL
     extern void setAromaticBonds(std::vector<RingDict>  & tRings,
                                  std::vector<BondDict>  & tBonds)
     {
-        std::cout << "HERE " << std::endl;
+        /*
         for (std::vector<BondDict>::iterator iB=tBonds.begin();
                 iB !=tBonds.end(); iB++)
         {
             std::cout << "Bond between atom " << iB->atoms[0]
                       << " and " << iB->atoms[1] << std::endl;
         }
+        */
 
         for (std::vector<RingDict>::iterator iR=tRings.begin();
                 iR !=tRings.end(); iR++)
         {
-            if (iR->isAromatic)
+            if (iR->isAromaticP)
             {
                 for (unsigned i=0; i < iR->atoms.size(); i++)
                 {

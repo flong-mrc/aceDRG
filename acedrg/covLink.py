@@ -3255,11 +3255,23 @@ class CovLinkGenerator(CExeCode):
     def compare2Bonds(self, tOriBond, tBond):
    
         lChanged = False
+        
         if tOriBond["type"].upper()[:3] !=tBond["type"].upper()[:3]:
             lChanged = True
-        if float(tOriBond["value_dist"]) != float(tBond["value_dist"]):
+        #print("Bond changes between %s and %s"%(tOriBond["atom_id_1"], tOriBond["atom_id_2"]))
+        v1 = float(tOriBond["value_dist"]) 
+        v2 = float(tBond["value_dist"])
+        dV = math.fabs(v1-v2)
+        s1 = float(tOriBond["value_dist_esd"])
+        s2 = float(tBond["value_dist_esd"])
+        dS = math.fabs(s1-s2)
+        #print("XXX delta is ", dS)
+        #print("0.3*s1 is ", 0.3*s1)
+        if  dV > s1 :
             lChanged = True
-         
+        elif dS > 0.3*s1:
+            lChanged = True
+                
         return lChanged
    
     def checkAngMod(self, tOrigAngs, tAng, tModAngs):
@@ -3280,9 +3292,17 @@ class CovLinkGenerator(CExeCode):
     def compare2Angs(self, tOrigAng, tAng):
    
         lChanged = False
-
-        if float(tOrigAng["value_angle"]) != float(tAng["value_angle"]):
+        v1 = float(tOrigAng["value_angle"])
+        v2 = float(tAng["value_angle"])
+        dV = math.fabs(v1-v2)
+        s1 = float(tOrigAng["value_angle_esd"])
+        s2 = float(tAng["value_angle_esd"])
+        dS = math.fabs(s1-s2)
+        if  dV > s1:
             lChanged = True
+        elif dS > 0.3*s1:
+            lChanged = True
+            
         return lChanged
    
     def checkTorMod(self, tOrigTors, tTor, tModTors):
@@ -3309,8 +3329,36 @@ class CovLinkGenerator(CExeCode):
         lChanged = False
         if float(tOrigTor["value_angle"]) !=float(tTor["value_angle"]):
             lChanged = True
+        elif float(tOrigTor["value_angle_esd"]) !=float(tTor["value_angle_esd"]):
+            lChanged = True
+        elif tOrigTor["id"] != tTor["id"]:
+            lChanged = self.checkTorId(tOrigTor["id"], tOrigTor["id"])
+        elif tOrigTor["period"] != tTor["period"]:
+            lChanged = True
+            
         return lChanged
    
+    def checkTorId(self, tId1, tId2):
+        
+        aRet = False
+        if (tId1.upper().find("CONST") !=-1 and \
+            tId2.upper().find("CONST") ==-1) or \
+           (tId2.upper().find("CONST") !=-1 and \
+            tId1.upper().find("CONST") ==-1) : 
+            aRet = True       
+        elif tId1.upper().find("CONST") ==-1 and \
+            tId2.upper().find("CONST") ==-1:
+            strs1 = tId1.strip().split("_")
+            strs2 = tId2.strip().split("_")
+            if len(strs1) > 2 and len(strs2) > 2:
+                if strs1[0] != strs2[0] or strs1[1] !=strs2[1]:
+                    aRet = True
+        
+        return aRet
+            
+            
+            
+        
     def checkChiMod(self, tOrigChirs, tChi, tModChi):
 
         pass
@@ -4119,7 +4167,7 @@ class CovLinkGenerator(CExeCode):
             tOutFile.write("_chem_mod_tor.atom_id_2\n")
             tOutFile.write("_chem_mod_tor.atom_id_3\n")
             tOutFile.write("_chem_mod_tor.atom_id_4\n")
-            tOutFile.write("_chem_mod_tor.new_id\n")
+            tOutFile.write("_chem_mod_tor.id\n")
             tOutFile.write("_chem_mod_tor.new_value_angle\n")
             tOutFile.write("_chem_mod_tor.new_value_angle_esd\n")
             tOutFile.write("_chem_mod_tor.new_period\n")

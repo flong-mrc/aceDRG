@@ -14661,12 +14661,16 @@ namespace LIBMOL
         {
 
             int aBIdx = getBond(allBonds, tAtm1, tAtm2);
-            //std::cout << "bond " << aBIdx << std::endl;
+            std::cout << "bond " << aBIdx << std::endl;
+            std::cout << "atom " << allBonds[aBIdx].atoms[0] << " and "
+                      << allBonds[aBIdx].atoms[1] << std::endl;
+            std::cout << " XXX Its order " << allBonds[aBIdx].order << std::endl;
             if (aBIdx !=-1)
             {
                 if (allBonds[aBIdx].isInSameRing)
                 {
                     std::cout << "It is in the same ring" << std::endl;
+
                     if (allBonds[aBIdx].order.find("arom") !=allBonds[aBIdx].order.npos)
                     {
                         aRet = 3;
