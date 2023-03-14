@@ -451,21 +451,39 @@ namespace LIBMOL
             }
             else if (tAtom.bondingIdx ==3)  // SP3
             {
-                if (tAtom.connHAtoms.size()==1)
+                if (tAtom.connAtoms.size()==4)
                 {
-                    tAtom.ccp4Type="NT1";
+                    if (tAtom.connHAtoms.size()==1)
+                    {
+                        tAtom.ccp4Type="NT1";
+                    }
+                    else if(tAtom.connHAtoms.size()==2)
+                    {
+                        tAtom.ccp4Type = "NT2";
+                    }
+                    else if(tAtom.connHAtoms.size()==3)
+                    {
+                        tAtom.ccp4Type = "NT3";
+                    }
+                    else
+                    {
+                        tAtom.ccp4Type = "NT";
+                    }
                 }
-                else if(tAtom.connHAtoms.size()==2)
+                else if (tAtom.connAtoms.size()==3)
                 {
-                    tAtom.ccp4Type = "NT2";
-                }
-                else if(tAtom.connHAtoms.size()==3)
-                {
-                    tAtom.ccp4Type = "NT3";
-                }
-                else
-                {
-                    tAtom.ccp4Type = "NT";
+                    if (tAtom.connHAtoms.size()==1)
+                    {
+                        tAtom.ccp4Type="N31";
+                    }
+                    else if(tAtom.connHAtoms.size()==2)
+                    {
+                        tAtom.ccp4Type = "N32";
+                    }
+                    else
+                    {
+                        tAtom.ccp4Type = "N3";
+                    }
                 }
             }
             else if (tAtom.bondingIdx==1)

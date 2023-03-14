@@ -8492,6 +8492,21 @@ namespace LIBMOL
                               << iA->coords[2] << std::endl;
 
                 }
+
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_acedrg.comp_id" << std::endl
+                          << "_chem_comp_acedrg.atom_id" << std::endl
+                          << "_chem_comp_acedrg.atom_type" << std::endl;
+
+                for (std::vector<AtomDict>::iterator iA1 = tAtoms.begin();
+                        iA1 != tAtoms.end(); iA1++)
+                {
+                    unsigned  aSize = iA1->codClass.size() + 4;
+                    outRestrF << longName
+                              << std::setw(6)  << iA1->id
+                              << std::setw(aSize)  << iA1->codClass << std::endl;
+                }
+
             }
 
             if (tBonds.size() >0)
@@ -8720,16 +8735,16 @@ namespace LIBMOL
                     //idxTorStr = "tor_" + idxTorStr;
                     // std::cout << "Torsion angle " << idxTor
                     //          << " It contains " << (int)iT->atoms.size() << std::endl;
-                     /*
-                    std::cout << "atom sp in a torsion " << std::endl;
+                     
+                    //std::cout << "atom sp in a torsion " << std::endl;
 
-                    std::cout << "atom " << tAtoms[iT->atoms[1]].id
-                              << " : " << tAtoms[iT->atoms[1]].hybrid
-                              << std::endl
-                              << "atom " << tAtoms[iT->atoms[2]].id
-                              << " : " << tAtoms[iT->atoms[1]].hybrid
-                              << std::endl;
-                    */
+                    //std::cout << "atom " << tAtoms[iT->atoms[1]].id
+                    //          << " : " << tAtoms[iT->atoms[1]].hybrid
+                    //          << std::endl
+                    //          << "atom " << tAtoms[iT->atoms[2]].id
+                    //          << " : " << tAtoms[iT->atoms[1]].hybrid
+                    //          << std::endl;
+                    
 
                     std::string aTorSiga;
                     if (iT->id.find("const") !=std::string::npos
@@ -8740,8 +8755,7 @@ namespace LIBMOL
                     }
                     else if (iT->id.find("sp2_sp2") !=std::string::npos)
                     {
-                        aTorSiga = "5.0";
-                        // aTorSiga = iT->sigValue;
+                        aTorSiga = RealToStr(iT->sigValue);
                     }
                     else if (iT->id.find("other_tor") !=std::string::npos)
                     {
@@ -8758,6 +8772,7 @@ namespace LIBMOL
                     {
                         aTorSiga = "10.0";
                     }
+                    // std::cout << "aTorSiga " << aTorSiga  << std::endl;
                     outRestrF << longName
                               << std::setw(22) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id

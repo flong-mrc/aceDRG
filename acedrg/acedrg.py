@@ -833,6 +833,7 @@ class Acedrg(CExeCode ):
                 else:
                     self.workMode    = 22
         elif t_inputOptionsP.typeOut:
+            
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
                 self.workMode    = 311
@@ -1205,13 +1206,13 @@ class Acedrg(CExeCode ):
                     inFileName    = tIn
                 else:
                     inFileName    = self.inMmCifName
-                if self.workMode == 31 or self.workMode == 32:
+                if self.workMode == 31:
                     if tIdxMol !=-1:  
                         aStr = "1"
                     else:
                         aStr = "2"
                     self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
-                elif self.workMode ==311 :
+                elif self.workMode ==311 or self.workMode == 32 or self.workMode==33:
                     self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
                     print("Output file name : %s "%self.outAtmTypeName)
                 self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
@@ -2830,6 +2831,7 @@ class Acedrg(CExeCode ):
                     print("found aromatic bonds")
                     self.chemCheck.addjustAtomsAndBonds(self.fileConv.atoms, 
                                                         self.fileConv.bonds)
+                sys.exit()
                 if len(self.fileConv.dataDescriptor):
                     
                     self.setMonoRoot(self.fileConv.dataDescriptor)
@@ -3259,43 +3261,45 @@ class Acedrg(CExeCode ):
             # 1. Generate molecules using the small molecule cif files at the input directory. 
             # 2. Generate atom classes for atoms in the molecules.
             # 3. Obtain unique bond lengths and angles and cluster them according to their 
-            #    component atoms in tables.
+            #    component at oms in tables.
             if os.path.isdir(self.inStdCifDir):
                 self.runLibmol()
             else:
                 print("Can not find the input directory ", self.inStdCifDir)
                 
-        if self.workMode == 31 or self.workMode==311:
+        if self.workMode == 31 or self.workMode==311 or self.workMode == 32\
+            or self.workMode == 33:
             print ("===================================================================") 
             print ("| Generate atom types of Acedrg style                             |")
             print ("===================================================================") 
-            if os.path.isfile(self.inMmCifName):
-                self.runLibmol()    
+            if self.workMode == 31 or self.workMode==311:
+                if os.path.isfile(self.inMmCifName):
+                    self.runLibmol()    
         
-        if self.workMode == 32:
-            print("work mode ", self.workMode)
-            if os.path.isfile(self.inSmiName):
-                self.runLibcheck(self.inSmiName)
-            else:
-                print("%s does not exist"%self.inSmiName)
-                sys.exit()
-
-            if os.path.isfile(self.libcheckLibName):
-                self.runLibmol(self.libcheckLibName)
-            else:
-                print("%s does not exist"%self.inMmCifName)
-                sys.exit()
-            
-        if self.workMode == 33:
-            if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
-                self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
-                tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
-                if len(self.rdKit.molecules)==1:
-                    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tMolMmcifName, self.chemCheck, self.monomRoot)
-                    print("Number of molecules ", len(self.rdKit.molecules))
-                    self.runLibmol(tMolMmcifName)
+            elif self.workMode == 32:
+                print("input file ", self.inSmiName)
+                if os.path.isfile(self.inSmiName):
+                    self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+                    tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
+                    if len(self.rdKit.molecules)==1:
+                        self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tMolMmcifName, self.chemCheck, self.monomRoot)
+                        print("Number of molecules ", len(self.rdKit.molecules))
+                        print("Temp cif ", tMolMmcifName)
+                        self.runLibmol(tMolMmcifName)
                 else:
-                    print("Do not process atom-types of multiple molecules at the same time, do nothing")
+                    print("Problem in reading %s or the molecule contains non-organic atoms"%self.inMdlName)  
+            
+            elif self.workMode == 33:
+                if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
+                    self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+                    tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
+                    if len(self.rdKit.molecules)==1:
+                        self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tMolMmcifName, self.chemCheck, self.monomRoot)
+                        print("Number of molecules ", len(self.rdKit.molecules))
+                        print("Temp cif ", tMolMmcifName)
+                        self.runLibmol(tMolMmcifName)
+                else:
+                    print("Problem in reading %s or the molecule contains non-organic atoms"%self.inMdlName)
 
         if self.workMode == 34:
             if os.path.isfile(self.inSdfName):

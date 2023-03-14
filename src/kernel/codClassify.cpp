@@ -14661,10 +14661,10 @@ namespace LIBMOL
         {
 
             int aBIdx = getBond(allBonds, tAtm1, tAtm2);
-            std::cout << "bond " << aBIdx << std::endl;
-            std::cout << "atom " << allBonds[aBIdx].atoms[0] << " and "
-                      << allBonds[aBIdx].atoms[1] << std::endl;
-            std::cout << " XXX Its order " << allBonds[aBIdx].order << std::endl;
+            //std::cout << "bond " << aBIdx << std::endl;
+            //std::cout << "atom " << allBonds[aBIdx].atoms[0] << " and "
+            //          << allBonds[aBIdx].atoms[1] << std::endl;
+            // std::cout << "Its order " << allBonds[aBIdx].order << std::endl;
             if (aBIdx !=-1)
             {
                 if (allBonds[aBIdx].isInSameRing)
@@ -14700,7 +14700,13 @@ namespace LIBMOL
                         iT !=allTorsions.end(); iT++)
         {
             std::cout << "look at torsion " << iT->seriNum << std::endl;
+            std::cout << "atom1 " << allAtoms[iT->atoms[0]].id
+                      << "  atom2 " << allAtoms[iT->atoms[1]].id
+                      << "  atom3 " << allAtoms[iT->atoms[2]].id
+                      << "  atom4 " << allAtoms[iT->atoms[3]].id << std::endl;
+
             int aFlag =checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2]);
+            
             if (aFlag == 3)
             {
                 // in a aromatic ring
@@ -14728,12 +14734,35 @@ namespace LIBMOL
             else if (aFlag == 1)
             {
                 iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                int aBIdx12 = getBond(allBonds, iT->atoms[0], iT->atoms[1]);
+                int aBIdx34 = getBond(allBonds, iT->atoms[2], iT->atoms[3]);
+                //std::cout << "Flag1" << std::endl;
+                //std::cout << "aBIdx12 " << aBIdx12 << std::endl;
+                //std::cout << "aBIdx34 " << aBIdx34 << std::endl;
+                if (aBIdx12 !=-1 && aBIdx34 !=-1)
+                {
+                    
+                    if (allBonds[aBIdx12].isInSameRing || allBonds[aBIdx34].isInSameRing)
+                    {
+                        std::cout << "Here " << std::endl;
+                        iT->sigValue =20.0;
+                    }
+                    else
+                    {
+                        std::cout << "Here2 " << std::endl;
+                        iT->sigValue =5.0;
+                    }
+                }
+                else
+                {
+                    iT->sigValue =5.0;
+                }
                 //if (iT->id.size() >=16 )
                 //{
                     //iT->id = "const_" + IntToStr(idxPTors);
                 //}
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
-                iT->sigValue =5.0;
+                
                 idxPTors +=1;
             }
             else if(checkATorsAtomsInPla(iT->atoms))
@@ -14782,7 +14811,8 @@ namespace LIBMOL
                     idxTors++;
                 }
             }
-            //std::cout << "its ID now is " << iT->id << std::endl;
+            //std::cout << "its ID now is " << iT->id << "and sig is "
+            //         <<   iT->sigValue << std::endl;
         }
 
 

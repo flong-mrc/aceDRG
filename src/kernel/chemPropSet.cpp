@@ -283,6 +283,12 @@ namespace LIBMOL
 
                     iAt->bondingIdx = 3;
                 }
+                else if(t_len==2)
+                {
+                    iAt->chiralIdx  = 0;
+                    iAt->bondingIdx = 3;
+
+                }
 
                 if (iAt->chemType.compare("P")==0 &&
                     t_len==5)
@@ -660,18 +666,18 @@ namespace LIBMOL
                     }
                     else
                     {
-                       if (confirmPlaneByAngle(tAtoms, iA, angCri))
-                       {
-                            iA->chiralIdx  = 5; // New value
-                            iA->bondingIdx = 2; // still keep it sp2, will use together
+                       //if (confirmPlaneByAngle(tAtoms, iA, angCri))
+                       //{
+                       //     iA->chiralIdx  = 5; // New value
+                       //     iA->bondingIdx = 2; // still keep it sp2, will use together
                                             // with chiralIdx
                                //std::cout << "inside 2 " << std::endl;
-                        }
-                        else
-                        {
+                        //}
+                        //else
+                        //{
                             iA->chiralIdx  = 5;
                             iA->bondingIdx = 3;
-                        }
+                        //}
                     }
                 }
                 else
@@ -697,18 +703,18 @@ namespace LIBMOL
                     }
                     else
                     {
-                        if (confirmPlaneByAngle(tAtoms, iA, angCri))
-                        {
-                            iA->chiralIdx  = 5; // New value
-                            iA->bondingIdx = 2; // still keep it sp2, will use together
+                        //if (confirmPlaneByAngle(tAtoms, iA, angCri))
+                        //{
+                        //    iA->chiralIdx  = 5; // New value
+                        //    iA->bondingIdx = 2; // still keep it sp2, will use together
                                 // with chiralIdx
                                 //std::cout << "inside 2 " << std::endl;
-                        }
-                        else
-                        {
+                        //}
+                        //else
+                        //{
                             iA->chiralIdx  = 5;
                             iA->bondingIdx = 3;
-                        }
+                        //}
                     }
                 }
 

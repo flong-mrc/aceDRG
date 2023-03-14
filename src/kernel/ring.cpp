@@ -1580,7 +1580,7 @@ namespace LIBMOL
             }
             std::cout << std::endl;
         }
-        
+
     }
 
     extern void checkAndSetupPlanes2(std::vector<RingDict>  & tAllRings,
@@ -1804,7 +1804,7 @@ namespace LIBMOL
         for (std::vector<RingDict>::iterator iR=tRings.begin();
                 iR !=tRings.end(); iR++)
         {
-            if (iR->isAromaticP)
+            if (iR->isAromaticP || iR->isAromatic)
             {
                 for (unsigned i=0; i < iR->atoms.size(); i++)
                 {
