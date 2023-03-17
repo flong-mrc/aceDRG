@@ -3742,6 +3742,7 @@ namespace LIBMOL {
                 std::cout << "It enters all bonds "<< std::endl;
                 aV.push_back(iB->value);
             }
+
             else if (!inVectABS(aV, iB->value, 0.0001))
             {
                 tMol.bonds.push_back(*iB);
@@ -3755,6 +3756,8 @@ namespace LIBMOL {
             // symm generated bonds should be the same
             else
             {
+                tMol.bonds.push_back(*iB);
+                aV.push_back(iB->value);
                 std::cout << "bond length duplicated "
                           << iB->value << std::endl
                           << "Between atoms "
@@ -5763,7 +5766,7 @@ namespace LIBMOL {
             if (iAt->isInPreCell) {
                 int nMax = 4;
                 if (iAt->chemType.compare("B") == 0) {
-                    nMax = 5;
+                    nMax = 7;
                 }
                 if (iAt->connAtoms.size() > nMax && !iAt->isMetal
                         && !connMetal(iAt->connAtoms, tMol.atoms)) {
@@ -5912,11 +5915,11 @@ namespace LIBMOL {
             }
         }
 
-
+        /*
         if (!validateBondValueSame(tMol, tErrInfo)) {
             return false;
         }
-
+        */
 
         // addition value difference check
         if (!validateBondValueDiff(tMol, tErrInfo)) {

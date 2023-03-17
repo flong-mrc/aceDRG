@@ -2788,6 +2788,24 @@ namespace LIBMOL
         if (tP1 !=-1)
         {
             ID tS1 = TrimSpaces(tStrs[tP1]);
+            if (tS1.find("+") !=std::string::npos)
+            {
+                std::vector<std::string>  tStrs;
+                StrTokenize(tS1, tStrs, '+');
+                if (tStrs.size() > 0)
+                {
+                    tS1 = tStrs[0];
+                }
+            }
+            else if (tS1.find("-") !=std::string::npos)
+            {
+                std::vector<std::string>  tStrs;
+                StrTokenize(tS1, tStrs, '-');
+                if (tStrs.size() > 0)
+                {
+                    tS1 = tStrs[0];
+                }
+            }
             itsCurAtom->sMolType = tS1;
             itsCurAtom->chemType = tS1;
         }
@@ -8735,7 +8753,7 @@ namespace LIBMOL
                     //idxTorStr = "tor_" + idxTorStr;
                     // std::cout << "Torsion angle " << idxTor
                     //          << " It contains " << (int)iT->atoms.size() << std::endl;
-                     
+
                     //std::cout << "atom sp in a torsion " << std::endl;
 
                     //std::cout << "atom " << tAtoms[iT->atoms[1]].id
@@ -8744,7 +8762,7 @@ namespace LIBMOL
                     //          << "atom " << tAtoms[iT->atoms[2]].id
                     //          << " : " << tAtoms[iT->atoms[1]].hybrid
                     //          << std::endl;
-                    
+
 
                     std::string aTorSiga;
                     if (iT->id.find("const") !=std::string::npos

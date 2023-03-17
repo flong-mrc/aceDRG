@@ -2831,7 +2831,7 @@ class Acedrg(CExeCode ):
                     print("found aromatic bonds")
                     self.chemCheck.addjustAtomsAndBonds(self.fileConv.atoms, 
                                                         self.fileConv.bonds)
-                sys.exit()
+                
                 if len(self.fileConv.dataDescriptor):
                     
                     self.setMonoRoot(self.fileConv.dataDescriptor)
@@ -3286,11 +3286,11 @@ class Acedrg(CExeCode ):
                         print("Number of molecules ", len(self.rdKit.molecules))
                         print("Temp cif ", tMolMmcifName)
                         self.runLibmol(tMolMmcifName)
-                else:
-                    print("Problem in reading %s or the molecule contains non-organic atoms"%self.inMdlName)  
+                #else:
+                #    print("Problem in reading %s or the molecule contains non-organic atoms"%self.inMdlName)  
             
             elif self.workMode == 33:
-                if os.path.isfile(self.inMdlName) and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
+                if os.path.isfile(self.inMdlName):   #and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
                     self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
                     tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
                     if len(self.rdKit.molecules)==1:
@@ -3298,8 +3298,8 @@ class Acedrg(CExeCode ):
                         print("Number of molecules ", len(self.rdKit.molecules))
                         print("Temp cif ", tMolMmcifName)
                         self.runLibmol(tMolMmcifName)
-                else:
-                    print("Problem in reading %s or the molecule contains non-organic atoms"%self.inMdlName)
+                #else:
+                #    print("Problem in reading %s or the molecule contains non-organic atoms"%self.inMdlName)
 
         if self.workMode == 34:
             if os.path.isfile(self.inSdfName):
