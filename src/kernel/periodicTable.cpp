@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   periodcTable.cpp
  * Author: flong
  *
@@ -23,7 +23,7 @@ namespace LIBMOL
         matTypes[8]     = "Halogens";               // F, Cl, Br, I, At
         matTypes[9]     = "Rare-Earth";             // La, Ce etc.
         matTypes[10]    = "Inert-Gases";            // He, Ne, Ar, Kr, Xe, Rn
-        
+
         /* For each element, the following properties are listed:
          *  1. row #   in the periodic table
          *  2. group # (general groups include the transition metal
@@ -32,13 +32,13 @@ namespace LIBMOL
          *  5. default valence.
          *  6. default oxidation number. If it is 0, then it has no default value and
          *     needs to to be decided on-fly
-         *  
+         *
          *  Unknown  = -1
          */
-        
+
         // Some of covalent radii for non-organic elements are from "Dalton Trans., 2008, 2832–2838,
         // Covalent radii revisited, by Beatriz Cordero at el"
-        // 
+        //
         // Hydrogen
         elements["H"]["row"]     = 1;
         elements["H"]["group"]   = 1;
@@ -49,17 +49,17 @@ namespace LIBMOL
         elemProps["H"]["cova"]   = 0.32;
         elemProps["H"]["ionM-"]   = 0.23;
         elemProps["H"]["ionM+"]   = 0.23;
-        
+
         elements["D"]["row"]     = 1;
         elements["D"]["group"]   = 1;
         elements["D"]["matType"] = 1;
         elements["D"]["atomNum"] = 1;
         elements["D"]["val"]     = 1;
         elemProps["D"]["vdw"]    = 1.20;
-        elemProps["D"]["cova"]   = 0.32; 
+        elemProps["D"]["cova"]   = 0.32;
         elemProps["D"]["ionM-"]   = 0.23;
-        elemProps["D"]["ionM+"]   = 0.23; 
-        
+        elemProps["D"]["ionM+"]   = 0.23;
+
         // Organic set or Non-metal
         elements["C"]["row"]     = 2;
         elements["C"]["group"]   = 14;
@@ -67,10 +67,10 @@ namespace LIBMOL
         elements["C"]["atomNum"] = 6;
         elements["C"]["val"]     = 4;
         elemProps["C"]["vdw"]    = 1.70;
-        elemProps["C"]["cova"]   = 0.76;
+        elemProps["C"]["cova"]   = 0.85;    // 0.76;
         elemProps["C"]["ionM-"]   = 0.30;
-        
-        
+
+
         elements["N"]["row"]       = 2;
         elements["N"]["group"]     = 15;
         elements["N"]["matType"]   = 2;
@@ -80,9 +80,9 @@ namespace LIBMOL
         elemProps["N"]["cova"]     = 0.71;
         elemProps["N"]["ionM-"]    = 1.32;
         elemProps["N"]["ionM+"]    = 0.30;
-      
-         
-        
+
+
+
         elements["O"]["row"]       = 2;
         elements["O"]["group"]     = 16;
         elements["O"]["matType"]   = 2;
@@ -91,7 +91,7 @@ namespace LIBMOL
         elemProps["O"]["vdw"]      = 1.52;
         elemProps["O"]["cova"]     = 0.68;
         elemProps["O"]["ionM-"]    = 1.26;
-        
+
         elements["P"]["row"]       = 3;
         elements["P"]["group"]     = 15;
         elements["P"]["matType"]   = 2;
@@ -102,7 +102,7 @@ namespace LIBMOL
         elemProps["P"]["cova"]     = 1.05;
         elemProps["P"]["ionM+"]   = 0.58;
         //elemProps["P5+"]["cova"]   = 0.52;
-        
+
         elements["S"]["row"]       = 3;
         elements["S"]["group"]     = 16;
         elements["S"]["matType"]   = 2;
@@ -114,7 +114,7 @@ namespace LIBMOL
         elemProps["S"]["ionM-"]    = 1.70;
         elemProps["S"]["ionM+"]    = 0.51;
         //elemProps["S6+"]["cova"]   = 0.43;
-        
+
         elements["Se"]["row"]      = 4;
         elements["Se"]["group"]    = 16;
         elements["Se"]["matType"]  = 2;
@@ -124,7 +124,7 @@ namespace LIBMOL
         elemProps["Se"]["cova"]    = 1.16;
         elemProps["Se"]["ionM-"]   = 1.84;
         elemProps["Se"]["ionM+"]   = 0.64;
-        
+
         //elemProps["Se6+"]["cova"]   = 0.56;
         elements["B"]["row"]        = 2;
         elements["B"]["group"]      = 13;
@@ -136,8 +136,8 @@ namespace LIBMOL
         elemProps["B"]["vdw"]       = 1.85;
         elemProps["B"]["cova"]      = 0.83;
         elemProps["B"]["ionM+"]     = 0.41;
-        
-        
+
+
         // Halogens
         elements["F"]["row"]     = 2;
         elements["F"]["group"]   = 17;
@@ -150,7 +150,7 @@ namespace LIBMOL
         elemProps["F"]["cova"]   = 0.57;
         elemProps["F"]["ionM-"] = 1.19;
         elemProps["F"]["ionM+"] = 0.22;
-        
+
         elements["Cl"]["row"]     = 3;
         elements["Cl"]["group"]   = 17;
         elements["Cl"]["matType"] = 8;
@@ -161,7 +161,7 @@ namespace LIBMOL
         elemProps["Cl"]["vdw"]    = 1.75;
         elemProps["Cl"]["cova"]    = 0.99;
         elemProps["Cl"]["ionM-"]  = 1.67;
-        
+
         elements["Br"]["row"]     = 4;
         elements["Br"]["group"]   = 17;
         elements["Br"]["matType"] = 8;
@@ -172,7 +172,7 @@ namespace LIBMOL
         elemProps["Br"]["vdw"]    = 1.85;
         elemProps["Br"]["cova"]    = 1.14;
         elemProps["Br"]["ionM-"]  = 1.96;
-        
+
         elements["I"]["row"]      = 5;
         elements["I"]["group"]    = 17;
         elements["I"]["matType"]  = 8;
@@ -183,18 +183,18 @@ namespace LIBMOL
         elemProps["I"]["vdw"]     = 1.98;
         elemProps["I"]["cova"]     = 1.33;
         elemProps["I"]["ionM-"]   = 2.06;
-        
+
         elements["At"]["row"]      = 6;
         elements["At"]["group"]    = 17;
         elements["At"]["matType"]  = 8;
         elements["At"]["atomNum"]  = 85;
-        elements["At"]["val"]      = 1; 
+        elements["At"]["val"]      = 1;
         //elements["At"]["vdw"]      = 2.00;
         //elements["At"]["cova"]     = 1.50;
         elemProps["At"]["vdw"]     = 2.00;
         elemProps["At"]["cova"]    = 1.50;
         elemProps["At"]["ionM-"]  = 0.76;
-        
+
         // Alkali-Metals
         elements["Li"]["row"]      = 2;
         elements["Li"]["group"]    = 1;
@@ -206,7 +206,7 @@ namespace LIBMOL
         elemProps["Li"]["vdw"]     = 1.82;
         elemProps["Li"]["cova"]    = 1.28;
         elemProps["Li"]["ionM+"]  = 0.73;
-        
+
         elements["Na"]["row"]      = 3;
         elements["Na"]["group"]    = 1;
         elements["Na"]["matType"]  = 3;
@@ -217,7 +217,7 @@ namespace LIBMOL
         elemProps["Na"]["vdw"]     = 2.27;
         elemProps["Na"]["cova"]    = 1.13;
         elemProps["Na"]["ionM+"]   = 1.13;
-        
+
         elements["K"]["row"]       = 4;
         elements["K"]["group"]     = 1;
         elements["K"]["matType"]   = 3;
@@ -228,7 +228,7 @@ namespace LIBMOL
         elemProps["K"]["vdw"]      = 2.75;
         elemProps["K"]["cova"]     = 1.23;
         elemProps["K"]["ionM+"]   = 1.52;
-        
+
         elements["Rb"]["row"]      = 5;
         elements["Rb"]["group"]    = 1;
         elements["Rb"]["matType"]  = 3;
@@ -239,7 +239,7 @@ namespace LIBMOL
         elemProps["Rb"]["vdw"]     = 2.00;
         elemProps["Rb"]["cova"]    = 1.48;
         elemProps["Rb"]["ionM+"]  = 1.48;
-        
+
         elements["Cs"]["row"]      = 6;
         elements["Cs"]["group"]    = 1;
         elements["Cs"]["matType"]  = 3;
@@ -248,9 +248,9 @@ namespace LIBMOL
         elements["Cs"]["vdw"]      = 2.00;
         //elements["Cs"]["cova"]     = 1.67;
         //elemProps["Cs"]["vdw"]     = 2.00;
-        elemProps["Cs"]["cova"]    = 1.67; 
-        elemProps["Cs"]["ionM+"]    = 1.81;        
-                
+        elemProps["Cs"]["cova"]    = 1.67;
+        elemProps["Cs"]["ionM+"]    = 1.81;
+
         elements["Fr"]["row"]      = 7;
         elements["Fr"]["group"]    = 1;
         elements["Fr"]["matType"]  = 3;
@@ -258,10 +258,10 @@ namespace LIBMOL
         elements["Fr"]["val"]      = 1;
         //elements["Fr"]["vdw"]      = 2.00;
         //elements["Fr"]["cova"]     = 1.50;
-        elemProps["Fr"]["vdw"]     = 2.00;    // need to find out it 
+        elemProps["Fr"]["vdw"]     = 2.00;    // need to find out it
         elemProps["Fr"]["cova"]    = 1.50;
         elemProps["Fr"]["ionM+"]    = 1.94;
-        
+
         // Alkaline-earth-Metals
         elements["Be"]["row"]      = 2;
         elements["Be"]["group"]    = 2;
@@ -273,7 +273,7 @@ namespace LIBMOL
         elemProps["Be"]["vdw"]     = 2.00;
         elemProps["Be"]["cova"]    = 0.96;
         elemProps["Be"]["ionM+"]  = 0.41;
-        
+
         elements["Mg"]["row"]      = 3;
         elements["Mg"]["group"]    = 2;
         elements["Mg"]["matType"]  = 4;
@@ -284,7 +284,7 @@ namespace LIBMOL
         elemProps["Mg"]["vdw"]     = 1.73;
         elemProps["Mg"]["cova"]     = 1.41;
         elemProps["Mg"]["ionM+"]   = 0.71;
-        
+
         elements["Ca"]["row"]      = 4;
         elements["Ca"]["group"]    = 2;
         elements["Ca"]["matType"]  = 4;
@@ -294,8 +294,8 @@ namespace LIBMOL
         //elements["Ca"]["cova"]     = 0.99;
         elemProps["Ca"]["vdw"]     = 2.00;
         elemProps["Ca"]["cova"]    = 1.74;
-        elemProps["Ca"]["ionM+"]  = 1.14;       
-        
+        elemProps["Ca"]["ionM+"]  = 1.14;
+
         elements["Sr"]["row"]      = 5;
         elements["Sr"]["group"]    = 2;
         elements["Sr"]["matType"]  = 4;
@@ -307,7 +307,7 @@ namespace LIBMOL
         // elemProps["Sr"]["cova"]    = 1.92;
         elemProps["Sr"]["cova"]    = 1.85;
         elemProps["Sr"]["ionM+"]    = 1.32;
-        
+
         elements["Ba"]["row"]      = 6;
         elements["Ba"]["group"]    = 2;
         elements["Ba"]["matType"]  = 4;
@@ -318,7 +318,7 @@ namespace LIBMOL
         elemProps["Ba"]["vdw"]     = 2.53;
         elemProps["Ba"]["cova"]    = 1.98;
         elemProps["Ba"]["ionM+"]  = 1.49;
-        
+
         elements["Ra"]["row"]      = 7;
         elements["Ra"]["group"]    = 2;
         elements["Ra"]["matType"]  = 4;
@@ -329,8 +329,8 @@ namespace LIBMOL
         elemProps["Ra"]["vdw"]     = 2.15;
         elemProps["Ra"]["cova"]    = 1.90;
         elemProps["Ra"]["ionM+"]    = 1.62;
-        
-        
+
+
         // Transition-Metals
 
         elements["Sc"]["row"]      = 4;
@@ -343,18 +343,18 @@ namespace LIBMOL
         elemProps["Sc"]["vdw"]     = 1.60;
         elemProps["Sc"]["cova"]    = 1.70;
         elemProps["Sc"]["ionM+"]  = 0.885;
-        
+
         elements["Y"]["row"]       = 5;
         elements["Y"]["group"]     = 3;
         elements["Y"]["matType"]   = 5;
-        elements["Y"]["atomNum"]   = 39; 
+        elements["Y"]["atomNum"]   = 39;
         elements["Y"]["val"]       = 3;
         //elements["Y"]["vdw"]       = 1.80;
         //elements["Y"]["cova"]      = 1.78;
         elemProps["Y"]["vdw"]      = 1.80;
         elemProps["Y"]["cova"]     = 1.90;
         elemProps["Y"]["ionM+"]   = 1.04;
-        
+
         elements["Ti"]["row"]      = 4;
         elements["Ti"]["group"]    = 4;
         elements["Ti"]["matType"]  = 5;
@@ -367,7 +367,7 @@ namespace LIBMOL
         elemProps["Ti"]["ionM+"]  = 0.86;
         //elemProps["Ti3+"]["cova"]  = 0.67;
         //elemProps["Ti4+"]["cova"]  = 0.61;
-        
+
         elements["Zr"]["row"]      = 5;
         elements["Zr"]["group"]    = 4;
         elements["Zr"]["matType"]  = 5;
@@ -378,7 +378,7 @@ namespace LIBMOL
         elemProps["Zr"]["vdw"]     = 1.55;
         elemProps["Zr"]["cova"]    = 1.75;
         elemProps["Zr"]["ionM+"]  = 0.72;
-        
+
         elements["Hf"]["row"]      = 6;
         elements["Hf"]["group"]    = 4;
         elements["Hf"]["matType"]  = 5;
@@ -389,17 +389,17 @@ namespace LIBMOL
         elemProps["Hf"]["vdw"]     = 1.55;
         elemProps["Hf"]["cova"]     = 1.75;
         elemProps["Hf"]["ionM+"]   = 0.85;
-        
-        
+
+
         elements["Rf"]["row"]      = 7;
         elements["Rf"]["group"]    = 4;
         elements["Rf"]["matType"]  = 5;
         elements["Rf"]["atomNum"]  = 104;
         elements["Rf"]["val"]      = 4;
-        elemProps["Rf"]["vdw"]     = 1.60;    // need to find it out 
+        elemProps["Rf"]["vdw"]     = 1.60;    // need to find it out
         elemProps["Rf"]["cova"]     = 1.21;
         elemProps["Rf"]["ionM+"]   = 0.85;
-        
+
         elements["V"]["row"]       = 4;
         elements["V"]["group"]     = 5;
         elements["V"]["matType"]   = 5;
@@ -412,7 +412,7 @@ namespace LIBMOL
         elemProps["V"]["ionM+"]   = 0.60;  // 0.68;
         //elemProps["V3+"]["cova"]    = 0.78;
         //elemProps["V4+"]["cova"]    = 0.72;
-        
+
         elements["Nb"]["row"]      = 5;
         elements["Nb"]["group"]    = 5;
         elements["Nb"]["matType"]  = 5;
@@ -425,7 +425,7 @@ namespace LIBMOL
         elemProps["Nb"]["ionM+"]  = 0.62;
         //elemProps["Nb4+"]["cova"]  = 0.82;
         //elemProps["Nb5+"]["cova"]  = 0.78;
-        
+
         elements["Ta"]["row"]       = 6;
         elements["Ta"]["group"]     = 5;
         elements["Ta"]["matType"]   = 5;
@@ -438,8 +438,8 @@ namespace LIBMOL
         elemProps["Ta"]["ionM+"]   = 0.78;
         //elemProps["Ta4+"]["cova"]   = 0.82;
         //elemProps["Ta5+"]["cova"]   = 0.78;
-        
-        
+
+
         elements["Db"]["row"]       = 7;
         elements["Db"]["group"]     = 5;
         elements["Db"]["matType"]   = 5;
@@ -447,11 +447,11 @@ namespace LIBMOL
         elements["Db"]["val"]       = 5;
         //elements["Db"]["vdw"]       = 1.45;
         //elements["Db"]["cova"]      = 1.50;
-        elemProps["Db"]["vdw"]      = 1.45;    // need to find it out 
+        elemProps["Db"]["vdw"]      = 1.45;    // need to find it out
         elemProps["Db"]["cova"]     = 1.50;
         elemProps["Db"]["ionM+"]   = 0.78;
-        
-        
+
+
         elements["Cr"]["row"]       = 4;
         elements["Cr"]["group"]     = 6;
         elements["Cr"]["matType"]   = 5;
@@ -466,7 +466,7 @@ namespace LIBMOL
         //elemProps["Cr4+"]["cova"]   = 0.69;
         //elemProps["Cr5+"]["cova"]   = 0.63;
         //elemProps["Cr6+"]["cova"]   = 0.58;
-        
+
         elements["Mo"]["row"]       = 5;
         elements["Mo"]["group"]     = 6;
         elements["Mo"]["matType"]   = 5;
@@ -480,8 +480,8 @@ namespace LIBMOL
         //elemProps["Mo4+"]["cova"]   = 0.79;
         //elemProps["Mo5+"]["cova"]   = 0.75;
         //elemProps["Mo6+"]["cova"]   = 0.73;
-        
-        
+
+
         elements["W"]["row"]        = 6;
         elements["W"]["group"]      = 6;
         elements["W"]["matType"]    = 5;
@@ -494,7 +494,7 @@ namespace LIBMOL
         elemProps["W"]["ionM+"]     = 0.80;
         //elemProps["W5+"]["cova"]   = 0.76;
         //elemProps["W6+"]["cova"]   = 0.74;
-        
+
         elements["Sg"]["row"]       = 7;
         elements["Sg"]["group"]     = 6;
         elements["Sg"]["matType"]   = 5;
@@ -520,7 +520,7 @@ namespace LIBMOL
         //elemProps["Mn5+"]["cova"]   = 0.67;
         //elemProps["Mn6+"]["cova"]   = 0.47;
         //elemProps["Mn7+"]["cova"]   = 0.40;
-        
+
         elements["Tc"]["row"]       = 5;
         elements["Tc"]["group"]     = 7;
         elements["Tc"]["matType"]   = 5;
@@ -533,7 +533,7 @@ namespace LIBMOL
         elemProps["Tc"]["ionM+"]    = 0.79;
         //elemProps["Tc5+"]["cova"]   = 0.64;
         //elemProps["Tc7+"]["cova"]   = 0.70;
-        
+
         elements["Re"]["row"]       = 6;
         elements["Re"]["group"]     = 7;
         elements["Re"]["matType"]   = 5;
@@ -547,7 +547,7 @@ namespace LIBMOL
         //elemProps["Re5+"]["cova"]   = 0.72;
         //elemProps["Re6+"]["cova"]   = 0.69;
         //elemProps["Re7+"]["cova"]   = 0.67;
-        
+
         elements["Bh"]["row"]       = 7;
         elements["Bh"]["group"]     = 7;
         elements["Bh"]["matType"]   = 5;
@@ -558,8 +558,8 @@ namespace LIBMOL
         elemProps["Bh"]["vdw"]      = 1.35;   // Need to find it out
         elemProps["Bh"]["cova"]     = 1.50;
         elemProps["Bh"]["ionM+"]    = 0.77;
-        
-        
+
+
         elements["Fe"]["row"]       = 4;
         elements["Fe"]["group"]     = 8;
         elements["Fe"]["matType"]   = 5;
@@ -573,9 +573,9 @@ namespace LIBMOL
         //elemProps["Fe3+"]["cova"]   = 0.69;
         //elemProps["Fe4+"]["cova"]   = 0.725;
         //elemProps["Fe6+"]["cova"]   = 0.39;
-      
-        
-        
+
+
+
         elements["Ru"]["row"]       = 5;
         elements["Ru"]["group"]     = 8;
         elements["Ru"]["matType"]   = 5;
@@ -590,7 +590,7 @@ namespace LIBMOL
         //elemProps["Ru5+"]["cova"]   = 0.705;
         //elemProps["Ru7+"]["cova"]   = 0.52;
         //elemProps["Ru8+"]["cova"]   = 0.50;
-      
+
         elements["Os"]["row"]       = 6;
         elements["Os"]["group"]     = 8;
         elements["Os"]["matType"]   = 5;
@@ -605,7 +605,7 @@ namespace LIBMOL
         //elemProps["Os6+"]["cova"]   = 0.685;
         //elemProps["Os7+"]["cova"]   = 0.665;
         //elemProps["Os8+"]["cova"]   = 0.53;
-        
+
         elements["Hs"]["row"]       = 7;
         elements["Hs"]["group"]     = 8;
         elements["Hs"]["matType"]   = 5;
@@ -616,7 +616,7 @@ namespace LIBMOL
         elemProps["Hs"]["vdw"]      = 1.30;   // Need to find it out
         elemProps["Hs"]["cova"]     = 1.50;
         elemProps["Hs"]["ionM+"]   = 0.805;
-        
+
         elements["Co"]["row"]       = 4;
         elements["Co"]["group"]     = 9;
         elements["Co"]["matType"]   = 5;
@@ -625,12 +625,12 @@ namespace LIBMOL
         //elements["Co"]["vdw"]       = 1.35;
         //elements["Co"]["cova"]      = 1.33;
         elemProps["Co"]["vdw"]      = 1.35;
-        elemProps["Co"]["cova"]     = 1.26;
+        elemProps["Co"]["cova"]     = 1.33; // 1.26
         elemProps["Co"]["ionM+"]    = 0.885;
         //elemProps["Co3+"]["cova"]   = 0.75;
         //elemProps["Co4+"]["cova"]   = 0.67;
-        
-        
+
+
         elements["Rh"]["row"]       = 5;
         elements["Rh"]["group"]     = 9;
         elements["Rh"]["matType"]   = 5;
@@ -642,8 +642,8 @@ namespace LIBMOL
         elemProps["Rh"]["ionM+"]   = 0.805;
         //elemProps["Rh4+"]["cova"]   = 0.74;
         //elemProps["Rh5+"]["cova"]   = 0.69;
-        
-        
+
+
         elements["Ir"]["row"]       = 6;
         elements["Ir"]["group"]     = 9;
         elements["Ir"]["matType"]   = 5;
@@ -655,7 +655,7 @@ namespace LIBMOL
         elemProps["Ir"]["ionM+"]    = 0.82;
         elemProps["Ir"]["cova"]     = 1.41;
         //elemProps["Ir5+"]["cova"]   = 0.71;
-        
+
         elements["Mt"]["row"]       = 7;
         elements["Mt"]["group"]     = 9;
         elements["Mt"]["matType"]   = 5;
@@ -666,7 +666,7 @@ namespace LIBMOL
         elemProps["Mt"]["vdw"]      = 1.35;   // Need to find it out
         elemProps["Mt"]["cova"]      = 1.21;
         elemProps["Mt"]["ionM+"]    = 0.82;
-        
+
         elements["Ni"]["row"]       = 4;
         elements["Ni"]["group"]     = 10;
         elements["Ni"]["matType"]   = 5;
@@ -679,7 +679,7 @@ namespace LIBMOL
         elemProps["Ni"]["ionM+"]    = 0.83;
         //elemProps["Ni3+"]["cova"]   = 0.70;
         //elemProps["Ni4+"]["cova"]   = 0.62;
-        
+
         elements["Pd"]["row"]       = 5;
         elements["Pd"]["group"]     = 10;
         elements["Pd"]["matType"]   = 5;
@@ -693,7 +693,7 @@ namespace LIBMOL
         //elemProps["Pd2+"]["cova"]    = 1.00;
         //elemProps["Pd3+"]["cova"]      = 0.90;
         //elemProps["Pd4+"]["cova"]      = 0.755;
-        
+
         elements["Pt"]["row"]       = 6;
         elements["Pt"]["group"]     = 10;
         elements["Pt"]["matType"]   = 5;
@@ -706,7 +706,7 @@ namespace LIBMOL
         elemProps["Pt"]["ionM+"]    = 0.94;
         //elemProps["Pt4+"]["cova"]    = 0.765;
         //elemProps["Pt5+"]["cova"]    = 0.71;
-        
+
         elements["Ds"]["row"]       = 7;
         elements["Ds"]["group"]     = 10;
         elements["Ds"]["matType"]   = 5;
@@ -717,7 +717,7 @@ namespace LIBMOL
         elemProps["Ds"]["vdw"]      = 1.75;
         elemProps["Ds"]["cova"]      = 1.50;
         elemProps["Ds"]["ionM+"]    = 0.94;
-        
+
         elements["Cu"]["row"]       = 4;
         elements["Cu"]["group"]     = 11;
         elements["Cu"]["matType"]   = 5;
@@ -730,7 +730,7 @@ namespace LIBMOL
         elemProps["Cu"]["ionM+"]    = 0.91;
         //elemProps["Cu2+"]["cova"]    = 0.87;
         //elemProps["Cu3+"]["cova"]    = 0.68;
-        
+
         elements["Ag"]["row"]       = 5;
         elements["Ag"]["group"]     = 11;
         elements["Ag"]["matType"]   = 5;
@@ -743,7 +743,7 @@ namespace LIBMOL
         elemProps["Ag"]["ionM+"]    = 1.29;
         //elemProps["Ag2+"]["cova"]    = 1.08;
         //elemProps["Ag3+"]["cova"]    = 0.89;
-        
+
         elements["Au"]["row"]       = 6;
         elements["Au"]["group"]     = 11;
         elements["Au"]["matType"]   = 5;
@@ -756,7 +756,7 @@ namespace LIBMOL
         elemProps["Au"]["ionM+"]    = 1.51;
         //elemProps["Au3+"]["cova"]    = 0.99;
         //elemProps["Au5+"]["cova"]    = 0.71;
-        
+
         elements["Rg"]["row"]       = 7;
         elements["Rg"]["group"]     = 11;
         elements["Rg"]["matType"]   = 5;
@@ -764,10 +764,10 @@ namespace LIBMOL
         elements["Rg"]["val"]       = -1;
         //elements["Rg"]["vdw"]       = 1.66;
         //elements["Rg"]["cova"]      = 1.50;
-        elemProps["Rg"]["vdw"]      = 1.66;   // Need to find it out 
+        elemProps["Rg"]["vdw"]      = 1.66;   // Need to find it out
         elemProps["Rg"]["cova"]     = 1.50;
         elemProps["Rg"]["ionM+"]    = 0.94;
-        
+
         elements["Zn"]["row"]       = 4;
         elements["Zn"]["group"]     = 12;
         elements["Zn"]["matType"]   = 5;
@@ -778,7 +778,7 @@ namespace LIBMOL
         elemProps["Zn"]["vdw"]      = 1.39;
         elemProps["Zn"]["cova"]     = 1.18;
         elemProps["Zn"]["ionM+"]    = 0.88;
-        
+
         elements["Cd"]["row"]       = 5;
         elements["Cd"]["group"]     = 12;
         elements["Cd"]["matType"]   = 5;
@@ -789,7 +789,7 @@ namespace LIBMOL
         elemProps["Cd"]["vdw"]      = 1.58;
         elemProps["Cd"]["cova"]     = 1.44;
         elemProps["Cd"]["ionM+"]    = 1.09;
-        
+
         elements["Hg"]["row"]       = 6;
         elements["Hg"]["group"]     = 12;
         elements["Hg"]["matType"]   = 5;
@@ -798,19 +798,19 @@ namespace LIBMOL
         //elements["Hg"]["vdw"]       = 155;
         //elements["Hg"]["cova"]      = 1.70;
         elemProps["Hg"]["vdw"]      = 1.55;
-        elemProps["Hg"]["cova"]     = 1.32;
+        elemProps["Hg"]["cova"]     = 1.70; //   1.32;
         elemProps["Hg"]["ionM+"]   = 1.33;
         //elemProps["Hg2+"]["cova"]   = 1.16;
-        
-        
+
+
         elements["Cn"]["row"]       = 7;
         elements["Cn"]["group"]     = 12;
         elements["Cn"]["matType"]   = 5;
         elements["Cn"]["atomNum"]   = 112;
         elements["Cn"]["val"]       = -1;
-        elemProps["Cn"]["vdw"]      = 1.58;   // Need to find it out 
+        elemProps["Cn"]["vdw"]      = 1.58;   // Need to find it out
         elemProps["Cn"]["cova"]     = 1.58;   // Need to find it out
-        
+
         // Other-Metal
         elements["Al"]["row"]       = 3;
         elements["Al"]["group"]     = 13;
@@ -822,7 +822,7 @@ namespace LIBMOL
         elemProps["Al"]["vdw"]      = 1.25;
         elemProps["Al"]["cova"]     = 1.21;
         elemProps["Al"]["ionM+"]    = 0.675;
-        
+
         elements["Ga"]["row"]       = 4;
         elements["Ga"]["group"]     = 13;
         elements["Ga"]["matType"]   = 6;
@@ -833,7 +833,7 @@ namespace LIBMOL
         elemProps["Ga"]["vdw"]      = 1.87;
         elemProps["Ga"]["cova"]     = 1.22;
         elemProps["Ga"]["ionM+"]    = 0.76;
-        
+
         elements["In"]["row"]       = 5;
         elements["In"]["group"]     = 13;
         elements["In"]["matType"]   = 6;
@@ -844,7 +844,7 @@ namespace LIBMOL
         elemProps["In"]["vdw"]      = 1.93;
         elemProps["In"]["cova"]     = 1.42;
         elemProps["In"]["ionM+"]    = 0.94;
-        
+
         elements["Ti"]["row"]       = 6;
         elements["Ti"]["group"]     = 13;
         elements["Ti"]["matType"]   = 6;
@@ -857,7 +857,7 @@ namespace LIBMOL
         elemProps["Ti"]["ionM+"]     = 1.00;
         //elemProps["Ti3+"]["cova"]     = 0.81;
         //elemProps["Ti4+"]["cova"]     = 0.745;
-        
+
         elements["Sn"]["row"]       = 5;
         elements["Sn"]["group"]     = 14;
         elements["Sn"]["matType"]   = 6;
@@ -868,7 +868,7 @@ namespace LIBMOL
         elemProps["Sn"]["vdw"]      = 2.17;
         elemProps["Sn"]["cova"]     = 1.39;
         elemProps["Sn"]["ionM+"]     = 0.83;
-        
+
         elements["Pb"]["row"]       = 6;
         elements["Pb"]["group"]     = 14;
         elements["Pb"]["matType"]   = 6;
@@ -880,7 +880,7 @@ namespace LIBMOL
         elemProps["Pb"]["cova"]     = 1.46;
         elemProps["Pb"]["ionM+"]     = 1.33;
         //elemProps["Pb+4"]["cova"]     = 0.915;
-        
+
         elements["Bi"]["row"]       = 6;
         elements["Bi"]["group"]     = 15;
         elements["Bi"]["matType"]   = 6;
@@ -889,10 +889,10 @@ namespace LIBMOL
         //elements["Bi"]["vdw"]       = 1.80;
         //elements["Bi"]["cova"]      = 1.54;
         elemProps["Bi"]["vdw"]      = 1.80;
-        elemProps["Bi"]["cova"]     = 1.48;
+        elemProps["Bi"]["cova"]     = 1.68;  //1.48;
         elemProps["Bi"]["ionM+"]    = 1.17;
         // Semimetallics
-        
+
 
         elements["Si"]["row"]       = 3;
         elements["Si"]["group"]     = 14;
@@ -902,9 +902,9 @@ namespace LIBMOL
         //elements["Si"]["vdw"]       = 2.10;
         //elements["Si"]["cova"]      = 1.20;
         elemProps["Si"]["vdw"]      = 2.10;
-        elemProps["Si"]["cova"]     = 1.11;
+        elemProps["Si"]["cova"]     = 1.20;
         elemProps["Si"]["ionM+"]    = 0.54;
-        
+
         elements["Ge"]["row"]       = 4;
         elements["Ge"]["group"]     = 14;
         elements["Ge"]["matType"]   = 7;
@@ -916,7 +916,7 @@ namespace LIBMOL
         elemProps["Ge"]["cova"]     = 1.20;
         elemProps["Ge"]["ionM+"]   = 0.87;
         //elemProps["Ge4+"]["cova"]   = 0.67;
-        
+
         elements["As"]["row"]       = 4;
         elements["As"]["group"]     = 15;
         elements["As"]["matType"]   = 7;
@@ -925,10 +925,10 @@ namespace LIBMOL
         //elements["As"]["vdw"]       = 1.85;
         //elements["As"]["cova"]      = 1.21;
         elemProps["As"]["vdw"]      = 1.85;
-        elemProps["As"]["cova"]     = 1.11;
+        elemProps["As"]["cova"]     = 1.21;  // 1.11;
         elemProps["As"]["ionM+"]    = 0.72;
         //elemProps["As5+"]["cova"]    = 0.60;
-        
+
         elements["Sb"]["row"]       = 5;
         elements["Sb"]["group"]     = 15;
         elements["Sb"]["matType"]   = 7;
@@ -940,7 +940,7 @@ namespace LIBMOL
         elemProps["Sb"]["cova"]     = 1.39;
         elemProps["Sb"]["ionM+"]    = 0.90;
         //elemProps["Sb5+"]["cova"]    = 0.74;
-        
+
         elements["Te"]["row"]       = 5;
         elements["Te"]["group"]     = 16;
         elements["Te"]["matType"]   = 7;
@@ -953,7 +953,7 @@ namespace LIBMOL
         elemProps["Te"]["ionM-"]    = 2.07;
         elemProps["Te"]["ionM+"]    = 1.11;
         //elemProps["Te5+"]["cova"]    = 0.70;
-        
+
         elements["Po"]["row"]       = 6;
         elements["Po"]["group"]     = 16;
         elements["Po"]["matType"]   = 7;
@@ -965,9 +965,9 @@ namespace LIBMOL
         elemProps["Po"]["cova"]     = 1.40;
         elemProps["Po"]["ionM+"]    = 1.08;
         //elemProps["Po6+"]["cova"]    = 0.81;
-        
+
         // Rare earth metals
-        
+
         elements["La"]["row"]       = 6;
         elements["La"]["group"]     = 3;
         elements["La"]["matType"]   = 9;
@@ -977,9 +977,9 @@ namespace LIBMOL
         //elements["Po"]["cova"]      = 1.60;
         elemProps["La"]["vdw"]      = 1.87;  //atom radius
         elemProps["La"]["cova"]     = 2.07;
-        elemProps["La"]["ionM+"]    = 1.08;     
-        
-        
+        elemProps["La"]["ionM+"]    = 1.08;
+
+
         elements["Ce"]["row"]       = 6;
         elements["Ce"]["group"]     = 3;
         elements["Ce"]["matType"]   = 9;
@@ -990,8 +990,8 @@ namespace LIBMOL
         elemProps["Ce"]["vdw"]      = 1.82;  //atom radius
         elemProps["Ce"]["cova"]     = 2.04;
         elemProps["Ce"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Pr"]["row"]       = 6;
         elements["Pr"]["group"]     = 3;
         elements["Pr"]["matType"]   = 9;
@@ -1002,8 +1002,8 @@ namespace LIBMOL
         elemProps["Pr"]["vdw"]      = 1.82;  //atom radius
         elemProps["Pr"]["cova"]     = 2.03;
         elemProps["Pr"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Nd"]["row"]       = 6;
         elements["Nd"]["group"]     = 3;
         elements["Nd"]["matType"]   = 9;
@@ -1014,8 +1014,8 @@ namespace LIBMOL
         elemProps["Nd"]["vdw"]      = 1.81;  //atom radius
         elemProps["Nd"]["cova"]     = 2.01;
         elemProps["Nd"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Pm"]["row"]       = 6;
         elements["Pm"]["group"]     = 3;
         elements["Pm"]["matType"]   = 9;
@@ -1026,8 +1026,8 @@ namespace LIBMOL
         elemProps["Pm"]["vdw"]      = 1.59;
         elemProps["Pm"]["cova"]     = 1.87;
         elemProps["Pm"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Sm"]["row"]       = 6;
         elements["Sm"]["group"]     = 3;
         elements["Sm"]["matType"]   = 9;
@@ -1038,7 +1038,7 @@ namespace LIBMOL
         elemProps["Sm"]["vdw"]      = 1.59;
         elemProps["Sm"]["cova"]     = 1.87;
         elemProps["Sm"]["ionM+"]    = 1.08;
-        
+
         elements["Eu"]["row"]       = 6;
         elements["Eu"]["group"]     = 3;
         elements["Eu"]["matType"]   = 9;
@@ -1049,7 +1049,7 @@ namespace LIBMOL
         elemProps["Eu"]["vdw"]      = 1.59;
         elemProps["Eu"]["cova"]     = 1.87;
         elemProps["Eu"]["ionM+"]    = 1.08;
-        
+
         elements["Gd"]["row"]       = 6;
         elements["Gd"]["group"]     = 3;
         elements["Gd"]["matType"]   = 9;
@@ -1058,7 +1058,7 @@ namespace LIBMOL
         elemProps["Gd"]["vdw"]      = 1.80;
         elemProps["Gd"]["cova"]     = 1.96;
         elemProps["Gd"]["ionM+"]    = 1.08;
-        
+
         elements["Tb"]["row"]       = 6;
         elements["Tb"]["group"]     = 3;
         elements["Tb"]["matType"]   = 9;
@@ -1067,7 +1067,7 @@ namespace LIBMOL
         elemProps["Tb"]["vdw"]      = 1.77;
         elemProps["Tb"]["cova"]     = 1.94;
         elemProps["Tb"]["ionM+"]    = 1.08;
-        
+
         elements["Dy"]["row"]       = 6;
         elements["Dy"]["group"]     = 3;
         elements["Dy"]["matType"]   = 9;
@@ -1076,7 +1076,7 @@ namespace LIBMOL
         elemProps["Dy"]["vdw"]      = 1.78;
         elemProps["Dy"]["cova"]     = 1.94;
         elemProps["Dy"]["ionM+"]    = 1.08;
-        
+
         elements["Ho"]["row"]       = 6;
         elements["Ho"]["group"]     = 3;
         elements["Ho"]["matType"]   = 9;
@@ -1085,7 +1085,7 @@ namespace LIBMOL
         elemProps["Ho"]["vdw"]      = 1.76;
         elemProps["Ho"]["cova"]     = 1.92;
         elemProps["Ho"]["ionM+"]    = 1.08;
-       
+
         elements["Er"]["row"]       = 6;
         elements["Er"]["group"]     = 3;
         elements["Er"]["matType"]   = 9;
@@ -1094,7 +1094,7 @@ namespace LIBMOL
         elemProps["Er"]["vdw"]      = 1.76;
         elemProps["Er"]["cova"]     = 1.89;
         elemProps["Er"]["ionM+"]    = 1.08;
-        
+
         elements["Tm"]["row"]       = 6;
         elements["Tm"]["group"]     = 3;
         elements["Tm"]["matType"]   = 9;
@@ -1103,7 +1103,7 @@ namespace LIBMOL
         elemProps["Tm"]["vdw"]      = 1.76;
         elemProps["Tm"]["cova"]     = 1.90;
         elemProps["Tm"]["ionM+"]    = 1.08;
-        
+
         elements["Yb"]["row"]       = 6;
         elements["Yb"]["group"]     = 3;
         elements["Yb"]["matType"]   = 9;
@@ -1112,7 +1112,7 @@ namespace LIBMOL
         elemProps["Yb"]["vdw"]      = 1.76;
         elemProps["Yb"]["cova"]     = 1.87;
         elemProps["Yb"]["ionM+"]    = 1.08;
-        
+
         elements["Lu"]["row"]       = 6;
         elements["Lu"]["group"]     = 3;
         elements["Lu"]["matType"]   = 9;
@@ -1121,7 +1121,7 @@ namespace LIBMOL
         elemProps["Lu"]["vdw"]      = 1.74;
         elemProps["Lu"]["cova"]     = 1.87;
         elemProps["Lu"]["ionM+"]    = 1.08;
-        
+
         elements["Ac"]["row"]       = 7;
         elements["Ac"]["group"]     = 3;
         elements["Ac"]["matType"]   = 9;
@@ -1130,7 +1130,7 @@ namespace LIBMOL
         elemProps["Ac"]["vdw"]      = 1.76;
         elemProps["Ac"]["cova"]     = 2.15;
         elemProps["Ac"]["ionM+"]    = 1.08;
-        
+
         elements["Th"]["row"]       = 7;
         elements["Th"]["group"]     = 3;
         elements["Th"]["matType"]   = 9;
@@ -1139,7 +1139,7 @@ namespace LIBMOL
         elemProps["Th"]["vdw"]      = 1.80;
         elemProps["Th"]["cova"]     = 2.06;
         elemProps["Th"]["ionM+"]    = 1.08;
-        
+
         elements["Pa"]["row"]       = 7;
         elements["Pa"]["group"]     = 3;
         elements["Pa"]["matType"]   = 9;
@@ -1148,7 +1148,7 @@ namespace LIBMOL
         elemProps["Pa"]["vdw"]      = 1.63;
         elemProps["Pa"]["cova"]     = 2.00;
         elemProps["Pa"]["ionM+"]    = 1.08;
-        
+
         elements["U"]["row"]       = 7;
         elements["U"]["group"]     = 3;
         elements["U"]["matType"]   = 9;
@@ -1157,7 +1157,7 @@ namespace LIBMOL
         elemProps["U"]["vdw"]      = 1.86;
         elemProps["U"]["cova"]     = 1.96;
         elemProps["U"]["ionM+"]    = 1.08;
-        
+
         elements["Np"]["row"]       = 7;
         elements["Np"]["group"]     = 3;
         elements["Np"]["matType"]   = 9;
@@ -1166,7 +1166,7 @@ namespace LIBMOL
         elemProps["Np"]["vdw"]      = 1.55;
         elemProps["Np"]["cova"]     = 1.90;
         elemProps["Np"]["ionM+"]    = 1.08;
-        
+
         elements["Pu"]["row"]       = 7;
         elements["Pu"]["group"]     = 3;
         elements["Pu"]["matType"]   = 9;
@@ -1175,7 +1175,7 @@ namespace LIBMOL
         elemProps["Pu"]["vdw"]      = 1.59;
         elemProps["Pu"]["cova"]     = 1.87;
         elemProps["Pu"]["ionM+"]    = 1.08;
-        
+
         elements["Am"]["row"]       = 7;
         elements["Am"]["group"]     = 3;
         elements["Am"]["matType"]   = 9;
@@ -1184,7 +1184,7 @@ namespace LIBMOL
         elemProps["Am"]["vdw"]      = 1.73;
         elemProps["Am"]["cova"]     = 1.80;
         elemProps["Am"]["ionM+"]    = 1.08;
-        
+
         elements["Cm"]["row"]       = 7;
         elements["Cm"]["group"]     = 3;
         elements["Cm"]["matType"]   = 9;
@@ -1193,8 +1193,8 @@ namespace LIBMOL
         elemProps["Cm"]["vdw"]      = 1.74;
         elemProps["Cm"]["cova"]     = 1.69;
         elemProps["Cm"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Bk"]["row"]       = 7;
         elements["Bk"]["group"]     = 3;
         elements["Bk"]["matType"]   = 9;
@@ -1203,11 +1203,11 @@ namespace LIBMOL
         elemProps["Bk"]["vdw"]      = 1.70;
         elemProps["Bk"]["cova"]     = 1.80;
         elemProps["Bk"]["ionM+"]    = 1.08;
-        
+
         // The following are  rare-earth synthetic elements
         // where atom, vdw and covalent radii are not available
-        // Put those props here just as position holders 
-        
+        // Put those props here just as position holders
+
         elements["Cf"]["row"]       = 7;
         elements["Cf"]["group"]     = 3;
         elements["Cf"]["matType"]   = 9;
@@ -1216,8 +1216,8 @@ namespace LIBMOL
         elemProps["Cf"]["vdw"]      = 1.73;       // not sure
         elemProps["Cf"]["cova"]     = 1.80;       // not sure
         elemProps["Cf"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Es"]["row"]       = 7;
         elements["Es"]["group"]     = 3;
         elements["Es"]["matType"]   = 9;
@@ -1226,8 +1226,8 @@ namespace LIBMOL
         elemProps["Es"]["vdw"]      = 1.73;       // not sure
         elemProps["Es"]["cova"]     = 1.80;       // not sure
         elemProps["Es"]["ionM+"]    = 1.08;
-        
-        
+
+
         elements["Fm"]["row"]       = 7;
         elements["Fm"]["group"]     = 3;
         elements["Fm"]["matType"]   = 9;
@@ -1236,7 +1236,7 @@ namespace LIBMOL
         elemProps["Fm"]["vdw"]      = 1.73;       // not sure
         elemProps["Fm"]["cova"]     = 1.80;       // not sure
         elemProps["Fm"]["ionM+"]    = 1.08;
-        
+
         elements["Md"]["row"]       = 7;
         elements["Md"]["group"]     = 3;
         elements["Md"]["matType"]   = 9;
@@ -1245,7 +1245,7 @@ namespace LIBMOL
         elemProps["Md"]["vdw"]      = 1.73;       // not sure
         elemProps["Md"]["cova"]     = 1.80;       // not sure
         elemProps["Md"]["ionM+"]    = 1.08;
-        
+
         elements["No"]["row"]       = 7;
         elements["No"]["group"]     = 3;
         elements["No"]["matType"]   = 9;
@@ -1254,7 +1254,7 @@ namespace LIBMOL
         elemProps["No"]["vdw"]      = 1.73;       // not sure
         elemProps["No"]["cova"]     = 1.80;       // not sure
         elemProps["No"]["ionM+"]    = 1.08;
-        
+
         elements["Lr"]["row"]       = 7;
         elements["Lr"]["group"]     = 3;
         elements["Lr"]["matType"]   = 9;
@@ -1263,26 +1263,26 @@ namespace LIBMOL
         elemProps["Lr"]["vdw"]      = 1.73;       // not sure
         elemProps["Lr"]["cova"]     = 1.80;       // not sure
         elemProps["Lr"]["ionM+"]    = 1.08;
-        
+
         //some elements have multiple valences
-        
+
         extraValences["P"].push_back(3);
-        
+
         extraValences["N"].push_back(5);
-        
+
         extraValences["S"].push_back(2);
         extraValences["S"].push_back(4);
-        
+
         extraValences["Se"].push_back(2);
-        extraValences["Se"].push_back(4);   
-        
+        extraValences["Se"].push_back(4);
+
         extraValences["Hg"].push_back(1);
         extraValences["Cu"].push_back(1);
-        
+
         extraValences["Br"].push_back(3);
         extraValences["Br"].push_back(5);
         extraValences["Br"].push_back(7);
-        
+
         for (std::map<ID, std::map<ID, int> >::iterator iEl=elements.begin();
                 iEl!=elements.end(); iEl++)
         {
@@ -1308,9 +1308,9 @@ namespace LIBMOL
                 // are decided on-fly
                 iEl->second["oxiNum"]=0;
             }
-            
-            // lone-pair electrons 
-            
+
+            // lone-pair electrons
+
             if (iEl->first == "N")
             {
                 iEl->second["pairedVE"] = 2;
@@ -1318,7 +1318,7 @@ namespace LIBMOL
             else if (iEl->first=="S")
             {
                 iEl->second["pairedVE"] = 4;
-            
+
             }
             else if (iEl->first=="P")
             {
@@ -1331,147 +1331,147 @@ namespace LIBMOL
             }
             else
             {
-                // for metal and C atoms, set number of default lone-pair 
+                // for metal and C atoms, set number of default lone-pair
                 // electrons to zero
-                
+
                 iEl->second["pairedVE"] = 0;
             }
-            
+
         }
 
-                
+
         // Hydrogen
         electronConf["H"].push_back(std::make_pair ("1s",1));
-        
+
         // Organic set or Non-metal
         electronConf["C"].push_back(std::make_pair ("2s",2));
         electronConf["C"].push_back(std::make_pair ("2p",2));
-             
+
         electronConf["N"].push_back(std::make_pair ("2s",2));
         electronConf["N"].push_back(std::make_pair ("2p",3));
-        
+
         electronConf["O"].push_back(std::make_pair ("2s",2));
         electronConf["O"].push_back(std::make_pair ("2p",4));
-        
-   
+
+
         electronConf["P"].push_back(std::make_pair ("3s",2));
         electronConf["P"].push_back(std::make_pair ("3p",3));
-        
+
         electronConf["S"].push_back(std::make_pair ("3s",2));
         electronConf["S"].push_back(std::make_pair ("3p",4));
-        
-        
+
+
         electronConf["Se"].push_back(std::make_pair ("4s",2));
         electronConf["Se"].push_back(std::make_pair ("3d",10));
         electronConf["Se"].push_back(std::make_pair ("4p",4));
-        
+
         // Halogens
         electronConf["F"].push_back(std::make_pair ("2s",2));
         electronConf["F"].push_back(std::make_pair ("2p",5));
-        
+
         electronConf["Cl"].push_back(std::make_pair ("3s",2));
         electronConf["Cl"].push_back(std::make_pair ("3p",5));
-        
+
         electronConf["Br"].push_back(std::make_pair ("4s",2));
         electronConf["Br"].push_back(std::make_pair ("4p",5));
-        
-        
+
+
         electronConf["I"].push_back(std::make_pair ("5s",2));
         electronConf["I"].push_back(std::make_pair ("5p",5));
-        
-        
+
+
         electronConf["At"].push_back(std::make_pair ("6s",2));
         electronConf["At"].push_back(std::make_pair ("6p",5));
-       
-        
+
+
         // Alkali-Metals
         electronConf["Li"].push_back(std::make_pair ("2s",1));
-        
+
         electronConf["Na"].push_back(std::make_pair ("3s",1));
-       
+
         electronConf["K"].push_back(std::make_pair ("4s",1));
-       
+
         electronConf["Rb"].push_back(std::make_pair ("5s",1));
-        
+
         electronConf["Cs"].push_back(std::make_pair ("6s",1));
-        
+
         electronConf["Fr"].push_back(std::make_pair ("7s",1));
-        
+
         // Alkaline-earth-Metals
         electronConf["Be"].push_back(std::make_pair ("2s",2));
-        
+
         electronConf["Mg"].push_back(std::make_pair ("3s",2));
-        
+
         electronConf["Ca"].push_back(std::make_pair ("4s",2));
-        
+
         electronConf["Sr"].push_back(std::make_pair ("5s",2));
-       
+
         electronConf["Ba"].push_back(std::make_pair ("6s",2));
-        
+
         electronConf["Ra"].push_back(std::make_pair ("7s",2));
-        
+
         // Transition-Metals
 
         electronConf["Sc"].push_back(std::make_pair ("3d",1));
         electronConf["Y"].push_back(std::make_pair ("4d",1));
-        
+
         electronConf["Ti"].push_back(std::make_pair ("3d",2));
         electronConf["Zr"].push_back(std::make_pair ("4d",2));
         electronConf["Hf"].push_back(std::make_pair ("5d",2));
         electronConf["Rf"].push_back(std::make_pair ("6d",2));
-        
-        
+
+
         electronConf["V"].push_back(std::make_pair ("3d",3));
-        
-        
+
+
         electronConf["Nb"].push_back(std::make_pair ("5s",1));
-        electronConf["Nb"].push_back(std::make_pair ("4d",4));    
+        electronConf["Nb"].push_back(std::make_pair ("4d",4));
         electronConf["Ta"].push_back(std::make_pair ("5d",3));
         electronConf["Db"].push_back(std::make_pair ("6d",3));
-        
+
         electronConf["Cr"].push_back(std::make_pair ("4s",1));
         electronConf["Cr"].push_back(std::make_pair ("3d",5));
         electronConf["Mo"].push_back(std::make_pair ("5s",1));
         electronConf["Mo"].push_back(std::make_pair ("4d",5));
-        
+
         electronConf["W"].push_back(std::make_pair ("5d",4));
         electronConf["Sg"].push_back(std::make_pair ("6d",4));
-        
+
         electronConf["Mn"].push_back(std::make_pair ("3d",5));
-        electronConf["Tc"].push_back(std::make_pair ("4d",5));   
+        electronConf["Tc"].push_back(std::make_pair ("4d",5));
         electronConf["Re"].push_back(std::make_pair ("5d",5));
         electronConf["Bh"].push_back(std::make_pair ("6d",5));
-        
+
         electronConf["Fe"].push_back(std::make_pair ("3d",6));
         electronConf["Fe"].push_back(std::make_pair ("4s",2));
         electronConf["Ru"].push_back(std::make_pair ("5s",1));
-        electronConf["Ru"].push_back(std::make_pair ("4d",7)); 
-        electronConf["Os"].push_back(std::make_pair ("5d",6)); 
+        electronConf["Ru"].push_back(std::make_pair ("4d",7));
+        electronConf["Os"].push_back(std::make_pair ("5d",6));
         electronConf["Hs"].push_back(std::make_pair ("6d",6));
-        
+
         electronConf["Co"].push_back(std::make_pair ("3d",7));
         electronConf["Rh"].push_back(std::make_pair ("5s",1));
         electronConf["Rh"].push_back(std::make_pair ("4d",8));
         electronConf["Ir"].push_back(std::make_pair ("5d",7));
         electronConf["Mt"].push_back(std::make_pair ("6d",7));
-        
+
         electronConf["Ni"].push_back(std::make_pair ("3d",8));
         electronConf["Pd"].push_back(std::make_pair ("4d",10));
-        
+
         electronConf["Pt"].push_back(std::make_pair ("6s",1));
         electronConf["Pt"].push_back(std::make_pair ("5d",9));
         electronConf["Ds"].push_back(std::make_pair ("7s",1));
         electronConf["Ds"].push_back(std::make_pair ("6d",9));
-        
+
         electronConf["Cu"].push_back(std::make_pair ("4s",1));
         electronConf["Cu"].push_back(std::make_pair ("3d",10));
         electronConf["Ag"].push_back(std::make_pair ("5s",1));
         electronConf["Ag"].push_back(std::make_pair ("4d",10));
         electronConf["Au"].push_back(std::make_pair ("6s",1));
-        electronConf["Au"].push_back(std::make_pair ("5d",10));  
+        electronConf["Au"].push_back(std::make_pair ("5d",10));
         electronConf["Rg"].push_back(std::make_pair ("7s",1));
         electronConf["Rg"].push_back(std::make_pair ("6d",10));
-        
+
         electronConf["Zn"].push_back(std::make_pair ("4s",2));
         electronConf["Zn"].push_back(std::make_pair ("3d",10));
         electronConf["Cd"].push_back(std::make_pair ("5s",2));
@@ -1480,12 +1480,12 @@ namespace LIBMOL
         electronConf["Hg"].push_back(std::make_pair ("5d",10));
         electronConf["Cn"].push_back(std::make_pair ("7s",2));
         electronConf["Cn"].push_back(std::make_pair ("6d",10));
-        
+
         // Other-Metal
         electronConf["Al"].push_back(std::make_pair ("3s",2));
         electronConf["Al"].push_back(std::make_pair ("3p",1));
         electronConf["Ga"].push_back(std::make_pair ("4s",2));
-        electronConf["Ga"].push_back(std::make_pair ("4p",1));     
+        electronConf["Ga"].push_back(std::make_pair ("4p",1));
         electronConf["In"].push_back(std::make_pair ("5s",2));
         electronConf["In"].push_back(std::make_pair ("4d",10));
         electronConf["In"].push_back(std::make_pair ("5p",1));
@@ -1495,23 +1495,23 @@ namespace LIBMOL
         electronConf["Sn"].push_back(std::make_pair ("5s",2));
         electronConf["Sn"].push_back(std::make_pair ("4d",10));
         electronConf["Sn"].push_back(std::make_pair ("5p",2));
-        
+
         electronConf["Pb"].push_back(std::make_pair ("6s",2));
         electronConf["Pb"].push_back(std::make_pair ("4f",14));
         electronConf["Pb"].push_back(std::make_pair ("5d",10));
-        electronConf["Pb"].push_back(std::make_pair ("6p",2));      
-        
+        electronConf["Pb"].push_back(std::make_pair ("6p",2));
+
         electronConf["Bi"].push_back(std::make_pair ("6s",2));
         electronConf["Bi"].push_back(std::make_pair ("4f",14));
         electronConf["Bi"].push_back(std::make_pair ("5d",10));
         electronConf["Bi"].push_back(std::make_pair ("6p",3));
-        
+
         // Semimetallics
-        
+
         electronConf["B"].push_back(std::make_pair ("2s",2));
         electronConf["B"].push_back(std::make_pair ("2p",1));
         electronConf["Si"].push_back(std::make_pair ("3s",2));
-        electronConf["Si"].push_back(std::make_pair ("3p",2));     
+        electronConf["Si"].push_back(std::make_pair ("3p",2));
         electronConf["Ge"].push_back(std::make_pair ("4s",2));
         electronConf["Ge"].push_back(std::make_pair ("3d",10));
         electronConf["Ge"].push_back(std::make_pair ("4p",2));
@@ -1528,30 +1528,30 @@ namespace LIBMOL
         electronConf["Po"].push_back(std::make_pair ("4f",14));
         electronConf["Po"].push_back(std::make_pair ("5d",10));
         electronConf["Po"].push_back(std::make_pair ("6p",4));
-        
+
         // Electronegativity of atoms, Allen scale
         // Allen, L.C., J. Am. Chem. Soc., 111, 9003, 1989
         // Unknown = -1.0
-        
+
         // Hydrogen
-        electronegativities["H"]  = 2.300; 
-          
-        
+        electronegativities["H"]  = 2.300;
+
+
         // Organic set or Non-metal
-        electronegativities["C"]  = 2.544;        
+        electronegativities["C"]  = 2.544;
         electronegativities["N"]  = 3.066;
         electronegativities["O"]  = 3.610;
         electronegativities["P"]  = 2.253;
         electronegativities["S"]  = 2.589;
         electronegativities["Se"] = 2.434;
-        
+
         // Halogens
         electronegativities["F"]  = 4.193;
         electronegativities["Cl"] = 2.869;
         electronegativities["Br"] = 2.685;
         electronegativities["I"]  = 2.359;
         electronegativities["At"] = 2.39;
-        
+
         // Alkali-Metals
         electronegativities["Li"] = 0.912;
         electronegativities["Na"] = 0.869;
@@ -1559,7 +1559,7 @@ namespace LIBMOL
         electronegativities["Rb"] = 0.706;
         electronegativities["Cs"] = 0.659;
         electronegativities["Fr"] = 0.67;
-        
+
         // Alkaline-earth-Metals
         electronegativities["Be"] = 1.576;
         electronegativities["Mg"] = 1.293;
@@ -1567,7 +1567,7 @@ namespace LIBMOL
         electronegativities["Sr"] = 0.963;
         electronegativities["Ba"] = 0.881;
         electronegativities["Ra"] = 0.89;
-        
+
         // Transition-Metals
 
         electronegativities["Sc"] = 1.19;
@@ -1608,7 +1608,7 @@ namespace LIBMOL
         electronegativities["Cd"] = 1.52;
         electronegativities["Hg"] = 1.76;
         electronegativities["Cn"] = -1.0;
-        
+
         // Other-Metal
         electronegativities["Al"] = 1.613;
         electronegativities["Ga"] = 1.756;
@@ -1617,9 +1617,9 @@ namespace LIBMOL
         electronegativities["Sn"] = 1.824;
         electronegativities["Pb"] = 1.854;
         electronegativities["Bi"] = 2.01;
-        
+
         // Semimetallics
-        
+
         electronegativities["B"]  = 2.051;
         electronegativities["Si"] = 1.916;
         electronegativities["Ge"] = 1.994;
@@ -1627,76 +1627,76 @@ namespace LIBMOL
         electronegativities["Sb"] = 1.984;
         electronegativities["Te"] = 2.158;
         electronegativities["Po"] = 2.190;
-        
+
     }
-    
+
     PeriodicTable::~PeriodicTable()
     {
     }
-    
+
     void PeriodicTable::compareIdealDists(std::map<std::string, std::map<
                                           std::string, std::map<std::string,
                                           REAL> > >  & tAllowedRangeDists,
                                           double tDelta)
     {
         // This function is for metal related bonds
-        
+
         //std::ofstream compTab("idealComp.table");
         tDelta = tDelta/10.0;
         std::vector<ID>  metTab, metLoidTab;
-        
+
         initMetalTab(metTab);
         initMetalloidTab(metLoidTab);
-        
-        for (std::map<ID,  std::map<ID, REAL> >::iterator 
+
+        for (std::map<ID,  std::map<ID, REAL> >::iterator
              iProp1=elemProps.begin(); iProp1 != elemProps.end(); iProp1++)
         {
             ID elem1 = iProp1->first;
             if (isMetal(metTab, elem1) || isMetalloid(metLoidTab, elem1))
             {
-                for (std::map<ID,  std::map<ID, REAL> >::iterator 
-                     iProp2=elemProps.begin(); iProp2 != elemProps.end(); 
+                for (std::map<ID,  std::map<ID, REAL> >::iterator
+                     iProp2=elemProps.begin(); iProp2 != elemProps.end();
                      iProp2++)
                 {
-                    
+
                     double d1=0.0, d2=0.0, dI=0;
                     ID elem2 = iProp2->first;
                     if (isMetal(metTab, elem2))
                     {
-                        if (elemProps[elem2].find("ionM-") 
+                        if (elemProps[elem2].find("ionM-")
                             !=elemProps[elem2].end())
                         {
-                            dI = elemProps[elem1]["ionM+"] 
+                            dI = elemProps[elem1]["ionM+"]
                                + elemProps[elem2]["ionM-"];
                         }
                         else
                         {
-                            dI = elemProps[elem1]["ionM+"] 
+                            dI = elemProps[elem1]["ionM+"]
                                + elemProps[elem2]["ionM+"];
                         }
                     }
                     else
                     {
-                        if (elemProps[elem1].find("cova") 
+                        if (elemProps[elem1].find("cova")
                             !=elemProps[elem1].end()
-                            && 
-                            elemProps[elem2].find("cova") 
+                            &&
+                            elemProps[elem2].find("cova")
                             !=elemProps[elem2].end())
                         {
-                            d1 = elemProps[elem1]["cova"] 
+                            d1 = elemProps[elem1]["cova"]
                                + elemProps[elem2]["cova"];
                         }
-                    
-                        if (elemProps[elem1].find("ionM+") 
+
+                        if (elemProps[elem1].find("ionM+")
                              !=elemProps[elem1].end()
-                             && 
-                             elemProps[elem2].find("ionM-") 
+                             &&
+                             elemProps[elem2].find("ionM-")
                              !=elemProps[elem2].end())
                         {
-                            d2 = elemProps[elem1]["ionM+"] 
+                            d2 = elemProps[elem1]["ionM+"]
                                 + elemProps[elem2]["ionM-"];
                         }
-                    
+
                         if (d1 >= d2)
                         {
                             dI = d1;
@@ -1706,7 +1706,7 @@ namespace LIBMOL
                             dI = d2;
                         }
                     }
-                    
+
                     if (dI !=0)
                     {
                         tAllowedRangeDists[elem1][elem2]["max"]= dI*(1+tDelta);
@@ -1715,17 +1715,17 @@ namespace LIBMOL
                     else
                     {
                         std::cout << "The distance range between elements "
-                                  << elem1 << " and " << elem2 
+                                  << elem1 << " and " << elem2
                                   << " is not determined " << std::endl;
                     }
                 }
             }
         }
-        
+
         /*
-        for (std::map<std::string, std::map<std::string, 
-             std::map<std::string, REAL> > >::iterator 
-             iR1=tAllowedRangeDists.begin(); 
+        for (std::map<std::string, std::map<std::string,
+             std::map<std::string, REAL> > >::iterator
+             iR1=tAllowedRangeDists.begin();
              iR1 != tAllowedRangeDists.end(); iR1++)
         {
             for (std::map<std::string, std::map<std::string, REAL> >::iterator
@@ -1738,43 +1738,43 @@ namespace LIBMOL
             }
         }
         */
-        
-        
+
+
     }
-    
+
     void PeriodicTable::construAtomIdealDists(std::map<std::string,
-       std::map<std::string,std::map<std::string,REAL> > >& tAllowedRangeDists, 
+       std::map<std::string,std::map<std::string,REAL> > >& tAllowedRangeDists,
        double tDelta)
     {
         const double dS = 1.0, dL=2.0, dDiff=0.5;
-        
+
         // Try use electro-negative to decide the ideal pair distances.
-        for (std::map<ID,  std::map<ID, REAL> >::iterator 
+        for (std::map<ID,  std::map<ID, REAL> >::iterator
              iProp1=elemProps.begin(); iProp1 != elemProps.end(); iProp1++)
         {
             ID elem1 = iProp1->first;
-            for (std::map<ID,  std::map<ID, REAL> >::iterator 
-                     iProp2=elemProps.begin(); iProp2 != elemProps.end(); 
+            for (std::map<ID,  std::map<ID, REAL> >::iterator
+                     iProp2=elemProps.begin(); iProp2 != elemProps.end();
                      iProp2++)
             {
                 ID elem2 = iProp2->first;
                 double dIon, dCova, dMax, dIdeal=0.0;
-                
+
                 if (electronegativities.find(elem1) !=electronegativities.end()
-                    && 
+                    &&
                     electronegativities.find(elem2) !=electronegativities.end())
-                {   
+                {
                     // dIon
                     if(electronegativities[elem1] <=
                        electronegativities[elem2])
                     {
-                        if (elemProps[elem2].find("ionM-") 
+                        if (elemProps[elem2].find("ionM-")
                             !=elemProps[elem2].end()
                             && elemProps[elem1].find("ionM+")
                             !=elemProps[elem1].end())
                         {
                             dIon=elemProps[elem1]["ionM+"]
-                                +elemProps[elem2]["ionM-"]; 
+                                +elemProps[elem2]["ionM-"];
                         }
                         else
                         {
@@ -1784,13 +1784,13 @@ namespace LIBMOL
                     }
                     else
                     {
-                        if (elemProps[elem1].find("ionM-") 
+                        if (elemProps[elem1].find("ionM-")
                             !=elemProps[elem1].end()
                             && elemProps[elem2].find("ionM+")
                             !=elemProps[elem2].end())
                         {
                             dIon=elemProps[elem1]["ionM-"]
-                                +elemProps[elem2]["ionM+"]; 
+                                +elemProps[elem2]["ionM+"];
                         }
                         else
                         {
@@ -1798,11 +1798,11 @@ namespace LIBMOL
                                    +elemProps[elem2]["cova"];
                         }
                     }
-                    
+
                     // dCova
                     dCova = elemProps[elem1]["cova"]
                            +elemProps[elem2]["cova"];
-                    
+
                     // dMax
                     if (dIon >= dCova)
                     {
@@ -1812,8 +1812,8 @@ namespace LIBMOL
                     {
                         dMax = dCova;
                     }
-                    
-                    
+
+
                     if (electronegativities[elem1] <= dS &&
                         electronegativities[elem2] <= dS)
                     {
@@ -1837,10 +1837,10 @@ namespace LIBMOL
                             dIdeal = dIon;
                         }
                     }
-                    
+
                     if (dIdeal !=0.0)
                     {
-                        tAllowedRangeDists[elem1][elem2]["max"] 
+                        tAllowedRangeDists[elem1][elem2]["max"]
                                                   =dIdeal*(1+tDelta);
                         tAllowedRangeDists[elem1][elem2]["min"]
                                                   = dIdeal*(1-tDelta);
@@ -1848,22 +1848,22 @@ namespace LIBMOL
                     else
                     {
                         std::cout << "The distance range between elements "
-                                  << elem1 << " and " << elem2 
+                                  << elem1 << " and " << elem2
                                   << " is not determined " << std::endl;
                     }
-                        
+
                 }
                 else
                 {
                     // dCova
                     dCova = elemProps[elem1]["cova"]
                            +elemProps[elem2]["cova"];
-                    
-                    
+
+
                 }
             }
         }
-        
+
     }
-    
+
 }

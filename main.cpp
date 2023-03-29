@@ -537,6 +537,7 @@ int main(int argc, char** argv) {
             //aCodSystem.codAtomClassifyNew2(2);
             LIBMOL::setAtomFormTypes(aCodSystem.allAtoms);
             LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
+                                               AJob.IOEntries["monoRootName"],
                                                aCodSystem.allAtoms,
                                                aCodSystem.allBonds,
                                                aCodSystem.allRingsV);

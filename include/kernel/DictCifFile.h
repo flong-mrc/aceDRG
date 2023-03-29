@@ -700,9 +700,10 @@ namespace LIBMOL
                               std::map<std::string, std::vector<std::string> > & tUnChangedEntries);
     
     extern void outAtomTypesAndConnections(FileName tFName,
-                                        std::vector<LIBMOL::AtomDict>& tAtoms,
-                                        std::vector<LIBMOL::BondDict>& tBonds,
-                                        std::vector<LIBMOL::RingDict> & tRings);
+                                           ID tMonoRootName,
+                                           std::vector<LIBMOL::AtomDict>& tAtoms,
+                                           std::vector<LIBMOL::BondDict>& tBonds,
+                                           std::vector<LIBMOL::RingDict> & tRings);
     
     extern void outMetalAtomInfo(FileName tFName,
                                  GenCifFile  & tCifObj);

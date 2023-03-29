@@ -5639,7 +5639,7 @@ namespace LIBMOL {
     bool MolGenerator::validateBondValueDiff(Molecule& tMol,
             std::string& tErrInfo) {
         std::map<ID, std::vector<REAL> > aBondMap;
-        REAL diffThreshold = 0.1;
+        REAL diffThreshold = 0.3;
 
         for (std::vector<BondDict>::iterator iBo = tMol.bonds.begin();
                 iBo != tMol.bonds.end(); iBo++) {
@@ -5670,7 +5670,7 @@ namespace LIBMOL {
                 }
                 else
                 {
-                    // std::cout << iBo->value << " under check " << std::endl;
+                    std::cout << iBo->value << " under check " << std::endl;
                     if (!tMol.atoms[iBo->atomsIdx[0]].isMetal
                             && !tMol.atoms[iBo->atomsIdx[1]].isMetal)
                     {
@@ -5699,7 +5699,7 @@ namespace LIBMOL {
                   << tMols.size() << std::endl;
 
         std::map<ID, std::vector<REAL> > aBondMap;
-        REAL diffThreshold = 0.1;
+        REAL diffThreshold = 0.3;
         for (std::vector<Molecule>::iterator iMol = tMols.begin();
                 iMol != tMols.end(); iMol++)
         {
@@ -5735,7 +5735,7 @@ namespace LIBMOL {
                     }
                     else
                     {
-                        //std::cout << iBo->value << " under check " << std::endl;
+                        std::cout << iBo->value << " under check " << std::endl;
 
                         if (outVectAbsDiff(aBondMap[aCombID], iBo->value,
                                 diffThreshold))
@@ -5765,7 +5765,7 @@ namespace LIBMOL {
                 iAt != tMol.atoms.end(); iAt++) {
             if (iAt->isInPreCell) {
                 int nMax = 4;
-                if (iAt->chemType.compare("B") == 0) {
+                if (iAt->chemType.compare("B") == 0 ||  iAt->chemType.compare("AS")) {
                     nMax = 7;
                 }
                 if (iAt->connAtoms.size() > nMax && !iAt->isMetal

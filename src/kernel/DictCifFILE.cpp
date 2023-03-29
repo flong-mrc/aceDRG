@@ -8515,13 +8515,12 @@ namespace LIBMOL
                           << "_chem_comp_acedrg.comp_id" << std::endl
                           << "_chem_comp_acedrg.atom_id" << std::endl
                           << "_chem_comp_acedrg.atom_type" << std::endl;
-
                 for (std::vector<AtomDict>::iterator iA1 = tAtoms.begin();
                         iA1 != tAtoms.end(); iA1++)
                 {
                     unsigned  aSize = iA1->codClass.size() + 4;
                     outRestrF << longName
-                              << std::setw(6)  << iA1->id
+                              << std::setw(10)  << iA1->id
                               << std::setw(aSize)  << iA1->codClass << std::endl;
                 }
 
@@ -9663,9 +9662,10 @@ namespace LIBMOL
     }
 
     extern void outAtomTypesAndConnections(FileName tFName,
-                                        std::vector<LIBMOL::AtomDict>& tAtoms,
-                                        std::vector<LIBMOL::BondDict>& tBonds,
-                                        std::vector<LIBMOL::RingDict> & tRings)
+                                           ID tMonoRootName,
+                                           std::vector<LIBMOL::AtomDict>& tAtoms,
+                                           std::vector<LIBMOL::BondDict>& tBonds,
+                                           std::vector<LIBMOL::RingDict> & tRings)
     {
 
         if (tAtoms.size() !=0 && tBonds.size())
@@ -9673,18 +9673,26 @@ namespace LIBMOL
             std::ofstream outTempF(tFName);
             if (outTempF.is_open())
             {
-                outTempF << "ATOMS:" << std::endl;
-                int nA=0;
-                std::map<int, int> seriMap;
-                std::vector<int> hAtomIdxs;
+                std::string longName =tMonoRootName.substr(0,3);
+                outTempF << "data_comp_" << longName << std::endl;
+                outTempF << "loop_" << std::endl
+                         << "_chem_comp_acedrg_atom.comp_id" << std::endl
+                         << "_chem_comp_acedrg_atom.type_symbol" << std::endl
+                         << "_chem_comp_acedrg_atom.atom_id" << std::endl
+                         << "_chem_comp_acedrg_atom.atom_type" << std::endl;
+                // outTempF << "ATOMS:" << std::endl;
+                //int nA=0;
+                //std::map<int, int> seriMap;
+                //std::vector<int> hAtomIdxs;
                 for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
                         iA != tAtoms.end(); iA++)
                 {
-                    outTempF << std::setw(10) << nA
+                    outTempF << std::setw(10) << longName
                              << std::setw(8)  << iA->chemType
                              << std::setw(10) << iA->id
                              << std::setw(iA->codClass.size()+6)
                              << iA->codClass << std::endl;
+                    /*
                     seriMap[iA->seriNum] = nA;
 
                     if (iA->chemType.compare("H")==0)
@@ -9692,11 +9700,12 @@ namespace LIBMOL
                         hAtomIdxs.push_back(nA);
                     }
 
-                    nA++;
 
+                    nA++;
+                    */
 
                 }
-
+                /*
                 if (hAtomIdxs.size() >0)
                 {
                     outTempF << "H FormType:" << std::endl;
@@ -9714,18 +9723,29 @@ namespace LIBMOL
                         }
                     }
                 }
-                outTempF << "CONNECTIONS:" << std::endl;
+                */
+                outTempF << "loop_" << std::endl
+                // outTempF << "CONNECTIONS:" << std::endl;
+                << "_chem_comp_acedrg_bond.comp_id" << std::endl
+                << "_chem_comp_acedrg_bond.atom_id_1" << std::endl
+                << "_chem_comp_acedrg_bond.atom_id_2" << std::endl;
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
                 {
-                    outTempF << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[0]].seriNum]
-                             << std::setw(12) << seriMap[tAtoms[iB->atomsIdx[1]].seriNum]
+                    outTempF << std::setw(10) << longName
+                            << std::setw(12) << tAtoms[iB->atomsIdx[0]].id
+                             << std::setw(12) << tAtoms[iB->atomsIdx[1]].id
                              << std::endl;
                 }
 
                 if (tRings.size() > 0)
                 {
-                    outTempF << "Ring Information: " << std::endl;
+                    outTempF << "loop_" << std::endl
+                    << "_chem_comp_acedrg_ring.comp_id" << std::endl
+                    << "_chem_comp_acedrg_ring.ring_id" << std::endl
+                    << "_chem_comp_acedrg_ring.atom_id" << std::endl
+                    << "_chem_comp_acedrg_ring.aromatic" << std::endl;
+                    // outTempF << "Ring Information: " << std::endl;
                     int  idxR = 1;
                     std::string aR = "RING_";
                     for (std::vector<RingDict>::iterator iR=tRings.begin();
@@ -9751,7 +9771,8 @@ namespace LIBMOL
                                 iA=iR->atoms.begin();
                                 iA !=iR->atoms.end(); iA++)
                         {
-                            outTempF << std::setw(12) << aLab
+                            outTempF << std::setw(10) << longName
+                                    << std::setw(12) << aLab
                                      << std::setw(12) << iA->id
                                      << std::setw(20) << aro
                                      << std::endl;

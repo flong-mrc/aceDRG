@@ -1213,9 +1213,10 @@ class Acedrg(CExeCode ):
                         aStr = "2"
                     self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
                 elif self.workMode ==311 or self.workMode == 32 or self.workMode==33:
-                    self.outAtmTypeName = self.outRoot + "_atomTypes.txt"
+                    self.outAtmTypeName = self.outRoot + "_atomTypes.cif"
                     print("Output file name : %s "%self.outAtmTypeName)
-                self._cmdline +=" -A yes -D %s -c %s  -o %s "%(self.acedrgTables, inFileName, self.outAtmTypeName)
+                self._cmdline +=" -A yes -D %s -c %s -r %s -o %s "\
+                    %(self.acedrgTables, inFileName, self.monomRoot, self.outAtmTypeName)
                 self.subExecute()
             elif self.workMode == 35 :
                 pass       
@@ -3127,7 +3128,7 @@ class Acedrg(CExeCode ):
                     self.runRefmac(self.iniLigandPdbName, aLibIn, self.monomRoot, curStage)
                     #print "initial input cif is  ", self.refmacXYZOUTName
                 else:
-                    print("Can not add line with 'CRYST1' to the temp PDB file ", tPDBName)
+                    print("Can not add line with 'CRYST1' to the temp PDB file ", self.iniLigandPdbName)
                     sys.exit() 
 
                 if os.path.isfile(self.refmacXYZOUTName):
@@ -3274,6 +3275,9 @@ class Acedrg(CExeCode ):
             print ("===================================================================") 
             if self.workMode == 31 or self.workMode==311:
                 if os.path.isfile(self.inMmCifName):
+                    self.fileConv.mmCifReader(self.inMmCifName)
+                    if len(self.fileConv.dataDescriptor):    
+                        self.setMonoRoot(self.fileConv.dataDescriptor)
                     self.runLibmol()    
         
             elif self.workMode == 32:
