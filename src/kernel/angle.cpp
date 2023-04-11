@@ -1,9 +1,9 @@
-/* 
+/*
  * File:   Angle.cpp
  * Author: flong
  *
  * Created on August 9, 2011, 11:32 AM
- * 
+ *
  */
 
 #include "angle.h"
@@ -21,7 +21,7 @@ namespace LIBMOL
              itsFrceConst(ZeroReal)
     {
     }
-    
+
     Angle::Angle(const Angle &tA)
     {
         isItTouched    = tA.isItTouched;
@@ -33,14 +33,14 @@ namespace LIBMOL
         itsSigValue    = tA.getSigValue(true);
         itsSigValueSt  = tA.getSigValue(false);
         itsFrceConst   = tA.getForceConst();
-        
+
         for (std::vector<Atom>::const_iterator iA= tA.atoms.begin();
                 iA != tA.atoms.end(); iA++)
         {
             atoms.push_back((*iA));
         }
     }
-    
+
     Angle::~Angle()
     {
         if(!atoms.empty())
@@ -48,7 +48,7 @@ namespace LIBMOL
             atoms.clear();
         }
     }
-    
+
     Angle & Angle::operator=(const Angle & tA)
     {
         itsName        = tA.getName();
@@ -64,11 +64,11 @@ namespace LIBMOL
                 iA != tA.atoms.end(); iA++)
         {
             atoms.push_back((*iA));
-        }       
+        }
         return (*this);
     }
-    
-    
+
+
     Name Angle::getName() const
     {
             return itsName;
@@ -77,7 +77,7 @@ namespace LIBMOL
     {
         itsName = tNa;
     }
-        
+
     ID Angle::getID() const
     {
         return itsID;
@@ -86,7 +86,7 @@ namespace LIBMOL
     {
         itsID = tID;
     }
-        
+
     SeriNumber Angle::getSeriNum() const
     {
         return itsSeriNum;
@@ -95,7 +95,7 @@ namespace LIBMOL
     {
         itsSeriNum = tSer;
     }
-           
+
     REAL Angle::getValue(bool tL) const
     {
         if (tL)
@@ -113,12 +113,12 @@ namespace LIBMOL
        {
            itsValueSt = tV;
        }
-       else 
+       else
        {
            itsValue   = tV;
        }
-    }   
-    
+    }
+
     void Angle::setValue()
     {
         if (atoms.size() == 3)
@@ -130,20 +130,20 @@ namespace LIBMOL
             itsValue =0.0;
         }
     }
-    
+
     void Angle::setValue(Atom& tA1, Atom& tA2, Atom tA3)
     {
         std::vector<REAL> tV1, tV2;
-        
+
         for (int i = 0; i < (int)tA1.coords.size(); i++)
         {
             tV1.push_back(tA1.coords[i]-tA2.coords[i]);
             tV2.push_back(tA2.coords[i]-tA2.coords[i]);
         }
-        
+
         itsValue = getAngle2V(tV1, tV2);
-    }    
-    
+    }
+
     REAL Angle::getSigValue(bool tL) const
     {
         if(tL)
@@ -166,10 +166,10 @@ namespace LIBMOL
             itsSigValueSt = tV;
         }
     }
-    
+
     // ============ Another angle class ==============
-    
-    // Default constructor 
+
+    // Default constructor
     AngleDict::AngleDict() : seriNum(-1),
             value(ZeroReal),
             sigValue(3.00),
@@ -187,8 +187,8 @@ namespace LIBMOL
             isInSameRing(ZeroInt)
     {
     }
-    
-    // 
+
+    //
     AngleDict::AngleDict(const AngleDict & tAngle) : seriNum(tAngle.seriNum),
             value(tAngle.value),
             sigValue(tAngle.sigValue),
@@ -205,65 +205,65 @@ namespace LIBMOL
             approxLevel(tAngle.approxLevel),
             isInSameRing(tAngle.isInSameRing)
     {
-           
+
         for (std::vector<int>::const_iterator iAt=tAngle.atoms.begin();
                 iAt != tAngle.atoms.end(); iAt++)
         {
             atoms.push_back(*iAt);
         }
-        
+
         for (std::vector<ID>::const_iterator iAd=tAngle.atomsId.begin();
                 iAd != tAngle.atomsId.end(); iAd++)
         {
             atomsId.push_back(*iAd);
         }
-        
+
         for(std::vector<ID>::const_iterator iID=tAngle.atomChemTypes.begin();
                 iID !=tAngle.atomChemTypes.end(); iID++)
         {
             atomChemTypes.push_back(*iID);
         }
-        
+
         for (std::vector<ID>::const_iterator iAt=tAngle.atomsCodClasses.begin();
                 iAt != tAngle.atomsCodClasses.end(); iAt++)
         {
             atomsCodClasses.push_back(*iAt);
         }
-        
+
         for (std::vector<ID>::const_iterator iAt=tAngle.atomsNB2Rep.begin();
                 iAt != tAngle.atomsNB2Rep.end(); iAt++)
         {
             atomsNB2Rep.push_back(*iAt);
         }
-        
-        
+
+
         for (std::vector<ID>::const_iterator iAt=tAngle.atomsNBRep.begin();
                 iAt != tAngle.atomsNBRep.end(); iAt++)
         {
             atomsNBRep.push_back(*iAt);
         }
-        
-        
+
+
         for (std::map<ID, ID>::const_iterator iAt=tAngle.atomsSPStats.begin();
                 iAt !=tAngle.atomsSPStats.end(); iAt++)
         {
             atomsSPStats[iAt->first] = iAt->second;
         }
-        
+
         for (std::map<ID, ID>::const_iterator iAt=tAngle.atomsNB1NB2SPStats.begin();
                 iAt !=tAngle.atomsNB1NB2SPStats.end(); iAt++)
         {
             atomsNB1NB2SPStats[iAt->first] = iAt->second;
         }
-        
+
         for (std::vector<REAL>::const_iterator iAt=tAngle.codAngleValues.begin();
                 iAt != tAngle.codAngleValues.end(); iAt++)
         {
             codAngleValues.push_back(*iAt);
         }
     }
-    
-    AngleDict::AngleDict(ID tAnchID, int tAnchPos, 
+
+    AngleDict::AngleDict(ID tAnchID, int tAnchPos,
             std::vector<AtomDict>& tAtoms): seriNum(-1),
             value(ZeroReal),
             sigValue(ZeroReal),
@@ -284,18 +284,18 @@ namespace LIBMOL
             atomsCodClasses.push_back(iAt->codClass);
         }
     }
-    
+
     AngleDict::~AngleDict()
     {
     }
-    
-    
-    
+
+
+
     /*
     void AngleDict::setValue()
     {
         std::vector<REAL> vect1, vect2;
-        
+
         if ((int)atoms.size() == 3)
         {
             for (int i=0; i < (int)atoms[1].coords.size(); i++)
@@ -306,7 +306,7 @@ namespace LIBMOL
                 vect1.push_back(t1);
                 vect2.push_back(t2);
             }
-            
+
             value = getAngle2V(vect1, vect2);
         }
         else
@@ -315,8 +315,8 @@ namespace LIBMOL
                     <<std::endl;
         }
     }
-    */ 
-    
+    */
+
     extern int getAngle(std::vector<AngleDict> & tAngs,
                         int cAt, int tAt1, int tAt2)
     {
@@ -332,15 +332,15 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         return tAng;
     }
-    
+
     extern REAL getAngleValueFromFracCoords(AtomDict & tAtCen,
                                             AtomDict & tAt1,
                                             AtomDict & tAt2,
                                             REAL a, REAL b, REAL c,
-                                  REAL alpha, REAL beta, REAL gamma) 
+                                  REAL alpha, REAL beta, REAL gamma)
     {
 
 

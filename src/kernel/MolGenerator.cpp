@@ -2271,12 +2271,14 @@ namespace LIBMOL {
                         if (metalBondRange[elem1].find(elem2)
                              !=metalBondRange[elem1].end())
                         {
-
-                            //std::cout << "Range2 between "
-                            //         <<  metalBondRange[elem1][elem2]["min"]
-                            //      << " and " << metalBondRange[elem1][elem2]["max"]
-                            //      << " for elements " << elem1
-                            //      << " and " << elem2 << std::endl;
+                            if (allAtoms[i].id.compare("Mo")==0)
+                            {
+                                std::cout << "Range2 between "
+                                          <<  metalBondRange[elem1][elem2]["min"]
+                                          << " and " << metalBondRange[elem1][elem2]["max"]
+                                          << " for elements " << elem1
+                                          << " and " << elem2 << std::endl;
+                            }
                             double mLowB
                             = 0.98*metalBondRange[elem1][elem2]["min"];
                             double mUpperB
@@ -2316,7 +2318,7 @@ namespace LIBMOL {
                 if (bondRange[0] > 0.20 && bondRange[1] > 0.20)
                 {
 
-                    if (allAtoms[i].id.compare("H1")==0)
+                    if (allAtoms[i].id.compare("Mo")==0)
                     {
                     std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id
@@ -2638,7 +2640,7 @@ namespace LIBMOL {
                 // std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl;
 
                 getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
-                        covalent_sensitivity, tPTab,
+                                          covalent_sensitivity, tPTab,
                         bondRange);
 
                 if (lMetal1)
@@ -5006,7 +5008,7 @@ namespace LIBMOL {
             //std::cout << "Atom " << iAt->id << " occupancy "
             //           << iAt->ocp << std::endl;
 
-            if (iAt->ocp < 0.99) {
+            if (iAt->ocp < 0.99 && iAt->chemType !="H") {
                 tErrInfo = "Atom " + iAt->id + " has an occupancy "
                         + RealToStr(iAt->ocp) + ", small than 1.0!";
 
@@ -7148,7 +7150,7 @@ namespace LIBMOL {
                 aSN = "\"" + TrimSpaces(parts[0]) + "\"";
             }
 
-            aOutCif.width(20);
+            aOutCif.width(aSN.size()+4);
             aOutCif << std::left << aSN;
             aOutCif.width(20);
             aOutCif << std::left <<  "NON-POLYMER";
@@ -7166,7 +7168,7 @@ namespace LIBMOL {
             aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
             aOutCif << "_chem_comp_atom.charge" << std::endl;
             aOutCif << "_chem_comp_atom.U_iso_or_equiv" << std::endl;
-            aOutCif << "_chem_comp_atom.excess_electrons" << std::endl;
+            // aOutCif << "_chem_comp_atom.excess_electrons" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_x" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_y" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_z" << std::endl;
@@ -7187,8 +7189,8 @@ namespace LIBMOL {
                 aOutCif.width(12);
                 aOutCif << std::left << std::setprecision(4)
                 << std::fixed << iAt->isoB;
-                aOutCif.width(10);
-                aOutCif << std::left << iAt->excessElec;
+                // aOutCif.width(10);
+                // aOutCif << std::left << iAt->excessElec;
                 aOutCif.width(10);
                 aOutCif << std::left << std::setprecision(3)
                         <<std::fixed << iAt->coords[0];

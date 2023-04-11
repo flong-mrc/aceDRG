@@ -475,8 +475,8 @@ namespace LIBMOL
         //elements["Mo"]["vdw"]       = 1.45;
         //elements["Mo"]["cova"]      = 1.47;
         elemProps["Mo"]["vdw"]      = 1.45;
-        elemProps["Mo"]["cova"]     = 1.39;
-        elemProps["Mo"]["ionM+"]    = 0.83;
+        elemProps["Mo"]["cova"]     = 1.29;     //1.39;
+        elemProps["Mo"]["ionM+"]    = 0.69;
         //elemProps["Mo4+"]["cova"]   = 0.79;
         //elemProps["Mo5+"]["cova"]   = 0.75;
         //elemProps["Mo6+"]["cova"]   = 0.73;
@@ -688,7 +688,7 @@ namespace LIBMOL
         //elements["Pd"]["vdw"]       = 1.63;
         //elements["Pd"]["cova"]      = 1.50;
         elemProps["Pd"]["vdw"]      = 1.63;
-        elemProps["Pd"]["cova"]     = 1.39;
+        elemProps["Pd"]["cova"]     =  1.50;  //1.39;
         elemProps["Pd"]["ionM+"]    = 0.73;
         //elemProps["Pd2+"]["cova"]    = 1.00;
         //elemProps["Pd3+"]["cova"]      = 0.90;
@@ -702,7 +702,7 @@ namespace LIBMOL
         //elements["Pt"]["vdw"]       = 1.72;
         //elements["Pt"]["cova"]      = 1.50;
         elemProps["Pt"]["vdw"]      = 1.72;
-        elemProps["Pt"]["cova"]      = 1.36;
+        elemProps["Pt"]["cova"]      = 1.60; // 1.36;
         elemProps["Pt"]["ionM+"]    = 0.94;
         //elemProps["Pt4+"]["cova"]    = 0.765;
         //elemProps["Pt5+"]["cova"]    = 0.71;
@@ -787,7 +787,7 @@ namespace LIBMOL
         //elements["Cd"]["vdw"]       = 1.58;
         //elements["Cd"]["cova"]      = 1.69;
         elemProps["Cd"]["vdw"]      = 1.58;
-        elemProps["Cd"]["cova"]     = 1.44;
+        elemProps["Cd"]["cova"]     = 1.69; //     1.44;
         elemProps["Cd"]["ionM+"]    = 1.09;
 
         elements["Hg"]["row"]       = 6;
@@ -889,8 +889,8 @@ namespace LIBMOL
         //elements["Bi"]["vdw"]       = 1.80;
         //elements["Bi"]["cova"]      = 1.54;
         elemProps["Bi"]["vdw"]      = 1.80;
-        elemProps["Bi"]["cova"]     = 1.68;  //1.48;
-        elemProps["Bi"]["ionM+"]    = 1.17;
+        elemProps["Bi"]["cova"]     = 1.42;  //1.48;
+        elemProps["Bi"]["ionM+"]    = 1.07;
         // Semimetallics
 
 
@@ -1696,7 +1696,16 @@ namespace LIBMOL
                             d2 = elemProps[elem1]["ionM+"]
                                 + elemProps[elem2]["ionM-"];
                         }
+                        /*
+                        if(elem1.find("Mo")!=std::string::npos
+                           && elem2.find("N")!=std::string::npos)
+                        {
+                            std::cout << "elem1 " << elem1 << " " << elem2 << std::endl;
+                            std::cout << " d1 " << d1 << std::endl;
+                            std::cout << " d2 " << d2 << std::endl;
 
+                        }
+                        */
                         if (d1 >= d2)
                         {
                             dI = d1;
@@ -1738,6 +1747,7 @@ namespace LIBMOL
             }
         }
         */
+
 
 
     }

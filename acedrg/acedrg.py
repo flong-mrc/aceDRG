@@ -124,6 +124,7 @@ class Acedrg(CExeCode ):
 
         self.numConformers    = 1
         self.useCifCoords     = False
+        self.noConformers     = False
 
         self.inputPara        = {}
         self.inputPara["PH"]  = [False, 0.0]
@@ -833,7 +834,7 @@ class Acedrg(CExeCode ):
                 else:
                     self.workMode    = 22
         elif t_inputOptionsP.typeOut:
-            
+            self.noConformers = True
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
                 self.workMode    = 311
@@ -969,6 +970,9 @@ class Acedrg(CExeCode ):
 
         if t_inputOptionsP.useExistCoords:
             self.inputPara["useExistCoords"]    = t_inputOptionsP.useExistCoords
+            
+        if self.noConformers:
+            self.inputPara["noConformers"]      = True
 
         if t_inputOptionsP.numInitConformers:
             self.inputPara["numInitConformers"] = t_inputOptionsP.numInitConformers
@@ -3297,6 +3301,7 @@ class Acedrg(CExeCode ):
                 if os.path.isfile(self.inMdlName):   #and self.chemCheck.isOrganic(self.inMdlName, self.workMode):
                     self.rdKit.initMols("mol", self.inMdlName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
                     tMolMmcifName = os.path.join(self.scrDir, "tmpMol.cif")
+                    
                     if len(self.rdKit.molecules)==1:
                         self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[0], tMolMmcifName, self.chemCheck, self.monomRoot)
                         print("Number of molecules ", len(self.rdKit.molecules))
