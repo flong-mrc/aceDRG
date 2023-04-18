@@ -2836,7 +2836,7 @@ class Acedrg(CExeCode ):
                     print("found aromatic bonds")
                     self.chemCheck.addjustAtomsAndBonds(self.fileConv.atoms, 
                                                         self.fileConv.bonds)
-                
+                    sys.exit()
                 if len(self.fileConv.dataDescriptor):
                     
                     self.setMonoRoot(self.fileConv.dataDescriptor)

@@ -809,19 +809,29 @@ class ChemCheck(object):
        
             
         return aRet
+    
+    def addjustAtomsAndBonds2(self, tAtoms, tBonds):
+        
+        pass 
         
     def addjustAtomsAndBonds(self, tAtoms, tBonds):
         
         # For molecules contain bonds called explicitly aromatic bonds
         
-        
         aCurVaMap   = {}
         adefVaMap   = {}
+        aChargeMap  = {}
+        aElemMap    = {}
+        aHMap       = {}
         
         for aAtm in tAtoms:
-            aCurVaMap[aAtm["_chem_comp_atom.atom_id"]] = 0
+            atmId = aAtm["_chem_comp_atom.atom_id"]
+            aElemMap [atmId]  = aAtm["_chem_comp_atom.type_symbol"]
+            aCurVaMap[atmId]  = 0
+            aChargeMap[atmId] = 0  
             if "_chem_comp_atom.charge" in aAtm.keys():
-                aCurVaMap[aAtm["_chem_comp_atom.atom_id"]]+=(float(aAtm["_chem_comp_atom.charge"]))
+                aChargeMap[atmId] = (float(aAtm["_chem_comp_atom.charge"]))
+                aCurVaMap[atmId] -=aChargeMap[atmId]
             if aAtm["_chem_comp_atom.type_symbol"].upper() in self.defaultBo.keys():
                 adefVaMap[aAtm["_chem_comp_atom.atom_id"]] = self.defaultBo[aAtm["_chem_comp_atom.type_symbol"]]
             else:
@@ -842,11 +852,11 @@ class ChemCheck(object):
                 aBON = BondOrderS2N(aBO)
                 
                 if not atm1Id in allAtmBondingMap.keys():
-                    allAtmBondingMap[atm1Id] = []
-                allAtmBondingMap[atm1Id].append([atm2Id, aBON, idxB])
+                    allAtmBondingMap[atm1Id] = {}
+                allAtmBondingMap[atm1Id][atm2Id] = [aBON, idxB] 
                 if not atm2Id in allAtmBondingMap.keys():
-                    allAtmBondingMap[atm2Id] = []
-                allAtmBondingMap[atm2Id].append([atm1Id, aBON, idxB])
+                    allAtmBondingMap[atm2Id] = {}
+                allAtmBondingMap[atm2Id][atm1Id] = [aBON, idxB]
                 
                 if aBO.find("AROM") !=-1:
                     if not atm1Id in aromAtmMap.keys():
@@ -856,92 +866,172 @@ class ChemCheck(object):
                     aromAtmMap[atm1Id].append(atm2Id)
                     aromAtmMap[atm2Id].append(atm1Id)
             idxB+=1
+            
+        
+        for aAtm in tAtoms:
+            
+            self.setInitNumH(aAtm, allAtmBondingMap, 
+                             aromAtmMap, aHMap, adefVaMap)
+                                                                    
                 
-                    
-                
-                
+        for aAtmId in aHMap.keys():
+            print("Atom %s needs to add %d Hs"%(aAtmId, aHMap[aAtmId]))
+        
+        
                 
         if len(aromAtmMap.keys()) > 0:
-            doneAtoms = {}
+            doneAtoms = []
             nextAtoms = []
             doneBonds = []
             self.getAndSetStartAtm(aromAtmMap, allAtmBondingMap, tAtoms, 
                                    tBonds,doneAtoms, nextAtoms, doneBonds,
                                    adefVaMap, aCurVaMap)
-                
+      
+            sys.exit()
+    
+            print("atoms to be done", nextAtoms)
+            i=1
+            while (len(nextAtoms) > 0) and i < 9:
+                for aAtm in nextAtoms:
+                    if not aAtm in doneAtoms:
+                        if aAtm in aromAtmMap.keys() and\
+                           not aromAtmMap[aAtm] in doneAtoms:
+                               print("\n***************")
+                               print("deal with ", aAtm)
+                               print("***************")
+                               self.setAtmBondOrder(aAtm, allAtmBondingMap,
+                                               tAtoms, tBonds, 
+                                               doneAtoms, nextAtoms, doneBonds, 
+                                               adefVaMap,aCurVaMap)
+                               nextAtoms.remove(aAtm)
+                               doneAtoms.append(aAtm)
+                i+=1    
+                               
+        
+        
         # Now check if H atoms should be added
         #addedHAtms = []
         #for aAtm in tAtoms: 
         
+    def setInitNumH(self, tAtm, tAllAtmBondingMap, tAromAtmMap,tHMap, tDefVaMap):
+        
+        aSumBO = 0
+
+        aAtm1  = tAtm["_chem_comp_atom.atom_id"]
+        if not  aAtm1 in tAromAtmMap.keys():
+            for aAtm2 in tAllAtmBondingMap[aAtm1].keys():
+                aSumBO += tAllAtmBondingMap[aAtm1][aAtm2][0]
+            aNumH = tDefVaMap[aAtm1] -float(tAtm["_chem_comp_atom.charge"])- aSumBO 
+            if aNumH < 0:
+                print("Bug, sum of bond-order around atom %s is wrong!"%tAtm)
+            elif aNumH > 0:
+                tHMap[aAtm1] = aNumH        
+        elif tAtm["_chem_comp_atom.type_symbol"] == "C":
+            nB  = len(tAllAtmBondingMap[aAtm1].keys())
+            nBA = len(tAromAtmMap[aAtm1])
+            if nB==2 and nBA==2:
+                tHMap[aAtm1] = 1
                 
+                
+        
+        
+
                 
     def getAndSetStartAtm(self, tAromAtoms, tAtmBondingMap, tAtoms, tBonds, 
                               tDAtms, tNAtms, tDBo, tdefVaMap, tCurVaMap):
-        set2Atms = []
+
         set1Atms = []
         setUAtms = []
+        
         for aAtm in tAromAtoms.keys():
-            for aPair in tAtmBondingMap[aAtm]:
-                if aPair[1] == 2:
-                    set2Atms.append(aAtm)
-                elif aPair[1]==1:
+            for aAtm2 in tAtmBondingMap[aAtm]:
+                if tAtmBondingMap[aAtm][aAtm2][0] ==1:
                     set1Atms.append(aAtm)
                 else:
                     setUAtms.append(aAtm)
-                    
-        if len(set2Atms) > 0:
-           for aAtm in set2Atms:
-               self.setAtmBondOrder(aAtm, tAtmBondingMap,tAtoms, tBonds, 
-                                         tDAtms, tNAtms, tDBo, tdefVaMap, 
-                                         tCurVaMap)
+                   
                 
         if len(set1Atms) > 0:
             for aAtm in set1Atms:
+                #print("Bond-order 1 atom : ", aAtm)
+                print("\n***************")
+                print("deal with ", aAtm)
+                print("***************")
                 self.setAtmBondOrder(aAtm, tAtmBondingMap,tAtoms, tBonds, 
                                           tDAtms, tNAtms, tDBo, tdefVaMap, 
                                           tCurVaMap)   
-            
+                if not aAtm in tDAtms:
+                    tDAtms.append(aAtm)
+                    
     def setAtmBondOrder(self, tAtm, tAtmBondingMap,tAtoms, tBonds, 
                         tDAtms, tNAtms, tDBo, tdefVaMap, tCurVaMap):
         
         
-        aSetBA  =[]
+        aSetBA   =[]
         aSetReBA =[]
-        for aPair in tAtmBondingMap[tAtm]:
-            if aPair[1] !=1.5:
-                tCurVaMap[tAtm]+=aPair[1]
-                aSetBA.append(aPair)
-            else:
-                aSetReBA.append(aPair)
+        
+        
+        for aAtm2 in tAtmBondingMap[tAtm].keys():
+            if not aAtm2 in tDAtms:
+                if  tAtmBondingMap[tAtm][aAtm2][0] != 1.5:
+                    tCurVaMap[tAtm]+=tAtmBondingMap[tAtm][aAtm2][0]
+                    aSetBA.append([aAtm2,tAtmBondingMap[tAtm][aAtm2]])
+                else:
+                    aSetReBA.append([aAtm2, tAtmBondingMap[tAtm][aAtm2]])
                 
         
         reVal = tdefVaMap[tAtm] - tCurVaMap[tAtm] 
         nReA  = len(aSetReBA)
-        #print(reVal)
-        #print(nReA)
+        print(reVal)
+        print(nReA)
         if reVal ==2.0:
+            if nReA ==1:
+                aBOr = "SINGLE"
+                self.setABond(aSetReBA[0], tBonds, aBOr, tNAtms, tDBo)
+                tCurVaMap[tAtm]          +=1.0
+                tCurVaMap[aSetReBA[0][0]]+=1.0
+                tAtmBondingMap[tAtm][aSetReBA[0][0]][0]=1.0
+                
             if nReA ==2:
                 aBOr = "SINGLE"
                 for aPair in aSetReBA:
                     self.setABond(aPair, tBonds, aBOr, tNAtms, tDBo)
+                    print("Here %s  and %f"%(aPair[0], tCurVaMap[aPair[0]]))
+                    tCurVaMap[tAtm]     +=1.0
+                    tCurVaMap[aPair[0]] +=1.0
+                    tAtmBondingMap[tAtm][aPair[0]][0]=1.0
+                    
         elif reVal ==3.0:
-            if nReA ==2:
+            if nReA ==1:
+                aBOr = "DOUBLE"
+                self.setABond(aSetReBA[0], tBonds, aBOr, tNAtms, tDBo)
+                tCurVaMap[tAtm]          +=2.0
+                tCurVaMap[aSetReBA[0][0]]+=2.0
+                tAtmBondingMap[tAtm][aSetReBA[0][0]][0]=2.0
+            elif nReA ==2:
                 aBOr = "SINGLE"
                 self.setABond(aSetReBA[0], tBonds, aBOr, tNAtms, tDBo)
+                tCurVaMap[tAtm]        +=1.0
+                tCurVaMap[aSetReBA[0][0]] +=1.0
+                tAtmBondingMap[tAtm][aSetReBA[0][0]][0]=1.0
                 aBOr = "DOUBLE"
                 self.setABond(aSetReBA[1], tBonds, aBOr, tNAtms, tDBo)  
-            
+                tCurVaMap[tAtm]    +=2.0
+                tCurVaMap[aSetReBA[1][0]]+=2.0
+                tAtmBondingMap[tAtm][aSetReBA[0][0]][0]=2.0
                     
         print("Bond orders around Atom %s has been set, they are:  "%tAtm)
-        for aPair in tAtmBondingMap[tAtm]:
-            print("Bond between atom %s and %s is %s"%(tAtm, aPair[0], 
-                      tBonds[aPair[2]]["_chem_comp_bond.value_order"]))
+        for aAtm2 in tAtmBondingMap[tAtm]:
+            idxB = tAtmBondingMap[tAtm][aAtm2][1]
+            print("Bond between atom %s and %s is %s"%(tAtm, aAtm2, 
+                      tBonds[idxB]["_chem_comp_bond.value_order"]))
+            #print("curV for ", aAtm2, " is ", tCurVaMap[aAtm2])
      
     def setABond(self, tPair, tBonds, tBOr, tNAtms, tDBo):    
         
         #print("Bond order should be  ", tBOr)
-        tBonds[tPair[2]]["_chem_comp_bond.value_order"] = tBOr
-        tDBo.append(tPair[2])
+        tBonds[tPair[1][1]]["_chem_comp_bond.value_order"] = tBOr
+        tDBo.append(tPair[1][1])
         tNAtms.append(tPair[0])
-        #print("Bond order is ", tBonds[tPair[2]]["_chem_comp_bond.value_order"])
+        #print("Bond order is ", tBonds[tPair[1][1]]["_chem_comp_bond.value_order"])
     

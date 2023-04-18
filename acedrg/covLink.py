@@ -3991,7 +3991,7 @@ class CovLinkGenerator(CExeCode):
             if nDA !=0:
                 for aAtom in tModLigand["deleted"]["atoms"]:
                     tPoolAtoms.append(aAtom["atom_id"])
-                    aC = "."
+                    aC = "0.0"
                     if "charge" in aAtom:
                         aC = aAtom["charge"]
                     #for aKey in aAtom.keys():
@@ -4003,7 +4003,7 @@ class CovLinkGenerator(CExeCode):
 
             if nCA !=0:
                 for aAtom in tModLigand["changed"]["atoms"]:
-                    aC = "."
+                    aC = "0.0"
                     if "charge" in aAtom:
                         aC = aAtom["charge"]
                     aL = "%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "change".ljust(15), aAtom["atom_id"].ljust(10),\
@@ -4013,7 +4013,7 @@ class CovLinkGenerator(CExeCode):
 
             if nAA !=0:
                 for aAtom in tModLigand["added"]["atoms"]:
-                    aC = "."
+                    aC = "0.0"
                     if "charge" in aAtom:
                         aC = aAtom["charge"]
                     aL = "%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "add".ljust(15), ".".ljust(10),\
@@ -4156,7 +4156,6 @@ class CovLinkGenerator(CExeCode):
                        #and not aTor["atom_id_2"] in tPoolAtoms and not aTor["atom_id_4"] in tPoolAtoms:
                         CT_Tors.append(aTor)
             nCTors = len(CT_Tors)
-
              
         if nDTors !=0 or nCTors != 0 or nATors !=0:
 
@@ -4177,7 +4176,7 @@ class CovLinkGenerator(CExeCode):
                     aL ="%s%s%s%s%s%s%s%s%s%s\n"%(tModLigand["name"].ljust(15), "delete".ljust(15), \
                                               aTor["atom_id_1"].ljust(10), aTor["atom_id_2"].ljust(10),\
                                               aTor["atom_id_3"].ljust(10), aTor["atom_id_4"].ljust(10),\
-                                              ".".ljust(12), ".".ljust(12), ".".ljust(12), ".".ljust(15))                  
+                                              ".".ljust(12), ".".ljust(12), ".".ljust(12), str(aTor["period"]).ljust(15))                  
                     tOutFile.write(aL)
            
             if nCTors !=0: 
