@@ -2747,18 +2747,23 @@ class CovLinkGenerator(CExeCode):
     def setTorIdsInOneLink(self, tTors):
 
         if len(tTors) !=0:
-
+            
            aTorIdMap = {}
            newStrs = []
            aSeriNum = 0 
            for aTor in tTors:
                idStrs = aTor["id"].strip().split("_")
+               print("aTor_id =", aTor["id"])
+               print(len(idStrs))
+               if len(idStrs)==2:
+                   newStrs = idStrs
                if len(idStrs)==3:
                    newStrs = idStrs[:2]
                elif len(idStrs)==4:
                    newStrs = idStrs[1:3]
     
                if len(newStrs)==2:
+                   
                    newId = newStrs[0] + "_" + newStrs[1]
                    if not newId in list(aTorIdMap.keys()):
                        aTorIdMap[newId] = []
@@ -3695,6 +3700,7 @@ class CovLinkGenerator(CExeCode):
                  %(aTor["atom_id_1"],aTor["atom_id_1_resNum"], aTor["atom_id_2"], aTor["atom_id_2_resNum"],\
                    aTor["atom_id_3"],aTor["atom_id_3_resNum"], aTor["atom_id_4"], aTor["atom_id_4_resNum"]))
             print("dist_esd ", aTor["value_angle_esd"])
+            
 
         
         tLinkedObj.cLink["chirals"] = [] 
@@ -3768,6 +3774,7 @@ class CovLinkGenerator(CExeCode):
                
         for aTor in tOutCombLigandTors:
             print("Torsion angle between %s, %s, %s, %s "%(aTor["atom_id_1"], aTor["atom_id_2"], aTor["atom_id_3"], aTor["atom_id_4"]))
+            print("Torsion id is ", aTor["id"])
             if (aTor["atom_id_1_alias"] == tAtm2Id and aTor["atom_id_2_alias"] == tAtm1Id):
                 if aTor["atom_id_3_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
                     if not lD3:                  

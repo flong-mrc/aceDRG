@@ -619,13 +619,13 @@ namespace LIBMOL
                         }
                     }
 
-                    //else if (tAtoms[*iCo].bondingIdx==2)
-                    //{
-                        //std::cout << "Check NB atom " << tAtoms[*iCo].id << std::endl;
-                        //std::cout << "It is sp2 related " << std::endl;
-                        //lAromRs=true;
-                        //break;
-                    //}
+                    else if (tAtoms[*iCo].bondingIdx==2)
+                    {
+                        std::cout << "Check NB atom " << tAtoms[*iCo].id << std::endl;
+                        std::cout << "It is sp2 related " << std::endl;
+                        lAromRs=true;
+                        break;
+                    }
                 }
 
                 // Use nAromRs, =1 will make decision temporarily
