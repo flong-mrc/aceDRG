@@ -255,13 +255,13 @@ class AcedrgRDKit(object):
                 else:
                     aMolName = tFileName.strip().split(
                         "/")[-1].strip().split(".")[0]
-                # print "Molecule name:  ", aMolName
+                print("Molecule name:  ", aMolName)
                 # self.reSetChirals     =    True
                 aMolT = Chem.MolFromMolFile(tFileName)
-                
                 if aMolT:
                     self.initCoords = []
                     self.getInitCoordsInMolFile(tFileName)
+                    
                     self.checkAndSetInitAtomPos(aMolT)
                     aMolT.SetProp("fixedName", "NO")
                     #aMolT = Chem.AddHs(aMolT1)
@@ -999,10 +999,12 @@ class AcedrgRDKit(object):
         f = open(tFileName, "r")
         aLs = f.readlines()
         f.close()
-        headL = aLs[3].strip()
+        headL = aLs[3]
+        
         if len(headL) > 6:
-            nA = headL[:3].strip()
-            if nA.isdigit():
+            nA = headL[:3]
+            #print("nA ",nA)
+            if nA.strip().isdigit():
                 numA = int(nA)
             else:
                 print("Format errors in file %s :" % tFileName)
@@ -1018,6 +1020,8 @@ class AcedrgRDKit(object):
         else:
             print("Bug: format errors in the initial mol file by aceDRG ")
             sys.exit(1)
+        
+        
     
     def checkAndSetInitAtomPos(self, tMol):
 
@@ -1052,7 +1056,7 @@ class AcedrgRDKit(object):
             for aElem in list(dictAtomTypes.keys()):
                 i = 1
                 for aIdx in dictAtomTypes[aElem]:
-                    aName = aElem + str(i)
+                    aName = aElem.upper() + str(i)
                     dictAtomNames[aIdx] = aName
                     i = i+1
 

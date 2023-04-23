@@ -130,7 +130,6 @@ class ChemCheck(object):
 
         allAtomElems = []
         self.getAtomElems(tInFileName, tTypeIdx, allAtomElems)
-        
         for aAtomElem in allAtomElems:
             if not aAtomElem in self.organicSec:
                 organicOnly = False
@@ -305,7 +304,6 @@ class ChemCheck(object):
                     nOneMolLines += 1
 
     def getAtomElemsFromSmiles(self, tFileName, tAtomElems):
-
         if os.path.isfile(tFileName):
             # SMILES string in a file
             try:

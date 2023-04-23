@@ -2753,8 +2753,6 @@ class CovLinkGenerator(CExeCode):
            aSeriNum = 0 
            for aTor in tTors:
                idStrs = aTor["id"].strip().split("_")
-               print("aTor_id =", aTor["id"])
-               print(len(idStrs))
                if len(idStrs)==2:
                    newStrs = idStrs
                if len(idStrs)==3:
@@ -3183,6 +3181,7 @@ class CovLinkGenerator(CExeCode):
          
         # Planes
         self.checkPlModFromCombo(tLinkedObj)
+        
         self.checkPlModFromOrig(tLinkedObj)
      
         nDP1 = len(tLinkedObj.modLigand1["deleted"]["planes"])   
@@ -3373,6 +3372,12 @@ class CovLinkGenerator(CExeCode):
         pass
 
     def checkPlModFromCombo(self, tLinkedObj):
+        
+        print("Number of the orig planes for lig 1 : ", len(tLinkedObj.stdLigand1["remainPls"]))
+        print("Number of the orig planes for lig 2 : ", len(tLinkedObj.stdLigand2["remainPls"]))
+        
+        aL1DelPlIds = []
+        aL2DelPlIds = []
 
         if "planes" in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]:
             for aPl in list(tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"].keys()):
@@ -3388,10 +3393,10 @@ class CovLinkGenerator(CExeCode):
                         inRes2.append(aAtom["atom_id"])
                 if len(inRes1) == nAtmInPl:
                     self.checkPlMod(tLinkedObj.stdLigand1["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
-                                    tLinkedObj.modLigand1["deleted"]["planes"], tLinkedObj.modLigand1["added"]["planes"]) 
+                                    tLinkedObj.modLigand1["deleted"]["planes"], tLinkedObj.modLigand1["added"]["planes"], aL1DelPlIds) 
                 elif len(inRes2) == nAtmInPl:
                     self.checkPlMod(tLinkedObj.stdLigand2["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
-                                tLinkedObj.modLigand2["deleted"]["planes"], tLinkedObj.modLigand2["added"]["planes"])
+                                    tLinkedObj.modLigand2["deleted"]["planes"], tLinkedObj.modLigand2["added"]["planes"], aL2DelPlIds)
      
     def checkPlModFromOrig(self, tLinkedObj):
 
@@ -3407,17 +3412,21 @@ class CovLinkGenerator(CExeCode):
             else:
                 self.checkPlMod2(aPl, tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"], tLinkedObj.modLigand2["deleted"]["planes"])
 
-    def checkPlMod(self, tOrigPls,  tPl, tModDelPls, tModAddPls):
+    def checkPlMod(self, tOrigPls,  tPl, tModDelPls, tModAddPls, tDelPlIds):
 
         tPlAtmIds = []
         #print("Atoms in tPl : ")
         for aAtm in tPl:
             #if aAtm["atom_id"][0] != "H":
             tPlAtmIds.append(aAtm["atom_id"])
-            print(aAtm["atom_id"])
+            #print(aAtm["atom_id"])
+        print("==========================")
+        print("Check the combo pl ", tPl[0]["plane_id"])
+        print("==========================")
         nAtoms = len(tPlAtmIds)
         for aPl in tOrigPls:
             #print("Atoms in aPl : ")
+            print("compare Orig pl ", aPl[0]["plane_id"])
             tOrigPlAtmIds = []
             for aPlAtm in aPl:
                 #if aPlAtm["atom_id"][0] != "H":
@@ -3431,10 +3440,15 @@ class CovLinkGenerator(CExeCode):
                         overlapAtms.append(aOId)
                 print ("overlaped atoms ",  len(overlapAtms))
                 if len(overlapAtms) == nOrigAtoms:
-                    tModDelPls.append(aPl) 
-                    tModAddPls.append(tPl)
-                    print("orignal plane deleted")
-                    break
+                    aPlId = aPl[0]["plane_id"]
+                    if not aPlId in tDelPlIds:
+                        tModDelPls.append(aPl) 
+                        tModAddPls.append(tPl)
+                        tDelPlIds.append(aPlId)
+                        print("Num atom in combPl ", nAtoms )
+                        print("Num atom in origPl ", nOrigAtoms)
+                        print("!!!!orignal %s is deleted"%aPlId)
+                        break
             elif nAtoms < nOrigAtoms: 
                 overlapAtms = []
                 for aOId in tPlAtmIds:
@@ -3444,10 +3458,15 @@ class CovLinkGenerator(CExeCode):
                     print ("overlaped atoms ",  len(overlapAtms))
                     for aId in overlapAtms:
                         print ("overlaped atom : %s "%aId)
-                    tModDelPls.append(aPl) 
-                    tModAddPls.append(tPl)
-                    print("orignal plane deleted")
-                    break
+                    aPlId = aPl[0]["plane_id"]
+                    if not aPlId in tDelPlIds:
+                        tModDelPls.append(aPl) 
+                        tModAddPls.append(tPl)
+                        tDelPlIds.append(aPlId)
+                        print("Num atom in combPl ", nAtoms )
+                        print("Num atom in origPl ", nOrigAtoms)
+                        print("!!!!orignal %s is deleted"%aPlId)
+                        break
 
         """
         for aPl in tModDelPls:
@@ -3470,12 +3489,17 @@ class CovLinkGenerator(CExeCode):
     def checkPlMod2(self, tPl, tComboPls, tModDelPls):
 
         tPlAtmIds = []
+        print("==========================")
+        print("Check the orig pl ", tPl[0]["plane_id"])
+        print("==========================")
         for aAtm in tPl:
             if aAtm["atom_id"][0] != "H":
                 tPlAtmIds.append(aAtm["atom_id"])
 
         lOverlapPls = False
         for aPl in tComboPls:
+            print("Here", aPl)
+            #print("compare combo pl ", aPl[0]["plane_id"])
             overlapAtms = []
             for aPlAtm in tComboPls[aPl]:
                 if aPlAtm["atom_id"][0] != "H":
@@ -3487,6 +3511,7 @@ class CovLinkGenerator(CExeCode):
 
         if not lOverlapPls:
             tModDelPls.append(tPl)
+            print("The orig pl ", tPl[0]["plane_id"])
 
  
             

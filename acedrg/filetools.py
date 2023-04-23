@@ -1094,9 +1094,11 @@ class FileTransformer(object) :
    
             # The Counts Line
             nA = str(len(self.atoms))
-            print("Number of atoms ", nA)
+            #print("Number of atoms ", nA)
             nB = str(len(self.bonds))
+            #print("Number of bonds ", nB)
             nC = ""
+        
             if len(self.chirals):
                 nC = "1"
             else:

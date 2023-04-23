@@ -385,7 +385,7 @@ namespace LIBMOL
         for (std::vector<RingDict>::iterator iR=tRings.begin();
                 iR !=tRings.end(); iR++)
         {
-            if (iR->isAromaticP)
+            if (iR->isAromaticP || iR->isAromatic)
             {
                 for (std::vector<AtomDict>::iterator iAm=iR->atoms.begin();
                         iAm !=iR->atoms.end(); iAm++)
@@ -436,4 +436,3 @@ namespace LIBMOL
 
 
 }
-
