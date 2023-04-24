@@ -451,8 +451,7 @@ namespace LIBMOL
             }
             else if (tAtom.bondingIdx ==3)  // SP3
             {
-                if ((tAtom.connAtoms.size()==4)
-                     || (tAtom.connAtoms.size()==3))
+                if (tAtom.connAtoms.size()==4)
                 {
                     if (tAtom.connHAtoms.size()==1)
                     {
@@ -466,9 +465,17 @@ namespace LIBMOL
                     {
                         tAtom.ccp4Type = "NT3";
                     }
-                    else
+                    else if(tAtom.connHAtoms.size()==4)
+                    {
+                        tAtom.ccp4Type = "NT4";
+                    }
+                    else if(tAtom.connHAtoms.size()==0)
                     {
                         tAtom.ccp4Type = "NT";
+                    }
+                    else
+                    {
+                        tAtom.ccp4Type = "N";
                     }
                 }
                 else if (tAtom.connAtoms.size()==3)
@@ -480,6 +487,14 @@ namespace LIBMOL
                     else if(tAtom.connHAtoms.size()==2)
                     {
                         tAtom.ccp4Type = "N32";
+                    }
+                    else if(tAtom.connHAtoms.size()==3)
+                    {
+                        tAtom.ccp4Type = "N33";
+                    }
+                    else if(tAtom.connHAtoms.size()==0)
+                    {
+                        tAtom.ccp4Type = "N30";
                     }
                     else
                     {
