@@ -408,6 +408,10 @@ namespace LIBMOL
                                 tAtom.ccp4Type ="NH2";
                             }
                         }
+                        else if (tAtom.connHAtoms.size() == 0)
+                        {
+                            tAtom.ccp4Type ="NH0";
+                        }
                         else
                         {
                             tAtom.ccp4Type = "N";
