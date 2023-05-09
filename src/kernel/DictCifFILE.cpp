@@ -8767,8 +8767,8 @@ namespace LIBMOL
                     if (iT->id.find("const") !=std::string::npos
                         || iT->id.find("CONST") !=std::string::npos)
                     {
-                        // std::cout << "X1 " << std::endl;
                         aTorSiga = "0.0";
+                        //aTorSiga = "1.0";
                     }
                     else if (iT->id.find("sp2_sp2") !=std::string::npos)
                     {
@@ -8789,7 +8789,8 @@ namespace LIBMOL
                     {
                         aTorSiga = "10.0";
                     }
-                    // std::cout << "aTorSiga " << aTorSiga  << std::endl;
+                    std::cout << "aTor id " << iT->id << std::endl;
+                    std::cout << "aTorSiga " << aTorSiga  << std::endl;
                     outRestrF << longName
                               << std::setw(22) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id

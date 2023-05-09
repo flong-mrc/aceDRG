@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   main.cpp
  * Author: flong
  *
@@ -86,22 +86,22 @@
  *  A temporary version of main, some re-organization under way
  */
 int main(int argc, char** argv) {
-    
+
     LIBMOL::CheckEnvAndGetMode AJob(argc, argv);
-    
+
     std::cout << "workMode " << AJob.workMode << std::endl;
-    //std::cout << "user output name " << AJob.IOEntries["userOutName"] 
+    //std::cout << "user output name " << AJob.IOEntries["userOutName"]
     //          << std::endl;
-    
-    
+
+
     for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
             iKW !=AJob.IOEntries.end(); iKW++)
-    {   
+    {
         std::cout << iKW->first << "\t" << iKW->second << std::endl;
     }
-    
-    
-    if (AJob.workMode == 11 
+
+
+    if (AJob.workMode == 11
         || AJob.workMode ==12
         || AJob.workMode ==13
         || AJob.workMode ==14)
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
                         LIBMOL::SmileTool aSmiConvertor;
                         aSmiConvertor.SmileToCifUsingLibcheck(AJob.IOEntries["inSmiName"].c_str(),
                                                               AJob.IOEntries["inCifName"]);
-                        std::cout << "The initial Cif file generated base on input SMILE file is: " 
+                        std::cout << "The initial Cif file generated base on input SMILE file is: "
                                   << std::endl <<  AJob.IOEntries["inCifName"] << std::endl;
                     }
                     else
@@ -127,37 +127,43 @@ int main(int argc, char** argv) {
                         exit(1);
                     }
                 }
-                else 
+                else
                 {
                     std::cout << "Program Bug, this mode requires a SMILE file "
                               << std::endl;
                 }
             }
-            
+
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-                                           
-            LIBMOL::AllSystem   aTargetSystem(dataFromCif, 
+
+            LIBMOL::AllSystem   aTargetSystem(dataFromCif,
                                               AJob.IOEntries["libMolTabDir"],
                                               AJob.upperBondSig,
-                                              AJob.lowBondSig, 
+                                              AJob.lowBondSig,
                                               AJob.upperAngleSig,
-                                              AJob.lowAngleSig); 
-            
+                                              AJob.lowAngleSig);
+
+            if (AJob.IOEntries.find("modifiedPl") !=  AJob.IOEntries.end())
+            {
+                aTargetSystem.lMdPls = true;
+            }
+
             if (AJob.IOEntries.find("PeptidesOnly") !=  AJob.IOEntries.end())
             {
                 aTargetSystem.isPeptide = true;
             }
-                  
+
             if ( (int)aTargetSystem.allAtoms.size() > 0)
-            {   
+            {
+
                  aTargetSystem.setupAllTargetValuesFromCOD2(
-                                AJob.IOEntries["userOutName"].c_str(), 
-                                AJob.IOEntries["monoRootName"], 
+                                AJob.IOEntries["userOutName"].c_str(),
+                                AJob.IOEntries["monoRootName"],
                                 AJob.IOEntries["libMolTabDir"]);
-                 
+
 
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
-                                  AJob.IOEntries["monoRootName"], 
+                                  AJob.IOEntries["monoRootName"],
                                   aTargetSystem.propComp,
                                   aTargetSystem.allAtoms,
                                   // aTargetSystem.allHAtomIdx,
@@ -167,17 +173,17 @@ int main(int argc, char** argv) {
                                   aTargetSystem.allRingsV,
                                   aTargetSystem.allPlanes,
                                   aTargetSystem.allChirals,
-                                  aTargetSystem.upperBondSig, 
-                                  aTargetSystem.lowBondSig, 
+                                  aTargetSystem.upperBondSig,
+                                  aTargetSystem.lowBondSig,
                                   aTargetSystem.upperAngleSig,
                                   aTargetSystem.lowAngleSig,
                                   aTargetSystem.HydrDistTable);
-                                
-                
+
+
                 LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                               AJob.IOEntries["monoRootName"], 
+                               AJob.IOEntries["monoRootName"],
                                aTargetSystem.allAtoms);
-                
+
                 LIBMOL::outB_and_A_Levels(AJob.IOEntries["userOutName"].c_str(),
                                           aTargetSystem.allAtoms,
                                           aTargetSystem.allBonds,
@@ -185,44 +191,44 @@ int main(int argc, char** argv) {
             }
             else
             {
-                std::cout << "The input Cif file " << AJob.IOEntries["inCifName"] 
+                std::cout << "The input Cif file " << AJob.IOEntries["inCifName"]
                           << " contains NO atoms! check the file " << std::endl;
             }
         }
         else if (AJob.workMode == 13)
         {
             LIBMOL::MolSdfFile dataFromSdf(AJob.IOEntries["inSdfName"], std::ios::in);
-            
-            
+
+
             if (dataFromSdf.allMols.size() !=0)
             {
                 int i =1;
-                
+
                 for (std::vector<LIBMOL::Molecule>::iterator iMol=dataFromSdf.allMols.begin();
                         iMol !=dataFromSdf.allMols.end(); iMol++)
                 {
-                    
+
                     LIBMOL::AllSystem   aTargetSystem(*iMol, AJob.IOEntries["libMolTabDir"]);
-                    
+
                     if ( (int)aTargetSystem.allAtoms.size() > 0)
                     {
                         std::string tOutName(AJob.IOEntries["userOutName"]);
                         // std::cout << "input name" << AJob.IOEntries["userOutName"] << std::endl;
-                        
-                        
+
+
                         if(dataFromSdf.allMols.size()>1)
                         {
                             tOutName.append("_");
                             tOutName.append(LIBMOL::IntToStr(i));
                         }
-                        
-                        
-                        aTargetSystem.setupAllTargetValuesFromCOD2(tOutName.c_str(), 
+
+
+                        aTargetSystem.setupAllTargetValuesFromCOD2(tOutName.c_str(),
                                                    AJob.IOEntries["monoRootName"],
                                                    AJob.IOEntries["libMolTabDir"]);
-                        
+
                         LIBMOL::outMMCif(tOutName.c_str(),
-                                                 AJob.IOEntries["monoRootName"], 
+                                                 AJob.IOEntries["monoRootName"],
                                                  aTargetSystem.propComp,
                                                  aTargetSystem.allAtoms,
                                                  // aTargetSystem.allHAtomIdx,
@@ -237,10 +243,10 @@ int main(int argc, char** argv) {
                                                  aTargetSystem.upperAngleSig,
                                                  aTargetSystem.lowAngleSig,
                                                  aTargetSystem.HydrDistTable);
-                        
-                        
+
+
                         LIBMOL::outPDB(tOutName.c_str(),
-                                AJob.IOEntries["monoRootName"], 
+                                AJob.IOEntries["monoRootName"],
                                 aTargetSystem.allAtoms);
                     }
                     i++;
@@ -248,20 +254,20 @@ int main(int argc, char** argv) {
             }
             else
             {
-                std::cout << "The input Sdf/Mol file " << AJob.IOEntries["inSdfName"] 
+                std::cout << "The input Sdf/Mol file " << AJob.IOEntries["inSdfName"]
                           << " contains NO atoms! check the file " << std::endl;
             }
         }
         else if (AJob.workMode == 14)
         {
             LIBMOL::SYBLMol2File dataFromMol2(AJob.IOEntries["inMol2Name"], std::ios::in);
-            
+
             if (dataFromMol2.atoms.size() >0)
             {
                 LIBMOL::AllSystem   aTargetSystem(dataFromMol2, AJob.IOEntries["libMolTabDir"]);
-                
+
                 LIBMOL::outMMCif2(AJob.IOEntries["userOutName"].c_str(),
-                                     AJob.IOEntries["monoRootName"], 
+                                     AJob.IOEntries["monoRootName"],
                                      aTargetSystem.propComp,
                                      aTargetSystem.allAtoms,
                                      // aTargetSystem.allHAtomIdx,
@@ -272,36 +278,36 @@ int main(int argc, char** argv) {
                                      aTargetSystem.allPlanes,
                                      aTargetSystem.allChirals);
             }
-                 
+
         }
     }
     else if (AJob.workMode == 21 || AJob.workMode == 22 )
     {
-       
+
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"].c_str(),
                                         AJob.IOEntries["inPdbName"].c_str());
-        
+
         std::string tOutName(AJob.IOEntries["userOutName"]);
         LIBMOL::outMMCif3Secs(tOutName.c_str(), AJob.IOEntries["monoRootName"],
                       dataFromCif.allAtoms, dataFromCif.allUnchangedBlocks);
-                         
-       
+
+
     }
-    else if (AJob.workMode==31 
+    else if (AJob.workMode==31
              || AJob.workMode==311
              || AJob.workMode==3111
              || AJob.workMode ==312
-             || AJob.workMode ==313 
+             || AJob.workMode ==313
              || AJob.workMode ==314
              || AJob.workMode ==315
-             || AJob.workMode==32 
+             || AJob.workMode==32
              || AJob.workMode==33)
     {
         //std::cout << "WorkMode: Molecule generation" << std::endl;
         int aNBDepth = LIBMOL::StrToInt(AJob.IOEntries["NBDepth"]);
-        
-        if (   AJob.workMode==31 
-            || AJob.workMode==311 
+
+        if (   AJob.workMode==31
+            || AJob.workMode==311
             || AJob.workMode==3111
             || AJob.workMode ==312
             || AJob.workMode ==313
@@ -314,34 +320,34 @@ int main(int argc, char** argv) {
             if (AJob.IOEntries.find("MolGenParaFile")==
                 AJob.IOEntries.end())
             {
-                LIBMOL::GenCifFile  
+                LIBMOL::GenCifFile
                 dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
-                std::cout << "Number of crystal in the system is " 
+                std::cout << "Number of crystal in the system is "
                       << dataFromCif.allCryst.size() << std::endl;
             }
              */
-               
-            LIBMOL::GenCifFile  
+
+            LIBMOL::GenCifFile
             dataFromCif(AJob.IOEntries["inCifNameB"],
-                        AJob.IOEntries["MolGenParaFile"],         
+                        AJob.IOEntries["MolGenParaFile"],
                         std::ios::in);
-            std::cout << "Number of crystal in the system is " 
+            std::cout << "Number of crystal in the system is "
                       << dataFromCif.allCryst.size() << std::endl;
-            
+
             // TEMP, CSD do not provide several parameters. Rely on CSD
             // search criteria.
-            
+
             if (dataFromCif.allAtoms.size() > 0)
             {
                 dataFromCif.outAtomElems(AJob.IOEntries["userOutName"]);
             }
-            
-            
+
+
             //if (dataFromCif.notPowder && dataFromCif.resolOK
-            //    && dataFromCif.RFactorOK && dataFromCif.colidOK 
+            //    && dataFromCif.RFactorOK && dataFromCif.colidOK
             //    && !dataFromCif.hasHeavyCalcAtoms && !dataFromCif.lErr)
             //if(!dataFromCif.lErr)
-            
+
             if (dataFromCif.checkOverAll(AJob.workMode))
             {
                 if (AJob.workMode ==3111)
@@ -356,22 +362,22 @@ int main(int argc, char** argv) {
                     //std::cout << "R factor satisfies the requirement" << std::endl;
                     std::cout << "Pass temporarily" << std::endl;
                 }
-                
+
                 //std::cout << "workMode " << AJob.workMode << std::endl;
                 //std::cout << "LibmolTabDir " << AJob.IOEntries["libMolTabDir"]
                 //          << std::endl;
-                  
+
                 dataFromCif.outCrystInfo(AJob.IOEntries["userOutName"]);
 
                 LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
-                
+
                 if (AJob.IOEntries.find("libMolTabDir")
                       != AJob.IOEntries.end())
                 {
                     aMolCreator.aLibmolTabDir = AJob.IOEntries["libMolTabDir"];
                 }
-               
-                
+
+
                 if (AJob.workMode==31 || AJob.workMode==311)
                 {
                     aMolCreator.execute1(AJob.IOEntries["UserParaFile"].c_str(),
@@ -384,22 +390,22 @@ int main(int argc, char** argv) {
                 else if (AJob.workMode ==312 || AJob.workMode==313)
                 {
                     std::cout << "Studies on metal atoms " << std::endl;
-                    
+
                     if (dataFromCif.hasMetal)
                     {
                         std::cout << "The system contain metal atoms " << std::endl;
                         std::cout << "Those metal atoms are : " << std::endl;
-                        for (std::vector<LIBMOL::AtomDict>::iterator 
+                        for (std::vector<LIBMOL::AtomDict>::iterator
                              iAt=dataFromCif.allAtoms.begin();
                              iAt != dataFromCif.allAtoms.end(); iAt++)
                         {
                             if (iAt->isMetal)
                             {
-                                std::cout << "Atom " << iAt->id << " of element " 
+                                std::cout << "Atom " << iAt->id << " of element "
                                           << iAt->chemType << std::endl;
                             }
                         }
-                
+
                         LIBMOL::outMetalAtomInfo(AJob.IOEntries["userOutName"].c_str(),
                                         dataFromCif);
                         //std::cout << "The structure is from single crystallographic x-ray "
@@ -415,8 +421,8 @@ int main(int argc, char** argv) {
                                 dataFromCif.reOrdErrMsg();
                                 if (aMolCreator.allMsg.size() !=0)
                                 {
-                                    for (std::vector<std::string>::iterator 
-                                        iErr=aMolCreator.allMsg.begin(); 
+                                    for (std::vector<std::string>::iterator
+                                        iErr=aMolCreator.allMsg.begin();
                                         iErr!=aMolCreator.allMsg.end(); iErr++)
                                         {
                                             dataFromCif.errMsg.push_back(*iErr);
@@ -425,8 +431,8 @@ int main(int argc, char** argv) {
                                 }
                                 LIBMOL::writeMsgFile(AJob.IOEntries["userOutName"],
                                                    dataFromCif.errMsg);
-                                for (std::vector<std::string>::iterator 
-                                     iErr=dataFromCif.errMsg.begin(); 
+                                for (std::vector<std::string>::iterator
+                                     iErr=dataFromCif.errMsg.begin();
                                      iErr!=dataFromCif.errMsg.end(); iErr++)
                                 {
                                     std::cout <<(*iErr) << std::endl;
@@ -449,32 +455,32 @@ int main(int argc, char** argv) {
                 }
                 else if (AJob.workMode==314)
                 {
-                    
+
                     std::cout << "Studies of neighbor distribution of "
                                 "certain non-metal atoms " << std::endl;
                     /*
                     LIBMOL::PeriodicTable aPTab;
                     double aDDelta = 0.3;
-                    
-                    
-                    if (AJob.IOEntries.find("distDelta") 
+
+
+                    if (AJob.IOEntries.find("distDelta")
                             !=AJob.IOEntries.end())
                     {
-                        aDDelta = 
+                        aDDelta =
                         LIBMOL::StrToReal(AJob.IOEntries["distDelta"]);
                     }
                     */
-                    
+
                     aMolCreator.executeSelectedAtomRange(
                                         AJob.IOEntries["UserParaFile"].c_str(),
-                                        AJob.IOEntries["userOutName"].c_str());    
+                                        AJob.IOEntries["userOutName"].c_str());
                 }
                 else if (AJob.workMode==315)
                 {
                     std::cout << "Detect possible H-bond candidates "
                               << std::endl;
-                    
-                    
+
+
                 }
             }
             else
@@ -484,8 +490,8 @@ int main(int argc, char** argv) {
                     dataFromCif.reOrdErrMsg();
                     LIBMOL::writeMsgFile(AJob.IOEntries["userOutName"],
                                          dataFromCif.errMsg);
-                    for (std::vector<std::string>::iterator 
-                         iErr=dataFromCif.errMsg.begin(); 
+                    for (std::vector<std::string>::iterator
+                         iErr=dataFromCif.errMsg.begin();
                          iErr!=dataFromCif.errMsg.end(); iErr++)
                     {
                         std::cout <<(*iErr) << std::endl;
@@ -493,14 +499,14 @@ int main(int argc, char** argv) {
                 }
                 else
                 {
-                    std::cout << "Check ! the structure has not been converted to " 
-                              << "molecules because of unknown reasons !" << std::endl; 
+                    std::cout << "Check ! the structure has not been converted to "
+                              << "molecules because of unknown reasons !" << std::endl;
                 }
             }
         }
         else if (AJob.workMode==32)
         {
-            
+
             std::cout << "Input cif " << AJob.IOEntries["inCifName"] << std::endl;
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromCif, aNBDepth);
@@ -509,31 +515,31 @@ int main(int argc, char** argv) {
         }
         else if (AJob.workMode==33)
         {
-            std::cout << "The directory of input cif files " 
+            std::cout << "The directory of input cif files "
                       << AJob.IOEntries["inCifNameB"] << std::endl;
         }
-        
+
     }
     else if (AJob.workMode == 41)
     {
-       
+
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-                                           
+
         // LIBMOL::DictCifFile aTargetSystem(AJob.IOEntries["inCifName"], std::ios::in);
-        
+
         if (dataFromCif.allAtoms.size() > 0)
-        {     
-            LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
+        {
+            LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]);
             LIBMOL::CodClassify  aCodSystem(aTargetSystem.allAtoms,
-                                            aTargetSystem.allHAtomIdx, 
-                                            aTargetSystem.allBonds, 
-                                            aTargetSystem.allAngles, 
-                                            aTargetSystem.allTorsions, 
-                                            aTargetSystem.allChirals, 
-                                            aTargetSystem.allPlanes, 
+                                            aTargetSystem.allHAtomIdx,
+                                            aTargetSystem.allBonds,
+                                            aTargetSystem.allAngles,
+                                            aTargetSystem.allTorsions,
+                                            aTargetSystem.allChirals,
+                                            aTargetSystem.allPlanes,
                                             aTargetSystem.allRings,
                                             AJob.IOEntries["libMolTabDir"], 2);
-            
+
             //aCodSystem.codAtomClassifyNew2(2);
             LIBMOL::setAtomFormTypes(aCodSystem.allAtoms);
             LIBMOL::outAtomTypesAndConnections(AJob.IOEntries["userOutName"].c_str(),
@@ -541,50 +547,50 @@ int main(int argc, char** argv) {
                                                aCodSystem.allAtoms,
                                                aCodSystem.allBonds,
                                                aCodSystem.allRingsV);
-            
+
         }
     }
     else if (AJob.workMode == 43)
     {
-        
+
     }
     else if (AJob.workMode == 43)
     {
         LIBMOL::MolSdfFile aMolFile(AJob.IOEntries["inSdfName"].c_str());
-        std::cout << "Number of molecules in " << AJob.IOEntries["inSdfName"] 
+        std::cout << "Number of molecules in " << AJob.IOEntries["inSdfName"]
                   << " is " << aMolFile.allMols.size() << std::endl;
-        
+
         std::map<std::string, std::vector<std::string> >    allAtomTypes;
         std::vector<std::string>                            allBondLines;
         std::vector<std::string>                            allAngleLines;
-        
+
         for (unsigned i=0; i < aMolFile.allMols.size(); i++)
         {
-            std::cout << "DEAL WITH MOLECULE " << i+1 << " in " 
+            std::cout << "DEAL WITH MOLECULE " << i+1 << " in "
                       << AJob.IOEntries["inSdfName"] << std::endl;
-            
+
             LIBMOL::AllSystem   aTargetSystem(aMolFile.allMols[i], AJob.IOEntries["libMolTabDir"]);
-            
+
             LIBMOL::CodClassify  aCodSystem(aTargetSystem.allAtoms,
-                                            aTargetSystem.allHAtomIdx, 
-                                            aTargetSystem.allBonds, 
-                                            aTargetSystem.allAngles, 
-                                            aTargetSystem.allTorsions, 
-                                            aTargetSystem.allChirals, 
-                                            aTargetSystem.allPlanes, 
+                                            aTargetSystem.allHAtomIdx,
+                                            aTargetSystem.allBonds,
+                                            aTargetSystem.allAngles,
+                                            aTargetSystem.allTorsions,
+                                            aTargetSystem.allChirals,
+                                            aTargetSystem.allPlanes,
                                             aTargetSystem.allRings,
                                             AJob.IOEntries["libMolTabDir"], 2);
-            
-            
+
+
             LIBMOL::accumInfoMols(aMolFile.allMols[i].comments[0],
                                   aCodSystem.allAtoms,
                                   aCodSystem.allBonds,
                                   aCodSystem.allAngles,
-                                  allAtomTypes, 
-                                  allBondLines, 
+                                  allAtomTypes,
+                                  allBondLines,
                                   allAngleLines);
         }
-        
+
         std::string  aAtName = AJob.IOEntries["userOutName"] + "_atomType.txt";
         std::ofstream outAtomTypes(aAtName.c_str());
         for (std::map<std::string,std::vector<std::string> >::iterator iAt=allAtomTypes.begin();
@@ -593,52 +599,52 @@ int main(int argc, char** argv) {
              outAtomTypes << iAt->first << "  :  "
                       << iAt->second.size() << std::endl;
         }
-        
+
         std::string  aBaName = AJob.IOEntries["userOutName"] + "_bonds.txt";
         std::ofstream outBonds(aBaName.c_str());
         for (std::vector<std::string>::iterator iB=allBondLines.begin();
               iB != allBondLines.end(); iB++)
         {
             outBonds << *iB;
-        }   
+        }
     }
     else if (AJob.workMode == 800)
     {
-        
-        
+
+
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-        
-        LIBMOL::AllSystem   aTargetSystem(dataFromCif, 
+
+        LIBMOL::AllSystem   aTargetSystem(dataFromCif,
                                           AJob.IOEntries["libMolTabDir"],
                                           AJob.upperBondSig,
-                                          AJob.lowBondSig, 
+                                          AJob.lowBondSig,
                                           AJob.upperAngleSig,
                                           AJob.lowAngleSig);
-        
-        
+
+
         LIBMOL::outProElecDistances(AJob.IOEntries["userOutName"].c_str(),
-                                    aTargetSystem);        
+                                    aTargetSystem);
     }
     else if (AJob.workMode == 900)
     {
         if (AJob.IOEntries.find("Type1") !=AJob.IOEntries.end()
             and AJob.IOEntries.find("Type2") !=AJob.IOEntries.end())
-        {   
-            
+        {
+
             LIBMOL::isomorGraph graphTool;
             LIBMOL::Graph  g1, g2;
-            
-            
-            
+
+
+
             std::vector<std::map<int, int> > matchedList;
-            
-            graphTool.graphMatch(AJob.IOEntries["Type1"].c_str(), 
+
+            graphTool.graphMatch(AJob.IOEntries["Type1"].c_str(),
                                      g1,
                                      AJob.IOEntries["Type2"].c_str(),
                                      g2,
                                      matchedList,
                                      1);
-            
+
             if (matchedList.size()>0)
             {
                 graphTool.outputMatchedGraphs(g1, g2, matchedList, 1,
@@ -649,63 +655,63 @@ int main(int argc, char** argv) {
             {
                 std::cout << "No matched graphs found. " << std::endl;
             }
-            
+
         }
-          
+
     }
     else if (AJob.workMode == 910)
     {
         // Hukel MO applications
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
         LIBMOL::CodClassify aClassifiedSys(dataFromCif, AJob.IOEntries["libMolTabDir"]);
-        
+
         LIBMOL::HuckelMOSuite  aMoTool;
         aMoTool.setWorkMode(2);
         //aMoTool.execute(dataFromCif.allAtoms, dataFromCif.allBonds);
-        aMoTool.execute2(aClassifiedSys.allAtoms, aClassifiedSys.allBonds, 
-                         aClassifiedSys.allRingsV);   
-        if(AJob.IOEntries.find("userOutName") 
+        aMoTool.execute2(aClassifiedSys.allAtoms, aClassifiedSys.allBonds,
+                         aClassifiedSys.allRingsV);
+        if(AJob.IOEntries.find("userOutName")
              == AJob.IOEntries.end())
         {
             AJob.IOEntries["userOutName"] = "Libmol_atoms_bonds.txt";
         }
         aMoTool.outBoAndChList(AJob.IOEntries["userOutName"].c_str(),
-                               aClassifiedSys.allAtoms, aClassifiedSys.allBonds);    
-        
+                               aClassifiedSys.allAtoms, aClassifiedSys.allBonds);
+
     }
     else if (AJob.workMode == 1001)
     {
-        
+
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
-                                               
-        LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]); 
-        
+
+        LIBMOL::AllSystem   aTargetSystem(dataFromCif, AJob.IOEntries["libMolTabDir"]);
+
         std::cout << "number of rings " << aTargetSystem.allRingsV.size() << std::endl;
-        
+
         if ( (int)aTargetSystem.allAtoms.size() > 0)
         {
             LIBMOL::KekulizeMol aKTool;
-            aKTool.execute(aTargetSystem.allAtoms, 
+            aKTool.execute(aTargetSystem.allAtoms,
                            aTargetSystem.allBonds,
                            aTargetSystem.allRingsV);
-            
+
             LIBMOL::outBoAndChList(AJob.IOEntries["userOutName"].c_str(),
-                                   aTargetSystem.allAtoms, 
+                                   aTargetSystem.allAtoms,
                                    aTargetSystem.allBonds);
         }
     }
     else if(AJob.workMode==1002)
     {
-        std::cout << "Input cif " 
+        std::cout << "Input cif "
                   << AJob.IOEntries["inCifNameB"] << std::endl;
         LIBMOL::GenCifFile  dataFromCif(AJob.IOEntries["inCifNameB"], std::ios::in);
         std::cout << "Number of H atoms " << dataFromCif.allHAtomIdx.size()
                   << std::endl;
-        
+
         if (dataFromCif.allHAtomIdx.size() >0)
         {
-           
-            AJob.IOEntries["userOutName"] = "HasH_" + 
+
+            AJob.IOEntries["userOutName"] = "HasH_" +
                                             AJob.IOEntries["userOutName"]
                                           + ".msg";
             std::cout << AJob.IOEntries["userOutName"] << std::endl;
@@ -713,29 +719,28 @@ int main(int argc, char** argv) {
 
             if (aHasHF.is_open())
             {
-                for (std::vector<int>::iterator 
+                for (std::vector<int>::iterator
                      iH=dataFromCif.allHAtomIdx.begin();
                      iH !=dataFromCif.allHAtomIdx.end(); iH++)
                 {
                     aHasHF << dataFromCif.allAtoms[*iH].id << std::endl;
                 }
-                
+
                 aHasHF.close();
             }
         }
         else
         {
-            AJob.IOEntries["userOutName"] = "NoH_" + 
+            AJob.IOEntries["userOutName"] = "NoH_" +
                                             AJob.IOEntries["userOutName"]
                                           + ".msg";
             std::cout << AJob.IOEntries["userOutName"] << std::endl;
-            
+
             std::ofstream aNoHF(AJob.IOEntries["userOutName"].c_str());
-            
+
         }
     }
-    
-    return 0;
-    
-}
 
+    return 0;
+
+}

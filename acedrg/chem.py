@@ -892,17 +892,20 @@ class ChemCheck(object):
                                   aromAtmMap, doneAtoms, nextAtoms,
                                   aHMap, aCurVaMap)
             
-            
-        
        
             self.getAndSetStartAtm(aromAtmMap, allAtmBondingMap, tAtoms, 
                                    tBonds,doneAtoms, nextAtoms, doneBonds,
                                    adefVaMap, aCurVaMap, aHMap)
             
             
-            print("atoms to be done", nextAtoms)
+            print("atoms to be done next: ", nextAtoms)
     
-            
+            print("Atoms left : ")
+            for aAtm in tAtoms:
+                aAtmId = aAtm["_chem_comp_atom.atom_id"] 
+                if not aAtmId in doneAtoms:
+                    print(aAtmId)
+            sys.exit()
             
             i=1
             while len(nextAtoms) > 0:

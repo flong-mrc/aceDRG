@@ -134,6 +134,7 @@ class Acedrg(CExeCode ):
         self.workMode         = 0
         self.useExistCoords   = False
         self.useExistCoords2  = False
+        self.modifiedPlanes   = False
 
         self.isOrg            = True
         self.isAA             = False
@@ -360,7 +361,7 @@ class Acedrg(CExeCode ):
                                     help="Input File of PDB format containing coordinates of the ligand")
 
         self.inputParser.add_option("-y", "--repcrd",
-                  action="store_true", dest="repCrd", default=False,
+                                    action="store_true", dest="repCrd", default=False,
                   help="Use this keyword if you want to replace the atomic coordinates in the input mmCif with those in the input PDB")
 
         self.inputParser.add_option("-z",  "--noGeoOpt", dest="noGeoOpt",  
@@ -374,6 +375,11 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-L",  "--linkInstruction", dest="linkInstructions", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File that gives the instructions to build a link")
+        
+        self.inputParser.add_option("-M",  "--modifiedPlanes", dest="modifiedPlanes",  
+                                    action="store_true", default=False, 
+                                    help="atoms attached to a ring will not be listed in the ring plane")
+        
 
         self.inputParser.add_option("-P",  "--inLigandPdbName", dest="inLigandPdbName", metavar="FILE", 
                                     action="store", type="string", 
@@ -772,7 +778,11 @@ class Acedrg(CExeCode ):
 
         if t_inputOptionsP.testMode :
             self.testMode = True
-
+        
+        if t_inputOptionsP.modifiedPlanes:
+            self.modifiedPlanes = t_inputOptionsP.modifiedPlanes
+        
+        
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
            and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions and\
            not t_inputOptionsP.qmInstructions and not t_inputOptionsP.testMode and not t_inputOptionsP.protCol: 
@@ -1113,7 +1123,7 @@ class Acedrg(CExeCode ):
             self._cmdline += " -1 %f -2 %f -3 %f -4 %f "\
                             %(self.upperSigForBonds, self.lowSigForBonds,\
                               self.upperSigForAngles, self.lowSigForAngles)
-
+            
             print("===================================================================") 
             print("| Generate the dictionary file using the internal database        |")
             print("===================================================================") 
@@ -1134,7 +1144,9 @@ class Acedrg(CExeCode ):
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
             if self.workMode==112:
                 self._cmdline +=" -C yes "
-            #print(self._cmdline)
+            if self.modifiedPlanes:
+                self._cmdline += " -W yes "
+            print(self._cmdline)
             #os.system(self._cmdline)
             self.runExitCode = self.subExecute()
         if self.workMode == 13 or self.workMode == 14 or self.workMode == 131 or self.workMode == 141:
@@ -1247,6 +1259,8 @@ class Acedrg(CExeCode ):
             self._cmdline += " -o %s "%self.libmolMatched
             self.subExecute()
 
+        
+            
 
         
     def getBondsAndAngles(self, tFName, tMolTabs):

@@ -1559,7 +1559,7 @@ namespace LIBMOL
 
         // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
         //setAllRingPlanes2(tAllRings, mergedRingSets, tAtoms, tPlanes);
-        setAllRingPlanes3(tAllRings, tAtoms, tPlanes);
+        setAllRingPlanes4(tAllRings, tAtoms, tPlanes);
 
 
         setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
@@ -1582,6 +1582,157 @@ namespace LIBMOL
         }
 
     }
+
+
+   extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
+                                    std::vector<PlaneDict> & tPlanes,
+                                    std::vector<AtomDict>  & tAtoms,
+                                    bool                     tMdPls)
+    {
+
+        // Check aromaticity for individual rings
+
+        std::vector<RingDict> tAroRings;
+        // std::cout << "\nCheck aromaticity for individual ring " << std::endl;
+        for (std::vector<RingDict>::iterator iR=tAllRings.begin();
+                iR !=tAllRings.end(); iR++)
+        {
+            // bool lS_sp3 = false;
+
+            std::vector<int> atmIdx;
+            for (std::vector<AtomDict>::iterator iAt=iR->atoms.begin();
+                    iAt !=iR->atoms.end(); iAt++)
+            {
+                atmIdx.push_back(iAt->seriNum);
+                // std::cout << iAt->id << std::endl;
+
+            }
+
+
+
+            if (iR->isPlanar)
+            {
+                std::cout << "One Planar Ring! It contains " << iR->atoms.size()
+                          << " atoms. They are : " << std::endl;
+
+
+                bool lAro = checkAromaSys(atmIdx, tAtoms, 0);
+                if (lAro)
+                {
+                    iR->isAromatic = true;
+                    tAroRings.push_back(*iR);
+                    // std::cout << "It is an aromatic ring " << std::endl;
+                }
+                else
+                {
+                    iR->isAromatic = false;
+                    REAL numPi = getTotalPiElec(atmIdx, tAtoms, 0);
+                    if (numPi > 0.0 && fabs(fmod(numPi, 4.0)) < 0.001)
+                    {
+
+                        iR->isAntiAroma = true;
+
+                    }
+                    std::cout << "number of pi elecs is "
+                                  <<numPi << std::endl;
+                    std::cout << fabs(fmod(numPi, 4.0)) << std::endl;
+                    std::cout << iR->isAntiAroma << std::endl;
+                    // std::cout << "It is not an aromatic ring " << std::endl;
+                }
+                bool lAroP = checkAromaSys(atmIdx, tAtoms, 1);
+                if (lAroP)
+                {
+                    iR->isAromaticP = true;
+                    tAroRings.push_back(*iR);
+                    // std::cout << "It is an aromatic ring " << std::endl;
+                }
+                //std::cout << std::endl;
+            }
+            else
+            {
+
+                bool lNBUnR=checkUndRing(atmIdx, tAtoms);
+                // std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
+
+                if (lNBUnR)
+                {
+                    bool lAroP = checkAromaSys(atmIdx, tAtoms,1);
+
+                    if (lAroP)
+                    {
+                        iR->isAromaticP = true;
+                        iR->isPlanar   = true;
+                        tAroRings.push_back(*iR);
+                    }
+                    else
+                    {
+                        iR->isAromaticP = false;
+                    }
+
+                    bool lAro = checkAromaSys(atmIdx, tAtoms,0);
+
+                    if (lAro)
+                    {
+                        iR->isAromatic = true;
+                        tAroRings.push_back(*iR);
+                    }
+                    else
+                    {
+                        iR->isAromatic = false;
+                    }
+
+                }
+                else
+                {
+                    iR->isAromatic =false;
+                }
+            }
+
+            // std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
+        }
+
+        //std::cout << "A: Number of rings "
+        //          << tAllRings.size() << std::endl;
+        std::vector<std::vector<int> >  mergedRingSets;
+        mergePlaneRings(tAllRings, mergedRingSets, tAtoms);
+
+        //std::cout << "B: Number of rings "
+        //          << tAllRings.size() << std::endl;
+
+        tPlanes.clear();
+
+        // setAllRingPlanes(tAllRings, tAtoms, tPlanes);
+        if (!tMdPls)
+        {
+            setAllRingPlanes3(tAllRings, tAtoms, tPlanes);
+        }
+        else
+        {
+            setAllRingPlanes4(tAllRings, tAtoms, tPlanes);
+        }
+
+        setAllOtherPlanes(tAllRings, tAtoms, tPlanes);
+
+        std::cout << "There are "         << tPlanes.size()
+                  << " planes. They are " << std::endl;
+
+
+        for (std::vector<PlaneDict>::iterator iPl= tPlanes.begin();
+                iPl !=tPlanes.end(); iPl++)
+        {
+            std::cout << "One Plane with " << iPl->atoms.size()
+                      << " atoms " << std::endl;
+            for (std::map<ID, int>::iterator iAt=iPl->atoms.begin();
+                    iAt !=iPl->atoms.end(); iAt++)
+            {
+                std::cout << iAt->first << std::endl;
+            }
+            std::cout << std::endl;
+        }
+
+    }
+
+
 
     extern void checkAndSetupPlanes2(std::vector<RingDict>  & tAllRings,
                                      std::vector<PlaneDict> & tPlanes,

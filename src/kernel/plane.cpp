@@ -350,6 +350,7 @@ namespace LIBMOL
             }
         }
 
+
         // Other small planes are determined via torsion angles.
 
         // Check
@@ -373,6 +374,68 @@ namespace LIBMOL
 
     }
 
+   extern void setAllRingPlanes4(std::vector<RingDict>           & tAllRings,
+                                  std::vector<AtomDict >          & tAtoms,
+                                  std::vector<PlaneDict>          & tPlanes)
+    {
+
+        std::vector<int>  exclRings;
+        for (unsigned iRIdx=0; iRIdx < tAllRings.size(); iRIdx++)
+        {
+            if (tAllRings[iRIdx].isAromaticP || tAllRings[iRIdx].isAromatic)
+            {
+                PlaneDict aPL;
+                std::cout << "Add planes from " << tAllRings[iRIdx].rep
+                          << std::endl;
+                for (std::vector<AtomDict>::iterator
+                        iAt=tAllRings[iRIdx].atoms.begin();
+                        iAt !=tAllRings[iRIdx].atoms.end(); iAt++)
+                {
+                    aPL.atoms[iAt->id] = iAt->seriNum;
+                    std::cout << "added atom " << iAt->id << std::endl;
+                    /*
+                    for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
+                            iNB !=iAt->connAtoms.end(); iNB++)
+                    {
+                        if (iAt->connAtoms.size() !=4 &&
+                            aPL.atoms.find(tAtoms[*iNB].id)
+                            == aPL.atoms.end())
+                        {
+                            std::cout << "add atom " << tAtoms[*iNB].id
+                                      << std::endl;
+                            aPL.atoms[tAtoms[*iNB].id]=tAtoms[*iNB].seriNum;
+                        }
+                    }
+                    */
+                }
+
+                tPlanes.push_back(aPL);
+            }
+        }
+
+
+        // Other small planes are determined via torsion angles.
+
+        // Check
+
+        if (tPlanes.size() !=0)
+        {
+            std::cout << "There are " << tPlanes.size()
+                      << " planes " << std::endl;
+            for (std::vector<PlaneDict>::iterator iPl=tPlanes.begin();
+                     iPl !=tPlanes.end(); iPl++)
+            {
+                std::cout << "One Plane. It has " << iPl->atoms.size()
+                          << " They are : " << std::endl;
+                for (std::map<ID, int>::iterator iAt=iPl->atoms.begin();
+                        iAt !=iPl->atoms.end(); iAt++)
+                {
+                    std::cout << "Atom " << iAt->first << std::endl;
+                }
+            }
+        }
+
+    }
 
 
 
@@ -428,8 +491,6 @@ namespace LIBMOL
 
             }
         }
-        std::cout << "NNN " << std::endl;
-
     }
 
 

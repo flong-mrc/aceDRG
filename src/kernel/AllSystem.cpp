@@ -16,6 +16,7 @@ namespace LIBMOL
                            usingInChiral(true),
                            isPeptide(false),
                            withSugar(false),
+                           lMdPls(false),
                            itsContainMetal(false),
                            itsCurAngleSeriNum(ZeroInt),
                            itsCurAngle(NullPoint),
@@ -32,6 +33,7 @@ namespace LIBMOL
                                 usingInChiral(tAllSys.usingInChiral),
                                 isPeptide(tAllSys.isPeptide),
                                 withSugar(tAllSys.withSugar),
+                                lMdPls(false),
                                 libmolTabDir(tAllSys.libmolTabDir),
                                 upperBondSig(tAllSys.upperBondSig),
                                 lowBondSig(tAllSys.lowBondSig),
@@ -70,6 +72,7 @@ namespace LIBMOL
                            usingInChiral(true),
                            isPeptide(false),
                            withSugar(false),
+                           lMdPls(false),
                            libmolTabDir(tLibmolTab),
                            upperBondSig(0.02),
                            lowBondSig(0.01),
@@ -108,6 +111,7 @@ namespace LIBMOL
                                                usingInChiral(true),
                                                isPeptide(false),
                                                withSugar(false),
+                                               lMdPls(false),
                                                libmolTabDir(""),
                                                upperBondSig(0.02),
                                                lowBondSig(0.01),
@@ -140,6 +144,7 @@ namespace LIBMOL
                                                usingInChiral(true),
                                                isPeptide(false),
                                                withSugar(false),
+                                               lMdPls(false),
                                                libmolTabDir(""),
                                                upperBondSig(tUBS),
                                                lowBondSig(tLBS),
@@ -163,11 +168,13 @@ namespace LIBMOL
 
     }
 
+
     AllSystem::AllSystem(SYBLMol2File& tMol2Obj, std::string tLibmolTab):
                                                hasCoords(tMol2Obj.hasCoords),
                                                usingInChiral(true),
                                                isPeptide(false),
                                                withSugar(false),
+                                               lMdPls(false),
                                                libmolTabDir(""),
                                                upperBondSig(0.02),
                                                lowBondSig(0.01),
@@ -195,6 +202,7 @@ namespace LIBMOL
                                          usingInChiral(true),
                                          isPeptide(false),
                                          withSugar(false),
+                                         lMdPls(false),
                                          libmolTabDir(""),
                                          upperBondSig(0.02),
                                          lowBondSig(0.01),
@@ -231,6 +239,7 @@ namespace LIBMOL
         AddChirals(tProCodSys.allChirals);
         AddPlanes(tProCodSys.allPlanes);
         AddRings(tProCodSys.allRings);
+        lMdPls=false;
     }
 
     AllSystem::~AllSystem()
@@ -352,7 +361,7 @@ namespace LIBMOL
 
         // setAllRingPlanes(allRingsV, allAtoms, allPlanes);
 
-        checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
+        checkAndSetupPlanes(allRingsV, allPlanes, allAtoms, lMdPls);
 
 
         setAromaticBonds(allRingsV, allBonds);
@@ -5468,7 +5477,7 @@ namespace LIBMOL
 
         CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles,
                                 allTorsions, allChirals, allPlanes, allRings,
-                                tLibmolDir, 2);
+                                tLibmolDir, 2, lMdPls);
 
 
         aCodSystem.setupAllTargetValues2();

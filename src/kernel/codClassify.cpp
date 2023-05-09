@@ -8,6 +8,7 @@
 #include "PDBFile.h"
 #include "TransCoord.h"
 #include <cstdio>
+#include <vector>
 #ifdef _MSC_VER
 #include <ciso646>
 #endif
@@ -19,7 +20,8 @@ namespace LIBMOL
                                upperBondSig(0.2),
                                lowBondSig(0.2),
                                upperAngleSig(3.0),
-                               lowAngleSig(1.5)
+                               lowAngleSig(1.5),
+                               lMdPls(false)
     {
         pPeriodictable = new PeriodicTable();
 
@@ -73,7 +75,8 @@ namespace LIBMOL
                                                                   upperBondSig(0.2),
                                                                   lowBondSig(0.2),
                                                                   upperAngleSig(3.0),
-                                                                  lowAngleSig(1.5)
+                                                                  lowAngleSig(1.5),
+                                                                  lMdPls(false)
 
     {
 
@@ -87,8 +90,8 @@ namespace LIBMOL
     }
 
     CodClassify::CodClassify(const DictCifFile & tCifObj,
-                             std::string   tLibmolTabDir):wSize(1000),
-                                                          libmolTabDir(tLibmolTabDir)
+                            std::string   tLibmolTabDir):wSize(1000),
+                            libmolTabDir(tLibmolTabDir)
 
     {
 
@@ -390,6 +393,96 @@ namespace LIBMOL
 
 
     }
+
+    CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms,
+                             const std::vector<int>& tHAtomIdx,
+                             const std::vector<BondDict>& tBonds,
+                             const std::vector<AngleDict>& tAngles,
+                             const std::vector<TorsionDict>& tTorsions,
+                             const std::vector<ChiralDict>& tChirals,
+                             const std::vector<PlaneDict>& tPlans,
+                             const std::map<ID,std::vector<RingDict> >& tRings,
+                             std::string               tLibmolTabDir,
+                             int                       nTM,
+                             bool                      tMdPls)
+                             :wSize(1000),
+                              lMdPls(tMdPls)
+    {
+        libmolTabDir = tLibmolTabDir;
+        pPeriodictable = new PeriodicTable();
+
+        for (std::vector<AtomDict>::const_iterator iA=tAtoms.begin();
+                iA != tAtoms.end(); iA++)
+        {
+            allAtoms.push_back(*iA);
+        }
+
+        for (std::vector<int>::const_iterator iH = tHAtomIdx.begin();
+                iH != tHAtomIdx.end(); iH++)
+        {
+            allHAtomIdx.push_back(*iH);
+        }
+
+        for (std::vector<BondDict>::const_iterator iB=tBonds.begin();
+                iB != tBonds.end(); iB++)
+        {
+            allBonds.push_back(*iB);
+        }
+
+        for (std::vector<AngleDict>::const_iterator iAng=tAngles.begin();
+                iAng != tAngles.end(); iAng++)
+        {
+            allAngles.push_back(*iAng);
+        }
+
+        for (std::vector<TorsionDict>::const_iterator iTor=tTorsions.begin();
+               iTor != tTorsions.end(); iTor++)
+        {
+            allTorsions.push_back(*iTor);
+        }
+
+        for (std::vector<ChiralDict>::const_iterator iCh=tChirals.begin();
+                iCh !=tChirals.end(); iCh++)
+        {
+            allChirals.push_back(*iCh);
+        }
+
+        for (std::vector<int>::const_iterator iH=tHAtomIdx.begin();
+                iH !=tHAtomIdx.end(); iH++)
+        {
+            allHydroAtoms.push_back(*iH);
+        }
+
+        for (std::vector<PlaneDict>::const_iterator iP=tPlans.begin();
+                iP!=tPlans.end(); iP++)
+        {
+            allPlanes.push_back(*iP);
+        }
+
+        for (std::map<ID, std::vector<RingDict> >::const_iterator iR=tRings.begin();
+                iR !=tRings.end(); iR++)
+        {
+            for (std::vector<RingDict>::const_iterator iR1=iR->second.begin();
+                    iR1 !=iR->second.end(); iR1++)
+            {
+                allRings[iR->first].push_back(*iR1);
+            }
+        }
+
+        // setupSystem();
+
+        if (nTM==3)
+        {
+            setupSystem3();
+        }
+        else
+        {
+            setupSystem2();
+        }
+
+
+    }
+
 
     CodClassify::CodClassify(const std::vector<AtomDict>& tAtoms,
                              const std::vector<int>& tHAtomIdx,
@@ -14706,22 +14799,51 @@ namespace LIBMOL
                       << "  atom4 " << allAtoms[iT->atoms[3]].id << std::endl;
 
             int aFlag =checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2]);
-            
+
             if (aFlag == 3)
             {
                 // in a aromatic ring
-                iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
-                if (iT->id.size() >=16 )
+                if (lMdPls)
                 {
-                    iT->id = "const_" + IntToStr(idxPTors);
+                    iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =1.0;
                 }
+                else
+                {
+                    iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =0;
+                    if (iT->id.size() >=16 )
+                    {
+                        // iT->id = IntToStr(idxPTors);
+                        iT->id = "const_" + IntToStr(idxPTors);
+                    }
+                }
+
+
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
-                iT->sigValue =0.0;
+
+                iT->period   =1;
                 idxPTors +=1;
             }
             else if (aFlag == 2)
             {
                 // in an all-sp2 ring
+                if (lMdPls)
+                {
+                    iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =1.0;
+                }
+                else
+                {
+                    iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =0;
+                    if (iT->id.size() >=16 )
+                    {
+                        // iT->id = IntToStr(idxPTors);
+                        iT->id = "const_" + IntToStr(idxPTors);
+                    }
+                }
+                /*
                 iT->id = "sp2_sp2_" + IntToStr(idxPTors);
                 //if (iT->id.size() >=16 )
                 //{
@@ -14729,6 +14851,8 @@ namespace LIBMOL
                 //}
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
                 iT->sigValue =1.0;
+                */
+                iT->period   =1;
                 idxPTors +=1;
             }
             else if (aFlag == 1)
@@ -14741,15 +14865,13 @@ namespace LIBMOL
                 //std::cout << "aBIdx34 " << aBIdx34 << std::endl;
                 if (aBIdx12 !=-1 && aBIdx34 !=-1)
                 {
-                    
+
                     if (allBonds[aBIdx12].isInSameRing || allBonds[aBIdx34].isInSameRing)
                     {
-                        std::cout << "Here " << std::endl;
                         iT->sigValue =20.0;
                     }
                     else
                     {
-                        std::cout << "Here2 " << std::endl;
                         iT->sigValue =5.0;
                     }
                 }
@@ -14762,7 +14884,7 @@ namespace LIBMOL
                     //iT->id = "const_" + IntToStr(idxPTors);
                 //}
                 //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
-                
+
                 idxPTors +=1;
             }
             else if(checkATorsAtomsInPla(iT->atoms))
@@ -14811,10 +14933,9 @@ namespace LIBMOL
                     idxTors++;
                 }
             }
-            //std::cout << "its ID now is " << iT->id << "and sig is "
-            //         <<   iT->sigValue << std::endl;
+            std::cout << "its ID now is " << iT->id << "and sig is "
+                      <<   iT->sigValue << std::endl;
         }
-
 
     }
 
@@ -15241,7 +15362,7 @@ namespace LIBMOL
     void CodClassify::setupMiniTorsions()
     {
         std::map<ID, std::vector<TorsionDict> >  TorsionSetOneBond;
-
+        std::map<ID, std::vector<int>  >         TorAtms;
         for (std::vector<TorsionDict>::iterator iTor=allTorsions.begin();
                 iTor !=allTorsions.end(); iTor++)
         {
@@ -15267,6 +15388,7 @@ namespace LIBMOL
                         std::sort(tIdxB.begin(), tIdxB.end());
 
                         ID tLab = IntToStr(tIdxB[0]) + "_" + IntToStr(tIdxB[1]);
+
                         //std::cout << "Bond of atoms " << allAtoms[iTor->atoms[1]].id
                         //          << " and " << allAtoms[iTor->atoms[2]].id << std::endl;
                         //std::cout << "torsion lab " << tLab << std::endl;
@@ -15291,8 +15413,38 @@ namespace LIBMOL
         for (std::map<ID, std::vector<TorsionDict> >::iterator iTorsB=TorsionSetOneBond.begin();
                 iTorsB !=TorsionSetOneBond.end(); iTorsB++)
         {
+            std::vector<ID>  idxs;
+            StrTokenize(iTorsB->first, idxs, '_');
+            int idxN1 =StrToInt(idxs[0]);
+            int idxN2 =StrToInt(idxs[1]);
 
-            selectOneTorFromOneBond(iTorsB->first, iTorsB->second);
+            if (allAtoms[idxN1].bondingIdx==2
+                && allAtoms[idxN2].bondingIdx==2)
+            {
+                std::vector<int> idx1, idx4;
+                //std::cout << "lab : " << iTorsB->first << std::endl;
+                for (std::vector<TorsionDict>::iterator
+                     iTor  = iTorsB->second.begin();
+                     iTor != iTorsB->second.end(); iTor++)
+                {
+                    int atm1 = iTor->atoms[0];
+                    int atm4 = iTor->atoms[3];
+                    if( (std::find(idx1.begin(), idx1.end(), atm1)==idx1.end())
+                         &&
+                        (std::find(idx4.begin(), idx4.end(), atm4)==idx4.end())
+                    )
+                    {
+                        miniTorsions.push_back(*iTor);
+                        idx1.push_back(atm1);
+                        idx4.push_back(atm4);
+                        //std::cout << "1st atom " << allAtoms[atm1].id << std::endl;
+                    }
+                }
+            }
+            else
+            {
+                selectOneTorFromOneBond(iTorsB->first, iTorsB->second);
+            }
         }
 
         std::cout << "Total number of torsions is " << allTorsions.size()
@@ -18067,4 +18219,3 @@ namespace LIBMOL
         }
     }
 }
-

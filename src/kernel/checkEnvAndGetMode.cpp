@@ -83,7 +83,7 @@ namespace LIBMOL
 
         int c, index;
         while ((c = getopt (numArg, ArgVars,
-"a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:C:D:H:L:M:N:O:P:Q:R:S:T:U:X:Y:Z:1:2:3:4:"))
+"a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:C:D:H:L:M:N:O:P:Q:R:S:T:U:W:X:Y:Z:1:2:3:4:"))
                != -1)
         {
             switch (c)
@@ -232,6 +232,11 @@ namespace LIBMOL
                     IOEntries["TempTests"] = optarg;
                     std::cout << "You are in temporally test mode "
                               << IOEntries["TempTests"] << std::endl;
+                    break;
+                case 'W':
+                    IOEntries["modifiedPl"] = optarg;
+                    std::cout << "Atoms attached to a plane removed : "
+                              << IOEntries["modifiedPl"] << std::endl;
                     break;
                 case 'X':
                     IOEntries["Type1"] = optarg;
