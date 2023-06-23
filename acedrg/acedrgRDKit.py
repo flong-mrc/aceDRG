@@ -1608,19 +1608,19 @@ class AcedrgRDKit(object):
                     tMol, tReq, maxAttempts=0, randomSeed=-1, clearConfs=False)
                 nNewCon = len(confIds)
                 # print(tReq)
-            print("number of comf generated ", len(tMol.GetConformers()))
-            print("number of confIds : ", len(confIds))
-            for aConf in tMol.GetConformers():
-                print("!!!!!!!!!! Conf ", aConf.GetId())
-                for aAtom in tMol.GetAtoms():
-                    aIdx = aAtom.GetIdx()
-                    name  = aAtom.GetProp("Name")
-                    aPos = aConf.GetAtomPosition(aIdx)
-                    print("For atom ", name)
-                    print("Its coordinates are : ")
-                    print ("x:  ", aPos.x)
-                    print ("y:  ", aPos.y)
-                    print ("z:  ", aPos.z)
+            #print("number of comf generated ", len(tMol.GetConformers()))
+            #print("number of confIds : ", len(confIds))
+            #for aConf in tMol.GetConformers():
+                #print("!!!!!!!!!! Conf ", aConf.GetId())
+                #for aAtom in tMol.GetAtoms():
+                    #aIdx = aAtom.GetIdx()
+                    #name  = aAtom.GetProp("Name")
+                    #aPos = aConf.GetAtomPosition(aIdx)
+                    #print("For atom ", name)
+                    #print("Its coordinates are : ")
+                    #print ("x:  ", aPos.x)
+                    #print ("y:  ", aPos.y)
+                    #print ("z:  ", aPos.z)
         else:
             confIds = self.generateMultiComformersByRDKit(tMol)
         
@@ -1637,16 +1637,16 @@ class AcedrgRDKit(object):
             iFormalE = 0
             for aConf in allConfs:
                 aCIdx = aConf.GetId()
-                print("!!!!!!!!!! Conf ", aCIdx)
-                for aAtom in tMol.GetAtoms():
-                    aIdx = aAtom.GetIdx()
-                    name  = aAtom.GetProp("Name")
-                    aPos = aConf.GetAtomPosition(aIdx)
-                    print("For atom ", name)
-                    print("Its coordinates are : ")
-                    print ("x:  ", aPos.x)
-                    print ("y:  ", aPos.y)
-                    print ("z:  ", aPos.z)
+                #print("!!!!!!!!!! Conf ", aCIdx)
+                #for aAtom in tMol.GetAtoms():
+                #    aIdx = aAtom.GetIdx()
+                #    name  = aAtom.GetProp("Name")
+                #    aPos = aConf.GetAtomPosition(aIdx)
+                #    print("For atom ", name)
+                #    print("Its coordinates are : ")
+                #    print ("x:  ", aPos.x)
+                #    print ("y:  ", aPos.y)
+                #    print ("z:  ", aPos.z)
                 #rdmolfiles.MolToPDBFile(tMol, "Test_initConformers.pdb")
                 
                 aWCoordList = []
@@ -1787,15 +1787,15 @@ class AcedrgRDKit(object):
                 tConf.SetAtomPosition(aIdx, aPos)
 
         # Now output all coordinates in the conformer
-        for aAtom in tAtoms:
-            aIdx = aAtom.GetIdx()
-            name = aAtom.GetProp("Name")
-            aPos = tConf.GetAtomPosition(aIdx)
-            print("For atom ", name)
-            print("Its coordinates are : ")
-            print("x:  ", aPos.x)
-            print("y:  ", aPos.y)
-            print("z:  ", aPos.z)
+        #for aAtom in tAtoms:
+        #    aIdx = aAtom.GetIdx()
+        #    name = aAtom.GetProp("Name")
+        #    aPos = tConf.GetAtomPosition(aIdx)
+        #    print("For atom ", name)
+        #    print("Its coordinates are : ")
+        #    print("x:  ", aPos.x)
+        #    print("y:  ", aPos.y)
+        #    print("z:  ", aPos.z)
 
     def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None, tMapMode=0):
 

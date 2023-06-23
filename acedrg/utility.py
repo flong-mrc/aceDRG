@@ -35,6 +35,18 @@ def isInt(t_string):
 
     return aRet    
 
+def isFloat(t_string):
+
+    aRet = True
+
+    t_string = t_string.strip()
+    try:
+        aInt = flaot(t_string)
+    except ValueError:
+        aRet = False
+
+    return aRet 
+
 # Functions for list comparison
 
 def listComp(a_list, b_list):

@@ -231,7 +231,7 @@ class CovLink(object):
 
 class CovLinkGenerator(CExeCode):
 
-    def __init__(self, tAADir, tLinkInstructions, tScrDir, tOutRoot, tVerInfo=None, tTestMode=None):
+    def __init__(self, tSetParas, tLinkInstructions, tScrDir, tOutRoot, tVerInfo=None, tTestMode=None):
 
         
         if tTestMode:
@@ -266,7 +266,7 @@ class CovLinkGenerator(CExeCode):
         self.allChemCombDir    = os.getenv("CLIBD_MON")
         #self.allChemCombDir   = "/Users/flong/DB/PDB_related/PDB_Ligands/Cif"
 
-        self.aaDir            = tAADir
+        self.setParas         = tSetParas 
         self.scrDir           = tScrDir
         self.subRoot          = ""
         self.outRoot          = tOutRoot
@@ -704,17 +704,14 @@ class CovLinkGenerator(CExeCode):
             if not aLink.stdLigand1["userIn"]:
                 aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
                 aLink.stdLigand1["userIn"] = True
-                #if aNL in self.chemCheck.aminoAcids :
-                #    aLink.stdLigand1["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
+                
 
             aNS = aLink.stdLigand2["name"][0].lower()
             aNL = aLink.stdLigand2["name"].upper()
             if not aLink.stdLigand2["userIn"]:
                 aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
                 aLink.stdLigand2["userIn"] = True
-                #if aNL in self.chemCheck.aminoAcids :
-                #    aLink.stdLigand2["inCif"] = os.path.join(self.aaDir, aNL + ".cif")
-
+                
             if aLink.checkInPara() and not self.errLevel:
                 self.cLinks.append(aLink)
                 print("Instructions for build a link are  ")
@@ -1334,8 +1331,9 @@ class CovLinkGenerator(CExeCode):
                 for aKey in list(self.errMessage.keys()):
                     for aLine in self.errMessage[aKey]:
                         print(aLine)
-	#print "User input cif for L 1 ", aLink.stdLigand1["compOut"]
+    	#print "User input cif for L 1 ", aLink.stdLigand1["compOut"]
         #print "User input cif for L 2 ", aLink.stdLigand2["compOut"]
+        
 
     def processOneLink(self, tLinkIns):
         if not self.errLevel:
@@ -1556,7 +1554,9 @@ class CovLinkGenerator(CExeCode):
             self._log_name  = os.path.join(self.scrDir, aNL + "_for_link.log")
             self.subRoot    = os.path.join(self.scrDir, aNL + "_for_link")
             self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)   
-            #print self._cmdline
+            if "modifiedPlanes" in self.setParas.keys():
+                self._cmdline   += " -M "
+            print(self._cmdline)
             self.runExitCode = self.subExecute()
             if not self.runExitCode :
                 aOutLigCif = self.subRoot + ".cif"
@@ -1592,6 +1592,7 @@ class CovLinkGenerator(CExeCode):
             self.addjustFormalChargeInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2)
         
         self.setAddedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
+        #self.setAddedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
         if not self.errLevel:
             self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
             if len(tLinkedObj.stdLigand1["linkChir"]) ==2:
@@ -1602,8 +1603,8 @@ class CovLinkGenerator(CExeCode):
                     self.setLinkChir(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.stdLigand1)
                 #if not self.errLevel:
                 #    self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
-                    #if not self.errLevel:
-                    #    self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+                #    if not self.errLevel:
+                #        self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
 
         if self.errLevel:
             print("Error level is ", self.errLevel)
@@ -1631,6 +1632,10 @@ class CovLinkGenerator(CExeCode):
         if len(tMod["changed"]["atoms"]) > 0:
             for aA in tMod["changed"]["atoms"]:
                 changeAtms.append(aA["atom_id"].strip().upper())
+        for aAt in tRes["remainAtoms"]:
+            print("Remain id ", aAt["atom_id"], " charge ", aAt["charge"]), " "
+            if aAt["atom_id"] == tRes["atomName"]:
+                aAt["charge"] = "0"
         for aFC in tMod["changed"]["formal_charges"]:
             aId = aFC["atom_id"].strip().upper()
             for aAt in tRes["comp"]["atoms"]:
@@ -1661,7 +1666,6 @@ class CovLinkGenerator(CExeCode):
             aCharge = int(tAt["charge"])
         if aCharge != 0: 
             nTotalVa = nTotalVa - aCharge
-        print("atom ",tAt["atom_id"] , "charge ", aCharge, " equiv bond-order ", nTotalVa)
         if tAt["type_symbol"] in self.chemCheck.orgVal:
             if not nTotalVa in self.chemCheck.orgVal[tAt["type_symbol"]]:
                 nVDiff = nTotalVa - self.chemCheck.orgVal[tAt["type_symbol"]][0]
@@ -1687,7 +1691,7 @@ class CovLinkGenerator(CExeCode):
         aCharge = 0
         if "charge" in tAt:
             aCharge = int(tAt["charge"])
-        if aCharge != 0: 
+        if aCharge != 0:
             nTotalVa = nTotalVa - aCharge
         print("atom ",tAt["atom_id"] , "charge ", aCharge, " equiv bond-order ", nTotalVa)
         if tAt["type_symbol"] in self.chemCheck.orgVal:
@@ -2504,8 +2508,8 @@ class CovLinkGenerator(CExeCode):
         for aBond in tLinkBonds:
             if aBond["atom_id_1"] ==tCenAtmID:
                 tChir[tKw]=aBond["atom_id_2"]
-                aChir["volume_sign"] = "both"
-                tResChirs.append(aChir)
+                tChir["volume_sign"] = "both"
+                tResChirs.append(tChir)
                 break
             elif aBond["atom_id_2"] ==tCenAtmID:
                 tChir[tKw]=aBond["atom_id_1"]
@@ -2799,7 +2803,7 @@ class CovLinkGenerator(CExeCode):
 
             tmpF.write("The mapping of bonds: original atom names vs their alias\n")
 
-            for aBond in tLinkedObj.combLigand["bonds"]:
+            for aBond in tLinkObj.combLigand["bonds"]:
                 tmpF.write("-------------------------\n")
                 tmpF.write("%s%s\n"%(aBond["atom_id_1"].ljust(), aBond["atom_id_2"].ljust()))
                 tmpF.write("%s%s\n"%(aBond["atom_id_1_alias"].ljust(), aBond["atom_id_2_alias"].ljust()))
@@ -2822,7 +2826,7 @@ class CovLinkGenerator(CExeCode):
                 aCharge = int(aAtom["charge"])
             if aCharge != 0: 
                 nTotalVa = nTotalVa - aCharge
-            print("atom ", atmId, "charge ", aCharge, " equiv bond-order ", nTotalVa)
+            print("Here 3: atom ", atmId, "charge ", aCharge, " equiv bond-order ", nTotalVa)
             if atmElm in self.chemCheck.orgVal and atmElm !="H":
                 if not nTotalVa in self.chemCheck.orgVal[atmElm]:
                     self.errLevel    = 45
@@ -2941,21 +2945,26 @@ class CovLinkGenerator(CExeCode):
     def buildComboLigand(self, tLinkedObj):
 
         if not self.errLevel:
-
+        
             self.adjustAtomsAndOthersForComboLigand(tLinkedObj)
+            
             tLinkedObj.combLigand["name"] = tLinkedObj.stdLigand1["name"].strip() + "-" + tLinkedObj.stdLigand2["name"].strip()
+            
             print("The name of combo-ligand : %s "%tLinkedObj.combLigand["name"])
             self.setInitComboLigand(tLinkedObj)
+            
             if not self.errLevel: 
                 print("Number of atoms in the combo-ligand is ", len(tLinkedObj.combLigand["atoms"]))
                 print("They are : ")
                 for aAtom in tLinkedObj.combLigand["atoms"]:
-                    print("%s%s%s"%(aAtom["atom_id"].ljust(10), aAtom["atom_id_alias"].ljust(10), aAtom["type_symbol"]))
+                    print("%s%s%s"%(aAtom["atom_id"].ljust(10), aAtom["atom_id_alias"].ljust(10), 
+                                      aAtom["type_symbol"].ljust(6)))
                 for aBond in tLinkedObj.combLigand["bonds"]:
                     print("%s%s%s%s%s\n"%(aBond["atom_id_1_alias"].ljust(10), aBond["atom_id_2_alias"].ljust(10),
                                    ("("+aBond["atom_id_1"]).ljust(10), (aBond["atom_id_2"]+ ")").ljust(10),
                                     aBond["type"].ljust(1) )) 
-                #self.outTmpComboLigandMap(tLinkedObj)    # Check 
+                #self.outTmpComboLigandMap(tLinkedObj)    # Check
+            
                 self.checkChemInMonomer(tLinkedObj.combLigand, 2)
                 if not self.errLevel:
                     tLinkedObj.combLigand["inCif"] = os.path.join(self.scrDir, tLinkedObj.combLigand["name"] + "_comboIn.cif")
@@ -3498,7 +3507,6 @@ class CovLinkGenerator(CExeCode):
 
         lOverlapPls = False
         for aPl in tComboPls:
-            print("Here", aPl)
             #print("compare combo pl ", aPl[0]["plane_id"])
             overlapAtms = []
             for aPlAtm in tComboPls[aPl]:

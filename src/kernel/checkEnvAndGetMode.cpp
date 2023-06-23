@@ -165,6 +165,9 @@ namespace LIBMOL
                     std::cout << "Table generator mode :  "
                               << IOEntries["tabGen"] << std::endl;
                     break;
+                case 'x':
+                    IOEntries["KandC"] = optarg;
+                    break;
                 case 'y':
                     IOEntries["transCoords"] = optarg;
                     StrLower(IOEntries["transCoords"]);
@@ -509,6 +512,10 @@ namespace LIBMOL
         else if (IOEntries.find("addProtCol") != IOEntries.end() )
         {
             workMode = 800;
+        }
+        else if (IOEntries.find("KandC") !=IOEntries.end())
+        {
+            workMode = 920;
         }
         else if ( IOEntries.find("inCifName")!=IOEntries.end() )
         {

@@ -59,6 +59,10 @@
 #include "MolGenerator.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
 #ifndef ALLSYSTEM_H
 #include "AllSystem.h"
 #endif
@@ -79,6 +83,7 @@
 #include <ciso646>
 #endif
 
+
 //using namespace GO;
 //using namespace FF;
 
@@ -94,11 +99,11 @@ int main(int argc, char** argv) {
     //          << std::endl;
 
 
-    for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
-            iKW !=AJob.IOEntries.end(); iKW++)
-    {
-        std::cout << iKW->first << "\t" << iKW->second << std::endl;
-    }
+    //for (std::map<LIBMOL::ID,LIBMOL::ID>::iterator iKW=AJob.IOEntries.begin();
+    //        iKW !=AJob.IOEntries.end(); iKW++)
+    //{
+    //    std::cout << iKW->first << "\t" << iKW->second << std::endl;
+    //}
 
 
     if (AJob.workMode == 11
@@ -679,6 +684,28 @@ int main(int argc, char** argv) {
                                aClassifiedSys.allAtoms, aClassifiedSys.allBonds);
 
     }
+    else if (AJob.workMode == 920)
+    {
+        LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
+        LIBMOL::setAtomRingProps(dataFromCif.allAtoms, dataFromCif.allRingsV);
+        std::cout << "number of rings " << dataFromCif.allRingsV.size() << std::endl;
+
+        if(dataFromCif.allAtoms.size()> 0 && dataFromCif.allBonds.size() > 0)
+        {
+            std::cout << "Kekulize the molecule " << std::endl;
+            LIBMOL::KekulizeMol aKTool;
+            std::map<std::string, int>               aHMap;
+            aKTool.execute(dataFromCif.allAtoms,
+                           dataFromCif.allBonds,
+                           dataFromCif.allRingsV,
+                           aHMap);
+            aKTool.outBondsAndHAtms(dataFromCif.allBonds, aHMap, AJob.IOEntries["userOutName"]);
+
+            //std::cout << "Kekulize done " << std::endl;
+        }
+
+    }
+    /*
     else if (AJob.workMode == 1001)
     {
 
@@ -700,6 +727,7 @@ int main(int argc, char** argv) {
                                    aTargetSystem.allBonds);
         }
     }
+    */
     else if(AJob.workMode==1002)
     {
         std::cout << "Input cif "

@@ -8466,7 +8466,10 @@ namespace LIBMOL
                           << "_chem_comp_atom.charge" << std::endl
                           << "_chem_comp_atom.x" << std::endl
                           << "_chem_comp_atom.y" << std::endl
-                          << "_chem_comp_atom.z" << std::endl;
+                          << "_chem_comp_atom.z" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_x_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_y_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_z_ideal" << std::endl;
 
 
 
@@ -8507,7 +8510,11 @@ namespace LIBMOL
                               << std::setw(12) << std::setprecision(3) << std::fixed
                               << iA->coords[1]
                               << std::setw(12) << std::setprecision(3) << std::fixed
-                              << iA->coords[2] << std::endl;
+                              << iA->coords[2]
+                              << std::setw(12) << std::setprecision(3) << std::fixed << iA->coords[0]
+                              << std::setw(12) << std::setprecision(3) << std::fixed << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed << iA->coords[2]
+                              << std::endl;
 
                 }
 

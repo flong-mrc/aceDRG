@@ -1136,7 +1136,7 @@ class Acedrg(CExeCode ):
         if self.workMode == 51:
             self.outRstCifName   =  self.baseRoot + "_bondOrder.list"
         if self.workMode == 11 or self.workMode == 12 or self.workMode==16\
-           or self.workMode == 111 or self.workMode==112\
+           or self.workMode == 111 or self.workMode==112 \
            or self.workMode == 121 or self.workMode==161:
             if tIn:
                 self.inMmCifName    = tIn
@@ -1146,9 +1146,16 @@ class Acedrg(CExeCode ):
                 self._cmdline +=" -C yes "
             if self.modifiedPlanes:
                 self._cmdline += " -W yes "
-            print(self._cmdline)
             #os.system(self._cmdline)
             self.runExitCode = self.subExecute()
+        if self.workMode==113:
+            print("self.monomRoot=", self.monomRoot)
+            self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot)
+            self._cmdline +=" -c %s -r %s -x yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
+            print(self._cmdline)
+        
+            self.runExitCode = self.subExecute()
+            
         if self.workMode == 13 or self.workMode == 14 or self.workMode == 131 or self.workMode == 141:
             if tIn:
                 self.inMmCifName = tIn
@@ -1861,20 +1868,35 @@ class Acedrg(CExeCode ):
             monoId = tDataDescriptor[-1].strip().split()[0]
         else:
             monoId = "UNL"
+            
+        
 
         #print monoId 
-
         if tDataDescriptor:
             cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
+            
             for aL in tDataDescriptor:
                 if aL[0].find("_")==-1:
+                    aL2=self.getLastEnts(aL)
+                    
+                    aNewL = "%s%s%s"%(monoId.ljust(6),monoId.ljust(6), "    " +aL2)
+                    
+                    """
                     if len(monoId) < 3:
-                        aNewL = "%s%s"%(monoId.ljust(6),monoId.ljust(6))+ aL[10:]
+                        #aNewL = "%s%s"%(monoId.ljust(6),monoId.ljust(6))+ aL[10:]
+                        aNewL = "%s%s"%(monoId.ljust(6),monoId.ljust(6))+ "    " + 
+                        print("aNew L:")
+                        print(aNewL)
                     else:
+                        
                         aNewL = "%s%s"%(monoId.ljust(8),monoId.ljust(8))+ aL[15:]
+                        print("aNew L:")
+                        print(aNewL)
+                    """
                     cifCont['head'].append(aNewL+"\n")   
                 else:
                     cifCont['head'].append(aL+"\n")
+            
             cifCont['head'].append("#\n")
             # monoId = tDataDescriptor[-1].strip().split()[0]
             cifCont['head'].append("data_comp_%s\n"%monoId)
@@ -1980,10 +2002,11 @@ class Acedrg(CExeCode ):
                                     tName = tID
                             
                                 if tName in pdbAtoms:
-                                    bLine = "%s%s%s%s%s%s%s%s\n"%(monoId.ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
+                                    bLine = "%s%s%s%s%s%s%s%s%s%s%s\n"%(monoId.ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
                                                                 strGrp[3].ljust(8), strGrp[4].ljust(8), \
                                                                 pdbAtoms[tName][0].ljust(12), pdbAtoms[tName][1].ljust(12), \
-                                                                pdbAtoms[tName][2].ljust(12)) 
+                                                                pdbAtoms[tName][2].ljust(12), pdbAtoms[tName][0].ljust(12),\
+                                                                pdbAtoms[tName][1].ljust(12), pdbAtoms[tName][2].ljust(12)) 
                                     cifCont['atoms'].append(bLine)
                                 else: 
                                     print("Bug. can not find atom %s in Pdb file %s "%(tName, tPdbInName)) 
@@ -2012,7 +2035,7 @@ class Acedrg(CExeCode ):
                             lOther = False 
                             lTors  = True
                             cifCont['tors'].append(aLine)
-                        elif lTor and aLine.find("loop_") != -1:
+                        elif lTors and aLine.find("loop_") != -1:
                             lAtom   = False
                             lOther  = False 
                             lTors   = True
@@ -2175,12 +2198,21 @@ class Acedrg(CExeCode ):
 
                     tOutCif.close()
     
+    def getLastEnts(self, tLine):
+        
+        aNewL = ""
+        strGrp = tLine.strip().split()
+        for i in range(2, len(strGrp)):
+            aRL = strGrp[i] + "        "
+            aNewL +=aRL 
+        return aNewL
+    
     def naCorr(self, tCifCont, tOutF):
         lTor = False
         speTors   = {}
         otherTors = []
         nTor = 0
-        nTorNa =0
+        
         nTorOthers = 0
         for aL in tCifCont:
             if aL.find("_chem_comp_tor.period") != -1:
@@ -2433,10 +2465,16 @@ class Acedrg(CExeCode ):
 
                 else :
                     if lCO:
-                        aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
-                                      %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
-                                        aAtom["type_energy"], float(aAtom["partial_charge"]), 
-                                        float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                        if isFloat(aAtom["x"]) and isFloat(aAtom["y"]) and isFloat(aAtom["z"]):  
+                            aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                                          %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                            aAtom["type_energy"], float(aAtom["partial_charge"]), 
+                                            float(aAtom["x"]), float(aAtom["y"]), float(aAtom["z"]) ))
+                        else:
+                            aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                                          %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
+                                            aAtom["type_energy"], float(aAtom["partial_charge"]),
+                                            0.0, 0.0, 0.0) )
                     else:
                         aMmCif.write("%s         %s      %s    %s     %3.2f   \n"
                                       %(tMonoName, aAtom["atom_id"], aAtom["type_symbol"],
@@ -2534,6 +2572,7 @@ class Acedrg(CExeCode ):
             else:    
                 aBl.append(aL)
         t3B.append(aBl) 
+        
 
     def readProTab(self, tBondSet):
  
@@ -2545,7 +2584,7 @@ class Acedrg(CExeCode ):
             strGrp = aL.strip().split()
             if len(strGrp)== 6:
                 combo_ID = strGrp[0] + "_" + strGrp[1]
-                print(combo_ID)
+                #print(combo_ID)
                 tBondSet[combo_ID] = {}
                 tBondSet[combo_ID]["atom_id_1"] = strGrp[0]
                 tBondSet[combo_ID]["atom_id_2"] = strGrp[1]
@@ -2553,7 +2592,7 @@ class Acedrg(CExeCode ):
                 tBondSet[combo_ID]["prot_h_s"]  = strGrp[3]
                 tBondSet[combo_ID]["e_h"]       = strGrp[4]
                 tBondSet[combo_ID]["e_h_s"]     = strGrp[5]
-                print("EL = %s"%tBondSet[combo_ID]["e_h"])   
+                #print("EL = %s"%tBondSet[combo_ID]["e_h"])   
 
     def getNewCif(self, tCif, tBondSet, t3Bs):
 
@@ -2562,15 +2601,15 @@ class Acedrg(CExeCode ):
         lFN = False
         for aL in t3Bs[0]:
             fO.write(aL)
-            if aL.find("_chem_comp_bond.value_dist_nucleus") != -1:
-                lFN = True  
+            #if aL.find("_chem_comp_bond.value_dist_nucleus") != -1:
+            #    lFN = True  
 
-        if not lFN:
-            fO.write("_chem_comp_bond.value_dist_nucleus\n")
-            fO.write("_chem_comp_bond.value_dist_nucleus_esd\n")
+        #if not lFN:
+        #    fO.write("_chem_comp_bond.value_dist_nucleus\n")
+        #    fO.write("_chem_comp_bond.value_dist_nucleus_esd\n")
 
         aIDList = list(tBondSet.keys())
-        print(aIDList)
+        
         for aL in t3Bs[1]:
             outL = ""
             strs = aL.strip().split()
@@ -2587,8 +2626,8 @@ class Acedrg(CExeCode ):
                         id2 = "\"" + id2 + "\""
                     compId1 = id1 + "_" + id2
                     compId2 = id2 + "_" + id1
-                    print("Id1 ", id1)
-                    print("Id2 ", id2)
+                    #print("Id1 ", id1)
+                    #print("Id2 ", id2)
 
                     if compId1 in aIDList or compId2 in aIDList:
                         if compId1 in aIDList:
@@ -2601,15 +2640,22 @@ class Acedrg(CExeCode ):
                             vs = "%4.3f"%float(tBondSet[compId2]["prot_h_s"])
                             e  = "%4.3f"%float(tBondSet[compId2]["e_h"])
                             es = "%4.3f"%float(tBondSet[compId2]["e_h_s"])
-                        for i in range(nStrs-2):
-                            outL += "%s"%(strs[i].ljust(10))
+                        for i in range(nStrs-4):
+                            if i < 2:
+                                nspace = 12
+                            else:
+                                nspace = 10
+                            outL += "%s"%(strs[i].ljust(nspace))
+                        #print(outL)
                         outL+="%s%s%s%s\n"%(v.ljust(10), vs.ljust(10), e.ljust(10), es.ljust(10))
+                        #print(outL)
                         fO.write(outL)
                     else:
                         for i in range(nStrs):
                             outL += "%s"%(strs[i].ljust(10))
-                        outL+="%s%s\n"%(strs[-2].ljust(10), strs[-1].ljust(10))
-                        fO.write(outL)
+                        outL+="\n"
+                        #fO.write(outL)
+                        fO.write(aL)
                 else :
                     for i in range(nStrs):
                         outL += "%s"%(strs[i].ljust(10))
@@ -2845,12 +2891,32 @@ class Acedrg(CExeCode ):
                 else:
                     self.lOrg = False
             
+            
             if  len(self.fileConv.atoms) > 1 and self.lOrg :
                 if self.chemCheck.containAROMA(self.fileConv.bonds):
                     print("found aromatic bonds")
-                    self.chemCheck.addjustAtomsAndBonds(self.fileConv.atoms, 
-                                                        self.fileConv.bonds)
-                    sys.exit()
+                    #self.chemCheck.addjustAtomsAndBonds(self.fileConv.atoms, 
+                    #                                    self.fileConv.bonds)
+                    print("Before : ")
+                    print("Number of atoms", len(self.fileConv.atoms))
+                    print("Number of bonds", len(self.fileConv.bonds))
+                    if len(self.fileConv.dataDescriptor):
+                        self.setMonoRoot(self.fileConv.dataDescriptor)
+                    else:
+                        self.monomRoot = "UNL"
+                    tmWorkMode    = self.workMode
+                    self.workMode = 113
+                    self.runLibmol()
+                    self.workMode = tmWorkMode
+                    self.chemCheck.addjustAtomsAndBonds2(self.fileConv.atoms, 
+                                                         self.fileConv.bonds,
+                                                         self.outRstCifName)
+                    
+                    print("After : ")
+                    print("Number of atoms", len(self.fileConv.atoms))
+                    print("Number of bonds", len(self.fileConv.bonds))
+                    
+                    
                 if len(self.fileConv.dataDescriptor):
                     
                     self.setMonoRoot(self.fileConv.dataDescriptor)
@@ -3219,7 +3285,6 @@ class Acedrg(CExeCode ):
                         print("===================================================================") 
                         print("| Geometrical Optimization                                        |")
                         print("===================================================================") 
-                        
                         if len(self.rdKit.molecules) != 0 and os.path.isfile(self.outRstCifName):
                             inPdbNamesRoot = {} 
                             for idxMol in range(len(self.rdKit.molecules)): 
@@ -3333,11 +3398,13 @@ class Acedrg(CExeCode ):
                 self.runLibmol()    
         
         if self.workMode == 61:
-            aAAdir      = os.path.join(self.acedrgTables, "AminoAcids")
             if not self.testMode: 
-                aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
+                aSetParas = {}
+                if self.modifiedPlanes:
+                    aSetParas["modifiedPlanes"] = self.modifiedPlanes
+                aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
             else:
-                aCLinkGenerator = CovLinkGenerator(aAAdir, self.linkInstructions, self.scrDir, self.outRoot,\
+                aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot,\
                                                    self.versionInfo, self.testMode)
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
