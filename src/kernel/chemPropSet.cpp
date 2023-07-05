@@ -5104,6 +5104,13 @@ namespace LIBMOL
 
     }
 
+    void KekulizeMol::executeBC(std::vector<AtomDict>& tAtoms,
+                                std::vector<BondDict>& tBonds,
+                                std::vector<RingDict> & tRings)
+    {
+
+    }
+
     bool KekulizeMol::checkIfAROMBs(std::vector<BondDict>& tBonds)
     {
         bool aRet = false;

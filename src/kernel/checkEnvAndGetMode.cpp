@@ -165,6 +165,9 @@ namespace LIBMOL
                     std::cout << "Table generator mode :  "
                               << IOEntries["tabGen"] << std::endl;
                     break;
+                case 'w':
+                    IOEntries["BandC"] = optarg;
+                    break;
                 case 'x':
                     IOEntries["KandC"] = optarg;
                     break;
@@ -516,6 +519,10 @@ namespace LIBMOL
         else if (IOEntries.find("KandC") !=IOEntries.end())
         {
             workMode = 920;
+        }
+        else if (IOEntries.find("BandC") !=IOEntries.end())
+        {
+            workMode = 930;
         }
         else if ( IOEntries.find("inCifName")!=IOEntries.end() )
         {

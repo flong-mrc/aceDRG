@@ -457,6 +457,10 @@ namespace LIBMOL
                      std::vector<RingDict>         & tRings,
                      std::map<std::string, int>    & tHMap);
 
+        void executeBC(std::vector<AtomDict>         & tAtoms,
+                       std::vector<BondDict>         & tBonds,
+                       std::vector<RingDict>         & tRings);
+
         bool checkIfAROMBs(std::vector<BondDict> & tBonds);
 
         void setAromBondOrderInSys(std::vector<AtomDict>       & tAtoms,

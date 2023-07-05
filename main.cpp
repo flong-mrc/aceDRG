@@ -684,7 +684,7 @@ int main(int argc, char** argv) {
                                aClassifiedSys.allAtoms, aClassifiedSys.allBonds);
 
     }
-    else if (AJob.workMode == 920)
+    else if (AJob.workMode == 920 || AJob.workMode == 930)
     {
         LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
         LIBMOL::setAtomRingProps(dataFromCif.allAtoms, dataFromCif.allRingsV);
@@ -692,16 +692,25 @@ int main(int argc, char** argv) {
 
         if(dataFromCif.allAtoms.size()> 0 && dataFromCif.allBonds.size() > 0)
         {
-            std::cout << "Kekulize the molecule " << std::endl;
-            LIBMOL::KekulizeMol aKTool;
-            std::map<std::string, int>               aHMap;
-            aKTool.execute(dataFromCif.allAtoms,
-                           dataFromCif.allBonds,
-                           dataFromCif.allRingsV,
-                           aHMap);
-            aKTool.outBondsAndHAtms(dataFromCif.allBonds, aHMap, AJob.IOEntries["userOutName"]);
+            if (AJob.workMode == 920 )
+            {
+                std::cout << "Kekulize the molecule " << std::endl;
+                LIBMOL::KekulizeMol aKTool;
+                std::map<std::string, int>               aHMap;
+                aKTool.execute(dataFromCif.allAtoms,
+                               dataFromCif.allBonds,
+                               dataFromCif.allRingsV,
+                               aHMap);
+                aKTool.outBondsAndHAtms(dataFromCif.allBonds, aHMap, AJob.IOEntries["userOutName"]);
+                //std::cout << "Kekulize done " << std::endl;
+            }
+            else if (AJob.workMode == 930 )
+            {
+                std::cout << "Kekulize the molecule and add charges. " << std::endl;
+                LIBMOL::KekulizeMol aKTool;
 
-            //std::cout << "Kekulize done " << std::endl;
+
+            }
         }
 
     }
