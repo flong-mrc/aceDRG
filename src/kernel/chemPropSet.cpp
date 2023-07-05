@@ -5634,7 +5634,7 @@ namespace LIBMOL
                 {
                     nP = 1;
                 }
-                else if (tAt->connAtoms.size()==3 and nAro==2)
+                else if (tAt->connAtoms.size()==3 && nAro==2)
                 {
                     nP = 2;
                 }
