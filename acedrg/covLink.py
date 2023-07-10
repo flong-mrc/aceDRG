@@ -2086,7 +2086,10 @@ class CovLinkGenerator(CExeCode):
                     tMod["deleted"]["planes"].append(tRes["comp"]["planes"][aPl])
                 else:
                     tRes["remainPls"].append(aPlGrp)
-                    
+         
+        self.setDeletedAngInOneResForModification(tRes, tMod)   
+        self.setDeleteTorsInOneResForModification(tRes, tMod) 
+        self.setDeleteChirsInOneResForModification(tRes, tMod)        
                     
     def setDeletedBondInOneResForModification(self, tRes, tMod):
         
@@ -2133,7 +2136,7 @@ class CovLinkGenerator(CExeCode):
         
         for aB in tRes["remainBonds"]:
             print("Bond between %s and %s "%(aB["atom_id_1"], aB["atom_id_2"]))
-        
+            
         # check and add H atom to those atoms involved in deleted bonds
         for aDB in tMod["deleted"]["bonds"]:    
             atm1DB = aDB["atom_id_1"]
@@ -2141,6 +2144,89 @@ class CovLinkGenerator(CExeCode):
             self.addjustAtomInDeletedBondInOneResForModification(tRes, tMod, atm1DB, dBIDs)
             self.addjustAtomInDeletedBondInOneResForModification(tRes, tMod, atm2DB, dBIDs)
     
+    
+    def setDeletedAngInOneResForModification(self, tRes, tMod):
+        
+        # check and add H atom to those atoms involved in deleted bonds
+        tmpRemAngs = []
+        for aAng in tRes["remainAngs"]:
+            tmpRemAngs.append(aAng)
+        
+        tRes["remainAngs"] = []
+        
+        if len(tMod["deleted"]["bonds"]) > 0:
+            for aDB in tMod["deleted"]["bonds"]:    
+                atm1DB = aDB["atom_id_1"]
+                atm2DB = aDB["atom_id_2"] 
+                aDList = [aDB["atom_id_1"], aDB["atom_id_2"]]
+                for aAng in tmpRemAngs:
+                    print("Ang among %s %s %s"%(aAng["atom_id_1"], aAng["atom_id_2"], aAng["atom_id_3"]))
+                    if aAng["atom_id_2"] in aDList:
+                        aIdList = [aAng["atom_id_1"], aAng["atom_id_2"], aAng["atom_id_3"]]
+                        if atm1DB in aIdList and atm2DB in aIdList:
+                            tMod["deleted"]["angles"].append(aAng)
+                        else:
+                            tRes["remainAngs"].append(aAng)
+                    else:
+                        tRes["remainAngs"].append(aAng)
+        else:
+            for aAng in tmpRemAngs:
+                tRes["remainAngs"].append(aAng)
+                    
+    def setDeleteTorsInOneResForModification(self, tRes, tMod):
+        
+        # check and add H atom to those atoms involved in deleted bonds
+        tmpRemTors = []
+        for aTor in tRes["remainTors"]:
+            tmpRemTors.append(aTor)
+        
+        tRes["remainTors"] = []
+        if len(tMod["deleted"]["bonds"]) > 0:
+            for aDB in tMod["deleted"]["bonds"]:    
+                atm1DB = aDB["atom_id_1"]
+                atm2DB = aDB["atom_id_2"] 
+                for aTor in tmpRemTors:
+                    aIdList = [aTor["atom_id_1"], aTor["atom_id_2"], aTor["atom_id_3"],  aTor["atom_id_4"]]
+                    if atm1DB in aIdList and atm2DB in aIdList:
+                        tMod["deleted"]["tors"].append(aTor)
+                    else:
+                        tRes["remainTors"].append(aTor) 
+        else:
+            for aTor in tmpRemTors:
+                tRes["remainTors"].append(aTor)
+                
+    
+    def setDeleteChirsInOneResForModification(self, tRes, tMod):
+            
+        # check and add H atom to those atoms involved in deleted bonds
+        tmpRemChirs = []
+        for aCh in tRes["remainChirs"] :
+            tmpRemChirs.append(aCh)
+            
+        tRes["remainChirs"] = []
+        if len(tMod["deleted"]["bonds"]) > 0:    
+            for aDB in tMod["deleted"]["bonds"]:    
+                atm1DB = aDB["atom_id_1"]
+                atm2DB = aDB["atom_id_2"]
+                aDList = [aDB["atom_id_1"], aDB["atom_id_2"]]
+                print("deleted bond between %s and %s "%(atm1DB, atm2DB))
+                for aCh in tmpRemChirs:
+                    aIdList = [aCh["atom_id_1"], aCh["atom_id_2"], aCh["atom_id_3"], aCh["atom_id_centre"]]
+                    print("For chir %s  %s %s %s "%(aCh["atom_id_centre"], aCh["atom_id_1"], aCh["atom_id_2"], aCh["atom_id_3"]) )
+                    if aCh["atom_id_centre"] in aDList:
+                        if atm1DB in aIdList and atm2DB in aIdList:
+                            tMod["deleted"]["chirs"].append(aCh)
+                            print("It is deleted")
+                        else:
+                            tRes["remainChirs"].append(aCh)
+                            print("It is included")
+                    else:
+                        tRes["remainChirs"].append(aCh)
+                        print("It is included")
+        else:
+            for aCh in tmpRemChirs:
+                tRes["remainChirs"].append(aCh)
+                
     def addjustAtomInDeletedBondInOneResForModification(self, tRes, tMod, tAtmId, tDelBAtmIds):
         
         
@@ -3107,10 +3193,10 @@ class CovLinkGenerator(CExeCode):
 
         # Angles
         for aAng in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["angles"]:
-            #print("A angle ")
-            #print("atom %s in residue %d "%(aAng["atom_id_1"], aAng["atom_id_1_resNum"]))
-            #print("atom %s in residue %d "%(aAng["atom_id_2"], aAng["atom_id_2_resNum"]))
-            #print("atom %s in residue %d "%(aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
+            print("A angle ")
+            print("atom %s in residue %d "%(aAng["atom_id_1"], aAng["atom_id_1_resNum"]))
+            print("atom %s in residue %d "%(aAng["atom_id_2"], aAng["atom_id_2_resNum"]))
+            print("atom %s in residue %d "%(aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
             if aAng["atom_id_1_resNum"]==1 and aAng["atom_id_2_resNum"]==1 and aAng["atom_id_3_resNum"]==1:
                 if not aAng["atom_id_1"] in addedSet1 and not aAng["atom_id_2"] in addedSet1 and not aAng["atom_id_3"] in addedSet1:
                     self.checkAngMod(tLinkedObj.stdLigand1["remainAngs"], aAng, tLinkedObj.modLigand1["changed"]["angles"]) 

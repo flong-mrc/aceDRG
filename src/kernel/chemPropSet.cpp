@@ -5108,6 +5108,96 @@ namespace LIBMOL
                                 std::vector<BondDict>& tBonds,
                                 std::vector<RingDict> & tRings)
     {
+        std::map<int, int>               curValMap;
+        std::map<int, int>               outElectronMap;
+        std::map<int, double>            chargeMap;
+        std::map<int, std::string>       elemMap;
+        std::map<int, int >              idAtmMap;
+        std::map<int, std::map<int, int> > allAtmBondingMap;
+
+        // Make sure the serial numbers of atoms are used consistent
+        int idxA = 0;
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            iAt->seriNum = idxA;
+            idxA++;
+            //std::cout << "Atom idx is " << iAt->seriNum << std::endl;
+            //std::cout << "Atom id " << iAt->id << std::endl;
+            //std::cout << "Atom elem " << iAt->chemType << std::endl;
+        }
+
+        setAllMaps(tAtoms, tBonds, tRings, curValMap, outElectronMap, chargeMap,
+                   elemMap, idAtmMap, allAtmBondingMap);
+
+
+    }
+
+    void KekulizeMol::setAllMaps(std::vector<AtomDict>       & tAtoms,
+                                 std::vector<BondDict>       & tBonds,
+                                 std::vector<RingDict>       & tRings,
+                                 std::map<int, int>          & tCurVal,
+                                 std::map<int, int>          & tOutEMap,
+                                 std::map<int, double>       & tChargeMap,
+                                 std::map<int, std::string>  & tElemMap,
+                                 std::map<int, int>          & tIdAtmMap,
+                                 std::map<int,
+                                  std::map<int, int> >     & tAllAtmBondingMap)
+    {
+        PeriodicTable   aPTab;
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            tElemMap[iAt->seriNum]   = iAt->chemType;
+            tChargeMap[iAt->seriNum] = iAt->charge;
+            tIdAtmMap[iAt->seriNum]  = iAt->seriNum;
+
+            // CurVal
+            if (aPTab.elements.find(iAt->chemType) !=aPTab.elements.end())
+            {
+                if (iAt->connAtoms.size() <= aPTab.elements[iAt->chemType]["val"])
+                {
+                    if (iAt->chemType=="S" || iAt->chemType=="Se"|| iAt->chemType=="SE" )
+                    {
+                        tCurVal[iAt->seriNum] = 2;
+                    }
+                    else
+                    {
+                        tCurVal[iAt->seriNum] = aPTab.elements[iAt->chemType]["val"];
+                    }
+                }
+                else
+                {
+                    if (aPTab.extraValences.find(iAt->chemType) !=aPTab.extraValences.end())
+                    {
+                        break;
+                    }
+                }
+            }
+
+            // outE
+            if (aPTab.electronConf.find(iAt->chemType) !=aPTab.electronConf.end())
+            {
+                tOutEMap[iAt->seriNum]=0;
+                for (int i=0; i < aPTab.electronConf[iAt->chemType].size(); i++)
+                {
+                    tOutEMap[iAt->seriNum]+=aPTab.electronConf[iAt->chemType][i].second;
+                }
+            }
+
+
+            std::cout << "=======================================" << std::endl;
+            std::cout << " atom serial number " << iAt->seriNum << std::endl;
+            std::cout << "The valence of " << iAt->id << " of " << iAt->chemType
+                      << " is " << tCurVal[iAt->seriNum] << std::endl;
+            std::cout << " The number of out-shell electrons is "
+                      << tOutEMap[iAt->seriNum] << std::endl;
+            std::cout << "it bonds to " << iAt->connAtoms.size()
+                      << " atoms " << std::endl;
+
+
+
+        }
 
     }
 
@@ -5158,13 +5248,6 @@ namespace LIBMOL
         std::map<std::string, std::map<std::string, int> > allAtmBondingMap;
         std::map<std::string, std::vector<std::string> >   aromAtmMap;
 
-        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
-                iAt != tAtoms.end(); iAt++)
-        {
-            //ElemMap
-            std::cout << "XX id " << iAt->id << std::endl;
-            std::cout << "XX elem " << iAt->chemType << std::endl;
-        }
 
         setAllMaps(tAtoms, tBonds, curValMap,chargeMap, elemMap,
                    idAtmMap, allAtmBondingMap, aromAtmMap, hMap);
@@ -5268,8 +5351,7 @@ namespace LIBMOL
                 iAt != tAtoms.end(); iAt++)
         {
             //ElemMap
-            std::cout << "XXX id " << iAt->id << std::endl;
-            std::cout << "XXX elem " << iAt->chemType << std::endl;
+
             tElemMap[iAt->id]   = iAt->chemType;
             tChargeMap[iAt->id] = iAt->charge;
             tIdAtmMap[iAt->id]  = iAt->seriNum;

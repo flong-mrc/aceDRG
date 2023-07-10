@@ -708,6 +708,10 @@ int main(int argc, char** argv) {
             {
                 std::cout << "Kekulize the molecule and add charges. " << std::endl;
                 LIBMOL::KekulizeMol aKTool;
+                aKTool.executeBC(dataFromCif.allAtoms,
+                               dataFromCif.allBonds,
+                               dataFromCif.allRingsV);
+
 
 
             }

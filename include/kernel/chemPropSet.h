@@ -461,6 +461,17 @@ namespace LIBMOL
                        std::vector<BondDict>         & tBonds,
                        std::vector<RingDict>         & tRings);
 
+        void setAllMaps(std::vector<AtomDict>      & tAtoms,
+                        std::vector<BondDict>      & tBonds,
+                        std::vector<RingDict>      & tRings,
+                        std::map<int, int>         & tCurVal,
+                        std::map<int, int>         & tOutEMap,
+                        std::map<int, double>         & tChargeMap,
+                        std::map<int, std::string>    & tElemMap,
+                        std::map<int, int>           & tIdAtmMap,
+                        std::map<int,
+                        std::map<int, int> >       & tAllAtmBondingMap);
+
         bool checkIfAROMBs(std::vector<BondDict> & tBonds);
 
         void setAromBondOrderInSys(std::vector<AtomDict>       & tAtoms,
