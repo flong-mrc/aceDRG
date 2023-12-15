@@ -1,5 +1,5 @@
 
-/* 
+/*
  * File:   PDBFile.cpp
  * Author: flong
  *
@@ -42,7 +42,7 @@
 
 namespace LIBMOL
 {
-    
+
     PDBFile::PDBFile() : itsTempRecordType(UnknownType),
                          itsCurrentModel(NullPoint),
                          itsCurrentAtom(NullPoint),
@@ -55,7 +55,7 @@ namespace LIBMOL
                          itsCurrentSheet(NullPoint),
                          itsCurrentSSBond(NullPoint),
                          itsCrystInfo(NullPoint)
-    {       
+    {
         allHeaderInfo.CAVEAT= NULL;
         allHeaderInfo.COMPND= NULL;
         allHeaderInfo.HEADER= NULL;
@@ -65,7 +65,7 @@ namespace LIBMOL
         allHeaderInfo.SPLIT= NULL;
         allHeaderInfo.TITLE= NULL;
     }
-    
+
     PDBFile::PDBFile(Name               tFname,
             std::ios_base::openmode tOpenMode) :
             itsTempRecordType(UnknownType),
@@ -103,7 +103,7 @@ namespace LIBMOL
         }
 
     }
-    
+
    PDBFile::PDBFile(FileName        tFname,
             std::ios::openmode      tOpenMode=std::ios::in ) :
             itsTempRecordType(UnknownType),
@@ -120,7 +120,8 @@ namespace LIBMOL
             itsCrystInfo(NullPoint)
     {
         if (tOpenMode == std::ios::in)
-        {       
+        {
+            std::cout << "Here " << std::endl;
             inFile.open(tFname, tOpenMode);
             itsCurrentModel   = new Model();
             itsCurrentAtom    = new Atom();
@@ -131,44 +132,45 @@ namespace LIBMOL
             itsCurrentHelix   = new Helix();
             itsCurrentSheet   = new Sheet();
             itsCurrentSSBond  = new SSBond();
-            itsCrystInfo      = new CrystInfo();            
+            itsCrystInfo      = new CrystInfo();
             setupSystem();
-        
+            std::cout << "Number of input atoms " << allHetAtmList.size()
+                      << std::endl;
             // all check
-            
-            //std::cout << "There are " << allAtomList.size() 
+
+            //std::cout << "There are " << allAtomList.size()
             //        << "  atoms " << std::endl;
-           
-            //std::cout<< "There are(is) " << allModels.size() 
+
+            //std::cout<< "There are(is) " << allModels.size()
             //        << " model in the system" << std::endl;
             //for (int i= 0; i < (int)allModels.size(); i++)
             //{
-                //std::cout << "in model: " << i 
-                //        << ", there are " << allModels[i].chains.size() 
+                //std::cout << "in model: " << i
+                //        << ", there are " << allModels[i].chains.size()
                 //        << " chains " << std::endl;
                 //for (int j =0; j < (int)allModels[i].chains.size(); j++ )
                 //{
                     //std::cout<< "for Chain " << j+1
-                    //        << " : its ID " << allModels[i].chains[j].getID() 
+                    //        << " : its ID " << allModels[i].chains[j].getID()
                     //        << std::endl;
                     //std::cout << "There are " << allModels[i].chains[j].residues.size()
                     //        << " residues" << std::endl;
-                    
+
                     //for (int k =0; k < (int)allModels[i].chains[j].residues.size();
                     //        k++)
-                    // {   
-                        
-                        //std::cout << "for Residue " 
+                    // {
+
+                        //std::cout << "for Residue "
                         //        << allModels[i].chains[j].residues[k].getName()
                         //       << "  :  " << std::endl;
-                        //std::cout << "Its chain ID " 
+                        //std::cout << "Its chain ID "
                         //        << allModels[i].chains[j].residues[k].getChainID()
                         //        << std::endl;
-                        //std::cout << "Its seqNum " 
+                        //std::cout << "Its seqNum "
                         //        << allModels[i].chains[j].residues[k].getSeqNum()
                         //        << std::endl;
-                        
-                        //std::cout << "There are " 
+
+                        //std::cout << "There are "
                         //        <<  allModels[i].chains[j].residues[k].atoms.size()
                         //        << " atoms. " << std::endl;
                         //for (int l = 0; l < (int)allModels[i].chains[j].residues[k].atoms.size();
@@ -176,16 +178,16 @@ namespace LIBMOL
                         //{
                         //    if(allModels[i].chains[j].residues[k].atoms[l].altLoc.size()!=0)
                         //    {
-                        //    std::cout << " atom " 
+                        //    std::cout << " atom "
                         //            << allModels[i].chains[j].residues[k].atoms[l].getSeriNum()
                         //            << "  :  " << std::endl;
-                        //    std::cout << " Name " 
+                        //    std::cout << " Name "
                         //            << allModels[i].chains[j].residues[k].atoms[l].getName()
                         //            << std::endl;
-                        //    std::cout << "Its seqNum " 
+                        //    std::cout << "Its seqNum "
                         //              << allModels[i].chains[j].residues[k].atoms[l].getSeqNum()
                         //              << std::endl;
-                        //    std::cout << " Chain ID " 
+                        //    std::cout << " Chain ID "
                         //            << allModels[i].chains[j].residues[k].atoms[l].getChainID()
                         //            << std::endl;
                         //    std::cout << "Coordinate X : "
@@ -195,9 +197,9 @@ namespace LIBMOL
                         //            << allModels[i].chains[j].residues[k].atoms[l].altLoc[0]
                         //            << std::endl;
                         //    }
-                        
+
                         //}
-                          
+
                     //}
                 //}
             //}
@@ -207,21 +209,21 @@ namespace LIBMOL
             outFile.open(tFname, tOpenMode);
         }
     }
-         
+
     PDBFile::~PDBFile()
     {
         if(inFile.is_open())
         {
             inFile.close();
         }
-        
+
         if(outFile.is_open())
         {
             outFile.close();
         }
         // delete operations
     }
-    
+
     void PDBFile::setPDBRecordHeader()
     {
         PDBRecordHeader.push_back("UNKNOWN");
@@ -327,25 +329,25 @@ namespace LIBMOL
             "TITLE ",
             "TURN  ",
             "TVECT "); */
-           
+
     void PDBFile::setupSystem()
     {
-          
+
         if (inFile.is_open() )
-        {    
+        {
             setPDBRecordHeader();
 
             bool tOK = true;
             std::string tRecord="";
-            
+
             while(!inFile.eof() && tOK)
             {
                 std::getline(inFile, tRecord);
-               
+
                 if (inFile.good())
-                {   
-                    int tRecType = getRecordType(tRecord); 
-                    
+                {
+                    int tRecType = getRecordType(tRecord);
+
                     switch(tRecType)
                     {
                         /*
@@ -455,13 +457,11 @@ namespace LIBMOL
                             tOK=extractTerInfo(tRecord);
                             break;
                         }
-                        /*
                         case HetatmType:
                         {
                             tOK=extractAtomInfo(tRecord);
                             break;
                         }
-                         */
                         case EndMdlType:
                         {
                             tOK=extractEndMdlInfo(tRecord);
@@ -479,29 +479,29 @@ namespace LIBMOL
                             itsTempRecordType=UnknownType;
                         }
                     }
-                    
-                }        
+
+                }
             }
-            
+
         }
-        
-       allModels.push_back(*itsCurrentModel); 
-       
+
+       allModels.push_back(*itsCurrentModel);
+
 
     }
-    
+
     int  PDBFile::getRecordType(std::string tRecord)
-    {   
+    {
         for (int i=1; i<(int)PDBRecordHeader.size(); i++)
         {
             Size tCmp = tRecord.compare(0,6,PDBRecordHeader[i]);
-            
+
             if (not tCmp)
             {
                 return i;
             }
         }
-        
+
         return 0;
     }
     // Title section
@@ -509,15 +509,15 @@ namespace LIBMOL
     {
         return true;
     }
-    
+
     // Primary Structure Section
-    
-    
+
+
     bool PDBFile::extractSEQRESInfo(std::string tRecord)
     {
-        if(tRecord.size()) 
+        if(tRecord.size())
         {
-            
+
             if( itsCurrentChain->getID() =="")
             {
                 itsCurrentChain->setID(tRecord.substr(11,1));
@@ -529,15 +529,15 @@ namespace LIBMOL
                 itsCurrentChain = new Chain();
                 itsCurrentChain->setID(tRecord.substr(11,1));
             }
-            
+
             if (!itsCurrentChain->getNumOfRes())
             {
                 itsCurrentChain->setNumOfRes(StrToInt(tRecord.substr(13,4)));
             }
-            
-            std::vector<std::string> tBuf; 
+
+            std::vector<std::string> tBuf;
             StrTokenize(tRecord.substr(19), tBuf);
-            
+
             for (std::vector<std::string>::iterator iT = tBuf.begin();
                     iT != tBuf.end(); ++iT )
             {
@@ -545,12 +545,12 @@ namespace LIBMOL
                 tRes.setName((*iT));
                 itsCurrentChain->residues.push_back(tRes);
             }
-            
+
             if (itsCurrentChain->residues.size()==itsCurrentChain->getNumOfRes())
             {
                 allChains.push_back(*itsCurrentChain);
             }
-            
+
             return true;
         }
         else
@@ -558,35 +558,35 @@ namespace LIBMOL
             return false;
         }
     }
-    
+
     bool PDBFile::extractMODRESInfo(std::string tRecord)
     {
         if(tRecord.size())
         {
             itsCurrentModRes =  new ModRes();
-            
+
             itsCurrentModRes->setID(tRecord.substr(7,4));
             itsCurrentModRes->setName(tRecord.substr(12,3));
             itsCurrentModRes->setChainID(tRecord.substr(16,1));
             itsCurrentModRes->setSeqNum(StrToInt(tRecord.substr(18,4)));
-            itsCurrentModRes->setInsCode(tRecord.substr(22,1));   
+            itsCurrentModRes->setInsCode(tRecord.substr(22,1));
             itsCurrentModRes->setStdName(tRecord.substr(24,3));
             itsCurrentModRes->setComment(tRecord.substr(29));
-        
+
             allModRes.push_back(*itsCurrentModRes);
-            
+
             return true;
         }
-        else 
+        else
         {
             return false;
         }
-        
+
     }
-    
-    
+
+
     // Secondary Structure Section
-    
+
     bool PDBFile::extractHelixInfo(std::string tRecord)
     {
         if(tRecord.size())
@@ -594,7 +594,7 @@ namespace LIBMOL
             Helix * tHelix = new Helix();
             tHelix->setSeriNum(StrToInt(tRecord.substr(7,3)));
             tHelix->setID(tRecord.substr(11,3));
-            
+
             if (!tRecord.substr(15,3).empty())
             {
                 Residue * tRes1 = new Residue();
@@ -602,43 +602,43 @@ namespace LIBMOL
                 tRes1->setChainID(tRecord.substr(19,1));
                 tRes1->setSeqNum(StrToInt(tRecord.substr(21,4)));
                 tHelix->setInitResidue(*tRes1);
-                       
+
             }
-            
+
             if (!tRecord.substr(27,3).empty())
             {
                 Residue * tRes2 = new Residue();
                 tRes2->setName(tRecord.substr(27,3));
                 tRes2->setChainID(tRecord.substr(31,1));
                 tRes2->setSeqNum(StrToInt(tRecord.substr(33,4)));
-                tHelix->setEndResidue(*tRes2);        
+                tHelix->setEndResidue(*tRes2);
             }
-            
+
             tHelix->setHelixClass(StrToInt(tRecord.substr(38,2)));
             tHelix->setComment(tRecord.substr(40,30));
             tHelix->setLength(StrToInt(tRecord.substr(71,5)));
-            
+
             allHelices.push_back(*tHelix);
-            
+
             return true;
-            
+
         }
-        else 
+        else
         {
             return false;
         }
-        
+
     }
-    
+
     bool PDBFile::extractSheetInfo(std::string tRecord)
     {
         if(tRecord.size())
         {
             if (StrToInt(tRecord.substr(7,3)) == 1)
-            {   
+            {
                 itsCurrentSheet = new Sheet();
             }
-            
+
             if ( itsCurrentSheet->getID() =="" )
             {
                 itsCurrentSheet->setID(tRecord.substr(11,3));
@@ -649,33 +649,33 @@ namespace LIBMOL
             }
             // sense of the current strand
             itsCurrentSheet->senses.push_back(StrToInt(tRecord.substr(38,2)));
-         
+
             Strand * tStrand = new Strand();
-           
+
             tStrand->setSeriNum(StrToInt(tRecord.substr(7,3)));
-            
+
             // starting residue in the strand
             Residue * tInitRes=new Residue();
             tInitRes->setName(tRecord.substr(17,3));
             tInitRes->setChainID(tRecord.substr(21,1));
             tInitRes->setSeqNum(StrToInt(tRecord.substr(22,4)));
-           
+
             tStrand->setTerResidue(*tInitRes, 1);
-            
+
             // ending residue in the strand
             Residue * tEndRes = new Residue();
             tEndRes->setName(tRecord.substr(28,3));
             tEndRes->setChainID(tRecord.substr(32,1));
             tEndRes->setSeqNum(StrToInt(tRecord.substr(33,4)));
-            
+
             tStrand->setTerResidue(*tEndRes, -1);
-            
+
             // delete tInitRes and tEndRes
             delete tInitRes;
             tInitRes = NullPoint;
             delete tEndRes;
             tEndRes  = NullPoint;
-            
+
             if (tRecord.size() > 40)
             {
                 // Registration atoms
@@ -684,92 +684,92 @@ namespace LIBMOL
                 tCurAtom->setResName(tRecord.substr(45,3));
                 tCurAtom->setChainID(tRecord.substr(49,1));
                 tCurAtom->setSegNum(StrToInt(tRecord.substr(50,4)));
-               
+
                 tStrand->setRegistAtom(*tCurAtom, 1);
-               
+
                 Atom * tPrevAtom = new Atom();
                 tPrevAtom->setName(tRecord.substr(56,4));
                 tPrevAtom->setResName(tRecord.substr(60,3));
                 tPrevAtom->setChainID(tRecord.substr(64,1));
                 tPrevAtom->setSegNum(StrToInt(tRecord.substr(65,4)));
-               
+
                 tStrand->setRegistAtom(*tPrevAtom, -1);
-                
+
                 // delete two temp atoms
                 delete tCurAtom;
                 tCurAtom  = NullPoint;
                 delete tPrevAtom;
                 tPrevAtom = NullPoint;
-                
+
             }
-           
+
             itsCurrentSheet->allStrands.push_back(*tStrand);
 
-            if( itsCurrentSheet->getNumOfStrands() == tStrand->getSeriNum() ) 
+            if( itsCurrentSheet->getNumOfStrands() == tStrand->getSeriNum() )
             {
-                // the current sheet finishes 
+                // the current sheet finishes
                 allSheets.push_back(*itsCurrentSheet);
             }
-            
+
             return true;
-                              
+
         }
-        else 
+        else
         {
             return false;
         }
     }
-    
+
     // Connectivity Annotation Section
-    
+
     bool PDBFile::extractSSBondInfo(std::string tRecord)
     {
         if(tRecord.size())
         {
             SSBond * tSSBond = new SSBond();
-           
+
             tSSBond->setName(tRecord.substr(0,6));
             tSSBond->setSeriNum(StrToInt(tRecord.substr(7,3)));
-            
+
             Residue * tResidue1 = new Residue();
             tResidue1->setName(tRecord.substr(11,3));
             tResidue1->setChainID(tRecord.substr(15,1));
             int tI = StrToInt(tRecord.substr(17,4));
             tResidue1->setSeqNum(tI);
-          
+
             tSSBond->resSeqNums[0] =tI;
-            
+
             Residue * tResidue2 = new Residue();
             tResidue2->setName(tRecord.substr(26,3));
             tResidue2->setChainID(tRecord.substr(29,1));
             tI = StrToInt(tRecord.substr(31,4));
-            tResidue2->setSeqNum(tI);           
-            
+            tResidue2->setSeqNum(tI);
+
             tSSBond->resSeqNums[1] = tI;
-            
+
             tSSBond->residues.push_back(*tResidue1);
             tSSBond->residues.push_back(*tResidue2);
-            
+
             tSSBond->resSym[0]  = StrToInt(tRecord.substr(59,6));
-            tSSBond->resSym[1]  = StrToInt(tRecord.substr(66,6));  
-            
+            tSSBond->resSym[1]  = StrToInt(tRecord.substr(66,6));
+
             tSSBond->setLength(StrToReal(tRecord.substr(73,5)));
-            
+
             allSSBonds.push_back(*tSSBond);
-            
+
         }
-        
+
         return true;
     }
-    
+
     bool PDBFile::extractLinkInfo(std::string tRecord)
     {
         if(tRecord.size())
         {
             Link * tLink = new Link();
-            
+
             tLink->setName(tRecord.substr(0,6));
-            
+
             Atom * tAtom1 = new Atom();
             tAtom1->setName(TrimSpaces(tRecord.substr(12,4)));
             tAtom1->setAltLoc(tRecord.substr(16,1));
@@ -777,11 +777,11 @@ namespace LIBMOL
             tAtom1->setChainID(tRecord.substr(21,1));
             tAtom1->setSegNum(StrToInt(tRecord.substr(22,4)));
             tAtom1->setInsCode(tRecord.substr(26,1));
-            
+
             tLink->atoms.push_back(*tAtom1);
             delete tAtom1;
             tAtom1 = NULL;
-            
+
             Atom * tAtom2 = new Atom();
             tAtom2->setName(TrimSpaces(tRecord.substr(42,4)));
             tAtom2->setAltLoc(tRecord.substr(46,1));
@@ -789,27 +789,27 @@ namespace LIBMOL
             tAtom2->setChainID(tRecord.substr(51,1));
             tAtom2->setSegNum(StrToInt(tRecord.substr(52,4)));
             tAtom2->setInsCode(tRecord.substr(56,1));
-            
+
             tLink->atoms.push_back(*tAtom2);
             delete tAtom2;
             tAtom2 = NULL;
-            
+
             tLink->symOp[0] = StrToInt(tRecord.substr(59,6));
-            
+
             tLink->symOp[0] = StrToInt(tRecord.substr(66,6));
-            
-            tLink->setLength(StrToReal(tRecord.substr(73,5)));            
-            
+
+            tLink->setLength(StrToReal(tRecord.substr(73,5)));
+
             allLinks.push_back(*tLink);
-            
+
             delete tLink;
             tLink = NULL;
-            
+
         }
-        
+
         return true;
     }
-    
+
     // Crystallographic and Coordinate Transformation Section
     bool PDBFile::extractCryst1Info(std::string tRecord)
     {
@@ -827,10 +827,10 @@ namespace LIBMOL
            */
             return true;
         }
-        
-        return false;        
+
+        return false;
     }
-    
+
 
     bool PDBFile::extractOrigXNInfo(std::string tRecord)
     {
@@ -840,14 +840,14 @@ namespace LIBMOL
             itsCrystInfo->ORIGXn.push_back(StrToReal(tRecord.substr(20,10)));
             itsCrystInfo->ORIGXn.push_back(StrToReal(tRecord.substr(30,10)));
             itsCrystInfo->ORIGXn.push_back(StrToReal(tRecord.substr(45,10)));
-         
+
             return true;
         }
-         
+
         return false;
-        
+
     }
- 
+
     bool PDBFile::extractMatrixNInfo(std::string tRecord)
     {
         if (tRecord.size())
@@ -856,14 +856,14 @@ namespace LIBMOL
             itsCrystInfo->MTRIXn.push_back(StrToReal(tRecord.substr(20,10)));
             itsCrystInfo->MTRIXn.push_back(StrToReal(tRecord.substr(30,10)));
             itsCrystInfo->MTRIXn.push_back(StrToReal(tRecord.substr(45,10)));
-         
+
             return true;
         }
-         
+
         return false;
-        
+
     }
-    
+
     bool PDBFile::extractScaleNInfo(std::string tRecord)
     {
         if (tRecord.size())
@@ -872,15 +872,15 @@ namespace LIBMOL
             itsCrystInfo->SCALEn.push_back(StrToReal(tRecord.substr(20,10)));
             itsCrystInfo->SCALEn.push_back(StrToReal(tRecord.substr(30,10)));
             itsCrystInfo->SCALEn.push_back(StrToReal(tRecord.substr(45,10)));
-         
+
             return true;
         }
-         
+
         return false;
-        
-    }    
-    
-    
+
+    }
+
+
     // Coordinate Section
     void PDBFile::initOneModel(std::string tRecord)
     {
@@ -890,10 +890,10 @@ namespace LIBMOL
             itsCurrentModel->setSeriNum(1);
         }
     }
-    
+
     bool PDBFile::extractAtomInfo(std::string tRecord)
     {
-        
+
         /*
         if (itsCurrentModel == NULL)
         {
@@ -905,7 +905,7 @@ namespace LIBMOL
             itsCurrentChain = new Chain();
             itsCurrentChain->setModSeriNum(itsCurrentModel->getSeriNum());
         }
-        
+
         if (itsCurrentResidue == NULL)
         {
             itsCurrentResidue = new Residue();
@@ -914,7 +914,7 @@ namespace LIBMOL
         if(!itsCurrentAltLoc)
         {
         Atom  tAtom;
-        
+
         tAtom.setModSeriNum(itsCurrentModel->getSeriNum());
         //std::cout << "Atom's model numb : " << tAtom.getModSeriNum() << std::endl;
         tAtom.setSeriNum(StrToInt(tRecord.substr(6,5)));
@@ -931,7 +931,7 @@ namespace LIBMOL
         tAtom.setResName(TrimSpaces(tResName));
         //std::cout << "Atom's Residue Name: " << tAtom.getResName() << std::endl;
         Name tCName=tRecord.substr(21,1);
-        
+
         tAtom.setChainID(TrimSpaces(tCName));
         //std::cout << "Atom'Chain ID: " << tAtom.getChainID() << std::endl;
         tAtom.setSeqNum(StrToInt(tRecord.substr(22,4)));
@@ -940,100 +940,100 @@ namespace LIBMOL
         {
             tAtom.setInsCode(TrimSpaces(tRecord.substr(26,1)));
         }
-        
+
         //std::cout << "Atom's InsCode: " << tAtom.getInsCode() << std::endl;
         tAtom.coords.push_back(StrToReal(tRecord.substr(30,8)));
-        tAtom.coords.push_back(StrToReal(tRecord.substr(38,8))); 
+        tAtom.coords.push_back(StrToReal(tRecord.substr(38,8)));
         tAtom.coords.push_back(StrToReal(tRecord.substr(46,8)));
         // std::cout << "Atom's coord z: " << tAtom.coords[2] << std::endl;
-        
+
         tAtom.setOccup(StrToReal(tRecord.substr(54,6)));
         tAtom.setTempFact(StrToReal(tRecord.substr(60,6)));
-        
+
         tAtom.setElementType(TrimSpaces(tRecord.substr(76,2)));
-        //std::cout << "Atom's Element type : " 
+        //std::cout << "Atom's Element type : "
         //          << tAtom.getElementType() << std::endl;
         tAtom.setPartialCharge(StrToReal(tRecord.substr(78,2)));
-        
-        
+
+
         allAtomList.push_back(tAtom);
-     
+
         //int ii = allAtomList.size() -1;
-        //std::cout<< "atom name            : " << allAtomList[ii].getName() 
+        //std::cout<< "atom name            : " << allAtomList[ii].getName()
         //        << std::endl;
-        //std::cout<< "atom seriNum        : " << allAtomList[ii].getSeriNum() 
+        //std::cout<< "atom seriNum        : " << allAtomList[ii].getSeriNum()
         //        << std::endl;
-       
+
         //std::cout<< "atom Residue Name   : " << allAtomList[ii].getResName()
         //        << std::endl;
-        //std::cout<< "atom ChainID        : " << allAtomList[ii].getChainID() 
+        //std::cout<< "atom ChainID        : " << allAtomList[ii].getChainID()
         //        << std::endl;
-        //std::cout << "Atoms resSeq numb  : " << allAtomList[ii].getSeqNum() 
+        //std::cout << "Atoms resSeq numb  : " << allAtomList[ii].getSeqNum()
         //        << std::endl;
-        //std::cout << "Atom  coords Z     : " << allAtomList[ii].coords[2] 
+        //std::cout << "Atom  coords Z     : " << allAtomList[ii].coords[2]
         //          << std::endl;
-        //std::cout << "Atom Element type : " 
+        //std::cout << "Atom Element type : "
         //          << allAtomList[ii].getElementType() << std::endl;
-    
-        
+
+
         // add it to the Het-atom list if it is
-     
+
         if (!tRecord.substr(0,6).compare("HETATM"))
         {
             allHetAtmList.push_back(tAtom);
         }
 
-     
-     
+
+
         if (itsCurrentResidue->getName() == NullString)
         {
             itsCurrentResidue->setName(tAtom.getResName());
         }
-       
+
         if (itsCurrentResidue->getSeqNum() == ZeroInt)
         {
            itsCurrentResidue->setSeqNum(tAtom.getSeqNum());
-        } 
-        
+        }
+
         if (itsCurrentResidue->getChainID() == NullString)
         {
            itsCurrentResidue->setChainID(tAtom.getChainID());
         }
-        
+
         if (itsCurrentResidue->getInsCode() == NullString)
         {
            itsCurrentResidue->setInsCode(tAtom.getInsCode());
-        } 
-        
+        }
+
         // add the atom to a residue
         //std::cout << tAtom.getResName() << std::endl;
         //std::cout << itsCurrentResidue->getName() << std::endl;
         //std::cout << tAtom.getSeqNum() << std::endl;
         //std::cout << itsCurrentResidue->getName() << std::endl;
-          
+
         if (tAtom.getSeqNum() == itsCurrentResidue->getSeqNum())
         {
            itsCurrentResidue->atoms.push_back(tAtom);
            // std::cout <<  itsCurrentResidue->atoms.size() << std::endl;
         }
-        else 
+        else
         {
             // add the current residue to a chain
 
             itsCurrentChain->addOneResidue(*itsCurrentResidue);
-           
+
             int iR = itsCurrentChain->residues.size()-1;
             itsCurrentChain->residues[iR].atoms.clear();
             for (int i = 0; i < (int)itsCurrentResidue->atoms.size(); i++)
             {
                 itsCurrentChain->residues[iR].atoms.push_back(itsCurrentResidue->atoms[i]);
             }
-           
+
             if (itsCurrentChain->getID() == "")
             {
                 itsCurrentChain->setID(tAtom.getChainID());
             }
-            
+
             itsCurrentResidue = new Residue();
             itsCurrentResidue->setName(tAtom.getResName());
             itsCurrentResidue->setSeqNum(tAtom.getSeqNum());
@@ -1041,7 +1041,7 @@ namespace LIBMOL
             itsCurrentResidue->setModelSeriNum(tAtom.getModSeriNum());
             itsCurrentResidue->atoms.push_back(tAtom);
         }
-        
+
         }
         else
         {
@@ -1050,17 +1050,17 @@ namespace LIBMOL
                 allAtomList.back().altLoc.push_back(StrToReal(tRecord.substr(30,8)));
                 allAtomList.back().altLoc.push_back(StrToReal(tRecord.substr(38,8)));
                 allAtomList.back().altLoc.push_back(StrToReal(tRecord.substr(46,8)));
-                
+
                 itsCurrentResidue->atoms.back().altLoc.push_back(StrToReal(tRecord.substr(30,8)));
                 itsCurrentResidue->atoms.back().altLoc.push_back(StrToReal(tRecord.substr(38,8)));
                 itsCurrentResidue->atoms.back().altLoc.push_back(StrToReal(tRecord.substr(46,8)));
                 itsCurrentAltLoc = false;
             }
         }
-        
+
         return true;
     }
-    
+
     bool PDBFile::extractAnisouInfo(std::string tRecord)
     {
         itsCurrentAtom->Uxx.push_back(StrToInt(tRecord.substr(28,7)));
@@ -1071,62 +1071,62 @@ namespace LIBMOL
         itsCurrentAtom->Uxx.push_back(StrToInt(tRecord.substr(63,7)));
         return true;
     }
-    
+
     // tRecord is not used yet
     bool PDBFile::extractTerInfo(std::string tRecord)
-    {     
+    {
         itsCurrentChain->addOneResidue(*itsCurrentResidue);
         itsCurrentModel->addOneChain(*itsCurrentChain);
-        
+
         delete itsCurrentResidue;
         itsCurrentResidue = NULL;
         itsCurrentResidue = new Residue();
-        
+
         delete itsCurrentChain;
         itsCurrentChain = NULL;
         itsCurrentChain = new Chain();
         return true;
     }
-    
+
     // tRecord is not used yet
     bool PDBFile::extractEndMdlInfo(std::string tRecord)
     {
         allModels.push_back(*itsCurrentModel);
         return true;
     }
-    
+
     bool PDBFile::extractConnectInfo(std::string tRecord)
     {
         int tSeriNum = StrToInt(tRecord.substr(0,6));
-        
+
         for (std::vector<Atom>::iterator ia=allAtomList.begin();
                 ia !=allAtomList.end(); ia++)
             if(tSeriNum==ia->getSeriNum())
             {
-                
+
                 ia->connectedAtoms.push_back(tSeriNum);
                 return true;
             }
-        
-        return false;     
+
+        return false;
     }
-    
+
     // get and set methods
     ID PDBFile::getPDBID() const
     {
         return allHeaderInfo.HEADER->PDBId;
     }
-    
+
     Date PDBFile::getDepositedDate() const
     {
         return allHeaderInfo.HEADER->depositDate;
     }
-        
-       
-    DictPDBFile::DictPDBFile() 
+
+
+    DictPDBFile::DictPDBFile()
     {
     }
-    
+
     DictPDBFile::DictPDBFile(Name tFname, std::ios_base::openmode tOpenMode)
     {
         if (tOpenMode == std::ios::in)
@@ -1135,11 +1135,11 @@ namespace LIBMOL
             setupSystem();
         }
     }
-    
+
     void DictPDBFile::setupSystem()
     {
         if (inFile.is_open() )
-        { 
+        {
             std::string tRecord="";
             while(!inFile.eof())
             {
@@ -1148,7 +1148,7 @@ namespace LIBMOL
                 StrTokenize(tRecord, tStrs);
                 if ((int)tStrs.size() >=12 )
                 {
-                    if (tStrs[0].find("HETATM") !=std::string::npos 
+                    if (tStrs[0].find("HETATM") !=std::string::npos
                          || tStrs[0].find("ATOM") !=std::string::npos)
                     {
                         ID aID(TrimSpaces(tRecord.substr(12,4)));
@@ -1161,21 +1161,21 @@ namespace LIBMOL
             inFile.close();
         }
     }
-    
-    void extern outPDB(FileName tFName, 
+
+    void extern outPDB(FileName tFName,
                        ID tMonoRootName,
                        std::vector<LIBMOL::AtomDict>& tAtoms)
     {
-        // This is a temporary one, the method should be defined outside 
+        // This is a temporary one, the method should be defined outside
         // this class.
-        std::string tName(tFName);    
-       
+        std::string tName(tFName);
+
         std::vector<std::string> parts;
         StrTokenize(tName, parts, '.');
         std::string outPDBName = parts[0] + ".pdb";
-        
+
         std::ofstream outPDB(outPDBName.c_str());
-        
+
         if(outPDB.is_open())
         {
             // Header section
@@ -1190,36 +1190,36 @@ namespace LIBMOL
             outPDB << std::left << tMonoRootName;
             outPDB.width(14);
             outPDB << std::left <<"" <<std::endl;
-                
-            // CRYST1 section 
+
+            // CRYST1 section
             outPDB.width(80);
-            outPDB << std::left 
-                   <<"CRYST1  100.000  100.000  100.000  90.00  90.00  90.00 P 1" 
+            outPDB << std::left
+                   <<"CRYST1  100.000  100.000  100.000  90.00  90.00  90.00 P 1"
                    <<std::endl;
-            
+
             // ATOM sections
             for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                     iA !=tAtoms.end(); iA++)
             {
-                
+
                 std::string tID(iA->id);
                 if (tID.find("\"") !=tID.npos)
                 {
                     char tQ='\"';
                     cleanChar(tID, tQ);
                 }
-                
+
                 //double r1 =  (double) rand()/RAND_MAX;
                 //double r2 =  (double) rand()/RAND_MAX;
                 //double r3 =  (double) rand()/RAND_MAX;
-                
+
                 outPDB.width(6);
                 outPDB <<std::left<< "HETATM";
                 outPDB.width(5);
                 outPDB <<std::right << iA->seriNum+1;
                 outPDB.width(1);
                 outPDB << " ";
-                
+
                 if ((int)tID.size() <=4)
                 {
                     outPDB.width(4);
@@ -1230,31 +1230,31 @@ namespace LIBMOL
                     outPDB.width(4);
                     outPDB << std::left << tID.substr(0,4);
                 }
-                
+
                 outPDB.width(1); // altLoc
                 outPDB << " ";
                 outPDB.width(3); // resName
                 outPDB << tMonoRootName.substr(0,3);
                 outPDB.width(1); // empty
                 outPDB << " ";
-                outPDB.width(1);  // chainID 
+                outPDB.width(1);  // chainID
                 outPDB << std::right << "A";
                 outPDB.width(4);  // resSeq
                 outPDB << std::right << "1";
                 outPDB.width(1);  // iCode
-                outPDB << " "; 
+                outPDB << " ";
                 outPDB.width(3); // empty
-                outPDB << "  "; 
+                outPDB << "  ";
                 outPDB.width(8);
-                outPDB << std::right << std::setprecision(3) 
+                outPDB << std::right << std::setprecision(3)
                         <<std::fixed << iA->coords[0];
                 outPDB.width(8);
-                outPDB << std::right << std::setprecision(3) 
+                outPDB << std::right << std::setprecision(3)
                         <<std::fixed << iA->coords[1];
                 outPDB.width(8);
-                outPDB << std::right << std::setprecision(3) 
+                outPDB << std::right << std::setprecision(3)
                         <<std::fixed << iA->coords[2];
-                
+
                 outPDB.width(6);
                 outPDB << std::right << "1.00";
                 outPDB.width(6);
@@ -1265,7 +1265,7 @@ namespace LIBMOL
                 outPDB << std::right << "" << std::endl;
             }
         }
-        
+
         outPDB.close();
     }
 }

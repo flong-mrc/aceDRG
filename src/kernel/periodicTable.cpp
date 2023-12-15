@@ -67,7 +67,7 @@ namespace LIBMOL
         elements["C"]["atomNum"] = 6;
         elements["C"]["val"]     = 4;
         elemProps["C"]["vdw"]    = 1.70;
-        elemProps["C"]["cova"]   = 0.85;    // 0.76;
+        elemProps["C"]["cova"]   = 0.76;       //0.85;    // 0.76;
         elemProps["C"]["ionM-"]   = 0.30;
 
 
@@ -215,7 +215,7 @@ namespace LIBMOL
         //elements["Na"]["vdw"]      = 2.27;
         //elements["Na"]["cova"]     = 0.97;
         elemProps["Na"]["vdw"]     = 2.27;
-        elemProps["Na"]["cova"]    = 1.13;
+        elemProps["Na"]["cova"]    = 1.66;                     //  1.13;
         elemProps["Na"]["ionM+"]   = 1.13;
 
         elements["K"]["row"]       = 4;
@@ -226,7 +226,7 @@ namespace LIBMOL
         //elements["K"]["vdw"]       = 2.75;
         //elements["K"]["cova"]      = 1.33;
         elemProps["K"]["vdw"]      = 2.75;
-        elemProps["K"]["cova"]     = 1.23;
+        elemProps["K"]["cova"]     = 2.03;
         elemProps["K"]["ionM+"]   = 1.52;
 
         elements["Rb"]["row"]      = 5;
@@ -282,7 +282,7 @@ namespace LIBMOL
         //elements["Mg"]["vdw"]      = 1.73;
         //elements["Mg"]["cova"]     = 1.10;
         elemProps["Mg"]["vdw"]     = 1.73;
-        elemProps["Mg"]["cova"]     = 1.41;
+        elemProps["Mg"]["cova"]    = 1.41;
         elemProps["Mg"]["ionM+"]   = 0.71;
 
         elements["Ca"]["row"]      = 4;
@@ -293,7 +293,7 @@ namespace LIBMOL
         //elements["Ca"]["vdw"]      = 2.00;
         //elements["Ca"]["cova"]     = 0.99;
         elemProps["Ca"]["vdw"]     = 2.00;
-        elemProps["Ca"]["cova"]    = 1.74;
+        elemProps["Ca"]["cova"]    = 1.76;
         elemProps["Ca"]["ionM+"]  = 1.14;
 
         elements["Sr"]["row"]      = 5;
@@ -569,7 +569,7 @@ namespace LIBMOL
         //elements["Fe"]["cova"]      = 1.34;
         elemProps["Fe"]["vdw"]      = 1.40;
         elemProps["Fe"]["cova"]     = 1.32;
-        elemProps["Fe"]["ionM+"]    = 0.75;
+        elemProps["Fe"]["ionM+"]    = 0.85;
         //elemProps["Fe3+"]["cova"]   = 0.69;
         //elemProps["Fe4+"]["cova"]   = 0.725;
         //elemProps["Fe6+"]["cova"]   = 0.39;
@@ -688,7 +688,7 @@ namespace LIBMOL
         //elements["Pd"]["vdw"]       = 1.63;
         //elements["Pd"]["cova"]      = 1.50;
         elemProps["Pd"]["vdw"]      = 1.63;
-        elemProps["Pd"]["cova"]     =  1.50;  //1.39;
+        elemProps["Pd"]["cova"]     =  1.39;  //1.50;  //1.39;
         elemProps["Pd"]["ionM+"]    = 0.73;
         //elemProps["Pd2+"]["cova"]    = 1.00;
         //elemProps["Pd3+"]["cova"]      = 0.90;
@@ -726,7 +726,7 @@ namespace LIBMOL
         //elements["Cu"]["vdw"]       = 1.40;
         //elements["Cu"]["cova"]      = 1.52;
         elemProps["Cu"]["vdw"]      = 1.40;
-        elemProps["Cu"]["cova"]     = 1.32;
+        elemProps["Cu"]["cova"]     = 1.20;     // 1.32;
         elemProps["Cu"]["ionM+"]    = 0.91;
         //elemProps["Cu2+"]["cova"]    = 0.87;
         //elemProps["Cu3+"]["cova"]    = 0.68;
@@ -739,7 +739,7 @@ namespace LIBMOL
         //elements["Ag"]["vdw"]       = 1.72;
         //elements["Ag"]["cova"]      = 1.59;
         elemProps["Ag"]["vdw"]      = 1.72;
-        elemProps["Ag"]["cova"]     = 1.45;
+        elemProps["Ag"]["cova"]     = 1.25;//1.45;
         elemProps["Ag"]["ionM+"]    = 1.29;
         //elemProps["Ag2+"]["cova"]    = 1.08;
         //elemProps["Ag3+"]["cova"]    = 0.89;
@@ -817,8 +817,8 @@ namespace LIBMOL
         elements["Al"]["matType"]   = 6;
         elements["Al"]["atomNum"]   = 13;
         elements["Al"]["val"]       = 3;
-        //elements["Al"]["vdw"]       = 1.25;
-        //elements["Al"]["cova"]      = 1.35;
+        //elements["Al"]["vdw"]     = 1.25;
+        //elements["Al"]["cova"]    = 1.35;
         elemProps["Al"]["vdw"]      = 1.25;
         elemProps["Al"]["cova"]     = 1.21;
         elemProps["Al"]["ionM+"]    = 0.675;
@@ -1264,24 +1264,33 @@ namespace LIBMOL
         elemProps["Lr"]["cova"]     = 1.80;       // not sure
         elemProps["Lr"]["ionM+"]    = 1.08;
 
-        //some elements have multiple valences
+        //Organic elements which have multiple valences
 
         extraValences["P"].push_back(3);
 
         extraValences["N"].push_back(5);
 
-        extraValences["S"].push_back(2);
         extraValences["S"].push_back(4);
+        extraValences["S"].push_back(6);
 
         extraValences["Se"].push_back(2);
         extraValences["Se"].push_back(4);
 
-        extraValences["Hg"].push_back(1);
-        extraValences["Cu"].push_back(1);
+        extraValences["I"].push_back(3);
+        extraValences["I"].push_back(5);
 
         extraValences["Br"].push_back(3);
         extraValences["Br"].push_back(5);
         extraValences["Br"].push_back(7);
+
+        extraValences["B"].push_back(4);
+        extraValences["B"].push_back(5);
+        extraValences["B"].push_back(6);
+
+        // Other elements which have multiple valences
+        extraValences["Cu"].push_back(1);
+        extraValences["Hg"].push_back(1);
+
 
         for (std::map<ID, std::map<ID, int> >::iterator iEl=elements.begin();
                 iEl!=elements.end(); iEl++)

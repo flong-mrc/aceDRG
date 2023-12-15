@@ -525,6 +525,17 @@ int main(int argc, char** argv) {
         }
 
     }
+    else if (AJob.workMode == 350)
+    {
+        if (AJob.IOEntries.find("inPdbName") !=AJob.IOEntries.end())
+        {
+            std::cout << "Input coordinate file "
+                      << AJob.IOEntries["inPdbName"] << std::endl;
+            LIBMOL::PDBFile dataFromPdb(AJob.IOEntries["inPdbName"].c_str(), std::ios::in);
+            LIBMOL::MolGenerator  aMolCreator(dataFromPdb);
+            aMolCreator.executePdb(AJob.IOEntries["userOutName"].c_str());
+        }
+    }
     else if (AJob.workMode == 41)
     {
 
@@ -554,10 +565,6 @@ int main(int argc, char** argv) {
                                                aCodSystem.allRingsV);
 
         }
-    }
-    else if (AJob.workMode == 43)
-    {
-
     }
     else if (AJob.workMode == 43)
     {
@@ -712,6 +719,15 @@ int main(int argc, char** argv) {
                                dataFromCif.allBonds,
                                dataFromCif.allRingsV);
 
+                outMMCif3(AJob.IOEntries["userOutName"].c_str(),
+                         AJob.IOEntries["monoRootName"],
+                         dataFromCif.allAtoms,
+                         dataFromCif.allBonds,
+                         dataFromCif.allRingsV);
+
+                aKTool.outBandC(AJob.IOEntries["userOutName"].c_str(),
+                         dataFromCif.allAtoms,
+                         dataFromCif.allBonds);
 
 
             }

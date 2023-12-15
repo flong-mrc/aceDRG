@@ -81,6 +81,8 @@ class AcedrgRDKit(object):
         self.conformerEngMap = {}
         self.numSelectForRefConfs = 25
         self.selecConformerIds = []
+        
+        self.atomPDPCMap = {}
 
         self.hasCCP4Type = False
 
@@ -379,7 +381,6 @@ class AcedrgRDKit(object):
             #print("file %s aTmpMode %d"%(tFileName,  aTmpMode))
             self.setOtherMolInfo(aMolT, tNumConf, tChemCheck,
                                  tPH, tNameMap, tMode, tChargeList, aTmpMode)
-            
             
             """
             lenA = len(self.moleculesA)
@@ -1063,12 +1064,14 @@ class AcedrgRDKit(object):
             for aAtom in tMol.GetAtoms():
                 aS = str(dictAtomNames[aAtom.GetIdx()])
                 aAtom.SetProp("Name", aS)
+                aAtom.SetProp("altName", aS)
         else:
             if tStage == 0:
                 # for non-H atoms
                 for aAtom in tMol.GetAtoms():
                     if aAtom.GetSymbol() != "H":
                         aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()])
+                        aAtom.SetProp("altName", tNameMap["nonH_alt"][aAtom.GetIdx()])
             elif tStage == 1:
                 if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
                     self.setNamesForHAtomsInMol_PP(tMol, tNameMap, tChemCheck)
@@ -1085,6 +1088,7 @@ class AcedrgRDKit(object):
             for aAtom in tMol.GetAtoms():
                 if aAtom.GetSymbol() != "H":
                     aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()])
+                    aAtom.SetProp("altName", tNameMap["nonH_alt"][aAtom.GetIdx()])
         elif tStage == 1:
             if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
                 self.setNamesForHAtomsInMol_PP(tMol, tNameMap, tChemCheck)
@@ -1232,7 +1236,13 @@ class AcedrgRDKit(object):
                             else:
                                 nExtra += 1
                                 tHName = hRootId + str(nExtra)
-
+        
+        
+        for aAtom in allAtoms:
+            if aAtom.GetSymbol() =="H":
+                if not aAtom.HasProp("altName"):
+                    aAtom.SetProp("altName", aAtom.GetProp("Name"))
+                    
         # for aAtom in allAtoms:
         #    if aAtom.GetSymbol() =="H":
         #        aSetBonds = aAtom.GetBonds()
@@ -1799,6 +1809,8 @@ class AcedrgRDKit(object):
 
     def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None, tMapMode=0):
 
+        # For molecule diff between  in/out in prot/de-prot or charges 
+        self.atomPDPCMap.clear()
         
         print("A molecule with residue name %s is generated" %
               tMol.GetProp("ResidueName"))
@@ -1832,7 +1844,19 @@ class AcedrgRDKit(object):
 
         Chem.SanitizeMol(tMol)
         Chem.Kekulize(tMol)
-
+        # Check 
+        for aAtom in tMol.GetAtoms():
+            self.atomPDPCMap[aAtom.GetIdx()]={}
+            self.atomPDPCMap[aAtom.GetIdx()]["origC"] = aAtom.GetFormalCharge()
+            self.atomPDPCMap[aAtom.GetIdx()]["newC"]  = self.atomPDPCMap[aAtom.GetIdx()]["origC"]
+            self.atomPDPCMap[aAtom.GetIdx()]["origH"] = aAtom.GetTotalNumHs()
+            self.atomPDPCMap[aAtom.GetIdx()]["newH"]  = self.atomPDPCMap[aAtom.GetIdx()]["origH"]
+            #print("atom idx : %d  its element %s : "
+            #      %(aAtom.GetIdx(),  aAtom.GetSymbol()))
+            #print("The original Number of H it connnects %d"%aAtom.GetTotalNumHs())
+            #print("Its original charge %d"%aAtom.GetFormalCharge())
+        
+        
         # Make sure an atom in the molecule has the same charge in the input file.
         # RDKit sometimes change it when initiating the molecule
         if tChargeList:
@@ -1913,6 +1937,16 @@ class AcedrgRDKit(object):
             else:
                 self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
+        
+        print("After p/dp process: ")
+        for aAtom in tMol.GetAtoms():
+            if aAtom.GetSymbol() != "H":
+                print("atom idx : %d  its element %s : "
+                      %(aAtom.GetIdx(),  aAtom.GetSymbol()))
+                print("The original Number of H it connnects %d"%aAtom.GetTotalNumHs())
+                print("Its original charge %d"%aAtom.GetFormalCharge())
+                self.atomPDPCMap[aAtom.GetIdx()]["newC"] = aAtom.GetFormalCharge()
+                self.atomPDPCMap[aAtom.GetIdx()]["newH"] = aAtom.GetTotalNumHs()
 
         # if self.reSetChirals:
         #    self.reAssignChirals(aMol)
@@ -2266,6 +2300,7 @@ class AcedrgRDKit(object):
             aMmCif.write("loop_\n")
             aMmCif.write("_chem_comp_atom.comp_id\n")
             aMmCif.write("_chem_comp_atom.atom_id\n")
+            aMmCif.write("_chem_comp_atom.alt_atom_id\n")
             aMmCif.write("_chem_comp_atom.type_symbol\n")
             aMmCif.write("_chem_comp_atom.type_energy\n")
             aMmCif.write("_chem_comp_atom.charge\n")
@@ -2282,8 +2317,14 @@ class AcedrgRDKit(object):
                 #nTetraChi +=1
                 # elif aAtom.HasProp("TmpChiral") !=0:
                 #    nTetraChi +=1
-                aMmCif.write("%s         %s      %s    %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
-                             % (tMonoName, aAtom.GetProp("Name"), aAtom.GetSymbol(),
+                aName    = aAtom.GetProp("Name")
+                aAltName = ""
+                if aAtom.HasProp("altName"):
+                    aAltName = aAtom.GetProp("altName")
+                else:
+                    aAltName = aName
+                aMmCif.write("%s         %s      %s      %s     %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                             % (tMonoName, aName, aAltName, aAtom.GetSymbol(),
                                 aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), pos.x, pos.y, pos.z))
             # Bond section
             aMmCif.write("#\n")
@@ -2735,6 +2776,21 @@ class AcedrgRDKit(object):
 
     def setAllFormalChargeFuncGroupAtoms(self, tMol, tPH=7.0):
 
+        # Check if there are errors in assigned bond-orders
+        for aAtom in tMol.GetAtoms():
+            elem = aAtom.GetSymbol()
+            if elem !="H":
+                if elem =="N":
+                    dV =self.chemCheck.defaultBo[elem] - aAtom.GetTotalValence()
+                    print ("atom %s dV=%d"%(elem, dV))
+                    print("Total valence ", aAtom.GetTotalValence())
+                    print("Default valence ", self.chemCheck.defaultBo[elem])
+                    print("Formal charge ", aAtom.GetFormalCharge())
+                    bonds = aAtom.GetBonds()
+                    for aB in bonds:
+                        print("a bond of ", aB.GetBondType())
+
+
         print("Is the molecule contains peptides %s ?" % self.isPEP)
         self.getAllFuncGroupAtoms(tMol)
         if len(self.funcGroups):
@@ -3027,7 +3083,7 @@ class AcedrgRDKit(object):
                         print("num of neighbor ", len(
                             tMol.GetAtomWithIdx(aIdx).GetNeighbors()))
                         if tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 \
-                                and tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 1:
+                                and tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() == 1:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                             print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),

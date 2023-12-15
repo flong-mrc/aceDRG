@@ -71,6 +71,27 @@ namespace LIBMOL {
 
     }
 
+    MolGenerator::MolGenerator(const PDBFile &  tPdbObj)
+    {
+        for (std::vector<Atom>::const_iterator iA = tPdbObj.allHetAtmList.begin();
+                iA != tPdbObj.allHetAtmList.end(); iA++)
+        {
+            AtomDict aAtom(*iA);
+            allAtoms.push_back(*iA);
+        }
+        for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
+                iA != allAtoms.end(); iA++)
+        {
+            std::cout << "Atom " << iA->id << std::endl
+                      << "its serial number " << iA->seriNum << std::endl
+                      << "its element " << iA->chemType << std::endl
+                      << "its x " << iA->coords[0] << std::endl
+                      << "its y " << iA->coords[1] << std::endl
+                      << "its z " << iA->coords[2] << std::endl;
+        }
+
+    }
+
     MolGenerator::~MolGenerator() {
     }
 
@@ -328,6 +349,7 @@ namespace LIBMOL {
                             iMol != aSetOfFiniteMols.end(); iMol++)
                     {
                         iMol->setAtomCartCoordFromFracCoord(iCryst);
+                        iMol->getAllTorsions();
                         allMolecules.push_back(*iMol);
                     }
 
@@ -370,7 +392,7 @@ namespace LIBMOL {
                     */
 
                     getOverallBondAndAnglesNew();
-
+                    setBondOrderAndChargeInMols(allMolecules);
                     outTables(tOutName, allMolecules, aSetOfInfMols);
 
                 }
@@ -899,8 +921,31 @@ namespace LIBMOL {
                 }
             }
         }
+    }
+
+    void MolGenerator::executePdb(FileName tOutName)
+    {
+        CCP4DictParas tCCP4EnergParas;
+        ccp4DictParas.push_back(tCCP4EnergParas);
+        PeriodicTable aPTable;
+
+        std::vector<ID> allMetals;
+        initMetalTab(allMetals);
+        checkMetal(allMetals);
+
+        if (allAtoms.size() > 1)
+        {
+            getUniqueAtomLinksPdb(aPTable);
+            buildMolsPdb(aPTable);
+            int aMode =1;
+            for (unsigned i=0; i < allMolecules.size(); i++)
+            {
+                outMolMmcif(tOutName, allMolecules[i].id, allMolecules[i], aMode);
+            }
+        }
 
     }
+
 
     void MolGenerator::getUserParasList(FileName tInName,
                                         std::map<std::string,
@@ -1100,7 +1145,7 @@ namespace LIBMOL {
                     double aStdev = StrToReal(tBuf[4]);
 
                     float  aFac   = tRadFac;
-                    float  aDelta = aFac/10.0;
+                    float  aDelta = aFac/20.0;
                     float  aFS    = aFac*aStdev;
                     //if ( aFS>= aDelta*aL)
                     //{
@@ -2097,6 +2142,7 @@ namespace LIBMOL {
         // Cancel lower boundary for allowed values
 
         setMetalBondRangeFromTable(tRadFac);
+        std::cout << "tRadFac=" <<  tRadFac << std::endl;
         setMetalBondRangeFromPeriodicTable(tRadFac, tPTab);
 
         REAL covalent_sensitivity0 = 0.15;
@@ -2131,7 +2177,7 @@ namespace LIBMOL {
         //std::cout << "NB list for allAtoms set " << std::endl;
 
 
-
+        /*
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                 iAt !=allAtoms.end(); iAt++)
         {
@@ -2150,6 +2196,7 @@ namespace LIBMOL {
 
             }
         }
+        */
 
 
 
@@ -2249,7 +2296,7 @@ namespace LIBMOL {
                     covalent_sensitivity = covalent_sensitivity2;
                 }
 
-                // std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl;
+                //std::cout << "covalent_sensitivity=" << covalent_sensitivity << std::endl;
 
                 getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                         covalent_sensitivity, tPTab,
@@ -2271,14 +2318,14 @@ namespace LIBMOL {
                         if (metalBondRange[elem1].find(elem2)
                              !=metalBondRange[elem1].end())
                         {
-                            if (allAtoms[i].id.compare("Mo")==0)
-                            {
-                                std::cout << "Range2 between "
-                                          <<  metalBondRange[elem1][elem2]["min"]
-                                          << " and " << metalBondRange[elem1][elem2]["max"]
-                                          << " for elements " << elem1
-                                          << " and " << elem2 << std::endl;
-                            }
+                            //if (allAtoms[i].id.compare("Mo")==0)
+                            //{
+                            //    std::cout << "Range2 between "
+                            //              <<  metalBondRange[elem1][elem2]["min"]
+                            //              << " and " << metalBondRange[elem1][elem2]["max"]
+                            //              << " for elements " << elem1
+                            //              << " and " << elem2 << std::endl;
+                            //}
                             double mLowB
                             = 0.98*metalBondRange[elem1][elem2]["min"];
                             double mUpperB
@@ -2289,7 +2336,8 @@ namespace LIBMOL {
                             }
                             if (mUpperB > bondRange[1])
                             {
-                                bondRange[1] = mUpperB;
+                                double dR=mUpperB -bondRange[1];
+                                bondRange[1] = bondRange[1] + 0.5*dR;       //mUpperB;
                             }
                         }
 
@@ -2318,24 +2366,6 @@ namespace LIBMOL {
                 if (bondRange[0] > 0.20 && bondRange[1] > 0.20)
                 {
 
-                    if (allAtoms[i].id.compare("Mo")==0)
-                    {
-                    std::cout << "Distance between: " << std::endl
-                                      << "Atom 1 " << allAtoms[i].id
-                                      << " of serial number "
-                                      << allAtoms[i].seriNum
-                                      << " from original atom "
-                                      << allAtoms[allAtoms[i].fromOrig].id
-                                      << std::endl
-                                      << "Atom 2 " << allAtoms[*iNB].id
-                                      << " of serial number " << allAtoms[*iNB].seriNum
-                                      << " from original atom "
-                                      << allAtoms[allAtoms[*iNB].fromOrig].id
-                                      << " is " << rD << std::endl;
-                    std::cout << "Range between " << bondRange[0]
-                                      << " and " << bondRange[1] << std::endl;
-
-                    }
 
                     if (bondRange[0] > 0.5)
                     {
@@ -2365,14 +2395,12 @@ namespace LIBMOL {
                                 allAtoms[*iNB].bondLengths.push_back(rD);
                             }
                         }
-                        /*
-                        if (allAtoms[i].chemType.compare("C") ==0
-                            || allAtoms[*iNB].chemType.compare("H")==0)
-                        {
+
+
 
                             //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
                             //          << " neighbor atoms. " << std::endl;
-
+                            /*
                             std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id
                                       << " of serial number "
@@ -2396,9 +2424,8 @@ namespace LIBMOL {
                                       << " is added to the bond_list_cell "
                                       << std::endl << "Its bond length is " << rD
                                       << std::endl;
+                             */
 
-                        }
-                        */
                     }
                 }
             }
@@ -2711,8 +2738,8 @@ namespace LIBMOL {
                         //if (allAtoms[i].chemType.compare("H") ==0
                         //    || allAtoms[*iNB].chemType.compare("H")==0)
                         //{
-                        if(allAtoms[i].isInPreCell && lMetal1)
-                        {
+                        //if(allAtoms[i].isInPreCell && lMetal1)
+                        //{
                             //std::cout << "Its has "
                             //          << allAtoms[i].neighbAtoms.size()
                             //          << " neighbor atoms. " << std::endl;
@@ -2740,7 +2767,8 @@ namespace LIBMOL {
                                       << " is added to the bond_list_cell "
                                       << std::endl << "Its bond length is " << rD
                                       << std::endl;
-                        }
+
+                        //}
                     }
                 }
             }
@@ -2785,6 +2813,7 @@ namespace LIBMOL {
     {
         if (metalBondRange3.find(tElem1)!=metalBondRange3.end())
         {
+
             if (metalBondRange3[tElem1].find(tElem2)
                     !=metalBondRange3[tElem1].end())
             {
@@ -2826,6 +2855,7 @@ namespace LIBMOL {
         }
         else if (metalBondRange2.find(tElem1)!=metalBondRange2.end())
         {
+
             if (metalBondRange2[tElem1].find(tElem2)
                     !=metalBondRange2[tElem1].end())
             {
@@ -3101,7 +3131,7 @@ namespace LIBMOL {
 
                             //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
                             //          << " neighbor atoms. " << std::endl;
-
+                            /*
                             std::cout << "Distance between: " << std::endl
                                       << "Atom 1 " << allAtoms[i].id
                                       << " of serial number "
@@ -3125,6 +3155,7 @@ namespace LIBMOL {
                                       << " is added to the bond_list_cell "
                                       << std::endl << "Its bond length is " << rD
                                       << std::endl;
+                            */
 
                         }
                     }
@@ -3215,7 +3246,7 @@ namespace LIBMOL {
 
     void MolGenerator::getUniqueAtomLinksMet(double         &   tRadFac,
                                              double         &   tAngCut,
-                                             PeriodicTable  & tPTab,
+                                             PeriodicTable  &   tPTab,
                                              std::vector<CrystInfo>::iterator tCryst)
     {
         getUniqueAtomLinks2(tRadFac, tPTab, tCryst);
@@ -3223,6 +3254,7 @@ namespace LIBMOL {
         checkAtomLinks(tCryst);
 
         checkAtomLinksByAngles2(tAngCut, tCryst);
+
         // compileMetalAtomNB();
 
         for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
@@ -3244,6 +3276,304 @@ namespace LIBMOL {
                 }
             }
         }
+    }
+
+    void MolGenerator::getUniqueAtomLinksPdb(PeriodicTable & tPTab)
+    {
+
+        REAL covalent_sensitivity0 = 0.15;
+        REAL covalent_sensitivity1 = 0.22;
+        REAL covalent_sensitivity2 = 0.240;
+        REAL covalent_sensitivity3 = 0.26;
+        REAL covalent_sensitivity4 = 0.60;
+
+        REAL covalent_sensitivity = covalent_sensitivity0;
+
+        NeighbListDict tNBListOfSystem;
+
+        int aDim = 3;
+        int aMode = 0;
+        REAL tCellL, tCellShell;
+
+        //if (lHasMetal)
+        //{
+           tCellL = 4.5;
+           tCellShell = 1.0;
+        //}
+        //else
+        //{
+        //    tCellL= 3.5;
+        //    tCellShell = 0.5;
+        //}
+
+
+        tNBListOfSystem.building(allAtoms, aDim, tCellL, tCellShell, aMode);
+
+
+        //std::cout << "NB list for allAtoms set " << std::endl;
+
+
+
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt !=allAtoms.end(); iAt++)
+        {
+
+
+            std::cout << "atom "<< iAt->id << "(serial number "
+                      << iAt->seriNum  <<") has " << iAt->neighbAtoms.size()
+                      << " NB atoms " << std::endl;
+
+
+            for (std::vector<int>::iterator iNB=iAt->neighbAtoms.begin();
+                    iNB != iAt->neighbAtoms.end(); iNB++)
+            {
+                std::cout << "NB atom " << allAtoms[*iNB].id << std::endl;
+            }
+
+
+        }
+
+
+        // std::vector<std::string>   existBondID;
+        // int j=0;
+        for (unsigned i = 0; i < allAtoms.size(); i++)
+        {
+            //if (allAtoms[i].sId=="555")
+            //{
+            //j++;
+            //std::cout << "Look for bonds to atom " << allAtoms[i].id
+            //          << "(serial number  " << allAtoms[i].seriNum
+            //          << ") " << std::endl;
+            bool lMetal = false;
+            if (allAtoms[i].isMetal)
+            {
+                lMetal = true;
+            }
+            ID elem1 = allAtoms[i].chemType;
+            for (std::vector<int>::iterator iNB = allAtoms[i].neighbAtoms.begin();
+                    iNB != allAtoms[i].neighbAtoms.end(); iNB++)
+            {
+
+                ID elem2 = allAtoms[(*iNB)].chemType;
+                REAL rD = distanceV(allAtoms[i].coords, allAtoms[(*iNB)].coords);
+
+
+                if (allAtoms[i].isMetal && allAtoms[(*iNB)].isMetal)
+                {
+                    metalRelatedMetalNBs[allAtoms[i].seriNum][allAtoms[(*iNB)].seriNum]
+                            = rD;
+
+
+                }
+
+
+                    ID id1 = allAtoms[i].id, id2 = allAtoms[(*iNB)].id;
+                    std::list<std::string> tIds;
+                    tIds.push_back(id1);
+                    tIds.push_back(id2);
+                    tIds.sort(compareNoCase2);
+                    std::string aCombID;
+                    int nRS = 0;
+                    for (std::list<std::string>::iterator iId = tIds.begin();
+                        iId != tIds.end(); iId++)
+                    {
+                        if (nRS == 0)
+                        {
+                            aCombID.append(*iId);
+                        } else
+                        {
+                            aCombID.append("_" + *iId);
+                        }
+                        nRS++;
+                    }
+
+
+                    //ID elem1 = allAtoms[i].chemType,
+                    //   elem2 = allAtoms[(*iNB)].chemType;
+                    if (std::find(distsNBs[elem1][elem2][rD].begin(),
+                                  distsNBs[elem1][elem2][rD].end(), aCombID)
+                             ==distsNBs[elem1][elem2][rD].end())
+                    {
+                        distsNBs[elem1][elem2][rD].push_back(aCombID);
+                    }
+
+                    if (lMetal && rD < 4.0)
+                    {
+                        metalNBs[i].push_back(*iNB);
+                    }
+
+
+
+                std::vector<REAL> bondRange;
+
+                if ((allAtoms[i].chemType == "H" && allAtoms[*iNB].chemType == "O")
+                        || (allAtoms[i].chemType == "O" && allAtoms[*iNB].chemType == "H")) {
+
+                    covalent_sensitivity = covalent_sensitivity4;
+
+                } else if (allAtoms[*iNB].chemType == "O" || allAtoms[i].chemType == "O") {
+
+                    covalent_sensitivity = covalent_sensitivity3;
+                } else if (allAtoms[*iNB].chemType == "H"
+                        || allAtoms[i].chemType == "H") {
+                    covalent_sensitivity = covalent_sensitivity3;
+                } else if ((!allAtoms[i].isMetal) && (!allAtoms[*iNB].isMetal)) {
+                    covalent_sensitivity = covalent_sensitivity1;
+                }else if (allAtoms[i].isMetal && allAtoms[(*iNB)].isMetal){
+                   covalent_sensitivity = covalent_sensitivity0;
+                }
+                else if( (allAtoms[i].isMetal && !allAtoms[(*iNB)].isMetal)
+                          ||(allAtoms[*iNB].isMetal && !allAtoms[(i)].isMetal))
+                {
+                   covalent_sensitivity = covalent_sensitivity0;
+                }
+                else
+                {
+                    covalent_sensitivity = covalent_sensitivity2;
+                }
+
+                // std::cout << "covalent_sensitivity="
+                //           << covalent_sensitivity << std::endl;
+
+                getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
+                                          covalent_sensitivity, tPTab,
+                                          bondRange);
+
+                /*
+                if (lMetal)
+                {
+
+                    if (metalBondRange.find(elem1)!=metalBondRange.end())
+                    {
+                        if (metalBondRange[elem1].find(elem2)
+                             !=metalBondRange[elem1].end())
+                        {
+                            double mLowB
+                            = 0.98*metalBondRange[elem1][elem2]["min"];
+                            double mUpperB
+                            = 1.02*metalBondRange[elem1][elem2]["max"];
+                            if (mLowB < bondRange[0])
+                            {
+                                bondRange[0] = mLowB;
+                            }
+                            if (mUpperB > bondRange[1])
+                            {
+                                bondRange[1] = mUpperB;
+                            }
+                        }
+                    }
+
+
+                    std::cout << "Distance between: " << std::endl
+                                      << "Atom 1 " << allAtoms[i].id
+                                      << " of serial number "
+                                      << allAtoms[i].seriNum
+                                      << " from original atom "
+                                      << allAtoms[allAtoms[i].fromOrig].id
+                                      << std::endl
+                                      << "Atom 2 " << allAtoms[*iNB].id
+                                      << " of serial number " << allAtoms[*iNB].seriNum
+                                      << " from original atom "
+                                      << allAtoms[allAtoms[*iNB].fromOrig].id
+                                      << " is " << rD << std::endl;
+                    std::cout << "Range between " << bondRange[0]
+                                      << " and " << bondRange[1] << std::endl;
+
+                }
+                */
+
+                if (bondRange[0] > 0.20 && bondRange[1] > 0.20)
+                {
+                    if (rD > bondRange[0] && rD < bondRange[1])
+                    {
+
+                        // setOneUniqueBondCell(i, *iNB, rD);
+                        if (std::find(allAtoms[i].connAtoms.begin(), allAtoms[i].connAtoms.end(), *iNB)
+                                == allAtoms[i].connAtoms.end()) {
+                            allAtoms[i].connAtoms.push_back(*iNB);
+                            if (!inVectABS(allAtoms[i].bondLengths, rD, 0.000001))
+                            {
+                                allAtoms[i].bondLengths.push_back(rD);
+                            }
+
+                        }
+                        if (std::find(allAtoms[*iNB].connAtoms.begin(),
+                                      allAtoms[*iNB].connAtoms.end(), i)
+                                      == allAtoms[*iNB].connAtoms.end())
+                        {
+                            allAtoms[*iNB].connAtoms.push_back(i);
+                            if (!inVectABS(allAtoms[*iNB].bondLengths, rD, 0.000001))
+                            {
+                                allAtoms[*iNB].bondLengths.push_back(rD);
+                            }
+                        }
+
+                        //if (allAtoms[i].chemType.compare("H") ==0
+                        //    || allAtoms[*iNB].chemType.compare("H")==0)
+                        //{
+
+                            //std::cout << "Its has " << allAtoms[i].neighbAtoms.size()
+                            //          << " neighbor atoms. " << std::endl;
+
+                            std::cout << "Distance between: " << std::endl
+                                      << "Atom 1 " << allAtoms[i].id
+                                      << " of serial number "
+                                      << allAtoms[i].seriNum
+                                      << " from original atom "
+                                      << allAtoms[allAtoms[i].fromOrig].id
+                                      << std::endl
+                                      << "Atom 2 " << allAtoms[*iNB].id
+                                      << " of serial number " << allAtoms[*iNB].seriNum
+                                      << " from original atom "
+                                      << allAtoms[allAtoms[*iNB].fromOrig].id
+                                      << " is " << std::endl << rD
+                                      << std::endl;
+                            std::cout << "Range between " << bondRange[0]
+                                      << " and " << bondRange[1] << std::endl;
+
+
+                            std::cout << "a bond between "
+                                      << allAtoms[i].id << " and "
+                                      << allAtoms[*iNB].id
+                                      << " is added to the bond_list_cell "
+                                      << std::endl << "Its bond length is " << rD
+                                      << std::endl;
+
+
+                        //}
+                    }
+                }
+            }
+        }
+
+        // std::cout << "Number of atoms in the unit cell considered " << j << std::endl;
+
+        // cleanUnconnAtoms();
+        /*
+        std::cout << "*********************************" << std::endl;
+        std::cout << "Before check " << std::endl
+                  << "*********************************" << std::endl;
+
+        for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                iAt != allAtoms.end(); iAt++) {
+            if (iAt->isInPreCell) {
+                std::cout << "Atom " << iAt->id << " (serial number " << iAt->seriNum
+                        << " ) bonds to " << iAt->connAtoms.size() << " atoms"
+                        << std::endl;
+                // std::cout << "The NB atoms are :" << std::endl;
+                for (std::vector<int>::iterator iC = iAt->connAtoms.begin();
+                        iC != iAt->connAtoms.end(); iC++) {
+                    std::cout << "A 1st NB atoms is :" << std::endl;
+                    std::cout << "Atom " << allAtoms[*iC].id
+                            << " of serial number " << allAtoms[*iC].seriNum
+                            << std::endl;
+                    //std::cout << "it connects to "
+                    //        << allAtoms[allAtoms[*iC].fromOrig].connAtoms.size()
+                    //        << " 2nd NB atoms " << std::endl << std::endl;
+                }
+            }
+        }
+        */
     }
 
     void MolGenerator::compileMetalAtomNB()
@@ -3806,7 +4136,7 @@ namespace LIBMOL {
                            checkIfBondInSameRing(tMol.atoms, iAt->seriNum, *iCo);
                     tMol.allBonds.push_back(aBond);
 
-
+                    /*
                     std::cout << "a bond between " << iAt->id
                               << " of element " << iAt->chemType
                               << " and " << tMol.atoms[(*iCo)].id
@@ -3814,7 +4144,7 @@ namespace LIBMOL {
                               << " is added to the bond_list_cell "
                               << std::endl << "Its bond length is " << aBond.value
                               << std::endl;
-
+                    */
                     /*
                     if (aBond.isInSameRing)
                     {
@@ -3841,7 +4171,7 @@ namespace LIBMOL {
 
         // Tests on the extra-electrons scheme
         setAtomNFormalCharge(tMol);
-        setAllAtomEXcessElectrons(tMol.atoms);
+        // setAllAtomEXcessElectrons(tMol.atoms);
         setAtomsNB1NB2_exElectrons(tMol.atoms);
 
 
@@ -4017,8 +4347,9 @@ namespace LIBMOL {
             std::cout << "tRad "    << tRad  << std::endl;
             std::cout << "tSen "    << tSens << std::endl;
             std::cout << "tExtraD " << std::endl;
+            std::cout << "range0=" <<  tRange[0] << std::endl;
+            std::cout << "range1=" <<  tRange[1] << std::endl;
             */
-
             if (tAtm1.chemType == "H"
                 || tAtm2.chemType == "H")
             {
@@ -4919,12 +5250,37 @@ namespace LIBMOL {
 
         std::string errInfoStr;
         bool tOkStruct = validateBondValueDiffStruct(allMolecules, errInfoStr);
-        if (!tOkStruct) {
-
+        if (!tOkStruct)
+        {
             allMolecules.clear();
             std::cout << errInfoStr << std::endl;
         }
     }
+
+    void MolGenerator::buildMolsPdb(PeriodicTable & tPTab)
+    {
+        Molecule aMol;
+        aMol.seriNum = 0;
+        if (allAtoms.size() > 0)
+        {
+            aMol.id = allAtoms[0].resName;
+            for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                 iAt !=allAtoms.end(); iAt++)
+            {
+                 aMol.atoms.push_back(*iAt);
+            }
+
+            allMolecules.push_back(aMol);
+
+            setBondOrderAndChargeInMols(allMolecules);
+
+
+        }
+
+
+
+    }
+
 
     bool MolGenerator::checEquiMoles(std::vector<Molecule> & tSetMols,
             Molecule& tMol)
@@ -5466,15 +5822,19 @@ namespace LIBMOL {
         getBondingRangePairAtoms2(allAtoms[tBo->atomsIdx[0]], allAtoms[tBo->atomsIdx[1]],
                 covalent_sensitivity, tPTab, linkRange);
 
-        if (tBo->value < linkRange[0] && tBo->value > linkRange[1]) {
-            tErrInfo = "Bond between " + allAtoms[tBo->atomsIdx[0]].id
+        if (!allAtoms[tBo->atomsIdx[0]].isMetal&& allAtoms[tBo->atomsIdx[1]].isMetal)
+        {
+            if (tBo->value < linkRange[0] && tBo->value > linkRange[1])
+            {
+                tErrInfo = "Bond between " + allAtoms[tBo->atomsIdx[0]].id
                     + " serial number " + IntToStr(allAtoms[tBo->atomsIdx[0]].seriNum)
                     + " and " + allAtoms[tBo->atomsIdx[1]].id
                     + " serial number " + IntToStr(allAtoms[tBo->atomsIdx[1]].seriNum)
                     + " is " + RealToStr(tBo->value)
                     + "It should be between " + RealToStr(linkRange[0]) + " and "
                     + RealToStr(linkRange[1]);
-            return false;
+                return false;
+            }
         }
 
         return true;
@@ -5538,25 +5898,27 @@ namespace LIBMOL {
                                   tMol.atoms[tBo->atomsIdx[1]],
                                   covalent_sensitivity, tPTab, linkRange);
 
-
-        if (tBo->value < linkRange[0] || tBo->value > linkRange[1]) {
-
-            std::cout << " covalent_sensitivity "
-                      << covalent_sensitivity << std::endl;
-            std::cout << "atom1 " << tMol.atoms[tBo->atomsIdx[0]].id << std::endl
+        if (!allAtoms[tBo->atomsIdx[0]].isMetal&& allAtoms[tBo->atomsIdx[1]].isMetal)
+        {
+            if (tBo->value < linkRange[0] || tBo->value > linkRange[1])
+            {
+                std::cout << " covalent_sensitivity "
+                          << covalent_sensitivity << std::endl;
+                std::cout << "atom1 " << tMol.atoms[tBo->atomsIdx[0]].id << std::endl
                       << "atom2 " << tMol.atoms[tBo->atomsIdx[1]].id << std::endl;
-            std::cout << "bond: low boundary  " << linkRange[0] <<  std::endl;
-            std::cout << "high boundary " << linkRange[1] << std::endl;
-            std::cout << "bond value  " << tBo->value << std::endl;
-            tErrInfo = "Bond between " + tMol.atoms[tBo->atomsIdx[0]].id
+                std::cout << "bond: low boundary  " << linkRange[0] <<  std::endl;
+                std::cout << "high boundary " << linkRange[1] << std::endl;
+                std::cout << "bond value  " << tBo->value << std::endl;
+                tErrInfo = "Bond between " + tMol.atoms[tBo->atomsIdx[0]].id
                     + " serial number " + IntToStr(tMol.atoms[tBo->atomsIdx[0]].seriNum)
                     + " and " + tMol.atoms[tBo->atomsIdx[1]].id
                     + " serial number " + IntToStr(tMol.atoms[tBo->atomsIdx[1]].seriNum)
                     + " is " + RealToStr(tBo->value)
                     + "It should be between " + RealToStr(linkRange[0]) + " and "
                     + RealToStr(linkRange[1]);
-            std::cout << tErrInfo << std::endl;
-            return false;
+                std::cout << tErrInfo << std::endl;
+                return false;
+            }
         }
         //else
         //{
@@ -5826,7 +6188,9 @@ namespace LIBMOL {
                                 + " has connections " + IntToStr((int) iAt->connAtoms.size());
                         return false;
                     }
-                }// Halogen group
+                }
+                // Halogen group
+                /*
                 else if (tPTab.elements[iAt->chemType]["group"] == 17
                         && iAt->connAtoms.size() > 1
                         && !connMetal(iAt->connAtoms, tMol.atoms)) {
@@ -5837,6 +6201,7 @@ namespace LIBMOL {
 
                     return false;
                 }
+                */
             }
         }
 
@@ -6009,11 +6374,11 @@ namespace LIBMOL {
 
     void MolGenerator::getAtomTypeOneMolNew(Molecule& tMol)
     {
-        //std::cout << "Number of atoms in this molecule is "
-        //        << tMol.atoms.size() << std::endl;
+        std::cout << "XXX Number of atoms in this molecule is "
+                  << tMol.atoms.size() << std::endl;
 
         CodClassify aCodSys(tMol.atoms);
-
+        std::cout << "XXXX here " << std::endl;
         setAtomsBondingAndChiralCenter(aCodSys.allAtoms);
 
 
@@ -6086,15 +6451,15 @@ namespace LIBMOL {
         for (std::vector<RingDict>::iterator iR = tMol.rings.begin();
                 iR != tMol.rings.end(); iR++)
         {
-            std::vector<ID> tAtIds;
+            std::vector<int>  atmIdxs;
             for (std::vector<AtomDict>::iterator iAt = iR->atoms.begin();
                     iAt != iR->atoms.end(); iAt++) {
-                tAtIds.push_back(iAt->id);
+                atmIdxs.push_back(iAt->seriNum);
             }
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++) {
-                if (std::find(tAtIds.begin(), tAtIds.end(), iAt->id)
-                        != tAtIds.end())
+                if (std::find(atmIdxs.begin(), atmIdxs.end(), iAt->seriNum)
+                        != atmIdxs.end())
                 {
                     iAt->inRings.push_back(idxR);
                     iAt->inRingsFull.push_back(*iR);
@@ -6799,6 +7164,57 @@ namespace LIBMOL {
         }
     }
 
+    void MolGenerator::reGenMolBondsAtomTypes(Molecule & tMol)
+    {
+        // The following one includes all connections within a molecules.
+            // That means bond values may be repeated because, e.g. they are
+            // from symmetry-generated atoms. But this one shows how the
+            // the molecule is connected
+
+         tMol.bonds.clear();
+        int nBo = 0;
+
+        for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
+                    iAt != tMol.atoms.end(); iAt++)
+        {
+
+            for (unsigned i=0; i < iAt->connAtoms.size(); i++)
+            {
+                if (iAt->connAtoms[i] > iAt->seriNum)
+                {
+                    BondDict aBond;
+                    aBond.seriNum = nBo;
+                    aBond.atoms.push_back(iAt->id);
+                    aBond.atoms.push_back(tMol.atoms[iAt->connAtoms[i]].id);
+                    aBond.atomsIdx.push_back(iAt->seriNum);
+                    aBond.atomsIdx.push_back(iAt->connAtoms[i]);
+                    aBond.atomsElem.push_back(iAt->chemType);
+                    aBond.atomsElem.push_back(tMol.atoms[iAt->connAtoms[i]].chemType);
+
+                    aBond.value = distanceV(iAt->coords,
+                                      tMol.atoms[iAt->connAtoms[i]].coords);
+                    tMol.bonds.push_back(aBond);
+                    nBo++;
+                }
+            }
+        }
+
+    }
+
+    void MolGenerator::setBondOrderAndChargeInMols(std::vector<Molecule> & tFinMols)
+    {
+
+        KekulizeMol aKTool;
+        for (unsigned i=0; i < tFinMols.size(); i++)
+        {
+            reGenMolBondsAtomTypes(tFinMols[i]);
+            aKTool.executeBC(tFinMols[i].atoms, tFinMols[i].bonds, tFinMols[i].rings);
+            std::cout << " The second round " << std::endl;
+            getAtomTypeOneMolNew(tFinMols[i]);
+        }
+
+    }
+
     void MolGenerator::outTableMols(std::ofstream & tMolTabs,
             Molecule & tMol)
     {
@@ -6829,8 +7245,8 @@ namespace LIBMOL {
             if (metAtms.size() > 0)
             {
                 tMolTabs << "loop_" << std::endl
-                         << "metal_type " << std::endl
-                         << "atom_id " << std::endl;
+                         << "_metal_type " << std::endl
+                         << "_atom_id " << std::endl;
                 for (std::map<std::string, std::vector< std::string> >::iterator
                       iMet=metAtms.begin(); iMet != metAtms.end();
                       iMet++)
@@ -6850,38 +7266,38 @@ namespace LIBMOL {
             //        << std::endl;
             //tMolTabs << "total_number_of_charges\t" << tMol.sumCharges
             //        << std::endl;
-
+            setAtomsAltId(tMol.atoms);
             tMolTabs << "loop_" << std::endl
-                    << "_chem_comp_atom.serial_number" << std::endl
                     << "_chem_comp_atom.atom_id " << std::endl
+                    << "_chem_comp_atom.atom_alt_id" << std::endl
                     << "_chem_comp_atom.element_symbol" << std::endl
                     << "_chem_comp_atom.x" << std::endl
                     << "_chem_comp_atom.y" << std::endl
                     << "_chem_comp_atom.z" << std::endl
-                    << "_chem_comp_atom.formal_charge" << std::endl
+                    << "_chem_comp_atom.charge" << std::endl
                     << "_chem_comp_atom.hybr" << std::endl
                     << "_chem_comp_atom.nb1_nb2_sp" << std::endl
-                    << "_chem_comp_atom.extraEls" << std::endl
-                    << "_chem_comp_atom.nb1_nb2_extra_elec" << std::endl
+                    //<< "_chem_comp_atom.extraEls" << std::endl
+                    //<< "_chem_comp_atom.nb1_nb2_extra_elec" << std::endl
                     << "_chem_comp_atom.cod_type" << std::endl;
 
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
             {
 
-                tMolTabs << std::setw(6) << iAt->seriNum + 1
-                        << std::setw(6)  << iAt->id
+                tMolTabs << std::setw(8)  << iAt->id
+                         << std::setw(8)  << iAt->altId
                         << std::setw(4)  << iAt->chemType
-                        << std::setw(12) << iAt->coords[0]
-                        << std::setw(12) << iAt->coords[1]
-                        << std::setw(12) << iAt->coords[2]
-                        << std::setw(6)  << iAt->formalCharge
+                        << std::setw(16) << iAt->coords[0]
+                        << std::setw(16) << iAt->coords[1]
+                        << std::setw(16) << iAt->coords[2]
+                        << std::setw(6)  << iAt->charge
                         << std::setw(10) << iAt->hybrid << "    "
                         << std::setw(iAt->codNB1NB2_SP.size() + 4)
                         << iAt->codNB1NB2_SP << "    "
-                        << std::setw(5) << iAt->excessElec << "    "
-                        << std::setw(iAt->codNB1NB2_ExElec.size() + 4)
-                        << iAt->codNB1NB2_ExElec << "    "
+                        //<< std::setw(5) << iAt->excessElec << "    "
+                        //<< std::setw(iAt->codNB1NB2_ExElec.size() + 4)
+                        //<< iAt->codNB1NB2_ExElec << "    "
                         << iAt->codClass << std::endl;
             }
             tMolTabs << std::endl;
@@ -6952,8 +7368,11 @@ namespace LIBMOL {
                     << "_chem_comp_bond.atom2_id" << std::endl
                     << "_chem_comp_bond.atom1_element_symbol" << std::endl
                     << "_chem_comp_bond.atom2_element_symbol" << std::endl
+                    << "_chem_comp_bond.value_order" << std::endl
                     << "_chem_comp_bond.value_dist" << std::endl;
                     //<< "_chem_comp_bond.is_in_same_ring" << std::endl;
+
+            /*
 
             int nBo = 1;
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
@@ -6981,6 +7400,20 @@ namespace LIBMOL {
                     }
                 }
             }
+            */
+            for (std::vector<BondDict>::iterator iBo = tMol.bonds.begin();
+                    iBo != tMol.bonds.end(); iBo++)
+            {
+                tMolTabs << std::setw(8) << iBo->seriNum
+                         << std::setw(6) << iBo->atomsIdx[0]
+                         << std::setw(6) << iBo->atomsIdx[1]
+                         << std::setw(10) << iBo->atoms[0]
+                         << std::setw(10) << iBo->atoms[1]
+                         << std::setw(6) << iBo->atomsElem[0]
+                         << std::setw(6) << iBo->atomsElem[1]
+                         << std::setw(12) << iBo->order
+                         << std::setw(10) << iBo->value << std::endl;
+            }
             std::cout << std::endl;
         }
         else
@@ -7000,14 +7433,14 @@ namespace LIBMOL {
                     << "_chem_comp_angle.value_angle" << std::endl
                     << "_chem_comp_angle.ring_size_of_angle" << std::endl;
 
-            int nAn = 1;
+            int nAn = 0;
             for (std::vector<AngleDict>::iterator iAn = tMol.angles.begin();
                     iAn != tMol.angles.end(); iAn++)
             {
                 tMolTabs << std::setw(6) << nAn
-                        << std::setw(6) << iAn->atoms[0] + 1
-                        << std::setw(6) << iAn->atoms[1] + 1
-                        << std::setw(6) << iAn->atoms[2] + 1
+                        << std::setw(6) << iAn->atoms[0]
+                        << std::setw(6) << iAn->atoms[1]
+                        << std::setw(6) << iAn->atoms[2]
                         << std::setw(4) << tMol.atoms[iAn->atoms[0]].chemType
                         << std::setw(4) << tMol.atoms[iAn->atoms[1]].chemType
                         << std::setw(4) << tMol.atoms[iAn->atoms[2]].chemType
@@ -7017,6 +7450,143 @@ namespace LIBMOL {
             }
 
             std::cout << std::endl;
+        }
+
+        if (tMol.torsions.size() >0)
+        {
+            tMolTabs << "loop_" << std::endl
+                     << "_chem_comp_torsion.id " << std::endl
+                     << "_chem_comp_torsion.atom1_element_symbol" << std::endl
+                     << "_chem_comp_torsion.atom2_element_symbol" << std::endl
+                     << "_chem_comp_torsion.atom3_element_symbol" << std::endl
+                     << "_chem_comp_torsion.atom4_element_symbol" << std::endl
+                     << "_chem_comp_torsion.atom1_serial_number" << std::endl
+                     << "_chem_comp_torsion.atom2_serial_number" << std::endl
+                     << "_chem_comp_torsion.atom3_serial_number" << std::endl
+                     << "_chem_comp_torsion.atom4_serial_number" << std::endl
+                     << "_chem_comp_torsion.atom1_id" << std::endl
+                     << "_chem_comp_torsion.atom2_id" << std::endl
+                     << "_chem_comp_torsion.atom3_id" << std::endl
+                     << "_chem_comp_torsion.atom4_id" << std::endl
+                     << "_chem_comp_torsion.value"    << std::endl
+                     << "_chem_comp_torsion.BondBetweenAtom2and3" << std::endl
+                     << "_chem_comp_torsion.AromaticyForAtom2"<< std::endl
+                     << "_chem_comp_torsion.Atom2InRings" << std::endl
+                     << "_chem_comp_torsion.AromaticyForAtom3"<< std::endl
+                     << "_chem_comp_torsion.Atom3InRings" << std::endl ;
+
+            int idxTor =0;
+            for (std::vector<TorsionDict>::iterator iTor=tMol.torsions.begin();
+                        iTor !=tMol.torsions.end(); iTor++)
+            {
+                    std::string tStr1="", tStr2="", tStr3="";
+                    std::string tStr22="", tStr32="";
+
+                    if (iTor->bonds[0].isInSameRing)
+                    {
+                        if (iTor->bonds[0].isAromatic)
+                        {
+                            tStr1 = "BondInSameAromaRing";
+                        }
+                        else
+                        {
+                            tStr1 = "BondInSameRing";
+                        }
+                    }
+                    else
+                    {
+                        tStr1 = "BondNotInSameRing";
+                    }
+
+                    if (iTor->fullAtoms[1].inRings.size() > 0)
+                    {
+                        if(iTor->fullAtoms[1].isInAromRing)
+                        {
+                            tStr2="InAromRing";
+                        }
+                        else if (iTor->fullAtoms[1].isInSP2Ring)
+                        {
+                            tStr2= "InSP2Ring";
+                        }
+                        else
+                        {
+                            tStr2 = "inNonSP2Ring";
+                        }
+
+
+                        for (std::vector<RingDict>::iterator
+                            iRF  =iTor->fullAtoms[1].inRingsFull.begin();
+                            iRF != iTor->fullAtoms[1].inRingsFull.end();
+                            iRF++)
+                        {
+                            tStr22 +=IntToStr(iRF->atoms.size());
+                        }
+                    }
+                    else
+                    {
+                        tStr2 = "NoInAnyRing";
+                        tStr22= "0";
+                    }
+
+                    if (iTor->fullAtoms[2].inRings.size() > 0)
+                    {
+                        if(iTor->fullAtoms[2].isInAromRing)
+                        {
+                            tStr3="InAromRing";
+                        }
+                        else if (iTor->fullAtoms[2].isInSP2Ring)
+                        {
+                            tStr3= "InSP2Ring";
+                        }
+                        else
+                        {
+                            tStr3 = "inNonSP2Ring";
+                        }
+
+                        for (std::vector<RingDict>::iterator
+                             iRF  =iTor->fullAtoms[2].inRingsFull.begin();
+                             iRF != iTor->fullAtoms[2].inRingsFull.end();
+                             iRF++)
+                        {
+                            tStr32 +=IntToStr(iRF->atoms.size());
+                        }
+                    }
+                    else
+                    {
+                        tStr3 = "NoInAnyRing";
+                        tStr32= "0";
+                    }
+                    int aW =10;
+                    if (tStr22.size() >aW)
+                    {
+                        aW=tStr2.size() + 4;
+                    }
+                    if (tStr32.size() >aW)
+                    {
+                        aW=tStr32.size() + 4;
+                    }
+
+                    tMolTabs << std::setw(25) << iTor->id
+                             << std::setw(6) << iTor->fullAtoms[0].chemType
+                             << std::setw(6) << iTor->fullAtoms[1].chemType
+                             << std::setw(6) << iTor->fullAtoms[2].chemType
+                             << std::setw(6) << iTor->fullAtoms[3].chemType
+                             << std::setw(6) << iTor->fullAtoms[0].seriNum
+                             << std::setw(6) << iTor->fullAtoms[1].seriNum
+                             << std::setw(6) << iTor->fullAtoms[2].seriNum
+                             << std::setw(6) << iTor->fullAtoms[3].seriNum
+                             << std::setw(9) << iTor->fullAtoms[0].id
+                             << std::setw(9) << iTor->fullAtoms[1].id
+                             << std::setw(9) << iTor->fullAtoms[2].id
+                             << std::setw(9) << iTor->fullAtoms[3].id
+                             << std::setw(16) << iTor->value
+                             << std::setw(22) << tStr1
+                             << std::setw(16) << tStr2
+                             << std::setw(aW) << tStr22
+                             << std::setw(16) << tStr3
+                             << std::setw(aW) << tStr32 << std::endl;
+            }
+
         }
 
         if (tMol.rings.size() >0)
@@ -7088,9 +7658,9 @@ namespace LIBMOL {
     }
     void MolGenerator::outMolMmcif(FileName tOutName,
                                    ID tMonoRootName,
-                                   Molecule& tMol)
+                                   Molecule& tMol, int tMode)
     {
-        setAtomsAltId(tMol.atoms);
+        // setAtomsAltId(tMol.atoms);
         int numH=0;
         for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
@@ -7118,7 +7688,8 @@ namespace LIBMOL {
                 tMonoRootName1.append(tMonoRootName);
             }
 
-            aOutCif << "data_comp_list" << std::endl;
+            aOutCif << "data_comp_" << tMonoRootName1 << std::endl;
+            aOutCif << "_chem_comp.pdbx_type        HETAIN" << std::endl;
             aOutCif << "loop_" << std::endl;
             aOutCif << "_chem_comp.id" << std::endl;
             aOutCif << "_chem_comp.three_letter_code" << std::endl;
@@ -7164,7 +7735,10 @@ namespace LIBMOL {
             aOutCif << "loop_" << std::endl;
             aOutCif << "_chem_comp_atom.comp_id"  << std::endl;
             aOutCif << "_chem_comp_atom.atom_id"  << std::endl;
-            aOutCif << "_chem_comp_atom.atom_alt_id"  << std::endl;
+            if (tMode==0)
+            {
+                aOutCif << "_chem_comp_atom.atom_alt_id"  << std::endl;
+            }
             aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
             aOutCif << "_chem_comp_atom.charge" << std::endl;
             aOutCif << "_chem_comp_atom.U_iso_or_equiv" << std::endl;
@@ -7172,16 +7746,39 @@ namespace LIBMOL {
             aOutCif << "_chem_comp_atom.model_Cartn_x" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_y" << std::endl;
             aOutCif << "_chem_comp_atom.model_Cartn_z" << std::endl;
-            aOutCif << "_chem_comp_atom.atom_class" << std::endl;
+
+            if (tMode==0)
+            {
+                aOutCif << "_chem_comp_atom.atom_class" << std::endl;
+            }
+
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
             {
+                if (iAt->id.find("\'") !=std::string::npos
+                    && iAt->id.find("\"") ==std::string::npos)
+                {
+                    iAt->id =  "\"" + iAt->id + "\"";
+                }
                 aOutCif.width(6);
                 aOutCif << std::left << tMonoRootName1;
-                aOutCif.width(12);
-                aOutCif << std::left << iAt->altId;
-                aOutCif.width(12);
-                aOutCif << std::left << iAt->id;
+                if (tMode==0)
+                {
+                    aOutCif.width(12);
+                    aOutCif << std::left << iAt->altId;
+                    //aOutCif << std::left << iAt->altId;
+                    aOutCif.width(12);
+                    aOutCif << std::left << iAt->id;
+                }
+                else
+                {
+                    aOutCif.width(12);
+                    aOutCif << std::left << iAt->id;
+                    //aOutCif << std::left << iAt->altId;
+                    //aOutCif.width(12);
+                    //aOutCif << std::left << iAt->id;
+                }
+                //aOutCif << std::left << iAt->id;
                 aOutCif.width(6);
                 aOutCif << std::left << iAt->chemType;
                 aOutCif.width(10);
@@ -7191,23 +7788,52 @@ namespace LIBMOL {
                 << std::fixed << iAt->isoB;
                 // aOutCif.width(10);
                 // aOutCif << std::left << iAt->excessElec;
-                aOutCif.width(10);
+                aOutCif.width(16);
                 aOutCif << std::left << std::setprecision(3)
                         <<std::fixed << iAt->coords[0];
-                aOutCif.width(10);
+                aOutCif.width(16);
                 aOutCif << std::left << std::setprecision(3)
                         <<std::fixed << iAt->coords[1];
-                aOutCif.width(12);
+                aOutCif.width(16);
                 aOutCif << std::left << std::setprecision(3)
                         <<std::fixed << iAt->coords[2];
                 //aOutCif.width(iAt->codClass.size()+4);
-                aOutCif << std::left << iAt->codClass << std::endl;
+                if (tMode==0)
+                {
+                    aOutCif << std::left << iAt->codClass;
+                }
+                aOutCif << std::endl;
             }
 
             aOutCif << "loop_" << std::endl;
             aOutCif << "_chem_comp_bond.comp_id"     << std::endl
                     << "_chem_comp_bond.atom_id_1"   << std::endl
-                    << "_chem_comp_bond.atom_id_2"   << std::endl;
+                    << "_chem_comp_bond.atom_id_2"   << std::endl
+                    << "_chem_comp_bond.value_order" << std::endl;
+
+            for (std::vector<BondDict>::iterator iBo = tMol.bonds.begin();
+                    iBo != tMol.bonds.end(); iBo++)
+            {
+                 aOutCif << std::setw(8)  << tMonoRootName1;
+                 if (tMode ==0)
+                 {
+                    aOutCif
+                         << std::setw(10)  << tMol.atoms[iBo->atomsIdx[0]].altId
+                         << std::setw(10)  << tMol.atoms[iBo->atomsIdx[1]].altId        // iBo->atoms[1]
+                         << std::setw(12) << iBo->order
+                         << std::endl;
+                 }
+                 else
+                 {
+                    aOutCif
+                         << std::setw(10)  << tMol.atoms[iBo->atomsIdx[0]].id
+                         << std::setw(10)  << tMol.atoms[iBo->atomsIdx[1]].id        // iBo->atoms[1]
+                         << std::setw(12)  << iBo->order
+                         << std::endl;
+                 }
+            }
+
+            /*
 
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
@@ -7226,7 +7852,7 @@ namespace LIBMOL {
                     }
                 }
             }
-
+            */
 
         }
 
@@ -7730,6 +8356,7 @@ namespace LIBMOL {
 
             if (tFinMols.size() > 0)
             {
+                int aMode = 0;
                 for (unsigned i = 0; i < tFinMols.size(); i++)
                 {
                     std::string aMolIdx(IntToStr(i+1));
@@ -7737,7 +8364,7 @@ namespace LIBMOL {
                     outPreCellAtomUs(preCellAtomU, tFinMols[i]);
                     std::string aMolName(aMolRootName);
                     aMolName.append(aMolIdx);
-                    outMolMmcif(aMolName.c_str(), "UNL", tFinMols[i]);
+                    outMolMmcif(aMolName.c_str(), "UNL", tFinMols[i], aMode);
                     outPDB(aMolName.c_str(), "UNL", tFinMols[i].atoms);
                 }
             }
@@ -8374,7 +9001,6 @@ namespace LIBMOL {
                     }
                 }
 
-
                 aBAndAF.close();
             }
 
@@ -8438,8 +9064,9 @@ namespace LIBMOL {
 
                 Name metalNBFName(rootFName);
                 metalNBFName.append("_"+allAtoms[iNBM->first].id + "_NB");
-
                 outPDB(metalNBFName.c_str(), "UNL", aSetAtoms);
+                outMetalClusterMmcif(metalNBFName.c_str(), aSetAtoms);
+
             }
         }
     }
@@ -8485,10 +9112,180 @@ namespace LIBMOL {
                     }
                     initAtmElemsFile << std::endl;
                 }
-
                 initAtmElemsFile.close();
             }
         }
     }
 
+    void MolGenerator::outMetalClusterMmcif(FileName tOutName,
+                            std::vector<AtomDict> & tSetAtoms)
+    {
+        int numH=0;
+        for (std::vector<AtomDict>::iterator iAt = tSetAtoms.begin();
+                    iAt != tSetAtoms.end(); iAt++)
+        {
+            if (iAt->chemType.compare("H")==0)
+            {
+                numH++;
+            }
+        }
+
+        std::string tName(tOutName);
+        std::vector<std::string> parts;
+        StrTokenize(tName, parts, '.');
+        std::string outMmcifName = parts[0] + ".cif";
+        std::ofstream aOutCif(outMmcifName.c_str());
+
+        if(aOutCif.is_open() && tSetAtoms.size()>0)
+        {
+            std::string aMonoRootName ="UNL";
+
+            aOutCif << "data_comp_" << aMonoRootName << std::endl;
+            aOutCif << "_chem_comp.pdbx_type        HETAIN" << std::endl;
+            aOutCif << "loop_" << std::endl;
+            aOutCif << "_chem_comp.id" << std::endl;
+            aOutCif << "_chem_comp.three_letter_code" << std::endl;
+            aOutCif << "_chem_comp.name" << std::endl;
+            aOutCif << "_chem_comp.group" << std::endl;
+            aOutCif << "_chem_comp.number_atoms_all" << std::endl;
+            aOutCif << "_chem_comp.number_atoms_nh" << std::endl;
+            aOutCif << "_chem_comp.desc_level" << std::endl;
+            aOutCif.width(8);
+            aOutCif << std::left <<  aMonoRootName;
+
+            aOutCif.width(8);
+            aOutCif << std::left <<  aMonoRootName;
+            std::string aSN;
+            if (parts[0].find("/") !=std::string::npos)
+            {
+                std::vector<std::string> tB;
+                StrTokenize(parts[0], tB, '/');
+                if (tB.size()> 0)
+                {
+                    aSN =  "\"" + tB[tB.size()-1] +  "\"";
+                }
+                else
+                {
+                    aSN = "\"" + TrimSpaces(parts[0]) + "\"";
+                }
+            }
+            else
+            {
+                aSN = "\"" + TrimSpaces(parts[0]) + "\"";
+            }
+
+            aOutCif.width(aSN.size()+4);
+            aOutCif << std::left << aSN;
+            aOutCif.width(20);
+            aOutCif << std::left <<  "NON-POLYMER";
+            aOutCif.width(8);
+            aOutCif << std::left << tSetAtoms.size();
+            aOutCif.width(8);
+            aOutCif << std::left << tSetAtoms.size()-numH;
+            aOutCif.width(6);
+            aOutCif << std::left << "." << std::endl;
+
+            aOutCif << "loop_" << std::endl;
+            aOutCif << "_chem_comp_atom.comp_id"  << std::endl;
+            aOutCif << "_chem_comp_atom.atom_id"  << std::endl;
+            // aOutCif << "_chem_comp_atom.alt_atom_id"  << std::endl;
+            aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
+            aOutCif << "_chem_comp_atom.charge" << std::endl;
+            aOutCif << "_chem_comp_atom.U_iso_or_equiv" << std::endl;
+            aOutCif << "_chem_comp_atom.model_Cartn_x" << std::endl;
+            aOutCif << "_chem_comp_atom.model_Cartn_y" << std::endl;
+            aOutCif << "_chem_comp_atom.model_Cartn_z" << std::endl;
+            std::vector<int> mcIdxs;
+            std::map<int, int> idxsMap;
+
+            int idxA =1;
+            for (std::vector<AtomDict>::iterator iAt = tSetAtoms.begin();
+                    iAt != tSetAtoms.end(); iAt++)
+            {
+                // iAt->altId = iAt->chemType +IntToStr(idxA);
+                idxsMap[iAt->seriNum]=idxA-1;
+                mcIdxs.push_back(iAt->seriNum);
+                idxA++;
+
+
+            }
+            for (std::vector<AtomDict>::iterator iAt = tSetAtoms.begin();
+                    iAt != tSetAtoms.end(); iAt++)
+            {
+                if (iAt->id.find("\'") !=std::string::npos
+                    && iAt->id.find("\"") ==std::string::npos)
+                {
+                    iAt->id =  "\"" + iAt->id + "\"";
+                }
+
+                aOutCif.width(6);
+                aOutCif << std::left << aMonoRootName;
+                aOutCif.width(10);
+                aOutCif << std::left << iAt->id;
+                //aOutCif.width(10);
+                //aOutCif << std::left << iAt->id;
+                aOutCif.width(6);
+                aOutCif << std::left << iAt->chemType;
+                aOutCif.width(10);
+                aOutCif << std::left << iAt->charge;
+                aOutCif.width(12);
+                aOutCif << std::left << std::setprecision(4)
+                        << std::fixed << iAt->isoB;
+                // aOutCif.width(10);
+                // aOutCif << std::left << iAt->excessElec;
+                aOutCif.width(16);
+                aOutCif << std::left << std::setprecision(3)
+                        <<std::fixed << iAt->coords[0];
+                aOutCif.width(16);
+                aOutCif << std::left << std::setprecision(3)
+                        <<std::fixed << iAt->coords[1];
+                aOutCif.width(16);
+                aOutCif << std::left << std::setprecision(3)
+                        <<std::fixed << iAt->coords[2];
+                //aOutCif.width(iAt->codClass.size()+4);
+                //if (tMode==0)
+                //{
+                //    aOutCif << std::left << iAt->codClass;
+                // }
+                aOutCif << std::endl;
+
+            }
+
+            aOutCif << "loop_" << std::endl;
+            aOutCif << "_chem_comp_bond.comp_id"     << std::endl
+                    << "_chem_comp_bond.atom1_serial_number" << std::endl
+                    << "_chem_comp_bond.atom2_serial_number" << std::endl
+                    << "_chem_comp_bond.atom_id_1"   << std::endl
+                    << "_chem_comp_bond.atom_id_2"   << std::endl;
+                    //<< "_chem_comp_bond.value_order" << std::endl;
+
+
+            for (std::vector<AtomDict>::iterator iAt = tSetAtoms.begin();
+                    iAt != tSetAtoms.end(); iAt++)
+            {
+
+                for (std::vector<int>::iterator iC=iAt->connAtoms.begin();
+                     iC!=iAt->connAtoms.end(); iC++)
+                {
+                    if (*iC > iAt->seriNum && std::find(mcIdxs.begin(),
+                                mcIdxs.end(), *iC)!=mcIdxs.end())
+                    {
+                         aOutCif.width(6);
+                         aOutCif << std::left << aMonoRootName;
+                         aOutCif.width(10);
+                         aOutCif << idxsMap[iAt->seriNum];
+                         aOutCif.width(10);
+                         aOutCif << idxsMap[allAtoms[*iC].seriNum];
+                         aOutCif << std::setw(10)  << iAt->id
+                         << std::setw(10)  << allAtoms[*iC].id
+                         << std::endl;
+                    }
+                }
+
+            }
+
+        }
+
+
+    }
 }

@@ -461,6 +461,7 @@ namespace LIBMOL
                        std::vector<BondDict>         & tBonds,
                        std::vector<RingDict>         & tRings);
 
+
         void setAllMaps(std::vector<AtomDict>      & tAtoms,
                         std::vector<BondDict>      & tBonds,
                         std::vector<RingDict>      & tRings,
@@ -468,9 +469,194 @@ namespace LIBMOL
                         std::map<int, int>         & tOutEMap,
                         std::map<int, double>         & tChargeMap,
                         std::map<int, std::string>    & tElemMap,
-                        std::map<int, int>           & tIdAtmMap,
+                        std::map<int, int>            & tIdAtmMap,
                         std::map<int,
-                        std::map<int, int> >       & tAllAtmBondingMap);
+                        std::map<int, int> >          & tAllAtmBondingMap);
+
+        void setSpecStrs(std::vector<AtomDict>         & tAtoms,
+                         std::vector<BondDict>         & tBonds,
+                         std::vector<int>           & tDoneAtoms,
+                         std::vector<int>           & tDoneFAtoms,
+                         std::vector<int>           & tDoneBonds,
+                         std::map<int,
+                         std::map<int, int> >       & tAllAtmBondingMap);
+
+        void setSpecStrN(std::vector<AtomDict>         & tAtoms,
+                         std::vector<BondDict>         & tBonds,
+                         std::vector<int>           & tDoneAtoms,
+                         std::vector<int>           & tDoneFAtoms,
+                         std::vector<int>           & tDoneBonds,
+                         std::map<int,
+                         std::map<int, int> >       & tAllAtmBondingMap,
+                         std::vector<AtomDict>::iterator tAt);
+
+        void setSpecStrCL(std::vector<AtomDict>         & tAtoms,
+                         std::vector<BondDict>         & tBonds,
+                         std::vector<int>           & tDoneAtoms,
+                         std::vector<int>           & tDoneFAtoms,
+                         std::vector<int>           & tDoneBonds,
+                         std::map<int,
+                         std::map<int, int> >       & tAllAtmBondingMap,
+                         std::vector<AtomDict>::iterator tAt);
+
+        void setAtomsPlans(std::vector<AtomDict>    & tAtoms,
+                           std::vector<BondDict>    & tBonds,
+                           std::vector<RingDict>    & tRings,
+                           std::map<int, bool>       & tAtmPlanMap);
+
+        void setRingsPlans(std::vector<AtomDict>    & tAtoms,
+                           std::vector<BondDict>    & tBonds,
+                           std::vector<RingDict>    & tRings,
+                           std::map<int, bool>      & tRingPlanMap);
+
+        void setValOneAtoms(std::vector<AtomDict>         & tAtoms,
+                           std::vector<BondDict>         & tBonds,
+                           std::map<int, int>            & tCurVal,
+                           std::map<int, int>            & tOutEMap,
+                           std::map<int, double>         & tChargeMap,
+                           std::map<int, std::string>    & tElemMap,
+                           std::map<int,
+                           std::map<int, int> >       & tAllAtmBondingMap,
+                           std::vector<int>           & tDoneAtoms,
+                           std::vector<int>           & tDoneBonds);
+
+        void setOneLinkAtoms(std::vector<AtomDict>         & tAtoms,
+                           std::vector<BondDict>         & tBonds,
+                           std::map<int, int>            & tCurVal,
+                           std::map<int, int>            & tOutEMap,
+                           std::map<int, double>         & tChargeMap,
+                           std::map<int, std::string>    & tElemMap,
+                           std::map<int,
+                           std::map<int, int> >       & tAllAtmBondingMap,
+                           std::vector<int>           & tDoneAtoms,
+                           std::vector<int>           & tDoneBonds);
+
+        void setAllMetalBO(std::vector<AtomDict>         & tAtoms,
+                           std::vector<BondDict>         & tBonds,
+                           std::map<int, int>            & tCurVal,
+                           std::map<int, int>            & tOutEMap,
+                           std::map<int, double>         & tChargeMap,
+                           std::map<int, std::string>    & tElemMap,
+                           std::map<int,
+                           std::map<int, int> >       & tAllAtmBondingMap,
+                           std::vector<int>           & tDoneAtoms,
+                           std::vector<int>           & tDoneBonds);
+
+
+        void PickSingBonds(std::vector<AtomDict>         & tAtoms,
+                           std::vector<BondDict>         & tBonds,
+                           std::vector<RingDict>         & tRings,
+                           std::map<int, int>            & tCurVal,
+                           std::map<int, int>            & tOutEMap,
+                           std::map<int, double>         & tChargeMap,
+                           std::map<int, std::string>    & tElemMap,
+                           std::map<int,
+                           std::map<int, int> >       & tAllAtmBondingMap,
+                           std::vector<int>           & tDoneAtoms,
+                           std::vector<int>           & tDoneBonds);
+
+        void setIsolateRings(std::vector<AtomDict>       & tAtoms,
+                             std::vector<BondDict>         & tBonds,
+                             std::vector<RingDict>         & tRings,
+                             std::map<int,
+                             std::map<int, int> >       & tAllAtmBondingMap,
+                             std::vector<int>           & tDoneAtoms,
+                             std::vector<int>           & tDoneFAtoms,
+                             std::vector<int>           & tDoneBonds);
+
+        void setOneIsolateC6Ring(std::vector<AtomDict>       & tAtoms,
+                                std::vector<BondDict>       & tBonds,
+                                RingDict                    & tRing,
+                                std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
+
+        void setOneIsolateC5Ring(std::vector<AtomDict>       & tAtoms,
+                                std::vector<BondDict>       & tBonds,
+                                RingDict                    & tRing,
+                                std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
+
+        void setOneIsolateC3N2Ring(std::vector<AtomDict>       & tAtoms,
+                                   std::vector<BondDict>       & tBonds,
+                                   RingDict                    & tRing,
+                                   std::map<int,
+                                   std::map<int, int> >       & tAllAtmBondingMap,
+                                   std::map<std::string, std::map<int, int> >
+                                                              & tConnMap,
+                                   std::vector<int>           & tDoneAtoms,
+                                   std::vector<int>           & tDoneFAtoms,
+                                   std::vector<int>           & tDoneBonds);
+
+        void setOneBondFusedRing(std::vector<AtomDict>     & tAtoms,
+                                std::vector<BondDict>      & tBonds,
+                                std::vector<RingDict>      & tRings,
+                                std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
+
+        void adjustC6ChargedRing(std::vector<AtomDict>     & tAtoms,
+                                std::vector<BondDict>      & tBonds,
+                                std::vector<RingDict>      & tRings,
+                                std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
+
+        void FurtheAssignBandC(std::vector<AtomDict>         & tAtoms,
+                           std::vector<BondDict>             & tBonds,
+                           std::vector<RingDict>             & tRings,
+                           std::map<int, int>                & tCurVal,
+                           std::map<int, int>                & tOutEMap,
+                           std::map<int, double>             & tChargeMap,
+                           std::map<int, std::string>        & tElemMap,
+                           std::map<int,
+                           std::map<int, int> >       & tAllAtmBondingMap,
+                           std::vector<int>           & tDoneAtoms,
+                           std::vector<int>           & tDoneFAtoms,
+                           std::vector<int>           & tDoneBonds);
+
+        int getResValForAtom(AtomDict                 & tAtom,
+                             std::vector<BondDict>    & tBonds,
+                             std::map<int,
+                             std::map<int, int> >     & tAllAtmBondingMap,
+                             std::map<int, int>       & tCurVal);
+
+        void modifCurVal(std::vector<AtomDict>::iterator   tAtm,
+                         std::map<int, int>       & tCurVal);
+
+        void checkRingCharge(std::vector<AtomDict>         & tAtoms,
+                           std::vector<BondDict>         & tBonds,
+                           std::vector<RingDict>         & tRings,
+                           std::map<int, int>            & tCurVal,
+                           std::map<int, int>            & tOutEMap,
+                           std::map<int, double>         & tChargeMap,
+                           std::map<int, std::string>    & tElemMap,
+                           std::map<int,
+                           std::map<int, int> >       & tAllAtmBondingMap,
+                           std::vector<int>           & tDoneAtoms,
+                           std::vector<int>           & tDoneBonds);
+
+        void finalAdjustBandC(std::vector<AtomDict>      & tAtoms,
+                              std::vector<BondDict>      & tBonds,
+                              std::vector<RingDict>      & tRings,
+                              std::map<int, int>         & tCurVal,
+                              std::map<int,
+                              std::map<int, int> >       & tAllAtmBondingMap,
+                              std::vector<int>           & tDoneAtoms,
+                              std::vector<int>           & tDoneFAtoms,
+                              std::vector<int>           & tDoneBonds);
+
+
+        void modAromRings(std::vector<RingDict>      & tRings);
 
         bool checkIfAROMBs(std::vector<BondDict> & tBonds);
 
@@ -671,6 +857,12 @@ namespace LIBMOL
         void modDelocBondsByEquivAtoms(std::vector<AtomDict> & tAtoms,
                                        std::vector<BondDict> & tBonds,
                                        std::vector<int>      & tIdxs);
+
+
+
+        void outBandC(FileName tFName,
+                      std::vector<AtomDict> & tAtoms,
+                      std::vector<BondDict> & tBonds);
 
 
         bool                                   lUpdate;

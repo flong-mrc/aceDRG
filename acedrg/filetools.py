@@ -111,13 +111,16 @@ class FileTransformer(object) :
         self.nameMapingCifMol = {}             # e.g. self.nameMapingCifMol[1]   = name 
                                                # where 1 : atom serial number   name : atom name
         self.nameMapingCifMol = {}            
-        self.nameMapingCifMol["nonH"] = {}            
-        self.nameMapingCifMol["H"]    = {}  
+        self.nameMapingCifMol["nonH"]         = {}            
+        self.nameMapingCifMol["H"]            = {}  
+        self.nameMapingCifMol["nonH_alt"]     = {}            
+        self.nameMapingCifMol["H_alt"]        = {} 
 
         self.nameMapingMol2 = {}
-        self.nameMapingMol2["nonH"] = {}
-        self.nameMapingMol2["H"]    = {}          
-                                             
+        self.nameMapingMol2["nonH"]           = {}
+        self.nameMapingMol2["H"]              = {}          
+        self.nameMapingMol2["nonH_alt"]       = {}            
+        self.nameMapingMol2["H_alt"]          = {}                                      
 
         self.nameMapingPDBMol = {}             # e.g. self.nameMapingPDBMol[1]   = name 
                                                # where 1 : atom serial number   name : atom name
@@ -251,7 +254,7 @@ class FileTransformer(object) :
                 self.parserAll2Cols(all2ColLines)
 
             self.TmpChemCheck()
-
+            
             
             self.selectAtomCoordinates()
 
@@ -376,6 +379,7 @@ class FileTransformer(object) :
                     self.getProp(tBlk, "strDescriptor")
                     self.hasStrDescriptors = True
                     break
+        
 
 
     def getDataDescriptor(self, tBlk):
@@ -542,11 +546,14 @@ class FileTransformer(object) :
 
         # multiple col format          
         colIdx = []
-        iStrD = 0
+
         for aL in tBlk:
             aL = aL.strip()
             strGrp = []
-            self.aLineToAlist(aL, strGrp)
+            #if (tProp=="atom"):
+            self.aLineToAlist2(aL, strGrp)
+            #else:
+            #self.aLineToAlist(aL, strGrp)
             #strGrp = aL.strip().split()
             if len(strGrp) == 1 and aL[0].find("_") !=-1 and strGrp[0].find(";")==-1:
                 colIdx.append(strGrp[0])
@@ -585,7 +592,7 @@ class FileTransformer(object) :
                          self.strDescriptors["entries"] = []
                      self.strDescriptors["entries"].append(aL)
 
-    
+        
         if tProp =="atom":
             tAtoms = []
             tHAtoms = []
@@ -658,7 +665,8 @@ class FileTransformer(object) :
                     for i in range(len(colIdx)):
                         aStr +="%s"%aChiral[colIdx[i]].ljust(8)
                     #print aStr
-
+        
+        
         #if tProp =="strDescriptor":
         #    if len(self.strDescriptors["props"]):
         #        for aProp in self.strDescriptors["props"]:
@@ -1135,12 +1143,20 @@ class FileTransformer(object) :
             for aAtom in tNonHAtoms:
                 self.atoms.append(aAtom)
                 self.nameMapingCifMol["nonH"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                if "_chem_comp_atom.alt_atom_id" in aAtom.keys():
+                    self.nameMapingCifMol["nonH_alt"][nAtm] = aAtom["_chem_comp_atom.alt_atom_id"]
+                else:
+                    self.nameMapingCifMol["nonH_alt"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
                 #print("NameMap ", nAtm, " : ", self.nameMapingCifMol["nonH"][nAtm])
                 #print("NameMap ", aAtom["_chem_comp_atom.atom_id"])
                 nAtm +=1
             for aAtom in tHAtoms:
                 self.atoms.append(aAtom)
-                self.nameMapingCifMol["H"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                if "_chem_comp_atom.alt_atom_id" in aAtom.keys():
+                    self.nameMapingCifMol["H_alt"][nAtm] = aAtom["_chem_comp_atom.alt_atom_id"]
+                else:
+                    self.nameMapingCifMol["H_alt"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                #self.nameMapingCifMol["H"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
                 #print("NameMap ", nAtm, " : ", self.nameMapingCifMol["H"][nAtm])
                 #print("NameMap ", aAtom["_chem_comp_atom.atom_id"])
                 nAtm +=1
@@ -1217,11 +1233,11 @@ class FileTransformer(object) :
                         chargeAtomList.append([idxAtom, nCharge])       
 
                 cha ="0"
-                if "_chem_comp_atom.pdbx_stereo_config" in aAtom:
-                    if aAtom["_chem_comp_atom.pdbx_stereo_config"].find("S") !=-1:
-                        cha = "1"
-                    elif aAtom["_chem_comp_atom.pdbx_stereo_config"].find("R") !=-1:
-                        cha = "2"
+                #if "_chem_comp_atom.pdbx_stereo_config" in aAtom:
+                #    if aAtom["_chem_comp_atom.pdbx_stereo_config"].find("S") !=-1:
+                #        cha = "1"
+                #    elif aAtom["_chem_comp_atom.pdbx_stereo_config"].find("R") !=-1:
+                #        cha = "2"
 
                 tOutFile.write("%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
                                                                      id.ljust(3), md.rjust(2), charge.rjust(3), \
@@ -1607,8 +1623,59 @@ class FileTransformer(object) :
                 else:
                     l0  = True
         if aTS != "":
-            tList.append(aTS.strip())    
+            tList.append(aTS.strip())   
+        
 
+    def aLineToAlist2(self, tL, tList):
+       
+            aTS = ""
+            l0  = False
+            l1  = False
+            l2  = False   
+            for aS in tL:
+                #print(aS)
+                if aS ==" ":
+                    if not l1 and not l2 and len(aTS)!=0:
+                        tList.append(aTS.strip()) 
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    elif l1 and not l2 and len(aTS) !=0:
+                        tList.append(aTS.strip()) 
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    elif l2:
+                        aTS = aTS + aS 
+                elif aS.find("\"") !=-1:
+                    if l2:
+                        aTS = "\"" + aTS + "\""
+                        tList.append(aTS.strip())
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    elif l1:
+                        aTS = aTS + aS
+                    else:
+                        l2 = True
+                        l1 = False
+                elif aS.find("\'") !=-1:
+                    if l1:
+                        aTS = "\'" + aTS + "\'"
+                        tList.append(aTS)
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    else:
+                        aTS = aTS + aS
+                        l1 = True
+                else:
+                    aTS = aTS + aS
+                    
+            if aTS != "":
+                tList.append(aTS.strip())    
+            
+            
     def mol2Reader(self, tFileName):
         """Read a file of mol2 for name matching purpose"""
 
@@ -1798,7 +1865,7 @@ class Ccp4MmCifObj (dict) :
         self["ccp4CifObj"]["instructs"]  = {}
 
         self["inCif"] = tInFileName
-        print(self["inCif"])
+        # print(self["inCif"])
         if os.path.isfile(self["inCif"]):
             self.getCCP4CifObj()
         else:
@@ -1839,7 +1906,18 @@ class Ccp4MmCifObj (dict) :
             for aKey in list(self["ccp4CifBlocks"].keys()):        
                 if aKey != "head_sec":
                     self.setupOneBlock(aKey, self["ccp4CifBlocks"])
-
+            
+            
+            if len(self["ccp4CifObj"]["comps"].keys()):
+                for aComp in sorted(self["ccp4CifObj"]["comps"]):
+                    if "bonds" in self["ccp4CifObj"]["comps"][aComp]: 
+                        for aBond in self["ccp4CifObj"]["comps"][aComp]["bonds"]:  
+                            if "type" in aBond and not "value_order" in aBond:
+                                aBond["value_order"] = aBond["type"]
+                            elif not "type" in aBond and "value_order" in aBond:
+                                aBond["type"] = aBond["value_order"]    
+                            
+                    
             """
             if len(self["ccp4CifObj"]["comps"].keys()):
                 print("Number of comps ", len(self["ccp4CifObj"]["comps"].keys()))
@@ -1849,7 +1927,7 @@ class Ccp4MmCifObj (dict) :
  
     def setupOneBlock(self, tKey, tBlock):
         
-        print("Block ", tKey)
+        #print("Block ", tKey)
         allLoops = []
         aLoop = []
         for aL in tBlock[tKey]:
@@ -1864,7 +1942,7 @@ class Ccp4MmCifObj (dict) :
  
         if len(aLoop) != 0:
             allLoops.append(aLoop)
-        print("It contains ", len(allLoops), " loops ")
+        #print("It contains ", len(allLoops), " loops ")
 
         lB = {}
         lB["LC"]  =False
@@ -1954,7 +2032,7 @@ class Ccp4MmCifObj (dict) :
                     else:
                         #aLineToAlist(aL, aStrSet)
                         aStrSet = splitLineSpa(aL)
-                    print(aStrSet)
+                    #print(aStrSet)
                 for aStr in aStrSet:
                     if aStr.strip()[0] =="_":
                         aKeySet.append(aStr)
@@ -1970,8 +2048,10 @@ class Ccp4MmCifObj (dict) :
 
         nK = len(aKeySet)
         nV = len(aValueSet) 
-        print("Number of keys in the loop is ", nK)
-        print("Number of values in the loop is ", nV)
+        #print("Number of keys in the loop is ", nK)
+        #print(aKeySet)
+        #print("Number of values in the loop is ", nV)
+        #print(aValueSet)
         if nK > 0 and nV > 0:
             if tKW =="list":
                 idxV = 0
@@ -1986,23 +2066,24 @@ class Ccp4MmCifObj (dict) :
                         tDict[compId][k] = v
                         idxV +=1
                     remV -=nK
-                    print("For list entry  %s, it has the following properties "%compId)
-                    for aPro in list(tDict[compId].keys()):
-                        print("%s : %s "%(aPro, tDict[compId][aPro]))
+                    #print("For list entry  %s, it has the following properties "%compId)
+                    #for aPro in list(tDict[compId].keys()):
+                    #    print("%s : %s "%(aPro, tDict[compId][aPro]))
             else:
                 aType    = ""
                 parts = aKeySet[0].strip().split(".")[0].strip().split("_")
+                #print(parts)
                 if len(parts) ==5:
                     aType = parts[3] + "_" + parts[4] + "s"
                 else:
-                    aType = parts[3] + "s"
+                    aType = parts[-1] + "s"
                 if aType not in tDict:
                     tDict[aType] = []
 
                 idxV = 0
                 remV = nV
-                print(aType)
-                print(idKeys)
+                #print(aType)
+                #print(idKeys)
                 while remV >= nK:
                     aObj = {}
                     for i in range(nK):
@@ -2012,10 +2093,10 @@ class Ccp4MmCifObj (dict) :
                         idxV +=1
                     remV -=nK
                     tDict[aType].append(aObj)
-                    print("-----------------")
-                    for aKey in list(aObj.keys()):
-                        print("%s   :   %s "%(aKey, aObj[aKey]))
-                print("Number of %s is %d "%(aType, len(tDict[aType]))) 
+                    #print("-----------------")
+                    #for aKey in list(aObj.keys()):
+                    #    print("%s   :   %s "%(aKey, aObj[aKey]))
+                #print("Number of %s is %d "%(aType, len(tDict[aType]))) 
 
     def setPlaneAtmGroupInOneComp(self, tName):
 

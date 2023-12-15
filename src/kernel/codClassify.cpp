@@ -9995,6 +9995,33 @@ namespace LIBMOL
                             codOrgAngleFiles2[haNum] = fRoot + haNum + ".table";
                         }
                     }
+                    else
+                    {
+                        for (std::map<ID, std::map<ID, ID> >::iterator
+                             iAX=allAngIdx[ha0].begin();
+                             iAX!=allAngIdx[ha0].end(); iAX++)
+                        {
+                            if (allAngIdx[ha0][iAX->first].find(ha2)
+                                !=allAngIdx[ha0][iAX->first].end())
+                            {
+                                haNum = allAngIdx[ha0][iAX->first][ha2];
+                                std::cout << "XXXX ha2=" << ha2 << std::endl;
+
+                                std::cout << "file number is " << haNum
+                                      << std::endl;
+                                if (codOrgAngleFiles2.find(haNum) ==codOrgAngleFiles2.end())
+                                {
+                                    codOrgAngleFiles2[haNum] =
+                                               fRoot + haNum + ".table";
+                                    std::cout << "File : "
+                                             << codOrgAngleFiles2[haNum]
+                                             << " is included " << std::endl;
+
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -13056,53 +13083,168 @@ namespace LIBMOL
             else
             {
                 // could not find three exact matches on 3 atomic hashing values
-                // using approximate default values
-                if (allAtoms[iAN->atoms[0]].bondingIdx <4)
-                {
-                    std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
-                    iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
-                    iAN->sigValue      = 3.0;
-                    iAN->numCodValues  = 0;
-                    iAN-> approxLevel = 6;
-                    lDef = true;
-                }
-                else if (allAtoms[iAN->atoms[0]].bondingIdx==5)
-                {
 
+                std::vector<aValueSet> aAngSet;
+                if (allDictAnglesIdx5D.find(ha1)!=allDictAnglesIdx5D.end())
+                {
+                    if (allDictAnglesIdx5D[ha1].find(ha2)!=allDictAnglesIdx5D[ha1].end())
+                    {
+                        for (std::map<int, std::map<ID,
+                             std::vector<aValueSet> > >::iterator
+                             iA1=allDictAnglesIdx5D[ha1][ha2].begin();
+                            iA1!=allDictAnglesIdx5D[ha1][ha2].end(); iA1++)
+                        {
+                            std::cout << "ha3 " << iA1->first << std::endl;
+                            for(std::map<ID, std::vector<aValueSet> >::iterator
+                                iA2=iA1->second.begin(); iA2!=iA1->second.end();
+                                iA2++)
+                            {
+                                // match the center atom's ring and sp
+                                std::string aSmiRSP = matchRandCenterA(Ring3A, sp_1,
+                                                  allDictAnglesIdx5D[ha1][ha2][iA1->first]);
+
+                                std::cout << "aSmiRSP" << aSmiRSP << std::endl;
+                                if(aSmiRSP.size() !=0)
+                                {
+                                    std::cout << "AAA size " << allDictAnglesIdx5D[ha1][ha2][iA1->first][aSmiRSP].size()
+                                              << std::endl;
+                                    for (std::vector<aValueSet>::iterator
+                                         iV=allDictAnglesIdx5D[ha1][ha2][iA1->first][aSmiRSP].begin();
+                                         iV!=allDictAnglesIdx5D[ha1][ha2][iA1->first][aSmiRSP].end();
+                                         iV++)
+                                    {
+                                        //if (iAN->atomsId[0]=="O1")
+                                        //{
+                                            std::cout << "1AAAA= " << iV->value << std::endl;
+                                             std::cout << "num " << iV->numCodValues << std::endl;
+                                        //}
+                                        aAngSet.push_back(*iV);
+                                        std::cout << "size " << aAngSet.size()
+                                                  << std::endl;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // further search
+                    //else
+                    //{
+                    for (std::map<int, std::map<int, std::map<ID,
+                         std::vector<aValueSet> > > >::iterator
+                         iA0=allDictAnglesIdx5D[ha1].begin();
+                         iA0!=allDictAnglesIdx5D[ha1].end(); iA0++)
+                    {
+                        if (allDictAnglesIdx5D[ha1][iA0->first].find(ha3)
+                            !=allDictAnglesIdx5D[ha1][iA0->first].end())
+                        {
+                            std::cout << "ha2 "<< iA0->first << std::endl;
+                            std::cout << "ha3 "<<  ha3 << std::endl;
+                            std::string aSmiRSP = matchRandCenterA(Ring3A, sp_1,
+                            allDictAnglesIdx5D[ha1][iA0->first][ha3]);
+                            std::cout << "aSmiRSP" << aSmiRSP << std::endl;
+                            if(aSmiRSP.size() !=0)
+                            {
+                                std::cout << "2AAA size "
+                                          << allDictAnglesIdx5D[ha1][iA0->first][ha3][aSmiRSP].size()
+                                          << std::endl;
+                                for (std::vector<aValueSet>::iterator
+                                         iV=allDictAnglesIdx5D[ha1][iA0->first][ha3][aSmiRSP].begin();
+                                         iV!=allDictAnglesIdx5D[ha1][iA0->first][ha3][aSmiRSP].end();
+                                         iV++)
+                                {
+                                        //if (iAN->atomsId[0]=="O1")
+                                        //{
+                                            std::cout << "2AAAA= " << iV->value << std::endl;
+                                            std::cout << "num " << iV->numCodValues << std::endl;
+                                        //}
+                                        aAngSet.push_back(*iV);
+                                }
+                            }
+                        }
+                    }
+                    // }
+                    if (aAngSet.size()> 0)
+                    {
+                        double tSum1=0.0, tSum2=0.0;
+                        int    tNum = 0, tNum1=0;
+                        for (std::vector<aValueSet>::iterator iAng=aAngSet.begin();
+                             iAng != aAngSet.end(); iAng++)
+                        {
+                            tSum1+=(iAng->value*iAng->numCodValues);
+                            tNum +=iAng->numCodValues;
+                            tNum1 +=1;
+                        }
+                        //std::cout << "tNum " << tNum << std::endl;
+                        //std::cout << "tNum1 " << tNum1 << std::endl;
+                        if (tNum!=0)
+                        {
+                            iAN->value = tSum1/tNum;
+
+                            for (std::vector<aValueSet>::iterator iAng=aAngSet.begin();
+                                 iAng != aAngSet.end(); iAng++)
+                            {
+                                tSum2+=((iAng->value-iAN->value)*(iAng->value-iAN->value));
+                            }
+                            iAN->sigValue= sqrt(tSum2/tNum1);
+                            //std::cout << " std dev " << iAN->sigValue << std::endl;
+                            iAN->numCodValues= tNum;
+                        }
+                    }
                 }
                 else
                 {
-                    std::cout << "Could not find COD angle value and even default angle value."
-                        <<std::endl << "The atoms in the target angle are: " << std::endl
-                        << "The inner atom "   << allAtoms[iAN->atoms[0]].id << std::endl
-                        << "Its COD class is " << allAtoms[iAN->atoms[0]].codClass << std::endl
-                        << "The outer atom 1 " << allAtoms[iAN->atoms[1]].id << std::endl
-                        << "Its COD class is " << allAtoms[iAN->atoms[1]].codClass << std::endl
-                        << "The outer atom 2 "  << allAtoms[iAN->atoms[2]].id << std::endl
-                        << "Its COD class is " << allAtoms[iAN->atoms[2]].codClass << std::endl;
+                    // not a single hash is found, using approximate default values
 
-                    exit(1);
+                    if (allAtoms[iAN->atoms[0]].bondingIdx <4)
+                    {
+                        std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
+                        iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                        iAN->sigValue      = 3.0;
+                        iAN->numCodValues  = 0;
+                        iAN-> approxLevel = 6;
+                        lDef = true;
+                    }
+                    else if (allAtoms[iAN->atoms[0]].bondingIdx==5)
+                    {
+
+                    }
+                    else
+                    {
+                        std::cout << "Could not find COD angle value and even default angle value."
+                                  <<std::endl << "The atoms in the target angle are: " << std::endl
+                                  << "The inner atom "   << allAtoms[iAN->atoms[0]].id << std::endl
+                                  << "Its COD class is " << allAtoms[iAN->atoms[0]].codClass << std::endl
+                                  << "The outer atom 1 " << allAtoms[iAN->atoms[1]].id << std::endl
+                                  << "Its COD class is " << allAtoms[iAN->atoms[1]].codClass << std::endl
+                                  << "The outer atom 2 "  << allAtoms[iAN->atoms[2]].id << std::endl
+                                  << "Its COD class is " << allAtoms[iAN->atoms[2]].codClass << std::endl;
+
+                        exit(1);
+                    }
                 }
-            }
-            if (allAtoms[iAN->atoms[0]].bondingIdx==1
-                && (iAN-> approxLevel >=1 && (iAN->numCodValues < 5||iAN->sigValue >= 3.0)) && !lDef)
-            {
-                iAN->value    = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
-                iAN->sigValue = 3.0;
-                iAN->  approxLevel = 6;
-            }
-            //if (iAN->sigValue > 3.0)
-            //{
-            //    iAN->sigValue = 3.0;
-            //}
-            if (iAN->sigValue < 1.5)
-            {
-                iAN->sigValue = 1.5;
+
+                if (allAtoms[iAN->atoms[0]].bondingIdx==1
+                    && (iAN-> approxLevel >=1 && (iAN->numCodValues < 5||iAN->sigValue >= 3.0)) && !lDef)
+                {
+                    iAN->value    = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                    iAN->sigValue = 3.0;
+                    iAN->  approxLevel = 6;
+                }
+                //if (iAN->sigValue > 3.0)
+                //{
+                //    iAN->sigValue = 3.0;
+                //}
+                if (iAN->sigValue < 1.5)
+                {
+                    iAN->sigValue = 1.5;
+                }
             }
             std::cout << "Finally the angle value is "
                       << iAN->value << std::endl;
             std::cout << "It sig value is " << iAN->sigValue
                       << std::endl;
+            std::cout << "Number of COD angles involved "
+                      << iAN->numCodValues << std::endl;
     }
 
     void CodClassify::levelSearchAngles(std::vector<int>          &      tHa,
@@ -13296,6 +13438,10 @@ namespace LIBMOL
 
             iAN->hasCodValue   = false;
             iAN->approxLevel   = 4;
+        }
+        else if (tLev==6)
+        {
+
         }
         std::cout << "Angle value " << iAN ->value << std::endl;
         std::cout << "Angle siga "  << iAN->sigValue << std::endl;
@@ -14745,19 +14891,20 @@ namespace LIBMOL
 
     int CodClassify::checkATorsAtomsInAroRing(int tAtm1, int tAtm2)
     {
-        //std::cout << "Check arom for atom "
-        //          << allAtoms[tAtm1].id << " and "
-        //          << allAtoms[tAtm2].id << std::endl;
+        std::cout << "Check arom for atom "
+                  << allAtoms[tAtm1].id << " of sp "<< allAtoms[tAtm1].bondingIdx 
+                  << " and " << allAtoms[tAtm2].id << " of sp " 
+                  << allAtoms[tAtm2].bondingIdx << std::endl;
         int aRet  = 0;                      // not in any ring
         if (allAtoms[tAtm1].bondingIdx==2
             && allAtoms[tAtm2].bondingIdx==2)
         {
 
             int aBIdx = getBond(allBonds, tAtm1, tAtm2);
-            //std::cout << "bond " << aBIdx << std::endl;
-            //std::cout << "atom " << allBonds[aBIdx].atoms[0] << " and "
-            //          << allBonds[aBIdx].atoms[1] << std::endl;
-            // std::cout << "Its order " << allBonds[aBIdx].order << std::endl;
+            std::cout << "bond " << aBIdx << std::endl;
+            std::cout << "atom " << allBonds[aBIdx].atoms[0] << " and "
+                      << allBonds[aBIdx].atoms[1] << std::endl;
+            std::cout << "Its order " << allBonds[aBIdx].order << std::endl;
             if (aBIdx !=-1)
             {
                 if (allBonds[aBIdx].isInSameRing)
@@ -14799,7 +14946,7 @@ namespace LIBMOL
                       << "  atom4 " << allAtoms[iT->atoms[3]].id << std::endl;
 
             int aFlag =checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2]);
-
+            std::cout << "aFlag == " << aFlag << std::endl;
             if (aFlag == 3)
             {
                 // in a aromatic ring
@@ -14835,13 +14982,14 @@ namespace LIBMOL
                 }
                 else
                 {
-                    iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
-                    iT->sigValue =0;
-                    if (iT->id.size() >=16 )
-                    {
+                    iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =5.0;
+                    //if (iT->id.size() >=16 )
+                    //{
                         // iT->id = IntToStr(idxPTors);
-                        iT->id = "const_" + IntToStr(idxPTors);
-                    }
+                        // iT->id = "const_" + IntToStr(idxPTors);
+                    //}
+                    // std::cout << "Here 2" << std::endl;
                 }
                 /*
                 iT->id = "sp2_sp2_" + IntToStr(idxPTors);

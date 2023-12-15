@@ -83,7 +83,7 @@ namespace LIBMOL
 
         int c, index;
         while ((c = getopt (numArg, ArgVars,
-"a:b:c:d:i:j:k:l:m:n:o:p:r:s:t:u:v:w:x:y:z:A:C:D:H:L:M:N:O:P:Q:R:S:T:U:W:X:Y:Z:1:2:3:4:"))
+"a:b:c:d:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:A:C:D:H:L:M:N:O:P:Q:R:S:T:U:W:X:Y:Z:1:2:3:4:"))
                != -1)
         {
             switch (c)
@@ -140,6 +140,11 @@ namespace LIBMOL
                     IOEntries["inPdbName"] = optarg;
                     //std::cout << "Input PDB file is : "
                     //          << IOEntries["inPdbName"] << std::endl;
+                    break;
+                case 'q':
+                    IOEntries["CoordToDict"] =  optarg;
+                    // std::cout << "Cooord to Dict "
+                    //          <<  IOEntries["inFileDir"] << std::endl;
                     break;
                 case 'r':
                     IOEntries["monoRootName"] = optarg;
@@ -466,6 +471,11 @@ namespace LIBMOL
         {
             workMode = 900;
         }
+        else if (IOEntries.find("CoordToDict") !=IOEntries.end())
+        {
+            workMode = 350;
+        }
+
         else if (IOEntries.find("HUMO")!=IOEntries.end())
         {
             if (IOEntries.find("inCifName")!=IOEntries.end())
@@ -524,6 +534,7 @@ namespace LIBMOL
         {
             workMode = 930;
         }
+
         else if ( IOEntries.find("inCifName")!=IOEntries.end() )
         {
             if (!IOEntries["inCifName"].empty())

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   molecule.h
  * Author: flong
  *
@@ -64,7 +64,7 @@ namespace LIBMOL
     class AtomDict;
     class Residue;
     class Chain;
-    
+
     class Bond;
     class BondDict;
     class Angle;
@@ -73,59 +73,70 @@ namespace LIBMOL
     class TorsionDict;
     class Chiral;
     class ChiralDict;
-    
+
     class Ring;
     class RingDict;
-    
+
     class PeriodicTable;
     class CCP4AtomType;
-    
-    class Molecule 
+
+    class Molecule
     {
-        // Not a molecule in chemistry sense, but rather a set of atoms 
+        // Not a molecule in chemistry sense, but rather a set of atoms
         // related by special connections
-        
+
     public :
-        
+
         // Default constructor
         Molecule();
         // Copy constructor
         Molecule(const Molecule & aMol);
         // Destructor
         ~Molecule();
-        
+
         void setAtomCartCoordFromFracCoord(std::vector<CrystInfo>::iterator tCryst);
         void setAllBondsFromCartCoord();
-        
+
         void setFormula();
         void calcSumExcessElecs();
         void calcSumCharges();
         void setAtomFormTypes();
-             
+
+        void getAllTorsions();
+
         std::vector<AtomDict>            atoms;
         std::vector<BondDict>            bonds;
         std::vector<BondDict>            allBonds;
         std::vector<AngleDict>           angles;
         std::vector<TorsionDict>         torsions;
+        std::vector<TorsionDict>         nonMetTorsions();             // No metal atoms in the ends of torsion angles
+        std::vector<TorsionDict>         nonHNonMetTorsions;           // No H atoms in the ends of torsion angles.
         std::vector<RingDict>            rings;
         std::vector<ChiralDict>          chirals;
         std::vector<AtomDict>            extraHAtoms;
-        
+
         std::map<ID, std::vector<ID> >   propData;
         std::vector<std::string>         comments;
-        
+
         int                              seriNum;
         ID                               id;
         ID                               formula;
         int                              sumExcessElecs;
         int                              sumCharges;
-        REAL                             atomCovRadMax; 
+        REAL                             atomCovRadMax;
         bool                             hasCoords;
-        bool                             validated;   
+        bool                             validated;
         bool                             isInf;
         bool                             stateChanged;
     };
+
+    extern void divideAtomGroup(std::vector<AtomDict>    & tAtoms,
+                std::map<unsigned, std::vector<int> >  tAtomGroups);
+
+    extern void cancelOneSP3Bond(std::vector<AtomDict>    & tAtoms,
+                                 std::vector<int>         & tLink);
+
+
 }
 
 #endif	/* MOLECULE_H */
-

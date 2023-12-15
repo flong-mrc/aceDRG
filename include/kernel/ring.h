@@ -179,6 +179,11 @@ namespace LIBMOL
     // modified to split isAromatic and isAromaticP
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
                                 int                   tMode);
+    extern REAL setPiForOneAtomNoMetal(int tIdx, std::vector<AtomDict> & tAtoms,
+                                        int                   tMode);
+    extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
+                                        int                   tMode);
+
     extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
                               std::vector<AtomDict> & tAtoms,
                               int                     tMode);

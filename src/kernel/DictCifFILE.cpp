@@ -386,6 +386,7 @@ namespace LIBMOL
             std::vector<std::string>     tBlocLines;
 
 
+
             while(!inFile.eof())
             {
                 std::getline(inFile, tRecord);
@@ -448,6 +449,7 @@ namespace LIBMOL
                 }
             }
 
+
             if (!tBlocLines.empty())
             {
                 tBlocs.push_back(tBlocLines);
@@ -455,6 +457,7 @@ namespace LIBMOL
             }
 
             inFile.close();
+            /*
             if (checkR)
             {
                 std::cout << "tRAllLine.size " <<  tRAllLines.size() << std::endl;
@@ -465,9 +468,10 @@ namespace LIBMOL
                 RFactorOK = true;
             }
 
-
+            */
 
             checkPowder(tAllLines);
+
 
             checkNeutronD(tAllLines);
 
@@ -552,6 +556,7 @@ namespace LIBMOL
 
 
                 // Now select what we need from the input cif file.
+
                 selectPropsToMaps(rowProps, colProps);
 
                 if (!lErr)
@@ -590,6 +595,7 @@ namespace LIBMOL
                     checkNonHAtomOccp();
 
                     setAtomsMetalType();
+
                     setAtomOxiType();
 
                     checkCalcAtoms();
@@ -2509,7 +2515,7 @@ namespace LIBMOL
                 itsCurAtomSeriNum ++;
                 if (hasProps["atom"].find("id") != hasProps["atom"].end())
                 {
-                    itsCurAtom->existProps["id"] =  hasProps["atom"]["resName"];
+                    itsCurAtom->existProps["id"] =  hasProps["atom"]["id"];
                     cleanSymbol(tF[hasProps["atom"]["id"]], "\"");
                     itsCurAtom->id = TrimSpaces(tF[hasProps["atom"]["id"]]);
                     // std::cout << "Its ID: " << itsCurAtom->id << std::endl;
@@ -3779,7 +3785,16 @@ namespace LIBMOL
 
             setAtomsCChemType();
 
-
+            for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                    iAt != allAtoms.end(); iAt++)
+            {
+                if (iAt->id == "S")
+                {
+                    std::cout << "Atom " << iAt->id
+                              << "HereB Its bonding index : "
+                            << iAt->bondingIdx << std::endl;
+                }
+            }
 
             setAtomsMetalType();
 
@@ -3787,7 +3802,16 @@ namespace LIBMOL
 
             setAtomsPartialCharges();
 
-
+            for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
+                    iAt != allAtoms.end(); iAt++)
+            {
+                if (iAt->id == "S")
+                {
+                    std::cout << "Atom " << iAt->id
+                              << "HereB2 Its bonding index : "
+                            << iAt->bondingIdx << std::endl;
+                }
+            }
             ringDetecting();
 
             setAtomFormTypes(allAtoms);
@@ -3803,7 +3827,7 @@ namespace LIBMOL
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
             {
-                std::cout << "\nAtom " << iA->seriNum << " : " << std::endl
+                std::cout << "\nHere Atom " << iA->seriNum << " : " << std::endl
                         << "Its ID : " << iA->id << std::endl
                         << "Its Chemical Type : " << iA->chemType << std::endl
                         << "Its CCP4 chemical type " << iA->ccp4Type << std::endl
@@ -4247,10 +4271,17 @@ namespace LIBMOL
                     //std::cout << curBlockLine << std::endl;
                     //curBlockLine++;
                 }
-                else if(tF1[1].find("atom_id") !=std::string::npos)
+                else if(tF1[1].find("atom_id") !=std::string::npos
+                        && tF1[1].find("alt_atom_id") ==std::string::npos)
                 {
                     hasProps["atom"].insert(std::pair<std::string, int>("id",curBlockLine));
                     //std::cout << curBlockLine << std::endl;
+                    //curBlockLine++;
+                }
+                else if(tF1[1].find("alt_atom_id") !=std::string::npos)
+                {
+                    hasProps["atom"].insert(std::pair<std::string, int>("alt_id",curBlockLine));
+                    // std::cout << curBlockLine << std::endl;
                     //curBlockLine++;
                 }
                 else if(tF1[1].find("type_symbol") !=std::string::npos)
@@ -4350,6 +4381,7 @@ namespace LIBMOL
                 itsCurAtom->resName = TrimSpaces(tF[hasProps["atom"]["resName"]]);
                 //std::cout << "Its residue name: " << itsCurAtom->resName << std::endl;
             }
+
             if (hasProps["atom"].find("id") != hasProps["atom"].end())
             {
                 itsCurAtom->existProps["id"] =  hasProps["atom"]["id"];
@@ -4357,6 +4389,15 @@ namespace LIBMOL
                 itsCurAtom->id = TrimSpaces(tF[hasProps["atom"]["id"]]);
                 //std::cout << "Its ID: " << itsCurAtom->id << std::endl;
             }
+
+            if (hasProps["atom"].find("alt_id") != hasProps["atom"].end())
+            {
+                itsCurAtom->existProps["alt_id"] =  hasProps["atom"]["alt_id"];
+                cleanSymbol(tF[hasProps["atom"]["alt_id"]], "\"");
+                itsCurAtom->altId = TrimSpaces(tF[hasProps["atom"]["alt_id"]]);
+                // std::cout << "Its alt ID: " << itsCurAtom->altId << std::endl;
+            }
+
             if (hasProps["atom"].find("chemType") != hasProps["atom"].end())
             {
                 itsCurAtom->existProps["chemType"] =  hasProps["atom"]["chemType"];
@@ -4480,6 +4521,8 @@ namespace LIBMOL
                     itsCurAtom->coords[2] = r3;
                 }
             }
+
+
 
             allAtoms.push_back(*itsCurAtom);
             //std::cout << "Number of atoms now " << allAtoms.size() << std::endl;
@@ -8454,13 +8497,14 @@ namespace LIBMOL
                       <<"#" << std::endl
                       <<"data_comp_" << longName << std::endl
                       <<"#" << std::endl;
-
+            outRestrF << "_chem_comp.pdbx_type        HETAIN" << std::endl;
             if (tAtoms.size() >0)
             {
                 // atom info section
                 outRestrF << "loop_" << std::endl
                           << "_chem_comp_atom.comp_id" << std::endl
                           << "_chem_comp_atom.atom_id" << std::endl
+                          << "_chem_comp_atom.alt_atom_id" << std::endl
                           << "_chem_comp_atom.type_symbol" << std::endl
                           << "_chem_comp_atom.type_energy" << std::endl
                           << "_chem_comp_atom.charge" << std::endl
@@ -8499,9 +8543,13 @@ namespace LIBMOL
 
                     StrUpper(iA->chemType);
                     StrUpper(iA->ccp4Type);
-
+                    if (iA->altId.size()==0)
+                    {
+                        iA->altId = iA->id;
+                    }
                     outRestrF << longName
                               << std::setw(12) << iA->id
+                              << std::setw(12) << iA->altId
                               << std::setw(6) << iA->chemType
                               << std::setw(6) << iA->ccp4Type
                               << std::setw(8) << strCharge
@@ -8540,8 +8588,10 @@ namespace LIBMOL
                           << "_chem_comp_bond.comp_id" << std::endl
                           << "_chem_comp_bond.atom_id_1" << std::endl
                           << "_chem_comp_bond.atom_id_2" << std::endl
-                          << "_chem_comp_bond.type" << std::endl
-                          << "_chem_comp_bond.aromatic"  << std::endl
+                          // << "_chem_comp_bond.type" << std::endl
+                          << "_chem_comp_bond.value_order" << std::endl
+                          // << "_chem_comp_bond.aromatic"  << std::endl
+                          << "_chem_comp_bond.pdbx_aromatic_flag"  << std::endl
                           << "_chem_comp_bond.value_dist_nucleus" << std::endl
                           << "_chem_comp_bond.value_dist_nucleus_esd" << std::endl
                           << "_chem_comp_bond.value_dist"<< std::endl
@@ -9007,7 +9057,7 @@ namespace LIBMOL
         {
             outTempFName+=aSetStrs[i];
         }
-        outTempFName +="_ac.txt";
+        // outTempFName +="_ac.txt";
         std::cout << "output AandC file name : " << outTempFName << std::endl;
 
         std::ofstream outRestrF(tFName);
@@ -9476,6 +9526,220 @@ namespace LIBMOL
             }
             outRestrF.close();
         }
+    }
+
+    extern void outMMCif3(FileName tFName,
+                         ID tMonoRootName,
+                         std::vector<LIBMOL::AtomDict>& tAtoms,
+                         // std::vector<int>    & tHydroAtoms,
+                         std::vector<LIBMOL::BondDict>& tBonds,
+                         std::vector<LIBMOL::RingDict> & tRings)
+    {
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                iA !=tAtoms.end(); iA++)
+        {
+            // std::cout << iA->id << std::endl;
+            if (iA->id.find("\'") !=std::string::npos)
+            {
+                iA->id = "\"" + iA->id + "\"";
+            }
+            // std::cout << iA->id << std::endl;
+        }
+
+        // std::cout << "Print Pos " << std::endl;
+        // Open a temp file for writing
+        // std::vector<std::string> aSetStrs;
+        // StrTokenize(tFName, aSetStrs, '.');
+        //std::string outTempFName;
+        //for (unsigned i=0; i < aSetStrs.size()-1; i++ )
+        //{
+        //    outTempFName+=aSetStrs[i];
+        //}
+        // outTempFName +="_ac.txt";
+        std::cout << "output AandC file name : " << tFName << std::endl;
+
+        std::ofstream outRestrF(tFName);
+
+        if(outRestrF.is_open())
+        {
+
+            srand((unsigned)std::time( NULL ));
+            // Temp
+            // 1. Global section
+            outRestrF << "global_" << std::endl
+                    << "_lib_name         ?" << std::endl
+                    << "_lib_version      ?" << std::endl
+                    << "_lib_update       ?" << std::endl;
+
+
+
+            // 'LIST OF MONOMERS' section
+
+
+            std::string longName =tMonoRootName.substr(0,3);
+            std::string sName =tMonoRootName.substr(0,3);
+
+            //StrUpper(longName);
+
+
+            ID ligType = "non-polymer";
+
+            int nH = getHAtomNum(tAtoms);
+
+
+            outRestrF << "# ------------------------------------------------" << std::endl
+                    << "#" << std::endl
+                    << "# ---   LIST OF MONOMERS ---" << std::endl
+                    << "#" << std::endl
+                    << "data_comp_list" << std::endl
+                    << "loop_" << std::endl
+                    << "_chem_comp.id" << std::endl
+                    << "_chem_comp.three_letter_code" << std::endl
+                    << "_chem_comp.name" << std::endl
+                    << "_chem_comp.group" << std::endl
+                    << "_chem_comp.number_atoms_all" << std::endl
+                    << "_chem_comp.number_atoms_nh"  << std::endl
+                    << "_chem_comp.desc_level" << std::endl;
+
+            outRestrF << longName <<"\t"<< sName << "\t" << "'.\t\t'\t"
+                      << ligType << "\t" << (int)tAtoms.size() << "\t"
+                      << (int)tAtoms.size()- nH << "\t."
+                          // << (int)tAtoms.size()-(int)tHydroAtoms.size() << "\t."
+                      << std::endl;
+
+            outRestrF <<"# ------------------------------------------------------" << std::endl
+                      <<"# ------------------------------------------------------" << std::endl
+                      <<"#" << std::endl
+                      <<"# --- DESCRIPTION OF MONOMERS ---" << std::endl
+                      <<"#" << std::endl
+                      <<"data_comp_" << longName << std::endl
+                      <<"#" << std::endl;
+
+            if (tAtoms.size() >0)
+            {
+                // atom info section
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_atom.comp_id" << std::endl
+                          << "_chem_comp_atom.atom_id" << std::endl
+                          << "_chem_comp_atom.type_symbol" << std::endl
+                          << "_chem_comp_atom.type_energy" << std::endl
+                          << "_chem_comp_atom.charge" << std::endl
+                          << "_chem_comp_atom.x" << std::endl
+                          << "_chem_comp_atom.y" << std::endl
+                          << "_chem_comp_atom.z" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_x_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_y_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_z_ideal" << std::endl;
+
+
+                for (std::vector<AtomDict>::iterator iA = tAtoms.begin();
+                        iA != tAtoms.end(); iA++)
+                {
+                    //double r1 =  (double) rand()/RAND_MAX;
+                    //double r2 =  (double) rand()/RAND_MAX;
+                    //double r3 =  (double) rand()/RAND_MAX;
+                    REAL tCharge =0.0;
+                    if (iA->charge !=0.0)
+                    {
+                        tCharge = iA->charge;
+                    }
+                    else if (iA->formalCharge !=0.0)
+                    {
+                        tCharge = iA->formalCharge;
+                    }
+
+                    std::string strCharge = TrimSpaces(RealToStr(tCharge));
+                    if (strCharge.find(".") !=strCharge.npos)
+                    {
+                        std::vector<std::string> tVec;
+                        StrTokenize(strCharge, tVec, '.');
+                        strCharge = tVec[0];
+                    }
+
+                    StrUpper(iA->chemType);
+                    StrUpper(iA->ccp4Type);
+
+                    outRestrF << longName
+                              << std::setw(12) << iA->id
+                              << std::setw(6) << iA->chemType
+                              << std::setw(6) << iA->ccp4Type
+                              << std::setw(8) << strCharge
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[0]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[2]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[0]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[2] << std::endl;
+                }
+            }
+
+            if (tBonds.size() >0)
+            {
+                // newly added
+
+
+                // Bond sections
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_bond.comp_id" << std::endl
+                          << "_chem_comp_bond.atom_id_1" << std::endl
+                          << "_chem_comp_bond.atom_id_2" << std::endl
+                          << "_chem_comp_bond.type" << std::endl
+                          << "_chem_comp_bond.value_order" << std::endl
+                          << "_chem_comp_bond.aromatic"  << std::endl
+                          << "_chem_comp_bond.value_dist"<< std::endl
+                          << "_chem_comp_bond.value_dist_esd" << std::endl;
+                          // << "_chem_comp_bond.exact_cod_dist" << std::endl;
+
+
+                for (std::vector<BondDict>::iterator iB=tBonds.begin();
+                          iB !=tBonds.end(); iB++)
+                {
+                    std::string tAr;
+
+                    StrLower(iB->order);
+
+                    if (iB->order.find("arom") !=iB->order.npos)
+                    {
+                        tAr       = "y";
+                    }
+                    else
+                    {
+                        unifyStrForOrder(iB->order);
+                        tAr = "n";
+                    }
+
+
+
+                    outRestrF <<  longName
+                              << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id
+                              << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id
+                              << std::setw(12)  << iB->order
+                              << std::setw(12)  << iB->order
+                              << std::setw(8)   << tAr
+                              << std::setw(10)  << std::setprecision(3)
+                              << iB->value
+                              << std::setw(8) << std::setprecision(3)
+                              << iB->sigValue << std::endl;
+
+                    //   if(iB->hasCodValue)
+                    //   {
+                    //       outRestrF << "Yes " << std::endl;
+                    //   }
+                    //   else
+                    //   {
+                    //       outRestrF << "No "  << std::endl;
+                    //   }
+                }
+            }
+            outRestrF.close();
+        }
+
     }
 
     extern void outMMCifFromOneMol(FileName tFName,

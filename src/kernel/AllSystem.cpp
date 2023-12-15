@@ -650,7 +650,7 @@ namespace LIBMOL
         //    std::cout << "CCP4 types already set " << std::endl;
         //}
 
-        setAllAtomEXcessElectrons(allAtoms);
+        // setAllAtomEXcessElectrons(allAtoms);
 
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
@@ -670,9 +670,9 @@ namespace LIBMOL
             }
         }
 
-        int tSum = sumExElectrons(allAtoms);
-        std::cout << "Sum of number of excess electrons is "
-                  << tSum << std::endl;
+        //int tSum = sumExElectrons(allAtoms);
+        //std::cout << "Sum of number of excess electrons is "
+        //          << tSum << std::endl;
 
         /*
         for (std::vector<BondDict>::iterator iB=allBonds.begin();
@@ -4339,7 +4339,7 @@ namespace LIBMOL
                     if (comboId.size() > 0)
                     {
 
-
+                        std::cout << "ComboId is " << comboId << std::endl;
                         TorsionDict aTor;
                         if (lForward)
                         {
@@ -4354,6 +4354,7 @@ namespace LIBMOL
                             //                         allAtoms[*iAt2]);
                             // aTor.value = getIntParts(aTor.value);
                             aTor.period = StrToInt(tPepTorStdIds[comboId][5]);
+                            aTor.value  = StrToReal(tPepTorStdIds[comboId][7]);
                         }
                         else
                         {
@@ -4369,8 +4370,31 @@ namespace LIBMOL
                             //aTor.value = getIntParts(aTor.value);
 
                             aTor.period = StrToInt(tPepTorStdIds[comboId][5]);
+                            aTor.value  = StrToReal(tPepTorStdIds[comboId][7]);
+                        }
+                        std::vector<std::string> tmpChi2;
+                        tmpChi2.push_back("CA_CB_CG_CD");
+                        tmpChi2.push_back("CA_CB_CG_CD1");
+                        tmpChi2.push_back("CA_CB_CG_CD2");
+                        if (std::find(tmpChi2.begin(), tmpChi2.end(), comboId)
+                            !=tmpChi2.end())
+                        {
+                            int sp1 = allAtoms[aTor.atoms[1]].bondingIdx;
+                            int sp2 = allAtoms[aTor.atoms[2]].bondingIdx;
+                            if ((sp1==2 && sp2==3) || (sp1==3 && sp2==2))
+                            {
+                                aTor.period =6;
+                                aTor.value  =90.0;
+                            }
                         }
 
+                        std::cout << "The tor id is " << aTor.id << std::endl;
+                        std::cout <<"The atoms are " << std::endl;
+                        for (unsigned i=0; i < 4; i++)
+                        {
+                            std::cout << allAtoms[aTor.atoms[i]].id << std::endl;
+                        }
+                        std::cout << "The tor value is " << tPepTorStdIds[comboId][7] << std::endl;
                         int curTorHi = StrToInt(tPepTorStdIds[comboId][6]);
                         if (curTorHi < aTorHi)
                         {
@@ -4421,7 +4445,7 @@ namespace LIBMOL
                 tRecord = TrimSpaces(tRecord);
                 std::vector<std::string> tBuf;
                 StrTokenize(tRecord, tBuf);
-                if ((int)tBuf.size() ==8)
+                if ((int)tBuf.size() ==9)
                 {
                     for (unsigned i=1; i < tBuf.size(); i++)
                     {
@@ -4450,9 +4474,10 @@ namespace LIBMOL
             }
             if((int)tPos.size() ==2)
             {
-                //std::cout << "Set torsion angles around the bond of atom "
-                //          << allAtoms[tPos[0]].id << " and "
-                //          << allAtoms[tPos[1]].id << std::endl;
+                std::cout << "Set peptide bonds " << std::endl;
+                std::cout << "Set torsion angles around the bond of atom "
+                          << allAtoms[tPos[0]].id << " and "
+                          << allAtoms[tPos[1]].id << std::endl;
                 setPeptideTorsionIdxFromOneBond(tPos[0], tPos[1],
                                                 pepTorStdIds,
                                                 chiTors, hhTors, cstTors);
@@ -4561,24 +4586,24 @@ namespace LIBMOL
 
                 if (mapIdSer.find(aId1) !=mapIdSer.end())
                 {
-                    double torVal = getTorsion(allAtoms[iTor->atoms[0]],
-                                        allAtoms[iTor->atoms[1]],
-                                        allAtoms[iTor->atoms[2]],
-                                        allAtoms[iTor->atoms[3]]);
+                    //double torVal = getTorsion(allAtoms[iTor->atoms[0]],
+                    //                    allAtoms[iTor->atoms[1]],
+                    //                    allAtoms[iTor->atoms[2]],
+                    //                    allAtoms[iTor->atoms[3]]);
 
-                    miniTorsions[mapIdSer[aId1]].value
-                                 = getIntParts(torVal);
+                    //miniTorsions[mapIdSer[aId1]].value  = iTor->value;
+                                                                                  //= getIntParts(torVal);
 
                     miniTorsions[mapIdSer[aId1]].period = iTor->period;
                 }
                 else if (mapIdSer.find(aId2) !=mapIdSer.end())
                 {
-                    double torVal = getTorsion(allAtoms[iTor->atoms[3]],
-                                        allAtoms[iTor->atoms[2]],
-                                        allAtoms[iTor->atoms[1]],
-                                        allAtoms[iTor->atoms[0]]);
-                    miniTorsions[mapIdSer[aId2]].value
-                                  = getIntParts(torVal);
+                    //double torVal = getTorsion(allAtoms[iTor->atoms[3]],
+                    //                    allAtoms[iTor->atoms[2]],
+                    //                    allAtoms[iTor->atoms[1]],
+                    //                    allAtoms[iTor->atoms[0]]);
+                    // miniTorsions[mapIdSer[aId2]].value = iTor->value;
+                                                                                 //   = getIntParts(torVal);
 
                     miniTorsions[mapIdSer[aId2]].period = iTor->period;
                 }

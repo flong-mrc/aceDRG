@@ -104,9 +104,9 @@ class ChemCheck(object):
         self.orgVal["P"]     = [5]    # should be [5, 3]. Use one at the moment
 
 
-        self.torsions   = []
-        self.outChiSign  ={}
-        self.tmpChiralSign = {}
+        self.torsions        = []
+        self.outChiSign      ={}
+        self.tmpChiralSign   = {}
 
 
     def isOrganicMol(self, tMol):
@@ -773,7 +773,7 @@ class ChemCheck(object):
                             atomLinks[aAId].append(aBond["_chem_comp_bond.atom_id_1"])
             if "N" in atomLinks["CA"] and "C" in atomLinks["CA"] and len(atomLinks["CA"])==4\
                and "O" in atomLinks["C"] and "OXT" in atomLinks["C"] and len(atomLinks["C"])==3\
-               and (len(atomLinks["N"])==2 or len(atomLinks["N"])==3):
+               and len(atomLinks["N"])<=4:
                 lAA = True
                 # Check and change if required
                 hAtomNameMap["CA"]= []
@@ -784,13 +784,12 @@ class ChemCheck(object):
                     lAA = False
                 elif hAtomNameMap["CA"][0] != "HA": 
                     lAA = False
-
                 hAtomNameMap["N"]= []
                 for aId in atomLinks["N"]:
                     if tAtoms[atomDicts[aId]]["_chem_comp_atom.type_symbol"]=="H": 
                         hAtomNameMap["N"].append(tAtoms[atomDicts[aId]]["_chem_comp_atom.atom_id"])
                 if len(atomLinks["N"])==3:
-                    if len(hAtomNameMap["N"]) ==0 or len(hAtomNameMap["N"])> 2 :
+                    if len(hAtomNameMap["N"]) ==0 or len(hAtomNameMap["N"])> 3 :
                         lAA = False
                     else:
                         if len(hAtomNameMap["N"]) ==1 :
@@ -799,7 +798,6 @@ class ChemCheck(object):
                         else:
                             if not "H" in hAtomNameMap["N"] or not "H2" in hAtomNameMap["N"]:
                                 lAA = False 
-                             
                 elif len(atomLinks["N"])==4:
                     if len(hAtomNameMap["N"]) != 3  :
                         lAA = False
@@ -904,7 +902,67 @@ class ChemCheck(object):
                     aHBond["_chem_comp_bond.value_dist"]             = "1.0"
                     aHBond["_chem_comp_bond.value_dist_esd"]         = "0.1"
                     tBonds.append(aHBond)
-            
+    
+    def addjustAtomsAndBonds3(self, tAtoms, tBonds, tBCFName):
+        
+    
+        tBCFName  = tBCFName + "_ac.txt"
+        if os.path.isfile(tBCFName):
+            f = open(tBCFName, "r")
+            allLs = f.readlines()
+            f.close()
+        
+        aAtmMap = {}
+        idxA =0
+        for aA in tAtoms:
+            idStr = aA["_chem_comp_atom.atom_id"]
+            aAtmMap[idStr] = idxA
+            idxA+=1
+        
+        aBondMap = {}
+        idxB =0;
+        for aB in tBonds:
+            idStr = aB["_chem_comp_bond.atom_id_1"].strip() + "_" +\
+                     aB["_chem_comp_bond.atom_id_2"].strip()
+            aBondMap[idStr] =  idxB   
+            idxB+=1
+        
+        for aL in allLs:
+            if aL.upper().find("CHARGE:") !=-1:
+                strGrp = aL.strip().split()
+                if len(strGrp) ==3:
+                    if strGrp[1] in aAtmMap.keys():
+                        idxAt = aAtmMap[strGrp[1]]
+                        tAtoms[idxAt]["_chem_comp_atom.charge"] = strGrp[2].strip()
+                    else:
+                        print("Bug: atom %s can not be found"%strGrp[1])
+            elif aL.upper().find("BOND:") !=-1:
+                strGrp = aL.strip().split()
+                if len(strGrp) ==4:
+                    idStr =""
+                    idStr1 =strGrp[1].strip() + "_" + strGrp[2].strip() 
+                    idStr2 =strGrp[2].strip() + "_" + strGrp[1].strip()
+                    if idStr1 in aBondMap.keys():
+                        idStr= idStr1
+                    elif idStr2 in aBondMap.keys():
+                        idStr= idStr2
+                    
+                    if idStr:
+                        idxBo = aBondMap[idStr] 
+                        tBonds[idxBo]["_chem_comp_bond.type"] = strGrp[3].strip()
+                    else:
+                        print("Bug: bond between atoms %s and %s can not be found"
+                              %(strGrp[1], strGrp[2]))
+                        
+        print("After keku: ")
+        for aAt in tAtoms:
+            print("Atom %s has charge of %s"%(aAt["_chem_comp_atom.atom_id"],  aAt["_chem_comp_atom.charge"]))
+        for aB in tBonds:
+            print("Bond-order between atoms %s and %s is %s"
+                  %(aB["_chem_comp_bond.atom_id_1"], aB["_chem_comp_bond.atom_id_2"], 
+                    aB["_chem_comp_bond.type"]))
+
+        print("Finished here ")                
     def addjustAtomsAndBonds(self, tAtoms, tBonds):
         
         # For molecules contain bonds called explicitly aromatic bonds

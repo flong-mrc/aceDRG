@@ -1,4 +1,4 @@
- /* 
+ /*
  * File:   atom.cpp
  * Author: flong
  *
@@ -32,16 +32,16 @@ namespace LIBMOL
             itsOccup(ZeroReal),
             itsTempFact(ZeroReal),
             itsSigOcc(ZeroReal),
-            itsSigTemp(ZeroReal)             
+            itsSigTemp(ZeroReal)
     {
-        
+
         // allRestrLists = new RestraintLists();
     }
 
-     Atom::Atom(const Atom & tAtom) 
+     Atom::Atom(const Atom & tAtom)
      {
         // Atom();
-         
+
          itsName        = tAtom.getName();
          itsSeriNum     = tAtom.getSeriNum();
          itsElementType = tAtom.getElementType();
@@ -52,27 +52,27 @@ namespace LIBMOL
          itsMass        = tAtom.getMass();
          itsInsCode     = tAtom.getInsCode();
          itsAltLoc      = tAtom.getAltLoc();
-         
+
          for (int i = 0; i < (int)tAtom.Uxx.size(); i++)
          {
-             Uxx.push_back(tAtom.Uxx[i]); 
-         } 
+             Uxx.push_back(tAtom.Uxx[i]);
+         }
          for (int i = 0; i <(int)tAtom.sigUxx.size(); i++)
          {
-             sigUxx.push_back(tAtom.sigUxx[i]); 
-         }         
+             sigUxx.push_back(tAtom.sigUxx[i]);
+         }
          for (int i=0; i < (int)tAtom.coords.size(); i++)
          {
              coords.push_back(tAtom.coords[i]);
          }
-         
+
          for (std::vector<REAL>::const_iterator iAtl=tAtom.altLoc.begin();
                  iAtl !=tAtom.altLoc.end(); iAtl++)
          {
              altLoc.push_back((*iAtl));
          }
      }
-     
+
      Atom::~Atom()
      {
       /*   if(allRestrLists !=NULL)
@@ -81,9 +81,9 @@ namespace LIBMOL
              allRestrLists = NULL;
          }
        */
-       
+
      }
-    
+
     std::string Atom::getName() const
     {
         return itsName;
@@ -92,17 +92,17 @@ namespace LIBMOL
     {
         itsName = tName;
     }
-    
+
     int  Atom::getSeriNum() const
     {
         return itsSeriNum;
     }
     void Atom::setSeriNum(int tN)
     {
-        itsSeriNum = tN; 
+        itsSeriNum = tN;
     }
-    
-    Element Atom::getElementType() const 
+
+    Element Atom::getElementType() const
     {
         return itsElementType;
     }
@@ -110,7 +110,7 @@ namespace LIBMOL
     {
         itsElementType=tElem;
     }
-        
+
     IDCode Atom::getID() const
     {
         return itsID;
@@ -119,8 +119,8 @@ namespace LIBMOL
     {
         itsID=tID;
     }
-        
-    ResName Atom::getResName() const  
+
+    ResName Atom::getResName() const
     {
         return itsResName;
     }
@@ -128,7 +128,7 @@ namespace LIBMOL
     {
         itsResName=tName;
     }
-        
+
     SeriNumber Atom::getSeqNum() const
     {
         return itsSeqNum;
@@ -137,7 +137,7 @@ namespace LIBMOL
     {
         itsSeqNum=tN;
     }
-        
+
     InsCode Atom::getInsCode()  const
     {
         return itsInsCode;
@@ -146,7 +146,7 @@ namespace LIBMOL
     {
         itsInsCode=tID;
     }
-        
+
     SeriNumber Atom::getSegNum() const
     {
         return itsSegNum;
@@ -155,8 +155,8 @@ namespace LIBMOL
     {
         itsSegNum = tN;
     }
-    
-    
+
+
     IDCode Atom::getSegID()  const
     {
         return itsSegID;
@@ -165,7 +165,7 @@ namespace LIBMOL
     {
         itsSegID = tID;
     }
-        
+
     ChainID Atom::getChainID() const
     {
         return itsChainID;
@@ -174,8 +174,8 @@ namespace LIBMOL
     {
         itsChainID = tID;
     }
-      
-    SeriNumber Atom::getModSeriNum() const  
+
+    SeriNumber Atom::getModSeriNum() const
     {
         return itsModNum;
     }
@@ -183,8 +183,8 @@ namespace LIBMOL
     {
         itsModNum = tN;
     }
-        
-    REAL Atom::getMass() const 
+
+    REAL Atom::getMass() const
     {
         return itsMass;
     }
@@ -192,7 +192,7 @@ namespace LIBMOL
     {
         itsMass = tMass;
     }
-        
+
     REAL Atom::getCharge()  const
     {
         return itsCharge;
@@ -201,26 +201,26 @@ namespace LIBMOL
     {
         itsCharge = tC;
     }
-        
+
     REAL Atom::getPartialCharge() const
     {
         return itsPCharge;
     }
-    void Atom::setPartialCharge(REAL tC) 
+    void Atom::setPartialCharge(REAL tC)
     {
         itsPCharge = tC;
     }
-        
+
     AltLoc Atom::getAltLoc() const
     {
         return itsAltLoc;
     }
-    
+
     void Atom::setAltLoc(AltLoc tA)
     {
         itsAltLoc = tA;
     }
-        
+
     REAL Atom::getOccup() const
     {
         return itsOccup;
@@ -229,16 +229,16 @@ namespace LIBMOL
     {
         itsOccup = tO;
     }
-        
+
     REAL Atom::getTempFact() const
     {
         return itsTempFact;
     }
-    void Atom::setTempFact(REAL tT) 
+    void Atom::setTempFact(REAL tT)
     {
         itsTempFact = tT;
     }
-        
+
     REAL Atom::getRadius() const
     {
         return itsRadius;
@@ -247,7 +247,7 @@ namespace LIBMOL
     {
         itsRadius = tR;
     }
-        
+
     REAL Atom::getIonRadius() const
     {
         return itsIonRadius;
@@ -255,10 +255,10 @@ namespace LIBMOL
     void Atom::setIonRadius (REAL tIR)
     {
         itsIonRadius = tIR;
-    }    
-    
-    // another kind of atom class 
-    
+    }
+
+    // another kind of atom class
+
     AtomDict::AtomDict() :seriNum(ZeroInt),
             resName(NullString),
             id(NullString),
@@ -317,7 +317,7 @@ namespace LIBMOL
         existProps["x"]          = -1;
         existProps["y"]          = -1;
         existProps["z"]          = -1;
-        
+
         int tDim=3;
         for (int i=0; i <  tDim; i++)
         {
@@ -325,14 +325,14 @@ namespace LIBMOL
             fracCoords.push_back(0.0);
             forces.push_back(0.0);
         }
-        
+
         baseRingProp["size"]  ="";
         baseRingProp["aroma"] ="";
-        
-        formalCharge = charge; 
+
+        formalCharge = charge;
     }
-    
-    AtomDict::AtomDict(const AtomDict& tAtom) : seriNum(tAtom.seriNum), 
+
+    AtomDict::AtomDict(const AtomDict& tAtom) : seriNum(tAtom.seriNum),
             resName(tAtom.resName),
             id(tAtom.id),
             altId(tAtom.altId),
@@ -389,7 +389,7 @@ namespace LIBMOL
         {
             existProps[iMa->first] = iMa->second;
         }
-        
+
         for(std::vector<REAL>::const_iterator tX=tAtom.coords.begin();
                 tX != tAtom.coords.end(); tX++)
         {
@@ -404,62 +404,68 @@ namespace LIBMOL
         {
             forces.push_back((*tF));
         }
-        
+
         for (std::vector<int>::const_iterator iA=tAtom.connAtoms.begin();
                 iA !=tAtom.connAtoms.end(); iA++)
         {
             connAtoms.push_back((*iA));
         }
-        
+
         for (std::vector<int>::const_iterator iA=tAtom.connHAtoms.begin();
                 iA !=tAtom.connHAtoms.end(); iA++)
         {
             connHAtoms.push_back((*iA));
         }
-        
+
+        for (std::vector<int>::const_iterator iA=tAtom.connMAtoms.begin();
+                iA !=tAtom.connMAtoms.end(); iA++)
+        {
+            connMAtoms.push_back((*iA));
+        }
+
         for (std::vector<int>::const_iterator iA=tAtom.neighbAtoms.begin();
                 iA != tAtom.neighbAtoms.end(); iA++)
         {
             neighbAtoms.push_back(*iA);
         }
-        
+
         for (std::map<int, REAL>::const_iterator iM=tAtom.NBAtomMap.begin();
                 iM != tAtom.NBAtomMap.end(); iM++)
         {
             NBAtomMap[iM->first]=iM->second;
         }
-        
+
         for (std::vector<int>::const_iterator iB = tAtom.inBonds.begin();
                 iB != tAtom.inBonds.end(); iB++)
         {
             inBonds.push_back((*iB));
         }
-        
+
         for (std::vector<REAL>::const_iterator iBL=tAtom.bondLengths.begin();
                 iBL != tAtom.bondLengths.end(); iBL++)
         {
             bondLengths.push_back(*iBL);
         }
-        
+
         for (std::vector<AngleDict>::const_iterator iA=tAtom.inAngles.begin();
                 iA != tAtom.inAngles.end(); iA++)
         {
             inAngles.push_back(*iA);
         }
-        
+
         for (std::vector<int>::const_iterator iR = tAtom.inRings.begin();
                 iR !=tAtom.inRings.end(); iR++)
         {
             inRings.push_back((*iR));
         }
-        
-        for (std::vector<RingDict>::const_iterator 
+
+        for (std::vector<RingDict>::const_iterator
                 iRF=tAtom.inRingsFull.begin();
                 iRF != tAtom.inRingsFull.end(); iRF++)
         {
             inRingsFull.push_back(*iRF);
         }
-        
+
         for(std::vector<int>::const_iterator iCh=tAtom.inChirals.begin();
                 iCh!=tAtom.inChirals.end(); iCh++)
         {
@@ -475,19 +481,19 @@ namespace LIBMOL
         {
              ringRep.insert(std::pair<std::string,int>(iRiRep->first, iRiRep->second));
         }
-        
+
         for (std::map<std::string,std::string>::const_iterator iRiRep=tAtom.ringRepS.begin();
                 iRiRep != tAtom.ringRepS.end(); iRiRep++)
         {
              ringRepS.insert(std::pair<std::string,std::string>(iRiRep->first, iRiRep->second));
         }
-        
+
         for (std::map<std::string,int>::const_iterator iRdRep=tAtom.ringRepBySeriNum.begin();
                 iRdRep != tAtom.ringRepBySeriNum.end(); iRdRep++)
         {
              ringRepBySeriNum.insert(std::pair<std::string,int>(iRdRep->first, iRdRep->second));
         }
-     
+
         for (std::vector<ID>::const_iterator iCod=tAtom.codClassV.begin();
                 iCod !=tAtom.codClassV.end(); iCod++)
         {
@@ -502,27 +508,87 @@ namespace LIBMOL
                 tree[iTr->first].push_back(*iAt);
             }
         }
-        
+
         for (std::map<std::string, std::string>::const_iterator iMRP=tAtom.baseRingProp.begin();
                 iMRP != tAtom.baseRingProp.end(); iMRP++)
         {
             baseRingProp[iMRP->first] = iMRP->second;
         }
-        
-        for (std::vector<std::string>::const_iterator 
+
+        for (std::vector<std::string>::const_iterator
              iFMType=tAtom.formType.begin();
              iFMType !=tAtom.formType.end(); iFMType++)
         {
             formType.push_back(*iFMType);
         }
-        
+
         formalCharge = charge;
     }
-    
+
+    AtomDict::AtomDict(const Atom & tAtom):seriNum(tAtom.getSeriNum()-1),
+                                resName(tAtom.getResName()),
+                                id(tAtom.getName()),
+                                altId(NullString),
+                                chemType(tAtom.getElementType()),
+                                enerType(NullString),
+                                charge(tAtom.getPartialCharge()),
+                                parCharge(ZeroReal),
+                                formalCharge(ZeroReal),
+                                formalChargeI(ZeroInt),
+                                radius(VDWCONST),
+                                ionRadius(VDWCONST),
+                                inChiralIdx(ZeroInt),
+                                chiralIdx(ZeroInt),
+                                bondingIdx(ZeroInt),
+                                hybrid(NullString),
+                                matType(0),
+                                isMetal(false),
+                                metalGeo(NullString),
+                                isoB(ZeroReal),
+                                ocp(1.0),
+                                symmMult(1),
+                                excessElec(0),
+                                ccp4Type(NullString),
+                                cChemType(NullString),
+                                codClass(NullString),
+                                codMolIdx(ZeroInt),
+                                codCifName(NullString),
+                                codAtmRoot(NullString),
+                                codNBSymb(NullString),
+                                codNB2Symb(NullString),
+                                codNB3Symb(NullString),
+                                codAtmMain(NullString),
+                                codNB1NB2_SP(NullString),
+                                codNB1NB2_ExElec(NullString),
+                                hashingValue(ZeroInt),
+                                coordExist(false),
+                                numPi(ZeroInt),
+                                isCChemTypeSet(false),
+                                isInPreCell(false),
+                                chiralChecked(false),
+                                isInAromRing(false),
+                                isInSP2Ring(false),
+                                fromCalc(false),
+                                sId(NullString),
+                                symmOp(NullString),
+                                fromOrig(-1),
+                                sMolType(NullString),
+                                treeBond(ZeroReal),
+                                treeAngle(ZeroReal),
+                                treeTorsion(ZeroReal)
+    {
+        for(std::vector<REAL>::const_iterator tX=tAtom.coords.begin();
+                tX != tAtom.coords.end(); tX++)
+        {
+            coords.push_back((*tX));
+        }
+
+    }
+
     AtomDict::~AtomDict()
     {
     }
-    
+
     int AtomDict::getNumAtomsWithin2stNB(std::vector<AtomDict> & tAllAtoms)
     {
         int tN=0;
@@ -530,12 +596,12 @@ namespace LIBMOL
                 iNB !=connAtoms.end(); iNB++)
         {
             // allow repeat calculations in 2st NB
-            tN +=(int)tAllAtoms[*iNB].connAtoms.size();    //should be (1+(int)tAllAtoms[*iNB].connAtoms-1)   
+            tN +=(int)tAllAtoms[*iNB].connAtoms.size();    //should be (1+(int)tAllAtoms[*iNB].connAtoms-1)
         }
-        
+
         return tN;
     }
-    
+
     int AtomDict::getNum1stNbHave2edNb(std::vector<AtomDict>& tAtoms)
     {
         int t12=0;
@@ -547,23 +613,23 @@ namespace LIBMOL
                 t12++;
             }
         }
-        
+
         return t12;
-        
+
     }
     /*
     void AtomDict::setCodClass()
     {
         codClass = "";
-        
+
         codClass.append(id);
         outRingSec();
-        
+
     }
-    
+
     void AtomDict::outRingSec()
     {
-        
+
         int numRings = (int)inRings.size();
         if (numRings)
         {
@@ -593,17 +659,17 @@ namespace LIBMOL
                     {
                         codClass.append(tSize + "]");
                     }
-                } 
+                }
             }
         }
     }
 
      */
-    
-    int AtomDict::getMinRing() 
+
+    int AtomDict::getMinRing()
     {
         int rSize = 0;
-        
+
         if ((int)ringRep.size() !=0)
         {
             int rMin = 7;
@@ -617,14 +683,14 @@ namespace LIBMOL
             }
             rSize = rMin;
         }
-        
+
         return rSize;
     }
-    
-    int AtomDict::getMinRing2() 
+
+    int AtomDict::getMinRing2()
     {
         int rSize = 0;
-        
+
         if (codClass.size() !=0)
         {
             std::vector<ID> tmpStrs1, tmpStrs2, tmpStrs3, tmpStrs4;
@@ -646,7 +712,7 @@ namespace LIBMOL
                                     StrTokenize(tmpStrs3[0],  tmpStrs4, 'x');
                                     if (tmpStrs4.size() >1)
                                     {
-                                        rSize = StrToInt(tmpStrs4[1]); 
+                                        rSize = StrToInt(tmpStrs4[1]);
                                     }
                                 }
                                 else
@@ -665,8 +731,8 @@ namespace LIBMOL
                                     StrTokenize(tmpStrs3[0],  tmpStrs4, 'x');
                                     if (tmpStrs4.size() >1)
                                     {
-                                        rSize = StrToInt(tmpStrs4[1]); 
-                                    } 
+                                        rSize = StrToInt(tmpStrs4[1]);
+                                    }
                                 }
                                 else
                                 {
@@ -682,10 +748,10 @@ namespace LIBMOL
         {
             rSize = getMinRing();
         }
-        
+
         return rSize;
     }
-    
+
     void AtomDict::setBaseRingProps()
     {
         if (codClass.size() !=0)
@@ -709,7 +775,7 @@ namespace LIBMOL
                         }
                         // std::cout << "ring prop " << baseRingProp["aroma"] << std::endl;
                         cleanChar(tRS[1], ']');
-                        
+
                         if(tRS[1].find(",") !=std::string::npos)
                         {
                             std::vector<ID> tMinR;
@@ -720,7 +786,7 @@ namespace LIBMOL
                                 {
                                     if (tMinR[0].find("a")==std::string::npos)
                                     {
-                                        baseRingProp["size"] = tMinR[0];    
+                                        baseRingProp["size"] = tMinR[0];
                                     }
                                     else
                                     {
@@ -737,7 +803,7 @@ namespace LIBMOL
                             {
                                 if (tRS[1].find("a")==std::string::npos)
                                 {
-                                    baseRingProp["size"] = tRS[1];    
+                                    baseRingProp["size"] = tRS[1];
                                 }
                                 else
                                 {
@@ -752,7 +818,7 @@ namespace LIBMOL
             }
         }
     }
-    
+
     void AtomDict::setCodChemType()
     {
         // Change the second letter in element ID from upper to low case.
@@ -766,23 +832,23 @@ namespace LIBMOL
             StrLower(tSubStr);
             cChemType = chemType.at(0)+ tSubStr;
         }
-        
+
         // other properties for COD database
-        
+
     }
-    
+
     void AtomDict::fromCodClassToEnerType()
     {
-        
+
     }
-        
+
     void AtomDict::outNeighBAtoms()
     {
-        
+
         // Check the atom
     }
- 
-   
+
+
     int AtomDict::atomPosition(std::vector<AtomDict>& tAtoms)
     {
         for (int i=0; i<(int)tAtoms.size(); i++)
@@ -792,18 +858,18 @@ namespace LIBMOL
                 return i;
             }
         }
-        
+
         return -1;
-        
+
     }
-    
-    
+
+
     metalCluster::metalCluster():metSeril(-1),
                                  formu(NullString),
                                  coordGeoID(NullString)
-    {   
+    {
     }
-   
+
     metalCluster::metalCluster(const metalCluster & tMC):metSeril(tMC.metSeril),
                                                         formu(tMC.formu),
                                                         coordGeoID(tMC.coordGeoID)
@@ -813,16 +879,16 @@ namespace LIBMOL
         {
             ligandSerilSet.push_back(*iLA);
         }
-        
-        for (std::map<int, std::map<int, std::vector<int> > >::const_iterator 
+
+        for (std::map<int, std::map<int, std::vector<int> > >::const_iterator
                   iLF=tMC.ligandNBs.begin();
                   iLF!=tMC.ligandNBs.end(); iLF++)
         {
-            for (std::map<int, std::vector<int> >::const_iterator 
+            for (std::map<int, std::vector<int> >::const_iterator
                     iOneLF=iLF->second.begin();
                     iOneLF !=iLF->second.end(); iOneLF++)
             {
-                for (std::vector<int>::const_iterator 
+                for (std::vector<int>::const_iterator
                      iNB = iOneLF->second.begin();
                      iNB != iOneLF->second.end(); iNB++)
                 {
@@ -830,34 +896,34 @@ namespace LIBMOL
                 }
             }
         }
-        
-        for (std::map<int, std::string >::const_iterator 
+
+        for (std::map<int, std::string >::const_iterator
                 iFo=tMC.ligandForma.begin();
                 iFo != tMC.ligandForma.end(); iFo++)
         {
             ligandForma[iFo->first] = iFo->second;
         }
-        
-        for (std::map<int, std::map<int, REAL> >::const_iterator 
+
+        for (std::map<int, std::map<int, REAL> >::const_iterator
                 iBM=tMC.uniqBondsMap.begin();
                 iBM != tMC.uniqBondsMap.end(); iBM++)
         {
-            for (std::map<int, REAL>::const_iterator iBV=iBM->second.begin(); 
+            for (std::map<int, REAL>::const_iterator iBV=iBM->second.begin();
                     iBV !=iBM->second.end(); iBV++)
             {
                 uniqBondsMap[iBM->first][iBV->first] = iBV->second;
             }
         }
-        
-        for (std::map<int, std::map<int, std::map<int, REAL> > >::const_iterator 
+
+        for (std::map<int, std::map<int, std::map<int, REAL> > >::const_iterator
                 iAngM=tMC.uniqAngsMap.begin(); iAngM !=tMC.uniqAngsMap.end();
                 iAngM++)
         {
-            for (std::map<int, std::map<int, REAL> >::const_iterator 
-                    iAng1=iAngM->second.begin(); 
+            for (std::map<int, std::map<int, REAL> >::const_iterator
+                    iAng1=iAngM->second.begin();
                     iAng1 != iAngM->second.end(); iAng1++)
             {
-                for (std::map<int, REAL>::const_iterator 
+                for (std::map<int, REAL>::const_iterator
                       iAng2=iAng1->second.begin();
                       iAng2 !=iAng1->second.end(); iAng2++)
                 {
@@ -866,16 +932,16 @@ namespace LIBMOL
                 }
             }
         }
-        
-        for (std::map<int, std::map<int, std::map<int, REAL> > >::const_iterator 
+
+        for (std::map<int, std::map<int, std::map<int, REAL> > >::const_iterator
             iAngM=tMC.secondNBAngsMap.begin(); iAngM !=tMC.secondNBAngsMap.end();
             iAngM++)
         {
-            for (std::map<int, std::map<int, REAL> >::const_iterator 
-                    iAng1=iAngM->second.begin(); 
+            for (std::map<int, std::map<int, REAL> >::const_iterator
+                    iAng1=iAngM->second.begin();
                     iAng1 != iAngM->second.end(); iAng1++)
             {
-                for (std::map<int, REAL>::const_iterator 
+                for (std::map<int, REAL>::const_iterator
                       iAng2=iAng1->second.begin();
                       iAng2 !=iAng1->second.end(); iAng2++)
                 {
@@ -884,42 +950,42 @@ namespace LIBMOL
                 }
             }
         }
-        
+
         allRings.clear();
         for (std::vector<RingDict>::const_iterator iR=tMC.allRings.begin();
               iR != tMC.allRings.end(); iR++)
         {
             allRings.push_back(*iR);
         }
-        
+
     }
-    
+
     metalCluster::~metalCluster()
     {
-        
+
     }
-    
+
     void metalCluster::setMetClusterFormu(std::vector<AtomDict>& tAtoms)
     {
         // The metal cluster formula.
         formu = setOneAtomFormu(tAtoms, metSeril);
         std::cout << "Metal cluster formular " << formu << std::endl;
-        
+
         // Formula for each ligand atoms
         for (std::vector<int>::iterator iL=ligandSerilSet.begin();
                 iL !=ligandSerilSet.end(); iL++)
         {
             ligandForma[*iL]= setOneAtomFormu(tAtoms, *iL);
-            std::cout << "NB for ligand atom " << tAtoms[*iL].id 
+            std::cout << "NB for ligand atom " << tAtoms[*iL].id
                       << " is " << ligandForma[*iL] << std::endl;
         }
     }
-    
-    
+
+
     std::string metalCluster::setOneAtomFormu(std::vector<AtomDict>& tAtoms,
                                                  int tCenSerial)
     {
-        
+
         std::string aReturn = "";
         int tOrig;
         if (!tAtoms[tCenSerial].isInPreCell)
@@ -930,17 +996,17 @@ namespace LIBMOL
         {
             tOrig = tAtoms[tCenSerial].seriNum;
         }
-        
+
         aReturn += (tAtoms[tOrig].chemType + ":");
-        
+
         std::map<std::string, std::vector<int> > tmpLF;
-        
+
         for (std::vector<int>::iterator iLS=tAtoms[tOrig].connAtoms.begin();
                 iLS !=tAtoms[tOrig].connAtoms.end(); iLS++)
         {
             tmpLF[tAtoms[*iLS].chemType].push_back(*iLS);
         }
-        
+
         std::string aLast = "";
         std::list<std::string> tContainer;
         for (std::map<std::string, std::vector<int> >::iterator iT=tmpLF.begin();
@@ -948,46 +1014,46 @@ namespace LIBMOL
         {
             if (iT->first.compare("H")!=0)
             {
-                tContainer.push_back("{" + iT->first 
+                tContainer.push_back("{" + iT->first
                                      + IntToStr(iT->second.size())
                                      + "}");
             }
             else
             {
-                // H atoms should not exist in the cluster, put in the last 
+                // H atoms should not exist in the cluster, put in the last
                 // for debug
                 aLast = "{" + iT->first + IntToStr(iT->second.size())
-                        + "}";  
+                        + "}";
             }
         }
-        
+
         tContainer.sort(compareNoCase2);
-        
+
         for (std::list<std::string>::iterator iComp=tContainer.begin();
                 iComp != tContainer.end(); iComp++)
         {
              aReturn+=*iComp;
         }
-        
+
         if(aLast.size() !=0)
         {
             aReturn +=aLast;
             if (tCenSerial==metSeril)
             {
-                std::cout << "A bug: metal atom " << tAtoms[metSeril].id 
-                      << " of serial number " << metSeril 
+                std::cout << "A bug: metal atom " << tAtoms[metSeril].id
+                      << " of serial number " << metSeril
                       << " connects directly to H atoms " << aLast
                       << ". Please check!" << std::endl;
             }
-                      
+
         }
-        
+
         // How to record the charge of the cluster ?
-        
+
         return aReturn;
-        
+
     }
-    
+
     void metalCluster::buildBondAndAngleMap(std::vector<AtomDict> & tAtoms,
                                        std::vector<CrystInfo>::iterator tCryst)
     {
@@ -995,28 +1061,28 @@ namespace LIBMOL
                   << tAtoms[metSeril].id << " of serial number "
                   << tAtoms[metSeril].seriNum << std::endl;
         std::vector<REAL>  bVList, aVList, a2VList;
-        
+
         for (std::vector<int>::iterator iNB = ligandSerilSet.begin();
-                    iNB != ligandSerilSet.end(); iNB++) 
+                    iNB != ligandSerilSet.end(); iNB++)
         {
-            
-            
+
+
             REAL rD = getBondLenFromFracCoords(tAtoms[metSeril].fracCoords,
                                                tAtoms[*iNB].fracCoords,
                                 tCryst->itsCell->a, tCryst->itsCell->b,
                                 tCryst->itsCell->c, tCryst->itsCell->alpha,
                                 tCryst->itsCell->beta, tCryst->itsCell->gamma);
-            
+
             if (!inVectABS(bVList,  rD, 0.00001))
             {
                 std::cout << "neighbor atom " << tAtoms[*iNB].id
                       << " of serial number " << tAtoms[*iNB].seriNum << std::endl;
                 std::cout << "Distance " << rD << std::endl;
-                // filter the exact same bond values caused by the symm atoms 
+                // filter the exact same bond values caused by the symm atoms
                 uniqBondsMap[metSeril][*iNB] = rD;
                 bVList.push_back(rD);
             }
-            
+
             // build angle map for Metal--NB1--NB22
             for (std::vector<int>::iterator iNB22=ligandNBs[metSeril][*iNB].begin();
                  iNB22!=ligandNBs[metSeril][*iNB].end(); iNB22++)
@@ -1032,14 +1098,14 @@ namespace LIBMOL
                     secondNBAngsMap[metSeril][*iNB][*iNB22] = tRA22;
                     a2VList.push_back(tRA22);
                 }
-                
+
             }
-            
+
             for (std::vector<int>::iterator iNB2 = ligandSerilSet.begin();
-                                iNB2 != ligandSerilSet.end(); iNB2++) 
+                                iNB2 != ligandSerilSet.end(); iNB2++)
             {
-                if (*iNB2 > *iNB) 
-                {         
+                if (*iNB2 > *iNB)
+                {
                     //std::cout   << " the other NB " << tAtoms[*iNB2].id
                     //            << " of serial " << tAtoms[*iNB2].seriNum
                     //            << std::endl;
@@ -1059,21 +1125,21 @@ namespace LIBMOL
                 }
             }
         }
-        std::cout << "The whole cluster is done." << std::endl;  
+        std::cout << "The whole cluster is done." << std::endl;
     }
-    
+
     void metalCluster::projectCoordsToUnitSph(std::vector<AtomDict>& tAtoms)
     {
         unitCoords.clear();
-        
+
         std::vector<REAL>   tZero;
         tZero.push_back(0.0);
         tZero.push_back(0.0);
         tZero.push_back(0.0);
         unitCoords.push_back(tZero);
-        
+
         for (std::vector<int>::iterator iNB = ligandSerilSet.begin();
-                    iNB != ligandSerilSet.end(); iNB++) 
+                    iNB != ligandSerilSet.end(); iNB++)
         {
             std::vector<REAL> aDiffVec;
             aDiffVec.clear();
@@ -1082,24 +1148,24 @@ namespace LIBMOL
             {
                 aDiffVec.push_back(tAtoms[*iNB].coords[i] -tAtoms[metSeril].coords[i]);
             }
-            
+
             normalizeV(aDiffVec);
-            
+
             unitCoords.push_back(aDiffVec);
         }
     }
-    
-    void metalCluster::setOrgRingsInMetalCluster(std::vector<AtomDict> & tAtoms, 
+
+    void metalCluster::setOrgRingsInMetalCluster(std::vector<AtomDict> & tAtoms,
                                                  int tCenSerial)
     {
     }
-    
+
     extern int getAtom(std::string              tId,
                        int                      tSeri,
                        std::vector<AtomDict> &  tAtoms)
     {
         int lFind= -1;
-        
+
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
@@ -1109,14 +1175,14 @@ namespace LIBMOL
                 break;
             }
         }
-        
+
         return lFind;
     }
-    
+
     extern void setAtomsAltId(std::vector<AtomDict> & tAtoms)
     {
         std::map<std::string, int> elemDistr;
-        
+
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
@@ -1129,23 +1195,42 @@ namespace LIBMOL
                 elemDistr[iAt->chemType] +=1;
             }
         }
-        
+
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
             iAt->altId = iAt->chemType + IntToStr(elemDistr[iAt->chemType]);
             elemDistr[iAt->chemType]--;
         }
-        
-        // Check 
+
+        // Check
         std::cout << "Now atoms are renamed " << std::endl;
-        
+
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
                 iAt !=tAtoms.end(); iAt++)
         {
-            std::cout << "Original name : " << iAt->id 
+            std::cout << "Original name : " << iAt->id
                       << "  New name : " << iAt->altId << std::endl;
         }
-        
+
+    }
+
+    extern void setMetalConnAtm(std::vector<AtomDict> & tAtoms)
+    {
+
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                iAt != tAtoms.end(); iAt++)
+        {
+            iAt->connMAtoms.clear();
+            for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                         iNB != iAt->connAtoms.end(); iNB++)
+            {
+                if (tAtoms[*iNB].isMetal)
+                {
+                    iAt->connMAtoms.push_back(*iNB);
+                }
+            }
+        }
+
     }
 }

@@ -20,12 +20,9 @@ from builtins import range
 import os,os.path,sys
 import platform
 import glob,shutil
-import re,string
 from optparse import OptionParser 
-import time
 import math
-import select
-import random
+
 
 from functools  import cmp_to_key
 
@@ -182,8 +179,9 @@ class Acedrg(CExeCode ):
         #    self.checInputFormat()          
 
         self.runExitCode      = 0 
-
+        
         self.setWorkMode(inputOptionsP)
+        
         self.setInputProcPara(inputOptionsP)
 
         self.checkDependency()
@@ -307,7 +305,11 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-p",  "--coords", dest="useExistCoords",  
                                     action="store_true",  default=False,
                                     help="Using existing coordinates in the input file")
-
+        
+        self.inputParser.add_option("-q",  "--mdiff", dest="molDiff",  
+                                    action="store_true",  default=False,
+                                    help="show protonation differences between input and output molecules")
+        
         self.inputParser.add_option("-r",  "--res", dest="monomRoot",  
                                     action="store", type="string", 
                                     help="The name of the chemical components users want to put into output files(e.g. PDB or MMCIF)")
@@ -316,22 +318,23 @@ class Acedrg(CExeCode ):
                                     action="store", type="string", 
                                     help="Input File of SDF format containing coordinates and bonds")
 
-        self.inputParser.add_option("--bsu", dest="upperSigForBonds",  
-                                    action="store", type="float", 
-                                    help="Set upper bound for the sigma of bonds")
-
-        self.inputParser.add_option("--bsl", dest="lowSigForBonds",  
-                                    action="store", type="float", 
-                                    help="Set low bound for the sigma of bonds")
+        self.inputParser.add_option("--asl", dest="lowSigForAngles",  
+                             action="store", type="float", 
+                             help="Set low bound for the sigma of angles")
 
         self.inputParser.add_option("--asu", dest="upperSigForAngles",  
                                     action="store", type="float", 
                                     help="Set upper bound for the sigma of angles")
 
-        self.inputParser.add_option("--asl", dest="lowSigForAngles",  
-                                    action="store", type="float", 
-                                    help="Set low bound for the sigma of angles")
+        
+        self.inputParser.add_option("--bsu", dest="upperSigForBonds",  
+                                   action="store", type="float", 
+                                   help="Set upper bound for the sigma of bonds")
 
+        self.inputParser.add_option("--bsl", dest="lowSigForBonds",  
+                                   action="store", type="float", 
+                                   help="Set low bound for the sigma of bonds")
+        
         self.inputParser.add_option("--fpar", dest="inParamFile", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File containing paramets that define upper and lower bounds for the sigma of bonds and angles")
@@ -343,7 +346,11 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("--nucl", dest="protCol",
                                     action="store_true",  default=False,
                                     help="The option to add nucleus columns in mmcif (dictionary) files")
-
+        
+        self.inputParser.add_option("--keku",  dest="keku",  
+                                    action="store_true",  default=False,
+                                    help="Rekekulize the bond order in the molecule")
+        
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input path that stores all bond and angle tables (if no input, default CCP4 location will be used)")
@@ -381,9 +388,9 @@ class Acedrg(CExeCode ):
                                     help="atoms attached to a ring will not be listed in the ring plane")
         
 
-        self.inputParser.add_option("-P",  "--inLigandPdbName", dest="inLigandPdbName", metavar="FILE", 
-                                    action="store", type="string", 
-                                    help="Input Ligand PDB File")
+        #self.inputParser.add_option("-P",  "--inLigandPdbName", dest="inLigandPdbName", metavar="FILE", 
+        #                            action="store", type="string", 
+        #                            help="Input Ligand PDB File")
 
         self.inputParser.add_option("-Q",  "--qmInstruction", dest="qmInstructions", metavar="FILE", 
                                     action="store", type="string", 
@@ -563,7 +570,7 @@ class Acedrg(CExeCode ):
         try:
             tF =open(self.geneInFileName, "r")
         except IOError:
-            print("%s can not be open for reading "%tFName)
+            print("%s can not be open for reading "%self.geneInFileName)
             sys.exit()
         else:
             
@@ -585,9 +592,11 @@ class Acedrg(CExeCode ):
     def setMonoRoot(self, tDataDesc=None):
    
         if len(self.monomRoot) !=0 and self.monomRoot.find("UNL")==-1:
+            
             return
  
         if tDataDesc:
+            
             for aIdx in list(tDataDesc.keys()):
                 if tDataDesc[aIdx][0].find("_chem_comp.id") !=-1:
                     self.monomRoot = tDataDesc[aIdx][1].strip()
@@ -714,7 +723,7 @@ class Acedrg(CExeCode ):
                         if aL[0].find("#") ==-1:
                             strgrp = aL.split()
                             if len(strgrp)==9:
-                                print("here ")
+                            
                                 torKey = strgrp[0].strip()
                                 if not torKey in self.naTorsList.keys():
                                     self.naTorsList[torKey]    = {}
@@ -785,11 +794,15 @@ class Acedrg(CExeCode ):
         
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
            and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions and\
-           not t_inputOptionsP.qmInstructions and not t_inputOptionsP.testMode and not t_inputOptionsP.protCol: 
+           not t_inputOptionsP.qmInstructions and not t_inputOptionsP.testMode\
+           and not t_inputOptionsP.protCol and not t_inputOptionsP.molDiff: 
             if not t_inputOptionsP.noGeoOpt:
                 if t_inputOptionsP.inMmCifName:
                     self.inMmCifName = t_inputOptionsP.inMmCifName
-                    self.workMode    = 11            
+                    if t_inputOptionsP.keku:
+                        self.workMode = 114
+                    else:
+                        self.workMode    = 11            
                 elif t_inputOptionsP.inSmiName: 
                     self.inSmiName = t_inputOptionsP.inSmiName
                     self.workMode    = 12            
@@ -802,14 +815,17 @@ class Acedrg(CExeCode ):
                 elif t_inputOptionsP.inMol2Name: 
                     self.inMol2Name = t_inputOptionsP.inMol2Name
                     self.workMode    = 15
-                elif t_inputOptionsP.inLigandPdbName: 
-                    self.inLigandPdbName = t_inputOptionsP.inLigandPdbName
+                elif t_inputOptionsP.inPdbName: 
+                    self.inPdbName = t_inputOptionsP.inPdbName
                     self.workMode    = 16
                     self.useExistCoords = True
             else:
                 if t_inputOptionsP.inMmCifName:
-                    self.inMmCifName = t_inputOptionsP.inMmCifName
-                    self.workMode    = 111            
+                    if t_inputOptionsP.keku:
+                        self.workMode = 114
+                    else:
+                        self.inMmCifName = t_inputOptionsP.inMmCifName
+                        self.workMode    = 111 
                 elif t_inputOptionsP.inSmiName: 
                     self.inSmiName = t_inputOptionsP.inSmiName
                     self.workMode    = 121            
@@ -822,8 +838,8 @@ class Acedrg(CExeCode ):
                 elif t_inputOptionsP.inMol2Name: 
                     self.inMol2Name = t_inputOptionsP.inMol2Name
                     self.workMode    = 151
-                elif t_inputOptionsP.inLigandPdbName: 
-                    self.inLigandPdbName = t_inputOptionsP.inPdbName
+                elif t_inputOptionsP.inPdbName: 
+                    self.inPdbName = t_inputOptionsP.inPdbName
                     self.workMode    = 161
                     self.useExistCoords = True
                   
@@ -893,6 +909,18 @@ class Acedrg(CExeCode ):
             self.workMode = 80
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
+        elif t_inputOptionsP.molDiff:
+            self.molDiff = t_inputOptionsP.molDiff
+            self.workMode = 81
+            if t_inputOptionsP.inMmCifName:
+                self.inMmCifName = t_inputOptionsP.inMmCifName
+            elif t_inputOptionsP.inSmiName: 
+                self.inSmiName = t_inputOptionsP.inSmiName
+            elif t_inputOptionsP.inMdlName: 
+                self.inMdlName = t_inputOptionsP.inMdlName
+            elif t_inputOptionsP.inMol2Name: 
+                self.inMol2Name = t_inputOptionsP.inMol2Name
+                
         elif t_inputOptionsP.testMode :
             if t_inputOptionsP.inMmCifName:
                 self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -1063,7 +1091,7 @@ class Acedrg(CExeCode ):
             if self.workMode==15 or self.workMode==151:
                 print("Input file: %s"%os.path.basename(self.inMol2Name))
             if self.workMode==16 or self.workMode==161:
-                print("Input file: %s"%os.path.basename(self.inLigandPdbName))
+                print("Input file: %s"%os.path.basename(self.inPdbName))
             print("Output dictionary file: %s"%self.outRoot + ".cif")
             if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15:
                 print("Output coordinate file: %s"%self.outRoot + ".pdb")
@@ -1104,8 +1132,9 @@ class Acedrg(CExeCode ):
 
         if self.workMode == 61:
             print("=====================================================================") 
-            print("| Your job is to generate full descriptions for two monomers, their |")
-            print("| modifications, and a link between them.                           |") 
+            print("| Your job is either to generate full descriptions for two monomers, |")
+            print("| their modifications, and a link between them, or just generate a   |")
+            print("| modification of a monomer.                                         |") 
             print("=====================================================================") 
 
     def runLibmol(self, tIn=None, tIdxMol=-1):
@@ -1116,10 +1145,10 @@ class Acedrg(CExeCode ):
             self._log_name       = os.path.join(self.scrDir, self.baseRoot +  "_cod.log")
 
         if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 \
-           or self.workMode==15 or self.workMode ==16\
+           or self.workMode==15 or self.workMode==16\
            or self.workMode == 111 or self.workMode==112\
            or self.workMode == 121 or self.workMode == 131 \
-           or self.workMode==141 or self.workMode==151 or self.workMode==161:
+           or self.workMode==141 or self.workMode==151 or self.workMode ==161:
             self._cmdline += " -1 %f -2 %f -3 %f -4 %f "\
                             %(self.upperSigForBonds, self.lowSigForBonds,\
                               self.upperSigForAngles, self.lowSigForAngles)
@@ -1135,9 +1164,9 @@ class Acedrg(CExeCode ):
                 self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_cod.pdb")
         if self.workMode == 51:
             self.outRstCifName   =  self.baseRoot + "_bondOrder.list"
-        if self.workMode == 11 or self.workMode == 12 or self.workMode==16\
+        if self.workMode == 11 or self.workMode == 12 \
            or self.workMode == 111 or self.workMode==112 \
-           or self.workMode == 121 or self.workMode==161:
+           or self.workMode == 121:
             if tIn:
                 self.inMmCifName    = tIn
             self._cmdline +=" -c %s -D %s "%(self.inMmCifName, self.acedrgTables)
@@ -1152,6 +1181,14 @@ class Acedrg(CExeCode ):
             print("self.monomRoot=", self.monomRoot)
             self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot)
             self._cmdline +=" -c %s -r %s -x yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
+            print(self._cmdline)
+        
+            self.runExitCode = self.subExecute()
+        
+        if self.workMode==114:
+            print("self.monomRoot=", self.monomRoot)
+            self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot)
+            self._cmdline +=" -c %s -r %s -w yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
             print(self._cmdline)
         
             self.runExitCode = self.subExecute()
@@ -1171,7 +1208,15 @@ class Acedrg(CExeCode ):
             self._cmdline += " -r %s -o %s "%(self.monomRoot, self.outRstCifName)
             # print self._cmdline  
             self.runExitCode = self.subExecute()
-           
+         
+        if self.workMode == 16 or self.workMode == 161 :
+            if tIn:
+                self.inPdbName = tIn
+            self._cmdline += " -p %s "%(self.inPdbName)
+            self._cmdline += " -q yes -o %s "%(self.outRstCifName)
+            print(self._cmdline)
+            
+            self.runExitCode = self.subExecute()
 
         if self.workMode in [21, 211] :
             if tIn:
@@ -1266,10 +1311,6 @@ class Acedrg(CExeCode ):
             self._cmdline += " -o %s "%self.libmolMatched
             self.subExecute()
 
-        
-            
-
-        
     def getBondsAndAngles(self, tFName, tMolTabs):
         
         for aMonTab in tMolTabs:
@@ -2002,8 +2043,8 @@ class Acedrg(CExeCode ):
                                     tName = tID
                             
                                 if tName in pdbAtoms:
-                                    bLine = "%s%s%s%s%s%s%s%s%s%s%s\n"%(monoId.ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
-                                                                strGrp[3].ljust(8), strGrp[4].ljust(8), \
+                                    bLine = "%s%s%s%s%s%s%s%s%s%s%s%s\n"%(monoId.ljust(8), tID.ljust(8), strGrp[2].ljust(8), \
+                                                                strGrp[3].ljust(8), strGrp[4].ljust(8), strGrp[5].ljust(8),\
                                                                 pdbAtoms[tName][0].ljust(12), pdbAtoms[tName][1].ljust(12), \
                                                                 pdbAtoms[tName][2].ljust(12), pdbAtoms[tName][0].ljust(12),\
                                                                 pdbAtoms[tName][1].ljust(12), pdbAtoms[tName][2].ljust(12)) 
@@ -2118,7 +2159,11 @@ class Acedrg(CExeCode ):
                 else:
                             
                     for aL in cifCont['head']:
-                        tOutCif.write(aL)
+                        if aL.find("data_comp_") !=-1 and aL.find("list")==-1:
+                            tOutCif.write(aL)
+                            tOutCif.write("_chem_comp.pdbx_type        HETAIN\n")
+                        else:
+                            tOutCif.write(aL)
                     for aL in cifCont['atoms']:
                         tOutCif.write(aL)
                     for aL in cifCont['others1']:
@@ -2878,19 +2923,39 @@ class Acedrg(CExeCode ):
         self.printJobs()
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
             print("One of output conformers will using input coordinates as initial ones")
-        #print("workMode : ", self.workMode)
+        print("workMode : ", self.workMode)
+        
         # Stage 1: initiate a mol file for RDKit obj
-        if self.workMode == 11 or self.workMode == 111:
+        if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
             if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                 # The input file is an mmcif file 
+                print("inName : ", self.inMmCifName)
                 self.fileConv.mmCifReader(self.inMmCifName)
                 print("Number of atoms in the cif file ", len(self.fileConv.atoms))
+                for aA in self.fileConv.atoms:
+                    print(aA["_chem_comp_atom.atom_id"])
+                for aB in self.fileConv.bonds:
+                    if "_chem_comp_bond.type" in aB.keys():
+                        print("a bond between %s and %s with order %s"
+                              %(aB["_chem_comp_bond.atom_id_1"],
+                                aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.type"]))
+                    elif "_chem_comp_bond.value_order" in aB.keys():
+                        print("a bond between %s and %s with order %s"
+                                  %(aB["_chem_comp_bond.atom_id_1"],
+                                    aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.value_order"]))
+                        
+                
+                # print(self.fileConv.dataDescriptor)
+            
+                if len(self.fileConv.dataDescriptor):
+                    self.setMonoRoot(self.fileConv.dataDescriptor)
+                else:
+                    self.monomRoot = "UNL"
                 #print(self.fileConv.atoms[0])
                 if len(self.fileConv.atoms) > 0:
                     self.lOrg = self.chemCheck.isOrganicInCif(self.fileConv.atoms)
                 else:
-                    self.lOrg = False
-            
+                    self.lOrg = False    
             
             if  len(self.fileConv.atoms) > 1 and self.lOrg :
                 if self.chemCheck.containAROMA(self.fileConv.bonds):
@@ -2900,10 +2965,6 @@ class Acedrg(CExeCode ):
                     print("Before : ")
                     print("Number of atoms", len(self.fileConv.atoms))
                     print("Number of bonds", len(self.fileConv.bonds))
-                    if len(self.fileConv.dataDescriptor):
-                        self.setMonoRoot(self.fileConv.dataDescriptor)
-                    else:
-                        self.monomRoot = "UNL"
                     tmWorkMode    = self.workMode
                     self.workMode = 113
                     self.runLibmol()
@@ -2915,11 +2976,20 @@ class Acedrg(CExeCode ):
                     print("After : ")
                     print("Number of atoms", len(self.fileConv.atoms))
                     print("Number of bonds", len(self.fileConv.bonds))
+                
+                elif self.workMode == 114:
                     
                     
+                    self.runLibmol()
+                    self.chemCheck.addjustAtomsAndBonds3(self.fileConv.atoms, 
+                                                         self.fileConv.bonds,
+                                                         self.outRstCifName)
+                    
+                    
+                self.workMode =11    
                 if len(self.fileConv.dataDescriptor):
                     
-                    self.setMonoRoot(self.fileConv.dataDescriptor)
+                    #self.setMonoRoot(self.fileConv.dataDescriptor)
                     
                     self.isNA=self.checkNAFromMmcif(self.fileConv.dataDescriptor)
                     tmpIsPep = self.checkPeptidesFromMmcif(self.fileConv.dataDescriptor)
@@ -3189,57 +3259,9 @@ class Acedrg(CExeCode ):
                 print(self.inMol2Name, " can not be found for reading ")
                 sys.exit()
 
-        if self.workMode == 16 or self.workMode == 161 :
-            
-            # The input file is a pdb file
-            # if os.path.isfile(self.inLigandPdbName) and self.chemCheck.isOrganic(self.inLigandPdbName, self.workMode):
-            if os.path.isfile(self.inLigandPdbName):
 
-                # RDKit way of generating molecules
-                #self.fileConv.getAtomNamesInPDB(self.inLigandPdbName)
-                #self.rdKit.initMols("pdb", self.inLigandPdbName, self.monomRoot, self.chemCheck,\
-                #                    self.inputPara["PH"], self.numConformers, 0, self.fileConv.nameMapingPDBMol)
-
-                # Refmac + RDKit way of generating molecules
-                bRoot = os.path.basename(self.inLigandPdbName)
-                pRoot = bRoot.strip().split(".")[0]
-                self.iniLigandPdbName = os.path.join(self.scrDir, pRoot + ".pdb") 
-                self.fileConv.checkAndAddCryst1InPDB(self.inLigandPdbName, self.iniLigandPdbName)
-                self.monomRoot = self.fileConv.getResNameFromPDB(self.inLigandPdbName)
-                if os.path.isfile(self.iniLigandPdbName):
-                    curStage = 0
-                    aLibIn   = ""
-                    self.runRefmac(self.iniLigandPdbName, aLibIn, self.monomRoot, curStage)
-                    #print "initial input cif is  ", self.refmacXYZOUTName
-                else:
-                    print("Can not add line with 'CRYST1' to the temp PDB file ", self.iniLigandPdbName)
-                    sys.exit() 
-
-                if os.path.isfile(self.refmacXYZOUTName):
-                    self.inMmCifName = self.refmacXYZOUTName
-                    self.useExistCoords = True
-                    """
-                    aOutLibCif = self.refmacXYZOUTName
-                    self.refmacXYZOUTName = ""
-                    self.fileConv.mmCifReader(aOutLibCif)
-                    if len(self.fileConv.atoms) !=0 and len(self.fileConv.bonds) !=0 :
-                        self.useExistCoords = True
-                        #self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
-                        if os.path.isfile(aIniMolName) :
-                            if len(self.fileConv.chiralPre) !=0:
-                            # Chiral centers defined in the original cif file
-                                self.rdKit.chiralPre =[]
-                                for aChi in self.fileConv.chiralPre:
-                                    self.rdKit.chiralPre.append(aChi) 
-                            self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
-                                                self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
-                                                self.fileConv.nameMapingCifMol, self.fileConv.inputCharge)    
-                    """
-                else: 
-                    print("Failed to generate initial dictionary file ", self.refmacXYZOUTName)
-                    sys.exit()
-
-        if not self.workMode in [80, 1001, 1002]:
+                
+        if not self.workMode in [80, 81, 1001, 1002]:
             self.setOutCifGlobSec()
         if self.workMode in [11, 12, 13, 14, 15]:
             if self.isPEP and self.workMode==11:
@@ -3250,7 +3272,6 @@ class Acedrg(CExeCode ):
             self.workMode = 111
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
-        print("workMode is ",self.workMode)
         
         if self.workMode in [11,  111, 112, 51] :  #  and not self.isAA :
             #print("Number of molecule ", len(self.rdKit.molecules))
@@ -3299,37 +3320,40 @@ class Acedrg(CExeCode ):
                         print("Error: No dictionary cif file is generated by Acedrg ")
 
         elif self.workMode == 16 or self.workMode == 161:
-            if os.path.isfile(self.inMmCifName):
-                if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
-                    print("The input system contains metal or other heavier element")
-                    print("The current version deals only with the atoms in the set of 'organic' elements") 
-                    sys.exit()
+            if os.path.isfile(self.inPdbName):
                 self.runLibmol()
+                newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.cif")
+                print(newInCifName)
+                
+                if os.path.isfile(newInCifName):
+                    self.cmdline   = "acedrg -c %s   -o %s -p"%(newInCifName, self.baseRoot)
+                    print(self.cmdline)
+                    os.system(self.cmdline)
             else:
-                print("The input %s does not exist"%self.inMmCifName)
+                print("The input %s does not exist"%self.inPdbName)
                 sys.exit()
-            if self.workMode == 16: 
-                if not self.runExitCode :
-                    # Stage 2: optimization
-                    print("===================================================================") 
-                    print("| Geometrical Optimization                                        |")
-                    print("===================================================================") 
-                        
-                    if os.path.isfile(self.outRstCifName):
-                        self.refmacXYZOUTName = ""
-                        self.runRefmac(self.iniLigandPdbName, self.outRstCifName, self.baseRoot, 1)
-                        if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
-                            finPdb = self.outRoot + ".pdb"
-                            finRst = self.outRoot + ".cif"
-                            shutil.copy(self.refmacXYZOUTName, finPdb)
-                            if os.path.isfile(finPdb):
-                                self.inPdbName        = finPdb
-                                self.inMmCifName      = self.outRstCifName
-                                self.outRstCifName    = finRst
-                                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                #print "==================================================================="
-                            else:
-                                print("Failed to produce %s after final geometrical optimization"%finPdb)
+            #if self.workMode == 16: 
+            #    if not self.runExitCode :
+            #        # Stage 2: optimization
+            #        print("===================================================================") 
+            #        print("| Geometrical Optimization                                        |")
+            #        print("===================================================================") 
+            #            
+            #        if os.path.isfile(self.outRstCifName):
+            #            self.refmacXYZOUTName = ""
+            #            self.runRefmac(self.iniLigandPdbName, self.outRstCifName, self.baseRoot, 1)
+            #            if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
+            #                finPdb = self.outRoot + ".pdb"
+            #                finRst = self.outRoot + ".cif"
+            #                shutil.copy(self.refmacXYZOUTName, finPdb)
+            #                if os.path.isfile(finPdb):
+            #                    self.inPdbName        = finPdb
+            #                    self.inMmCifName      = self.outRstCifName
+            #                    self.outRstCifName    = finRst
+            #                    self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
+            #                    #print "==================================================================="
+            #                else:
+            #                    print("Failed to produce %s after final geometrical optimization"%finPdb)
 
         if self.workMode in [21, 211]:
             
@@ -3419,7 +3443,63 @@ class Acedrg(CExeCode ):
                 self.addProtCols()
             else:
                 print("The mmcif file to be modified does not exist")
-
+        if self.workMode == 81:
+            outDiffFile = self.outRoot + ".txt"        
+            
+            if os.path.isfile(self.inSmiName):
+                print("Input file is ", self.inSmiName)
+                self.rdKit.reSetSmi = True
+                self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+                # To be output to the file : One mole only at the moment 
+               
+            elif os.path.isfile(self.inMmCifName):
+                print("inName : ", self.inMmCifName)
+                self.fileConv.mmCifReader(self.inMmCifName)
+                print("Number of atoms in the cif file ", len(self.fileConv.atoms))
+                if len(self.fileConv.dataDescriptor):
+                    self.setMonoRoot(self.fileConv.dataDescriptor)
+                else:
+                    self.monomRoot = "UNL"
+                aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
+                self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
+                if os.path.isfile(aIniMolName):
+                    self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
+                                                self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
+                                                self.fileConv.nameMapingCifMol, self.fileConv.inputCharge)
+            if not self.errLevel:
+                
+                try: 
+                    diffMF = open(outDiffFile, "w")
+                except IOError:
+                    print("%s Could not be opened for writing"%outDiffFile)
+                else:
+                    diffMF.write("%s%s%s%s%s%s\n"%("SerialNum".ljust(15), "Element".ljust(15),
+                                                 "origCharge".ljust(15), "newCharge".ljust(15),
+                                                 "origHatoms".ljust(15), "newHAtoms".ljust(15)))
+                    
+                    for aMol in  self.rdKit.molecules:
+                        print ("The diff in A Molecule: ")
+                        for aAtom in aMol.GetAtoms():
+                            idxA = aAtom.GetIdx()
+                            idxAS = str(idxA)
+                            elemA= aAtom.GetSymbol()
+                            if (elemA != "H"):
+                                oriC = str(self.rdKit.atomPDPCMap[idxA]["origC"])
+                                newC = str(self.rdKit.atomPDPCMap[idxA]["newC"])
+                                oriH = str(self.rdKit.atomPDPCMap[idxA]["origH"])
+                                newH = str(self.rdKit.atomPDPCMap[idxA]["newH"])
+                                print("%s%s%s%s%s%s\n"
+                                      %(idxAS.ljust(15), elemA.ljust(15), 
+                                        oriC.ljust(15), newC.ljust(15),
+                                        oriH.ljust(15), newH.ljust(15)))
+                                diffMF.write("%s%s%s%s%s%s\n"
+                                      %(idxAS.ljust(15), elemA.ljust(15), 
+                                        oriC.ljust(15), newC.ljust(15),
+                                        oriH.ljust(15), newH.ljust(15)))
+                    
+                        diffMF.close()
+                        
+                
     def printExitInfo(self):
 
         print("Error: check log file at %s"%self._log_name)

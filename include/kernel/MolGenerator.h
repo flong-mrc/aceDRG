@@ -1,9 +1,9 @@
-/* 
+/*
  * File:   MolGenerator.h
  * Author: flong
  *
- * Generator a molecule from input sets of atoms and symmetry operators 
- * 
+ * Generator a molecule from input sets of atoms and symmetry operators
+ *
  * Created on August 13, 2013, 5:26 PM
  */
 
@@ -20,6 +20,10 @@
 
 #ifndef CIFFILE_H
 #include "DictCifFile.h"
+#endif
+
+#ifndef PDBFILE_H
+#include "PDBFile.h"
 #endif
 
 #ifndef CCP4ATOMTYPE_H
@@ -73,86 +77,90 @@ namespace LIBMOL
 {
     class SpaceGroupMember;
     class Cell;
-    
+
     class AtomDict;
     class Molecule;
-    
+
     class CrystInfo;
-    
+
     class GenCifFile;
     class CCP4DictParas;
-    
+
+    class PDBFile;
+
     class PeriodicTable;
-    
+
     class MolGenerator
     {
     public:
-        //Default constructor 
+        //Default constructor
         MolGenerator();
-        
+
         // Constructor using a cif object
         MolGenerator(const GenCifFile &  tCifObj,
                      int        tNBDepth=1);
-        
+
         MolGenerator(const DictCifFile &  tCifObj,
-                     int        tNBDepth=1);  
-        
+                     int        tNBDepth=1);
+
+        MolGenerator(const PDBFile &  tPdbObj);
+
         // Destructor
         ~MolGenerator();
-        
+
         // Check if metal atoms exist in the assym unit
         void checkMetal(std::vector<ID> & tMeTab);
-        
+
         void getMetalBondRange();
         void getMetalBondRange2();
-        
-        // Generate a "molecule" (not normal sense) using a set of atoms and 
+
+        // Generate a "molecule" (not normal sense) using a set of atoms and
         // a set of symmetry operators
-      
+
         void symmAtomGen(std::vector<CrystInfo>::iterator    tCrys,
                          PeriodicTable & tPTab);
         void symmAtomGen2(std::vector<CrystInfo>::iterator    tCrys,
                          PeriodicTable & tPTab);
-        
-        
+
+
         void getOneSymmAtom(std::vector<AtomDict>::iterator        tCurAtom,
                             std::map<std::string, std::vector<std::vector<REAL> > >::iterator tOp,
-                            std::vector<CrystInfo>::iterator   tCrys, 
+                            std::vector<CrystInfo>::iterator   tCrys,
                             PeriodicTable & tPTab);
         void getOneSymmAtom2(std::vector<AtomDict>::iterator        tCurAtom,
                             std::map<std::string, std::vector<std::vector<REAL> > >::iterator tOp,
-                            std::vector<CrystInfo>::iterator   tCrys, 
+                            std::vector<CrystInfo>::iterator   tCrys,
                             PeriodicTable & tPTab);
-        
+
         void packAtomIntoCell(AtomDict & tAtm);
-        
-        
-        // Create a system of atom including some of atoms in unit cells around 
+
+
+        // Create a system of atom including some of atoms in unit cells around
         // the center unit cell.
-        
+
         void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst);
-        void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst, 
+        void buildRefAtoms(std::vector<CrystInfo>::iterator  iCryst,
                            int                               tLimNB);
-        
+
         void addOneSetRefAtoms(AtomDict                         & tCurAtom,
                                std::vector<CrystInfo>::iterator   tCryst);
         void swithAtoms(std::vector<CrystInfo>::iterator tCryst);
         void cleanUnconnAtoms();
         void reIdxConnAtoms();
-        
+
         void setUniqueAtomLinks(PeriodicTable & tPTab);
         void setUniqueAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        
-        
+
+
         void getMolByEqClassInCell();
         void getMolByEqClassInCrys();
-        void deleteNonCenCellMols(std::map<unsigned, std::vector<int> >  
+        void deleteNonCenCellMols(std::map<unsigned, std::vector<int> >
                                    & tMoleculesInCell);
-        void deleteNonASUAtomCellMols(std::map<unsigned, std::vector<int> >  
+        void deleteNonASUAtomCellMols(std::map<unsigned, std::vector<int> >
                                       & tMoleculesInCell);
-        
-        bool inBonds(int tIdx1, int tIdx2, 
+
+        bool inBonds(int tIdx1, int tIdx2,
                      std::vector<BondDict> & tBonds);
         void getUniqueBonds(PeriodicTable & tPTab);
         void getUniqueAtomLinks(double   &    tRadFac,
@@ -163,111 +171,113 @@ namespace LIBMOL
                                  std::vector<CrystInfo>::iterator tCryst);
         void getUniqueAtomLinksNeuD(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        
+
         void getUniqueAtomLinksMet(double        &    tRadFac,
                                    double        &  tAngCut,
                                    PeriodicTable & tPTab,
                                    std::vector<CrystInfo>::iterator tCryst);
-        
-        
+
+        void getUniqueAtomLinksPdb(PeriodicTable & tPTab);
+
         void setAssymCellAtomLinks(PeriodicTable & tPTab,
                                 std::vector<CrystInfo>::iterator tCryst);
-        
+
         void compileMetalAtomNB();
-        
+
         void checkAtomLinks(std::vector<CrystInfo>::iterator tCryst);
-        
+
         void checkAtomLinksByAngles(double  & tAngCut,
                                     std::vector<CrystInfo>::iterator tCryst);
         void checkAtomLinksByAngles2(double  & tAngCut,
                                      std::vector<CrystInfo>::iterator tCryst);
-        
-        void getUniqueBondsMols(Molecule    & tMol, 
+
+        void getUniqueBondsMols(Molecule    & tMol,
                                 std::vector<CrystInfo>::iterator tCryst);
-        
+
         void getUniqueBondsMols2(Molecule    & tMol);
-        
-        void getAllBondsInOneMol(Molecule    & tMol, 
+
+        void getAllBondsInOneMol(Molecule    & tMol,
                                  std::vector<CrystInfo>::iterator tCryst);
-        
+
         void getBondingRangePairAtoms(AtomDict & tAtm1,
                                       AtomDict & tAtm2,
                                       REAL tExtraD,
                                       PeriodicTable & tPTab,
                                       std::vector<REAL> & tRange);
-        
+
         void getBondingRangePairAtoms2(AtomDict & tAtm1,
                                       AtomDict & tAtm2,
                                       REAL tExtraD,
                                       PeriodicTable & tPTab,
                                       std::vector<REAL> & tRange);
-        
+
         void setOneUniqueBondCrys(int     tIdxAtm1,
-                                  int     tIdxAtm2, 
+                                  int     tIdxAtm2,
                                   REAL    rD);
-        
+
         void setOneUniqueBondCell(int     tIdxAtm1,
-                                  int     tIdxAtm2, 
+                                  int     tIdxAtm2,
                                   REAL    rD);
-        
+
         void checkBondOneForming(PeriodicTable & tPTab);
-        
+
         // convFracToCartCoords used only in torsion calculations.
         // For bond calculations, getBondLenFromFracCoords is used.
         // For angle calculations, getAngleValueFromFracCoords is used.
-        
-        bool convFracToCartCoords3D(std::vector<REAL> & tCartCoord, 
+
+        bool convFracToCartCoords3D(std::vector<REAL> & tCartCoord,
                                   std::vector<REAL> & tFracCoord,
-                                  REAL a, REAL b, REAL c, 
-                                  REAL alpha, REAL beta, REAL gamma);             
-        
+                                  REAL a, REAL b, REAL c,
+                                  REAL alpha, REAL beta, REAL gamma);
+
         REAL getBondLenFromFracCoords(std::vector<REAL> & tCoord1, std::vector<REAL> & tCoord2,
                                       REAL a, REAL b, REAL c, REAL alpha, REAL beta, REAL gamma);
-        
+
         void getUniqAngles();
         void getUniqAngles(std::vector<CrystInfo>::iterator tCryst);
         void getUniqAngleMols(Molecule    & tMol,
                               std::vector<CrystInfo>::iterator tCryst);
-        
+
         REAL getAngleValueFromFracCoords(AtomDict  & tAtCen,
-                                         AtomDict  & tAt1, 
+                                         AtomDict  & tAt1,
                                          AtomDict  & tAt2,
-                                         REAL a, REAL b, REAL c, 
+                                         REAL a, REAL b, REAL c,
                                          REAL alpha, REAL beta, REAL gamma);
-        
-        
-        // Validate all molecules 
+
+
+        // Validate all molecules
         void buildAndValidMols(PeriodicTable & tPTab,
-                           std::vector<CrystInfo>::iterator  tCryst);
+                               std::vector<CrystInfo>::iterator  tCryst);
         void buildAndValidMolsNeuD(PeriodicTable & tPTab,
                            std::vector<CrystInfo>::iterator  tCryst);
-        
+        void buildMolsPdb(PeriodicTable & tPTab);
+
         bool checEquiMoles(std::vector<Molecule> & tSetMols,
                            Molecule & tMol);
         void checkAtomElementID(std::vector<AtomDict> & tAtoms);
         bool colidAtom(AtomDict               & tAtom,
-                       std::vector<AtomDict>  &  tRefAtoms, 
+                       std::vector<AtomDict>  &  tRefAtoms,
                        int tMode);
         bool colidAtom(std::vector<REAL>               & tFrcX,
                        std::vector<AtomDict>  &  tRefAtoms, int tMode);
         bool isASUAtomInMol(std::map<unsigned, std::vector<int> >::iterator tMol);
-        
-        bool connMetal(std::vector<int>      & tIdxs, 
+
+        bool connMetal(std::vector<int>      & tIdxs,
                        std::vector<AtomDict> & tAtoms);
-        bool connMetal1stNB(std::vector<int>      & tIdxs, 
+        bool connMetal1stNB(std::vector<int>      & tIdxs,
                             std::vector<AtomDict> & tAtoms);
-        bool connMetal2ndNB(std::vector<int>      & tIdxs, 
+        bool connMetal2ndNB(std::vector<int>      & tIdxs,
                        std::vector<AtomDict> & tAtoms);
-        
+
         bool checkAtomGeom(std::vector<int>      & tIdxs,
                            std::vector<AtomDict> & tAtoms);
-        
+
         bool checkAsmAtomsInMol(Molecule  & tMol, std::string  & tErrInfo);
         bool checkAtomOcp(Molecule  & tMol, std::string  & tErrInfo);
-        bool validateBonds(std::vector<BondDict>::iterator tBo, 
+        bool validateBonds(std::vector<BondDict>::iterator tBo,
                            std::string & tErrInfo,
                            PeriodicTable & tPTab);
-        bool validateBonds(std::vector<BondDict>::iterator tBo, 
+        bool validateBonds(std::vector<BondDict>::iterator tBo,
                            Molecule    & tMol,
                            std::string & tErrInfo,
                            PeriodicTable & tPTab);
@@ -277,61 +287,67 @@ namespace LIBMOL
                                    std::string & tErrInfo);
         bool validateBondValueDiffStruct(std::vector<Molecule> & tMols,
                                          std::string & tErrInfo);
-        
+
         bool validateAtomLinks(Molecule    & tMol,
                                PeriodicTable & tPTab,
                                std::string & tErrInfo);
-        
+
         bool validateAtomLinksAssymCell(Molecule    & tMol,
                                         std::string & tErrInfo);
-        
+
         bool validateMolecule(Molecule    & tMol, PeriodicTable & tPTab,
                               std::string & tErrInfo);
         bool validateMoleculeNeuD(Molecule    & tMol, PeriodicTable & tPTab,
                                   std::string & tErrInfo);
-        
+
         void checkInfMols(std::vector<Molecule> & aSetInfMols,
                           std::vector<Molecule> & aSetFinMols);
-        
+
         bool checkOneMolInf(std::vector<Molecule>::iterator tMol);
-        
+
         void setBondOrderAndFormalChargeByExcessEl(Molecule & tMol,
                                                    HuckelMOSuite & tHuTool);
         void setAtomNFormalCharge(Molecule & tMol);
         void getAtomTypeMols();
         void getAtomTypeOneMol(Molecule    & tMol);
         void getAtomTypeOneMolNew(Molecule & tMol);
-        
+
         void getOverallBondAndAngles();
         void getOverallBondAndAnglesNew();
         void getHRelatedBondsNeuD();
         void getSPRelatedTorsions(std::vector<Molecule>::iterator tMol,
                                   std::vector<BondDict>::iterator tBo,
-                                  std::map<std::string, 
+                                  std::map<std::string,
                                   std::vector<REAL> >  & tTorM);
-        void getSPRelatedTorsions(std::map<std::string, 
+        void getSPRelatedTorsions(std::map<std::string,
                                   std::vector<REAL> >    &        tTorM,
                                   std::vector<Molecule>::iterator tMol);
-        
-        void outTableMols(std::ofstream & tMolTabs, 
+
+        void reGenMolBondsAtomTypes(Molecule & tMol);
+        void setBondOrderAndChargeInMols(std::vector<Molecule> & tFinMols);
+
+        void outTableMols(std::ofstream & tMolTabs,
                           Molecule & tMol);
         void outPreCellAtomUs(std::ofstream & tAU, Molecule & tMol);
         void outMolMmcif(FileName tOutName,
                          ID tMonoRootName,
-                         Molecule  & tMol);
+                         Molecule  & tMol,
+                         int tMode);
+        void outMetalClusterMmcif(FileName tOutName,
+                                  std::vector<AtomDict> & tSetAtoms);
         void outTableBAndA(FileName tBAndAFName);
-        void setTableSpAndChirals(Molecule & tMol, 
+        void setTableSpAndChirals(Molecule & tMol,
                                   std::map<std::string, std::map<std::string,
                                   std::map<std::string, std::map<std::string,
                                   REAL> > > > & tAtomSpAndChMap);
-        
-        void outTables(FileName tOutName, 
+
+        void outTables(FileName tOutName,
                          std::vector<Molecule> & tFinMols,
                          std::vector<Molecule> & tInfMols);
-        
-        void outAtomTypeTables(FileName tOutName, 
+
+        void outAtomTypeTables(FileName tOutName,
                                std::vector<Molecule> & tFinMols);
-        
+
         void outMsg(FileName tOutName);
         void getOutFileRoot(FileName tOutName, Name & tRootName);
         void outMolsInfo(std::ofstream & tMolTabs,
@@ -341,16 +357,16 @@ namespace LIBMOL
                          std::vector<Molecule> & tFinMols,
                          std::vector<Molecule> & tInfMols);
         void outHRelatedBonds(FileName tOutName);
-        
+
         void contMetal2NB(int & tNB, int & tNA);
-        
+
         // Metal Atom studies where molecules will not be generated
         void buildMetalClusters(std::vector<CrystInfo>::iterator tCryst);
         void buildMetalAtomCoordMap(std::vector<CrystInfo>::iterator tCryst);
         bool checkNBAtomOccp(std::vector<AtomDict>::iterator tAtm);
         bool checkNBAtomOccp(AtomDict  & tAtm);
-        int  getNumOrgNB(std::vector<AtomDict> & tAtoms, 
-                         int  tIdx, 
+        int  getNumOrgNB(std::vector<AtomDict> & tAtoms,
+                         int  tIdx,
                          std::vector<std::string> & tOrgTab);
         double getStdDistFromPTable(PeriodicTable & tPTab,
                                     ID elem1, ID elem2);
@@ -359,7 +375,7 @@ namespace LIBMOL
                                                 PeriodicTable  & tPTab);
         void setMetalBondRange(std::string tElem1, std::string tElem2,
                                std::vector<double> & tBondRange);
-        
+
         void buildMetalSph(double & tRadFac,
                            PeriodicTable & tPTab,
                            std::vector<CrystInfo>::iterator tCryst,
@@ -369,91 +385,94 @@ namespace LIBMOL
                            std::vector<CrystInfo>::iterator  tCryst,
                            std::vector<std::string>        & tElems,
                            FileName tOutName);
-        
+
         void buildSelectedAtomsForH(
                            std::map<std::string, double>    & tElemParas,
                            PeriodicTable                    & tPTab,
                            std::vector<CrystInfo>::iterator   tCryst,
                            std::vector<ID>                  & tSelectedAtomIds,
                            FileName                           tOutName);
-                           
+
         void outMetalAtomCoordInfo(FileName tOutName);
         void outMetalClusterInfo(FileName tOutName);
         void outMetalTables(FileName tOutName);
         void outElementsInInitAtoms(FileName tOutName);
-        
+
         void getUserParasList(FileName tInName,
-                              std::map<std::string, 
+                              std::map<std::string,
                               std::vector<std::string> > & tUserLists);
-        
-        void getUserParas(FileName tInName, 
+
+        void getUserParas(FileName tInName,
                           std::map<std::string, double> & tUserParas);
-        
-        
+
+
         void execute( FileName tInParaName,
                       FileName tOutName);
-        
+
         void execute1(FileName tInParaName,
                       FileName tOutName);
-        
+
         void executeAtomOut(FileName tOutName);
-        
+
         void executeNeuD(FileName tOutName);
-        
+
         void executeMet(FileName tInParaName, FileName tOutName);
-        
+
         void executeMetRange(FileName tInParaName,
                              FileName tOutName);
-        
+
         void executeSelectedAtomRange(FileName tInParaName,
                                       FileName tOutName);
-        
+
         void executeHBondCands(FileName tInParaName,
                                FileName tOutName);
-        
+
+        void executePdb(FileName tOutName);
+
+
         std::string                     aLibmolTabDir;
         bool                            lColid;
         bool                            lHasMetal;
-        
+
         std::vector<std::string>        allMsg;
         std::map<int, std::string>      validedMolMsg;
         std::map<int, std::string>      errMolMsg;
-        
+
         std::vector<CCP4DictParas>      ccp4DictParas;
-        
-        
+
+
         std::vector<AtomDict>           initAtoms;
         std::vector<AtomDict>           allAtoms;       // these are all atoms (including symmetrically generated atoms)
                                                         // in a unit cell
-        std::vector<AtomDict>           refAtoms;       
-        std::vector<AtomDict>           uniqueAtoms; 
+        std::vector<AtomDict>           refAtoms;
+        std::vector<AtomDict>           uniqueAtoms;
         std::vector<Molecule>           allMolecules;
         std::vector<CrystInfo>          allCryst;
-        
+
         std::vector<BondDict>           bonds;
         std::vector<AngleDict>          angles;
         std::vector<TorsionDict>        torsions;
-   
-        
+
+
         std::map<unsigned, std::vector<int> >   moleculesInCell;
         std::map<unsigned, std::vector<int> >   moleculesInCryst;
-        
-        
+
+
         std::vector<metalCluster>               allMetalClusters;
         std::map<int, std::vector<int> >        bondsMetal2NB;
         std::map<int, std::vector<int> >        anglesMetal2NB;
         std::vector<int>                        noContriMols;
-   
-        // Metal atom studies 
+
+        // Metal atom studies
         std::map<int, std::vector<int> >        connMapMetalAtoms;
         std::map<int, std::map<int, REAL> >     metalRelatedBonds;
-        std::map<int, std::map<int, std::map<int, REAL> > > 
+        std::map<int, std::map<int, std::map<int, REAL> > >
                                                 metalRelatedAngles;
         // For tempo research
         std::map<int, std::map<int, REAL> >     metalRelatedMetalNBs;
-        std::map<ID, std::map<ID, 
-        std::map<REAL, std::vector<ID> > > >    distsNBs; 
-        
+        std::map<ID, std::map<ID,
+        std::map<REAL, std::vector<ID> > > >    distsNBs;
+
         std::map<int, std::vector<int> >        metalNBs;
         std::map<std::string, std::map<
         std::string, std::map<std::string,
@@ -464,24 +483,23 @@ namespace LIBMOL
         std::map<std::string, std::map<
         std::string, std::map<std::string,
         REAL> > >                               metalBondRange3;
-        
+
         std::map<std::string, std::map<REAL,
-        std::vector<std::vector<std::string > > > >     
+        std::vector<std::vector<std::string > > > >
                                                 hRelatedBonds;  // H-atomType, bond value,
                                                                 //< <hID, hElem, connId, connElem> >
-                                                   
-        
-        
+
+
+
     private :
-        
+
         REAL                                                myNBCut;
         int                                                 myNBDepth;
         std::map<std::string, std::map<std::string, REAL> > shortLenList;
-                
+
     };
-       
+
 }
 
 
 #endif	/* MOLGENERATOR_H */
-

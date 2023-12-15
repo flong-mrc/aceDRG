@@ -2081,9 +2081,11 @@ namespace LIBMOL
                        "U", "u", "Np", "np",
                        "Am", "am", "Cm", "cm", "Bk", "bk", "Cf", "cf", 
                        "Es", "es", "Fm", "fm",
-                       "Md", "md", "No", "no", "Lr", "lr"};
+                       "Md", "md", "No", "no", "Lr", "lr", 
+                       "Sb", "sb", "Te", "te", "Po", "po", "Pd", "pd",  
+                       "Sn", "sn", "Pb", "pb"};
         
-        tMeTab.assign(metals, metals+159);
+        tMeTab.assign(metals, metals+171);
         /*
         ID metalsA[] = {"Si", "si", "Ge", "ge", "As", "as", "Sb", "sb", 
                        "Te", "te", "Po", "po", "Pd", "pd", "Ga", "ga", 
@@ -2307,7 +2309,7 @@ namespace LIBMOL
         }
         else if (tOrder == 3)
         {
-            sOrder = "trip";
+            sOrder = "triple";
         }
         else if (tOrder == 4 || tOrder==1.5)
         {
@@ -2344,7 +2346,7 @@ namespace LIBMOL
         }
         else if (tOrder == "3")
         {
-            sOrder = "trip";
+            sOrder = "triple";
         }
         else if (tOrder == "4" || tOrder=="1.5" )
         {
