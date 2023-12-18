@@ -827,8 +827,11 @@ namespace LIBMOL
             }
         }
 
-        //std::cout << "number of pi electron in the system is "
-        //          <<  numPiAll << std::endl;
+        std::cout << "number of pi electron in the system numPiAll1 is "
+                  <<  numPiAll1 << std::endl;
+
+        std::cout << "number of pi electron in the system numPiAll2 is "
+                  <<  numPiAll2 << std::endl;
 
         if (numPiAll1 > 0.0 && fabs(fmod(numPiAll1, 4.0)-2.0) < 0.001)
         {
@@ -838,7 +841,7 @@ namespace LIBMOL
         {
             lAr = true;
         }
-
+        std::cout << "lAr = " << lAr << std::endl;
         return lAr;
 
     }
@@ -1309,22 +1312,22 @@ namespace LIBMOL
                             // aN =2.0;
                         }
                     }
-                    else if (tAtoms[tIdx].formalCharge==1.0)
+                    else if (tAtoms[tIdx].charge==1.0)
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==3)
                         {
 
-                            //if (tMode ==1)
-                            //{
+                            if (tMode ==1)
+                            {
                                // For aromatic ring plane.
-                               //  aN=1.0;
-                            //}
-                            //else
-                            //{
+                               aN=1.0;
+                            }
+                            else
+                            {
                                 // For atom classification. It will be
                                 // calcelled once the charge problem in COO solved
-                                // aN = 2.0;
-                            // }
+                                //aN = 2.0;
+                            }
                             aN=1.0;
 
                         }
@@ -1565,23 +1568,23 @@ namespace LIBMOL
                             aN =2.0;
                         }
                     }
-                    else if (tAtoms[tIdx].formalCharge==1.0)
+                    else if (tAtoms[tIdx].charge==1.0)
                     {
                         if (nonMC ==3)
                         {
 
-                            //if (tMode ==1)
-                            //{
-                               // For aromatic ring plane.
-                               //  aN=1.0;
-                            //}
-                            //else
-                            //{
+                            if (tMode ==1)
+                            {
+                               //For aromatic ring plane.
+                               aN=1.0;
+                            }
+                            else
+                            {
                                 // For atom classification. It will be
                                 // calcelled once the charge problem in COO solved
-                                // aN = 2.0;
-                            // }
-                            aN=1.0;
+                                aN = 2.0;
+                            }
+                            // aN=1.0;
 
                         }
                     }
@@ -1810,23 +1813,23 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                             aN =2.0;
                         }
                     }
-                    else if (tAtoms[tIdx].formalCharge==1.0)
+                    else if (tAtoms[tIdx].charge==1.0)
                     {
                         if (nonMC ==3)
                         {
 
-                            //if (tMode ==1)
-                            //{
+                            if (tMode ==1)
+                            {
                                // For aromatic ring plane.
-                               //  aN=1.0;
-                            //}
-                            //else
-                            //{
+                               aN=1.0;
+                            }
+                            else
+                            {
                                 // For atom classification. It will be
                                 // calcelled once the charge problem in COO solved
-                                // aN = 2.0;
-                            // }
-                            aN=1.0;
+                                aN = 2.0;
+                            }
+                            //aN=1.0;
 
                         }
                     }
@@ -1901,14 +1904,15 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             }
         }
 
-        /*
+        if (tAtoms[tIdx].chemType =="N")
+        {
         std::cout << "atom " << tAtoms[tIdx].id << std::endl;
         std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
         std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
         std::cout << "HERE Pi atom added " << aN  << std::endl;
-        */
+        }
 
         return aN;
     }
