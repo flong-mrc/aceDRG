@@ -148,14 +148,14 @@ namespace LIBMOL
                     break;
                 case 'r':
                     IOEntries["monoRootName"] = optarg;
-                    if (IOEntries["monoRootName"].size() > 3)
-                    {
-                        IOEntries["monoRootName"] = IOEntries["monoRootName"].substr(0,3);
-                    }
-                    else if (IOEntries["monoRootName"].size() > 3)
-                    {
-                        IOEntries["monoRootName"] ="UNL";
-                    }
+                    //if (IOEntries["monoRootName"].size() > 3)
+                    //{
+                    //    IOEntries["monoRootName"] = IOEntries["monoRootName"].substr(0,3);
+                    //}
+                    //else if (IOEntries["monoRootName"].size() > 3)
+                    //{
+                    //    IOEntries["monoRootName"] ="UNL";
+                    //}
 
                     //std::cout << "Monomer root name is : "
                     //          << IOEntries["monoRootName"] << std::endl;

@@ -392,7 +392,7 @@ namespace LIBMOL
                         iAt !=tAllRings[iRIdx].atoms.end(); iAt++)
                 {
                     aPL.atoms[iAt->id] = iAt->seriNum;
-                    std::cout << "added atom " << iAt->id << std::endl;
+                    std::cout << "Here added atom " << iAt->id << std::endl;
                     /*
                     for (std::vector<int>::iterator iNB=iAt->connAtoms.begin();
                             iNB !=iAt->connAtoms.end(); iNB++)

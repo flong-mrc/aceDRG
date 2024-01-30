@@ -459,7 +459,7 @@ namespace LIBMOL
         {
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
-                // std::cout << "Planar ring " << i << std::endl;
+                std::cout << "Planar ring " << tAllRings[i].rep << std::endl;
 
                 DoneList.push_back(i);
                 std::vector<int> curLinkedRing;
@@ -1974,7 +1974,65 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
         return aN;
     }
 
+    extern bool isPyroleRing(RingDict  & tR)
+    {
+        bool aRet = false;
+        int numC=0, numN=0;
 
+        if (tR.atoms.size()==5)
+        {
+            if (tR.isPlanar)
+            {
+                for (std::vector<AtomDict>::iterator iAt=tR.atoms.begin();
+                     iAt !=tR.atoms.end(); iAt++)
+                {
+                    if (iAt->chemType=="C")
+                    {
+                        numC++;
+                    }
+                    else if (iAt->chemType=="N")
+                    {
+                        numN++;
+                    }
+                }
+
+                if (numC==4 && numN==1)
+                {
+                    aRet = true;
+                }
+            }
+        }
+
+        return aRet;
+
+    }
+
+    extern void setPyroleRings(std::vector<RingDict>  & tAllRings)
+    {
+        std::vector<int> pyroRings;
+
+        for (unsigned i=0; i < tAllRings.size(); i++)
+        {
+            if (isPyroleRing(tAllRings[i]))
+            {
+                std::cout << "Pyrole ring " << tAllRings[i].rep << std::endl;
+                pyroRings.push_back(i);
+            }
+        }
+        std::cout << "Here number of py rings is " << pyroRings.size()
+                  << std::endl;
+
+        if (pyroRings.size()==4)
+        {
+            for (std::vector<int>::iterator iPR=pyroRings.begin();
+                 iPR != pyroRings.end(); iPR++)
+            {
+                tAllRings[*iPR].isAromatic = true;
+                tAllRings[*iPR].isAromaticP = true;
+            }
+        }
+
+    }
 
     extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
                                     std::vector<PlaneDict> & tPlanes,
@@ -2080,6 +2138,9 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             // std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
         }
 
+        // Test: extra-step for pyrole rings
+        setPyroleRings(tAllRings);
+
         //std::cout << "A: Number of rings "
         //          << tAllRings.size() << std::endl;
         std::vector<std::vector<int> >  mergedRingSets;
@@ -2117,10 +2178,10 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
     }
 
 
-   extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
-                                    std::vector<PlaneDict> & tPlanes,
-                                    std::vector<AtomDict>  & tAtoms,
-                                    bool                     tMdPls)
+   extern void checkAndSetupPlanes(std::vector<RingDict>   & tAllRings,
+                                   std::vector<PlaneDict>  & tPlanes,
+                                   std::vector<AtomDict>   & tAtoms,
+                                   bool                      tMdPls)
     {
 
         // Check aromaticity for individual rings
@@ -2226,6 +2287,10 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
 
         //std::cout << "A: Number of rings "
         //          << tAllRings.size() << std::endl;
+
+        // Test: extra-step for pyrole rings
+        setPyroleRings(tAllRings);
+
         std::vector<std::vector<int> >  mergedRingSets;
         mergePlaneRings(tAllRings, mergedRingSets, tAtoms);
 

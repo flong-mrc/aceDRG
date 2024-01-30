@@ -170,7 +170,7 @@ class ChemCheck(object):
             print ("Your molecule contains atoms of elements of the following type_symbol:")
             for aE in nonOrgSet:
                 print(aE)
-            print("The job finishes without the output cif file.")
+            #print("The job finishes without the output cif file.")
        
         if not lElem :
             print ("Can not get the element symbols of atoms. Check input file format")

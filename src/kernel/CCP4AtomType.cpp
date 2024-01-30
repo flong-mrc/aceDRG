@@ -260,6 +260,17 @@ namespace LIBMOL
                 R6+=1;
             }
         }
+
+        int nC =0;
+        for (std::vector<int>::iterator iC=tAtom.connAtoms.begin();
+                    iC!=tAtom.connAtoms.end(); iC++)
+        {
+            if (allAtoms[*iC].bondingIdx==2)
+            {
+                nC++;
+            }
+        }
+
         /*
         std::cout << "atom " << tAtom.id << std::endl
                   << "it is ring 5 " << R5 << std::endl
@@ -267,6 +278,7 @@ namespace LIBMOL
                   << "its bond-idx " << tAtom.bondingIdx << std::endl
                   << "its connect to " << (int)tAtom.connHAtoms.size()
                   << " H atoms " << std::endl;
+        std::cout << "nC=" << nC << std::endl;
         */
         // C atom
         if (tAtom.chemType.compare("C")==0)
@@ -364,14 +376,33 @@ namespace LIBMOL
                 {
                     if (R5)
                     {
-                        if (tAtom.connHAtoms.size() == 1)
+                        if (nC >1)
                         {
-                            tAtom.ccp4Type = "NR15";
+                            if (tAtom.connHAtoms.size() == 1)
+                            {
+                                tAtom.ccp4Type = "NR15";
+                            }
+                            else
+                            {
+                                tAtom.ccp4Type = "NR5";
+                            }
                         }
                         else
                         {
-                            tAtom.ccp4Type = "NR5";
+                            if (tAtom.connHAtoms.size() == 0)
+                            {
+                                tAtom.ccp4Type ="NH0";
+                            }
+                            else if (tAtom.connHAtoms.size() == 1)
+                            {
+                                tAtom.ccp4Type ="NH1";
+                            }
+                            else if (tAtom.connHAtoms.size() == 1)
+                            {
+                                tAtom.ccp4Type ="NH2";
+                            }
                         }
+
                     }
                     else if (R6)
                     {
@@ -773,7 +804,7 @@ namespace LIBMOL
             StrUpper(tAtom.ccp4Type);
         }
 
-
+        std::cout << "========================================" << std::endl;
         std::cout << "Atom Name " << tAtom.id << " bonding index "
                       << tAtom.bondingIdx << std::endl;
         std::cout << "Its element type " << tAtom.chemType << std::endl;
@@ -781,10 +812,6 @@ namespace LIBMOL
         if (!tAtom.codClass.empty())
         {
             std::cout << " Cod type" << tAtom.codClass << std::endl;
-        }
-        else
-        {
-            std::cout << std::endl;
         }
         std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
 

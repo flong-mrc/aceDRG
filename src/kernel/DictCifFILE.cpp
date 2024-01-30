@@ -8426,9 +8426,10 @@ namespace LIBMOL
             // 'LIST OF MONOMERS' section
 
 
-            std::string longName =tMonoRootName.substr(0,3);
-            std::string sName =tMonoRootName.substr(0,3);
-
+            //std::string longName =tMonoRootName.substr(0,3);
+            //std::string sName =tMonoRootName.substr(0,3);
+            std::string longName =tMonoRootName;
+            std::string sName =tMonoRootName;
             //StrUpper(longName);
 
 

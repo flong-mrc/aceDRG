@@ -17,23 +17,8 @@ from builtins import str
 from builtins import range
 from builtins import object
 import os,os.path,sys
-import platform
-import glob,shutil
-import re,string
 import time
 import math
-
-from rdkit      import rdBase
-
-from rdkit      import Chem
-from rdkit.Chem import AllChem
-from rdkit.Chem import rdchem
-from rdkit.Chem import rdmolfiles
-from rdkit.Chem import rdMolTransforms
-from rdkit.Chem import rdmolops
-from rdkit.Chem import Pharm3D 
-from rdkit.Chem.Pharm3D import EmbedLib
-from rdkit.Geometry import rdGeometry 
 
 if os.name != 'nt':
     import fcntl
@@ -41,18 +26,11 @@ import signal
 
 from . exebase       import CExeCode
 
-from . acedrgRDKit   import AcedrgRDKit
 from . filetools     import FileTransformer
 from . filetools     import Ccp4MmCifObj
 from . chem          import ChemCheck
 
 from . utility       import isInt
-from . utility       import listComp
-from . utility       import listComp2
-from . utility       import listCompDes
-from . utility       import listCompAcd
-from . utility       import setBoolDict
-from . utility       import splitLineSpa
 from . utility       import BondOrderS2N
 from . utility       import setNameByNumPrime
 
@@ -345,10 +323,10 @@ class CovLinkGenerator(CExeCode):
         self.cLinks           = []
 
         #Modification of monomers related 
+        
         self.modInstructionsContent = []
         self.modSrcDir        = ""
         self.modRess          = []
-        # engs 
 
         self.chemCheck        = ChemCheck()
         self.fileTool         = FileTransformer()
@@ -377,6 +355,7 @@ class CovLinkGenerator(CExeCode):
                 self.errMessage[self.errLevel].append("Check your instruction file")
                 
         elif self.lMode ==2:
+            
             print("Number of links to be processed ", len(self.cLinks))
 
             if not self.errLevel:
@@ -1464,8 +1443,13 @@ class CovLinkGenerator(CExeCode):
             
             nL = len(insList)
             
+            aKList = ["ATOM", "BOND", "CHARGE", "ADD", "DELETE", "CHANGE"]
+            
             while i < nL :
-                print(insList[i])
+                #print(insList[i])
+                #print(lCh)
+                #print(lDel)
+                #print(lAd)
                 if (i+1) < nL:
                     if insList[i].upper().find("RES-NAME") != -1:
                         aModRes.stdLigand["name"]   = insList[i+1]
@@ -1492,7 +1476,6 @@ class CovLinkGenerator(CExeCode):
                         lCh  = False
                         i +=1
                     elif lDel :
-                        
                         if insList[i].upper().find("ATOM") != -1 :
                             if i+1 < nL:
                                 atmDName = setNameByNumPrime(insList[i+1])
@@ -1526,15 +1509,24 @@ class CovLinkGenerator(CExeCode):
                     elif lCh :
                         if insList[i].upper().find("BOND") != -1 :
                             if i+3 < nL:
-                                aBond = {}
-                                aBond["atom_id_1"]      = insList[i+1]
-                                aBond["atom_id_2"]      = insList[i+2]
-                                aBond["type"]           = insList[i+3]
-                                aBond["value_order"]    = insList[i+3]
-                                aBond["value_dist"]     = 0.0     
-                                aBond["value_dist_esd"] = 0.02
-                                i+=4
-                                aModRes.modLigand["changed"]["bonds"].append(aBond)
+                                if not  insList[i+3] in aKList:
+                                    aBond = {}
+                                    aBond["atom_id_1"]      = insList[i+1]
+                                    aBond["atom_id_2"]      = insList[i+2]
+                                    aBond["type"]           = insList[i+3]
+                                    aBond["value_order"]    = insList[i+3]
+                                    aBond["value_dist"]     = 0.0     
+                                    aBond["value_dist_esd"] = 0.02
+                                    i+=4
+                                    aModRes.modLigand["changed"]["bonds"].append(aBond)
+                                else:
+                                    self.errLevel = 2
+                                    if self.errLevel not in self.errMessage:
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Error in BOND CHANGE section in the instruction file:\n "
+                                    aMess+= "Not enough information to define the change of the bond\n"
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break    
                             else:
                                 self.errLevel = 2
                                 if self.errLevel not in self.errMessage:
@@ -1552,7 +1544,7 @@ class CovLinkGenerator(CExeCode):
                                     aAddCharge["charge"] = int(insList[i+2])
                                     print("Charge is %d"%aAddCharge["charge"])
                                     aModRes.modLigand["changed"]["charges"].append(aAddCharge)
-                                    
+                                  
                                 else:
                                     self.errLevel = 2
                                     if self.errLevel not in self.errMessage:
@@ -1575,14 +1567,23 @@ class CovLinkGenerator(CExeCode):
                     elif lAd :
                         if insList[i].upper().find("ATOM") != -1 :
                             if i+3 < nL:
-                                aAtom = {}
-                                aAtom["atom_id"]     = insList[i+1]
-                                aAtom["type_symbol"] = insList[i+2]
-                                aAtom["charge"]      = int(insList[i+3])
-                                aAtom["type_energy"] = aAtom["type_symbol"]
-                                aAtom["is_added"]    = True
-                                aModRes.modLigand["added"]["atoms"].append(aAtom)
-                                i+=4
+                                if not insList[i+3] in aKList:
+                                    aAtom = {}
+                                    aAtom["atom_id"]     = insList[i+1]
+                                    aAtom["type_symbol"] = insList[i+2]
+                                    aAtom["charge"]      = int(insList[i+3])
+                                    aAtom["type_energy"] = aAtom["type_symbol"]
+                                    aAtom["is_added"]    = True
+                                    aModRes.modLigand["added"]["atoms"].append(aAtom)
+                                    i+=4
+                                else:
+                                    self.errLevel = 2
+                                    if self.errLevel not in self.errMessage:
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Error in ADD ATOM section in the instruction file:\n "
+                                    aMess+= "Not enough information to define added atom\n"
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break
                             else:
                                 self.errLevel = 2
                                 if self.errLevel not in self.errMessage:
@@ -1593,15 +1594,24 @@ class CovLinkGenerator(CExeCode):
                                 break
                         if insList[i].upper().find("BOND") != -1 :
                             if i+3 < nL:
-                                aBond = {}
-                                aBond["atom_id_1"] = insList[i+1]
-                                aBond["atom_id_2"] = insList[i+2]
-                                aBond["type"]      = insList[i+3]
-                                aBond["value_order"] = insList[i+3]
-                                aBond["value_dist"]     = 0.0     
-                                aBond["value_dist_esd"] = 0.02
-                                aModRes.modLigand["added"]["bonds"].append(aBond)
-                                i+=4
+                                if not insList[i+3] in aKList:
+                                    aBond = {}
+                                    aBond["atom_id_1"] = insList[i+1]
+                                    aBond["atom_id_2"] = insList[i+2]
+                                    aBond["type"]      = insList[i+3]
+                                    aBond["value_order"] = insList[i+3]
+                                    aBond["value_dist"]     = 0.0     
+                                    aBond["value_dist_esd"] = 0.02
+                                    aModRes.modLigand["added"]["bonds"].append(aBond)
+                                    i+=4
+                                else:
+                                    self.errLevel = 2
+                                    if self.errLevel not in self.errMessage:
+                                        self.errMessage[self.errLevel] = []
+                                    aMess = "Error in ADD BOND section in the instruction file:\n "
+                                    aMess+= "Not enough information to define added bond\n"
+                                    self.errMessage[self.errLevel].append(aMess)
+                                    break
                             else:
                                 self.errLevel = 2
                                 if self.errLevel not in self.errMessage:
@@ -1619,6 +1629,7 @@ class CovLinkGenerator(CExeCode):
                         break
                 
                 else :
+                    
                     print("Errors begin at %s. Check your instruction file "%insList[i])
                     self.errLevel = 2
                     if 2 not in self.errMessage:
@@ -1672,7 +1683,7 @@ class CovLinkGenerator(CExeCode):
                         for aA in aModRes.modLigand["changed"]["charges"]:
                             print("Atom %s with charge %d "%(aA["atom_id"], aA["charge"]))
                 
-                
+        
     def processOneModRes(self, tModRes):
         
         if not self.errLevel:
@@ -1714,6 +1725,7 @@ class CovLinkGenerator(CExeCode):
                 tModRes.newLigand["name"] = tModRes.stdLigand["name"]
                 tModRes.newLigand["inCif"] = os.path.join(self.scrDir, tModRes.newLigand["name"] + "_In.cif")
                 self.newLigToSimplifiedMmcif(tModRes,  tModRes.newLigand["inCif"])
+                self.checkKekuInModRes(tModRes)
                 if not self.errLevel:
                     self.setOneMonomer(tModRes.newLigand, 2)
                     if not self.errLevel:
@@ -1833,17 +1845,22 @@ class CovLinkGenerator(CExeCode):
                 aOutF.close()   
             
             
+    def checkKekuInModRes(self, tModRes):
         
+        pass 
+    
     def adjustAtomsAndOthersForOneMod(self, tModRes):
-        
         
         if len(tModRes.modLigand["changed"]["charges"]) > 0:
             self.addjustFormalChargeInOneModRes(tModRes.stdLigand, tModRes.modLigand)
         
         self.setAddedInOneResForModRes(tModRes.stdLigand, tModRes.modLigand)
-        
+
         if not self.errLevel:
             self.setDeletedInOneResForModRes(tModRes.stdLigand, tModRes.modLigand)
+        
+            
+        
         
     def extractOneModMonomerInfo(self, tModRes):
         
@@ -2549,8 +2566,9 @@ class CovLinkGenerator(CExeCode):
             if aAtom["type_symbol"] == "H":
                 tMonomer["hAtoms"].append(aAtom["atom_id"])
         
-    def setOneMonomer(self, tMonomer, tMode=1):                     # tMode ==1 link generation
-                                                                     # tMode ==2 generate a modification of a  monomer
+    def setOneMonomer(self, tMonomer, tMode=1):             # tMode ==1 link generation
+                                                            # tMode ==2 generate a modification of a  monomer
+        #print("tMode==", tMode)
         if os.path.isfile(tMonomer["inCif"]):
             #print(tMonomer["inCif"])
             #aNL = tMonomer["name"].upper()
@@ -2566,7 +2584,7 @@ class CovLinkGenerator(CExeCode):
                 aNL = tMonomer["name"]
                 self._log_name  = os.path.join(self.scrDir, aNL + "_for_Mod.log")
                 self.subRoot    = os.path.join(self.scrDir, aNL + "_for_Mod")
-                self._cmdline   = "acedrg -c %s  -r %s -o %s --keku "%(tMonomer["inCif"], aNL, self.subRoot)
+                self._cmdline   = "acedrg -c %s  -r %s -o %s -K "%(tMonomer["inCif"], aNL, self.subRoot)
             elif tMode ==3:
                 aNL = tMonomer["name"]
                 self._log_name  = os.path.join(self.scrDir, aNL + ".log")
@@ -2693,9 +2711,10 @@ class CovLinkGenerator(CExeCode):
                 if aAt["atom_id"].strip().upper() ==aId:
                     aAt["charge"] = aFC["charge"]
                     tMod["changed"]["atoms"].append(aAt)
-                    if not aId in changeAtms:
-                        addedHs=self.checkAssocHAtoms(tRes, tMod, aAt)
+                    #if not aId in changeAtms:
+                    #    addedHs=self.checkAssocHAtoms(tRes, tMod, aAt)
                     break
+        
         for aAt in tRes["comp"]["atoms"]:
             print("aId ", aAt["atom_id"])
             print("Its charge ", aAt["charge"])
@@ -2776,6 +2795,7 @@ class CovLinkGenerator(CExeCode):
         if aCharge != 0:
             nTotalVa = nTotalVa - aCharge
         print("atom ",tAt["atom_id"] , "charge ", aCharge, " equiv bond-order ", nTotalVa)
+        
         if tAt["type_symbol"] in self.chemCheck.orgVal:
             if not nTotalVa in self.chemCheck.orgVal[tAt["type_symbol"]]:
                 nVDiff = nTotalVa - self.chemCheck.orgVal[tAt["type_symbol"]][0]
@@ -3295,6 +3315,12 @@ class CovLinkGenerator(CExeCode):
             for aId in delAtomIdSet:
                 self.deleteOneAtomAndConnectedHAtoms(tRes, tMod, aId)            
         print("Number of deleted atoms according to the instruction file is ", len(delAtomIdSet))
+        if len(delAtomIdSet) > 0:
+            print("They are : ")
+            for aId in delAtomIdSet: 
+                print("atom ", aId)
+    
+        
         extraAtomSet = []
         if len(tMod["changed"]["bonds"]) > 0:
             for aB in tMod["changed"]["bonds"]:
@@ -3449,7 +3475,9 @@ class CovLinkGenerator(CExeCode):
          
         self.setDeletedAngInOneResForModification(tRes, tMod)   
         self.setDeleteTorsInOneResForModification(tRes, tMod) 
-        self.setDeleteChirsInOneResForModification(tRes, tMod)        
+        self.setDeleteChirsInOneResForModification(tRes, tMod)     
+        
+        
                     
     def setDeletedBondInOneResForModification(self, tRes, tMod):
         
@@ -4408,7 +4436,6 @@ class CovLinkGenerator(CExeCode):
             print("The name of combo-ligand : %s "%tLinkedObj.combLigand["name"])
             self.setInitComboLigand(tLinkedObj)
             
-
             if not self.errLevel: 
                 print("Number of atoms in the combo-ligand is ", len(tLinkedObj.combLigand["atoms"]))
                 print("They are : ")
@@ -4424,7 +4451,6 @@ class CovLinkGenerator(CExeCode):
                                    ("("+aBond["atom_id_1"]).ljust(10), (aBond["atom_id_2"]+ ")").ljust(10),
                                     aBond["type"].ljust(1))) 
                 #self.outTmpComboLigandMap(tLinkedObj)    # Check
-            
                 
                 self.checkChemInMonomer(tLinkedObj.combLigand, 2)
                 if not self.errLevel:
@@ -4994,7 +5020,7 @@ class CovLinkGenerator(CExeCode):
     def extractOneLinkInfo(self, tLinkedObj):
 
         self.reIndexCombLigand(tLinkedObj) 
-        self.outComboPdb(tLinkedObj)
+        #self.outComboPdb(tLinkedObj)
         self.getLinkInfo(tLinkedObj)
         self.getChangesInModificationFromCombLigand(tLinkedObj)
  
@@ -5323,7 +5349,7 @@ class CovLinkGenerator(CExeCode):
         tOutFile.write("%s%s\n"%("_acedrg_version".ljust(30),    self.verInfo["ACEDRG_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_acedrg_db_version".ljust(30), self.verInfo["DATABASE_VERSION"].ljust(20)))
         tOutFile.write("%s%s\n"%("_rdkit_version".ljust(30),    self.verInfo["RDKit_VERSION"].ljust(20)))
-        tOutFile.write("%s%s\n"%("_refmac_version".ljust(30),   self.verInfo["REFMAC_VERSION"].ljust(20)))
+        tOutFile.write("%s%s\n"%("_servalcat_version".ljust(30),   self.verInfo["SERVALCAT_VERSION"].ljust(20)))
         if len(self.linkInstructionsContent) > 0:
             tOutFile.write("_CCP4_AceDRG_link_generation.instruction\n")
             tOutFile.write(";\n")

@@ -187,9 +187,14 @@ namespace LIBMOL
     extern bool checkAromaSys(std::vector<int>      & tSubAtoms,
                               std::vector<AtomDict> & tAtoms,
                               int                     tMode);
+
     extern REAL getTotalPiElec(std::vector<int>      & tSubAtoms,
                                std::vector<AtomDict> & tAtoms,
                                int                     tMode);
+
+    extern bool isPyroleRing(RingDict & tRing);
+
+    extern void setPyroleRings(std::vector<RingDict>  & tAllRings);
 
     extern void checkAndSetupPlanes(std::vector<RingDict>  & tAllRings,
                                     std::vector<PlaneDict> & tPlanes,

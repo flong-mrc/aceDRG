@@ -224,6 +224,67 @@ def aLineToAList2(tL, tList):
 
         print(tList)
 
+
+def aLineToAlist2(tL, tList):
+       
+            aTS = ""
+            l0  = False
+            l1  = False
+            l2  = False   
+            print(tL)
+            for aS in tL:
+                #print(aS)
+                if aS ==" ":
+                    if not l1 and not l2 and len(aTS)!=0:
+                        tList.append(aTS.strip()) 
+                        print("1 ",aTS)
+                        l1 = False
+                        l2 = False
+                        aTS = ""
+                    elif l1 and not l2 and len(aTS) !=0:
+                        tList.append(aTS.strip()) 
+                        print("2 ",aTS)
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    elif l2:
+                        aTS = aTS + aS 
+                elif aS.find("\"") !=-1:
+                    if l2:
+                        aTS = "\"" + aTS + "\""
+                        tList.append(aTS.strip())
+                        print("3 ",aTS)
+                        aTS = ""
+                        l1  = False  
+                        l2  = False
+                    elif l1:
+                        aTS = aTS + aS
+                    else:
+                        l2 = True
+                        l1 = False
+                elif aS.find("\'") !=-1:
+                    if l1:
+                        if not l2:
+                            aTS = "\'" + aTS + "\'"
+                            tList.append(aTS)
+                            print("4 ",aTS)
+                            aTS = ""
+                            l1  = False
+                            l2  = False
+                        else:
+                            aTS = aTS + aS
+                            l1  = True
+                    else:
+                        aTS = aTS + aS
+                        l1 = True
+                else:
+                    aTS = aTS + aS
+               
+                    
+            if aTS != "":
+                tList.append(aTS.strip())    
+            print("here ", tList)
+
 def aLineToAlist(tL, tList):
 
     aTS = ""
@@ -404,3 +465,36 @@ def checkRepAtomTypes(tFileName, tS):
         aRet = False
 
     return aRet
+
+def getLinkedGroups(tAtoms, tLinks, tMols):
+    
+    tGroups    = {}
+    nAts       = len(tAtoms)
+    tGroups[0] = 0
+    for i in  range(1, nAts):
+        id_i = tAtoms[i]['_chem_comp_atom.atom_id']
+        tGroups[i] = i
+        for j in range(i):
+            id_j = tAtoms[j]['_chem_comp_atom.atom_id']
+            tGroups[j] = tGroups[tGroups[j]]
+            if id_j in tLinks[id_i]:
+                tGroups[tGroups[tGroups[j]]] = i
+    
+    for i in range(nAts):
+        tGroups[i] = tGroups[tGroups[i]];
+    
+    tMols = {}
+    
+    for iG in range(len(tGroups)):
+        idxM = tGroups[iG]
+        if not idxM in tMols:
+            tMols[idxM] = []
+        tMols[idxM].append(iG)
+
+    print("number of fragments is ", len(tMols))
+    aIdxF = 1
+    for aIdxM in tMols.keys():
+        print("Fragment ", aIdxF, " contains the following atoms: ")
+        aIdxF+=1
+        for aIdxA in tMols[aIdxM]:
+            print("Atom : %s "%tAtoms[aIdxA]['_chem_comp_atom.atom_id'])

@@ -248,7 +248,7 @@ class AcedrgRDKit(object):
         aTmpMode = 0
         aMolT = None
         aMolName = ""
-        print("Input File for rdkit is ", tFileName)
+        #print("Input File for rdkit is ", tFileName)
         if tFileType == "mol":
             if os.path.isfile(tFileName):
                 if platform.system() == "Windows":
@@ -257,7 +257,7 @@ class AcedrgRDKit(object):
                 else:
                     aMolName = tFileName.strip().split(
                         "/")[-1].strip().split(".")[0]
-                print("Molecule name:  ", aMolName)
+                #print("Molecule name:  ", aMolName)
                 # self.reSetChirals     =    True
                 aMolT = Chem.MolFromMolFile(tFileName)
                 if aMolT:
@@ -379,8 +379,10 @@ class AcedrgRDKit(object):
             if not aMolT.HasProp("fiexedName"):
                 aMolT.SetProp("fixedName", "NO")
             #print("file %s aTmpMode %d"%(tFileName,  aTmpMode))
+            #aMolT = self.checkAAAndSetAAAtomNames(aMolT)
             self.setOtherMolInfo(aMolT, tNumConf, tChemCheck,
                                  tPH, tNameMap, tMode, tChargeList, aTmpMode)
+        
             
             """
             lenA = len(self.moleculesA)
@@ -395,7 +397,6 @@ class AcedrgRDKit(object):
 
         nMax = 0
         maxM = {}
-
         containAA = False
         tMol.SetBoolProp("fixedName", False)
 
@@ -404,6 +405,7 @@ class AcedrgRDKit(object):
             if tMol.HasSubstructMatch(patt):
                 print("Find a amino acid %s in the input molecule" % aAA)
                 print("matched aa string ", self.aminoAcidsSmas[aAA])
+                self.isPEP = True
                 atomSets = tMol.GetSubstructMatches(patt)
                 for oneSetAtm in atomSets:
                     containAA = True
@@ -412,26 +414,26 @@ class AcedrgRDKit(object):
                         nMax = nAtms
                         maxM["name"] = aAA
                         maxM["atoms"] = oneSetAtm
-
-        if containAA:
-            self.isPEP = True
-            print("Find %s in the input molecule" % maxM["name"])
-            print("Matched atoms are ", maxM["atoms"])
+        
+        #if containAA:
+            
+        #    print("Find %s in the input molecule" % maxM["name"])
+        #    print("Matched atoms are ", maxM["atoms"])
             #self.setAAAtomNames(maxM["name"], tMol, maxM["atoms"])
-            self.setMainAANames(tMol, maxM["atoms"])
-            print("number of atoms ", tMol.GetNumAtoms())
-            tMol2 = Chem.AddHs(tMol)
-            print("number of atoms ", tMol2.GetNumAtoms())
-            self.setAAHAtomNames(tMol2)
-            self.setAAOtherAtomName(tMol2)
+            #self.setMainAANames(tMol, maxM["atoms"])
+            #print("number of atoms ", tMol.GetNumAtoms())
+            #tMol2 = Chem.AddHs(tMol)
+            #print("number of atoms ", tMol2.GetNumAtoms())
+            #self.setAAHAtomNames(tMol2)
+            #self.setAAOtherAtomName(tMol2)
             # self.setOtherAtomNames(tMol2)
-            tMol2.SetBoolProp("fixedName", True)
+            #tMol2.SetBoolProp("fixedName", True)
         else:
             print("No AA found")
-        if containAA:
-            return tMol2
-        else:
-            return tMol
+        #if containAA:
+        #    return tMol2
+        #else:
+        return tMol
 
     def setMainAANames(self, tMol, tAtomSet):
 
@@ -1109,7 +1111,7 @@ class AcedrgRDKit(object):
             if aAtom.GetSymbol() == "H":
                 nh += 1
                 idxH = aAtom.GetIdx()
-                print("H Atom  of serial number ", aAtom.GetIdx())
+                #print("H Atom  of serial number ", aAtom.GetIdx())
                 idxB = -1
                 idxE = -1
                 idxC = -1
@@ -1117,8 +1119,8 @@ class AcedrgRDKit(object):
                 if len(aSetBonds) == 1:
                     idxB = aSetBonds[0].GetBeginAtomIdx()
                     idxE = aSetBonds[0].GetEndAtomIdx()
-                    print("Bond atom idx 1 ", idxB)
-                    print("Bond atom idx 2 ", idxE)
+                    #print("Bond atom idx 1 ", idxB)
+                    #print("Bond atom idx 2 ", idxE)
                     if idxH == idxB:
                         idxC = idxE
                     elif idxH == idxE:
@@ -1143,6 +1145,7 @@ class AcedrgRDKit(object):
             # Check if total numbers of H atoms are different between the original mol and current mol
             # Names for H atoms in the original file
             origHNames = []
+    
             for aNonH in list(HConns.keys()):
                 if aNonH in tNameMap["H"]:
                     c3 = len(tNameMap["H"][aNonH])
@@ -1150,8 +1153,10 @@ class AcedrgRDKit(object):
                         origHNames.append(tNameMap["H"][aNonH][i])
             numOrigH = len(origHNames)
             nExtra = numOrigH + 1
+            
             for aK in list(HConns.keys()):
                 c1 = len(HConns[aK])
+                #print("c1=", c1)
                 if aK in tNameMap["H"]:
                     c2 = len(tNameMap["H"][aK])
                     if c1 == c2:
@@ -1193,17 +1198,28 @@ class AcedrgRDKit(object):
                                 aInt = int(aEH[iNum:])
                                 if aInt > idxMax:
                                     idxMax = aInt
-                        # print "idxMax ", idxMax
+                        #print("idxMax ", idxMax)
                         cDiff = c1 - c2
-                        # print "cDiff is ", cDiff
+                        #print("cDiff is ", cDiff)
                         for j in range(cDiff):
-                            tHName = hRootId + str(idxMax+1)
-                            if not tHName in origHNames:
+                            
+                            tHName0 = hRootId
+                            tHName  = hRootId + str(idxMax+1)
+                            if tHName=="H1" and tHName0 in origHNames:
+                                tHName = hRootId + str(idxMax+2)
+                            if not tHName0 in origHNames:
+                                tMol.GetAtomWithIdx(
+                                    HConns[aK][c2+j]).SetProp("Name", tHName0)
+                                aNewHName = tMol.GetAtomWithIdx(
+                                    HConns[aK][c2+j]).GetProp("Name")
+                                print("0 An added H is named as ", aNewHName)
+                                origHNames.append(aNewHName)
+                            elif not tHName in origHNames:
                                 tMol.GetAtomWithIdx(
                                     HConns[aK][c2+j]).SetProp("Name", tHName)
                                 aNewHName = tMol.GetAtomWithIdx(
                                     HConns[aK][c2+j]).GetProp("Name")
-                                print("An added H is named as ", aNewHName)
+                                print("1 An added H is named as ", aNewHName)
                                 origHNames.append(aNewHName)
                             else:
                                 nExtra = 2
@@ -1223,6 +1239,7 @@ class AcedrgRDKit(object):
                 else:
                     hRootId = "H"
                     nExtra = 2
+                    
                     for i in range(c1):
                         tHName = hRootId + str(nExtra)
                         while True:
@@ -1230,7 +1247,7 @@ class AcedrgRDKit(object):
                                 tMol.GetAtomWithIdx(
                                     HConns[aK][i]).SetProp("Name", tHName)
                                 origHNames.append(tHName)
-                                print("An added H is named as ", tHName)
+                                print("2 An added H is named as ", tHName)
                                 nExtra += 1
                                 break
                             else:
@@ -1270,7 +1287,7 @@ class AcedrgRDKit(object):
         #        print "should be name ", tNameMap[tMol.GetAtomWithIdx(aIdxH).GetIdx()]
         #
         #        nH += 1
-
+    
     def setNamesForHAtomsInMol_PP(self, tMol, tNameMap, tChemCheck):
 
         tIdxHs = {}
@@ -1938,20 +1955,20 @@ class AcedrgRDKit(object):
                 self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
         
-        print("After p/dp process: ")
+        #print("After p/dp process: ")
         for aAtom in tMol.GetAtoms():
             if aAtom.GetSymbol() != "H":
-                print("atom idx : %d  its element %s : "
-                      %(aAtom.GetIdx(),  aAtom.GetSymbol()))
-                print("The original Number of H it connnects %d"%aAtom.GetTotalNumHs())
-                print("Its original charge %d"%aAtom.GetFormalCharge())
+                #print("atom idx : %d  its element %s : "
+                #      %(aAtom.GetIdx(),  aAtom.GetSymbol()))
+                #print("The original Number of H it connnects %d"%aAtom.GetTotalNumHs())
+                #print("Its original charge %d"%aAtom.GetFormalCharge())
                 self.atomPDPCMap[aAtom.GetIdx()]["newC"] = aAtom.GetFormalCharge()
                 self.atomPDPCMap[aAtom.GetIdx()]["newH"] = aAtom.GetTotalNumHs()
 
         # if self.reSetChirals:
         #    self.reAssignChirals(aMol)
         allAtoms = aMol.GetAtoms()
-        print("number of atom now ", len(allAtoms))
+        #print("number of atom now ", len(allAtoms))
         
         if not self.noConformers:
             for aAtom in allAtoms:
@@ -1965,10 +1982,10 @@ class AcedrgRDKit(object):
             else:
                 confId = aMol.GetConformer()
                 self.selecConformerIds.append(confId)
-            print("AAA: Number of conformers selected for refinement is ",
-                  len(self.selecConformerIds))
+            #print("AAA: Number of conformers selected for refinement is ",
+            #      len(self.selecConformerIds))
             nConf = aMol.GetNumConformers()
-            print("number of conformers in Conf", nConf)
+            #print("number of conformers in Conf", nConf)
         
             if len(aMol.GetConformers()) != 0:
 
@@ -1977,7 +1994,7 @@ class AcedrgRDKit(object):
                 aSetTorsions = []
                 self.assignTorsions(aMol, aSetTorsions)
 
-                print("Number of torsions in this molecule is ", len(aSetTorsions))
+                #print("Number of torsions in this molecule is ", len(aSetTorsions))
             else:
                 print(
                      "RDKit failed to produce any conformers. Acedrg needs at least one conformer ")
@@ -2335,7 +2352,7 @@ class AcedrgRDKit(object):
             aMmCif.write("_chem_comp_bond.aromatic\n")
             aMmCif.write("_chem_comp_bond.value_dist\n")
             aMmCif.write("_chem_comp_bond.value_dist_esd\n")
-            print("N Bonds ", len(allBonds))
+            
             for aBond in allBonds:
                 atom1 = aBond.GetBeginAtom()
                 name1 = atom1.GetProp("Name")
@@ -2411,7 +2428,7 @@ class AcedrgRDKit(object):
         nChiPre = 0
         if tChiDes:
             nChiPre = len(tChiDes)
-        print("number of chiral center predefined ", nChiPre)
+        #print("number of chiral center predefined ", nChiPre)
         if nChiPre != 0:
             for aChiral in tChiDes:
                 chiStrs = aChiral.strip().split()
@@ -2494,7 +2511,7 @@ class AcedrgRDKit(object):
             #print("Chiral centres with sign")
             for aAtom in chiCenAtms3:
                 aId = aAtom.GetProp("Name")
-                print("atom name ", aId)
+                #print("atom name ", aId)
                 if not aId in chiCenAtmIds1:
                     aCTName = "chir_" + str(chiralIdx)
                     aLine = "%s%s%s%s%s%s%s\n"\
@@ -2516,7 +2533,7 @@ class AcedrgRDKit(object):
                 aId = aAtom.GetProp("Name")
                 if not aId in chiCenAtmIds1:
                     aCTName = "chir_" + str(chiralIdx)
-                    print(aId)
+                    #print(aId)
                     aLine = "%s%s%s%s%s%s%s\n"\
                         % (tMonoName.ljust(12), aCTName.ljust(12),
                            aId.ljust(12),
@@ -2611,13 +2628,13 @@ class AcedrgRDKit(object):
             #    print(len(reNameSet[aId]))
             #    for aPair in reNameSet[aId]:
             #        print(aPair[0].GetProp("Name"), " : ", aPair[1])
-        for aId in reNameSet.keys():
-            if aId.find("H") == -1:
-                print("Atom ", aId)
-                print("Its NB CIP is arranged as follow ")
-                for aPair in reNameSet[aId]:
-                    print("Atom %s : CIP RANK %s " %
-                          (aPair[0].GetProp("Name"), aPair[1]))
+        #for aId in reNameSet.keys():
+        #    if aId.find("H") == -1:
+                #print("Atom ", aId)
+                #print("Its NB CIP is arranged as follow ")
+                #for aPair in reNameSet[aId]:
+                #    print("Atom %s : CIP RANK %s " %
+                #          (aPair[0].GetProp("Name"), aPair[1]))
         return reNameSet
 
     def setChiralsByMultiConformers(self, tChemCheck, tMol, tNBCIPMap):
@@ -2782,13 +2799,13 @@ class AcedrgRDKit(object):
             if elem !="H":
                 if elem =="N":
                     dV =self.chemCheck.defaultBo[elem] - aAtom.GetTotalValence()
-                    print ("atom %s dV=%d"%(elem, dV))
-                    print("Total valence ", aAtom.GetTotalValence())
-                    print("Default valence ", self.chemCheck.defaultBo[elem])
-                    print("Formal charge ", aAtom.GetFormalCharge())
+                    #print ("atom %s dV=%d"%(elem, dV))
+                    #print("Total valence ", aAtom.GetTotalValence())
+                    #print("Default valence ", self.chemCheck.defaultBo[elem])
+                    #print("Formal charge ", aAtom.GetFormalCharge())
                     bonds = aAtom.GetBonds()
-                    for aB in bonds:
-                        print("a bond of ", aB.GetBondType())
+                    #for aB in bonds:
+                    #    print("a bond of ", aB.GetBondType())
 
 
         print("Is the molecule contains peptides %s ?" % self.isPEP)

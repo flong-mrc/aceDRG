@@ -11,6 +11,9 @@
 ## The date of last modification: 21/02/2020
 #
 
+
+
+
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
@@ -22,6 +25,7 @@ import platform
 import glob,shutil
 from optparse import OptionParser 
 import math
+import json 
 
 
 from functools  import cmp_to_key
@@ -43,6 +47,7 @@ from . exebase     import CExeCode
 from . acedrgRDKit import AcedrgRDKit
 
 from . chem        import ChemCheck
+from . metalMode   import metalMode
 
 from . covLink     import CovLink
 from . covLink     import CovLinkGenerator
@@ -106,12 +111,15 @@ class Acedrg(CExeCode ):
         self.libcheck         = ""
         self.libcheckLogName  = ""
         self.refmac           = ""
+        self.refmacV          = ""
         self.refmacLogName    = ""
 
         self.refmacXYSList    = {}
         self.refmacMinFValueList = []
         #self.refmacMinFValueList["value"] =100000.00
         #self.refmacMinFValueList["fileName"] =""
+        
+        self.servalcat        = "python -m servalcat.command_line refine_geom "
         
 
         self.linkInstructions = ""
@@ -204,6 +212,8 @@ class Acedrg(CExeCode ):
         self.fileConv         = FileTransformer()   
             
         self.chemCheck        = ChemCheck() 
+        
+        self.metalMode        = metalMode()
         
         self.initMmcifMolMap  = {}
 
@@ -440,12 +450,15 @@ class Acedrg(CExeCode ):
                                 
         if "CCP4" in os.environ:
             tRefmac = os.path.join(os.environ['CBIN'], "refmac5")
+            #tRefmac  = os.path.join(os.environ['CBIN'], "refmacat")
+            tRefmacV = os.path.join(os.environ['CBIN'], "refmac5")
             if platform.system()=="Windows": tRefmac += ".exe"
             if not glob.glob(tRefmac):
                 print("refmac5 could not be found")
                 sys.exit()
             else:
-                self.refmac = tRefmac
+                self.refmac  = tRefmac
+                self.refmacV = tRefmacV
 
             tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
             if platform.system()=="Windows": tLibcheck += ".exe"
@@ -512,7 +525,21 @@ class Acedrg(CExeCode ):
                             self.versionInfo[strs[0]] = strs[1]
        
         self.versionInfo["RDKit_VERSION"] = rdBase.rdkitVersion 
+        # servalcat version info
+        self.runServalcatVersionInfo()
+        if os.path.isfile(self._log_name):
+            fRV = open(self._log_name, "r")
+            allLs = fRV.readlines()
+            fRV.close()
+            for aL in allLs:
+                if aL.find("Servalcat") !=-1:
+                    strs = aL.strip().split()
+                    if len(strs) >= 2:
+                        self.versionInfo["SERVALCAT_VERSION"] = strs[1].strip()
+                        print("Servalcat  Version: ", self.versionInfo["SERVALCAT_VERSION"]) 
+                
         # Refmac version info 
+        """
         self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
         self.runRefmacVersionInfo()
         
@@ -534,7 +561,7 @@ class Acedrg(CExeCode ):
         if "REFMAC_VERSION" not in self.versionInfo:
             print("Refmac version info is not available")
            
-             
+        """     
     def setOutCifGlobSec(self):
        
         #if not self.fileConv.hasStrDescriptors:
@@ -547,22 +574,22 @@ class Acedrg(CExeCode ):
         self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.descriptor\n")
         #self.outCifGlobSect.append("#_purpose\n")
         if "ACEDRG_VERSION" in self.versionInfo:
-            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg".ljust(21), "?".ljust(12), '\"dictionary generator\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "acedrg".ljust(21), "?".ljust(12), '\"dictionary generator\"'.ljust(40)))
         
         if "DATABASE_VERSION" in self.versionInfo:
-            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg_database".ljust(21), self.versionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "acedrg_database".ljust(21), self.versionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
         else:
-            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "acedrg_database".ljust(21), "?".ljust(12), '\"data source\"'.ljust(40)))
+            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "acedrg_database".ljust(21), "?".ljust(12), '\"data source\"'.ljust(40)))
 
-        self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
+        self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
   
-        if "REFMAC_NAME" in self.versionInfo:
-            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
-                                       '\"optimization tool\"'.ljust(40)))
-        else:
-            self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "refmac".ljust(21), "?".ljust(12), '\"optimization tool\"'.ljust(40)))
+        #if "REFMAC_NAME" in self.versionInfo:
+        #    self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
+        #                               '\"optimization tool\"'.ljust(40)))
+        #else:
+        #    self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "refmac".ljust(21), "?".ljust(12), '\"optimization tool\"'.ljust(40)))
         
          
     def checInputFormat(self):
@@ -682,7 +709,7 @@ class Acedrg(CExeCode ):
             if len(allLs) > 0:
                 for aL in allLs:
                     aL = aL.strip()
-                    print(aL)
+                    #print(aL)
                     if len(aL) > 0:
                         if aL[0].find("#") ==-1:
                             strgrp = aL.split()
@@ -694,18 +721,18 @@ class Acedrg(CExeCode ):
                                 self.naTorsList[torKey][strgrp[1].strip()] = \
                                       [strgrp[2].strip(), strgrp[3].strip(), strgrp[4].strip(), strgrp[5].strip(),\
                                        strgrp[6].strip(), strgrp[7].strip(), strgrp[8].strip()]                           
-
-        if len(self.naTorsList.keys()) > 0:
-            print("special torsion angles for NA:")
-            for aK in sorted(self.naTorsList.keys()):
-                print("==========================")
-                print("torsion key : %s "%aK)
-                for aId in self.naTorsList[aK].keys():
-                    print("ID          : %s "%aId)
-                    print("atom Ids    :  ",self.naTorsList[aK][aId])
-                    print("value       : %s "%self.naTorsList[aK][aId][4])
-                    print("std_dev     : %s "%self.naTorsList[aK][aId][5])
-                    print("period      : %s "%self.naTorsList[aK][aId][6])
+        
+        #if len(self.naTorsList.keys()) > 0:
+        #    print("special torsion angles for NA:")
+        #    for aK in sorted(self.naTorsList.keys()):
+        #        print("==========================")
+        #        print("torsion key : %s "%aK)
+        #        for aId in self.naTorsList[aK].keys():
+        #            print("ID          : %s "%aId)
+        #            print("atom Ids    :  ",self.naTorsList[aK][aId])
+        #            print("value       : %s "%self.naTorsList[aK][aId][4])
+        #            print("std_dev     : %s "%self.naTorsList[aK][aId][5])
+        #            print("period      : %s "%self.naTorsList[aK][aId][6])
         
     def getPEPTors(self):
 
@@ -718,7 +745,7 @@ class Acedrg(CExeCode ):
             if len(allLs) > 0:
                 for aL in allLs:
                     aL = aL.strip()
-                    print(aL)
+                    #print(aL)
                     if len(aL) > 0:
                         if aL[0].find("#") ==-1:
                             strgrp = aL.split()
@@ -731,9 +758,9 @@ class Acedrg(CExeCode ):
                                 self.naTorsList[torKey][strgrp[1].strip()] = \
                                       [strgrp[2].strip(), strgrp[3].strip(), strgrp[4].strip(), strgrp[5].strip(),\
                                        strgrp[6].strip(), strgrp[7].strip(), strgrp[8].strip()]                           
-
+        """
         if len(self.naTorsList.keys()) > 0:
-            print("special torsion angles for NA:")
+            #print("special torsion angles for NA:")
             for aK in sorted(self.naTorsList.keys()):
                 print("==========================")
                 print("torsion key : %s "%aK)
@@ -744,7 +771,7 @@ class Acedrg(CExeCode ):
                     print("std_dev     : %s "%self.naTorsList[aK][aId][5])
                     print("period      : %s "%self.naTorsList[aK][aId][6])
         
-
+        """
     def setWorkMode(self, t_inputOptionsP = None):
 
         #print "acedrg is in ", self.acedrgDir
@@ -1093,8 +1120,8 @@ class Acedrg(CExeCode ):
             if self.workMode==16 or self.workMode==161:
                 print("Input file: %s"%os.path.basename(self.inPdbName))
             print("Output dictionary file: %s"%self.outRoot + ".cif")
-            if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15:
-                print("Output coordinate file: %s"%self.outRoot + ".pdb")
+            #if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15:
+            #    print("Output coordinate file: %s"%self.outRoot + ".pdb")
 
         if self.workMode in [21, 22]:
             print("=====================================================================") 
@@ -1717,9 +1744,74 @@ class Acedrg(CExeCode ):
         if self._log_name == "":
             self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
 
-        self._cmdline = self.refmac  + " -i "
+        self._cmdline = self.refmacV  + " -i "
         self.subExecute()
-
+    
+    def runServalcat(self, tRoot, tInCif=None):
+        
+        aRoot = os.path.join(self.scrDir, tRoot)
+        self._log_name       = aRoot +   "_.servalcat_geom.log"
+        #print("servalcat log name ", self._log_name)
+        self._cmdline = self.servalcat
+        
+        self._cmdline += "--update_dictionary  %s -o  %s \n"%(tInCif, aRoot)
+        #print(self._cmdline)
+        self.subExecute() 
+        
+    def runServalcatVersionInfo(self):
+        
+        
+        self._log_name    = os.path.join(self.scrDir, "servalcat_version.log")
+        self._cmdline = "servalcat -v "
+        self.subExecute()
+   
+    def getFvalFromJson(self, tJSFN):
+        
+        retFval = 100000000
+        try:
+            aGeomUpdatJson = open(tJSFN, "r")
+        except  IOError:
+            print("Failed to open the json file %s "%tJSFN) 
+        else:
+            aSetData = json.load(aGeomUpdatJson)
+            aMinN    = -1
+            if len(aSetData)==2:
+                for aNCSet in aSetData[1]:
+                    if "fval" in aNCSet.keys() and "Ncyc" in aNCSet.keys():
+                        if float(aNCSet["fval"]) < retFval:
+                            retFval = float(aNCSet["fval"])
+                            aMinN  = aNCSet["Ncyc"]
+        
+        return retFval 
+    
+    def cleanSFile(self, tSOutName, tFinCif):
+        
+        lS = False
+        
+        try:
+            aSF = open(tSOutName, "r")
+        except IOError:
+            print("Failed to open %s for reading"%tSOutName)
+            sys.exit(1)
+        else:
+            allLs = aSF.readlines()
+            aSF.close()
+            
+            try:
+                aF = open(tFinCif, "w")
+            except IOError:
+                print("Failed to open %s for writing"%tFinCif)
+                sys.exit(1)
+            else:
+                for aL in allLs:
+                    if not lS and aL.find("servalcat") !=-1:
+                        lS = True
+                        aF.write(aL)
+                    elif lS and  aL.find("servalcat") !=-1:
+                        lS = False
+                    else:
+                        aF.write(aL)
+            
     def runGeoOpt(self):
         
         # Geometrical optimization
@@ -1745,6 +1837,7 @@ class Acedrg(CExeCode ):
                                 self.inPdbName        = finPdb 
                                 self.inMmCifName      = self.outRstCifName
                                 self.outRstCifName    = finRst
+                                
                                 self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
                                 print("===================================================================") 
                             else:
@@ -1760,33 +1853,32 @@ class Acedrg(CExeCode ):
         else:
             print("No dictionary file produced ! ") 
                         
-    def runGeoOpt(self, tRoot, tPdbIn, tCifLibIn):
+    def runGeoOpt(self, tRoot, tCifLibIn):
        
         # Geometrical optimization
-        if os.path.isfile(tPdbIn) and os.path.isfile(tCifLibIn):
-            if os.path.getsize(tPdbIn) > 100 and os.path.getsize(tCifLibIn) > 50:
-                stageNow = 0
-                self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
-                tPdbIn1 = self.refmacXYZOUTName 
+        if os.path.isfile(tCifLibIn):
+            if os.path.getsize(tCifLibIn) > 50:
+                #stageNow = 0
+                #self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
+                self.runServalcat(tRoot, tCifLibIn)
+                #tPdbIn1 = self.refmacXYZOUTName 
                 #tPdbIn1 = tPdbIn 
-                stageNow = 1
-                self.runRefmac(tPdbIn1, tCifLibIn, tRoot, stageNow)
+                #stageNow = 1
+                #self.runRefmac(tPdbIn1, tCifLibIn, tRoot, stageNow)
                 #self.refmacXYZOUTName
-                if not os.path.isfile(self.refmacXYZOUTName):
-                    print("Failed to produce the coordinates for input file %s in optimization"%tPdbIn) 
-                else:
-                    tFValue = -1.0 
-                    tFValue = self.getRefmacFValue(self._log_name)
-                    if tFValue >= -0.000001:
-                        if len(tRoot) !=0:
-                            if tRoot not in self.refmacXYSList:
-                                 self.refmacXYSList[tRoot] = {}
-                            self.refmacXYSList[tRoot]["log"]    = self._log_name 
-                            self.refmacXYSList[tRoot]["xyz"]    = self.refmacXYZOUTName 
-                            self.refmacXYSList[tRoot]["fvalue"] = tFValue 
-                            # print "| %s|"%("Done: " + tRoot).ljust(64) 
-                        aRefPair = [tFValue, self.refmacXYZOUTName]
+                
+                aOutDictCif = os.path.join(self.scrDir, tRoot + "_updated.cif")
+                print("updated cif is ", aOutDictCif)
+                aJsonFN = os.path.join(self.scrDir, tRoot + "_stats.json")
+                print ("out Json file is ", aJsonFN)
+                if os.path.isfile(aOutDictCif) and os.path.isfile(aJsonFN):
+                    tFValue = self.getFvalFromJson(aJsonFN)
+                    if ( tFValue< 100000000):             
+                        aRefPair = [tFValue, aOutDictCif]
                         self.refmacMinFValueList.append(aRefPair)
+                else: 
+                    print("No %s or %s. Geometry optimization on %s  failed "%(aOutDictCif, aJsonFN, tRoot))
+                
             else:
                 print("No dictionary file for optimization ! ") 
         else:
@@ -1795,56 +1887,67 @@ class Acedrg(CExeCode ):
     def runGeoOptOneMolFull(self, tIdxMol):
 
         print("Number of final output conformers for molecule %d is %d "%(tIdxMol+1, self.numConformers))
-        tmpStr = ""
-        if self.numConformers == 1:
-            tmpStr = "_tmp"
+        #tmpStr = ""
+        #if self.numConformers == 1:
+        #    tmpStr = "_tmp"
         nConf = self.rdKit.molecules[tIdxMol].GetNumConformers()
         print("Number of intial conformers for the molecule  ", nConf)
 
-        inPdbNamesRoot =[]
-        #for idxConf in range(nConf): 
-        idxC = 1
-        #print "Number of selct conformers ", self.rdKit.selecConformerIds
-        for idxConf in self.rdKit.selecConformerIds : 
-            tPdbRoot = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxC) + tmpStr
-            aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
-            #print "PDB root ", tPdbRoot
-            #print aConfPdb
-            # print("idxConf=", idxConf)
-            self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign, self.rdKit.useExistCoords2)
-            if os.path.isfile(aConfPdb):
-                inPdbNamesRoot.append(tPdbRoot)
-            idxC+=1
-        aLibCifIn = self.outRstCifName 
-        for aFRoot in inPdbNamesRoot: 
-            aPdbIn    = os.path.join(self.scrDir, aFRoot + "_init.pdb")
-            #print ("|%s%s|"%("Input XYZ : ".ljust(12), aPdbIn.ljust(53)))
-            #print ("|%s%s|"%("Input LIB : ".ljust(12), aLibCifIn.ljust(53)))
-            self.runGeoOpt(aFRoot, aPdbIn, aLibCifIn) 
-            if  self.runExitCode :
-                print("Geometrical optimization fails to produce the final coordinates for %s after geometrical optimization"%aPdbIn)
-        if len(self.refmacMinFValueList) > 0 :
-            #self.refmacMinFValueList.sort(listComp2)
-            self.refmacMinFValueList=sorted(self.refmacMinFValueList, key=cmp_to_key(listComp2))
-            #for aPair in self.refmacMinFValueList:
-            #    print("======")
-            #    print("FValue: ", aPair[0], "  File name ", aPair[1])  
+        aLibCifIn = self.outRstCifName
+        if nConf==1:
+            self.runGeoOpt(self.monomRoot, aLibCifIn)
+            self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+            
+        else:
+            inCifNamesRoot =[]
+            #for idxConf in range(nConf): 
+            idxC = 1
+            #print "Number of selct conformers ", self.rdKit.selecConformerIds
+            for idxConf in self.rdKit.selecConformerIds : 
+                aCifRoot  = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxC)
+                aConfCif = os.path.join(self.scrDir, aCifRoot + "_init.cif")
+                print("Cif root ", aCifRoot)
+                self.fileConv.setAInitConfForMonCif(aLibCifIn, aConfCif, self.rdKit.molecules[tIdxMol], idxConf)
+                if os.path.isfile(aConfCif):
+                    inCifNamesRoot.append(aCifRoot)
+                idxC+=1    
+                #tPdbRoot = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxC)
+                #aConfPdb = os.path.join(self.scrDir, tPdbRoot + "_init.pdb")
+                #print "PDB root ", tPdbRoot
+                #print(aConfPdb)
+                # print("idxConf=", idxConf)
+                #self.fileConv.MolToPDBFile(aConfPdb, tIdxMol, self.rdKit.molecules[tIdxMol], self.fileConv.dataDescriptor,self.monomRoot, idxConf,  self.rdKit.repSign, self.rdKit.useExistCoords2)
+                #if os.path.isfile(aConfPdb):
+                #    inPdbNamesRoot.append(tPdbRoot)
+            
+            
+                self.runGeoOpt(aCifRoot, aConfCif) 
+                if  self.runExitCode :
+                    print("Geometrical optimization fails to produce the final coordinates for %s"%aCifRoot)
+                
+            if len(self.refmacMinFValueList) > 0 :
+                #self.refmacMinFValueList.sort(listComp2)
+                self.refmacMinFValueList=sorted(self.refmacMinFValueList, key=cmp_to_key(listComp2))
+                #for aPair in self.refmacMinFValueList:
+                #    print("======")
+                #    print("FValue: ", aPair[0], "  File name ", aPair[1])  
             if self.numConformers==1: 
                 #print "Come to output final info"
-               
-                self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
-                print("=====================================================================")
-                print("|               Finished                                            |")
-                print("=====================================================================")
+                self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+                # self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             else:
                 for i in range(self.numConformers):
                     aRoot = "Mol" + str(tIdxMol) + "_conformer" + str(i+1) 
-                    self.getFinalOutputFiles(aRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[i][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
-            
+                    self.getFinalOutputFiles2(aRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[i][1], self.fileConv.ccp4DataDes, self.fileConv.strDescriptors, self.fileConv.delocBondList)
+                    #self.getFinalOutputFiles(aRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[i][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+        print("=====================================================================")
+        print("|               Finished                                            |")
+        print("=====================================================================")
+        
     def getRefmacFValue(self, tLogName):
 
         aFva = -1.0
-
+    
         try:
             aLogIn = open(tLogName, "r")
         except IOError:
@@ -1868,6 +1971,7 @@ class Acedrg(CExeCode ):
         
     def getFinalOutputFiles(self, tRoot, tMol, tInCif, tInPdb, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
        
+        
         iIter = 0
         if os.path.isfile(tInPdb):
             if tRoot !="":
@@ -1879,8 +1983,8 @@ class Acedrg(CExeCode ):
                 finPdb = self.outRoot +  ".pdb"
                 finRst = self.outRoot +  ".cif"
                 finTor = self.outRoot +  "_torsion_only.txt"
-            #print "tInPdb ", tInPdb 
-            #print "finPdb ", finPdb
+             
+            
 
             shutil.copy(tInPdb, finPdb)
 
@@ -1892,27 +1996,154 @@ class Acedrg(CExeCode ):
                 #self.outTorsionRestraints(self.outRstCifName, finTor)
         else:
             print("Failed to produce %s after final geometrical optimization"%tInPdb)
+            
+    
+    def getFinalOutputFiles2(self, tRoot, tMol, tCifInName, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
+        
+        if os.path.isfile(tCifInName):
+            if tRoot !="":
+                #self.outRstCifName = self.outRoot +  "_"+ tRoot +".cif"
+                self.outRstCifName = self.outRoot +  ".cif"
+            else:
+                self.outRstCifName = self.outRoot +  ".cif"
+            
+            
+            cifCont = {}
+            cifCont['head']   = []
+            cifCont['bulk']   = []
+            cifCont['others'] =[]
+            monoId = ""
+
+            if self.monomRoot.find("UNL") ==-1:
+                #if len(self.monomRoot) >=3:
+                #    monoId = self.monomRoot[:3]
+                #else:
+                monoId = self.monomRoot
+     
+            elif tDataDescriptor:
+                monoId = tDataDescriptor[-1].strip().split()[0]
+            else:
+                monoId = "UNL"
+                
+
+            #print("monoId ", monoId)
+            #sys.exit()
+            if tDataDescriptor:
+                cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
+                for aL in tDataDescriptor:
+                    if aL[0].find("_")==-1:
+                        aL2=self.getLastEnts(aL)
+                    
+                        aNewL = "%s%s%s"%(monoId.ljust(6),monoId.ljust(6), "    " +aL2)
+                        cifCont['head'].append(aNewL+"\n")   
+                    else:
+                        cifCont['head'].append(aL+"\n")
+            
+                cifCont['head'].append("#\n")
+                # monoId = tDataDescriptor[-1].strip().split()[0]
+                cifCont['head'].append("data_comp_%s\n"%monoId)
+                cifCont['head'].append("#\n")
+                #cifCont['head'].append("loop_\n")   
+                #cifCont['head'].append("_chem_comp_atom.comp_id\n")
+                
+            try: 
+                tCifIn = open(tCifInName, "r")
+            except IOError:
+                print("%s can not be opened for reading"%tCifInName)
+                sys.exit()
+            else:
+                allCifLines = tCifIn.readlines()
+                tCifIn.close()
+                
+                lO = False
+                lS = False
+                lP = False
+                
+                for aL in allCifLines:
+                    if aL.find("_chem_comp.pdbx_type") !=-1:
+                        lS = True
+                    elif not lP and aL.find("plan-") !=-1:
+                        lP = True
+                        cifCont['bulk'].append(aL)
+                        lS = False
+                    elif not lO and aL.find("_pdbx_chem_comp_description_generator")!=-1:
+                        lO = True
+                        lS = False
+                        lP = False
+                    elif lS:
+                        cifCont['bulk'].append(aL)
+                    elif lP and aL.find("loop_")==-1:
+                         cifCont['bulk'].append(aL)
+                    elif lO:
+                        cifCont['others'].append(aL)
+                
+                aSLine = ""
+                for aOL in  cifCont['others']:
+                    if aOL.find("servalcat") !=-1:
+                        aSLine = aOL
+                
+                
+                try:
+                    tOutCif = open(self.outRstCifName, "w")
+                    print("Out cif name ", self.outRstCifName)
+                except IOError:
+                    print("%s can not be opened for write"%self.outRstCifName)
+                    sys.exit()
+                else:
+                            
+                    for aL in cifCont['head']:
+                        if aL.find("data_comp_") !=-1 and aL.find("list")==-1:
+                            tOutCif.write(aL)
+                            tOutCif.write("_chem_comp.pdbx_type        HETAIN\n")
+                        else:
+                            tOutCif.write(aL)
+                    
+                    for aL in cifCont['bulk']:
+                        tOutCif.write(aL)
+                        
+                    
+                    aPos = len(monoId)   
+                    if tStrDescriptors and "props" in tStrDescriptors and len(tStrDescriptors["props"]) !=0:
+                        aSetChars = ["#", ";", "\""]
+                        tOutCif.write("loop_"+"\n")
+                        for aL in tStrDescriptors["props"]:
+                            tOutCif.write(aL+"\n")
+                        for aL in tStrDescriptors["entries"]:
+                            if len(aL.strip()) >0 and not aL[0] in aSetChars: 
+                                aL1 = monoId + aL[aPos:]
+                            else:
+                                aL1 = aL
+                            tOutCif.write(aL1+"\n")
+                    
+                    if len(self.outCifGlobSect):
+                        tOutCif.write("\n")
+                        for aL in self.outCifGlobSect:
+                            tOutCif.write(aL)
+                        tOutCif.write(aSLine) 
+                    
+                
+                
 
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol=-1, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
-
+        
         cifCont = {}
         cifCont['head'] = []
         monoId = ""
 
         if self.monomRoot.find("UNL") ==-1:
-            if len(self.monomRoot) >=3:
-                monoId = self.monomRoot[:3]
-            else:
-                monoId = self.monomRoot
+            #if len(self.monomRoot) >=3:
+            #    monoId = self.monomRoot[:3]
+            #else:
+            monoId = self.monomRoot
  
         elif tDataDescriptor:
             monoId = tDataDescriptor[-1].strip().split()[0]
         else:
             monoId = "UNL"
             
-        
 
-        #print monoId 
+        #print("monoId ", monoId)
+        #sys.exit()
         if tDataDescriptor:
             cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
             
@@ -2282,9 +2513,9 @@ class Acedrg(CExeCode ):
                             elif id2 in self.naTorsList.keys():
                                 id = id2
                                 idSet=[strs[5], strs[4], strs[3], strs[2]]
-                            print("id1=",id1)
-                            print("id2=",id2)
-                            print("id=", id)
+                            #print("id1=",id1)
+                            #print("id2=",id2)
+                            #print("id=", id)
                             if len(id) > 0:
                                 for aId in sorted(self.naTorsList[id].keys()):
                                     aTorL = "%s%s%s%s%s%s%s%s%s\n"%(strs[0].ljust(8), aId.ljust(16),\
@@ -2293,7 +2524,7 @@ class Acedrg(CExeCode ):
                                         idSet[0].ljust(10), idSet[1].ljust(10), idSet[2].ljust(10), idSet[3].ljust(10),
                                         self.naTorsList[id][aId][4].ljust(14), self.naTorsList[id][aId][5].ljust(10),\
                                         self.naTorsList[id][aId][6].ljust(6))
-                                    print("aTorL=", aTorL)
+                                    #print("aTorL=", aTorL)
                                     speTors[aId]= aTorL
                             else:
                                 otherTors.append(aL)
@@ -2922,7 +3153,7 @@ class Acedrg(CExeCode ):
  
         self.printJobs()
         if self.useExistCoords or self.workMode==16 or self.workMode==161:
-            print("One of output conformers will using input coordinates as initial ones")
+            print("One of output conformers will using input coordinates as the initial one")
         print("workMode : ", self.workMode)
         
         # Stage 1: initiate a mol file for RDKit obj
@@ -2932,17 +3163,17 @@ class Acedrg(CExeCode ):
                 print("inName : ", self.inMmCifName)
                 self.fileConv.mmCifReader(self.inMmCifName)
                 print("Number of atoms in the cif file ", len(self.fileConv.atoms))
-                for aA in self.fileConv.atoms:
-                    print(aA["_chem_comp_atom.atom_id"])
-                for aB in self.fileConv.bonds:
-                    if "_chem_comp_bond.type" in aB.keys():
-                        print("a bond between %s and %s with order %s"
-                              %(aB["_chem_comp_bond.atom_id_1"],
-                                aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.type"]))
-                    elif "_chem_comp_bond.value_order" in aB.keys():
-                        print("a bond between %s and %s with order %s"
-                                  %(aB["_chem_comp_bond.atom_id_1"],
-                                    aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.value_order"]))
+                #for aA in self.fileConv.atoms:
+                #    print(aA["_chem_comp_atom.atom_id"])
+                #for aB in self.fileConv.bonds:
+                #    if "_chem_comp_bond.type" in aB.keys():
+                #        print("a bond between %s and %s with order %s"
+                #              %(aB["_chem_comp_bond.atom_id_1"],
+                #                aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.type"]))
+                #    elif "_chem_comp_bond.value_order" in aB.keys():
+                #        print("a bond between %s and %s with order %s"
+                #                  %(aB["_chem_comp_bond.atom_id_1"],
+                #                    aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.value_order"]))
                         
                 
                 # print(self.fileConv.dataDescriptor)
@@ -3017,6 +3248,7 @@ class Acedrg(CExeCode ):
                         self.useExistCoords    = True
                     #print("is this monomer a peptide ", self.isPEP)
                 if  len(self.fileConv.bonds) !=0 :   #and not self.isAA:
+                    
                     # Option A: 
                     if self.useExistCoords :
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -3194,7 +3426,24 @@ class Acedrg(CExeCode ):
                                 self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
                                                 self.numConformers, 0, self.fileConv.nameMapingCifMol,\
                                                 self.fileConv.inputCharge) 
-                    
+            
+            elif len(self.fileConv.atoms) > 1 and not self.lOrg:
+                print("Metal atoms are found")
+                aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
+                                                   self.outRoot, self.fileConv, self.chemCheck)
+                if os.path.isfile(aFinInCif):
+                    self.runServalcat(self.outRoot, aFinInCif)
+                    aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                    if os.path.isfile(aSOutName):
+                        aFinCif = self.outRoot + "_final.cif"
+                        self.cleanSFile(aSOutName, aFinCif)
+                        print("The final output is %s "%aFinCif)
+                        print("=====================================================================")
+                        print("|               Finished                                            |")
+                        print("=====================================================================")
+                else:
+                    print("acedrg failed to produce a metal contained mmcif file")
+                sys.exit()
             elif len(self.fileConv.atoms) == 1:
                 finCif = self.outRoot + ".cif"
                 self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
@@ -3259,8 +3508,7 @@ class Acedrg(CExeCode ):
                 print(self.inMol2Name, " can not be found for reading ")
                 sys.exit()
 
-
-                
+        
         if not self.workMode in [80, 81, 1001, 1002]:
             self.setOutCifGlobSec()
         if self.workMode in [11, 12, 13, 14, 15]:
@@ -3288,7 +3536,7 @@ class Acedrg(CExeCode ):
                 if self.workMode in [11,  111, 112]:
                     print("Using coords ", self.rdKit.useExistCoords)
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
-
+                
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                         print("The input system contains metal or other heavier element")
@@ -3466,6 +3714,7 @@ class Acedrg(CExeCode ):
                     self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
                                                 self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
                                                 self.fileConv.nameMapingCifMol, self.fileConv.inputCharge)
+                
             if not self.errLevel:
                 
                 try: 
@@ -3499,6 +3748,9 @@ class Acedrg(CExeCode ):
                     
                         diffMF.close()
                         
+    def SetNewMolWithoutMetal(self):
+        
+        pass 
                 
     def printExitInfo(self):
 

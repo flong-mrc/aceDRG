@@ -45,6 +45,7 @@ from . utility  import setBoolDict
 from . utility  import splitLineSpa
 from . utility  import splitLineSpa2
 from . utility  import aLineToAlist
+from . utility  import aLineToAlist2
 from . utility  import aLineToAList2
 
 class FileTransformer(object) :
@@ -1066,8 +1067,8 @@ class FileTransformer(object) :
             self.mmCifReader(tInFileName)
 
         #print "Num of atoms ", len(self.atoms)
-        for aA in self.atoms:
-            print(aA["_chem_comp_atom.atom_id"])
+        #for aA in self.atoms:
+        #    print(aA["_chem_comp_atom.atom_id"])
         #print "Num of bonds ", len(self.bonds)
         if not len(self.atoms) or not len(self.bonds):
             print("No atoms and/or bonds from the input file, check !")
@@ -1282,11 +1283,11 @@ class FileTransformer(object) :
                 else:
                     print("Input file bug: no bond type(order) for bonds!")        
                     sys.exit()
-                aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
-                       sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
-                print("The bond between %s of serial number %s and %s of serial number %s is : %s"\
-                      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2, bt))
-                print(aBL)
+                #aBL = "%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
+                #       sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3))    
+                #print("The bond between %s of serial number %s and %s of serial number %s is : %s"\
+                #      %(aBond["_chem_comp_bond.atom_id_1"], a1, aBond["_chem_comp_bond.atom_id_2"], a2, bt))
+                #print(aBL)
                 tOutFile.write("%s%s%s%s%s%s%s\n"%(a1.rjust(3), a2.rjust(3), bt.rjust(3), \
                                sss.rjust(3), xxx.rjust(3), rrr.rjust(3), ccc.rjust(3)))
 
@@ -1383,7 +1384,85 @@ class FileTransformer(object) :
                         outF.write(aL)
                 outF.close()
 
-       
+    def setAInitConfForMonCif(self, tInCifName, tOutCifName, tMol, tIdxConf):
+        
+        try:
+            aInCif = open(tInCifName, "r")
+        except IOError:
+            print("%s  can not be open for reading "%tInCifName)
+            sys.exit()
+        else:
+            
+            origCifLs = aInCif.readlines()
+            aInCif.close()
+            
+            cifLs ={}
+            cifLs["part1"] = []
+            cifLs["atoms"] = []
+            cifLs["part2"] = []
+            
+            lK  = True
+            lA  = False
+            lK2 = False
+            for aL in origCifLs:
+                if aL.find("_chem_comp_atom.pdbx_model_Cartn_z_ideal") !=-1:
+                    lK  = False
+                    lA  = True
+                    lK2 = False
+                    cifLs["part1"].append(aL)
+                elif lA and aL.find("loop_") !=-1:
+                    lA  = False
+                    lK  = False
+                    lK2 = True
+                    cifLs["part2"].append(aL)
+                elif lK:
+                    cifLs["part1"].append(aL)
+                elif lA:
+                    cifLs["atoms"].append(aL)
+                elif lK2:
+                    cifLs["part2"].append(aL)
+            
+            aConf  =  tMol.GetConformer(tIdxConf) 
+            atoms  =  tMol.GetAtoms()
+            atomPOS ={}
+            for aAtom in atoms:
+                idxA  = aAtom.GetIdx() 
+                name  = aAtom.GetProp("Name").strip() 
+                pos = aConf.GetAtomPosition(idxA)
+                posX ="%8.3f"%pos.x
+                posY ="%8.3f"%pos.y
+                posZ ="%8.3f"%pos.z
+                atomPOS[name] = []
+                atomPOS[name].append(posX)
+                atomPOS[name].append(posY)
+                atomPOS[name].append(posZ)
+            cifNewLs = []
+            for aLA in cifLs["atoms"]:
+                strs = aLA.strip().split()
+                if len(strs)==12:
+                    aName =strs[1]
+                    atmL  = "%s%s%s%s%s%s%s%s%s%s%s%s\n"\
+                            %(strs[0].ljust(8), strs[1].ljust(8), strs[2].ljust(8),
+                              strs[3].ljust(6), strs[4].ljust(6), strs[5].ljust(6),
+                              atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12),
+                              atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12))
+                    cifNewLs.append(atmL)
+            
+            try:
+                aOutCif = open(tOutCifName, "w")
+            except IOError:
+                print("%s  can not be open for writing "%tOutCifName)
+                sys.exit()
+            else:
+                for aL in cifLs["part1"]:
+                    aOutCif.write(aL)
+                for aL in cifNewLs:
+                    aOutCif.write(aL) 
+                for aL in cifLs["part2"]:
+                    aOutCif.write(aL) 
+                aOutCif.close()
+                
+            
 
     def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="UNL", idxConf=0, tDelSign="", tUsingCoords=False):
 
@@ -1661,11 +1740,15 @@ class FileTransformer(object) :
                         l1 = False
                 elif aS.find("\'") !=-1:
                     if l1:
-                        aTS = "\'" + aTS + "\'"
-                        tList.append(aTS)
-                        aTS = ""
-                        l1 = False
-                        l2 = False
+                        if not l2:
+                            aTS = "\'" + aTS + "\'"
+                            tList.append(aTS)
+                            aTS = ""
+                            l1  = False
+                            l2  = False
+                        else:
+                            aTS = aTS + aS
+                            l1  = True
                     else:
                         aTS = aTS + aS
                         l1 = True
@@ -2022,7 +2105,7 @@ class Ccp4MmCifObj (dict) :
                 aStrSet = [] 
                 if tKW =="list":
                     if aL.find("\'") !=-1 and aL.find("\"") ==-1:
-                        aLineToAList2(aL, aStrSet)
+                        aLineToAlist2(aL, aStrSet)
                     else: 
                         aLineToAlist(aL, aStrSet)
                 else:
@@ -2033,6 +2116,7 @@ class Ccp4MmCifObj (dict) :
                         #aLineToAlist(aL, aStrSet)
                         aStrSet = splitLineSpa(aL)
                     #print(aStrSet)
+                # 
                 for aStr in aStrSet:
                     if aStr.strip()[0] =="_":
                         aKeySet.append(aStr)

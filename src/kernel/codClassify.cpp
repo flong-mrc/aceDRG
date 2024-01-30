@@ -1213,6 +1213,7 @@ namespace LIBMOL
 
         if (allRingsV.size())
         {
+
             checkAndSetupPlanes(allRingsV, allPlanes, allAtoms);
             setAromaticBonds(allRingsV, allBonds);
         }
@@ -6506,6 +6507,7 @@ namespace LIBMOL
                     aKeySet.push_back(a2M);
                     aKeySet.push_back(a1C);
                     aKeySet.push_back(a2C);
+
                     if ( allDictBondsIdxD[ha1][ha2][hybrComb][tInR].find(a1NB2) !=allDictBondsIdxD[ha1][ha2][hybrComb][tInR].end())
                     {
                         std::cout << "find " << a1NB2 << std::endl;
@@ -6939,6 +6941,11 @@ namespace LIBMOL
                     aKeySet.push_back(a2M);
                     aKeySet.push_back(a1C);
                     aKeySet.push_back(a2C);
+                    //std::cout << "aKeySet are " << std::endl;
+                    //for (int ke=0; ke < aKeySet.size(); ke++)
+                    //{
+                    //    std::cout << " i " << ke << " : " << aKeySet[ke] << std::endl;
+                    //}
                     if ( allDictBondsIdxD[ha1][ha2][hybrComb][tInR].find(a1NB2) !=allDictBondsIdxD[ha1][ha2][hybrComb][tInR].end())
                     {
                         std::cout << "find " << a1NB2 << std::endl;
@@ -7371,11 +7378,13 @@ namespace LIBMOL
                  iB5 !=allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].end();
                  iB5++)
             {
+
                 if (iB5->first.compare(tKeySet2[4]) !=0)
                 {
                     for (std::map<ID, std::vector<aValueSet> >::iterator iB6=iB5->second.begin();
                          iB6 !=iB5->second.end(); iB6++)
                     {
+
                         if (iB6->first.compare(tKeySet2[5])==0)
                         {
                             for (std::vector<aValueSet>::iterator iB7=iB6->second.begin();
@@ -7447,13 +7456,7 @@ namespace LIBMOL
         else if (tLev==6)
         {
             // For both a1NB and a2NB not found
-            //std::cout << "Found keys are: " << std::endl
-            //          << tKeySet1[0] << std::endl
-            //          << tKeySet1[1] << std::endl
-            //          << tKeySet2[0] << std::endl
-            //          << tKeySet2[1] << std::endl
-            //          << tKeySet2[2] << std::endl
-            //          << tKeySet2[3] << std::endl;
+
             std::vector<aValueSet> tBs5;
             for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5
                  =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].begin();
@@ -7879,7 +7882,7 @@ namespace LIBMOL
         {
 
             // exchange  a1NB and a2NB
-            std::cout << "tSKey "  << tSKey << std::endl;
+            // std::cout << "tSKey "  << tSKey << std::endl;
             std::vector<aValueSet> tBs5;
             for (std::map<ID, std::map<ID, std::vector<aValueSet> > >::iterator iB5
                  =allDictBondsIdx2D[tKeySet1[0]][tKeySet1[1]][tKeySet2[0]][tKeySet2[1]][tKeySet2[2]][tKeySet2[3]].begin();
@@ -14892,8 +14895,8 @@ namespace LIBMOL
     int CodClassify::checkATorsAtomsInAroRing(int tAtm1, int tAtm2)
     {
         std::cout << "Check arom for atom "
-                  << allAtoms[tAtm1].id << " of sp "<< allAtoms[tAtm1].bondingIdx 
-                  << " and " << allAtoms[tAtm2].id << " of sp " 
+                  << allAtoms[tAtm1].id << " of sp "<< allAtoms[tAtm1].bondingIdx
+                  << " and " << allAtoms[tAtm2].id << " of sp "
                   << allAtoms[tAtm2].bondingIdx << std::endl;
         int aRet  = 0;                      // not in any ring
         if (allAtoms[tAtm1].bondingIdx==2
