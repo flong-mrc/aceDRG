@@ -119,7 +119,8 @@ class Acedrg(CExeCode ):
         #self.refmacMinFValueList["value"] =100000.00
         #self.refmacMinFValueList["fileName"] =""
         
-        self.servalcat        = "python -m servalcat.command_line refine_geom "
+        self.servalcat        = "servalcat refine_geom "
+        #self.servalcat        = "python -m servalcat.command_line refine_geom "
         
 
         self.linkInstructions = ""
@@ -1775,7 +1776,7 @@ class Acedrg(CExeCode ):
         else:
             aSetData = json.load(aGeomUpdatJson)
             aMinN    = -1
-            if len(aSetData)==2:
+            if len(aSetData)==4:
                 for aNCSet in aSetData[1]:
                     if "fval" in aNCSet.keys() and "Ncyc" in aNCSet.keys():
                         if float(aNCSet["fval"]) < retFval:

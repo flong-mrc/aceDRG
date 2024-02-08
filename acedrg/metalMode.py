@@ -39,6 +39,10 @@ class metalMode(CExeCode):
         self.monomRoot        = ""
         self.outRoot          = ""
         
+        """
+        check
+        """
+        
     def execute(self, tAtoms, tBonds, tMonomRoot, tOutRoot, tFileConv, tChem):
         
         aRet = ""
