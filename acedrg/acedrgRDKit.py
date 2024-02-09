@@ -1082,21 +1082,24 @@ class AcedrgRDKit(object):
 
     def setNamesForAtomsInMol2(self, tMol, tChemCheck, tNameMap, tStage=0):
 
-        dictAtomTypes = {}
-        dictAtomNames = {}
+       
 
         if tStage == 0:
             # for non-H atoms
             for aAtom in tMol.GetAtoms():
                 if aAtom.GetSymbol() != "H":
                     aAtom.SetProp("Name", tNameMap["nonH"][aAtom.GetIdx()])
-                    aAtom.SetProp("altName", tNameMap["nonH_alt"][aAtom.GetIdx()])
+                    if aAtom.GetIdx() in tNameMap["nonH_alt"].keys():
+                        aAtom.SetProp("altName", tNameMap["nonH_alt"][aAtom.GetIdx()])
+                    else:
+                        aAtom.SetProp("altName", tNameMap["nonH"][aAtom.GetIdx()])
         elif tStage == 1:
             if tMol.GetProp("ResidueName") in tChemCheck.aminoAcids:
                 self.setNamesForHAtomsInMol_PP(tMol, tNameMap, tChemCheck)
             else:
                 self.setNamesForHAtomsInMol(tMol, tNameMap, tChemCheck)
-
+    
+        
     def setNamesForHAtomsInMol(self, tMol, tNameMap, tChemCheck):
 
         #tIdxHs = {}
@@ -1851,7 +1854,10 @@ class AcedrgRDKit(object):
         #    sys.exit()
         # print "Number of atoms in this molecule is initially ", nAtoms
         # self.showInfoAboutAtomsAndBonds(aMol, 0)
-
+        print(tMapMode)
+        print(tNameMap)
+        
+        
         if tMol.GetProp("fixedName") == "NO":
             if tMapMode == 1:
                 self.setNamesForAtomsInMol2(tMol, ChemCheck,  tNameMap, 0)

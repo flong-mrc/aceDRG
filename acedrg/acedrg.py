@@ -1861,6 +1861,7 @@ class Acedrg(CExeCode ):
             if os.path.getsize(tCifLibIn) > 50:
                 #stageNow = 0
                 #self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
+                print("Servalcat is running")
                 self.runServalcat(tRoot, tCifLibIn)
                 #tPdbIn1 = self.refmacXYZOUTName 
                 #tPdbIn1 = tPdbIn 
