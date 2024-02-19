@@ -119,7 +119,7 @@ class Acedrg(CExeCode ):
         #self.refmacMinFValueList["value"] =100000.00
         #self.refmacMinFValueList["fileName"] =""
         
-        self.servalcat        = "servalcat refine_geom "
+        self.servalcat        = "servalcat "
         #self.servalcat        = "python -m servalcat.command_line refine_geom "
         
 
@@ -1753,10 +1753,11 @@ class Acedrg(CExeCode ):
         aRoot = os.path.join(self.scrDir, tRoot)
         self._log_name       = aRoot +   "_.servalcat_geom.log"
         #print("servalcat log name ", self._log_name)
+        log2  = os.path.join(self.scrDir, "servalcat.log")
         self._cmdline = self.servalcat
-        
-        self._cmdline += "--update_dictionary  %s -o  %s \n"%(tInCif, aRoot)
-        #print(self._cmdline)
+        self._cmdline += "  --logfile %s  "%log2
+        self._cmdline += " refine_geom  --update_dictionary  %s -o  %s \n"%(tInCif, aRoot)
+        print(self._cmdline)
         self.subExecute() 
         
     def runServalcatVersionInfo(self):
@@ -3538,13 +3539,11 @@ class Acedrg(CExeCode ):
                 if self.workMode in [11,  111, 112]:
                     print("Using coords ", self.rdKit.useExistCoords)
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
-                
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                         print("The input system contains metal or other heavier element")
                         print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
-                    
                     self.runLibmol(self.inMmCifName, iMol)
                 else:
                     print("The input %s does not exist"%self.inMmCifName)

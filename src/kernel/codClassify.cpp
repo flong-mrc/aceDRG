@@ -15631,12 +15631,12 @@ namespace LIBMOL
             {
                 int idx1 = StrToInt(tLabs[0]);
                 int idx2 = StrToInt(tLabs[1]);
-                // std::cout << "torsion lab " << tS << std::endl;
-                // std::cout << "Select torsion angles for the bond of atoms "
-                //          << allAtoms[idx1].id << " and " << allAtoms[idx2].id
-                //          << std::endl;
+                std::cout << "torsion lab " << tS << std::endl;
+                std::cout << "Select torsion angles for the bond of atoms "
+                          << allAtoms[idx1].id << " and " << allAtoms[idx2].id
+                          << std::endl;
 
-                std::cout << "Number of torsions is " << tTors.size() << std::endl;
+                std::cout << "1. Number of torsions is " << tTors.size() << std::endl;
 
                 std::vector<int> idxR1, idxNonH1, idxH1, idxR2, idxNonH2, idxH2;
 
@@ -15654,15 +15654,24 @@ namespace LIBMOL
                                 {
                                     if (allAtoms[*iConn].inRings.size() !=0)
                                     {
-                                        idxR1.push_back(*iConn);
+					if (std::find(idxR1.begin(), idxR1.end(), *iConn)==idxR1.end())
+				        {
+					    idxR1.push_back(*iConn);
+					}
                                     }
                                     else if (allAtoms[*iConn].chemType !="H")
                                     {
-                                        idxNonH1.push_back(*iConn);
+					 if (std::find(idxNonH1.begin(), idxNonH1.end(), *iConn)==idxNonH1.end())
+					 {	 
+                                              idxNonH1.push_back(*iConn);
+					 }
                                     }
                                     else
                                     {
-                                        idxH1.push_back(*iConn);
+					 if (std::find(idxH1.begin(), idxH1.end(), *iConn)==idxH1.end())
+					 {	 
+                                             idxH1.push_back(*iConn);
+					 }
                                     }
                                 }
                             }
@@ -15676,34 +15685,46 @@ namespace LIBMOL
                                 {
                                     if (allAtoms[*iConn].inRings.size() !=0)
                                     {
-                                        idxR2.push_back(*iConn);
+					    
+					if (std::find(idxR2.begin(), idxR2.end(), *iConn)==idxR2.end())
+				        {
+                                            idxR2.push_back(*iConn);
+					}
                                     }
                                     else if (allAtoms[*iConn].chemType.find("H")
                                              ==std::string::npos)
                                     {
-                                        idxNonH2.push_back(*iConn);
+					    
+					 if (std::find(idxNonH2.begin(), idxNonH2.end(), *iConn)==idxNonH2.end())
+					 {	 
+                                             idxNonH2.push_back(*iConn);
+					 }
                                     }
                                     else
                                     {
-                                        idxH2.push_back(*iConn);
+					 if (std::find(idxH2.begin(), idxH2.end(), *iConn)==idxH2.end())
+					 {	 
+                                             idxH2.push_back(*iConn);
+					 }
                                     }
                                 }
                             }
                         }
                     }
                 }
-                //std::cout << "atom  " << allAtoms[idx1].id
-                //          << " connects to " << std::endl;
+                std::cout << "atom  " << allAtoms[idx1].id
+                          << " connects to " << std::endl;
                 //std::cout << "ring atoms " << idxR1.size() << std::endl
-                //          << "non-H atoms (excluded above) " << idxNonH1.size() << std::endl
-                //          << "H atoms " << idxH1.size() << std::endl;
-                //std::cout << "atom  " << allAtoms[idx2].id
-                //          << " connects to " << std::endl;
-                //std::cout << "ring atoms " << idxR2.size() << std::endl
-                //          << "non-H atoms (excluded above) " << idxNonH2.size() << std::endl
-                //          << "H atoms " << idxH2.size() << std::endl;
+		std::cout << "non-H atoms (excluded above) " << idxNonH1.size() << std::endl
+                          << "H atoms " << idxH1.size() << std::endl;
+                std::cout << "atom  " << allAtoms[idx2].id
+                          << " connects to " << std::endl;
+                std::cout << "ring atoms " << idxR2.size() << std::endl
+                          << "non-H atoms (excluded above) " << idxNonH2.size() << std::endl
+                          << "H atoms " << idxH2.size() << std::endl;
                 // Now select the torsion angles
                 // 1. atoms of Non-ring, non-H first
+                std::cout << "2. Number of torsions is " << tTors.size() << std::endl;
                 if (idxNonH1.size() !=0 && idxNonH2.size() !=0)
                 {
                     int tIdxT= getTorsion(allTorsions, idxNonH1[0], idx1, idx2, idxNonH2[0]);
@@ -15954,6 +15975,8 @@ namespace LIBMOL
             }
         }
 
+        std::cout << "3. Number of torsions is " << miniTorsions.size() << std::endl;
+
         if (miniTorsions.size() > 0)
         {
             std::vector<TorsionDict> tmpTorsions;
@@ -15961,22 +15984,38 @@ namespace LIBMOL
             for (std::vector<TorsionDict>::iterator iTor=miniTorsions.begin();
                 iTor != miniTorsions.end(); iTor++)
             {
+		
+		std::cout << "Tor atom 1 " << allAtoms[iTor->atoms[0]].id
+			  << " atom 2 " << allAtoms[iTor->atoms[1]].id 
+			  << " atom 3 " << allAtoms[iTor->atoms[2]].id
+			  << " atom 4 " << allAtoms[iTor->atoms[3]].id << std::endl;
+
+		if (iTor->atoms.size()==4 && allAtoms[iTor->atoms[0]].id !=allAtoms[iTor->atoms[3]].id )
+		{
                 tmpTorsions.push_back(*iTor);
+		}
             }
+
+            std::cout << "4. Number of torsions is " << tmpTorsions.size() << std::endl;
 
             miniTorsions.clear();
 
             for (std::vector<TorsionDict>::iterator iTor=tmpTorsions.begin();
                 iTor != tmpTorsions.end(); iTor++)
             {
+		if (iTor->atoms.size()==4 && allAtoms[iTor->atoms[0]].id !=allAtoms[iTor->atoms[3]].id )
+		{
+
                 if (iTor->atoms.size()==4 &&
                     allAtoms[iTor->atoms[0]].id !=allAtoms[iTor->atoms[3]].id )
                 {
                     miniTorsions.push_back(*iTor);
                 }
+		}
             }
         }
 
+        std::cout << "5. Number of torsions is " << allTorsions.size() << std::endl;
         if (allTorsions.size() > 0)
         {
 
@@ -16001,6 +16040,7 @@ namespace LIBMOL
             }
 
         }
+	std::cout << "Here" << std::endl;
     }
 
     void CodClassify::setupTargetTorsions()

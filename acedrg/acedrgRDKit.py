@@ -2686,37 +2686,38 @@ class AcedrgRDKit(object):
                                 aChiralSetMap[aId]["isChiraled"] = False
 
                         if aChiralSetMap[aId]["isChiraled"]:
-                            aChiralSetMap[aId][aCid] = {}
-                            aPass = self.checkUncertainChirals(tNBCIPMap[aId])
-                            if not aPass:
+                            if aElem == "N" and nNB ==3 and nConnHs <2: 
                                 aChiralSetMap[aId]["finalChiVolSign"] = "both"
                             else:
-                                if "finalChiVolSign" in aChiralSetMap[aId] and aChiralSetMap[aId]["finalChiVolSign"] == "both":
-                                    # Already in "both" sign, no need to further check
-                                    pass
+                                aChiralSetMap[aId][aCid] = {}
+                                aPass = self.checkUncertainChirals(tNBCIPMap[aId])
+                                if not aPass:
+                                    aChiralSetMap[aId]["finalChiVolSign"] = "both"
                                 else:
-                                    # the second one should be for insurance
-                                    if aId in tNBCIPMap and len(tNBCIPMap[aId]) > 2:
-                                        posCen = aConformer.GetAtomPosition(
-                                            aIdx)
-                                        coordsCen = [float(posCen.x), float(
-                                            posCen.y), float(posCen.z)]
-                                        pos1 = aConformer.GetAtomPosition(
-                                            tNBCIPMap[aId][0][0].GetIdx())
-                                        coords1 = [float(pos1.x), float(
-                                            pos1.y), float(pos1.z)]
-                                        pos2 = aConformer.GetAtomPosition(
-                                            tNBCIPMap[aId][1][0].GetIdx())
-                                        coords2 = [float(pos2.x), float(
-                                            pos2.y), float(pos2.z)]
-                                        pos3 = aConformer.GetAtomPosition(
-                                            tNBCIPMap[aId][2][0].GetIdx())
-                                        coords3 = [float(pos3.x), float(
-                                            pos3.y), float(pos3.z)]
-                                        aChiralSetMap[aId][aCid]["confSign"] = tChemCheck.getChiralVolumeSign(
-                                            posCen, pos1, pos2, pos3)
-                                        if "finalChiVolSign" not in aChiralSetMap[aId]:
-                                            aChiralSetMap[aId]["finalChiVolSign"] = aChiralSetMap[aId][aCid]["confSign"]
+                                    if "finalChiVolSign" in aChiralSetMap[aId] and aChiralSetMap[aId]["finalChiVolSign"] == "both":
+                                        # Already in "both" sign, no need to further check
+                                        pass
+                                    else:
+                                        # the second one should be for insurance
+                                        if aId in tNBCIPMap and len(tNBCIPMap[aId]) > 2:
+                                            posCen = aConformer.GetAtomPosition(aIdx)
+                                            coordsCen = [float(posCen.x), float(
+                                                               posCen.y), float(posCen.z)]
+                                            pos1 = aConformer.GetAtomPosition(
+                                                   tNBCIPMap[aId][0][0].GetIdx())
+                                            coords1 = [float(pos1.x), float(pos1.y), float(pos1.z)]
+                                            pos2 = aConformer.GetAtomPosition(
+                                                tNBCIPMap[aId][1][0].GetIdx())
+                                            coords2 = [float(pos2.x), float(
+                                                pos2.y), float(pos2.z)]
+                                            pos3 = aConformer.GetAtomPosition(
+                                                tNBCIPMap[aId][2][0].GetIdx())
+                                            coords3 = [float(pos3.x), float(
+                                                pos3.y), float(pos3.z)]
+                                            aChiralSetMap[aId][aCid]["confSign"] = tChemCheck.getChiralVolumeSign(
+                                                posCen, pos1, pos2, pos3)
+                                            if "finalChiVolSign" not in aChiralSetMap[aId]:
+                                                aChiralSetMap[aId]["finalChiVolSign"] = aChiralSetMap[aId][aCid]["confSign"]
         if len(tmpBadCid):
             tmpCids = []
             for aCid in self.selecConformerIds:

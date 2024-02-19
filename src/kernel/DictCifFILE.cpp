@@ -8820,8 +8820,11 @@ namespace LIBMOL
                     //          << " : " << tAtoms[iT->atoms[1]].hybrid
                     //          << std::endl;
 
+                    std::string hy1 = tAtoms[iT->atoms[1]].hybrid;
+                    std::string hy2 = tAtoms[iT->atoms[2]].hybrid;
 
                     std::string aTorSiga;
+                    /* 
                     if (iT->id.find("const") !=std::string::npos
                         || iT->id.find("CONST") !=std::string::npos)
                     {
@@ -8830,11 +8833,8 @@ namespace LIBMOL
                     }
                     else if (iT->id.find("sp2_sp2") !=std::string::npos)
                     {
-                        aTorSiga = RealToStr(iT->sigValue);
-                    }
-                    else if (iT->id.find("other_tor") !=std::string::npos)
-                    {
-                        aTorSiga = "10.0";
+                        // aTorSiga = RealToStr(iT->sigValue);
+                        aTorSiga = "5.0";
                     }
                     else if (tAtoms[iT->atoms[1]].hybrid.find("SP2")
                              !=std::string::npos
@@ -8843,10 +8843,85 @@ namespace LIBMOL
                     {
                         aTorSiga = "5.0";
                     }
-                    else
+                    else if (iT->id.find("sp3_sp3") !=std::string::npos)
                     {
                         aTorSiga = "10.0";
                     }
+                    else if (tAtoms[iT->atoms[1]].hybrid.find("SP3")
+                             !=std::string::npos
+                            && tAtoms[iT->atoms[2]].hybrid.find("SP3")
+                             !=std::string::npos)
+                    {
+                        aTorSiga = "10.0";
+                    }
+                    else if (iT->id.find("sp2_sp3") !=std::string::npos)
+                    {
+                        aTorSiga = "20.0";
+                    }
+                    else if ((tAtoms[iT->atoms[1]].hybrid.find("SP2")
+                             !=std::string::npos
+                            && tAtoms[iT->atoms[2]].hybrid.find("SP3")
+                             !=std::string::npos)
+                            || (tAtoms[iT->atoms[2]].hybrid.find("SP2")
+                             !=std::string::npos
+                            && tAtoms[iT->atoms[1]].hybrid.find("SP3")
+                             !=std::string::npos))
+                    {
+                        aTorSiga = "20.0";
+                    }
+                    else if (iT->id.find("other_tor") !=std::string::npos)
+                    {
+                        aTorSiga = "10.0";
+                    }
+                    else
+                    {
+                        aTorSiga = RealToStr(iT->sigValue);
+                    }
+                    */
+ 
+                    if (iT->id.find("const") !=std::string::npos
+                        || iT->id.find("CONST") !=std::string::npos)
+                    {
+                        aTorSiga = "0.0";
+                        //aTorSiga = "1.0";
+                    }
+                    else if (hy1 =="sp2" && hy2=="sp2")
+                    {
+                        aTorSiga = "5.0";
+                    }
+                    else if (hy1 =="SP2" && hy2=="SP2")
+                    {
+                        aTorSiga = "5.0";
+                    }
+                    else if (hy1 =="sp3" && hy2=="sp3")
+                    {
+                        aTorSiga = "10.0";
+                    }
+                    else if (hy1 =="SP3" && hy2=="SP3")
+                    {
+                        aTorSiga = "10.0";
+                    }
+                    else if (hy1 =="sp2" && hy2=="sp3")
+                    {
+                        aTorSiga = "20.0";
+                    }
+                    else if (hy1 =="SP2" && hy2=="SP3")
+                    {
+                        aTorSiga = "20.0";
+                    }
+                    else if (hy2 =="sp2" && hy1=="sp3")
+                    {
+                        aTorSiga = "20.0";
+                    }
+                    else if (hy2 =="SP2" && hy1=="SP3")
+                    {
+                        aTorSiga = "20.0";
+                    }
+                    else
+                    {
+                        aTorSiga = 1.0;
+                    }
+                    
                     std::cout << "aTor id " << iT->id << std::endl;
                     std::cout << "aTorSiga " << aTorSiga  << std::endl;
                     outRestrF << longName

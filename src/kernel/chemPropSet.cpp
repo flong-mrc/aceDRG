@@ -132,6 +132,7 @@ namespace LIBMOL
 
             int t_len =0;
             int t_m_len =0;
+
             for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
                     iConn !=iAt->connAtoms.end(); iConn++)
             {
@@ -322,11 +323,12 @@ namespace LIBMOL
                 }
                 else if (t_len==3 || t_len==4)
                 {
-                    if (iAt->chiralIdx ==0)
-                    {
-                        iAt->chiralIdx  = 2;
-                    }
-                    iAt->bondingIdx = 3;
+                    //if (iAt->chiralIdx ==0)
+                    //{
+                    //    iAt->chiralIdx  = 2;
+                    //}
+                    iAt->chiralIdx   =  2;
+                    iAt->bondingIdx  = 3;
                 }
                 else if (t_len==6)
                 {
@@ -457,14 +459,18 @@ namespace LIBMOL
                     }
                 }
             }
-            else if (iAt->chemType.compare("S")==0 )  // || iAt->chemType.compare("S")==0)
-            {
-                if (aNBSP2>0 && t_len <4)
-                {
-                    iAt->chiralIdx   =  0;
-                    iAt->bondingIdx  =  2;
-                }
-            }
+            //else if (iAt->chemType.compare("S")==0 )  // || iAt->chemType.compare("S")==0)
+            //{
+                //if (aNBSP2>0 && t_len <4)
+                //{
+                    //iAt->chiralIdx   =  0;
+                    //iAt->bondingIdx  =  2;
+
+                    //iAt->chiralIdx   =  1;
+                    //iAt->bondingIdx  =  3;
+
+                //}
+            //}
 
         }
 
