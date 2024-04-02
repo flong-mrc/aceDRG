@@ -2563,9 +2563,9 @@ namespace LIBMOL
                             tS2 = *iAt2;
                             tV1.push_back(*iAt1);
                             tV2.push_back(*iAt2);
-                            // std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
-                            //          << allAtoms[*iAt2].id  << " is in the same ring "
-                            //          << std::endl;
+                            std::cout << "atom " << allAtoms[*iAt1].id << " and atom "
+                                      << allAtoms[*iAt2].id  << " is in the same ring "
+                                      << std::endl;
                             break;
                     }
                 }
@@ -2663,12 +2663,24 @@ namespace LIBMOL
         {
             for (int j=0; j < (int)tV2.size(); j++)
             {
-                std::vector<int> aTS;
-                aTS.push_back(tV1[i]);
-                aTS.push_back(tIdx1);
-                aTS.push_back(tIdx2);
-                aTS.push_back(tV2[j]);
-                setOneTorsion(aTS, va[i][j], per);
+                if (tV1[i] != tV2[j])
+                {
+                    std::vector<int> aTS;
+                    aTS.push_back(tV1[i]);
+                    aTS.push_back(tIdx1);
+                    aTS.push_back(tIdx2);
+                    aTS.push_back(tV2[j]);
+                    setOneTorsion(aTS, va[i][j], per);
+                    /*
+                    unsigned n = allTorsions.size();
+                    std::cout << "Torsion angle among atoms "
+                          << allAtoms[tV1[i]].id
+                          << " : " << allAtoms[tIdx1].id
+                          << " : " << allAtoms[tIdx2].id
+                          << " : " << allAtoms[tV2[j]].id
+                          << " is " << allTorsions[n-1].value << std::endl;
+                    */
+                }
             }
         }
     }
@@ -3288,29 +3300,29 @@ namespace LIBMOL
                 (iFind2 != OxyCol.end() && bIdx2==3))
         {
             // two Oxy column atoms with sp3 orbiting
-            //std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 2, 90.0)" << std::endl;
-            //std::cout << "atom 1 "  << allAtoms[tIdx1].id
-            //          << " atom 2 " << allAtoms[tIdx2].id << std::endl;
+            std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 2, 90.0)" << std::endl;
+            std::cout << "atom 1 "  << allAtoms[tIdx1].id
+                      << " atom 2 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 90.0);
         }
         else if ((iFind1 != OxyCol.end() && bIdx1==2) && bIdx2==3)
         {
-            //std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 12, 180.0)" << std::endl;
-            // std::cout << "atom 1 sp2 " << allAtoms[tIdx1].id
-            //         << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
+            std::cout << "SetOneSP3OxyColumnBond(bIdx1, bIdx2, 12, 180.0)" << std::endl;
+            std::cout << "atom 1 sp2 " << allAtoms[tIdx1].id
+                      << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx2, tIdx1, 3, 180.0, tF);
 
         }
         else if ((iFind2 != OxyCol.end() && bIdx2==2) && bIdx1==3)
         {
-            //std::cout << "SetOneSP3OxyColumnBond" << std::endl;
-            // std::cout << "atom 1 sp3 " << allAtoms[tIdx1].id
-            //           << "atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
+            std::cout << "SetOneSP3OxyColumnBond" << std::endl;
+            std::cout << "atom 1 sp3 " << allAtoms[tIdx1].id
+                      << "atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
             SetOneSP3OxyColumnBond(tIdx1, tIdx2, 3, 180.0, tF);
         }
         else if (bIdx1==2 && bIdx2==2)
         {
-            //std::cout << "SetOneSP2SP2Bond" << std::endl;
+            std::cout << "SetOneSP2SP2Bond" << std::endl;
             SetOneSP2SP2Bond(tIdx1, tIdx2);
 
         }
@@ -3318,22 +3330,22 @@ namespace LIBMOL
         {
             if (bIdx1==2 && bIdx2==3)
             {
-                // std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
-                // std::cout << " atom 1 sp2 " << allAtoms[tIdx1].id
-                //           << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
+                std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
+                std::cout << " atom 1 sp2 " << allAtoms[tIdx1].id
+                          << " atom 2 sp3 " << allAtoms[tIdx2].id << std::endl;
                 SetOneSP2SP3Bond(tIdx1, tIdx2);
             }
             else
             {
-                // std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
-                // std::cout << " atom 1 sp3 " << allAtoms[tIdx1].id
-                //           << " atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
+                std::cout << "SetOneSP2SP3Bond(bIdx1, bIdx2)" << std::endl;
+                std::cout << " atom 1 sp3 " << allAtoms[tIdx1].id
+                          << " atom 2 sp2 " << allAtoms[tIdx2].id << std::endl;
                 SetOneSP2SP3Bond(tIdx2, tIdx1);
             }
         }
         else if (bIdx1==3 && bIdx2==3)
         {
-            // std::cout << "SetOneSP3SP3Bond" << std::endl;
+            std::cout << "SetOneSP3SP3Bond" << std::endl;
             SetOneSP3SP3Bond(tIdx1, tIdx2, tF);
         }
         else if(bIdx1==1 && bIdx2==1)
@@ -3595,16 +3607,17 @@ namespace LIBMOL
                 // std::cout << "tPos.size() " << (int)tPos.size() << std::endl;
                 if((int)tPos.size() ==2)
                 {
-                    //std::cout << "set torsion angles for the bond of atoms "
-                    //          << allAtoms[tPos[0]].id << " and "
-                    //          << allAtoms[tPos[1]].id
-                    //          << " with " << flip << std::endl;
+                    std::cout << "set torsion angles for the bond of atoms "
+                              << allAtoms[tPos[0]].id << " and "
+                              << allAtoms[tPos[1]].id
+                              << " with " << flip << std::endl;
 
                     setTorsionFromOneBond(tPos[0], tPos[1], flip);
                     tBs.push_back(tBos[i]);
                 }
             }
         }
+
     }
 
     void AllSystem::checkSugarRings()

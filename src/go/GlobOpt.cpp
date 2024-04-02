@@ -311,7 +311,8 @@ namespace GO
         
         //std::string tFileName = parts[0] + "_tree";
         // std::cout << tFileName << std::endl;
-        LIBMOL::outPDB("tt.pdb", "UNK", allAtoms);
+        int aMode =1;
+        LIBMOL::outPDB("tt.pdb", "UNK", allAtoms, aMode);
        
         
         /*
@@ -564,14 +565,15 @@ namespace GO
         std::cout << " The final full idealization \n";
         lComp =100;
         LocalMin();
+        int aMode =1;
         if (curObjValue < 1.5*allOptimSets[0].objValue)
         {
             AddToOptim();
-            LIBMOL::outPDB("Pro-Idealized.pdb", "DDI", allAtoms);
+            LIBMOL::outPDB("Pro-Idealized.pdb", "DDI", allAtoms, aMode);
         }
         else
         {
-            LIBMOL::outPDB("Pro-Idealized.pdb", "DDI", allOptimSets[0].atoms);
+            LIBMOL::outPDB("Pro-Idealized.pdb", "DDI", allOptimSets[0].atoms, aMode);
         }
         std::cout << "Pro-Idealizations finished" << std::endl;
         

@@ -88,20 +88,24 @@ class ChemCheck(object):
 
         # Copy some data from libmol to here
         self.orgVal          = {}
+        self.orgVal["AS"]    = [3]
+        self.orgVal["AT"]    = [1]
+        self.orgVal["B"]     = [3]
+        self.orgVal["BR"]    = [1]
+        self.orgVal["C"]     = [4]
+        self.orgVal["CL"]    = [1]
+        self.orgVal["F"]     = [1]
+        self.orgVal["GE"]    = [4]
         self.orgVal["H"]     = [1]
         self.orgVal["D"]     = [1]
-        self.orgVal["F"]     = [1]
-        self.orgVal["CL"]    = [1]
-        self.orgVal["BR"]    = [1]
         self.orgVal["I"]     = [1]
-        self.orgVal["AT"]    = [1]
+        self.orgVal["N"]     = [3]
         self.orgVal["O"]     = [2]
+        self.orgVal["P"]     = [5]    # should be [5, 3]. Use one at the moment
         self.orgVal["S"]     = [2, 4, 6]
         self.orgVal["SE"]    = [2]
-        self.orgVal["N"]     = [3]
-        self.orgVal["B"]     = [3]
-        self.orgVal["C"]     = [4]
-        self.orgVal["P"]     = [5]    # should be [5, 3]. Use one at the moment
+        self.orgVal["SI"]    = [4]
+        
 
 
         self.torsions        = []
@@ -163,14 +167,14 @@ class ChemCheck(object):
 
         if len(nonOrgSet)> 0: 
             aRet = False
-        if not aRet :
-            print("The input ligands/molecules contains metal or other heavier atoms ")
-            print("Acedrg currently deals with ligands/molecules with following elements only ")
-            print("As, B, Br, C, Cl, F, Ge, H, I, N, O, P, S, Si")
-            print ("Your molecule contains atoms of elements of the following type_symbol:")
-            for aE in nonOrgSet:
-                print(aE)
-            #print("The job finishes without the output cif file.")
+        #if not aRet :
+        #    print("The input ligands/molecules contains metal or other heavier atoms ")
+        #    print("Acedrg currently deals with ligands/molecules with following elements only ")
+        #    print("As, B, Br, C, Cl, F, Ge, H, I, N, O, P, S, Si")
+        #    print ("Your molecule contains atoms of elements of the following type_symbol:")
+        #    for aE in nonOrgSet:
+        #        print(aE)
+        #print("The job finishes without the output cif file.")
        
         if not lElem :
             print ("Can not get the element symbols of atoms. Check input file format")
@@ -435,8 +439,8 @@ class ChemCheck(object):
                 else:
                     nOrder += nBT
             else:  
-                aLine = "Unknown type %s for the added bond between %s and %s \n"\
-                        %(aPair[0]["type"], aPair[0]["atom_id_1"], aPair[0]["atom_id_2"])
+                #aLine = "Unknown type %s for the added bond between %s and %s \n"\
+                #        %(aPair[0]["type"], aPair[0]["atom_id_1"], aPair[0]["atom_id_2"])
                 aBool = False
                 break
         if aBool:
@@ -455,12 +459,49 @@ class ChemCheck(object):
                 aBool = False
          
         return [aBool, aLine]
+    
+    def valideBondOrderForOneOrgAtom2(self, tAtom, tBonds):
+
+        aBool = True
+        aLine = ""
+
+        nOrder = 0
+        for aB in tBonds:
+            nBT = BondOrderS2N(aB["type"])
+            if nBT != -1 : 
+                if "charge" in tAtom:
+                    nOrder += (nBT + int(tAtom["charge"]))
+                else:
+                    nOrder += nBT
+            else:  
+                #aLine = "Unknown type %s for the added bond between %s and %s \n"\
+                #        %(aPair[0]["type"], aPair[0]["atom_id_1"], aPair[0]["atom_id_2"])
+                aBool = False
+                break
+        if aBool:
+            print("Total Bond order (including charges) for atom %s is %d"%(tAtom["atom_id"], nOrder))
+            curAllowOrds = self.getAllowBondOrderForOneOrgAtom(tAtom)
+            if len(curAllowOrds) !=0:
+                print("Total allowed bond orders are : ")
+                for aOrd in curAllowOrds:
+                    print(aOrd)
+                if not nOrder in curAllowOrds:
+                     difBo =  nOrder - curAllowOrds[0]
+                     aLine ="Bond order (valence) %d around added atom %s are wrong.\n"%(nOrder, tAtom["atom_id"])
+                     aLine += "It should be %d, check your input file(bond order or charge)\n"%curAllowOrds[0]
+                     aBool = False   
+            else:
+                aLine = "Bug, can not find the allowed valence for added atom %s\n"%tAtom["atom_id"]
+                aBool = False
+         
+        return [aBool, aLine, difBo]
 
     def adjustNBForOneAddedAtom(self, tAtom, tNBAtoms, tBonds, tRes, tMod, tDelAtmIds):
 
         aBool = True
         aLine = ""
-
+        
+        
         nOrder = 0
         for aB in tBonds:
             nBT = -1
@@ -482,15 +523,15 @@ class ChemCheck(object):
                 print("Total allowed bond orders are : ")
                 for aOrd in curAllowOrds:
                     print(aOrd)
-                print("Current bond order is : ", nOrder)
+                #print("Current bond order is : ", nOrder)
                 if not nOrder in curAllowOrds:
                     # If total valence does not equal to one of allowed valences. Use curAllowOrds[0]
                     # The procedures are:
                     # (1) if the atom has formal charge, dealt with it first
                     # (2) adjust H atom around the atom
                     # (3) error info : tell the user to re-define the added bonds
-
-                    if nOrder == (curAllowOrds[0] - 1):
+                    defOrd = curAllowOrds[0] - nOrder 
+                    if defOrd == 1:
                         if tAtom["charge"]=="1":
                             # (1a) nOrder = curAllowOrds[0] - 1, cancel the formal charge in atom
                             tAtom["charge"]="0"
@@ -499,17 +540,52 @@ class ChemCheck(object):
                         else:
                             # (1b) to add H atoms and therefore the valence of the atom.
                             aAtom = {}
-                            aAtom["atom_id"]     = "HXX"          # tempo
+                            
+                            aId = ""
+                            if len(tAtom["atom_id"]) > 2:
+                                aId = tAtom["atom_id"][1:]
+                            else :
+                                aId = tAtom["atom_id"]
+                            aAtom["atom_id"]     = "H" + aId 
                             aAtom["type_symbol"] = "H"
                             aAtom["type_energy"] = aAtom["type_symbol"]
                             aAtom["comp_id"]     = tAtom["comp_id"] 
+                            aAtom["charge"]      = "0"
                             tMod["added"]["atoms"].append(aAtom)
+                            tRes["remainAtoms"].append(aAtom)
                             print("One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"]))
                             aBond = {}
                             aBond["atom_id_1"] = aAtom["atom_id"]
                             aBond["atom_id_2"] = tAtom["atom_id"]
                             aBond["type"]      = "SINGLE"
+                            aBond["value_dist"] = "1.0"
+                            aBond["value_dist_esd"] = "0.01"
                             tMod["added"]["bonds"].append(aBond)
+                            tRes["remainBonds"].append(aBond)
+                    elif defOrd > 1:
+                        for i in range(defOrd):
+                            aAtom = {}
+                            aId = ""
+                            if len(tAtom["atom_id"]) > 1:
+                                aId = tAtom["atom_id"][1:]
+                            else :
+                                aId = tAtom["atom_id"]
+                            aAtom["atom_id"]     = "H" + aId + str(i+1)         # tempo
+                            aAtom["type_symbol"] = "H"
+                            aAtom["type_energy"] = aAtom["type_symbol"]
+                            aAtom["comp_id"]     = tRes["name"]
+                            aAtom["charge"]      = "0"
+                            tMod["added"]["atoms"].append(aAtom)
+                            tRes["remainAtoms"].append(aAtom)
+                            print("One H atom %s is added into the residue %s "%(aAtom["atom_id"], aAtom["comp_id"]))
+                            aBond = {}
+                            aBond["atom_id_1"] = aAtom["atom_id"]
+                            aBond["atom_id_2"] = tAtom["atom_id"]
+                            aBond["type"]      = "SINGLE"
+                            aBond["value_dist"] = "1.0"
+                            aBond["value_dist_esd"] = "0.01"
+                            tMod["added"]["bonds"].append(aBond)
+                            tRes["remainBonds"].append(aBond)
                     elif nOrder > curAllowOrds[0]:
                         if len(curAllowOrds)==1:
                             aN = nOrder-curAllowOrds[0]
@@ -535,8 +611,7 @@ class ChemCheck(object):
                                  aLine = "Currently it is not allowed to do such a change for atom %s %s\n"%tAtom["atom_id"]
                                  aBool = False
                         else: 
-                            print("Here ")
-                            sys.exit()
+                            
                             nAdded = 1 # TEMPO
                             lAdded = False
                             for i in range(1,len(curAllowOrds)):
@@ -933,7 +1008,10 @@ class ChemCheck(object):
                 if len(strGrp) ==3:
                     if strGrp[1] in aAtmMap.keys():
                         idxAt = aAtmMap[strGrp[1]]
+                        #aCha = int(strGrp[2].strip())
                         tAtoms[idxAt]["_chem_comp_atom.charge"] = strGrp[2].strip()
+                        #if aCha !=0:
+                        #    tCharges[tAtoms[idxAt]["_chem_comp_atom.atom_id"]] = aCha
                     else:
                         print("Bug: atom %s can not be found"%strGrp[1])
             elif aL.upper().find("BOND:") !=-1:
@@ -962,7 +1040,7 @@ class ChemCheck(object):
                   %(aB["_chem_comp_bond.atom_id_1"], aB["_chem_comp_bond.atom_id_2"], 
                     aB["_chem_comp_bond.type"]))
 
-        print("Finished here ")                
+                       
     def addjustAtomsAndBonds(self, tAtoms, tBonds):
         
         # For molecules contain bonds called explicitly aromatic bonds

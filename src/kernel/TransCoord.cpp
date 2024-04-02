@@ -373,7 +373,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = 0;
 
-        delete v2;
+        delete [] v2;
         v2 = 0;
 
         delete [] v3;
@@ -1267,7 +1267,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = NULL;
 
-        delete v2;
+        delete [] v2;
         v2 = NULL;
 
         delete [] v3;
@@ -2116,7 +2116,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = NULL;
 
-        delete v2;
+        delete [] v2;
         v2 = NULL;
 
         delete [] v3;
@@ -2901,7 +2901,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = 0;
 
-        delete v2;
+        delete [] v2;
         v2 = 0;
   
         delete [] tmp_v;
@@ -3192,7 +3192,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = 0;
 
-        delete v2;
+        delete [] v2;
         v2 = 0;
   
         delete [] tmp_v;
@@ -3354,7 +3354,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = NULL;
 
-        delete v2;
+        delete [] v2;
         v2 = NULL;
   
         delete [] tmp_v;
@@ -3501,7 +3501,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = NULL;
 
-        delete v2;
+        delete [] v2;
         v2 = NULL;
   
         delete [] tmp_v;
@@ -3897,7 +3897,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = 0;
 
-        delete v2;
+        delete [] v2;
         v2 = 0;
   
         delete [] tmp_v;
@@ -4279,7 +4279,7 @@ namespace LIBMOL
         delete [] v1;
         v1 = 0;
 
-        delete v2;
+        delete [] v2;
         v2 = 0;
   
         delete [] tmp_v;

@@ -1237,6 +1237,7 @@ namespace LIBMOL {
 
         if (aMetSPh.size() >0)
         {
+            int aMode =1;
             for (std::map<int, std::vector<AtomDict> >::iterator
                  iMet=aMetSPh.begin(); iMet != aMetSPh.end(); iMet++)
             {
@@ -1244,7 +1245,7 @@ namespace LIBMOL {
                 {
                     Name metalSPhFName(tOutName);
                     metalSPhFName.append("_"+allAtoms[iMet->first].id + "_NB");
-                    outPDB(metalSPhFName.c_str(), "UNL", iMet->second);
+                    outPDB(metalSPhFName.c_str(), "UNL", iMet->second, aMode);
                 }
             }
         }
@@ -1347,13 +1348,14 @@ namespace LIBMOL {
 
         if (aSelectedAtomSPh.size() >0)
         {
+            int aMode=1;
             for (std::map<int, std::vector<AtomDict> >::iterator
                  iAtm=aSelectedAtomSPh.begin(); iAtm != aSelectedAtomSPh.end();
                  iAtm++)
             {
                 Name atmSPhFName(tOutName);
                 atmSPhFName.append("_"+allAtoms[iAtm->first].id + "_NB");
-                outPDB(atmSPhFName.c_str(), "UNL", iAtm->second);
+                outPDB(atmSPhFName.c_str(), "UNL", iAtm->second, aMode);
             }
         }
 
@@ -6374,11 +6376,11 @@ namespace LIBMOL {
 
     void MolGenerator::getAtomTypeOneMolNew(Molecule& tMol)
     {
-        std::cout << "XXX Number of atoms in this molecule is "
-                  << tMol.atoms.size() << std::endl;
+        //std::cout << "XXX Number of atoms in this molecule is "
+        //          << tMol.atoms.size() << std::endl;
 
         CodClassify aCodSys(tMol.atoms);
-        std::cout << "XXXX here " << std::endl;
+        //std::cout << "XXXX here " << std::endl;
         setAtomsBondingAndChiralCenter(aCodSys.allAtoms);
 
 
@@ -7208,6 +7210,7 @@ namespace LIBMOL {
         for (unsigned i=0; i < tFinMols.size(); i++)
         {
             reGenMolBondsAtomTypes(tFinMols[i]);
+            std::cout << "Kekulize molecule " << tFinMols[i].seriNum << std::endl;
             aKTool.executeBC(tFinMols[i].atoms, tFinMols[i].bonds, tFinMols[i].rings);
             std::cout << " The second round " << std::endl;
             getAtomTypeOneMolNew(tFinMols[i]);
@@ -8365,7 +8368,7 @@ namespace LIBMOL {
                     std::string aMolName(aMolRootName);
                     aMolName.append(aMolIdx);
                     outMolMmcif(aMolName.c_str(), "UNL", tFinMols[i], aMode);
-                    outPDB(aMolName.c_str(), "UNL", tFinMols[i].atoms);
+                    outPDB(aMolName.c_str(), "UNL", tFinMols[i].atoms, aMode);
                 }
             }
 
@@ -9061,10 +9064,10 @@ namespace LIBMOL {
                         std::cout << *iNBCo << std::endl;
                     }
                 }
-
+                int aMode =1;
                 Name metalNBFName(rootFName);
                 metalNBFName.append("_"+allAtoms[iNBM->first].id + "_NB");
-                outPDB(metalNBFName.c_str(), "UNL", aSetAtoms);
+                outPDB(metalNBFName.c_str(), "UNL", aSetAtoms, aMode);
                 outMetalClusterMmcif(metalNBFName.c_str(), aSetAtoms);
 
             }

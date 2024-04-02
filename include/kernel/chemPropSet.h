@@ -562,7 +562,8 @@ namespace LIBMOL
                              std::map<int, int> >       & tAllAtmBondingMap,
                              std::vector<int>           & tDoneAtoms,
                              std::vector<int>           & tDoneFAtoms,
-                             std::vector<int>           & tDoneBonds);
+                             std::vector<int>           & tDoneBonds,
+                             std::vector<int>           & tExcFRings);
 
         void setOneIsolateC6Ring(std::vector<AtomDict>       & tAtoms,
                                 std::vector<BondDict>       & tBonds,
@@ -600,7 +601,8 @@ namespace LIBMOL
                                 std::map<int, int> >       & tAllAtmBondingMap,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
-                                std::vector<int>           & tDoneBonds);
+                                std::vector<int>           & tDoneBonds,
+                                std::vector<int>           & tExcRings);
 
         void adjustC6ChargedRing(std::vector<AtomDict>     & tAtoms,
                                 std::vector<BondDict>      & tBonds,
@@ -645,6 +647,7 @@ namespace LIBMOL
                            std::vector<int>           & tDoneAtoms,
                            std::vector<int>           & tDoneBonds);
 
+
         void finalAdjustBandC(std::vector<AtomDict>      & tAtoms,
                               std::vector<BondDict>      & tBonds,
                               std::vector<RingDict>      & tRings,
@@ -664,6 +667,11 @@ namespace LIBMOL
                                    std::vector<BondDict>       & tBonds,
                                    std::vector<RingDict>       & tRings,
                                    std::map<std::string, int>  & hMap);
+
+        void modChargeAndBOforSpecialCases(
+                              std::vector<AtomDict>      & tAtoms,
+                              std::vector<BondDict>      & tBonds,
+                              std::vector<RingDict>      & tRings);
 
         void preStage1(std::vector<AtomDict> & tAtoms,
                      std::vector<BondDict> & tBonds,

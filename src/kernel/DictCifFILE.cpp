@@ -8824,7 +8824,7 @@ namespace LIBMOL
                     std::string hy2 = tAtoms[iT->atoms[2]].hybrid;
 
                     std::string aTorSiga;
-                    /* 
+                    /*
                     if (iT->id.find("const") !=std::string::npos
                         || iT->id.find("CONST") !=std::string::npos)
                     {
@@ -8878,7 +8878,7 @@ namespace LIBMOL
                         aTorSiga = RealToStr(iT->sigValue);
                     }
                     */
- 
+
                     if (iT->id.find("const") !=std::string::npos
                         || iT->id.find("CONST") !=std::string::npos)
                     {
@@ -8919,11 +8919,11 @@ namespace LIBMOL
                     }
                     else
                     {
-                        aTorSiga = 1.0;
+                        aTorSiga = "20.0";
                     }
-                    
-                    std::cout << "aTor id " << iT->id << std::endl;
-                    std::cout << "aTorSiga " << aTorSiga  << std::endl;
+
+                    //std::cout << "aTor id " << iT->id << std::endl;
+                    //std::cout << "aTorSiga " << aTorSiga  << std::endl;
                     outRestrF << longName
                               << std::setw(22) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id
@@ -9095,6 +9095,48 @@ namespace LIBMOL
                     }
                 }
             }
+            if ((int)tRings.size() >0)
+            {
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_ring_atom.comp_id"  << std::endl
+                          << "_chem_comp_ring_atom.ring_serial_number" << std::endl
+                          << "_chem_comp_ring_atom.atom_id"  << std::endl
+                          << "_chem_comp_ring_atom.is_aromatic_ring" << std::endl;
+                int idxR = 1;
+                for (std::vector<RingDict>::iterator iR=tRings.begin();
+                        iR !=tRings.end(); iR++)
+                {
+
+                    std::string aAR;
+                    if (iR->isAromatic)
+                    {
+                        aAR="YES";
+                    }
+                    else
+                    {
+                        aAR="NO";
+                    }
+
+                    std::string idxRStr = IntToStr(idxR);
+                    idxRStr = "ring-" + idxRStr;
+
+                    for (std::vector<AtomDict>::iterator iA=iR->atoms.begin();
+                        iA != iR->atoms.end(); iA++)
+                    {
+                        outRestrF << longName
+                                  << std::setw(10) << idxRStr
+                                  << std::setw(8) << iA->id
+                                  << std::setw(8) << aAR
+                                  << std::endl;
+                    }
+                    idxR++;
+
+                }
+
+
+
+            }
+
             outRestrF.close();
         }
     }
@@ -9632,7 +9674,8 @@ namespace LIBMOL
         //    outTempFName+=aSetStrs[i];
         //}
         // outTempFName +="_ac.txt";
-        std::cout << "output AandC file name : " << tFName << std::endl;
+
+        std::cout << "output BandC cif  file name : " << tFName << std::endl;
 
         std::ofstream outRestrF(tFName);
 
@@ -9690,6 +9733,7 @@ namespace LIBMOL
                       <<"#" << std::endl
                       <<"data_comp_" << longName << std::endl
                       <<"#" << std::endl;
+            outRestrF <<"_chem_comp.pdbx_type        HETAIN " << std::endl;
 
             if (tAtoms.size() >0)
             {

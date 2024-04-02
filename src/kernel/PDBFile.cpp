@@ -1164,7 +1164,8 @@ namespace LIBMOL
 
     void extern outPDB(FileName tFName,
                        ID tMonoRootName,
-                       std::vector<LIBMOL::AtomDict>& tAtoms)
+                       std::vector<LIBMOL::AtomDict>& tAtoms,
+                       int                            tMode)
     {
         // This is a temporary one, the method should be defined outside
         // this class.
@@ -1202,13 +1203,23 @@ namespace LIBMOL
                     iA !=tAtoms.end(); iA++)
             {
 
-                std::string tID(iA->id);
+                // std::string tID(iA->id);
+                std::string tID;
+                if (tMode ==0)
+                {
+                     tID = iA->altId;
+                }
+                else
+                {
+                     tID = iA->id;
+                }
+
                 if (tID.find("\"") !=tID.npos)
                 {
                     char tQ='\"';
                     cleanChar(tID, tQ);
                 }
-
+                // std::cout << "atom id is " << tID << std::endl;
                 //double r1 =  (double) rand()/RAND_MAX;
                 //double r2 =  (double) rand()/RAND_MAX;
                 //double r3 =  (double) rand()/RAND_MAX;

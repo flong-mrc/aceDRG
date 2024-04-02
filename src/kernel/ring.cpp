@@ -459,12 +459,13 @@ namespace LIBMOL
         {
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
-                std::cout << "Planar ring " << tAllRings[i].rep << std::endl;
+
 
                 DoneList.push_back(i);
                 std::vector<int> curLinkedRing;
                 curLinkedRing.push_back(i);
                 findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing);
+
                 if (curLinkedRing.size() > 1)
                 {
                     mergedRings.push_back(curLinkedRing);
@@ -544,18 +545,27 @@ namespace LIBMOL
 
         std::vector<int> DoneList;
         std::vector<std::vector<int> > mergedRings;       // The inside vector represents a set of merged rings
-
+        // std::cout << "Number of rings " << tAllRings.size() << std::endl;
         for (unsigned i=0; i < tAllRings.size(); i++)
         {
+            //std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
+            //std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
 
-                // std::cout << "Planar ring " << i << std::endl;
+                // std::cout << "Planar ring " << tAllRings[i].rep << std::endl;
 
                 DoneList.push_back(i);
                 std::vector<int> curLinkedRing;
                 curLinkedRing.push_back(i);
                 findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing);
+                /*
+                std::cout << "those are connected : " << std::endl;
+                for (unsigned cr=0; cr < curLinkedRing.size(); cr++)
+                {
+                    std::cout << tAllRings[curLinkedRing[cr]].rep << std::endl;
+                }
+                */
                 if (curLinkedRing.size() > 1)
                 {
                     mergedRings.push_back(curLinkedRing);
@@ -568,22 +578,22 @@ namespace LIBMOL
         if (mergedRings.size() !=0)
         {
 
-            std::cout << "number of Merged planar rings : "
-                      << mergedRings.size() << std::endl;
+            //std::cout << "number of Merged planar rings : "
+            //          << mergedRings.size() << std::endl;
             for (std::vector<std::vector<int> >::iterator iMr=mergedRings.begin();
                     iMr != mergedRings.end(); iMr++)
             {
                 std::vector<int> atmIdxs;
-                std::cout << "A merged system contains " << iMr->size()
-                          << " rings. They are:  " << std::endl;
+                //std::cout << "A merged system contains " << iMr->size()
+                //          << " rings. They are:  " << std::endl;
                 for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
                 {
-                    std::cout << "The Ring with atoms " << std::endl;
+                    // std::cout << "The Ring with atoms " << std::endl;
                     for (std::vector<AtomDict>::iterator iA=tAllRings[*iR].atoms.begin();
                             iA != tAllRings[*iR].atoms.end(); iA++)
                     {
-                        std::cout << iA->id << std::endl;
+                        // std::cout << iA->id << std::endl;
                         if(std::find(atmIdxs.begin(), atmIdxs.end(), iA->seriNum)
                             ==atmIdxs.end())
                         {
@@ -598,7 +608,7 @@ namespace LIBMOL
 
                 if(checkAromaSys(atmIdxs, tAtoms))
                 {
-                    std::cout << "It is an aromatic system" << std::endl;
+                    // std::cout << "It is an aromatic system" << std::endl;
                     tRingAtoms.push_back(*iMr);
                     for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
@@ -608,8 +618,8 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "It is not aromatic system for the merged system"
-                              << std::endl;
+                    //std::cout << "It is not aromatic system for the merged system"
+                    //          << std::endl;
                     // Further check
                     std::vector<int> atmIdxsOR;
                     for (std::vector<int>::iterator iR=iMr->begin();
@@ -715,13 +725,14 @@ namespace LIBMOL
             tSeri.push_back(iA->seriNum);
         }
 
-        for (unsigned tNext=tCurIdx+1; tNext < tRings.size(); tNext++)
+        // for (unsigned tNext=tCurIdx+1; tNext < tRings.size(); tNext++)
+        for (unsigned tNext=0; tNext < tRings.size(); tNext++)
         {
             if (std::find(tDoneList.begin(), tDoneList.end(), tNext) == tDoneList.end()
-                    && tRings[tNext].isPlanar)
+                    && tRings[tNext].isPlanar && tNext != tCurIdx)
             {
                 int aA=0;
-
+                //std::cout << "checking " << tRings[tNext].rep << std::endl;
                 for (std::vector<AtomDict>::iterator iNA=tRings[tNext].atoms.begin();
                         iNA != tRings[tNext].atoms.end(); iNA++)
                 {
@@ -734,6 +745,7 @@ namespace LIBMOL
 
                 if (aA > 1)
                 {
+                    // std::cout << "ring linked " << tRings[tNext].rep << std::endl;
                     tCurLinkedRing.push_back(tNext);
                     tDoneList.push_back(tNext);
                     findAllRingsConnectedOneRing(tNext, tRings, tDoneList, tCurLinkedRing);
@@ -766,9 +778,9 @@ namespace LIBMOL
             //}
 
 
-            std::cout << "Atom " << tAtoms[*iAt].id
-                      << " its charge " << tAtoms[*iAt].charge << std::endl
-                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            //std::cout << "Atom " << tAtoms[*iAt].id
+            //          << " its charge " << tAtoms[*iAt].charge << std::endl
+            //          << " add " << numOneAtm << " pi atoms" << std::endl;
             if (numOneAtm > 0.0)
             {
                 numPiAll +=numOneAtm;
@@ -807,15 +819,15 @@ namespace LIBMOL
             //else
             //{
 
-            std::cout << "tMode " << tMode << std::endl;
+            //std::cout << "tMode " << tMode << std::endl;
             numOneAtm1 = setPiForOneAtomNoMetal(*iAt, tAtoms, tMode);
             numOneAtm2 = setPiForOneAtomAll(*iAt, tAtoms, tMode);
             //}
 
-            std::cout << "XXX here Atom " << tAtoms[*iAt].id
-                  << " its charge " << tAtoms[*iAt].charge << std::endl
-                  << " add " << numOneAtm1 << " or "
-                  <<  numOneAtm2 << " pi atoms" << std::endl;
+            //std::cout << "XXX here Atom " << tAtoms[*iAt].id
+            //      << " its charge " << tAtoms[*iAt].charge << std::endl
+            //      << " add " << numOneAtm1 << " or "
+            //      <<  numOneAtm2 << " pi atoms" << std::endl;
 
             if (numOneAtm1 > 0.0)
             {
@@ -955,9 +967,9 @@ namespace LIBMOL
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms)
     {
         REAL aN=0.0;
-        std::cout << "Here charge is " << tAtoms[tIdx].charge << std::endl;
-        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
-                  << std::endl;
+        //std::cout << "Here charge is " << tAtoms[tIdx].charge << std::endl;
+        //std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+        //          << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
 

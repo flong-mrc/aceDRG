@@ -58,8 +58,11 @@ class metalMode(CExeCode):
         self.setCCP4MonDataDescritor(tFileConv.dataDescriptor)
         
         self.outInitModifiedCif(tmpMmcifName)
-        print("Stage 2 ")
-        if os.path.isfile(tmpMmcifName):
+        
+        nBonds = len(self.remainBonds) 
+        
+        if os.path.isfile(tmpMmcifName) and nBonds:
+            print("Stage 2 ")
             print("acedrg is running")
             outTmpRootName = self.outRoot + "_tmp"
             self.runAcedrg(tmpMmcifName, outTmpRootName)
@@ -76,6 +79,15 @@ class metalMode(CExeCode):
                 self.modiCif(outTmpCifName, outTmp2CifName)
                 if os.path.isfile(outTmp2CifName):
                     aRet = outTmp2CifName
+        elif nBonds==0:
+            print("==============================================")
+            print("No non-metal related bonds exist in the molecule")
+            print("Acedrg does not produce any output.")
+            print("==============================================")
+        elif not os.path.isfile(tmpMmcifName):
+            print("==============================================")
+            print("Bug: no input file %s "%outTmpCifName)
+            print("==============================================")
                 
         return aRet         
         
@@ -183,9 +195,11 @@ class metalMode(CExeCode):
             for aB in self.mcAtomBonds[aMC]:
                 print(aB['_chem_comp_bond.atom_id_1'])
                 print(aB['_chem_comp_bond.atom_id_2'])
-                print(aB['_chem_comp_bond.value_order'])
-        
-                   
+                if '_chem_comp_bond.value_order' in aB:
+                    print(aB['_chem_comp_bond.value_order'])
+                elif '_chem_comp_bond.type' in aB:
+                    print(aB['_chem_comp_bond.type'])
+                    
         if len(self.metalConnAtomsMap):
             #print("These atoms are : ")
             #for aA in self.metalConnAtomsMap.keys():
@@ -262,7 +276,7 @@ class metalMode(CExeCode):
                    -numBO + int(tAtom['_chem_comp_atom.charge'])
             #print("number H need ", retH)
         else :
-            retH = tDefBo[['_chem_comp_atom.type_symbol']]
+            retH = tDefBo[tAtom['_chem_comp_atom.type_symbol']]
         return retH
     
     def setCCP4MonDataDescritor(self, tDataDescriptor):
@@ -411,55 +425,56 @@ class metalMode(CExeCode):
                 
                 
             # Bond section
-            aMmCif.write("#\n")
-            aMmCif.write("loop_\n")
-            aMmCif.write("_chem_comp_bond.comp_id\n")
-            aMmCif.write("_chem_comp_bond.atom_id_1\n")
-            aMmCif.write("_chem_comp_bond.atom_id_2\n")
-            aMmCif.write("_chem_comp_bond.type\n")
-            aMmCif.write("_chem_comp_bond.value_dist\n")
-            aMmCif.write("_chem_comp_bond.value_dist_esd\n")
+            if len(self.remainBonds) or len(self.addedHBs):
+                aMmCif.write("#\n")
+                aMmCif.write("loop_\n")
+                aMmCif.write("_chem_comp_bond.comp_id\n")
+                aMmCif.write("_chem_comp_bond.atom_id_1\n")
+                aMmCif.write("_chem_comp_bond.atom_id_2\n")
+                aMmCif.write("_chem_comp_bond.type\n")
+                aMmCif.write("_chem_comp_bond.value_dist\n")
+                aMmCif.write("_chem_comp_bond.value_dist_esd\n")
                 
-            for aBond in self.remainBonds:
-                aType = ""
-                if '_chem_comp_bond.value_order' in aBond.keys():
-                    aType = aBond['_chem_comp_bond.value_order']
-                elif '_chem_comp_bond.type' in aBond.keys():
-                    aType = aBond['_chem_comp_bond.type']
-                else:
-                    print("No bond-order for the bond between atoms %s and %s"
-                          %(aBond['_chem_comp_bond.atom_id_1'],
-                            aBond['_chem_comp_bond.atom_id_2']))
-                    sys.exit()
+                for aBond in self.remainBonds:
+                    aType = ""
+                    if '_chem_comp_bond.value_order' in aBond.keys():
+                        aType = aBond['_chem_comp_bond.value_order']
+                    elif '_chem_comp_bond.type' in aBond.keys():
+                        aType = aBond['_chem_comp_bond.type']
+                    else:
+                        print("No bond-order for the bond between atoms %s and %s"
+                              %(aBond['_chem_comp_bond.atom_id_1'],
+                                aBond['_chem_comp_bond.atom_id_2']))
+                        sys.exit()
                     
-                bLen = "0.0"
-                dBLen = "0.01"
-                aMmCif.write("%s%s%s%s%s%s\n"
-                             % (self.monomRoot.ljust(8),
-                             aBond['_chem_comp_bond.atom_id_1'].ljust(10), 
-                             aBond['_chem_comp_bond.atom_id_2'].ljust(10),  
-                             aType.ljust(10), bLen.ljust(10), dBLen.ljust(10)))
+                    bLen = "0.0"
+                    dBLen = "0.01"
+                    aMmCif.write("%s%s%s%s%s%s\n"
+                                 % (self.monomRoot.ljust(8),
+                                 aBond['_chem_comp_bond.atom_id_1'].ljust(10), 
+                                 aBond['_chem_comp_bond.atom_id_2'].ljust(10),  
+                                 aType.ljust(10), bLen.ljust(10), dBLen.ljust(10)))
             
             
-            for aBond in self.addedHBs:
-                aType = ""
-                if '_chem_comp_bond.value_order' in aBond.keys():
-                    aType = aBond['_chem_comp_bond.value_order']
-                elif '_chem_comp_bond.type' in aBond.keys():
-                    aType = aBond['_chem_comp_bond.type']
-                else:
-                    print("No bond-order for the bond between atoms %s and %s"
-                          %(aBond['_chem_comp_bond.atom_id_1'],
-                            aBond['_chem_comp_bond.atom_id_2']))
-                    sys.exit()
+                for aBond in self.addedHBs:
+                    aType = ""
+                    if '_chem_comp_bond.value_order' in aBond.keys():
+                        aType = aBond['_chem_comp_bond.value_order']
+                    elif '_chem_comp_bond.type' in aBond.keys():
+                        aType = aBond['_chem_comp_bond.type']
+                    else:
+                        print("No bond-order for the bond between atoms %s and %s"
+                              %(aBond['_chem_comp_bond.atom_id_1'],
+                                aBond['_chem_comp_bond.atom_id_2']))
+                        sys.exit()
                     
-                bLen = "0.0"
-                dBLen = "0.01"
-                aMmCif.write("%s%s%s%s%s%s\n"
-                             % (self.monomRoot.ljust(8),
-                             aBond['_chem_comp_bond.atom_id_1'].ljust(10), 
-                             aBond['_chem_comp_bond.atom_id_2'].ljust(10),  
-                             aType.ljust(10), bLen.ljust(10), dBLen.ljust(10)))
+                    bLen = "0.0"
+                    dBLen = "0.01"
+                    aMmCif.write("%s%s%s%s%s%s\n"
+                                 % (self.monomRoot.ljust(8),
+                                 aBond['_chem_comp_bond.atom_id_1'].ljust(10), 
+                                 aBond['_chem_comp_bond.atom_id_2'].ljust(10),  
+                                 aType.ljust(10), bLen.ljust(10), dBLen.ljust(10)))
             
             aMmCif.close()
             

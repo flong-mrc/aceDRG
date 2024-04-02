@@ -349,7 +349,8 @@ namespace LIBMOL
     
     void extern outPDB(FileName tFName, 
                        ID tMonoRootName,
-                       std::vector<LIBMOL::AtomDict>& tAtoms);
+                       std::vector<LIBMOL::AtomDict>& tAtoms,
+                       int tMode);
     
 }
 

@@ -461,13 +461,13 @@ class Acedrg(CExeCode ):
                 self.refmac  = tRefmac
                 self.refmacV = tRefmacV
 
-            tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
-            if platform.system()=="Windows": tLibcheck += ".exe"
-            if not glob.glob(tLibcheck):
-                print("libcheck could not be found")
-                sys.exit()
-            else:
-                self.libcheck = tLibcheck
+            #tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
+            #if platform.system()=="Windows": tLibcheck += ".exe"
+            #if not glob.glob(tLibcheck):
+            #    print("libcheck could not be found")
+            #    sys.exit()
+            #else:
+            #    self.libcheck = tLibcheck
             
             if not self.libmol:
                 tLibmol = os.path.join(os.environ['CCP4'], "libexec", "libmol")
@@ -500,8 +500,8 @@ class Acedrg(CExeCode ):
             if os.path.isfile(tFuncGroupTable):
                 self.funcGroupTable = tFuncGroupTable
             
-        print("The path to Acedrg tables is at ", self.acedrgTables)
-        print("Libmol used is at ", self.libmol)
+        #print("The path to Acedrg tables is at ", self.acedrgTables)
+        #print("Libmol used is at ", self.libmol)
 
     def checkVersionInfo(self):
   
@@ -569,10 +569,10 @@ class Acedrg(CExeCode ):
         #   for aL in self.fileConv.strDescriptors["defProps"]:
         #       self.outCifGlobSect.append(aL + "\n") 
         self.outCifGlobSect.append("loop_\n")
-        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.comp_id\n")
-        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.program_name\n")
-        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.program_version\n")
-        self.outCifGlobSect.append("_pdbx_chem_comp_description_generator.descriptor\n")
+        self.outCifGlobSect.append("_acedrg_chem_comp_descriptor.comp_id\n")
+        self.outCifGlobSect.append("_acedrg_chem_comp_descriptor.program_name\n")
+        self.outCifGlobSect.append("_acedrg_chem_comp_descriptor.program_version\n")
+        self.outCifGlobSect.append("_acedrg_chem_comp_descriptor.type\n")
         #self.outCifGlobSect.append("#_purpose\n")
         if "ACEDRG_VERSION" in self.versionInfo:
             self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "acedrg".ljust(21), self.versionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
@@ -1217,6 +1217,7 @@ class Acedrg(CExeCode ):
             print("self.monomRoot=", self.monomRoot)
             self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot)
             self._cmdline +=" -c %s -r %s -w yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
+            #self._cmdline +=" -c %s -r %s -x yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
             print(self._cmdline)
         
             self.runExitCode = self.subExecute()
@@ -1757,7 +1758,7 @@ class Acedrg(CExeCode ):
         self._cmdline = self.servalcat
         self._cmdline += "  --logfile %s  "%log2
         self._cmdline += " refine_geom  --update_dictionary  %s -o  %s \n"%(tInCif, aRoot)
-        print(self._cmdline)
+        # print(self._cmdline)
         self.subExecute() 
         
     def runServalcatVersionInfo(self):
@@ -1871,9 +1872,9 @@ class Acedrg(CExeCode ):
                 #self.refmacXYZOUTName
                 
                 aOutDictCif = os.path.join(self.scrDir, tRoot + "_updated.cif")
-                print("updated cif is ", aOutDictCif)
+                #print("updated cif is ", aOutDictCif)
                 aJsonFN = os.path.join(self.scrDir, tRoot + "_stats.json")
-                print ("out Json file is ", aJsonFN)
+                #print ("out Json file is ", aJsonFN)
                 if os.path.isfile(aOutDictCif) and os.path.isfile(aJsonFN):
                     tFValue = self.getFvalFromJson(aJsonFN)
                     if ( tFValue< 100000000):             
@@ -1909,7 +1910,7 @@ class Acedrg(CExeCode ):
             for idxConf in self.rdKit.selecConformerIds : 
                 aCifRoot  = "mol_" + str(tIdxMol+1) + "_conf_" + str(idxC)
                 aConfCif = os.path.join(self.scrDir, aCifRoot + "_init.cif")
-                print("Cif root ", aCifRoot)
+                #print("Cif root ", aCifRoot)
                 self.fileConv.setAInitConfForMonCif(aLibCifIn, aConfCif, self.rdKit.molecules[tIdxMol], idxConf)
                 if os.path.isfile(aConfCif):
                     inCifNamesRoot.append(aCifRoot)
@@ -2029,14 +2030,12 @@ class Acedrg(CExeCode ):
                 monoId = "UNL"
                 
 
-            #print("monoId ", monoId)
-            #sys.exit()
+            
             if tDataDescriptor:
                 cifCont['head']   = ["#\n", "data_comp_list\n", "loop_\n"]
                 for aL in tDataDescriptor:
                     if aL[0].find("_")==-1:
                         aL2=self.getLastEnts(aL)
-                    
                         aNewL = "%s%s%s"%(monoId.ljust(6),monoId.ljust(6), "    " +aL2)
                         cifCont['head'].append(aNewL+"\n")   
                     else:
@@ -2051,6 +2050,7 @@ class Acedrg(CExeCode ):
                 
             try: 
                 tCifIn = open(tCifInName, "r")
+                #print("cifName ", tCifInName)
             except IOError:
                 print("%s can not be opened for reading"%tCifInName)
                 sys.exit()
@@ -2065,7 +2065,7 @@ class Acedrg(CExeCode ):
                 for aL in allCifLines:
                     if aL.find("_chem_comp.pdbx_type") !=-1:
                         lS = True
-                    elif not lP and aL.find("plan-") !=-1:
+                    elif not lP and aL.find("ring-") !=-1:
                         lP = True
                         cifCont['bulk'].append(aL)
                         lS = False
@@ -2079,6 +2079,9 @@ class Acedrg(CExeCode ):
                          cifCont['bulk'].append(aL)
                     elif lO:
                         cifCont['others'].append(aL)
+                
+                if cifCont['bulk'][-1].find("loop_") !=-1:
+                    del cifCont['bulk'][-1]
                 
                 aSLine = ""
                 for aOL in  cifCont['others']:
@@ -2107,8 +2110,10 @@ class Acedrg(CExeCode ):
                     
                     aPos = len(monoId)   
                     if tStrDescriptors and "props" in tStrDescriptors and len(tStrDescriptors["props"]) !=0:
+                        
                         aSetChars = ["#", ";", "\""]
                         tOutCif.write("loop_"+"\n")
+                    
                         for aL in tStrDescriptors["props"]:
                             tOutCif.write(aL+"\n")
                         for aL in tStrDescriptors["entries"]:
@@ -2117,6 +2122,8 @@ class Acedrg(CExeCode ):
                             else:
                                 aL1 = aL
                             tOutCif.write(aL1+"\n")
+                        
+                    
                     
                     if len(self.outCifGlobSect):
                         tOutCif.write("\n")
@@ -2154,7 +2161,7 @@ class Acedrg(CExeCode ):
                 if aL[0].find("_")==-1:
                     aL2=self.getLastEnts(aL)
                     
-                    aNewL = "%s%s%s"%(monoId.ljust(6),monoId.ljust(6), "    " +aL2)
+                    aNewL = "%s%s%s"%(monoId.ljust(6),monoId.ljust(6), "  " +aL2)
                     
                     """
                     if len(monoId) < 3:
@@ -2482,7 +2489,7 @@ class Acedrg(CExeCode ):
         aNewL = ""
         strGrp = tLine.strip().split()
         for i in range(2, len(strGrp)):
-            aRL = strGrp[i] + "        "
+            aRL = strGrp[i] + " "
             aNewL +=aRL 
         return aNewL
     
@@ -3218,8 +3225,13 @@ class Acedrg(CExeCode ):
                     self.chemCheck.addjustAtomsAndBonds3(self.fileConv.atoms, 
                                                          self.fileConv.bonds,
                                                          self.outRstCifName)
-                    
-                    
+                    self.fileConv.inputCharge.clear()
+                    for aA in self.fileConv.atoms:
+                        print("Atom ", aA["_chem_comp_atom.atom_id"], " charge ", aA["_chem_comp_atom.charge"] )
+                        aC = int(aA["_chem_comp_atom.charge"])
+                        if aC !=0:
+                            self.fileConv.inputCharge[aA["_chem_comp_atom.atom_id"]] = aC
+                    print("Here2 ", self.fileConv.inputCharge)
                 self.workMode =11    
                 if len(self.fileConv.dataDescriptor):
                     
@@ -3444,9 +3456,9 @@ class Acedrg(CExeCode ):
                         print("=====================================================================")
                         print("|               Finished                                            |")
                         print("=====================================================================")
-                else:
-                    print("acedrg failed to produce a metal contained mmcif file")
-                sys.exit()
+                #else:
+                #    print("acedrg failed to produce a metal contained mmcif file")
+                #sys.exit()
             elif len(self.fileConv.atoms) == 1:
                 finCif = self.outRoot + ".cif"
                 self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
@@ -3524,7 +3536,7 @@ class Acedrg(CExeCode ):
         if self.workMode in [51, 52, 53, 54, 55]:
             self.workMode = 51
         
-        if self.workMode in [11,  111, 112, 51] :  #  and not self.isAA :
+        if self.workMode in [11,  111, 112, 114, 51] :  #  and not self.isAA :
             #print("Number of molecule ", len(self.rdKit.molecules))
             if len(self.rdKit.molecules):
                 print("Ligand ID ", self.monomRoot)
@@ -3545,6 +3557,7 @@ class Acedrg(CExeCode ):
                         print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
                     self.runLibmol(self.inMmCifName, iMol)
+                    
                 else:
                     print("The input %s does not exist"%self.inMmCifName)
                     sys.exit()

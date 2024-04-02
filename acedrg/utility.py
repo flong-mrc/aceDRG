@@ -231,19 +231,19 @@ def aLineToAlist2(tL, tList):
             l0  = False
             l1  = False
             l2  = False   
-            print(tL)
+
             for aS in tL:
                 #print(aS)
                 if aS ==" ":
                     if not l1 and not l2 and len(aTS)!=0:
                         tList.append(aTS.strip()) 
-                        print("1 ",aTS)
+                        #print("1 ",aTS)
                         l1 = False
                         l2 = False
                         aTS = ""
                     elif l1 and not l2 and len(aTS) !=0:
                         tList.append(aTS.strip()) 
-                        print("2 ",aTS)
+                        #print("2 ",aTS)
                         aTS = ""
                         l1 = False
                         l2 = False
@@ -253,7 +253,7 @@ def aLineToAlist2(tL, tList):
                     if l2:
                         aTS = "\"" + aTS + "\""
                         tList.append(aTS.strip())
-                        print("3 ",aTS)
+                        #print("3 ",aTS)
                         aTS = ""
                         l1  = False  
                         l2  = False
@@ -267,7 +267,7 @@ def aLineToAlist2(tL, tList):
                         if not l2:
                             aTS = "\'" + aTS + "\'"
                             tList.append(aTS)
-                            print("4 ",aTS)
+                            #print("4 ",aTS)
                             aTS = ""
                             l1  = False
                             l2  = False
@@ -283,7 +283,6 @@ def aLineToAlist2(tL, tList):
                     
             if aTS != "":
                 tList.append(aTS.strip())    
-            print("here ", tList)
 
 def aLineToAlist(tL, tList):
 
@@ -498,3 +497,4 @@ def getLinkedGroups(tAtoms, tLinks, tMols):
         aIdxF+=1
         for aIdxA in tMols[aIdxM]:
             print("Atom : %s "%tAtoms[aIdxA]['_chem_comp_atom.atom_id'])
+            

@@ -1102,6 +1102,7 @@ class AcedrgRDKit(object):
         
     def setNamesForHAtomsInMol(self, tMol, tNameMap, tChemCheck):
 
+        #print("tNameMap ", tNameMap)
         #tIdxHs = {}
         #tIdxHs = []
         HConns = {}
@@ -1114,7 +1115,6 @@ class AcedrgRDKit(object):
             if aAtom.GetSymbol() == "H":
                 nh += 1
                 idxH = aAtom.GetIdx()
-                #print("H Atom  of serial number ", aAtom.GetIdx())
                 idxB = -1
                 idxE = -1
                 idxC = -1
@@ -1131,6 +1131,7 @@ class AcedrgRDKit(object):
                     # print "Bonding  to ", " atom ", tMol.GetAtomWithIdx(idxC).GetProp("Name")
                     if idxC != -1:
                         nonH_Id = tNameMap["nonH"][idxC]
+                        #print ("Bonding  to ", " atom ", nonH_Id)
                         if nonH_Id not in HConns:
                             HConns[nonH_Id] = []
                         HConns[nonH_Id].append(idxH)
@@ -1148,14 +1149,15 @@ class AcedrgRDKit(object):
             # Check if total numbers of H atoms are different between the original mol and current mol
             # Names for H atoms in the original file
             origHNames = []
-    
-            for aNonH in list(HConns.keys()):
-                if aNonH in tNameMap["H"]:
-                    c3 = len(tNameMap["H"][aNonH])
-                    for i in range(c3):
-                        origHNames.append(tNameMap["H"][aNonH][i])
+            #for aNonH in list(HConns.keys()):
+            for aNonH in tNameMap["H"]:
+                c3 = len(tNameMap["H"][aNonH])
+                for i in range(c3):
+                    origHNames.append(tNameMap["H"][aNonH][i])
+                    
             numOrigH = len(origHNames)
             nExtra = numOrigH + 1
+            
             
             for aK in list(HConns.keys()):
                 c1 = len(HConns[aK])
@@ -1205,7 +1207,6 @@ class AcedrgRDKit(object):
                         cDiff = c1 - c2
                         #print("cDiff is ", cDiff)
                         for j in range(cDiff):
-                            
                             tHName0 = hRootId
                             tHName  = hRootId + str(idxMax+1)
                             if tHName=="H1" and tHName0 in origHNames:
@@ -1215,67 +1216,107 @@ class AcedrgRDKit(object):
                                     HConns[aK][c2+j]).SetProp("Name", tHName0)
                                 aNewHName = tMol.GetAtomWithIdx(
                                     HConns[aK][c2+j]).GetProp("Name")
-                                print("0 An added H is named as ", aNewHName)
+                                print("1 An added H is named as ", aNewHName)
                                 origHNames.append(aNewHName)
                             elif not tHName in origHNames:
                                 tMol.GetAtomWithIdx(
                                     HConns[aK][c2+j]).SetProp("Name", tHName)
                                 aNewHName = tMol.GetAtomWithIdx(
                                     HConns[aK][c2+j]).GetProp("Name")
-                                print("1 An added H is named as ", aNewHName)
+                                print("2 An added H is named as ", aNewHName)
                                 origHNames.append(aNewHName)
                             else:
-                                nExtra = 2
-                                tHName = hRootId + str(idxMax+nExtra)
-                                while True:
-                                    if not tHName in origHNames:
-                                        tMol.GetAtomWithIdx(
-                                            HConns[aK][c2+j]).SetProp("Name", tHName)
-                                        origHNames.append(tHName)
-                                        print("An added H is named as ", tHName)
-                                        nExtra += 1
-                                        break
+                                numListCN = ["", "2", "3"]
+                                tHName = hRootId
+                                aHId = ""
+                                print('origHNames ', origHNames)
+                                for aS in numListCN:
+                                    aHId =  hRootId + aS
+                                    print("aHId =", aHId)
+                                    if aHId in origHNames:
+                                        aHId = ""
                                     else:
-                                        nExtra += 1
-                                        tHName = hRootId + str(idxMax+nExtra)
+                                        break
+                                
+                                if aHId != "":
+                                    tHName = aHId 
+                                    tMol.GetAtomWithIdx(
+                                        HConns[aK][c2+j]).SetProp("Name", tHName)
+                                    origHNames.append(tHName)
+                                    print("An added H is named as ", tHName)
+                                else:
+                                    tHName = aHId  
+                                    nExtra = 2
+                                    tHName = hRootId + str(idxMax+nExtra)
+                                    while True:
+                                        if not tHName in origHNames:
+                                            tMol.GetAtomWithIdx(
+                                            HConns[aK][c2+j]).SetProp("Name", tHName)
+                                            origHNames.append(tHName)
+                                            print("An added H is named as ", tHName)
+                                            nExtra += 1
+                                            break
+                                        else:
+                                            nExtra += 1
+                                            tHName = hRootId + str(idxMax+nExtra)
 
                 else:
                     hRootId = "H"
                     nExtra = 2
+                    numListCN = ["", "2", "3"]
+                    tHName = hRootId
                     
                     for i in range(c1):
-                        tHName = hRootId + str(nExtra)
-                        while True:
-                            if not tHName in origHNames:
-                                tMol.GetAtomWithIdx(
-                                    HConns[aK][i]).SetProp("Name", tHName)
-                                origHNames.append(tHName)
-                                print("2 An added H is named as ", tHName)
-                                nExtra += 1
-                                break
+                        aHId = ""
+                        for aS in numListCN:
+                            aHId =  hRootId + aS
+                            if aHId in origHNames:
+                                aHId = ""
                             else:
-                                nExtra += 1
-                                tHName = hRootId + str(nExtra)
+                                break
+                    
+                        if aHId != "":
+                            tHName = aHId 
+                            tMol.GetAtomWithIdx(
+                                HConns[aK][i]).SetProp("Name", tHName)
+                            origHNames.append(tHName)
+                            print("An added H is named as ", tHName)    
+                            
+                        else:
+                            tHName = hRootId + str(nExtra)
+                            while True:
+                                if not tHName in origHNames:
+                                    tMol.GetAtomWithIdx(
+                                        HConns[aK][i]).SetProp("Name", tHName)
+                                    origHNames.append(tHName)
+                                    print("An added H is named as ", tHName)
+                                    nExtra += 1
+                                    break
+                                else:
+                                    nExtra += 1
+                                    tHName = hRootId + str(nExtra)
         
         
         for aAtom in allAtoms:
             if aAtom.GetSymbol() =="H":
                 if not aAtom.HasProp("altName"):
                     aAtom.SetProp("altName", aAtom.GetProp("Name"))
-                    
-        # for aAtom in allAtoms:
-        #    if aAtom.GetSymbol() =="H":
-        #        aSetBonds = aAtom.GetBonds()
-        #        if aAtom.HasProp("Name"):
-        #            #print "\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name")
-        #            #print "It is in the following bonds: "
-        #            #for aB in aSetBonds:
-        #            #    print "Bond ", aB.GetIdx()
-        #            #    print "Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name"))
-        #            #    print "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name"))
-        #        else:
-        #            print "\nH atom without name, its idx is ", aAtom.GetIdx()
-
+    
+        """            
+        print("Check:")            
+        for aAtom in allAtoms:
+            if aAtom.GetSymbol() =="H":
+                aSetBonds = aAtom.GetBonds()
+                if aAtom.HasProp("Name"):
+                     print("\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name"))
+                     print ("It is in the following bonds: ")
+                     for aB in aSetBonds:
+                         print("Bond ", aB.GetIdx())
+                         print("Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name")))
+                         print( "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name")))
+                else:
+                    print( "\nH atom without name, its idx is ", aAtom.GetIdx())
+        """
         # if len(tIdxHs) !=0:
 
         #    hNameDone = []
@@ -1535,7 +1576,22 @@ class AcedrgRDKit(object):
                     else:
                         print("Atom name %s can not be handled " % name1)
                         sys.exit()
-
+        """
+        print("Check:")  
+        allAtoms = tMol.GetAtoms()          
+        for aAtom in allAtoms:
+            if aAtom.GetSymbol() =="H":
+                aSetBonds = aAtom.GetBonds()
+                if aAtom.HasProp("Name"):
+                     print("\nH atom idx ", aAtom.GetIdx(), "  its matched Name ", aAtom.GetProp("Name"))
+                     print ("It is in the following bonds: ")
+                     for aB in aSetBonds:
+                         print("Bond ", aB.GetIdx())
+                         print("Its begin atom  %d of %s"%(aB.GetBeginAtomIdx(), allAtoms[aB.GetBeginAtomIdx()].GetProp("Name")))
+                         print( "Its end atom %d of %s "%(aB.GetEndAtomIdx(), allAtoms[aB.GetEndAtomIdx()].GetProp("Name")))
+                else:
+                    print( "\nH atom without name, its idx is ", aAtom.GetIdx())
+        """
     def getTwoParts(self, tStr):
 
         t1 = ""
@@ -1854,8 +1910,8 @@ class AcedrgRDKit(object):
         #    sys.exit()
         # print "Number of atoms in this molecule is initially ", nAtoms
         # self.showInfoAboutAtomsAndBonds(aMol, 0)
-        print(tMapMode)
-        print(tNameMap)
+        #print(tMapMode)
+        #print(tNameMap)
         
         
         if tMol.GetProp("fixedName") == "NO":
@@ -1864,6 +1920,7 @@ class AcedrgRDKit(object):
             else:
                 self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
+        
 
         Chem.SanitizeMol(tMol)
         Chem.Kekulize(tMol)
@@ -1883,6 +1940,7 @@ class AcedrgRDKit(object):
         # Make sure an atom in the molecule has the same charge in the input file.
         # RDKit sometimes change it when initiating the molecule
         if tChargeList:
+            print("Here ", tChargeList)
             for aAtom in tMol.GetAtoms():
                 if aAtom.GetSymbol() != "H":
                     name = aAtom.GetProp("Name")
@@ -1953,13 +2011,16 @@ class AcedrgRDKit(object):
             # print "Output SMILES ", tMol.GetProp("SmilesOut")
 
         # Further: give names to those newly added H atoms
-
+        
         if tMol.GetProp("fixedName") == "NO":
             if tMapMode == 1:
                 self.setNamesForAtomsInMol2(aMol, tChemCheck,  tNameMap, 1)
             else:
                 self.setNamesForAtomsInMol(aMol, tChemCheck, tNameMap, 1)
         # self.showInfoAboutAtomsAndBonds(aMol, 2)
+        allAtoms = aMol.GetAtoms()
+        #print("number of atom now ", len(allAtoms))
+        
         
         #print("After p/dp process: ")
         for aAtom in tMol.GetAtoms():
@@ -1970,11 +2031,15 @@ class AcedrgRDKit(object):
                 #print("Its original charge %d"%aAtom.GetFormalCharge())
                 self.atomPDPCMap[aAtom.GetIdx()]["newC"] = aAtom.GetFormalCharge()
                 self.atomPDPCMap[aAtom.GetIdx()]["newH"] = aAtom.GetTotalNumHs()
-
+        
+        
+        
         # if self.reSetChirals:
         #    self.reAssignChirals(aMol)
         allAtoms = aMol.GetAtoms()
         #print("number of atom now ", len(allAtoms))
+               
+        
         
         if not self.noConformers:
             for aAtom in allAtoms:
@@ -2249,6 +2314,7 @@ class AcedrgRDKit(object):
         # (4) Description of torsion angles in the molecules
         # (5) Description of chiral centers in the molecules
         # This file is mainly used as an input file for Acedrg
+        #print("cif_in name ", tMmcifName)
         print("Ligand ID ", tMonoName)
         print("Group Name ", tGroupName)
 
@@ -2335,7 +2401,7 @@ class AcedrgRDKit(object):
                 pos = aConformer.GetAtomPosition(aAtom.GetIdx())
                 #aChi = aAtom.GetChiralTag()
                 # if aChi != rdchem.ChiralType.CHI_UNSPECIFIED:
-                # print "Atom ", aAtom.GetProp("Name")
+                #print("xxxx Atom ", aAtom.GetProp("Name"))
                 # print "Chiral center ? ", aChi
                 #nTetraChi +=1
                 # elif aAtom.HasProp("TmpChiral") !=0:
@@ -2749,6 +2815,7 @@ class AcedrgRDKit(object):
 
     def setupFuncGroupTab(self, tFuncFileName):
 
+
         try:
             tFuncF = open(tFuncFileName, "r")
         except IOError:
@@ -2774,28 +2841,29 @@ class AcedrgRDKit(object):
             # print "Number of atoms in Smiles ",  Chem.MolFromSmiles(self.funcGroupTab[aKey][0]).GetNumAtoms()
             self.stdFuncGroupMols.append([aKey, Chem.MolFromSmarts(
                 self.funcGroupTab[aKey][0]),  Chem.MolFromSmiles(self.funcGroupTab[aKey][0])])
-
+        
     def getAllFuncGroupAtoms(self, tMol):
+        
         self.funcGroups = {}
         for aTri in self.stdFuncGroupMols:
             atmGrpIdxs = tMol.GetSubstructMatches(aTri[1])
-            if len(atmGrpIdxs) == 0:
-                atmGrpIdxs = tMol.GetSubstructMatches(aTri[2])
+            #if len(atmGrpIdxs) == 0:
+            #    atmGrpIdxs = tMol.GetSubstructMatches(aTri[2])
             if len(atmGrpIdxs):
-                # print "search for the functional group %s "%aTri[0]
+                #print("search for the functional group %s "%aTri[0])
                 # print "number of substruct ", atmGrpIdxs
-                # print "Those atoms in this molecule are found in functional group %s: "%aTri[0]
+                #print("Those atoms in this molecule are found in functional group: ")
                 allAs = tMol.GetAtoms()
-                # for i in range(len(atmGrpIdxs)):
+                #for i in range(len(atmGrpIdxs)):
                 #    for aIdx in atmGrpIdxs[i]:
-                #        print "atom ", allAs[aIdx].GetProp("Name")
+                #        print("atom ", allAs[aIdx].GetProp("Name"))
                 if aTri[0] not in self.funcGroups:
                     self.funcGroups[aTri[0]] = []
                 for oneAtmIdxGrp in atmGrpIdxs:
                     # print aTri[0], "add func atoms"
                     self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
                 # print ""
-
+    
     # The following methods are migrated from Acedrg c++ section
 
     def setAllFormalChargeFuncGroupAtoms(self, tMol, tPH=7.0):
@@ -2819,8 +2887,12 @@ class AcedrgRDKit(object):
         self.getAllFuncGroupAtoms(tMol)
         if len(self.funcGroups):
             for aFuncG in list(self.funcGroups.keys()):
-                # print "check ", aFuncG
+                print("check ", aFuncG)
                 if aFuncG.find("CARBOXY-AMINO-TERS") != -1:
+                    print("Doing ", aFuncG)
+                    self.setFormalChargeC_A_T(
+                        tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
+                if aFuncG.find("CARBOXY-ARO") != -1:
                     print("Doing ", aFuncG)
                     self.setFormalChargeC_A_T(
                         tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
@@ -2909,7 +2981,8 @@ class AcedrgRDKit(object):
                     # print self.funcGroups[aFuncG]
                     self.setFormalChargeC_T(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
-
+        
+        
     def setFormalChargeC_T(self, tMol, tFunG, tAtomIdxs, tPH):
 
         tPka = self.funcGroupTab[tFunG][1]

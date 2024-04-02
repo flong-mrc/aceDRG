@@ -185,9 +185,9 @@ int main(int argc, char** argv) {
                                   aTargetSystem.HydrDistTable);
 
 
-                LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                               AJob.IOEntries["monoRootName"],
-                               aTargetSystem.allAtoms);
+                //LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
+                //               AJob.IOEntries["monoRootName"],
+                //               aTargetSystem.allAtoms, );
 
                 LIBMOL::outB_and_A_Levels(AJob.IOEntries["userOutName"].c_str(),
                                           aTargetSystem.allAtoms,
@@ -250,9 +250,9 @@ int main(int argc, char** argv) {
                                                  aTargetSystem.HydrDistTable);
 
 
-                        LIBMOL::outPDB(tOutName.c_str(),
-                                AJob.IOEntries["monoRootName"],
-                                aTargetSystem.allAtoms);
+                        //LIBMOL::outPDB(tOutName.c_str(),
+                        //        AJob.IOEntries["monoRootName"],
+                        //        aTargetSystem.allAtoms);
                     }
                     i++;
                 }
@@ -718,8 +718,8 @@ int main(int argc, char** argv) {
                 aKTool.executeBC(dataFromCif.allAtoms,
                                dataFromCif.allBonds,
                                dataFromCif.allRingsV);
-
-                outMMCif3(AJob.IOEntries["userOutName"].c_str(),
+                std::string aName = AJob.IOEntries["userOutName"] + ".cif";
+                outMMCif3(aName.c_str(),
                          AJob.IOEntries["monoRootName"],
                          dataFromCif.allAtoms,
                          dataFromCif.allBonds,
@@ -728,6 +728,7 @@ int main(int argc, char** argv) {
                 aKTool.outBandC(AJob.IOEntries["userOutName"].c_str(),
                          dataFromCif.allAtoms,
                          dataFromCif.allBonds);
+
 
 
             }

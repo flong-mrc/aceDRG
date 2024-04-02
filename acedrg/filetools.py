@@ -1066,9 +1066,10 @@ class FileTransformer(object) :
         if tMode==0: 
             self.mmCifReader(tInFileName)
 
-        #print "Num of atoms ", len(self.atoms)
+        print("Num of atoms ", len(self.atoms))
         #for aA in self.atoms:
-        #    print(aA["_chem_comp_atom.atom_id"])
+        #    print(aA["_chem_comp_atom.atom_id"], "xxx charge ",  aA["_chem_comp_atom.charge"])
+        
         #print "Num of bonds ", len(self.bonds)
         if not len(self.atoms) or not len(self.bonds):
             print("No atoms and/or bonds from the input file, check !")
@@ -1226,7 +1227,7 @@ class FileTransformer(object) :
                     nCharge =0
                     if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
                         nCharge = int(aAtom["_chem_comp_atom.charge"])
-                        #print("Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"])
+                        print("Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"])
                         #print(" converted to charge symbol ", chargeMap[nCharge]) 
                     if nCharge in list(chargeMap.keys()):
                         charge  = " %d "%chargeMap[nCharge]
@@ -1247,7 +1248,7 @@ class FileTransformer(object) :
                                                                      iii.rjust(3), mmm.rjust(3), nnn.rjust(3), \
                                                                      eee.rjust(3)))
                 idxAtom +=1
-
+            # print("Number of atoms with charges ", len(chargeAtomList))
             # Bond block
            
             self.DelocBondConvertor()
@@ -1861,7 +1862,7 @@ class FileTransformer(object) :
     def outputSingleAtomCif(self, tOutFileName, tVersionInfo):
    
         lF = False
-
+        print("The output single molecule cif file is ", tOutFileName)
         headerSec = {}
         for aK in self.dataDescriptor.keys():
             if self.dataDescriptor[aK][0].find("_chem_comp.id") !=-1:
@@ -1883,7 +1884,7 @@ class FileTransformer(object) :
                sys.exit()
             else:
                 aCif.write("data_comp_list\n")
-                aCif.write("loop\n")
+                aCif.write("loop_\n")
                 aCif.write("_chem_comp.id\n")
                 aCif.write("_chem_comp.three_letter_code\n")
                 aCif.write("_chem_comp.name\n")
@@ -1896,8 +1897,10 @@ class FileTransformer(object) :
                                          headerSec["_chem_comp.group"].ljust(len(headerSec["_chem_comp.group"])+6),\
                                          "1".ljust(6), "0".ljust(6), ".".ljust(4))
                 aCif.write(aL)
-
+                
+                
                 aCif.write("data_comp_%s\n"%headerSec["_chem_comp.id"])
+                aCif.write("loop_\n")
                 aCif.write("_chem_comp_atom.comp_id\n")
                 aCif.write("_chem_comp_atom.atom_id\n")
                 aCif.write("_chem_comp_atom.type_symbol\n")
@@ -1923,8 +1926,8 @@ class FileTransformer(object) :
                            tVersionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg_database".ljust(21),\
                            tVersionInfo["DATABASE_VERSION"].strip().ljust(12), '\"data source\"'.ljust(40)))
-                aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(4), tVersionInfo["REFMAC_NAME"].ljust(21),\
-                            tVersionInfo["REFMAC_VERSION"].ljust(12), '\"optimization tool\"'.ljust(40)))
+                #aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(4), tVersionInfo["REFMAC_NAME"].ljust(21),\
+                #            tVersionInfo["REFMAC_VERSION"].ljust(12), '\"optimization tool\"'.ljust(40)))
                 aCif.close() 
                  
         
@@ -1986,10 +1989,9 @@ class Ccp4MmCifObj (dict) :
                         print(aL)
                         sys.exit()
 
-            for aKey in list(self["ccp4CifBlocks"].keys()):        
+            for aKey in list(self["ccp4CifBlocks"].keys()): 
                 if aKey != "head_sec":
                     self.setupOneBlock(aKey, self["ccp4CifBlocks"])
-            
             
             if len(self["ccp4CifObj"]["comps"].keys()):
                 for aComp in sorted(self["ccp4CifObj"]["comps"]):
@@ -2059,7 +2061,6 @@ class Ccp4MmCifObj (dict) :
                     
             for aLoop in allLoops:
                 if lB["LC"]:
-                    #print "set comp list loop "
                     self["ccp4CifObj"]["lists"]["comp"] = {}
                     self.setupOneLoop(self["ccp4CifObj"]["lists"]["comp"], aLoop, "list")
                 elif lB["LM"]:
@@ -2273,7 +2274,7 @@ class Ccp4MmCifObj (dict) :
                 print("\nProp %s"%aKey)
                 for aProp in self["ccp4CifObj"]["mods"][tName][aKey]:
                     for aEntry in list(aProp.keys()):
-                        print("%s   :   %s  "%(aKey, aPA[aKey]))
+                        print("%s   :   %s  "%(aEntry, aProp[aEntry]))
                          
 
     def getAtomById(self, tId, tName):
@@ -2294,5 +2295,6 @@ class Ccp4MmCifObj (dict) :
                aReturn = aBond
                break
         return aReturn
-         
-       
+    
+
+

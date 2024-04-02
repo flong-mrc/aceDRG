@@ -1062,7 +1062,7 @@ namespace GO
           delete [] xb;
           xb =NULL;
   
-          delete xc;
+          delete [] xc;
           xc =NULL;
     }
     
