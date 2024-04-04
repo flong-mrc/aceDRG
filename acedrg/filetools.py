@@ -372,6 +372,9 @@ class FileTransformer(object) :
                 elif len(aL) > 16 and aL[:16].find("_chem_comp_bond.") !=-1:
                     self.getProp(tBlk, "bond")
                     break
+                #elif len(aL) > 17 and aL[:17].find("_chem_comp_angle.") !=-1:
+                #    self.getProp(tBlk, "angles")
+                #    break
                 elif len(aL) > 16 and aL[:16].find("_chem_comp_chir.") !=-1:
                    
                     self.getProp(tBlk, "chiral")

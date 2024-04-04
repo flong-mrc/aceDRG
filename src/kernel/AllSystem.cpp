@@ -659,7 +659,7 @@ namespace LIBMOL
                       << "Its ID : " << iA->id << std::endl
                       << "Its Chemical Type : " << iA->chemType << std::endl
                       << "Its bonding index : "   << iA->bondingIdx << std::endl
-                      << "Its formal charge : " << iA->formalCharge << std::endl
+                      << "Its formal charge : " << iA->charge << std::endl
                       << "Its CCP4 atom type : "  << iA->ccp4Type << std::endl
                       << "Its residue Name: " << iA->resName<< std::endl;
             std::cout << "Its connected atoms are : " << std::endl;

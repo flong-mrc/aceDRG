@@ -1566,3 +1566,4 @@ class ChemCheck(object):
         tNAtms.append(tPair[0])
         #print("Bond order is ", tBonds[tPair[1][1]]["_chem_comp_bond.value_order"])
     
+    

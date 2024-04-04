@@ -3778,9 +3778,9 @@ namespace LIBMOL
 
             setHydroAtomConnect();
             // addMissHydroAtoms();
-
+            std::cout << "HERE1" << std::endl;
             setAtomsBondingAndChiralCenter(allAtoms);
-
+            std::cout << "HERE2" << std::endl;
             // setAllAngles();
 
             setAtomsCChemType();
@@ -3833,7 +3833,7 @@ namespace LIBMOL
                         << "Its CCP4 chemical type " << iA->ccp4Type << std::endl
                         << "Its bonding index : "   << iA->bondingIdx << std::endl
                         << "Its residue Name: " << iA->resName<< std::endl
-                        << "Its formal charge " << iA->parCharge << std::endl;
+                        << "Its formal charge " << iA->charge << std::endl;
                 std::cout << "Its connected atoms are : " << std::endl;
                 for (std::vector<int>::iterator iSer= iA->connAtoms.begin();
                         iSer != iA->connAtoms.end(); iSer++)

@@ -132,6 +132,8 @@ namespace LIBMOL
 
             int t_len =0;
             int t_m_len =0;
+            std::cout << "Atom " << iAt->id << " with Charge "
+                      << iAt->charge << std::endl;
 
             for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
                     iConn !=iAt->connAtoms.end(); iConn++)
@@ -178,8 +180,16 @@ namespace LIBMOL
                 }
                 else if (t_len ==3)
                 {
-                    iAt->chiralIdx  = 0;
-                    iAt->bondingIdx = 2;
+                    if (iAt->charge==-1.0)
+                    {
+                        iAt->chiralIdx  = 2;
+                        iAt->bondingIdx = 3;
+                    }
+                    else
+                    {
+                        iAt->chiralIdx  = 0;
+                        iAt->bondingIdx = 2;
+                    }
                 }
                 else if(t_len==2)
                 {
@@ -301,9 +311,7 @@ namespace LIBMOL
                     iAt->bondingIdx = 3;
 
                 }
-
-                if (iAt->chemType.compare("P")==0 &&
-                    t_len==5)
+                else if (t_len==5)
                 {
                     iAt->chiralIdx  = 2;
                     iAt->bondingIdx = 3;
@@ -335,8 +343,7 @@ namespace LIBMOL
                     iAt->chiralIdx = 0;
                     iAt->bondingIdx = 5;
                 }
-                std::cout << "Atom " << iAt->id << " is set to sp "
-                          << iAt->bondingIdx  << std::endl;
+
 
             }
             else if (iAt->chemType.compare("SE")==0
@@ -393,6 +400,8 @@ namespace LIBMOL
                 }
                  */
             }
+            std::cout << "Atom " << iAt->id << " is initially set to sp "
+                          << iAt->bondingIdx  << std::endl;
             // std::cout << "its chiralIdx " << iAt->chiralIdx << std::endl;
         }
 
@@ -474,7 +483,7 @@ namespace LIBMOL
 
         }
 
-        // Then N and B atoms
+        // Then N, B, and C atoms
         std::map<int, int> preBondingIdx;
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
@@ -501,7 +510,7 @@ namespace LIBMOL
 
                 if(t_len==3)
                 {
-                    if (iAt->parCharge ==0.0)
+                    if (iAt->charge ==0.0)
                     {
 
                         bool l_sp2 = false;
@@ -532,15 +541,61 @@ namespace LIBMOL
                             iAt->bondingIdx =  3;
                         }
                     }
-                    else if (iAt->parCharge ==1.0)
+                    else if (iAt->charge ==1.0)
                     {
                         iAt->chiralIdx  =  0;
                         iAt->bondingIdx =  2;
                     }
                 }
             }
-            //std::cout << "Again atom " << iAt->id << " its chiralIdx "
-            //          << iAt->chiralIdx << std::endl;
+            if (iAt->chemType.compare("C")==0 )
+            {
+                // int t_len = (int)iAt->connAtoms.size();
+                std::cout << "For " << iAt->id << std::endl;
+                std::cout << "t_len = " << t_len << std::endl;
+                std::cout << "Its charge is " << iAt->charge << std::endl;
+                if(t_len==3 && iAt->charge ==-1.0)
+                {
+
+                    bool l_sp2 = false;
+                    for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                                 iCA != iAt->connAtoms.end(); iCA++)
+                    {
+                        // if(tAtoms[*iCA].bondingIdx == 2)
+                        if (iAt->id =="CAP")
+                        {
+                            std::cout << "Its neighbor  " << tAtoms[*iCA].id
+                                      << " is " << tAtoms[*iCA].bondingIdx
+                                      << std::endl;
+                            std::cout << "pre " << preBondingIdx[*iCA] << std::endl;
+
+                        }
+
+                        if (preBondingIdx[*iCA]==2.0)
+                        {
+                            l_sp2 = true;
+                            break;
+                        }
+                    }
+
+                    if (l_sp2)
+                    {
+                        // Now we can say this atom is in sp2 orbits
+                        iAt->chiralIdx  =  0;
+                        iAt->bondingIdx =  2;
+                    }
+                    else
+                    {
+                        if (iAt->chiralIdx ==0)
+                        {
+                            iAt->chiralIdx  = 2;
+                        }
+
+                        iAt->bondingIdx =  3;
+                    }
+
+                }
+            }
         }
 
         // Further check if a chiral center is a real one
@@ -5213,6 +5268,14 @@ namespace LIBMOL
             {
                 std::cout << tAtoms[*iD].id << std::endl;
             }
+        std::cout << "after setOneLinkAtom" << std::endl;
+        for (std::vector<BondDict>::iterator iBo= tBonds.begin();
+                iBo != tBonds.end(); iBo++)
+        {
+            std::cout << "Bond-order between atoms " << iBo->atoms[0]
+                      << " and " << iBo->atoms[1]
+                      << " is "  << iBo->orderN << std::endl;
+        }
 
         setAllMetalBO(tAtoms, tBonds, curValMap, outElectronMap,
                       chargeMap, elemMap, allAtmBondingMap, doneAtoms, doneBonds);
@@ -5987,10 +6050,25 @@ namespace LIBMOL
                     }
                     else if (iAt->chemType=="N")
                     {
-                        int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
-                        tBonds[idxB].orderN = 1;
-                        tDoneBonds.push_back(idxB);
-                        tDoneAtoms.push_back(iAt->seriNum);
+                        if (iAt->connAtoms.size()==1)
+                        {
+                            if (tAtoms[nonMConn].chemType=="O" && tAtoms[nonMConn].connAtoms.size()==1)
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 2;
+                                tDoneBonds.push_back(idxB);
+                                iAt->charge = -1;
+                                tDoneAtoms.push_back(iAt->seriNum);
+                                tDoneAtoms.push_back(nonMConn);
+                            }
+                        }
+                        else
+                        {
+                            int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                            tBonds[idxB].orderN = 1;
+                            tDoneBonds.push_back(idxB);
+                            //tDoneAtoms.push_back(iAt->seriNum);
+                        }
                     }
                 }
             }

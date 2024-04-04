@@ -1757,7 +1757,8 @@ class Acedrg(CExeCode ):
         log2  = os.path.join(self.scrDir, "servalcat.log")
         self._cmdline = self.servalcat
         self._cmdline += "  --logfile %s  "%log2
-        self._cmdline += " refine_geom  --update_dictionary  %s -o  %s \n"%(tInCif, aRoot)
+        #self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  \n"%(tInCif, aRoot)
+        self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  --randomize 0.01 \n"%(tInCif, aRoot)
         # print(self._cmdline)
         self.subExecute() 
         
@@ -1810,9 +1811,7 @@ class Acedrg(CExeCode ):
                     if not lS and aL.find("servalcat") !=-1:
                         lS = True
                         aF.write(aL)
-                    elif lS and  aL.find("servalcat") !=-1:
-                        lS = False
-                    else:
+                    elif not lS :
                         aF.write(aL)
             
     def runGeoOpt(self):

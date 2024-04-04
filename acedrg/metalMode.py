@@ -17,11 +17,13 @@ class metalMode(CExeCode):
 
     def __init__( self):
         
-        self.remainAtoms      = []
-        self.metalAtoms       = []
-        self.metalConnAtoms   = []
-        self.metalConnAtomsMap = {}
+        self.remainAtoms          = []
+        self.metalAtoms           = []
+        self.metalConnAtoms       = []
+        self.metalConnAtomsMap    = {}
         self.metalConnFullAtoms   = []
+        self.nonMAtmConnsMap      = {}
+        self.connMAMap            = {}
         
         self.addedHs          = []
         
@@ -29,6 +31,9 @@ class metalMode(CExeCode):
         self.metalBonds       = []
         self.mcAtomBonds      = {}
         self.addedHBs         = []
+        
+        self.speAngs          = []
+        self.atmHybr          = {}
         
         self.dataDiescriptor  = []
         
@@ -66,7 +71,6 @@ class metalMode(CExeCode):
             print("acedrg is running")
             outTmpRootName = self.outRoot + "_tmp"
             self.runAcedrg(tmpMmcifName, outTmpRootName)
-                       
             outTmpCifName  =  outTmpRootName + ".cif"
             
             
@@ -83,6 +87,7 @@ class metalMode(CExeCode):
             print("==============================================")
             print("No non-metal related bonds exist in the molecule")
             print("Acedrg does not produce any output.")
+            print("Run metalCoord directly")
             print("==============================================")
         elif not os.path.isfile(tmpMmcifName):
             print("==============================================")
@@ -110,19 +115,33 @@ class metalMode(CExeCode):
         print("number of org atoms is ", len(self.remainAtoms))
         
         atmConnsMap = {} 
+        atmNonHMap  = {}
         for aBond in tBonds:
+            atm1 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_1'])
+            atm2 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_2'])
+            
             if aBond['_chem_comp_bond.atom_id_1'] in metalIds:
                 if not aBond['_chem_comp_bond.atom_id_1'] in self.metalConnAtomsMap:
                     self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']] = []
                 self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
                 self.metalBonds.append(aBond)
+                if not aBond['_chem_comp_bond.atom_id_2'] in metalIds:
+                    if not aBond['_chem_comp_bond.atom_id_2'] in self.connMAMap:
+                        self.connMAMap[aBond['_chem_comp_bond.atom_id_2']] = []
+                    self.connMAMap[aBond['_chem_comp_bond.atom_id_2']].append(aBond['_chem_comp_bond.atom_id_1'])
             if aBond['_chem_comp_bond.atom_id_2'] in metalIds:
                 if not aBond['_chem_comp_bond.atom_id_2'] in self.metalConnAtomsMap:
                     self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_2']] = []
                 self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_2']].append(aBond['_chem_comp_bond.atom_id_1'])
                 self.metalBonds.append(aBond)
+                if not aBond['_chem_comp_bond.atom_id_1'] in metalIds:
+                    if not aBond['_chem_comp_bond.atom_id_1'] in self.connMAMap:
+                        self.connMAMap[aBond['_chem_comp_bond.atom_id_1']] = []
+                    self.connMAMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
+                
             if not aBond['_chem_comp_bond.atom_id_1'] in metalIds and not aBond['_chem_comp_bond.atom_id_2'] in metalIds:
                 self.remainBonds.append(aBond)
+                
                 if not aBond['_chem_comp_bond.atom_id_1'] in atmConnsMap.keys():
                     atmConnsMap[aBond['_chem_comp_bond.atom_id_1']] = []
                 if not aBond['_chem_comp_bond.atom_id_2'] in atmConnsMap.keys():
@@ -131,14 +150,34 @@ class metalMode(CExeCode):
                     atmConnsMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
                 if not aBond['_chem_comp_bond.atom_id_1'] in atmConnsMap[aBond['_chem_comp_bond.atom_id_2']]:
                     atmConnsMap[aBond['_chem_comp_bond.atom_id_2']].append(aBond['_chem_comp_bond.atom_id_1'])
-          
+                
+                if atm1 and atm2:
+                    #print("1", atm1)
+                    #print("2", atm2)
+                    aElem1 = atm1['_chem_comp_atom.type_symbol'] 
+                    aElem2 = atm2['_chem_comp_atom.type_symbol'] 
+                    aId1   = atm1['_chem_comp_atom.atom_id']
+                    aId2   = atm2['_chem_comp_atom.atom_id'] 
+                    #print("1 ", aId1)
+                    #print("2 ", aId2)
+                    
+                    if not aElem1 in atmNonHMap and aElem1 !="H":
+                        atmNonHMap[aId1] = []
+                        
+                    if not aElem2 in atmNonHMap and aElem2 !="H":
+                        atmNonHMap[aId2] = []
+                    if aElem1 !="H" and aElem2 != "H":
+                        atmNonHMap[aId1].append(aId2)
+                        atmNonHMap[aId2].append(aId1)
+                    
+        
         # Check 
-        for aMAtm in self.metalConnAtomsMap:
-            print("%s is a metal atom "%aMAtm)
-            if len(self.metalConnAtomsMap[aMAtm]) > 0:
-                print("It connects to the following atoms")
-                for aCAtm in self.metalConnAtomsMap[aMAtm]:
-                    print("atom : ", aCAtm)
+        #for aMAtm in self.metalConnAtomsMap:
+        #    print("%s is a metal atom "%aMAtm)
+        #    if len(self.metalConnAtomsMap[aMAtm]) > 0:
+        #        print("It connects to the following atoms")
+        #        for aCAtm in self.metalConnAtomsMap[aMAtm]:
+        #            print("atom : ", aCAtm)
         
         
         
@@ -189,16 +228,16 @@ class metalMode(CExeCode):
             for aI in idxR[aK]:
                 self.mcAtomBonds[aK].append(self.remainBonds[aI])
                 
-        for aMC in self.mcAtomBonds:
-            print("a metal bonding atom ", aMC)
-            print("It has ", len(self.mcAtomBonds[aMC]), " non metal bonds")
-            for aB in self.mcAtomBonds[aMC]:
-                print(aB['_chem_comp_bond.atom_id_1'])
-                print(aB['_chem_comp_bond.atom_id_2'])
-                if '_chem_comp_bond.value_order' in aB:
-                    print(aB['_chem_comp_bond.value_order'])
-                elif '_chem_comp_bond.type' in aB:
-                    print(aB['_chem_comp_bond.type'])
+        #for aMC in self.mcAtomBonds:
+        #    print("a metal bonding atom ", aMC)
+        #    print("It has ", len(self.mcAtomBonds[aMC]), " non metal bonds")
+        #    for aB in self.mcAtomBonds[aMC]:
+        #        print(aB['_chem_comp_bond.atom_id_1'])
+        #        print(aB['_chem_comp_bond.atom_id_2'])
+        #        if '_chem_comp_bond.value_order' in aB:
+        #            print(aB['_chem_comp_bond.value_order'])
+        #        elif '_chem_comp_bond.type' in aB:
+        #            print(aB['_chem_comp_bond.type'])
                     
         if len(self.metalConnAtomsMap):
             #print("These atoms are : ")
@@ -241,7 +280,128 @@ class metalMode(CExeCode):
                             aMCAtom['_chem_comp_atom.charge'] = -self.checkVal(aMCAtom, tChem.defaultBo) 
                             print("It carries ", aMCAtom['_chem_comp_atom.charge'], " charges")
 
-             
+        
+        for aNonM in atmConnsMap.keys():
+            if not aNonM in self.nonMAtmConnsMap.keys():
+                self.nonMAtmConnsMap[aNonM] = []
+            for bNonM in atmConnsMap[aNonM]:
+                self.nonMAtmConnsMap[aNonM].append(bNonM)
+                
+        # Check
+        self.setAtomHybr(tAtoms)
+        
+        for aMA in self.metalConnAtomsMap.keys():
+            print("For metal atom ", aMA)
+            for aMN in self.metalConnAtomsMap[aMA]:
+                aSP = self.atmHybr[aMN]
+                print("atom ", aMN, " hybr ", aSP)
+                if aMN in atmNonHMap.keys():
+                    if len(atmNonHMap[aMN]) < 2:      
+                        print("NB atom ", aMN, " has the following angles: ")
+                        for aNN in self.nonMAtmConnsMap[aMN]:
+                            print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
+                            self.setASpeAng(aMA, aMN, aNN, aSP)
+       
+    def setAtomHybr(self, tAtoms):
+        print(self.nonMAtmConnsMap)
+        # First round
+        for aAtm in tAtoms:
+            aId = aAtm['_chem_comp_atom.atom_id']
+            self.atmHybr[aId] =0
+            if aId in self.nonMAtmConnsMap.keys():
+                aM=0
+                if aId in self.connMAMap:
+                    aM = len(self.connMAMap[aId])
+                aL = len(self.nonMAtmConnsMap[aId])
+                if aL > 4 :
+                    self.atmHybr[aId] = aL
+                elif aL < 2:
+                    self.atmHybr[aId] = 1
+                elif aAtm['_chem_comp_atom.type_symbol']=="C" or \
+                     aAtm['_chem_comp_atom.type_symbol']=="SI" or\
+                     aAtm['_chem_comp_atom.type_symbol']=="Si" or\
+                     aAtm['_chem_comp_atom.type_symbol']=="GE" or\
+                     aAtm['_chem_comp_atom.type_symbol']=="Ge":
+                     if aL==4:
+                         self.atmHybr[aId] = 3
+                     elif aL==3:
+                         if aM==1:
+                             self.atmHybr[aId] = 3
+                         else:
+                             self.atmHybr[aId] = 2
+                     elif aL==2:
+                         self.atmHybr[aId] = 1
+                elif aAtm['_chem_comp_atom.type_symbol']=="N" or \
+                     aAtm['_chem_comp_atom.type_symbol']=="AS" or\
+                     aAtm['_chem_comp_atom.type_symbol']=="As":
+                     if aL==4 or aL==3:
+                         self.atmHybr[aId] = 3
+                     elif aL==2:
+                         self.atmHybr[aId] = 1
+                elif aAtm['_chem_comp_atom.type_symbol']=="B":
+                     if aL==4:
+                         self.atmHybr[aId] = 3
+                     elif aL==3:
+                         self.atmHybr[aId] = 2
+                     elif aL==2:
+                         if int(aAtm['_chem_comp_atom.charge']) ==1:
+                             self.atmHybr[aId] = 1  
+                         else:
+                             self.atmHybr[aId] = 2 
+                elif aAtm['_chem_comp_atom.type_symbol']=="O":
+                     if aL==2:
+                         self.atmHybr[aId] = 3
+                         
+                elif aAtm['_chem_comp_atom.type_symbol']=="P":
+                     if aL > 1 and aL <6:
+                         self.atmHybr[aId] = 3     
+                elif aAtm['_chem_comp_atom.type_symbol']=="S":
+                     if aL==4 or aL==3 or aL==2:
+                         self.atmHybr[aId] = 3
+                     elif aL==6:
+                         self.atmHybr[aId] = 5  
+                elif aAtm['_chem_comp_atom.type_symbol']=="SE" or\
+                    aAtm['_chem_comp_atom.type_symbol']=="Se":
+                     if aL==3:
+                         self.atmHybr[aId] = 2
+                     else:
+                         self.atmHybr[aId] = 3
+                
+                         
+        # second round
+        for aAtm in tAtoms:
+            if aAtm['_chem_comp_atom.type_symbol']=="N":
+                aId = aAtm['_chem_comp_atom.atom_id']
+                lSp = False
+                for aNM in self.nonMAtmConnsMap[aId]:
+                    if self.atmHybr[aNM]== 2:
+                        lSp=True
+                        break
+                if lSp:
+                    self.atmHybr[aId]=2
+                
+                        
+                
+                         
+    def setASpeAng(self, tMA, tMN, tNN, tSP):
+        
+        aAng = {}
+        aAng["_chem_comp_angle.atom_id_1"] = tMA 
+        aAng["_chem_comp_angle.atom_id_2"] = tMN
+        aAng["_chem_comp_angle.atom_id_3"] = tNN
+        if tSP==1:
+            aAng["_chem_comp_angle.value_angle"] = "180.00"
+        elif tSP==2:
+            aAng["_chem_comp_angle.value_angle"] = "120.00"
+        elif tSP==3:
+            aAng["_chem_comp_angle.value_angle"] = "109.47"
+        else:
+            aAng["_chem_comp_angle.value_angle"] = "0.0"
+        
+        aAng["_chem_comp_angle.value_angle_esd"] = "5.0"
+        print("add angle:")
+        print(aAng)
+        self.speAngs.append(aAng)
         
     def getAtomById(self, tAtoms, tId):
         
@@ -479,10 +639,19 @@ class metalMode(CExeCode):
             aMmCif.close()
             
             
+    def setMetalNBAngs(self, tAtoms):
         
+        self.setHYAtoms(self, tAtoms)
+        
+        for aMA in self.metalConnAtomsMap.keys():
+            for aMNB in self.metalConnAtomsMap[aMA]:
+                pass
+        
+    def setHYAtoms(self, tAtoms):
+        
+        pass 
         
     def modiCif(self, tInCif, tOutCif):
-        
         
         
         hIds = []
@@ -520,9 +689,19 @@ class metalMode(CExeCode):
             allLs = aMmCif.readlines()
             aMmCif.close()
             
+            
+            lExistAng = False
+            for aL in allLs:
+                if aL.find("_chem_comp_angle.") !=-1:
+                    lExistAng = True
+                    break
+            
+            
             lA = False
             lB = False
-            lP = False
+            lANG = False
+            lP   = False
+            lDis = False
             newLines = []
             for aL in allLs:
                 if lA and aL.find('_chem_comp_atom') == -1:
@@ -531,18 +710,38 @@ class metalMode(CExeCode):
                 elif lB and aL.find('_chem_comp_bond')==-1:
                     self.writeNewBondCifLine(newLines)
                     lB=False
+                elif lANG and aL.find('_chem_comp_angle.')==-1:
+                    if lExistAng:
+                        self.writeNewAngCifLine(newLines)
+                    lANG=False
                 elif not  lA and aL.find('_chem_comp_atom') != -1:
                     lA=True
                     lB=False
+                    lANG = False
                     lP=False
                 elif not lB and aL.find('_chem_comp_bond') != -1:
                     lB=True
+                    lA=False
+                    lANG=False
+                    lP=False
+                elif not lANG and aL.find('_chem_comp_angle') != -1:
+                    lANG=True
+                    lB=False
                     lA=False
                     lP=False
                 elif not lP and aL.find('_chem_comp_plane_atom') !=-1:
                     lP = True
                     lA = False
                     lB = False
+                    lANG = False
+                elif not lDis and aL.find('_acedrg_chem_comp_descriptor.') !=-1:
+                    if not lExistAng:
+                        self.writeNewAngCifLine2(newLines)
+                    lDis = True
+                    lP = False
+                    lA = False
+                    lB = False
+                    lANG = False
                     
                 if self.noNewHLine(aL, hIds):
                     newLines.append(aL)
@@ -581,7 +780,6 @@ class metalMode(CExeCode):
                 for aL in newLines:
                     aOutCif.write(aL)
                 aOutCif.close()
-        
         
    
     def noNewHLine(self, tLine, tHIds):
@@ -668,7 +866,40 @@ class metalMode(CExeCode):
                      aType.ljust(10), "n".ljust(8), "2.0".ljust(10), "0.01".ljust(10),
                      "2.0".ljust(10), "0.01".ljust(10))
             tLines.append(aLine)
+    
+    def writeNewAngCifLine(self, tLines):
+        
+        for aA in self.speAngs:
+        
+            aLine = "%s%s%s%s%s%s\n"\
+                  % (self.monomRoot.ljust(8),
+                     aA['_chem_comp_angle.atom_id_1'].ljust(10), 
+                     aA['_chem_comp_angle.atom_id_2'].ljust(10),
+                     aA['_chem_comp_angle.atom_id_3'].ljust(10),
+                     aA["_chem_comp_angle.value_angle"].ljust(8), 
+                     aA["_chem_comp_angle.value_angle_esd"].ljust(10))
+            tLines.append(aLine)
             
+    def writeNewAngCifLine2(self, tLines):
+        
+        tLines.append("_chem_comp_angle.comp_id\n")
+        tLines.append("_chem_comp_angle.atom_id_1\n")
+        tLines.append("_chem_comp_angle.atom_id_2\n")
+        tLines.append("_chem_comp_angle.atom_id_3\n")
+        tLines.append("_chem_comp_angle.value_angle\n")
+        tLines.append("_chem_comp_angle.value_angle_esd\n")
+        
+        for aA in self.speAngs:
+            aLine = "%s%s%s%s%s%s\n"\
+                  % (self.monomRoot.ljust(8),
+                     aA['_chem_comp_angle.atom_id_1'].ljust(10), 
+                     aA['_chem_comp_angle.atom_id_2'].ljust(10),
+                     aA['_chem_comp_angle.atom_id_3'].ljust(10),
+                     aA["_chem_comp_angle.value_angle"].ljust(8), 
+                     aA["_chem_comp_angle.value_angle_esd"].ljust(10))
+            tLines.append(aLine)
+        tLines.append("loop_\n")
+        
     def writeNewAtomPdbLines(self, tLines):
         
         idx = len(self.metalAtoms)
