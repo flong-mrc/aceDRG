@@ -1993,8 +1993,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
 
         if (tR.atoms.size()==5)
         {
-            if (tR.isPlanar)
-            {
+            //if (tR.isPlanar)
+            //{
                 for (std::vector<AtomDict>::iterator iAt=tR.atoms.begin();
                      iAt !=tR.atoms.end(); iAt++)
                 {
@@ -2012,7 +2012,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 {
                     aRet = true;
                 }
-            }
+            //}
         }
 
         return aRet;
@@ -2039,8 +2039,11 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             for (std::vector<int>::iterator iPR=pyroRings.begin();
                  iPR != pyroRings.end(); iPR++)
             {
-                tAllRings[*iPR].isAromatic = true;
-                tAllRings[*iPR].isAromaticP = true;
+                if (tAllRings[*iPR].isPlanar)
+                {
+                    tAllRings[*iPR].isAromatic  = true;
+                    tAllRings[*iPR].isAromaticP = true;
+                }
             }
         }
 

@@ -132,6 +132,8 @@ namespace LIBMOL
 
             int t_len =0;
             int t_m_len =0;
+
+
             std::cout << "Atom " << iAt->id << " with Charge "
                       << iAt->charge << std::endl;
 
@@ -222,6 +224,7 @@ namespace LIBMOL
                     {
                         iAt->bondingIdx = 1;
                     }
+
                     else
                     {
                         iAt->bondingIdx = 2;
@@ -637,7 +640,7 @@ namespace LIBMOL
         }
         std::cout << "Chiral and plane feather for atoms in the system"
                   << std::endl;
-        */
+
 
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
@@ -664,6 +667,7 @@ namespace LIBMOL
                         << " is not a chiral center" << std::endl;
             }
         }
+        */
 
     }
 

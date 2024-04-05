@@ -152,23 +152,25 @@ class metalMode(CExeCode):
                     atmConnsMap[aBond['_chem_comp_bond.atom_id_2']].append(aBond['_chem_comp_bond.atom_id_1'])
                 
                 if atm1 and atm2:
-                    #print("1", atm1)
-                    #print("2", atm2)
+                    
                     aElem1 = atm1['_chem_comp_atom.type_symbol'] 
                     aElem2 = atm2['_chem_comp_atom.type_symbol'] 
                     aId1   = atm1['_chem_comp_atom.atom_id']
                     aId2   = atm2['_chem_comp_atom.atom_id'] 
-                    #print("1 ", aId1)
-                    #print("2 ", aId2)
                     
-                    if not aElem1 in atmNonHMap and aElem1 !="H":
+                    
+                    if not aId1 in atmNonHMap and aElem1 !="H":
                         atmNonHMap[aId1] = []
-                        
-                    if not aElem2 in atmNonHMap and aElem2 !="H":
+                    if not aId2 in atmNonHMap and aElem2 !="H":
                         atmNonHMap[aId2] = []
-                    if aElem1 !="H" and aElem2 != "H":
-                        atmNonHMap[aId1].append(aId2)
-                        atmNonHMap[aId2].append(aId1)
+                    if aElem1 !="H":
+                        if aElem2 != "H":
+                            atmNonHMap[aId1].append(aId2)
+                            
+                    if aElem2 !="H":
+                        if aElem1 != "H":
+                            atmNonHMap[aId2].append(aId1)
+                            
                     
         
         # Check 
@@ -296,6 +298,7 @@ class metalMode(CExeCode):
                 aSP = self.atmHybr[aMN]
                 print("atom ", aMN, " hybr ", aSP)
                 if aMN in atmNonHMap.keys():
+                    print("Here atmNonHMap = ", len(atmNonHMap[aMN]) )
                     if len(atmNonHMap[aMN]) < 2:      
                         print("NB atom ", aMN, " has the following angles: ")
                         for aNN in self.nonMAtmConnsMap[aMN]:
@@ -313,6 +316,7 @@ class metalMode(CExeCode):
                 if aId in self.connMAMap:
                     aM = len(self.connMAMap[aId])
                 aL = len(self.nonMAtmConnsMap[aId])
+                
                 if aL > 4 :
                     self.atmHybr[aId] = aL
                 elif aL < 2:
@@ -337,7 +341,10 @@ class metalMode(CExeCode):
                      if aL==4 or aL==3:
                          self.atmHybr[aId] = 3
                      elif aL==2:
-                         self.atmHybr[aId] = 1
+                         if aId in self.connMAMap:
+                             self.atmHybr[aId] = 3
+                         else:
+                             self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="B":
                      if aL==4:
                          self.atmHybr[aId] = 3
