@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
                               << std::endl;
                 }
             }
-
+            std::cout << "Start " << std::endl;
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
 
             LIBMOL::AllSystem   aTargetSystem(dataFromCif,
