@@ -281,6 +281,10 @@ namespace LIBMOL
                     {
                         iAt->bondingIdx = 2;
                     }
+                    else
+                    {
+                        iAt->bondingIdx = 3;
+                    }
                 }
                 else
                 {
@@ -346,6 +350,11 @@ namespace LIBMOL
                     iAt->chiralIdx = 0;
                     iAt->bondingIdx = 5;
                 }
+                else if (t_len==1)
+                {
+                    iAt->chiralIdx = 0;
+                    iAt->bondingIdx = 3;
+                }
 
 
             }
@@ -375,6 +384,11 @@ namespace LIBMOL
                 {
                     iAt->chiralIdx = 0;
                     iAt->bondingIdx = 5;
+                }
+                else if (t_len==1)
+                {
+                    iAt->chiralIdx = 0;
+                    iAt->bondingIdx = 3;
                 }
                 /*
                 else if (t_len==2)

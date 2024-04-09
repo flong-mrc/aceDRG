@@ -293,16 +293,16 @@ class metalMode(CExeCode):
         self.setAtomHybr(tAtoms)
         
         for aMA in self.metalConnAtomsMap.keys():
-            print("For metal atom ", aMA)
+            #print("For metal atom ", aMA)
             for aMN in self.metalConnAtomsMap[aMA]:
                 aSP = self.atmHybr[aMN]
-                print("atom ", aMN, " hybr ", aSP)
+                #print("atom ", aMN, " hybr ", aSP)
                 if aMN in atmNonHMap.keys():
-                    print("Here atmNonHMap = ", len(atmNonHMap[aMN]) )
+                    #print("Here atmNonHMap = ", len(atmNonHMap[aMN]) )
                     if len(atmNonHMap[aMN]) < 2:      
-                        print("NB atom ", aMN, " has the following angles: ")
+                        #print("NB atom ", aMN, " has the following angles: ")
                         for aNN in self.nonMAtmConnsMap[aMN]:
-                            print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
+                            #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
                             self.setASpeAng(aMA, aMN, aNN, aSP)
        
     def setAtomHybr(self, tAtoms):
@@ -364,10 +364,8 @@ class metalMode(CExeCode):
                      elif aL==1:
                          self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="O":
-                     if aL==2:
+                     if aL==2 or aL ==1:
                          self.atmHybr[aId] = 3
-                     elif aL==1:
-                         self.atmHybr[aId] = 1    
                 elif aAtm['_chem_comp_atom.type_symbol']=="P":
                      if aL > 1 and aL <6:
                          self.atmHybr[aId] = 3     
