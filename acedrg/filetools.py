@@ -1261,6 +1261,7 @@ class FileTransformer(object) :
             rrr ="0"
             ccc ="0"
             for aBond in self.bonds:
+                print(aBond)
                 id1 = aBond["_chem_comp_bond.atom_id_1"]
                 id2 = aBond["_chem_comp_bond.atom_id_2"]
                 #print "id1 %s "%id1 

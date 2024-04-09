@@ -101,8 +101,8 @@ class metalMode(CExeCode):
         metalIds = []
         for aAtom in tAtoms:
             if "_chem_comp_atom.type_symbol" in aAtom.keys():
-                #print("Atom ", aAtom['_chem_comp_atom.atom_id'], 
-                #      " is ", aAtom["_chem_comp_atom.type_symbol"])
+                print("Atom ", aAtom['_chem_comp_atom.atom_id'], 
+                      " is ", aAtom["_chem_comp_atom.type_symbol"])
                 if not aAtom['_chem_comp_atom.type_symbol'] in tChem.organicSec:
                     print("atom %s is a metal atom of elem %s "
                           %(aAtom['_chem_comp_atom.atom_id'], aAtom['_chem_comp_atom.type_symbol'])) 
@@ -306,21 +306,23 @@ class metalMode(CExeCode):
                             self.setASpeAng(aMA, aMN, aNN, aSP)
        
     def setAtomHybr(self, tAtoms):
+        
         print(self.nonMAtmConnsMap)
         # First round
         for aAtm in tAtoms:
             aId = aAtm['_chem_comp_atom.atom_id']
+            print(aId)
             self.atmHybr[aId] =0
             if aId in self.nonMAtmConnsMap.keys():
                 aM=0
                 if aId in self.connMAMap:
                     aM = len(self.connMAMap[aId])
                 aL = len(self.nonMAtmConnsMap[aId])
-                
+                print("conn ", aL)
                 if aL > 4 :
                     self.atmHybr[aId] = aL
-                elif aL < 2:
-                    self.atmHybr[aId] = 1
+                #elif aL < 2:
+                #    self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="C" or \
                      aAtm['_chem_comp_atom.type_symbol']=="SI" or\
                      aAtm['_chem_comp_atom.type_symbol']=="Si" or\
@@ -335,6 +337,8 @@ class metalMode(CExeCode):
                              self.atmHybr[aId] = 2
                      elif aL==2:
                          self.atmHybr[aId] = 1
+                     elif aL==1:
+                         self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="N" or \
                      aAtm['_chem_comp_atom.type_symbol']=="AS" or\
                      aAtm['_chem_comp_atom.type_symbol']=="As":
@@ -345,6 +349,8 @@ class metalMode(CExeCode):
                              self.atmHybr[aId] = 3
                          else:
                              self.atmHybr[aId] = 1
+                     elif aL==1:
+                         self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="B":
                      if aL==4:
                          self.atmHybr[aId] = 3
@@ -354,16 +360,19 @@ class metalMode(CExeCode):
                          if int(aAtm['_chem_comp_atom.charge']) ==1:
                              self.atmHybr[aId] = 1  
                          else:
-                             self.atmHybr[aId] = 2 
+                             self.atmHybr[aId] = 2
+                     elif aL==1:
+                         self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="O":
                      if aL==2:
                          self.atmHybr[aId] = 3
-                         
+                     elif aL==1:
+                         self.atmHybr[aId] = 1    
                 elif aAtm['_chem_comp_atom.type_symbol']=="P":
                      if aL > 1 and aL <6:
                          self.atmHybr[aId] = 3     
                 elif aAtm['_chem_comp_atom.type_symbol']=="S":
-                     if aL==4 or aL==3 or aL==2:
+                     if aL==4 or aL==3 or aL==2 or aL==1:
                          self.atmHybr[aId] = 3
                      elif aL==6:
                          self.atmHybr[aId] = 5  
@@ -406,8 +415,8 @@ class metalMode(CExeCode):
             aAng["_chem_comp_angle.value_angle"] = "0.0"
         
         aAng["_chem_comp_angle.value_angle_esd"] = "5.0"
-        print("add angle:")
-        print(aAng)
+        #print("add angle:")
+        #print(aAng)
         self.speAngs.append(aAng)
         
     def getAtomById(self, tAtoms, tId):
