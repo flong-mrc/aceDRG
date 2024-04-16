@@ -6328,7 +6328,7 @@ namespace LIBMOL
                                     else
                                     {
                                         tBonds[nonAssBos[0]].orderN = 1;
-                                        if (iAt->chemType=="O" or iAt->chemType=="N")
+                                        if (iAt->chemType=="O" || iAt->chemType=="N")
                                         {
                                             iAt->charge  = -1;
                                         }
