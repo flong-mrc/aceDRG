@@ -161,7 +161,10 @@ class ChemCheck(object):
                  if not aAtm["_chem_comp_atom.type_symbol"] in self.organicSec :
                      if not aAtm["_chem_comp_atom.type_symbol"] in nonOrgSet:
                          nonOrgSet.append(aAtm["_chem_comp_atom.type_symbol"])
-                     
+            elif "type_symbol" in aAtm.keys():
+                 if not aAtm["type_symbol"] in self.organicSec :
+                     if not aAtm["type_symbol"] in nonOrgSet:
+                         nonOrgSet.append(aAtm["type_symbol"])         
             else:
                  lElem = False
 

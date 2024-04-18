@@ -3184,7 +3184,6 @@ class Acedrg(CExeCode ):
                 #                  %(aB["_chem_comp_bond.atom_id_1"],
                 #                    aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.value_order"]))
                         
-                
                 # print(self.fileConv.dataDescriptor)
             
                 if len(self.fileConv.dataDescriptor):

@@ -2204,7 +2204,8 @@ class Ccp4MmCifObj (dict) :
             self["errMessage"]  =  "%s does not have required file format for the component!\n"%self["inCif"]
             self["errMessage"] +=  "The component mmcif file should have the same format\n"
             self["errMessage"] +=  "as those mmcif in CCP4 monomer lib\n" 
- 
+
+        
     def printOneComp(self, tName):
 
         if tName in self["ccp4CifObj"]["comps"]:

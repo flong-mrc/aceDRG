@@ -2510,6 +2510,12 @@ class CovLinkGenerator(CExeCode):
         
         
         if not aMmcifObj["errLevel"]:
+            if tMonomer["name"] in aMmcifObj["ccp4CifObj"]["comps"]:
+                lMetal=self.chemCheck.isOrganicInCif(aMmcifObj["ccp4CifObj"]["comps"][tMonomer["name"]]["atoms"]) 
+                if not lMetal:    # contain metal 
+                    pass 
+                
+        if not aMmcifObj["errLevel"]:
             #print(list(aMmcifObj["ccp4CifObj"].keys()))
             #print(list(aMmcifObj["ccp4CifObj"]["comps"].keys()))
             if tMonomer["name"] in aMmcifObj["ccp4CifObj"]["comps"]:

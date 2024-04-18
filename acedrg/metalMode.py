@@ -307,18 +307,18 @@ class metalMode(CExeCode):
        
     def setAtomHybr(self, tAtoms):
         
-        print(self.nonMAtmConnsMap)
+        #print(self.nonMAtmConnsMap)
         # First round
         for aAtm in tAtoms:
             aId = aAtm['_chem_comp_atom.atom_id']
-            print(aId)
+            #print(aId)
             self.atmHybr[aId] =0
             if aId in self.nonMAtmConnsMap.keys():
                 aM=0
                 if aId in self.connMAMap:
                     aM = len(self.connMAMap[aId])
                 aL = len(self.nonMAtmConnsMap[aId])
-                print("conn ", aL)
+                #print("conn ", aL)
                 if aL > 4 :
                     self.atmHybr[aId] = aL
                 #elif aL < 2:

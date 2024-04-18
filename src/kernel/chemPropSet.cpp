@@ -202,6 +202,10 @@ namespace LIBMOL
                         //iAt->bondingIdx=2;
                         iAt->bondingIdx=1;
                     }
+                    else if (t_m_len==1 || iAt->charge==-1.0)
+                    {
+                        iAt->bondingIdx = 2;
+                    }
                     else
                     {
                         iAt->bondingIdx=1;
