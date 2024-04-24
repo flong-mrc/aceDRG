@@ -5589,13 +5589,13 @@ class CovLinkGenerator(CExeCode):
         for aTor in tOutCombLigandTors:
             if (aTor["atom_id_2_alias"] == tAtm1Id and aTor["atom_id_3_alias"] == tAtm2Id) or\
                (aTor["atom_id_2_alias"] == tAtm2Id and aTor["atom_id_3_alias"] == tAtm1Id):
-                if aTor["atom_id_1_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
+                if aTor["atom_id_1_alias"][0] !="H" or aTor["atom_id_4_alias"][0] !="H":
                     if not lD1:                  
                         tLinkTors.append(aTor)
                         lD1 = True
         for aTor in tOutCombLigandTors:
             if (aTor["atom_id_1_alias"] == tAtm1Id and aTor["atom_id_2_alias"] == tAtm2Id):
-                if aTor["atom_id_3_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
+                if aTor["atom_id_3_alias"][0] !="H" or aTor["atom_id_4_alias"][0] !="H":
                     if not lD2:                  
                         tLinkTors.append(aTor)
                         lD2 = True
@@ -5609,13 +5609,13 @@ class CovLinkGenerator(CExeCode):
             print("Torsion angle between %s, %s, %s, %s "%(aTor["atom_id_1"], aTor["atom_id_2"], aTor["atom_id_3"], aTor["atom_id_4"]))
             print("Torsion id is ", aTor["id"])
             if (aTor["atom_id_1_alias"] == tAtm2Id and aTor["atom_id_2_alias"] == tAtm1Id):
-                if aTor["atom_id_3_alias"][0] !="H" and aTor["atom_id_4_alias"][0] !="H":
+                if aTor["atom_id_3_alias"][0] !="H" or aTor["atom_id_4_alias"][0] !="H":
                     if not lD3:                  
                         tLinkTors.append(aTor)
                         lD3 = True
                     tLinkTors.append(aTor)
             elif (aTor["atom_id_4_alias"] == tAtm2Id and aTor["atom_id_3_alias"] == tAtm1Id):
-                if aTor["atom_id_2_alias"][0] !="H" and aTor["atom_id_1_alias"][0] !="H":
+                if aTor["atom_id_2_alias"][0] !="H" or aTor["atom_id_1_alias"][0] !="H":
                     print("Torsion angle between %s and %s "%(aTor["atom_id_1"], aTor["atom_id_2"]))
                     if not lD3:                  
                         tLinkTors.append(aTor)
