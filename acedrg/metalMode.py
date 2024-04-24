@@ -56,6 +56,7 @@ class metalMode(CExeCode):
         
         print("Stage 1 ")
         
+        
         self.getNewMolWithoutMetal(tAtoms, tBonds, tChem)
         
         tmpMmcifName = self.monomRoot + "_tmpIn.cif"
@@ -962,9 +963,20 @@ class metalMode(CExeCode):
     
     def runAcedrg(self, tInCif, tOutRoot):
         
-        self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tInCif, self.monomRoot, tOutRoot)
+        if not os.path.isdir(tOutRoot+"_TMP"):
+            os.mkdir(tOutRoot+"_TMP")
+        aMtConnFileName = os.path.join(tOutRoot+"_TMP", "mtconn.list")
+        aMC = open(aMtConnFileName, "w")
+        for aK in self.connMAMap.keys():
+            for aM in self.connMAMap[aK]:
+                aMC.write("BONDING  %s%s\n"%(aK.ljust(10), aM.ljust(10)))
+        aMC.close()    
+        
+        self._cmdline   = "acedrg -c %s  -r %s -o %s --mtList %s "%(tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
         self._log_name  = tOutRoot + "_acedrg.log"
+        print(self._cmdline)
         self.runExitCode = self.subExecute()
+        sys.exit()
     
     def runRefmac(self, tInCif, tInPdb, tOutRoot):
         

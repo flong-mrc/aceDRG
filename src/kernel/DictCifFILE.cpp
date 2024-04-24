@@ -3778,9 +3778,9 @@ namespace LIBMOL
 
             setHydroAtomConnect();
             // addMissHydroAtoms();
-            std::cout << "HERE1" << std::endl;
+
             setAtomsBondingAndChiralCenter(allAtoms);
-            std::cout << "HERE2" << std::endl;
+
             // setAllAngles();
 
             setAtomsCChemType();

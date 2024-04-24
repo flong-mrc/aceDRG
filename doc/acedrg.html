@@ -1,0 +1,731 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head><title>CCP4 Program Suite: acedrg</title></head><body>
+<!-- ::INDEX_INFO::ACEDRG::Supported::Ligand Dictionary Generator::generation of stereo-chemical descriptions for ligands using data derived from small molecule databases:::::::: -->
+<h1>ACEDRG (CCP4: Supported Program)</h1>
+<h2>NAME</h2>
+<span style="font-weight: bold;">acedrg<br></span><b>&nbsp;</b>-A stereo-chemical description generator for ligands
+<h2>SYNOPSIS</h2>
+<p><b>acedrg -h </b></p>
+<p><b>acedrg -c (or --mmcif=)</b> <i>input_mmcif_file </i> <b> -o (or --out=) </b> <i> name_root_for_output_files </i> <b> -r (or --res= ) </b> <i> output_short_monomer_name(optional) </i>
+<p><b>acedrg -i (or --smi= )</b> <i>input_file_containing_a_SMILES_string </i> <b> -o (or --out=) </b> <i> name_root_for_your_output_files </i> <b> -r (or --res= ) </b> <i> output_short_monomer_name(optional) </i>
+<p><b>acedrg -m (or --mol= )</b> <i>input_mol_file </i> <b> -o (or --out=) </b> <i> name_root_for_output_files </i> <b> -r (or --res= ) </b> <i> output_short_monomer_name(optional) </i>
+<p><b>acedrg -g (or --mol2=)</b> <i>input_mol2_file </i> <b> -o (or --out=) </b> <i> name_root_for_output_files </i> <b> -r (or --res= ) </b> <i> output_short_monomer_name(optional) </i>
+<p><b>acedrg -x (or --pdb=)</b> <i>input_pdb_file </i> <b> -o (or --out=) </b> <i> name_root_for_output_files </i> <b> -r (or --res= ) </b> <i> output_short_monomer_name(optional) </i>
+<p><b>acedrg -L (or --linkInstruction=)</b> <i>instruction_file_for_build_covalent-links (txt format)</i> <b> -o (or --out=) </b> <i> name_root_for_output_files </i> <b> -r (or --res= ) </b> <i> output_short_monomer_name(optional) </i>
+<br>
+<br>
+<br>
+<a href="#description">Description</a><br>
+<a href="#InputOutput">Input and output files</a> <br>
+<a href="#usuage">Usuage</a><br>
+<a href="#keywords">Keyworded input</a><br>
+<a href="#references">References</a> <br>
+<a href="#authors">Authors and credits</a> <br>
+<a href="#citations">How to cite ACEDRG</a> <br>
+<br>
+<h2><a name="description"></a>DESCRIPTION</h2>
+
+<p>The program ACEDRG is designed for the derivation of stereo-chemical information about
+monomers/ligands (or small molecules). It uses local chemical and topological environment-based atom typing to 
+organise bond lengths and angles from a small molecule database i.e. the Crystallography Open
+Database (COD). Information about hybridisation states of atoms, small ring belongingness (up to
+seven membered rings), ring aromaticity and nearest-neighbour information is encoded in the atom
+types. All atoms from COD have been classified according to the generated atom types. All bonds and
+angles have also been classified according to the atom types, and, in a certain sense, bond types.
+
+<p>Using the tables containing those bonds and angles, ACEDRG can derive <q>ideal</q> bond lengths, angles for an unknown monomer/ligand. It also generates information on plane and stereo-chemical properties in the monomer/ligand. The minumum information Acedrg requires the users provide for is element types of atoms iin the monomer/ligand, and  the basic bonding pattern in the monomer/ligand, such as atom connnections and bond-orders. Of course, users can provide some extra information such as coordinates of atoms, properties of existing chiral-centers, and ask Acedrg to use those information.
+
+<p>When users want to join two monomers/ligands by covalengtly bonding one atom in one monomer/ligand to that in the other monomer/ligands. The descriptions of the effects from that bonding can be provided for via the running covalent-link generation mode in Acedrg. Once jobs finish succesfully, Acedrg gives (1) information on the link, i.e. the bonds, angles and torsions that involve both atoms which newly joined, (2) information on modifications to two input monomers/ligands. The latter consists of changes of bonds, angles, torsions, chiral centers and planes in those two monomers, all of which are in an output file of mmCif format. To get the information on the link and modifications to the original monomers/ligands, users need to give some instructions for operations to Acedrg. Those instructions are included in a .txt file and input to Acedrg as a command-line argument. The format of an input instruction file to and the output mmCif file from ACEDRG, and some examples are shown in the following sections.    
+
+<h2><a name="InputOutput"></a>INPUT AND OUTPUT FILES</h2>
+<p> When used to generate a full descriptioon of a monomer/ligand, Acedrg takes input files from some of of the computational chemistry file formats, which include SMILES, mmCIF, SDF/MOL, and SYBYL MOL2 files. It outputs ACEDRG-derived <q>ideal</q> bond lengths, angles, plane groups, aromatic rings and chirality information, and writes them to an file of mmCif format that can be used by the refinement programs and model building programs. It also outputs coordinator sets of the ligands in form of PDB files. 
+
+<p>A instruction file as an input file is required for running Acedrg to get information on covalent-links and the resulting modifications to monomers/ligands.
+
+<br>
+<h3>Input</h3>
+<dl compact="compact">
+  <dt>SMILES</dt>
+  <dd>a typographical line notation for specifying chemical structure</dd>
+  <ol>
+       <li> <pre>"C1=CC=CC(CCC2)=C12", which can be feed into command-lines </pre></li>
+       <li> <pre>a_smiles.smi, which contains the above SMILES string and can be feed into command-lines </pre></li>
+  </ol>
+</dl>
+<dl compact="compact">
+  <dt>MDL MOL File</dt>
+  <dd>A MDL Molfile is a file format created by MDL and now owned by Symyx. It contains information about the atoms, bonds, connectivity and coordinates of a molecule. It also includes some header information, the Connection Table (CT) containing atom info, then bond connections and types, followed by sections for more complex information</dd>
+  <ul>
+       <li> a_molecule.mol, which contains the following information <br>
+            <pre>
+  201
+  Mrv0541 02231214312D          
+
+ 14 15  0  0  0  0            999 V2000
+    3.0791    1.6500    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    1.6500   -0.8250    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    3.0791   -0.8250    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    4.5741    0.6639    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3645    0.4125    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    4.5741   -0.6639    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    3.7935    0.4125    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.7935   -0.4125    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.0791    0.8250    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3645   -0.4125    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    5.0556    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    3.0791   -1.6500    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    4.8305    1.4482    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.6500    0.8250    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+  1  9  2  0  0  0  0
+  2 10  2  0  0  0  0
+  3  8  1  0  0  0  0
+  3 10  1  0  0  0  0
+  3 12  1  0  0  0  0
+  4  7  1  0  0  0  0
+  4 11  1  0  0  0  0
+  4 13  1  0  0  0  0
+  5  9  1  0  0  0  0
+  5 10  1  0  0  0  0
+  5 14  1  0  0  0  0
+  6  8  1  0  0  0  0
+  6 11  2  0  0  0  0
+  7  8  2  0  0  0  0
+  7  9  1  0  0  0  0
+M  END
+            </pre></li>
+  </ul>
+</dl>
+<dl compact="compact">
+  <dt>mmCif File</dt>
+  <dd>The macromolecular Crystallographic Information File (mmCIF) is a extension from Crystallographic Information File (CIF) data representation.</dd>
+  <ul>
+       <li> Format from mmCif files can be found in  <a href="http://mmcif.wwpdb.org/">PDBx/mmCIF Dictionary Resources</a>  <br>
+  </ul>
+</dl>
+
+<dl compact="compact">
+  <dt>Mol2 file</dt>
+  <dd>A MOL2 (.mol2) is a flexible representation of molecules, containing atom coordinates, bonds, substructure information. </dd>
+  <ul>
+	       <li> Format from mmCif files can be found in  <a href="http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf">Tripos Mol2 File Format</a> </li>
+  </ul>
+</dl>
+<!-- <span style="font-weight: normal;"></span><span style="font-weight: normal;">
+</span> -->
+<h3>Output</h3>
+Execution of ACEDRG in different modes will result in different output files. One of the modes used most frequently is to generate ligand descriptions. Two output files will be provided from ACEDRG if the job finishes successfully. <br>
+<!-- <span style="font-family: monospace;"><br> -->
+ <br>
+ (a) From the mode to generate ligand descriptions:<br>
+ <dl compact="compact">
+  <dt> Two output files will be provided from this mode if the job finishes successfully.
+  <ul>
+       <li> a PDB file (.pdb), which suggests a set of atom coordinates ACEDRG obtains from a low energy conformer.</li>
+       <li> a MMcif file(.cif), which contains bond lengths, angles, and other stereo-chemical information. One of an example is as following:
+            <pre>
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+UNL     UNL     .              NON-POLYMER     70     39     .     
+#
+data_comp_UNL
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+UNL     N       N       NT2     0       -3.654      2.378       1.008       
+UNL     C27     C       CH1     0.000   -4.053      1.059       0.498       
+UNL     C28     C       CH1     0.000   -5.015      0.357       1.466       
+UNL     O4      O       OH1     0.000   -6.187      1.144       1.627       
+UNL     C29     C       CH1     0.000   -5.373      -1.044      0.973       
+UNL     O5      O       OH1     0.000   -6.131      -1.715      1.978       
+UNL     C30     C       CH1     0.000   -4.100      -1.837      0.666       
+UNL     C31     C       CH2     0.000   -4.376      -3.187      0.039       
+UNL     O6      O       OH1     0.000   -3.169      -3.910      -0.200      
+UNL     O7      O       O2      0.000   -3.284      -1.104      -0.273      
+UNL     C26     C       CH1     0.000   -2.855      0.174       0.204       
+UNL     O3      O       O2      0.000   -2.023      0.820       -0.748      
+UNL     C25     C       CH1     0.000   -0.752      0.221       -1.038      
+UNL     C24     C       CH2     0.000   -0.737      -0.497      -2.386      
+UNL     C12     C       CH1     0.000   0.751       -0.744      -2.626      
+UNL     C11     C       CH1     0.000   1.545       0.376       -1.882      
+UNL     C23     C       CR56    0.000   2.571       -0.397      -1.077      
+UNL     C22     C       CR16    0.000   3.636       0.105       -0.329      
+UNL     C21     C       CR66    0.000   4.504       -0.782      0.373  
+................
+     
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.aromatic
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+UNL           N         C27      single       n     1.470   0.013
+UNL         C27         C28      single       n     1.532   0.010
+UNL         C27         C26      single       n     1.512   0.020
+UNL         C28          O4      single       n     1.421   0.011
+UNL         C28         C29      single       n     1.523   0.010
+UNL         C13          O2      double       n     1.215   0.010
+UNL         C23         C22    aromatic       y     1.383   0.012
+UNL         C23         C14    aromatic       y     1.388   0.010
+UNL         C22         C21    aromatic       y     1.420   0.010
+UNL         C21         C20    aromatic       y     1.416   0.010
+UNL         C21         C16    aromatic       y     1.423   0.010
+UNL         C20         C19    aromatic       y     1.358   0.012
+UNL         C15         C14    aromatic       y     1.371   0.010
+................
+     
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+UNL         C27           N         HN1     109.984    3.00
+UNL         C27           N         HN2     109.984    3.00
+UNL         HN1           N         HN2     108.673    3.00
+UNL           N         C27         C28     111.315    2.25
+UNL           N         C27         C26     111.865    2.42
+UNL           N         C27         H27     108.113    1.50
+UNL         C28         C27         C26     111.124    1.57
+UNL         C28         C27         H27     107.258    1.68
+UNL         C26         C27         H27     107.511    1.55
+UNL         C27         C28          O4     110.124    1.87
+UNL         C27         C28         C29     110.742    1.50
+UNL         C27         C28         H28     108.987    1.50
+UNL          O4         C28         C29     110.984    1.55
+UNL          O4         C28         H28     108.954    1.50
+UNL         C29         C28         H28     108.714    1.50
+UNL         C28          O4         HO4     108.064    2.53
+UNL         C28         C29          O5     109.301    2.14
+UNL         C28         C29         C30     109.454    1.50
+UNL         C28         C29         H29     109.514    1.50
+UNL          O5         C29         C30     109.072    2.07
+UNL          O5         C29         H29     109.194    1.50
+UNL         C30         C29         H29     109.223    1.50
+UNL         C29          O5         HO5     109.564    3.00
+UNL         C29         C30         C31     112.996    1.59
+UNL         C29         C30          O7     109.140    1.86
+................  
+   
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+UNL            sp3_sp3_80         C28         C27           N         HN1     -60.000   10.00     3
+UNL           sp3_sp3_112         C27         C26          O3         C25     180.000   10.00     3
+UNL           sp3_sp3_115         C24         C25          O3         C26     180.000   10.00     3
+UNL            sp3_sp3_20         C12         C24         C25          O3     180.000   10.00     3
+UNL           sp3_sp3_121          O3         C25          C9         C11      60.000   10.00     3
+UNL            sp3_sp3_28         C11         C12         C24         C25     -60.000   10.00     3
+UNL            sp3_sp3_11         C23         C11         C12         C24     180.000   10.00     3
+UNL            sp2_sp3_29          O2         C13         C12         C24     -60.000   10.00     6
+UNL            sp2_sp3_22         C22         C23         C11         C12     180.000   10.00     6
+UNL            sp3_sp3_37         C12         C11          C9         C25     -60.000   10.00     3
+UNL              const_30         C21         C22         C23         C11     180.000   10.00     2
+UNL              const_26         C15         C14         C23         C11     180.000   10.00     2
+UNL              const_35         C20         C21         C22         C23     180.000   10.00     2
+UNL              const_50         C19         C20         C21         C22     180.000   10.00     2
+UNL              const_38         C17         C16         C21         C22     180.000   10.00     2
+UNL              const_53         C18         C19         C20         C21       0.000   10.00     2
+UNL            sp3_sp3_89          O3         C26         C27           N     180.000   10.00     3
+UNL            sp3_sp3_50           N         C27         C28          O4     -60.000   10.00     3
+UNL              const_57         C17         C18         C19         C20       0.000   10.00     2
+UNL              const_61         C16         C17         C18         C19       0.000   10.00     2
+................ 
+    
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+UNL    chir_1    N    C27    HN1    HN2    both
+UNL    chir_2    C27    N    C26    C28    negative
+UNL    chir_3    C28    O4    C29    C27    negative
+UNL    chir_4    C29    O5    C30    C28    positive
+UNL    chir_5    C30    O7    C29    C31    negative
+UNL    chir_6    C26    O7    O3    C27    negative
+UNL    chir_7    C25    O3    C9    C24    positive
+UNL    chir_8    C12    C13    C11    C24    positive
+UNL    chir_9    C11    C9    C23    C12    negative
+UNL    chir_10    C9    C8    C25    C10    positive
+................
+     
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+UNL    plan-1         C11   0.020
+UNL    plan-1         C13   0.020
+UNL    plan-1         C14   0.020
+UNL    plan-1         C15   0.020
+UNL    plan-1         C16   0.020
+UNL    plan-1         C17   0.020
+UNL    plan-1         C20   0.020
+UNL    plan-1         C21   0.020
+UNL    plan-1         C22   0.020
+UNL    plan-1         C23   0.020
+UNL    plan-1         H15   0.020
+UNL    plan-1         H22   0.020
+UNL    plan-2         C15   0.020
+UNL    plan-2         C16   0.020
+UNL    plan-2         C17   0.020
+UNL    plan-2         C18   0.020
+UNL    plan-2         C19   0.020
+UNL    plan-2         C20   0.020
+UNL    plan-2         C21   0.020
+UNL    plan-2         C22   0.020
+UNL    plan-2         H17   0.020
+UNL    plan-2         H18   0.020
+UNL    plan-2         H19   0.020
+UNL    plan-2         H20   0.020
+................
+     
+loop_
+_pdbx_chem_comp_descriptor.comp_id
+_pdbx_chem_comp_descriptor.type
+_pdbx_chem_comp_descriptor.program
+_pdbx_chem_comp_descriptor.program_version
+_pdbx_chem_comp_descriptor.descriptor
+UNL SMILES           ACDLabs              10.04 "O=C6c2cc1ccccc1cc2C7C4(c3ccccc3CCC4=O)C(OC5OC(C(O)C(O)C5N)CO)CC67" 
+UNL SMILES_CANONICAL CACTVS               3.341 "N[C@@H]1[C@@H](O)[C@H](O)[C@@H](CO)O[C@H]1O[C@H]2C[C@H]3[C@H](c4cc5ccccc5cc4C3=O)[C@@]26C(=O)CCc7ccccc67" 
+UNL SMILES           CACTVS               3.341 "N[CH]1[CH](O)[CH](O)[CH](CO)O[CH]1O[CH]2C[CH]3[CH](c4cc5ccccc5cc4C3=O)[C]26C(=O)CCc7ccccc67" 
+            </pre> 
+       </li>
+  </ul>
+  </dt>
+ </dl>
+ <br>
+<a name="usuage"></a>
+<h2>Usuage</h2>
+<ol>
+   <h3><li>Generate descriptions of a ligand with input files of different formats</li></h3>
+       <dl compact="compact">
+       <dt>SMILES</dt>
+       <dd>Generate descriptions of a ligand when the input file is a SMILES string </dd>
+       <ol>
+           <li>
+               <pre> 
+           acedrg -i "C1=CC=CC(CCC2)=C12"  -o my_ligand
+       When the job finishes, you will see two output files, my_ligand.cif and my_ligand.pdb.
+              </pre> 
+           </li>
+           <li>
+               <pre> 
+           acedrg -i my_ligand.smi  -o my_ligand
+       The file, my_ligand.smi, contains a SMILES string, such as C1=CC=CC(CCC2)=C12. 
+       Again, the output files are my_ligand.cif and my_ligand.pdb.
+              </pre> 
+           </li>
+       </ol>
+       </dl> 
+       <dl compact="compact">
+       <dt>MMCIF</dt>
+       <dd>Generate descriptions of a ligand when the input file is of mmcif format </dd>
+           <pre>
+           acedrg -c my_ligand.cif  -o my_ligand_fromAcedrg   
+       When the job finishes, you will see two output files, my_ligand_fromAcedrg.cif 
+       and my_ligand.pdb. The difference between my_ligand.cif and my_ligand_fromAcedrg.cif
+       is that the latter contain more detailed stereo-chemical information.
+           </pre>
+       </dl>
+       <dl compact="compact">
+       <dt>MDL MOL</dt>
+       <dd>Generate descriptions of a ligand when the input file is of mdl/mol format </dd>
+           <pre>
+           acedrg -m my_ligand.mol  -o my_ligand  
+       When the job finishes, you will see two output files, my_ligand.cif and my_ligand.pdb.
+           </pre>
+       </dl>
+       <dl compact="compact">
+       <dt> SYBL MOL2 </dt>
+       <dd>Generate descriptions of a ligand when the input file is of SYBL mol2 (.mol2) format </dd>
+           <pre>
+           acedrg -g my_ligand.mol2  -o my_ligand       
+       When the job finishes, you will see two output files, my_ligand.cif and my_ligand.pdb.
+           </pre>
+       </dl>
+       <dl compact="compact">
+       <dt>Other options that may help  </dt>
+       <dd>Use the following options to achieve different purposes </dd>
+       <ol>
+           <li>
+               <pre>
+           acedrg -c my_ligand.cif  -o my_ligand_fromAcedrg -p   
+       When option -p is used, acedrg will use the coordinates of atoms in my_ligand.cif as 
+       the initial coordinates for optimization. 
+              </pre>
+           </li>
+           <li>
+              <pre>
+           acedrg -m my_ligand.mol  -o my_ligand  -K (upper case)     
+       Acedrg will keep the original protonation/deprotonation states in the input file, my_ligand.mol
+             </pre>
+           </li>
+       </ol>
+       </dl>
+
+   <h3><li>Generate a description of a linker between two atoms in two different ligands </li></h3> 
+       <dl compact="compact">
+       <ol type="I">
+           <li>Generating a linker involves a few steps and needs an instruction file to tell acedrg how to do it 
+           <ol type="a">
+              <li>Create an instruction file, e.g. my_instructions.txt 
+              </li>
+              <li>Run aceDRG in a command line, using the instruction file created in step (a), e.g. 
+                  <pre>
+       acedrg -L my_instructions.txt -o my_linker
+                  </pre>
+              </li>
+              <li>The output file, e.g. my_linker.cif, contains the detailed information of the linker.
+              </li>
+           </ol>
+           <li> How to create an instruction file.
+                <ol type="a" >
+                  <li> The instruction file always begins with "LINK:" 
+                  </li> 
+                  <li> Keywords:
+                      <ol type="i">
+                         <li>The required keywords :
+                             <ul>
+                                 <li>RES-NAME-1 </li>
+                                 <li>ATOM-NAME-1</li>
+                                 <li>FILE-1</li>
+                                 <li>RES-NAME-2 </li>
+                                 <li>ATOM-NAME-2</li>
+                                 <li>FILE-2</li>
+                             </ul>
+                         </li>
+                         <li> The optional keywords :
+                             <ul>
+                                 <li>DELETE</li>
+                                 <li>CHANGE</li>
+                                 <li>BOND-TYPE</li>
+                             </ul>
+                         </li>
+                         <li>The cases for the keywords do not matter. ATOM-NAME-1 and aToM-NamE-1 have the same effect.
+                         </li>
+                      </ol>
+                  </li> 
+                  <li> Details and examples: 
+                     <ul>
+                         <li>All contents in an instruction file should be in one line 
+                         <pre>
+       LINK: RES-NAME-1 2OP FILE-1 2OP_acedrg.cif ATOM-NAME-1  C  RES-NAME-2 VAL ATOM-NAME-2  N
+                         </pre>
+                         </li>
+		         <li>keywords RES-NAME-1 and RES-NAME-2 should be followed by two residue names, e.g. 2OP and VAL</li>
+                         <li>keywords ATOM-NAME-1 and ATOM-NAME-2 should be followed by two atom names, e.g. C and N. 
+                            These are two atoms to be linked. 
+                         </li>
+                         <li>keyword FILE-1 and FILE-2 should be followed by a mmcif file name which provides detailed 
+                             information on the ligand. These two keywords are optional depending on what types of ligands 
+                             to be linked.
+                          </li>
+                              <ol type="i">
+                                   <li> If the ligand/monomer is an amino acid such as VAL in the above example, you do not
+                                        need to use these keywords. 
+                                   </li>
+                                   <li> You can generate the mmcif file of the ligand/monomer, e.g. 2OP, by running aceDRG, 
+                                        as shown below: 
+                                        <ol>
+                                               <li>Get the mmcif file, 2OP.cif, from <a href="https://www.rcsb.org/"><b>PDB</b></a>. 
+                                               </li>     
+                                               <li>Run acedrg using 2OP.cif as an input file.
+                                                   <pre>
+       acedrg -c 2OP.cif -o 2OP_acedrg  -p(optional)
+                                                   </pre>
+                                                </li>
+                                                <li>Put the generated mmcif file, 2OP_acedrg.cif, into the instruction file
+                                                    as showed in the example instruction file.
+                                                </li>
+                                        </ol>
+                                   </li>
+                              </ol>
+                       </li>
+      
+                       <li> Some keywords can be used to perform further actions on the linker
+                            <ul>
+                                <li>The keyword, DELETE, can be used to delete the following properties in one of the ligands/monomers.
+                                     <ol>
+                                          <li>
+                                               An atom in one of the ligands/monomers. e.g.
+                                               <pre>
+    LINK: RES-NAME-1 2OP FILE-1 2OP_acedrg.cif ATOM-NAME-1 C RES-NAME-2 VAL ATOM-NAME-2 N DELETE ATOM OXT 1
+    which means that atom, OXT, in ligand 1, i.e. 2OP will be deleted when the linker is generated.
+                                               </pre>
+                                          </li>
+                                          <li>
+                                               A bond, e.g.  in one of the ligands/monomers. e.g.
+                                               <pre>
+    LINK: RES-NAME-1 CYS ATOM-NAME-1 SG RES-NAME-2 TMP FILE-2 TMP.cif ATOM-NAME-2 C1 DELETE BOND C1 C2 2
+    which means that the bond order between C1 and C2 in ligand 2, i.e. TMP will be deleted.
+                                               </pre>
+                                      </ol>
+                                </li> 
+                                <li>The keyword, CHANGE, can be used to change the following properties in one of the ligands/monomers. 
+                                      <ol>
+                                          <li> A bond, e.g. between atom C1 and C2 in Residue TMP.
+                                               <pre>
+    LINK: RES-NAME-1 CYS ATOM-NAME-1 SG RES-NAME-2 TMP FILE-2 TMP.cif ATOM-NAME-2 C1 CHANGE BOND C1 C2 SINGLE 2
+    which means that the bond order between C1 and C2 in ligand 2, i.e. TMP will be changed from orignal double into single.
+                                               </pre>
+                                          </li>
+                                          <li> A formal charge on one of atoms in a residue/monomer. The keywords "CHANGE CHARGE" are followed by the residue number, atom name, and the value(a positive or negetive integer). For example: 
+                                               <pre>
+    LINK: RES-NAME-1 TYR ATOM-NAME-1  CE1  RES-NAME-2 MET ATOM-NAME-2 SD CHANGE CHARGE 2 SD 1
+    which means that the formal charge on atom SD in residue 2, i.e. MET will be changed into 1. 
+    Note: formal charges are always integers. 
+                                               </pre>
+
+                                               <pre>
+    LINK: RES-NAME-1 BO2 ATOM-NAME-1 B26 RES-NAME-2 THR ATOM-NAME-2 OG1 CHANGE CHARGE 1 B26 1
+    which means that the formal charge on atom B26 in residue 1, i.e. BO2 will be changed into 1. 
+                                               </pre>
+                                           </li>
+                                      </ol> 
+                                <li>The keyword, BOND-TYPE, can be used to define the bond order between atoms linked. By 
+                                    default, the bond order between two atoms linked together is single.
+                                <pre>
+    LINK: RES-NAME-1 LYS ATOM-NAME-1 NZ RES-NAME-2 PLP FILE-2 PLP_acedrg.cif ATOM-NAME-2 C4A BOND-TYPE DOUBLE DELETE ATOM O4A 2 
+    which means that the bond between NZ in LYS and C4A in PLP_acedrg.cif, will be a bond order of double.
+                                </pre>
+                                </li> 
+                            </ul>
+                       </li>
+                </ol>
+             </ol>
+       </dl>
+   <h3><li>Generate a description about the modification of a  ligands (or Modification for short) </li></h3> 
+       <dl compact="compact">
+       <ol type="I">
+           <li>Generating a Modification is similar to generating a link. The steps are:
+           <ol type="a">
+              <li>Create an instruction file, e.g. my_instructions.txt, which tells acedrg how to do it 
+              </li>
+              <li>Run aceDRG in a command line, using the instruction file created in step (a), e.g. 
+                  <pre>
+       acedrg -L my_instructions.txt -o my_modification
+                  </pre>
+              </li>
+              <li>There are two output cif files if the program finishes. One is the dictionary file for modifid ligand, 
+                  the other is a cif file showing what modification have done to the ligand. The corresponding files for 
+                  the above command-line is "my_modification.cif", and "my_modification_modres.cif".
+              </li>
+           </ol>
+           <li> How to create an instruction file.
+                <ol type="a" >
+                  <li> The instruction file always begins with "MOD:" 
+                  </li>
+                  <li> Keywords:
+                      <ol type="i">
+                         <li>The keywords :
+                             <ul>
+                                 <li>RES-NAME </li>
+                                 <li>FILE</li>
+                                 <li>ADD</li>
+                                 <li>DELETE</li>
+                                 <li>CHANGE</li>
+                                 <li>ATOM</li>
+                                 <li>BOND</li>
+                             </ul>
+                         <li>The cases for the keywords do not matter. ATOM and aToM have the same effect.
+                         </li>
+                      </ol>
+                  </li> 
+                  <li> Values following keywords:
+                      <ol type="i">
+                         <li>All contents in an instruction file should be in one line
+                         </li> 
+                         <li>The keywords "RES-NAME" is followed by the name of the original ligand, e.g.
+                             <pre> RES-NAME HIS </pre>
+                         </li>
+                         <li>The keywords ADD, DELETE, CHANGE are always followed by ATOM or BOND or CHARGE. 
+                         </li>
+                         <li>To add an atom, using "ADD ATOM "  followed by atom name, element and charge, e.g. 
+                             <pre> ADD ATOM O1 O 0 </pre>
+                             When adding a non-H atom, you do not need to add the associated H atoms. 
+                             But there may be a few possiblities. if you would like to sure some H atoms are added. 
+                             You should put those atoms in the instruction file as shown above. See the examples for details. 
+                         </li>
+                         <li>To delete an atom, using "DELETE ATOM "  followed by atom name only, e.g. 
+                             <pre> DELETE ATOM O2 </pre>
+                             When deleting an atom, the atoms attched only this deleted atoms will be deleted at 
+                             the same time. In above example, any H atoms attached to O2 atom will be deleted. 
+                         </li>
+                         <li> To add a bond, using "ADD BOND " followed by names of two atoms forming the bond, and the bond type, 
+                              e.g. 
+                              <pre> ADD BOND NZ CM SINGLE </pre> 
+                         </li>
+                         <li> To delete a bond, using "DELETE BOND " followed by names of two atoms forming the bond only, 
+                              e.g. 
+                              <pre> DELETE BOND NZ CM </pre> 
+                         </li>
+                         <li>To change the charge on an atom, using "CHANGE CHARGE" followed by the atom 
+                             name and the value of a charge, e.g.
+                             <pre> CHANGE CHARGE ND 1 </pre> 
+                             It is not recommended to put CHARGE key in the instruction file. If there is no CHARGE keyword 
+                             in the instruction file, acedrg will re-calculate the bond-order and charges if necessary.  
+                         </li>
+                         <li>Acedrg will add or delete H atoms accordingly, and will re-calculate bond-orders and charges if necessary. </li>
+                      </ol>
+                  </li> 
+                  <li> Details and examples: 
+                     <ul>
+                         <li>  Example 1
+                         <pre>
+       MOD: RES-NAME LYS ADD ATOM CM C 0 ADD BOND NZ CM SINGLE
+                         </pre>
+		         In this example:
+                              <ol type="i">
+                              <li> the monomer to be modificated is LYS. </li>
+                              <li> the atom CM is added to LYS. It bonds to atom NZ in LYS, the bond order is "SINGLE". </li>
+                              <li> As no other information is provided, acedrg will statisfy the valence requirement of atom CM, 
+                                   three H atoms will be added, each of which of them will bond to CM. That means a Methyl group is added, 
+                                   instead of just one C atom. One of H atom bonding to NZ will be deleted automatically. 
+                              </li> 
+                              </ol>
+                         </li>
+                         <li>  Example 2
+                         <pre>
+       MOD: RES-NAME HIS DELETE ATOM HD1 CHANGE CHARGE ND1 0
+                         </pre>
+		         In this example:
+                              <ol type="i">
+                              <li> the monomer to be modificated is HIS. </li>
+                              <li> the atom HD1 is deleted. </li>
+                              <li> the charge on atom ND1 is changed to be zero </li> 
+                              </ol>
+                         </li>
+                         <li>  Example 3
+                         <pre>
+       MOD: RES-NAME HIS DELETE ATOM HE2
+                         </pre>
+		         In this example:
+                              <ol type="i">
+                              <li> the monomer to be modificated is HIS. </li>
+                              <li> the atom HE2 is deleted. </li>
+                              <li> after deleting HE2, valence requirement for NE2 is not satisfied. As there no other condition is proposed, the bond order and charge will be re-calculated </li> 
+                              </ol>
+                         </li>
+                         <li>  Example 4
+                         <pre>
+  MOD: RES-NAME LYS ADD ATOM CM1 C 0  ADD ATOM CM2 C 0 ADD ATOM CM3 C 0 ADD BOND NZ CM1 SINGLE ADD BOND NZ CM2 SINGLE ADD BOND OXT CM3 SINGLE
+                         </pre>
+		         In this example:
+                              <ol type="i">
+                              <li> the monomer to be modificated is LYS. </li>
+                              <li> three atoms CM1, CM2, CM3 are added into the monomer. </li>
+                              <li> H atoms associated with atoms CM1, CM2, CM3 are added automatically </li>
+                              <li> three bonds are added, all of which are SINGLE. </li> 
+                              </ol>
+                         </li>
+                         <li>  Example 5
+                         <pre>
+  MOD: RES-NAME HY3 ADD ATOM O3 O 0 ADD BOND C4 O3 SINGLE DELETE ATOM O2 ADD ATOM HB3 H 0 ADD BOND HB3 C3 SINGLE
+                         </pre>
+		         In this example:
+                              <ol type="i">
+                              <li> the monomer to be modificated is HY3. </li>
+                              <li> atoms O3 are added into the monomer together with a bond between C4 and O3 </li>
+                              <li> H atom HB3 is specifically instructed to be added. The program will make sure about that </li>
+                              <li> atom O2 and associated H atom HO1 are deleted </li> 
+                              </ol>
+                         </li>
+                     </ul>
+                  </li>
+                </ol>
+             </ol>
+</ol>
+
+<a name="references"></a>
+<h2>REFERENCES</h2>
+<dl compact="compact">
+  <ol>
+    <ol>
+      <li>Fei Long, Robert A Nicholls, Paul Emsley, Saulius GraZulis, Andrius Merkys,
+          Antanas Vaitkus and Garib N Murshudov
+          "ACEDRG: A stereo-chemical description generator for ligands" 
+          Acta Cryst. (2017), D73,  112-122. <br>
+      </li>
+      <li>Fei Long, Robert A Nicholls, Paul Emsley, Saulius GraZulis, Andrius Merkys,
+          Antanas Vaitkus and Garib N Murshudov
+          "Validation and extraction of stereochemical information fromsmall
+           molecular databases"
+          Acta Cryst. (2017), D73, 103-111. <br>
+      </li>
+    </ol>
+  </ol>
+</dl>
+<br>
+<a name="authors"></a>
+  <h2>AUTHORS AND CREDITS</h2>
+  <p>Fei Long(flong@mrc-lmb.cam.ac.uk) and Garib N Murshudov(garib@mrc-lmb.cam.ac.uk) for most ideas and programming
+  <br>
+  Robert A Nicholls(nicholls@mrc-lmb.cam.ac.uk) for statistical validations of tables used in ACEDRG<br>
+  Paul Emsley and Robert A Nicholls for systematic testing  
+  </p>
+  <p>
+  Special thanks to CCP4 core team for work on distribution and people participating <a href="mailto:LIGANDS@JISCMAIL.AC.UK">Ligand Forum</a> for useful discussions.
+  </p>
+<br>
+<a name="citations"></a>
+  <h2>HOW TO CITE ACEDRG</h2>
+  <p>
+  The main reference for ACEDRG is:<br>
+  <br>
+  <span style="color: rgb(80, 80, 255);">
+  Fei Long, Robert A Nicholls, Paul Emsley, Saulius GraZulis, Andrius Merkys,
+  Antanas Vaitkus and Garib N Murshudov <br>
+  <em>"ACEDRG: A stereo-chemical description generator for ligands"</em><br>
+  Acta Cryst. (2017), D73, 112-122. 
+  </span>
+  </p>
+  <p>
+  The following reference should also be included when citing ACEDRG because the software makes frequent use of the Cheminformatics Software RDKit and  the CCP4 programs REFMAC :<br>
+  <br>
+  For RDKit cite<br>
+  <span style="color: rgb(80, 80, 255);">
+  <em><a href="http:/www.rdkit.org/RDKit_Docs.current.pdf">RDKit Documentation</a></em><br>
+  </span>
+  <br><br>
+
+  For REFMAC cite<br>
+  <span style="color: rgb(80, 80, 255);">
+  Murshudov, G. N., Skubak, P., Lebedev, A. A., Pannu, N. S., Steiner, R. A., Nicholls, R. A. ,
+  Winn, M. D., Long, F. & Vagin, A. A.<br>
+  <em>REFMAC5 for the refinement of macromolecular crystal structures</em><br>
+  Acta Cryst. (2011), D67, 355-367
+  </span>
+  </p>
+<h2>SEE ALSO</h2>
+<blockquote>
+<a href="http://www.rdkit.org/"><b>RDKit</b></a>
+<a href="http://www.ccp4.ac.uk/html/refmac5.html"><b>REFMAC</b></a>
+</blockquote>
+</body></html>

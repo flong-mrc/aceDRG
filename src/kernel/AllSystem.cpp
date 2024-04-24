@@ -55,6 +55,7 @@ namespace LIBMOL
         AddPlanes(tAllSys.allPlanes);
         AddRings(tAllSys.allRings);
         setAtomsMetalType();
+
     }
 
 
@@ -897,6 +898,51 @@ namespace LIBMOL
         {
             std::cout << "Bug: Can not find " << metDefCoordGeoFileName
                       << " to read !" << std::endl;
+        }
+    }
+
+    void AllSystem::getMetaLConn(FileName tMCFileName)
+    {
+
+        std::ifstream aInMCFile(tMCFileName);
+
+        if (aInMCFile.is_open())
+        {
+            std::string tRecord="";
+            while(!aInMCFile.eof())
+            {
+                std::getline(aInMCFile, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                if (tRecord.find("BONDING")!=std::string::npos)
+                {
+                    std::vector<std::string> tF;
+                    StrTokenize(tRecord, tF);
+                    if (tF.size()==3)
+                    {
+                        metalConn[tF[1]].push_back(tF[2]);
+                    }
+                }
+
+            }
+            aInMCFile.close();
+        }
+
+        std::map<std::string, int> idNumMap;
+        for (std::vector<AtomDict>::const_iterator iA=allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            idNumMap[iA->id] = iA->seriNum;
+        }
+
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+                iA !=allAtoms.end(); iA++)
+        {
+            iA->connMAtoms.clear();
+            for (std::vector<std::string>::iterator iMC=metalConn[iA->id].begin();
+                 iMC!=metalConn[iA->id].end(); iMC++)
+            {
+                iA->connMAtoms.push_back(idNumMap[*iMC]);
+            }
         }
 
     }

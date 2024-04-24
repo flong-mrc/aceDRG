@@ -165,10 +165,15 @@ namespace LIBMOL
                     //std::cout << "Monomer root name is : "
                     //          << IOEntries["monoRootName"] << std::endl;
                     break;
-                 case 't':
+                case 't':
                     IOEntries["tabGen"] = optarg;
                     std::cout << "Table generator mode :  "
                               << IOEntries["tabGen"] << std::endl;
+                    break;
+                case 'u':
+                    IOEntries["inMC"] = optarg;
+                    std::cout << "inPut MC  :  "
+                              << IOEntries["inMC"] << std::endl;
                     break;
                 case 'w':
                     IOEntries["BandC"] = optarg;

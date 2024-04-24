@@ -167,6 +167,7 @@ class Acedrg(CExeCode ):
         self.upperSigForAngles  = 3.0
         self.lowSigForAngles    = 1.5
         
+        self.inMtConnFile       = ""
 
         self.allBondsAndAngles["atomClasses"] = {}
         self.allBondsAndAngles["bonds"]       = {}
@@ -349,7 +350,11 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("--fpar", dest="inParamFile", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input File containing paramets that define upper and lower bounds for the sigma of bonds and angles")
-
+        
+        self.inputParser.add_option("--mtList", dest="inMtConnFile", metavar="FILE", 
+                                    action="store", type="string", 
+                                    help="Input File containing connections between metal and other atoms")
+        
         self.inputParser.add_option("--neu", dest="neuDif",  
                                     action="store_true",  default=False,  
                                     help="The option to look into structures (represented by cif files) determined by neutron diffraction")
@@ -1008,6 +1013,11 @@ class Acedrg(CExeCode ):
                     tF.close()
                     self.inSmiName = tName
                     print(tName)
+                    
+                    
+        if t_inputOptionsP.inMtConnFile:
+            self.inMtConnFile = t_inputOptionsP.inMtConnFile
+        
 
 
     def setInputProcPara(self, t_inputOptionsP = None):
@@ -1180,7 +1190,9 @@ class Acedrg(CExeCode ):
             self._cmdline += " -1 %f -2 %f -3 %f -4 %f "\
                             %(self.upperSigForBonds, self.lowSigForBonds,\
                               self.upperSigForAngles, self.lowSigForAngles)
-            
+            if os.path.isfile(self.inMtConnFile):
+                self._cmdline += " -u %s "%self.inMtConnFile
+            print(self._cmdline)
             print("===================================================================") 
             print("| Generate the dictionary file using the internal database        |")
             print("===================================================================") 
@@ -3554,6 +3566,8 @@ class Acedrg(CExeCode ):
                         print("The input system contains metal or other heavier element")
                         print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
+                    if os.path.isfile(self.inMtConnFile):
+                        self.runLibmol(self.inMmCifName, iMol)
                     self.runLibmol(self.inMmCifName, iMol)
                     
                 else:

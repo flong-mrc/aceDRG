@@ -315,7 +315,7 @@ namespace LIBMOL
 
         // metal-related
         void setDefaultCoordGeos();
-
+        void getMetaLConn(FileName tMCFileName);
 
 
         // COD applications
@@ -378,6 +378,10 @@ namespace LIBMOL
 
         std::map<int, std::map<std::string,
         std::map<std::string, double > > >       HydrDistTable;
+
+        std::map<std::string,
+                 std::vector<std::string> >      metalConn;
+
 
 
     private:

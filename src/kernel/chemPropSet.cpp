@@ -123,7 +123,7 @@ namespace LIBMOL
     extern void setAtomsBondingAndChiralCenter(std::vector<AtomDict> & tAtoms)
     {
 
-
+        std::map<std::string, std::vector<int> > numConnMap;                      // numConnMap<id, <t_len, t_m_len> >
 
         // First round
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
@@ -132,7 +132,6 @@ namespace LIBMOL
 
             int t_len =0;
             int t_m_len =0;
-
 
             std::cout << "Atom " << iAt->id << " with Charge "
                       << iAt->charge << std::endl;
@@ -150,11 +149,18 @@ namespace LIBMOL
                 }
             }
 
+            if (iAt->connMAtoms.size()>0)
+            {
+                t_m_len = iAt->connMAtoms.size();
+            }
+
             if (iAt->chemType=="C" && t_len==2 && t_m_len==1)
             {
                 t_len=3;
             }
 
+            numConnMap[iAt->id].push_back(t_len);
+            numConnMap[iAt->id].push_back(t_m_len);
 
             // int t_len = (int)iAt->connAtoms.size();
             std::cout << "Atom " << iAt->id << std::endl
@@ -545,12 +551,21 @@ namespace LIBMOL
                                 break;
                             }
                         }
-
+                        //std::cout << "Here atom " << iAt->id << " connected with "
+                        //          << numConnMap[iAt->id][1]  << " metal atoms" << std::endl;
                         if (l_sp2)
                         {
                             // Now we can say this atom is in sp2 orbits
-                            iAt->chiralIdx  =  0;
-                            iAt->bondingIdx =  2;
+                            if (numConnMap[iAt->id][1] !=0)
+                            {
+                                iAt->chiralIdx  =   2;
+                                iAt->bondingIdx =   3;
+                            }
+                            else
+                            {
+                                iAt->chiralIdx  =  0;
+                                iAt->bondingIdx =  2;
+                            }
                         }
                         else
                         {
@@ -572,9 +587,9 @@ namespace LIBMOL
             if (iAt->chemType.compare("C")==0 )
             {
                 // int t_len = (int)iAt->connAtoms.size();
-                std::cout << "For " << iAt->id << std::endl;
-                std::cout << "t_len = " << t_len << std::endl;
-                std::cout << "Its charge is " << iAt->charge << std::endl;
+                //std::cout << "For " << iAt->id << std::endl;
+                //std::cout << "t_len = " << t_len << std::endl;
+                //std::cout << "Its charge is " << iAt->charge << std::endl;
                 if(t_len==3 && iAt->charge ==-1.0)
                 {
 
@@ -583,14 +598,6 @@ namespace LIBMOL
                                  iCA != iAt->connAtoms.end(); iCA++)
                     {
                         // if(tAtoms[*iCA].bondingIdx == 2)
-                        if (iAt->id =="CAP")
-                        {
-                            std::cout << "Its neighbor  " << tAtoms[*iCA].id
-                                      << " is " << tAtoms[*iCA].bondingIdx
-                                      << std::endl;
-                            std::cout << "pre " << preBondingIdx[*iCA] << std::endl;
-
-                        }
 
                         if (preBondingIdx[*iCA]==2.0)
                         {
@@ -644,7 +651,7 @@ namespace LIBMOL
 
         // Check
 
-        /*
+
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -656,10 +663,10 @@ namespace LIBMOL
                       << " and is with bond index "
                       << iAt->bondingIdx << std::endl;
         }
-        std::cout << "Chiral and plane feather for atoms in the system"
-                  << std::endl;
+        //std::cout << "Chiral and plane feather for atoms in the system"
+        //          << std::endl;
 
-
+        /*
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {

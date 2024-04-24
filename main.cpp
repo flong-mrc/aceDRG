@@ -138,7 +138,8 @@ int main(int argc, char** argv) {
                               << std::endl;
                 }
             }
-            std::cout << "Start " << std::endl;
+
+
             LIBMOL::DictCifFile dataFromCif(AJob.IOEntries["inCifName"], std::ios::in);
 
             LIBMOL::AllSystem   aTargetSystem(dataFromCif,
@@ -147,6 +148,12 @@ int main(int argc, char** argv) {
                                               AJob.lowBondSig,
                                               AJob.upperAngleSig,
                                               AJob.lowAngleSig);
+
+            if (AJob.IOEntries.find("inMC") !=  AJob.IOEntries.end())
+            {
+                aTargetSystem.getMetaLConn(AJob.IOEntries["inMC"].c_str());
+                LIBMOL::setAtomsBondingAndChiralCenter(aTargetSystem.allAtoms);
+            }
 
             if (AJob.IOEntries.find("modifiedPl") !=  AJob.IOEntries.end())
             {
