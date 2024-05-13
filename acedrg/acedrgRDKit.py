@@ -62,6 +62,7 @@ class AcedrgRDKit(object):
         self.moleculesB = []
 
         self.isPEP = False
+        self.isSug = False
         self.funcGroupTab = {}
         self.stdFuncGroupMols = []
         self.funcGroups = {}
@@ -995,6 +996,18 @@ class AcedrgRDKit(object):
         for aAtm in tMol:
             if not aAtm.HasProp("Name"):
                 pass
+    
+    def checkSugar(self, tMol):
+      
+        for aSu in self.chemCheck.sugar:
+            print("Check ", aSu)
+            for aVM in self.chemCheck.sugar[aSu]:
+                aMol = Chem.MolFromSmarts(aVM)
+            if tMol.HasSubstructMatch(aMol):  
+                tMol.SetProp("isSugar", aSu)
+                print("The molecule is a ", aSu)
+                break
+        
         
     
     def getInitCoordsInMolFile(self, tFileName):
@@ -1975,6 +1988,7 @@ class AcedrgRDKit(object):
                 tMol.GetAtomWithIdx(aGrp[1]).UpdatePropertyCache()
         tMol.UpdatePropertyCache()
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
+        # self.checkSugar(tMol)
         
         if not self.noProtonation:
             if tPH[0]:

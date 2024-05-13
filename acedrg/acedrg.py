@@ -381,7 +381,7 @@ class Acedrg(CExeCode ):
 
         self.inputParser.add_option("-x",  "--pdb", dest="inPdbName", metavar="FILE", 
                                     action="store", type="string", 
-                                    help="Input File of PDB format containing coordinates of the ligand")
+                                    help="Input File of PDB format containing coordinates of the ligand (non-metal containing ligand only)")
 
         self.inputParser.add_option("-y", "--repcrd",
                                     action="store_true", dest="repCrd", default=False,
@@ -2061,7 +2061,6 @@ class Acedrg(CExeCode ):
                 
             try: 
                 tCifIn = open(tCifInName, "r")
-                #print("cifName ", tCifInName)
             except IOError:
                 print("%s can not be opened for reading"%tCifInName)
                 sys.exit()
@@ -2074,13 +2073,18 @@ class Acedrg(CExeCode ):
                 lP = False
                 
                 for aL in allCifLines:
+                    print("lO ", lO)
+                    print(aL)
                     if aL.find("_chem_comp.pdbx_type") !=-1:
                         lS = True
+                        lO = False
+                        lP = False
                     elif not lP and aL.find("ring-") !=-1:
                         lP = True
                         cifCont['bulk'].append(aL)
                         lS = False
-                    elif not lO and aL.find("_pdbx_chem_comp_description_generator")!=-1:
+                        lO = False
+                    elif not lO and aL.find("acedrg_chem_comp_descriptor")!=-1:
                         lO = True
                         lS = False
                         lP = False
@@ -2098,6 +2102,7 @@ class Acedrg(CExeCode ):
                 for aOL in  cifCont['others']:
                     if aOL.find("servalcat") !=-1:
                         aSLine = aOL
+                
                 
                 
                 try:
@@ -3196,12 +3201,15 @@ class Acedrg(CExeCode ):
                 #                  %(aB["_chem_comp_bond.atom_id_1"],
                 #                    aB["_chem_comp_bond.atom_id_2"], aB["_chem_comp_bond.value_order"]))
                         
-                # print(self.fileConv.dataDescriptor)
-            
+                #print(self.fileConv.dataDescriptor)
+
+                
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)
                 else:
                     self.monomRoot = "UNL"
+                
+                
                 #print(self.fileConv.atoms[0])
                 if len(self.fileConv.atoms) > 0:
                     self.lOrg = self.chemCheck.isOrganicInCif(self.fileConv.atoms)
@@ -3455,7 +3463,7 @@ class Acedrg(CExeCode ):
             elif len(self.fileConv.atoms) > 1 and not self.lOrg:
                 print("Metal atoms are found")
                 aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
-                                                   self.outRoot, self.fileConv, self.chemCheck)
+                                                   self.outRoot, self.fileConv, self.chemCheck, self.versionInfo)
                 if os.path.isfile(aFinInCif):
                     self.runServalcat(self.outRoot, aFinInCif)
                     aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
@@ -3700,6 +3708,7 @@ class Acedrg(CExeCode ):
                 aSetParas = {}
                 if self.modifiedPlanes:
                     aSetParas["modifiedPlanes"] = self.modifiedPlanes
+                
                 aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
             else:
                 aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot,\

@@ -191,7 +191,7 @@ namespace LIBMOL
                     if (iAt->charge==-1.0)
                     {
                         iAt->chiralIdx  = 2;
-                        iAt->bondingIdx = 3;
+                        iAt->bondingIdx = 2;
                     }
                     else
                     {
@@ -651,7 +651,7 @@ namespace LIBMOL
 
         // Check
 
-
+        /*
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -666,7 +666,7 @@ namespace LIBMOL
         //std::cout << "Chiral and plane feather for atoms in the system"
         //          << std::endl;
 
-        /*
+
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -714,14 +714,15 @@ namespace LIBMOL
                 std::cout << "Its initial sp is " << iA->bondingIdx << std::endl;
                 bool lAromRs = false;
                 bool lH2     = false;
-
+                std::vector<int> H2;
                 for (std::vector<int>::iterator iCo=iA->connAtoms.begin();
                         iCo !=iA->connAtoms.end(); iCo++)
                 {
+
                     if (tAtoms[*iCo].inRings.size() !=0)
                     {
-                        std::cout << "connected atom " << tAtoms[*iCo].id
-                                  << "is in rings: " << std::endl;
+                        //std::cout << "connected atom " << tAtoms[*iCo].id
+                        //          << "is in rings: " << std::endl;
 
                         for (std::vector<int>::iterator iR=tAtoms[*iCo].inRings.begin();
                                iR !=tAtoms[*iCo].inRings.end(); iR++)
@@ -743,11 +744,27 @@ namespace LIBMOL
                         break;
                     }
                 }
-                std::cout << "lAromRs " << lAromRs << std::endl;
+
+                for (std::vector<int>::iterator iCo=iA->connAtoms.begin();
+                        iCo !=iA->connAtoms.end(); iCo++)
+                {
+                    std::cout << tAtoms[*iCo].id << "  is " << tAtoms[*iCo].chemType << std::endl;
+                    if (tAtoms[*iCo].chemType=="H")
+                    {
+                        H2.push_back(*iCo);
+                    }
+                }
+
+                if (H2.size()==2)
+                {
+                    lH2 = true;
+                }
+                //std::cout << "lAromRs " << lAromRs << std::endl;
+                //std::cout << "lH2 " << lH2 << std::endl;
                 // Use nAromRs, =1 will make decision temporarily
                 // adjust in future.
                 // std::cout << "lAromRs " << lAromRs << std::endl;
-                if (lAromRs)
+                if (lAromRs && !lH2)
                 {
 
                     //if (checkBridgeStruct(tAtoms, tRings, iA->seriNum))
@@ -793,7 +810,6 @@ namespace LIBMOL
                         else
                         {
                             iA->chiralIdx  = 5;
-                            std::cout << "Here" << std::endl;
                             iA->bondingIdx = 3;
                         }
                     }
@@ -846,7 +862,7 @@ namespace LIBMOL
                     iA->bondingIdx = 3;
                 }
                  */
-                 std::cout << "Here Its hybridization is sp" << iA->bondingIdx << std::endl;
+                //std::cout << "Its hybridization is sp" << iA->bondingIdx << std::endl;
             }
 
             if((iA->chemType.compare("N")==0)
@@ -5561,7 +5577,7 @@ namespace LIBMOL
                     && tAtoms[idx3] .connAtoms.size()==1
                     && tAtoms[idx4] .connAtoms.size()==1)
                 {
-                    std::cout << "Here3 " << std::endl;
+                    //std::cout << "Here3 " << std::endl;
                     int idxB1 = tAllAtmBondingMap[tAt->seriNum][idx1];
                     std::cout << "idxB1 " << idxB1 << std::endl;
                     tBonds[idxB1].orderN = 2;
@@ -6090,15 +6106,121 @@ namespace LIBMOL
                                 tDoneAtoms.push_back(iAt->seriNum);
                                 tDoneAtoms.push_back(nonMConn);
                             }
+                            else if (tAtoms[nonMConn].chemType=="C" && tAtoms[nonMConn].connAtoms.size()==2)
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 3;
+                                tDoneBonds.push_back(idxB);
+                                tDoneAtoms.push_back(iAt->seriNum);
+                            }
                         }
                         else
                         {
-                            int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
-                            tBonds[idxB].orderN = 1;
-                            tDoneBonds.push_back(idxB);
-                            //tDoneAtoms.push_back(iAt->seriNum);
+                            if (tAtoms[nonMConn].chemType=="C" && tAtoms[nonMConn].connAtoms.size() < 3)
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 3;
+                                tDoneBonds.push_back(idxB);
+                                tDoneAtoms.push_back(iAt->seriNum);
+                            }
+                            else
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 1;
+                                tDoneBonds.push_back(idxB);
+                                //tDoneAtoms.push_back(iAt->seriNum);
+                            }
                         }
                     }
+                    else if (iAt->chemType=="O")
+                    {
+                        if (tAtoms[nonMConn].chemType=="N" )
+                        {
+                            if (tAtoms[nonMConn].connAtoms.size() >=3)
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 2;
+                                //tBonds[idxB].orderN = 1;
+                                //iAt->charge         = -1;
+                                tDoneBonds.push_back(idxB);
+                                tDoneAtoms.push_back(iAt->seriNum);
+                            }
+                            else if (tAtoms[nonMConn].connAtoms.size() < 3)
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 2;
+                                tDoneBonds.push_back(idxB);
+                                tDoneAtoms.push_back(iAt->seriNum);
+                            }
+                        }
+                        else if (tAtoms[nonMConn].chemType=="C" )
+                        {
+                            if (tAtoms[nonMConn].connAtoms.size() >=4)
+                            {
+                                int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                tBonds[idxB].orderN = 1;
+                                iAt->charge         = -1;
+                                tDoneBonds.push_back(idxB);
+                                tDoneAtoms.push_back(iAt->seriNum);
+                            }
+                            else if (tAtoms[nonMConn].connAtoms.size() ==3)
+                            {
+                                int remVal= getResValForAtom(tAtoms[nonMConn], tBonds, tAllAtmBondingMap, tCurVal);
+                                int N0    = getUnsetBondsForAtom(tAtoms[nonMConn], tBonds, tAllAtmBondingMap);
+                                if (remVal==4)
+                                {
+                                    int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                    tBonds[idxB].orderN = 2;
+                                    tDoneBonds.push_back(idxB);
+                                    tDoneAtoms.push_back(iAt->seriNum);
+                                }
+                                else if (remVal==3)
+                                {
+                                    int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                    if (N0<2)
+                                    {
+                                        tBonds[idxB].orderN = 2;
+                                        tDoneBonds.push_back(idxB);
+                                        tDoneAtoms.push_back(iAt->seriNum);
+                                    }
+                                    else
+                                    {
+                                        tBonds[idxB].orderN = 1;
+                                        iAt->charge = -1;
+                                        tDoneBonds.push_back(idxB);
+                                        tDoneAtoms.push_back(iAt->seriNum);
+                                    }
+                                }
+                                else if (remVal ==2)
+                                {
+                                    if (N0==0)
+                                    {
+                                        int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                        tBonds[idxB].orderN = 2;
+                                        tDoneBonds.push_back(idxB);
+                                        tDoneAtoms.push_back(iAt->seriNum);
+                                    }
+                                    else
+                                    {
+                                        int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                        tBonds[idxB].orderN = 1;
+                                        iAt->charge = -1;
+                                        tDoneBonds.push_back(idxB);
+                                        tDoneAtoms.push_back(iAt->seriNum);
+                                    }
+                                }
+                                else
+                                {
+                                    int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                                    tBonds[idxB].orderN = 1;
+                                    iAt->charge = -1;
+                                    tDoneBonds.push_back(idxB);
+                                    tDoneAtoms.push_back(iAt->seriNum);
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -6244,7 +6366,7 @@ namespace LIBMOL
                         int idxNB =  nonAssAtms[0];
                         std::vector<int> nonAssBosNB;
                         int assBONB =0;
-                        std::cout << "Here0 " << std::endl;
+                        // std::cout << "Here0 " << std::endl;
                         for (std::vector<int>::iterator iNNB = tAtoms[idxNB].connAtoms.begin();
                              iNNB != tAtoms[idxNB].connAtoms.end(); iNNB++)
                         {
@@ -6302,7 +6424,7 @@ namespace LIBMOL
                             }
                             else
                             {
-                                std::cout << "Here2 " << std::endl;
+                                // std::cout << "Here2 " << std::endl;
                                 if (tAtoms[idxNB].chemType =="H")
                                 {
                                     tBonds[nonAssBos[0]].orderN=1;
@@ -6338,15 +6460,18 @@ namespace LIBMOL
                                     }
                                     else
                                     {
-                                        tBonds[nonAssBos[0]].orderN = 1;
-                                        if (iAt->chemType=="O" || iAt->chemType=="N")
+
+                                        if (iAt->chemType=="O") //|| iAt->chemType=="N")
                                         {
+                                            tBonds[nonAssBos[0]].orderN = 1;
                                             iAt->charge  = -1;
                                         }
                                         else
                                         {
-                                            iAt->charge  = 1;
+                                            tBonds[nonAssBos[0]].orderN = remBO;
+
                                         }
+
                                     }
                                 }
                                 tDoneBonds.push_back(nonAssBos[0]);
@@ -6743,6 +6868,12 @@ namespace LIBMOL
                                                 tAllAtmBondingMap, tDoneAtoms,
                                                 tDoneFAtoms, tDoneBonds);
                         }
+                    }
+                    else if (numCs==6)
+                    {
+                        setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
+                                                tAllAtmBondingMap, tDoneAtoms,
+                                                tDoneFAtoms, tDoneBonds);
                     }
                 }
                 else if (tRings[idxRs[j]].atoms.size()==5)
@@ -8044,6 +8175,26 @@ namespace LIBMOL
         return retRi;
     }
 
+    int  KekulizeMol::getUnsetBondsForAtom(AtomDict               & tAtom,
+                                        std::vector<BondDict>  & tBonds,
+                                        std::map<int,
+                                        std::map<int, int> >   & tAllAtmBondingMap)
+    {
+        int unSB=0;
+
+        for (std::vector<int>::iterator iNB = tAtom.connAtoms.begin();
+                         iNB != tAtom.connAtoms.end(); iNB++)
+        {
+            int idxBo = tAllAtmBondingMap[tAtom.seriNum][*iNB];
+            if (tBonds[idxBo].orderN==0)
+            {
+                unSB+=1;
+            }
+        }
+
+        return unSB;
+    }
+
     void KekulizeMol::modifCurVal(std::vector<AtomDict>::iterator   tAtm,
                                   std::map<int, int>       & tCurVal)
     {
@@ -8060,7 +8211,6 @@ namespace LIBMOL
             //{
             //    tCurVal[tAtm->seriNum] = 4;
             //}
-            std::cout << "Here" << std::endl;
             if  (tCurVal[tAtm->seriNum] < 6)
             {
                 tCurVal[tAtm->seriNum] = 6;
@@ -8141,6 +8291,8 @@ namespace LIBMOL
                               std::vector<int>           & tDoneFAtoms,
                               std::vector<int>           & tDoneBonds)
     {
+        PeriodicTable aPTab;
+
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -8167,7 +8319,7 @@ namespace LIBMOL
                             std::cout << "sum1 "<< sum << std::endl;
                             //if (tAtoms[idxA1].chemType=="N")
                             //{
-                                tAtoms[idxA1].charge=sum-tCurVal[idxA1]-tAtoms[idxA1].charge;
+                                // tAtoms[idxA1].charge=sum-tCurVal[idxA1]-tAtoms[idxA1].charge;
                             //}
                             //else
                             //{
@@ -8238,16 +8390,19 @@ namespace LIBMOL
                     std::cout << " curVal " << tCurVal[iAt->seriNum]<< std::endl;
                     std::cout << " sumBo " << sumBo << std::endl;
                     std::cout << " remV " << remV << std::endl;
-
+                    if (aPTab.extraValences.find(iAt->chemType) != aPTab.extraValences.end())
+                    {
+                        if (std::find(aPTab.extraValences[iAt->chemType].begin(),
+                                      aPTab.extraValences[iAt->chemType].end(), sumBo)
+                                      !=aPTab.extraValences[iAt->chemType].end())
+                        {
+                            remV =0;
+                            std::cout << iAt->id << "remV is set to " << remV << std::endl;
+                        }
+                    }
 
                     if (remV !=0)
                     {
-                        //if (iAt->chemType=="C")
-                        //{
-                        //    iAt->charge= remV;
-                        //}
-                        //else
-                        //{
                         if (remV==1 && iAt->charge==1)
                         {
                             iAt->charge =0;

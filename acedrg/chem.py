@@ -66,6 +66,15 @@ class ChemCheck(object):
                            "GLN", "GLU", "GLY", "HIS", "ILE", \
                            "LEU", "LYS", "MET", "PHE", "PRO", \
                            "SER", "THR", "TRP", "TYR", "VAL"]
+        
+        self.sugar = {}
+        self.sugar["pyranose"]  = []
+        self.sugar["pyranose"].append("OC1C(C(C(C(O1)O)O)O)O")        # Pyranose 
+        self.sugar["pyranose"].append("C1C(C(C(C(O1)O)O)O)O")         # 0MK, A6P, XYS
+        self.sugar["pyranose"].append("C1C(C(C(C(O1)*)O)O)*")         # B1H
+        self.sugar["pyranose"].append("C1C(C(C(C(O1)*)*)O)O")         # AGL 
+        self.sugar["furanoses"] = []
+        self.sugar["furanoses"].append("C1CCCO1")
 
         # Just for checking of amino acids in the old ccp4 monomer lib
         self.defaultBo ={}

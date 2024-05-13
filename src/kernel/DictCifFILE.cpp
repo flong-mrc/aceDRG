@@ -457,7 +457,7 @@ namespace LIBMOL
             }
 
             inFile.close();
-            /*
+
             if (checkR)
             {
                 std::cout << "tRAllLine.size " <<  tRAllLines.size() << std::endl;
@@ -468,7 +468,8 @@ namespace LIBMOL
                 RFactorOK = true;
             }
 
-            */
+            // Temporarily allowing all R pass
+            RFactorOK = true;
 
             checkPowder(tAllLines);
 
@@ -2496,11 +2497,16 @@ namespace LIBMOL
                     hasProps["atom"].insert(std::pair<std::string, int>("ocp",curBlockLine));
                     //std::cout << curBlockLine << std::endl;
                 }
+                else if(tF[0].find("_atom_site_calc_flag") !=std::string::npos)
+                {
+                    hasProps["atom"].insert(std::pair<std::string, int>("fromCalc",curBlockLine));
+                    //std::cout << curBlockLine << std::endl;
+                }
                 else if(tF[0].find("_atom_site_symmetry_multiplicity") !=std::string::npos
                         || tF[0].find("_atom_site_site_symmetry_multiplicity") !=std::string::npos)
                 {
                     hasProps["atom"].insert(std::pair<std::string, int>("symm_mul",curBlockLine));
-                    std::cout << "site_symm_mul " << curBlockLine << std::endl;
+                    // std::cout << "site_symm_mul " << curBlockLine << std::endl;
                 }
 
                 curBlockLine++;
@@ -2576,6 +2582,17 @@ namespace LIBMOL
                     itsCurAtom->existProps["ocp"] = hasProps["atom"]["ocp"];
                     itsCurAtom->ocp = StrToReal(TrimSpaces(tF[itsCurAtom->existProps["ocp"]]));
                     std::cout << "Its occupancy : " << itsCurAtom->ocp << std::endl;
+                }
+                if (hasProps["atom"].find("fromCalc") != hasProps["atom"].end())
+                {
+                    itsCurAtom->existProps["fromCalc"] = hasProps["atom"]["fromCalc"];
+                    std::string strCalc = TrimSpaces(tF[itsCurAtom->existProps["fromCalc"]]);
+                    StrUpper(strCalc);
+                    if (strCalc.find("CALC")==std::string::npos)
+                    {
+                        itsCurAtom->fromCalc =true;
+                    }
+                    std::cout << "Is the atom from calc : " << itsCurAtom->fromCalc << std::endl;
                 }
                 if (hasProps["atom"].find("symm_mul") != hasProps["atom"].end())
                 {
@@ -3827,7 +3844,7 @@ namespace LIBMOL
             for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                     iA != allAtoms.end(); iA++)
             {
-                std::cout << "\nHere Atom " << iA->seriNum << " : " << std::endl
+                std::cout << "\nAtom " << iA->seriNum << " : " << std::endl
                         << "Its ID : " << iA->id << std::endl
                         << "Its Chemical Type : " << iA->chemType << std::endl
                         << "Its CCP4 chemical type " << iA->ccp4Type << std::endl
@@ -8802,7 +8819,11 @@ namespace LIBMOL
 
                 int idxTor = 1;
                 //std::cout << "number of torsions " << (int)allTorsions.size() << std::endl;
-
+                std::map<std::string, int> aTorIdx;
+                aTorIdx["const_"] = 1;
+                aTorIdx["sp2_sp2"] = 1;
+                aTorIdx["sp2_sp3"] = 1;
+                aTorIdx["sp3_sp3"] = 1;
                 for (std::vector<TorsionDict>::iterator iT=tTorsions.begin();
                         iT !=tTorsions.end(); iT++)
                 {
@@ -8822,7 +8843,8 @@ namespace LIBMOL
 
                     std::string hy1 = tAtoms[iT->atoms[1]].hybrid;
                     std::string hy2 = tAtoms[iT->atoms[2]].hybrid;
-
+                    StrLower(hy1);
+                    StrLower(hy2);
                     std::string aTorSiga;
                     /*
                     if (iT->id.find("const") !=std::string::npos
@@ -8878,43 +8900,94 @@ namespace LIBMOL
                         aTorSiga = RealToStr(iT->sigValue);
                     }
                     */
+                    bool lChId = false;
+                    std::string cpTId;
+                    cpTId.assign(iT->id);
+                    StrLower(cpTId);
+                    if (cpTId.find("sp2") !=std::string::npos
+                        || cpTId.find("sp3") !=std::string::npos)
+                    {
+                        lChId = true;
+                    }
 
                     if (iT->id.find("const") !=std::string::npos
                         || iT->id.find("CONST") !=std::string::npos)
                     {
+                        iT->id = "const_" + IntToStr(aTorIdx["const"]);
+                        aTorIdx["const"] +=1;
                         aTorSiga = "0.0";
                         //aTorSiga = "1.0";
                     }
                     else if (hy1 =="sp2" && hy2=="sp2")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp2_sp2_" + IntToStr(aTorIdx["sp2_sp2"]);
+                            aTorIdx["sp2_sp2"] +=1;
+                        }
                         aTorSiga = "5.0";
                     }
                     else if (hy1 =="SP2" && hy2=="SP2")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp2_sp2_" + IntToStr(aTorIdx["sp2_sp2"]);
+                            aTorIdx["sp2_sp2"] +=1;
+                        }
                         aTorSiga = "5.0";
                     }
                     else if (hy1 =="sp3" && hy2=="sp3")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp3_sp3_" + IntToStr(aTorIdx["sp3_sp3"]);
+                            aTorIdx["sp3_sp3"] +=1;
+                        }
                         aTorSiga = "10.0";
                     }
                     else if (hy1 =="SP3" && hy2=="SP3")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp3_sp3_" + IntToStr(aTorIdx["sp3_sp3"]);
+                            aTorIdx["sp3_sp3"] +=1;
+                        }
                         aTorSiga = "10.0";
                     }
                     else if (hy1 =="sp2" && hy2=="sp3")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp2_sp3_" + IntToStr(aTorIdx["sp2_sp3"]);
+                            aTorIdx["sp2_sp3"] +=1;
+                        }
                         aTorSiga = "20.0";
                     }
                     else if (hy1 =="SP2" && hy2=="SP3")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp2_sp3_" + IntToStr(aTorIdx["sp2_sp3"]);
+                            aTorIdx["sp2_sp3"] +=1;
+                        }
                         aTorSiga = "20.0";
                     }
                     else if (hy2 =="sp2" && hy1=="sp3")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp2_sp3_" + IntToStr(aTorIdx["sp2_sp3"]);
+                            aTorIdx["sp2_sp3"] +=1;
+                        }
                         aTorSiga = "20.0";
                     }
                     else if (hy2 =="SP2" && hy1=="SP3")
                     {
+                        if (lChId)
+                        {
+                            iT->id = "sp2_sp3_" + IntToStr(aTorIdx["sp2_sp3"]);
+                            aTorIdx["sp2_sp3"] +=1;
+                        }
                         aTorSiga = "20.0";
                     }
                     else

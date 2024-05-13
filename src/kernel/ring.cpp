@@ -967,7 +967,7 @@ namespace LIBMOL
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms)
     {
         REAL aN=0.0;
-        //std::cout << "Here charge is " << tAtoms[tIdx].charge << std::endl;
+        //std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         //std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
         //          << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
@@ -1185,6 +1185,14 @@ namespace LIBMOL
                 }
             }
         }
+        /*
+        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
+        std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
+        std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
+        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+                  << std::endl;
+        std::cout << "Pi atom added " << aN  << std::endl;
+        */
         return aN;
     }
 
@@ -1338,9 +1346,9 @@ namespace LIBMOL
                             {
                                 // For atom classification. It will be
                                 // calcelled once the charge problem in COO solved
-                                //aN = 2.0;
+                                aN = 2.0;
                             }
-                            aN=1.0;
+                            //aN=1.0;
 
                         }
                     }
@@ -1375,14 +1383,14 @@ namespace LIBMOL
         {
             if (tAtoms[tIdx].chemType.compare("N")==0)
             {
-                if (tAtoms[tIdx].formalCharge==-1.0)
+                if (tAtoms[tIdx].charge==-1.0)
                 {
                     if (tAtoms[tIdx].connAtoms.size() ==2)
                     {
                             aN =2.0;
                     }
                 }
-                else if (tAtoms[tIdx].formalCharge==1.0)
+                else if (tAtoms[tIdx].charge==1.0)
                 {
                     if (tAtoms[tIdx].connAtoms.size() ==3)
                     {                        // Place holder in case for future.
@@ -1415,14 +1423,14 @@ namespace LIBMOL
             }
         }
 
-        /*
+
         std::cout << "atom " << tAtoms[tIdx].id << std::endl;
         std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
         std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
-        std::cout << "HERE Pi atom added " << aN  << std::endl;
-        */
+        std::cout << "Pi atom added " << aN  << std::endl;
+
 
         return aN;
     }
@@ -1433,21 +1441,21 @@ namespace LIBMOL
     {
         REAL aN=0.0;
         int nonMC=0;
-        std::cout << "For atom " << tAtoms[tIdx].id
-                  << std::endl;
+        //std::cout << "For atom " << tAtoms[tIdx].id
+        //          << std::endl;
         for (unsigned i=0; i < tAtoms[tIdx].connAtoms.size(); i++)
         {
             int aIdx = tAtoms[tIdx].connAtoms[i];
-            std::cout << "is bonding atom "
-                      << tAtoms[aIdx].id << "  metal ?"
-                      << tAtoms[aIdx].isMetal << std::endl;
+            //std::cout << "is bonding atom "
+            //          << tAtoms[aIdx].id << "  metal ?"
+            //          << tAtoms[aIdx].isMetal << std::endl;
             if (!tAtoms[aIdx].isMetal)
             {
                 nonMC++;
             }
         }
-        std::cout << "Here atom " << tAtoms[tIdx].id << " has "
-                  << nonMC << " nonMetal bonding " << std::endl;
+        //std::cout << "atom " << tAtoms[tIdx].id << " has "
+        //          << nonMC << " nonMetal bonding " << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
 
@@ -1677,7 +1685,8 @@ namespace LIBMOL
         std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
-        std::cout << "HERE Pi atom added " << aN  << std::endl;
+        std::cout << "Pi atom added " << aN  << std::endl;
+
         */
 
         return aN;
@@ -1687,11 +1696,23 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                                int tMode)
     {
         REAL aN=0.0;
-        int nonMC=tAtoms[tIdx].connAtoms.size();
-        std::cout << "For atom " << tAtoms[tIdx].id
-                  << std::endl;
+        int nonMC=0;
+        //std::cout << "For atom " << tAtoms[tIdx].id
+        //          << std::endl;
 
-        std::cout << "Here atom " << tAtoms[tIdx].id << " has "
+        for (unsigned i=0; i < tAtoms[tIdx].connAtoms.size(); i++)
+        {
+            int aIdx = tAtoms[tIdx].connAtoms[i];
+            //std::cout << "is bonding atom "
+            //          << tAtoms[aIdx].id << "  metal ?"
+            //          << tAtoms[aIdx].isMetal << std::endl;
+            if (!tAtoms[aIdx].isMetal)
+            {
+                nonMC++;
+            }
+        }
+
+        std::cout << "atom " << tAtoms[tIdx].id << " has "
                   << nonMC << "  bonding " << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
@@ -1839,7 +1860,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                             {
                                 // For atom classification. It will be
                                 // calcelled once the charge problem in COO solved
-                                aN = 2.0;
+                                aN = 2.0;                 // aN = 2.0;
                             }
                             //aN=1.0;
 
@@ -1876,18 +1897,23 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
         {
             if (tAtoms[tIdx].chemType.compare("N")==0)
             {
-                if (tAtoms[tIdx].formalCharge==-1.0)
+                if (tAtoms[tIdx].charge==-1.0)
                 {
                     if (nonMC ==2)
                     {
                             aN =2.0;
                     }
                 }
-                else if (tAtoms[tIdx].formalCharge==1.0)
+                else if (tAtoms[tIdx].charge==1.0)
                 {
                     if (nonMC ==3)
                     {                        // Place holder in case for future.
                         aN=1.0;
+                        std::cout << "should be here " << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "why " << std::endl;
                     }
                 }
                 else
@@ -1916,15 +1942,14 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             }
         }
 
-        if (tAtoms[tIdx].chemType =="N")
-        {
+
         std::cout << "atom " << tAtoms[tIdx].id << std::endl;
         std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
         std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
-        std::cout << "HERE Pi atom added " << aN  << std::endl;
-        }
+        std::cout << "Pi atom added " << aN  << std::endl;
+
 
         return aN;
     }
@@ -1934,7 +1959,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
     {
         REAL aN=0.0;
 
-
+         std::cout << "NOT " << std::endl;
 
         return aN;
     }

@@ -64,6 +64,7 @@ class FileTransformer(object) :
 
         self.atoms           = []
         self.bonds           = []
+        self.angles          = []
         self.chirals         = []
         self.chiralPre       = []
 
@@ -266,6 +267,8 @@ class FileTransformer(object) :
             #    for aK in self.dataDescriptor.keys():
             #        print("Key : ", aK)
             #        print("values ", self.dataDescriptor[aK])
+            
+            
             #idKey = "_chem_comp_atom.atom_id"
             #for aAtom in self.atoms:
             #    if aAtom.has_key(idKey):
@@ -372,9 +375,9 @@ class FileTransformer(object) :
                 elif len(aL) > 16 and aL[:16].find("_chem_comp_bond.") !=-1:
                     self.getProp(tBlk, "bond")
                     break
-                #elif len(aL) > 17 and aL[:17].find("_chem_comp_angle.") !=-1:
-                #    self.getProp(tBlk, "angles")
-                #    break
+                elif len(aL) > 17 and aL[:17].find("_chem_comp_angle.") !=-1:
+                    self.getProp(tBlk, "angle")
+                    break
                 elif len(aL) > 16 and aL[:16].find("_chem_comp_chir.") !=-1:
                    
                     self.getProp(tBlk, "chiral")
@@ -448,6 +451,34 @@ class FileTransformer(object) :
                 #                self.dataDescriptor[i]=[colIdx[i], strGrp[i]]
                 if aL.find("\"") !=-1:
                     strGrp1 = aL.strip().split("\"")
+                    #print(strGrp1)
+                    strGrp  = []
+                    if len(strGrp1) == 3: 
+                        strGrp10 = strGrp1[0].strip().split()
+                        strGrp12 = strGrp1[2].strip().split()
+                        for aS in strGrp10:
+                            strGrp.append(aS)
+                        strGrp.append("\"" + strGrp1[1] + "\"")
+                        for aS in strGrp12:
+                            strGrp.append(aS)
+                        if len(strGrp)==len(colIdx):
+                            for i in range(len(strGrp)):
+                                self.dataDescriptor[i]=[colIdx[i], strGrp[i]]
+                    elif len(strGrp1) == 5: 
+                        strGrp10 = strGrp1[0].strip().split() 
+                        strGrp14 = strGrp1[4].strip().split()
+                        for aS in strGrp10:
+                            strGrp.append(aS)
+                        strGrp.append("\"" + strGrp1[1] + "\"")
+                        strGrp.append("\"" + strGrp1[3] + "\"")
+                        for aS in strGrp14:
+                            strGrp.append(aS)
+                        if len(strGrp)==len(colIdx):
+                            for i in range(len(strGrp)):
+                                self.dataDescriptor[i]=[colIdx[i], strGrp[i]]
+                                
+                elif aL.find("\'") !=-1:
+                    strGrp1 = aL.strip().split("\'")
                     strGrp  = []
                     if len(strGrp1) == 3: 
                         strGrp10 = strGrp1[0].strip().split()
@@ -529,6 +560,9 @@ class FileTransformer(object) :
                     s4 = "RNA"
                 else:
                     s4 = self.dataDescriptor[aKey][1]  
+        
+        if tMol.HasProp("isSugar"):
+            s4 = tMol.GetProp("isSugar")
             
         aLine = "%s%s%s%s%s%s%s"%(s1.ljust(len(s1)+5), s2.ljust(len(s2)+5), \
                                     s3.ljust(len(s3)+5), s4.ljust(len(s4)+5), \
@@ -573,7 +607,7 @@ class FileTransformer(object) :
                 #                    strGrp.append(aS)
 
                 if len(strGrp)==len(colIdx):
-                    if tProp =="atom" or tProp =="bond" or tProp =="chiral" : 
+                    if tProp =="atom" or tProp =="bond"  or tProp =="angle" or tProp =="chiral" : 
                         aProp = {}
                         for i in range(len(strGrp)):
                             aProp[colIdx[i]] = strGrp[i]
@@ -581,6 +615,8 @@ class FileTransformer(object) :
                             self.atoms.append(aProp)
                         elif tProp =="bond":
                             self.bonds.append(aProp)
+                        elif tProp =="angle":
+                             self.angles.append(aProp)
                         elif tProp =="chiral":
                             self.chirals.append(aProp)
                     elif tProp =="strDescriptor":
@@ -958,7 +994,6 @@ class FileTransformer(object) :
                             break
                     if not lq2:
                         self.mmCifHasCoords   = True
-                        print("Using _chem_comp_atom.pdbx_model_Cartn_x_ideal")
                         for aAtom in self.atoms:           
                             aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
                             aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
@@ -1261,7 +1296,6 @@ class FileTransformer(object) :
             rrr ="0"
             ccc ="0"
             for aBond in self.bonds:
-                print(aBond)
                 id1 = aBond["_chem_comp_bond.atom_id_1"]
                 id2 = aBond["_chem_comp_bond.atom_id_2"]
                 #print "id1 %s "%id1 

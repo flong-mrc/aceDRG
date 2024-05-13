@@ -7279,6 +7279,9 @@ namespace LIBMOL {
                     << "_chem_comp_atom.z" << std::endl
                     << "_chem_comp_atom.charge" << std::endl
                     << "_chem_comp_atom.hybr" << std::endl
+                    << "_chem_comp_atom.U_iso_or_equiv" << std::endl
+                    << "_chem_comp_atom.occupancy" << std::endl
+                    << "_chem_comp_atom.calc_flag" << std::endl
                     << "_chem_comp_atom.nb1_nb2_sp" << std::endl
                     //<< "_chem_comp_atom.extraEls" << std::endl
                     //<< "_chem_comp_atom.nb1_nb2_extra_elec" << std::endl
@@ -7287,7 +7290,11 @@ namespace LIBMOL {
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
             {
-
+                std::string strCalc = "NO";
+                if (iAt->fromCalc)
+                {
+                    strCalc = "YES";
+                }
                 tMolTabs << std::setw(8)  << iAt->id
                          << std::setw(8)  << iAt->altId
                         << std::setw(4)  << iAt->chemType
@@ -7296,6 +7303,9 @@ namespace LIBMOL {
                         << std::setw(16) << iAt->coords[2]
                         << std::setw(6)  << iAt->charge
                         << std::setw(10) << iAt->hybrid << "    "
+                        << std::setw(16) << iAt->isoB
+                        << std::setw(6) << iAt->ocp
+                        << std::setw(8) << strCalc
                         << std::setw(iAt->codNB1NB2_SP.size() + 4)
                         << iAt->codNB1NB2_SP << "    "
                         //<< std::setw(5) << iAt->excessElec << "    "

@@ -632,6 +632,11 @@ namespace LIBMOL
                              std::map<int, int> >     & tAllAtmBondingMap,
                              std::map<int, int>       & tCurVal);
 
+        int getUnsetBondsForAtom(AtomDict                 & tAtom,
+                                 std::vector<BondDict>    & tBonds,
+                                 std::map<int,
+                                 std::map<int, int> >     & tAllAtmBondingMap);
+
         void modifCurVal(std::vector<AtomDict>::iterator   tAtm,
                          std::map<int, int>       & tCurVal);
 

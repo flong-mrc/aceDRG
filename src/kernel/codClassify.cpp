@@ -16003,7 +16003,7 @@ namespace LIBMOL
             for (std::vector<TorsionDict>::iterator iTor=miniTorsions.begin();
                 iTor != miniTorsions.end(); iTor++)
             {
-                std::cout << "HereTor " << i << std::endl;
+                std::cout << "Tor " << i << std::endl;
                 //std::cout << " iTor->atoms[0] " << iTor->atoms[0] << std::endl
                 //          << " iTor->atoms[1] " << iTor->atoms[1]
                 //          << " iTor->atoms[2] " << iTor->atoms[2] << std::endl
@@ -16011,7 +16011,7 @@ namespace LIBMOL
 
 		        if (iTor->atoms.size()==4 && allAtoms[iTor->atoms[0]].id !=allAtoms[iTor->atoms[3]].id )
 		        {
-                    std::cout << "Tor atom 1 " << allAtoms[iTor->atoms[0]].id
+                    std::cout << "atom 1 " << allAtoms[iTor->atoms[0]].id
 			              << " atom 2 " << allAtoms[iTor->atoms[1]].id
 			              << " atom 3 " << allAtoms[iTor->atoms[2]].id
 			              << " atom 4 " << allAtoms[iTor->atoms[3]].id << std::endl;

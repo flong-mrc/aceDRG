@@ -30,6 +30,7 @@ from . exebase       import CExeCode
 from . filetools     import FileTransformer
 from . filetools     import Ccp4MmCifObj
 from . chem          import ChemCheck
+from . metalMode     import metalMode
 
 from . utility       import isInt
 from . utility       import BondOrderS2N
@@ -183,6 +184,7 @@ class CovLink(object):
                 self.errMessage.append(aMess)
                 #print "%s does not exist"%self.stdLigand2["inCif"]
                 #self.errMessage.append("%s does not exist"%self.stdLigand2["inCif"])
+        print("error info", self.errMessage)
         return aReturn 
 
     def setModiName(self):
@@ -303,6 +305,7 @@ class CovLinkGenerator(CExeCode):
         self.lMode = 0                        # 0 No job, 
                                               # 1 modificate a monomer
                                               # 2 generate a link
+        self.lNoMeta = True
 
         # TEMPO
         if "CCP4" not in os.environ:
@@ -333,6 +336,8 @@ class CovLinkGenerator(CExeCode):
 
         self.chemCheck        = ChemCheck()
         self.fileTool         = FileTransformer()
+        self.metalMode        = metalMode()
+
 
         if os.path.isfile(self.instructions):
             # input from a file
@@ -426,7 +431,9 @@ class CovLinkGenerator(CExeCode):
             if self.lMode == 1:
                 self.getInstructionsForModification(insLines)
             elif self.lMode ==2:
+                
                 self.getInstructionsForLinkFreeFormat2(insLines)
+            
              
     def checkInCompCif(self, tMonomer, tFName, tResName):
        
@@ -518,6 +525,8 @@ class CovLinkGenerator(CExeCode):
                     for aStr in strs:
                         if aStr.find("LINK:") == -1:
                             aList.append(aStr)
+        
+        
 
         if len(aList):
             lSt  = True
@@ -545,7 +554,7 @@ class CovLinkGenerator(CExeCode):
 
             nL = len(aList)
             while i < nL :
-                #print aList[i]
+                print (aList[i])
                 if lSt  :
                     if (i+1) < nL:
                         if aList[i].upper().find("RES-NAME-1") != -1:
@@ -961,9 +970,9 @@ class CovLinkGenerator(CExeCode):
             aLink.stdLigand2["group"]   = "."
 
             nL = len(aList)
-
+ 
             while i < nL :
-                #print aList[i]
+                #print(aList[i])
                 if (i+1) < nL:
                     if aList[i].upper().find("RES-NAME-1") != -1:
                         aLink.stdLigand1["name"]   = aList[i+1]
@@ -1272,18 +1281,52 @@ class CovLinkGenerator(CExeCode):
                     aBond["value_dist_esd"]    = 0.02
                     aLink.suggestBonds.append(aBond) 
 
+                # Set Ligand 1 file  
                 aNS = aLink.stdLigand1["name"][0].lower()
                 aNL = aLink.stdLigand1["name"].upper()
                 if not aLink.stdLigand1["userIn"]:
                     aLink.stdLigand1["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
                     aLink.stdLigand1["userIn"] = True
-
+                    
+                # Look into the file to see if it contains metal element and then dealt with them
+                aMmcifObj1 = Ccp4MmCifObj(aLink.stdLigand1["inCif"])
+                aMmcifObj1.checkBlockCompsExist()
+                if not aMmcifObj1["errLevel"]:
+                    if aLink.stdLigand1["name"] in aMmcifObj1["ccp4CifObj"]["comps"]:
+                        self.lNoMetal=self.chemCheck.isOrganicInCif(aMmcifObj1["ccp4CifObj"]["comps"][aLink.stdLigand1["name"]]["atoms"]) 
+                        if not self.lNoMetal:    # contain metal 
+                            print(aLink.stdLigand1["name"], " contains metal atoms ")
+                            self.subRoot = aLink.stdLigand1["name"] + "_intmedia"
+                            self.setOneMonomer(aLink.stdLigand1, 4)
+                            aIntmedFN = self.subRoot + "_tmp.cif"
+                            if os.path.isfile(aIntmedFN):
+                                aLink.stdLigand1["inCif"]=aIntmedFN  
+                                print("one component cif is now",  aLink.stdLigand1["inCif"])
+                            #aIntMediatCif = os.path.join(self.subRoot + "_TMP", )
+                            #print("the intermediate file is ", )
+                
+                # Ligand 2 file and elements
                 aNS = aLink.stdLigand2["name"][0].lower()
                 aNL = aLink.stdLigand2["name"].upper()
                 if not aLink.stdLigand2["userIn"]:
                     aLink.stdLigand2["inCif"] = os.path.join(self.allChemCombDir, aNS, aNL + ".cif")
                     aLink.stdLigand2["userIn"] = True
-
+                  
+                aMmcifObj2 = Ccp4MmCifObj(aLink.stdLigand2["inCif"])
+                aMmcifObj2.checkBlockCompsExist()
+                if not aMmcifObj2["errLevel"]:
+                    if aLink.stdLigand2["name"] in aMmcifObj2["ccp4CifObj"]["comps"]:
+                        self.lNoMetal=self.chemCheck.isOrganicInCif(aMmcifObj2["ccp4CifObj"]["comps"][aLink.stdLigand2["name"]]["atoms"]) 
+                        if not self.lNoMetal:    # contain metal 
+                            print(aLink.stdLigand2["name"], " contains metal atoms ")
+                            self.subRoot = aLink.stdLigand2["name"] + "_intmedia"
+                            self.setOneMonomer(aLink.stdLigand2, 4)
+                            aIntmedFN = self.subRoot + "_tmp.cif"
+                            if os.path.isfile(aIntmedFN):
+                                aLink.stdLigand2["inCif"]=aIntmedFN  
+                                print("one component cif is now",  aLink.stdLigand2["inCif"])
+                
+                
                 if aLink.checkInPara() and not self.errLevel:
                     self.cLinks.append(aLink)
                     print("Instructions for build a link are  ")
@@ -1415,7 +1458,7 @@ class CovLinkGenerator(CExeCode):
     	#print "User input cif for L 1 ", aLink.stdLigand1["compOut"]
         #print "User input cif for L 2 ", aLink.stdLigand2["compOut"]
         
-
+        
     def getInstructionsForModification(self, tInLines):
         
         insList = []
@@ -1920,8 +1963,8 @@ class CovLinkGenerator(CExeCode):
     def extractOneModMonomerInfo(self, tModRes):
         
         
-        for aA in tModRes.modLigand["changed"]["atoms"]:
-            print("here ", aA["atom_id"])
+        #for aA in tModRes.modLigand["changed"]["atoms"]:
+        #    print("here ", aA["atom_id"])
             
         addedSet = []
         existChangeAtmIdsRes = []
@@ -2508,14 +2551,8 @@ class CovLinkGenerator(CExeCode):
         aMmcifObj = Ccp4MmCifObj(tFileName)
         aMmcifObj.checkBlockCompsExist()
         
-        
-        if not aMmcifObj["errLevel"]:
-            if tMonomer["name"] in aMmcifObj["ccp4CifObj"]["comps"]:
-                lMetal=self.chemCheck.isOrganicInCif(aMmcifObj["ccp4CifObj"]["comps"][tMonomer["name"]]["atoms"]) 
-                if not lMetal:    # contain metal 
-                    pass 
-                
-        if not aMmcifObj["errLevel"]:
+                    
+        if not aMmcifObj["errLevel"] :
             #print(list(aMmcifObj["ccp4CifObj"].keys()))
             #print(list(aMmcifObj["ccp4CifObj"]["comps"].keys()))
             if tMonomer["name"] in aMmcifObj["ccp4CifObj"]["comps"]:
@@ -2766,6 +2803,10 @@ class CovLinkGenerator(CExeCode):
                 self._log_name  = os.path.join(self.scrDir, aNL + ".log")
                 self.subRoot    = os.path.join(self.scrDir, aNL)
                 self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)
+            elif tMode ==4:
+                aNL = tMonomer["name"]
+                self._log_name  = os.path.join(self.scrDir, aNL + ".log")
+                self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)
             if tMode ==1 :
                 print ("Link generation")
             elif tMode==2 or tMode==21:
@@ -2774,9 +2815,12 @@ class CovLinkGenerator(CExeCode):
             self.runExitCode = self.subExecute()
             #self.runExitCode = os.system(self._cmdline)
             if not self.runExitCode :
-                aOutLigCif = self.subRoot + ".cif"
-                print("intermediate cif is ",aOutLigCif)
-                
+                if tMode !=4:
+                     aOutLigCif = self.subRoot + ".cif"
+                     print("intermediate cif is ",aOutLigCif)
+                else:
+                    aOutLigCif = self.subRoot + "_tmp.cif"
+                    print("intermediate cif is ",aOutLigCif)
                 if os.path.isfile(aOutLigCif): 
                     tMonomer["outCif"] = aOutLigCif
                 else: 
@@ -2876,7 +2920,9 @@ class CovLinkGenerator(CExeCode):
          print ("atom ", tMod["deleted"]["chirs"][-1]["atom_id_3"], " in chir ", tMod["deleted"]["chirs"][-1]['id'])
     
     def addjustFormalChargeInOneModRes(self, tRes, tMod):
-
+   
+        
+        
         changeAtms = []
         if len(tMod["changed"]["atoms"]) > 0:
             for aA in tMod["changed"]["atoms"]:
@@ -2890,6 +2936,7 @@ class CovLinkGenerator(CExeCode):
         for aBond in tMod["added"]["bonds"]:
             atm1 = aBond["atom_id_1"]
             atm2 = aBond["atom_id_2"]
+            print("Bond between ", atm1,  " and ", atm2, " is Aadded ")
             if atm1 in addedAtms and not atm2 in addedAtms:
                 idxAtm2 = self.getAtomById(atm2, tRes["comp"]["atoms"])
                 if not idxAtm2==-1 and int(tRes["comp"]["atoms"][idxAtm2]["charge"]) !=0:
@@ -2902,6 +2949,7 @@ class CovLinkGenerator(CExeCode):
                     tRes["comp"]["atoms"][idxAtm1]["charge"]=0
                     tMod["changed"]["atoms"].append(tRes["comp"]["atoms"][idxAtm1])         
                     print("Atom ",  tRes["comp"]["atoms"][idxAtm1]["atom_id"], " charge : ",  tRes["comp"]["atoms"][idxAtm1]["charge"])
+                    
         for aFC in tMod["changed"]["charges"]:
             aId = aFC["atom_id"].strip().upper()
             print("aId ", aId)
@@ -2913,6 +2961,7 @@ class CovLinkGenerator(CExeCode):
                     #if not aId in changeAtms:
                     #    addedHs=self.checkAssocHAtoms(tRes, tMod, aAt)
                     break
+    
         
         #for aAt in tRes["comp"]["atoms"]:
         #    print("aId ", aAt["atom_id"])
@@ -3108,6 +3157,7 @@ class CovLinkGenerator(CExeCode):
             initAddedAtoms = []
             for aAtom in tMod["added"]["atoms"]:
                 initAddedAtoms.append(aAtom)
+                print(aAtom["atom_id"], " is added ")
             
             initAddedBonds = []
             for aBond in tMod["added"]["bonds"]:
@@ -3118,8 +3168,9 @@ class CovLinkGenerator(CExeCode):
             for aAtom in tMod["deleted"]["atoms"]:
                 aSetDelIds.append(aAtom["atom_id"])
             #print("Initially deleted atoms are: ", aSetDelIds)
-        
-                
+            
+            
+            
             for aAtom in initAddedAtoms:
                 print("Add atom ", aAtom["atom_id"])
                 aBool = self.checkDubAtomNameInOneRes(tRes, aAtom)
@@ -3136,7 +3187,6 @@ class CovLinkGenerator(CExeCode):
                     self.errMessage[self.errLevel].append(aLine)
                     break
                 
-            
         
     def checkDubAtomNameInOneRes(self, tRes, tAtom):
 
@@ -3158,11 +3208,18 @@ class CovLinkGenerator(CExeCode):
         tmpBandA = []
         tmpAtoms = []
         tmpBonds = []
+        
+        addAtmMap = {}
+        i=0
+        for aAtm in tInitAddedAtoms:
+            addAtmMap[aAtm["atom_id"]] = i
+            i+=1
 
         nAtoms = len(tRes["comp"]["atoms"])
         #for aBond in tMod["added"]["bonds"]:
         for aBond in tInitAddedBonds:
             tRes["remainBonds"].append(aBond)
+            print("check bond between ",  aBond["atom_id_1"], " and ",  aBond["atom_id_2"])
             if aBond["atom_id_1"]==tAtom["atom_id"]:
                 atmIdx = self.getOneAtomSerialById(aBond["atom_id_2"], tRes["comp"]["atoms"])
                 if atmIdx > 0 and atmIdx < nAtoms:
@@ -3170,6 +3227,11 @@ class CovLinkGenerator(CExeCode):
                         tmpBandA.append([aBond, tRes["comp"]["atoms"][atmIdx]])
                         tmpAtoms.append(tRes["comp"]["atoms"][atmIdx])
                         tmpBonds.append(aBond)
+                elif aBond["atom_id_2"] in addAtmMap:
+                    idxA=addAtmMap[aBond["atom_id_2"]]
+                    tmpBandA.append([aBond, tInitAddedAtoms[idxA]])
+                    tmpAtoms.append(tInitAddedAtoms[idxA])
+                    tmpBonds.append(aBond)
                 else:
                     self.errLevel = 12
                     if self.errLevel not in self.errMessage:
@@ -3184,6 +3246,11 @@ class CovLinkGenerator(CExeCode):
                         tmpBandA.append([aBond, tRes["comp"]["atoms"][atmIdx]])
                         tmpAtoms.append(tRes["comp"]["atoms"][atmIdx])
                         tmpBonds.append(aBond)
+                elif aBond["atom_id_1"] in addAtmMap:
+                    idxA=addAtmMap[aBond["atom_id_1"]]
+                    tmpBandA.append([aBond, tInitAddedAtoms[idxA]])
+                    tmpAtoms.append(tInitAddedAtoms[idxA])
+                    tmpBonds.append(aBond)
                 else:
                     self.errLevel = 12
                     if self.errLevel not in self.errMessage:
@@ -3191,7 +3258,8 @@ class CovLinkGenerator(CExeCode):
                     aLine = "Can not find idx for atom ", aBond["atom_id_1"] 
                     self.errMessage[self.errLevel].append(aLine)
                     break
-    
+       
+        
         if len(tmpBonds) > 0:
             # Check bonds around the added atoms
             print("Check added atom %s and around bonds "%tAtom["atom_id"])
@@ -3898,7 +3966,6 @@ class CovLinkGenerator(CExeCode):
                 connectedH = []
                 self.getHAtomConnected(aName, tRes, connectedH)
                 
-                print("HereXXX ", )
                 if len(aTmpLABonds)==4 and len(connectedH) >0:
                     if "charge" in tRes["comp"]["atoms"][aLAtmSerial]:
                         tRes["comp"]["atoms"][aLAtmSerial]["charge"] = "0"

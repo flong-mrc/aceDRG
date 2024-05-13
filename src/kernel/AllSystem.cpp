@@ -631,7 +631,7 @@ namespace LIBMOL
 
         detectPlaneGroups();
 
-
+        //modAtomsBondingAndChiralCenter(allAtoms,  allBonds, allAngles, allRingsV, 0);
 
         setAllTorsions2();
 
@@ -663,7 +663,7 @@ namespace LIBMOL
                       << "Its formal charge : " << iA->charge << std::endl
                       << "Its CCP4 atom type : "  << iA->ccp4Type << std::endl
                       << "Its residue Name: " << iA->resName<< std::endl;
-            std::cout << "Its connected atoms are : " << std::endl;
+            std::cout << "yHere Its connected atoms are : " << std::endl;
             for (std::vector<int>::iterator iSer= iA->connAtoms.begin();
                         iSer != iA->connAtoms.end(); iSer++)
             {
