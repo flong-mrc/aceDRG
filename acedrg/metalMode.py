@@ -447,7 +447,7 @@ class metalMode(CExeCode):
             aAng["_chem_comp_angle.value_angle"] = "0.0"
         
         aAng["_chem_comp_angle.value_angle_esd"] = "5.0"
-        print("add metal related angle:", aAng)
+        #print("add metal related angle:", aAng)
     
         self.speAngs.append(aAng)
         
@@ -959,17 +959,15 @@ class metalMode(CExeCode):
                 print(" ang sum for ", aA, " is ", angSumMap[aA])
             
             for aMA in self.metalConnAtomsMap.keys():
-                print("For metal atom ", aMA)
+                #print("For metal atom ", aMA)
                 for aMN in self.metalConnAtomsMap[aMA]:
                     aSP = self.atmHybr[aMN]
-                    print("atom ", aMN, " hybr ", aSP)
-                    if aMN in self.atmNonHMap.keys():
-                        print("atmNonHMap = ", len(self.atmNonHMap[aMN]) )
-                        if len(self.atmNonHMap[aMN]) >= 2:      
-                            print("NB atom ", aMN, " has the following angles: ")
-                            for aNN in self.atmNonHMap[aMN]:
-                                #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
-                                self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
+                    #print("atom ", aMN, " hybr ", aSP)
+                    #if aMN in self.atmNonHMap.keys():
+                    for aNN in self.nonMAtmConnsMap[aMN]:
+                        #print("NB atom ", aMN, " has the following angles: ")
+                        #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
+                        self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
             
             self.setMetalPA()
             
