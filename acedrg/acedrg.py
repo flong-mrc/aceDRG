@@ -2073,8 +2073,6 @@ class Acedrg(CExeCode ):
                 lP = False
                 
                 for aL in allCifLines:
-                    print("lO ", lO)
-                    print(aL)
                     if aL.find("_chem_comp.pdbx_type") !=-1:
                         lS = True
                         lO = False

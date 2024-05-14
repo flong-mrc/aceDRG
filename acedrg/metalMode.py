@@ -309,6 +309,7 @@ class metalMode(CExeCode):
                 for aMCId in self.metalConnAtomsMap[aMA]:
                     print("For metal bonding atom ", aMCId)
                     aMCAtom = self.getAtomById(tAtoms, aMCId)
+                    self.metalConnFullAtoms.append(aMCAtom)
                     if aMCAtom['_chem_comp_atom.type_symbol'] in tChem.organicSec\
                        and not aMCId in doneOrgAtms:
                         doneOrgAtms.append(aMCId)
@@ -319,7 +320,7 @@ class metalMode(CExeCode):
                             #aMCAtom['_chem_comp_atom.charge'] = numC
                             aMCAtom['_chem_comp_atom.charge'] = -self.checkVal(aMCAtom, tChem.defaultBo) 
                             print("It carries ", aMCAtom['_chem_comp_atom.charge'], " charges")
-                            self.metalConnFullAtoms.append(aMCAtom)
+                            
         
         for aNonM in atmConnsMap.keys():
             if not aNonM in self.nonMAtmConnsMap.keys():
@@ -762,9 +763,9 @@ class metalMode(CExeCode):
             aMmCif.write("_chem_comp_atom.atom_id\n")
             aMmCif.write("_chem_comp_atom.type_symbol\n")
             aMmCif.write("_chem_comp_atom.charge\n")
-            aMmCif.write("_chem_comp_atom.x\n")
-            aMmCif.write("_chem_comp_atom.y\n")
-            aMmCif.write("_chem_comp_atom.z\n")
+            aMmCif.write("_chem_comp_atom.model_Cartn_x\n")
+            aMmCif.write("_chem_comp_atom.model_Cartn_y\n")
+            aMmCif.write("_chem_comp_atom.model_Cartn_z\n")
             
             for aAtom in tAtoms:
                 posX =0.0
@@ -795,6 +796,8 @@ class metalMode(CExeCode):
                 aMmCif.write("_chem_comp_bond.atom_id_1\n")
                 aMmCif.write("_chem_comp_bond.atom_id_2\n")
                 aMmCif.write("_chem_comp_bond.type\n")
+                aMmCif.write("_chem_comp_bond.value_dist_nucleus\n")
+                aMmCif.write("_chem_comp_bond.value_dist_nucleus_esd\n")
                 aMmCif.write("_chem_comp_bond.value_dist\n")
                 aMmCif.write("_chem_comp_bond.value_dist_esd\n")
                 
@@ -812,11 +815,12 @@ class metalMode(CExeCode):
                     
                     bLen = "2.0"
                     dBLen = "0.01"
-                    aMmCif.write("%s%s%s%s%s%s\n"
+                    aMmCif.write("%s%s%s%s%s%s%s%s\n"
                                  % (self.monomRoot.ljust(8),
                                  aBond['_chem_comp_bond.atom_id_1'].ljust(10), 
                                  aBond['_chem_comp_bond.atom_id_2'].ljust(10),  
-                                 aType.ljust(10), bLen.ljust(10), dBLen.ljust(10)))
+                                 aType.ljust(10), bLen.ljust(10), dBLen.ljust(10), 
+                                 bLen.ljust(10), dBLen.ljust(10)))
             if len(tVersionInfo):
                 aMmCif.write("loop_\n")
                 aMmCif.write("_acedrg_chem_comp_descriptor.comp_id\n")
