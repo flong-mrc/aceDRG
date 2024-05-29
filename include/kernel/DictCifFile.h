@@ -395,6 +395,7 @@ namespace LIBMOL
         REAL                       obsR;
         REAL                       allWR;
         REAL                       gtWR;
+        REAL                       refWR;
         REAL                       resol;
         REAL                       RTHRESHOLD_U;     // replacement RTHRESHOLD
                                                      // defined in constants.h

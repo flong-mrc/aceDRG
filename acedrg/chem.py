@@ -16,35 +16,14 @@ from builtins import str
 from builtins import range
 from builtins import object
 import os,os.path,sys
-import platform
-import glob,shutil
-import re,string
-from optparse import OptionParser 
-import time
-import math
-import random
 
-
-
-from rdkit      import rdBase
 
 from rdkit      import Chem
-from rdkit.Chem import AllChem
 from rdkit.Chem import rdchem
 from rdkit.Chem import rdmolfiles
-from rdkit.Chem import rdMolTransforms
-from rdkit.Chem import rdmolops
-from rdkit.Chem import Pharm3D 
-from rdkit.Chem.Pharm3D import EmbedLib
-from rdkit.Geometry import rdGeometry 
 
-from . utility  import listComp
-from . utility  import listComp2
-from . utility  import listCompDes
-from . utility  import listCompAcd
+
 from . utility  import BondOrderS2N
-from . utility  import splitLineSpa
-from . utility  import splitLineSpa2
 from . utility  import aLineToAlist
 
 class ChemCheck(object):
@@ -519,7 +498,7 @@ class ChemCheck(object):
             nBT = -1
             if "type" in aB:
                 nBT = BondOrderS2N(aB["type"])
-                print("Bond-type between atom %s and %s is %d "%(aB["atom_id_1"], aB["atom_id_2"], nBT))
+                #print("Bond-type between atom %s and %s is %d "%(aB["atom_id_1"], aB["atom_id_2"], nBT))
             if nBT != -1 :
                 nOrder += nBT
             else: 

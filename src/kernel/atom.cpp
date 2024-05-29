@@ -1204,14 +1204,14 @@ namespace LIBMOL
         }
 
         // Check
-        std::cout << "Now atoms are renamed " << std::endl;
+        //std::cout << "Now atoms are renamed " << std::endl;
 
-        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
-                iAt !=tAtoms.end(); iAt++)
-        {
-            std::cout << "Original name : " << iAt->id
-                      << "  New name : " << iAt->altId << std::endl;
-        }
+        //for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+        //        iAt !=tAtoms.end(); iAt++)
+        //{
+        //    std::cout << "Original name : " << iAt->id
+        //              << "  New name : " << iAt->altId << std::endl;
+        //}
 
     }
 

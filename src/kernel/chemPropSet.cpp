@@ -551,8 +551,8 @@ namespace LIBMOL
                                 break;
                             }
                         }
-                        //std::cout << "Here atom " << iAt->id << " connected with "
-                        //          << numConnMap[iAt->id][1]  << " metal atoms" << std::endl;
+                        std::cout << "Here atom " << iAt->id << "is sp2 "
+                                  << l_sp2 << std::endl;
                         if (l_sp2)
                         {
                             // Now we can say this atom is in sp2 orbits
@@ -799,6 +799,7 @@ namespace LIBMOL
                     }
                     else
                     {
+                       /*
                        if (confirmPlaneByAngle(tAtoms, iA, angCri))
                        // if (confirmPlaneByChiralVol(tAtoms, iA))
                        {
@@ -812,6 +813,7 @@ namespace LIBMOL
                             iA->chiralIdx  = 5;
                             iA->bondingIdx = 3;
                         }
+                        */
                     }
                 }
                 else
@@ -821,6 +823,7 @@ namespace LIBMOL
                     {
                         if (iA->isInPreCell)
                         {
+                            /*
                             if (confirmPlaneByAngle(tAtoms, iA, angCri))
                             {
                                 iA->chiralIdx  = 5; // New value
@@ -833,6 +836,7 @@ namespace LIBMOL
                                 iA->chiralIdx  = 5;
                                 iA->bondingIdx = 3;
                             }
+                            */
                         }
                     }
                     else
@@ -6295,6 +6299,8 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
                          iNB != iAt->connAtoms.end(); iNB++)
                     {
+                        std::cout << "HereNB " << tAtoms[*iNB].id << std::endl;
+                        std::cout << tAtoms[*iNB].isMetal << std::endl;
                         if (!tAtoms[*iNB].isMetal)
                         {
                             int idxB = tAllAtmBondingMap[iAt->seriNum][*iNB];
@@ -6872,8 +6878,8 @@ namespace LIBMOL
                     else if (numCs==6)
                     {
                         setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
-                                                tAllAtmBondingMap, tDoneAtoms,
-                                                tDoneFAtoms, tDoneBonds);
+                                            tAllAtmBondingMap, tDoneAtoms,
+                                            tDoneFAtoms, tDoneBonds);
                     }
                 }
                 else if (tRings[idxRs[j]].atoms.size()==5)
@@ -7027,7 +7033,17 @@ namespace LIBMOL
         int nPre;
         int aPre;
         int aNext;
-        std::cout << "Begin atom is " << tRing.atoms[0].id << std::endl;
+        int idxRStart =0;
+        for (unsigned idxStart = 0; idxStart < tRing.atoms.size(); idxStart++)
+        {
+            if (std::find(tDoneAtoms.begin(), tDoneAtoms.end(), tRing.atoms[idxStart].seriNum)
+                == tDoneAtoms.end())
+            {
+                idxRStart = idxStart;
+                break;
+            }
+        }
+        std::cout << "Begin atom is " << tRing.atoms[idxRStart].id << std::endl;
         for (std::vector<int>::iterator iC= tRing.atoms[0].connAtoms.begin();
              iC != tRing.atoms[0].connAtoms.end(); iC++)
         {
@@ -7060,33 +7076,41 @@ namespace LIBMOL
                     }
                     else
                     {
-                        if (iSt==-1)
+                        if (std::find(tDoneBonds.begin(), tDoneBonds.end(), idxB)
+                            ==tDoneBonds.end())
                         {
-                            iSt=*iC;
+                            if (iSt==-1)
+                            {
+                                iSt=*iC;
+                            }
+                            if (nPre==0)
+                            {
+                                tBonds[idxB].orderN = 1;
+                            }
+                            else
+                            {
+                                tBonds[idxB].orderN = 3-nPre;
+                            }
+                            tDoneBonds.push_back(idxB);
                         }
-                        if (nPre==0)
-                        {
-                            tBonds[idxB].orderN = 1;
-                        }
-                        else
-                        {
-                            tBonds[idxB].orderN = 3-nPre;
-                        }
-                        tDoneBonds.push_back(idxB);
                     }
                 }
             }
             else
             {
-                tBonds[idxB].orderN = 1;
-                if (tAtoms[*iC].chemType=="H")
+                if (std::find(tDoneBonds.begin(), tDoneBonds.end(), idxB)
+                            ==tDoneBonds.end())
                 {
-                    tDoneAtoms.push_back(*iC);
-                    tDoneFAtoms.push_back(*iC);
+                    tBonds[idxB].orderN = 1;
+                    if (tAtoms[*iC].chemType=="H")
+                    {
+                        tDoneAtoms.push_back(*iC);
+                        tDoneFAtoms.push_back(*iC);
+                    }
                 }
                 tDoneBonds.push_back(idxB);
             }
-            std::cout << "Bond between " << tAtoms[idxA].id
+            std::cout << "1. Bond between " << tAtoms[idxA].id
                           << " and " << tAtoms[*iC].id
                           << " is set to " << tBonds[idxB].orderN
                           << std::endl;
@@ -7105,7 +7129,9 @@ namespace LIBMOL
                 int idxB=tAllAtmBondingMap[iSt][*iC];
 
                 if (std::find(idxRiAtms.begin(), idxRiAtms.end(), *iC)
-                    ==idxRiAtms.end())
+                    ==idxRiAtms.end() &&
+                    std::find(tDoneBonds.begin(), tDoneBonds.end(), idxB)
+                    ==tDoneBonds.end())
                 {
                     tBonds[idxB].orderN = 1;
                     tDoneBonds.push_back(idxB);
@@ -7144,12 +7170,21 @@ namespace LIBMOL
             }
             iSt = aNext;
             std::cout << "the next atom is " << tAtoms[iSt].id << std::endl;
-            //std::cout << "Those atoms are set " << std::endl;
-            //for (std::vector<int>::iterator iD= tDoneAtoms.begin();
-            //     iD != tDoneAtoms.end(); iD++)
-            //{
-            //    std::cout << tAtoms[*iD].id << std::endl;
-            //}
+            std::cout << "2. Those atoms are set " << std::endl;
+            for (std::vector<int>::iterator iD= tDoneAtoms.begin();
+                 iD != tDoneAtoms.end(); iD++)
+            {
+                std::cout << tAtoms[*iD].id << std::endl;
+            }
+
+            std::cout << "Those bonds are set " << std::endl;
+            for (std::vector<int>::iterator tBB=tDoneBonds.begin();
+                 tBB != tDoneBonds.end(); tBB++)
+            {
+                std::cout << " 2. Bond between atoms " << tBonds[*tBB].atoms[0]
+                          << " and " << tBonds[*tBB].atoms[1]
+                          << ". The order is " << tBonds[*tBB].orderN << std::endl;
+            }
 
             tDoneFAtoms.push_back(aPre);
             iter++;

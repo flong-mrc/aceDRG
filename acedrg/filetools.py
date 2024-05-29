@@ -2038,8 +2038,12 @@ class Ccp4MmCifObj (dict) :
                             if "type" in aBond and not "value_order" in aBond:
                                 aBond["value_order"] = aBond["type"]
                             elif not "type" in aBond and "value_order" in aBond:
-                                aBond["type"] = aBond["value_order"]    
-                            
+                                aBond["type"] = aBond["value_order"] 
+                    if "atoms" in self["ccp4CifObj"]["comps"][aComp]:
+                        for aAtom in self["ccp4CifObj"]["comps"][aComp]["atoms"]: 
+                            if "partial_charge" in aAtom and not "charge" in aAtom:
+                                aAtom["charge"] = aAtom["partial_charge"]
+                                #print("partial_charge transfered", aAtom["charge"])
                     
             """
             if len(self["ccp4CifObj"]["comps"].keys()):

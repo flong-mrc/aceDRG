@@ -39,6 +39,7 @@ namespace LIBMOL
             obsR(-1.0),
             allWR(-1.0),
             gtWR(-1.0),
+            refWR(-1.0),
             itsCurAtomSeriNum(ZeroInt),
             itsCurAtom(NullPoint),
             itsCurBlock(""),
@@ -71,6 +72,7 @@ namespace LIBMOL
                            obsR(-1.0),
                            allWR(-1.0),
                            gtWR(-1.0),
+                           refWR(-1.0),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
@@ -125,6 +127,7 @@ namespace LIBMOL
                            obsR(-1.0),
                            allWR(-1.0),
                            gtWR(-1.0),
+                           refWR(-1.0),
                            RESOLTHRESHOLD_U(0.842),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
@@ -206,6 +209,7 @@ namespace LIBMOL
                            obsR(-1.0),
                            allWR(-1.0),
                            gtWR(-1.0),
+                           refWR(-1.0),
                            RTHRESHOLD_U(0.10),
                            RESOLTHRESHOLD_U(0.842),
                            itsCurAtomSeriNum(ZeroInt),
@@ -374,6 +378,8 @@ namespace LIBMOL
 
     void GenCifFile::setupSystem2()
     {
+
+
        if (inFile.is_open() )
         {
             std::vector<std::vector<std::string> > tBlocs;
@@ -471,10 +477,13 @@ namespace LIBMOL
             // Temporarily allowing all R pass
             RFactorOK = true;
 
-            checkPowder(tAllLines);
 
 
-            checkNeutronD(tAllLines);
+            //checkPowder(tAllLines);
+
+
+
+            // checkNeutronD(tAllLines);
 
             //if (!notPowder)
             //{
@@ -596,6 +605,8 @@ namespace LIBMOL
                     checkNonHAtomOccp();
 
                     setAtomsMetalType();
+
+
 
                     setAtomOxiType();
 
@@ -849,6 +860,7 @@ namespace LIBMOL
 
                 // Now select what we need from the input cif file.
                 selectPropsToMaps(rowProps, colProps);
+
 
                 if (!lErr)
                 {
@@ -1383,38 +1395,45 @@ namespace LIBMOL
     void GenCifFile::setAtomsMetalType()
     {
         std::vector<ID>  allMetals;
-        std::vector<ID>  pureMetals;
-        std::vector<ID>  allMetalloids;
+        //std::vector<ID>  pureMetals;
+        //std::vector<ID>  allMetalloids;
 
-        initMetalTab(pureMetals);
-        initMetalloidTab(allMetalloids);
-        for (std::vector<ID>::iterator iM=pureMetals.begin();
-                iM !=pureMetals.end(); iM++)
-        {
-            allMetals.push_back(*iM);
-        }
-        for (std::vector<ID>::iterator iM=allMetalloids.begin();
-                iM !=allMetalloids.end(); iM++)
-        {
-            allMetals.push_back(*iM);
-        }
+        initMetalTab(allMetals);
+        //initMetalloidTab(allMetalloids);
+        //for (std::vector<ID>::iterator iM=pureMetals.begin();
+        //        iM !=pureMetals.end(); iM++)
+        //{
+        //    allMetals.push_back(*iM);
+        //}
+        //for (std::vector<ID>::iterator iM=allMetalloids.begin();
+        //        iM !=allMetalloids.end(); iM++)
+        //{
+        //    allMetals.push_back(*iM);
+        //}
 
         //std::cout << "Number of metal in the table " << allMetals.size()
         //          << std::endl;
+        //std::cout << "They are : " << std::endl;
+        //for (std::vector<ID>::iterator iM=allMetals.begin();
+        //        iM !=allMetals.end(); iM++)
+
+        //{
+        //    std::cout << *iM << std::endl;
+        //}
         //std::cout << "Number of metalloids in the table "
         //          << allMetalloids.size() << std::endl;
 
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                      iA !=allAtoms.end(); iA++)
         {
-            if (isMetal(pureMetals, iA->chemType))
+            if (isMetal(allMetals, iA->chemType))
             {
                 iA->matType = 1;
             }
-            else if (isMetalloid(allMetalloids, iA->chemType))
-            {
-                iA->matType = 2;
-            }
+            //else if (isMetalloid(allMetalloids, iA->chemType))
+            //{
+            //    iA->matType = 2;
+            //
             iA->isMetal = isMetal(allMetals, iA->chemType);
             if (iA->isMetal)
             {
@@ -1423,7 +1442,7 @@ namespace LIBMOL
                     hasMetal = true;
                 }
             }
-            /*
+
             std::string TP="organic ";
 
             if (iA->matType ==1)
@@ -1437,9 +1456,8 @@ namespace LIBMOL
 
             std::cout << "Atom " << iA->id << " of " << iA->chemType
                       << " is a " << TP << " atom " << std::endl;
-             */
-        }
 
+        }
 
     }
 
@@ -1654,11 +1672,13 @@ namespace LIBMOL
             }
         }
 
+
+
         if (itsCurCryst !=NullPoint)
         {
 
             allCryst.push_back(*itsCurCryst);
-            // std::cout << "number of crystal : " << allCryst.size() << std::endl;
+            std::cout << "number of crystal : " << allCryst.size() << std::endl;
         }
         else
         {
@@ -1675,6 +1695,7 @@ namespace LIBMOL
             errMsg.push_back("No symmetry operators, can not generator molecules \n");
             lErr = true;
         }
+
     }
 
     void GenCifFile::initAllCifKeys()
@@ -8804,7 +8825,21 @@ namespace LIBMOL
             }
 
             // Torsion section
-            if((int)tTorsions.size() !=0)
+            std::vector<TorsionDict> outTors;
+            for (std::vector<TorsionDict>::iterator iT=tTorsions.begin();
+                        iT !=tTorsions.end(); iT++)
+            {
+                std::string hy1 = tAtoms[iT->atoms[1]].hybrid;
+                std::string hy2 = tAtoms[iT->atoms[2]].hybrid;
+                StrLower(hy1);
+                StrLower(hy2);
+                if (hy1.find("sp1")==std::string::npos &&
+                    hy1.find("sp1")==std::string::npos)
+                {
+                    outTors.push_back(*iT);
+                }
+            }
+            if((int)outTors.size() !=0)
             {
                 outRestrF << "loop_" << std::endl
                           << "_chem_comp_tor.comp_id"         << std::endl
@@ -8824,8 +8859,8 @@ namespace LIBMOL
                 aTorIdx["sp2_sp2"] = 1;
                 aTorIdx["sp2_sp3"] = 1;
                 aTorIdx["sp3_sp3"] = 1;
-                for (std::vector<TorsionDict>::iterator iT=tTorsions.begin();
-                        iT !=tTorsions.end(); iT++)
+                for (std::vector<TorsionDict>::iterator iT=outTors.begin();
+                        iT !=outTors.end(); iT++)
                 {
                     //std::string idxTorStr=IntToStr(idxTor);
                     //idxTorStr = "tor_" + idxTorStr;

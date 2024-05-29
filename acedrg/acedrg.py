@@ -542,7 +542,7 @@ class Acedrg(CExeCode ):
                     strs = aL.strip().split()
                     if len(strs) >= 2:
                         self.versionInfo["SERVALCAT_VERSION"] = strs[1].strip()
-                        print("Servalcat  Version: ", self.versionInfo["SERVALCAT_VERSION"]) 
+                        #print("Servalcat  Version: ", self.versionInfo["SERVALCAT_VERSION"]) 
                 
         # Refmac version info 
         """
@@ -1771,7 +1771,7 @@ class Acedrg(CExeCode ):
         self._cmdline += "  --logfile %s  "%log2
         #self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  \n"%(tInCif, aRoot)
         self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  --randomize 0.01 \n"%(tInCif, aRoot)
-        # print(self._cmdline)
+        print(self._cmdline)
         self.subExecute() 
         
     def runServalcatVersionInfo(self):
@@ -3460,9 +3460,14 @@ class Acedrg(CExeCode ):
             
             elif len(self.fileConv.atoms) > 1 and not self.lOrg:
                 print("Metal atoms are found")
+                print("outRoot ", self.outRoot)
                 aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
                                                    self.outRoot, self.fileConv, self.chemCheck, self.versionInfo)
+                    
+                
                 if os.path.isfile(aFinInCif):
+                    print("HereC ", aFinInCif)
+                    print("outRoot ", self.outRoot)
                     self.runServalcat(self.outRoot, aFinInCif)
                     aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
                     if os.path.isfile(aSOutName):

@@ -86,6 +86,7 @@ class metalMode(CExeCode):
             #    print("Metal atom ", aA['_chem_comp_atom.atom_id'], 
             #          " carries ", aA['_chem_comp_atom.charge'], 
             #          " formal charge ")
+    
             if os.path.isfile(outTmpCifName):
                 outTmp2CifName = self.outRoot   + "_tmp2.cif"
                 self.modiCif(outTmpCifName, outTmp2CifName)
@@ -474,22 +475,21 @@ class metalMode(CExeCode):
         print(rAndPMap2)
         """
             
-        metalRA = {}
         for aMA in self.metalConnAtomsMap:
-            print("a MA ", aMA)
+            #print("a MA ", aMA)
             for aOA in self.metalConnAtomsMap[aMA]:
-                print(" a OA ", aOA)
+                #print(" a OA ", aOA)
                 for aP in self.simpP:
-                    print("aP ", aP)
-                    print(self.simpP[aP])
+                    #print("aP ", aP)
+                    #print(self.simpP[aP])
                     if aOA in self.simpP[aP]:
-                        print(aOA, ' is in ', aP)
+                        #print(aOA, ' is in ', aP)
                         if not aMA in self.metalInPs:
                             self.metalInPs[aMA] = []
                         if not aP in self.metalInPs[aMA]:
                             self.metalInPs[aMA].append(aP)
         
-        print(self.metalInPs)
+        #print(self.metalInPs)
         
     def getAtomById(self, tAtoms, tId):
         
@@ -939,8 +939,8 @@ class metalMode(CExeCode):
                     lSR = True
                     lSP = False
                     
-            print(self.simpP)
-            print(self.simpR)
+            #print(self.simpP)
+            #print(self.simpR)
     
     
             
@@ -955,8 +955,8 @@ class metalMode(CExeCode):
                 else:
                     angSumMap[idCen]+=float(aAng['_chem_comp_angle.value_angle'])
             
-            for aA in angSumMap:
-                print(" ang sum for ", aA, " is ", angSumMap[aA])
+            #for aA in angSumMap:
+            #    print(" ang sum for ", aA, " is ", angSumMap[aA])
             
             for aMA in self.metalConnAtomsMap.keys():
                 #print("For metal atom ", aMA)

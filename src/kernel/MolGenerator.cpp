@@ -4060,27 +4060,27 @@ namespace LIBMOL {
         for (std::vector<BondDict>::iterator iB = tMol.allBonds.begin();
                 iB != tMol.allBonds.end(); iB++)
         {
-            std::cout << "bond length "
-                      << iB->value << std::endl
-                      << "Between atoms "
-                      << tMol.atoms[iB->atomsIdx[0]].id
-                      << "(" << tMol.atoms[iB->atomsIdx[0]].chemType + ")"
-                      << " and "
-                      << tMol.atoms[iB->atomsIdx[1]].id
-                      << "(" << tMol.atoms[iB->atomsIdx[1]].chemType + ")"
-                      << std::endl;
+            //std::cout << "bond length "
+            //          << iB->value << std::endl
+            //          << "Between atoms "
+            //          << tMol.atoms[iB->atomsIdx[0]].id
+            //          << "(" << tMol.atoms[iB->atomsIdx[0]].chemType + ")"
+            //          << " and "
+            //          << tMol.atoms[iB->atomsIdx[1]].id
+            //          << "(" << tMol.atoms[iB->atomsIdx[1]].chemType + ")"
+            //          << std::endl;
 
             if (aV.size() == 0)
             {
                 tMol.bonds.push_back(*iB);
-                std::cout << "It enters all bonds "<< std::endl;
+                //std::cout << "It enters all bonds "<< std::endl;
                 aV.push_back(iB->value);
             }
 
             else if (!inVectABS(aV, iB->value, 0.0001))
             {
                 tMol.bonds.push_back(*iB);
-                std::cout << "It enters all bonds "<< std::endl;
+                //std::cout << "It enters all bonds "<< std::endl;
                 aV.push_back(iB->value);
             }
             //else
@@ -4092,11 +4092,11 @@ namespace LIBMOL {
             {
                 tMol.bonds.push_back(*iB);
                 aV.push_back(iB->value);
-                std::cout << "bond length duplicated "
-                          << iB->value << std::endl
-                          << "Between atoms "
-                          << tMol.atoms[iB->atomsIdx[0]].id << " and "
-                          << tMol.atoms[iB->atomsIdx[1]].id << std::endl;
+                //std::cout << "bond length duplicated "
+                //          << iB->value << std::endl
+                //          << "Between atoms "
+                //          << tMol.atoms[iB->atomsIdx[0]].id << " and "
+                //          << tMol.atoms[iB->atomsIdx[1]].id << std::endl;
             }
 
             //aV.push_back(iB->value);

@@ -775,6 +775,7 @@ namespace LIBMOL
             std::cout << "Atom " << iAt->seriNum << " : " << std::endl
                       << "Its ID " << iAt->id << std::endl
                       << "Its element type " << iAt->chemType << std::endl
+                      << "Its bondidx " << iAt->bondingIdx << std::endl
                       << "Its COD root atom type " << iAt->codAtmRoot << std::endl
                       << "Its acedrg atom type " << iAt->codClass << std::endl
                       << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
@@ -941,6 +942,7 @@ namespace LIBMOL
             std::cout << "Atom " << iAt->seriNum << " : " << std::endl
                       << "Its ID " << iAt->id << std::endl
                       << "Its element type " << iAt->chemType << std::endl
+                      << "Its bondidx " << iAt->bondingIdx << std::endl
                       << "Its COD root atom type " << iAt->codAtmRoot << std::endl
                       << "Its acedrg atom type " << iAt->codClass << std::endl
                       << "Its acedrg atom main type " << iAt->codAtmMain << std::endl
@@ -10550,7 +10552,21 @@ namespace LIBMOL
                 {
                     if(allAtoms[iA->atoms[0]].connAtoms.size() < 5)
                     {
-                        searchCodOrgAngles22(iA);
+                        if (allAtoms[iA->atoms[0]].bondingIdx==1)
+                        {
+                            iA->value = 180.00;
+                            iA->sigValue = 3.0;
+                            std::cout << "Angle where the center atom is sp1 : " << std::endl;
+                            std::cout << "center atom : " << allAtoms[iA->atoms[0]].id << std::endl;
+                            std::cout << "atom 1 : " << allAtoms[iA->atoms[1]].id << std::endl;
+                            std::cout << "atom 2 : " << allAtoms[iA->atoms[2]].id << std::endl;
+                            std::cout << "Angle value :" << iA->value << std::endl;
+                            std::cout << "sigma of angle value : " << iA->sigValue << std::endl;
+                        }
+                        else
+                        {
+                            searchCodOrgAngles22(iA);
+                        }
                     }
                     else
                     {
