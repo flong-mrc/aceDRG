@@ -2147,10 +2147,12 @@ class Ccp4MmCifObj (dict) :
             if len(aL) !=0:
                 aStrSet = [] 
                 if tKW =="list":
-                    if aL.find("\'") !=-1 and aL.find("\"") ==-1:
+                    if aL.find("\'") ==-1 and aL.find("\"") ==-1:
                         aLineToAlist2(aL, aStrSet)
                     else: 
+                        #print(aL)
                         aLineToAlist(aL, aStrSet)
+                        #print(aStrSet)   
                 else:
                     aPr = countPrime(aL)
                     if not aPr:

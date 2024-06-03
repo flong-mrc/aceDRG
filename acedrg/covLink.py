@@ -2488,6 +2488,7 @@ class CovLinkGenerator(CExeCode):
         if not self.errLevel:
             if not tLinkIns.stdLigand1["fromScr"]:
                 self.setOneCompFromCif(tLinkIns.stdLigand1["inCif"], tLinkIns.stdLigand1)
+                
                 if not self.errLevel: 
                     print("Comp 1 ", tLinkIns.stdLigand1["name"], " contains ") 
                     if "atoms" in tLinkIns.stdLigand1["comp"]:
@@ -2556,7 +2557,6 @@ class CovLinkGenerator(CExeCode):
         aMmcifObj = Ccp4MmCifObj(tFileName)
         aMmcifObj.checkBlockCompsExist()
         
-                    
         if not aMmcifObj["errLevel"] :
             #print(list(aMmcifObj["ccp4CifObj"].keys()))
             #print(list(aMmcifObj["ccp4CifObj"]["comps"].keys()))
@@ -4082,7 +4082,8 @@ class CovLinkGenerator(CExeCode):
                 print("The initial charge is  ", aC)
                 if aLAtmElem in self.chemCheck.orgVal:
                     if "charge" in tRes["comp"]["atoms"][ aLAtmSerial]:
-                        allowedBO = self.chemCheck.orgVal[aLAtmElem][0] + int(tRes["comp"]["atoms"][ aLAtmSerial]["charge"])
+                        print(tRes["comp"]["atoms"][ aLAtmSerial]["charge"])
+                        allowedBO = self.chemCheck.orgVal[aLAtmElem][0] + int(float(tRes["comp"]["atoms"][ aLAtmSerial]["charge"]))
                     else:
                         allowedBO = self.chemCheck.orgVal[aLAtmElem][0]
                     print("Allowed order is ", allowedBO)
@@ -4699,7 +4700,7 @@ class CovLinkGenerator(CExeCode):
             nTotalVa=self.getTotalBondOrderInOneMmcifAtom(atmId, aLABonds) 
             aCharge = 0
             if "charge" in aAtom:
-                aCharge = int(aAtom["charge"])
+                aCharge = int(float(aAtom["charge"]))
             if aCharge != 0: 
                 nTotalVa = nTotalVa - aCharge
             print("its charge is ", aCharge)
