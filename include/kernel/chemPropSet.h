@@ -560,6 +560,7 @@ namespace LIBMOL
                              std::vector<RingDict>         & tRings,
                              std::map<int,
                              std::map<int, int> >       & tAllAtmBondingMap,
+                             std::map<int, int>         & tCurVal,
                              std::vector<int>           & tDoneAtoms,
                              std::vector<int>           & tDoneFAtoms,
                              std::vector<int>           & tDoneBonds,

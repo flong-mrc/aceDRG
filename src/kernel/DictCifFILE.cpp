@@ -464,6 +464,7 @@ namespace LIBMOL
 
             inFile.close();
 
+
             if (checkR)
             {
                 std::cout << "tRAllLine.size " <<  tRAllLines.size() << std::endl;
@@ -564,10 +565,10 @@ namespace LIBMOL
                 }
                 */
 
-
                 // Now select what we need from the input cif file.
 
                 selectPropsToMaps(rowProps, colProps);
+
 
                 if (!lErr)
                 {
@@ -1072,7 +1073,7 @@ namespace LIBMOL
 
         if (!RFactorOK)
         {
-            lErr = true;
+        //    lErr = true;
             errMsg.push_back("R FACTOR IS TWO HIGH\n");
         }
 
@@ -1435,6 +1436,7 @@ namespace LIBMOL
             //    iA->matType = 2;
             //
             iA->isMetal = isMetal(allMetals, iA->chemType);
+            std::cout << iA->id << " is metal " << iA->isMetal  << std::endl;
             if (iA->isMetal)
             {
                 if (!hasMetal)
@@ -4950,7 +4952,7 @@ namespace LIBMOL
     void DictCifFile::setAtomsMetalType()
     {
         // setDefaultCoordGeos();
-
+        /*
         ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb", "Cs", "cs", "Fr", "fr",
                      "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba", "ba", "Ra", "ra",
                      "Sc", "sc", "Y",  "y",
@@ -4968,6 +4970,37 @@ namespace LIBMOL
                      "Sn", "sn", "Pb", "pb", "Bi", "bi"};
         // "Si", "si", "Ge", "ge", "As", "as",
         MetalTable.assign(metals, metals+115);
+        */
+        ID metals[] = {"Li", "li", "Na", "na", "K",  "k",  "Rb", "rb",
+                       "Cs", "cs", "Fr", "fr",
+                       "Be", "be", "Mg", "mg", "Ca", "ca", "Sr", "sr", "Ba",
+                       "ba", "Ra", "ra",
+                       "Sc", "sc", "Y",  "y",
+                       "Ti", "ti", "Zr", "zr", "Hf", "hf", "Rf", "rf",
+                       "V",  "v"   "Nb", "nb", "Ta", "ta", "Db", "db",
+                       "Cr", "cr", "Mo", "mo", "W",  "w",  "Sg", "sg",
+                       "Mn", "mn", "Tc", "tc", "Re", "re", "Bh", "bh",
+                       "Fe", "fe", "Ru", "ru", "Os", "os", "Hs", "hs",
+                       "Co", "co", "Rh", "rh", "Ir", "ir", "Mt", "mt",
+                       "Ni", "ni", "Pt", "pt", "Ds", "ds",
+                       "Cu", "cu", "Ag", "ag", "Au", "au", "Rg", "rg",
+                       "Zn", "zn", "Cd", "cd", "Hg", "hg",
+                       "Al", "al", "Ti", "ti",
+                       "Bi", "bi", "Pu", "pu", "Nd", "nd", "Ce", "ce",
+                       "La", "la","Pr", "pr", "Pm", "pm", "Sm", "sm",
+                       "Eu", "eu", "Gd", "gd",
+                       "Tb", "tb", "Dy", "dy", "Ho", "ho", "Er", "er",
+                       "Tm", "tm", "Yb", "yb",
+                       "Lu", "lu", "Ac", "ac", "Th", "th", "Pa", "pa",
+                       "U", "u", "Np", "np",
+                       "Am", "am", "Cm", "cm", "Bk", "bk", "Cf", "cf",
+                       "Es", "es", "Fm", "fm",
+                       "Md", "md", "No", "no", "Lr", "lr",
+                       "Sb", "sb", "Te", "te", "Po", "po", "Pd", "pd",
+                       "Sn", "sn", "Pb", "pb", "In", "in"};                 // element In is added to the metal element list
+
+        MetalTable.assign(metals, metals+175);
+
         /*
         std::cout << "Metal Elements :" << std::endl;
         for (std::vector<ID>::iterator iM =MetalTable.begin();
@@ -5020,6 +5053,7 @@ namespace LIBMOL
                           << "its default coordination geometry is set to "
                           << iA->metalGeo << std::endl;
             }
+
         }
 
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
@@ -9238,11 +9272,7 @@ namespace LIBMOL
                                   << std::endl;
                     }
                     idxR++;
-
                 }
-
-
-
             }
 
             outRestrF.close();

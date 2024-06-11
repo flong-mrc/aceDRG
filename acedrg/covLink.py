@@ -2089,11 +2089,11 @@ class CovLinkGenerator(CExeCode):
         # Chirs
         if "chirs" in tModRes.newLigand["cifObj"]["comps"][compId]:
             for aChi in tModRes.newLigand["cifObj"]["comps"][compId]["chirs"]:
-                print("A chiral center by the following atoms")
-                print("atom %s "%aChi["atom_id_centre"])  
-                print("atom %s "%aChi["atom_id_1"])   
-                print("atom %s "%aChi["atom_id_2"])   
-                print("atom %s "%aChi["atom_id_3"])  
+                #print("A chiral center by the following atoms")
+                #print("atom %s "%aChi["atom_id_centre"])  
+                #print("atom %s "%aChi["atom_id_1"])   
+                #print("atom %s "%aChi["atom_id_2"])   
+                #print("atom %s "%aChi["atom_id_3"])  
                 
                 if not aChi["atom_id_centre"] in addedSet and not aChi["atom_id_1"] in addedSet\
                    and not aChi["atom_id_2"] in addedSet and not aChi["atom_id_3"] in addedSet:
@@ -4991,10 +4991,10 @@ class CovLinkGenerator(CExeCode):
 
         # Angles
         for aAng in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["angles"]:
-            print("A angle ")
-            print("atom %s in residue %d "%(aAng["atom_id_1"], aAng["atom_id_1_resNum"]))
-            print("atom %s in residue %d "%(aAng["atom_id_2"], aAng["atom_id_2_resNum"]))
-            print("atom %s in residue %d "%(aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
+            #print("A angle ")
+            #print("atom %s in residue %d "%(aAng["atom_id_1"], aAng["atom_id_1_resNum"]))
+            #print("atom %s in residue %d "%(aAng["atom_id_2"], aAng["atom_id_2_resNum"]))
+            #print("atom %s in residue %d "%(aAng["atom_id_3"], aAng["atom_id_3_resNum"]))
             if aAng["atom_id_1_resNum"]==1 and aAng["atom_id_2_resNum"]==1 and aAng["atom_id_3_resNum"]==1:
                 if not aAng["atom_id_1"] in addedSet1 and not aAng["atom_id_2"] in addedSet1 and not aAng["atom_id_3"] in addedSet1:
                     self.checkAngMod(tLinkedObj.stdLigand1["remainAngs"], aAng, tLinkedObj.modLigand1["changed"]["angles"]) 
@@ -5218,17 +5218,20 @@ class CovLinkGenerator(CExeCode):
         id3 = tTor["atom_id_3"]
         id4 = tTor["atom_id_4"]
         
+        speTorIds = ["chi1", "chi2", "chi3", "chi4", "chi5", "hh", "hh1", "hh2"]
+        
         for aTor in tOrigTors:
-            if (aTor["atom_id_2"]==id2 and aTor["atom_id_3"]==id3):
-                if (aTor["atom_id_1"]==id1 and aTor["atom_id_4"]==id4):
-                    if self.compare2Tors(aTor, tTor):
-                        tModTors.append(tTor)
-                    break
-            elif (aTor["atom_id_2"]==id3 and aTor["atom_id_3"]==id2):
-                if (aTor["atom_id_1"]==id4 and aTor["atom_id_4"]==id1):
-                    if self.compare2Tors(aTor, tTor):
-                        tModTors.append(tTor)
-                    break
+            if not aTor["id"] in speTorIds:
+                if (aTor["atom_id_2"]==id2 and aTor["atom_id_3"]==id3):
+                    if (aTor["atom_id_1"]==id1 and aTor["atom_id_4"]==id4):
+                        if self.compare2Tors(aTor, tTor):
+                            tModTors.append(tTor)
+                        break
+                elif (aTor["atom_id_2"]==id3 and aTor["atom_id_3"]==id2):
+                    if (aTor["atom_id_1"]==id4 and aTor["atom_id_4"]==id1):
+                        if self.compare2Tors(aTor, tTor):
+                            tModTors.append(tTor)
+                        break
 
     def compare2Tors(self, tOrigTor, tTor):
    
@@ -5246,6 +5249,7 @@ class CovLinkGenerator(CExeCode):
    
     def checkTorId(self, tId1, tId2):
         
+        
         aRet = False
         if (tId1.upper().find("CONST") !=-1 and \
             tId2.upper().find("CONST") ==-1) or \
@@ -5259,6 +5263,8 @@ class CovLinkGenerator(CExeCode):
             if len(strs1) > 2 and len(strs2) > 2:
                 if strs1[0] != strs2[0] or strs1[1] !=strs2[1]:
                     aRet = True
+                    print("HereT")
+                    
         
         return aRet
             
@@ -5292,7 +5298,10 @@ class CovLinkGenerator(CExeCode):
                         inRes1.append(aAtom["atom_id"])
                     elif aAtom["atom_id_resNum"]== 2:
                         inRes2.append(aAtom["atom_id"])
-                print("Check plane combo plane ", aPl)
+                #print("Check plane combo plane ", aPl)
+                #print("nAtmInPl=", nAtmInPl)
+                #print("inRes1=", len(inRes1))
+                #print("inRes2=", len(inRes2))
                 if len(inRes1) == nAtmInPl:
                     self.checkPlMod(tLinkedObj.stdLigand1["remainPls"], tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]["planes"][aPl],\
                                     tLinkedObj.modLigand1["deleted"]["planes"], tLinkedObj.modLigand1["added"]["planes"], tDelPlanIds["1"]) 
@@ -5302,7 +5311,7 @@ class CovLinkGenerator(CExeCode):
      
     def checkPlModFromOrig(self, tLinkedObj, tDelPlaIds):
 
-        print("check from original ")
+        #print("check from original ")
         
         for aPl in tLinkedObj.stdLigand1["remainPls"]:
             if not "planes" in tLinkedObj.outCombLigand["cifObj"]["comps"]["UNL"]:
@@ -5320,6 +5329,7 @@ class CovLinkGenerator(CExeCode):
 
     def checkPlMod(self, tOrigPls,  tPl, tModDelPls, tModAddPls, tDelPlIds):
 
+        
         tPlAtmIds = []
         #print("Atoms in tPl : ")
         for aAtm in tPl:
@@ -5378,7 +5388,9 @@ class CovLinkGenerator(CExeCode):
                         tModAddPls.append(tPl)
                         print("!!!!combo plan %s is added"%aPlId)
                         break
-        
+        """
+        print("2. tModDelPls")
+        print(tModDelPls)
         for aPl in tModDelPls:
             tOrigPlAtmIds = []
             for aPlAtm in aPl:
@@ -5391,9 +5403,10 @@ class CovLinkGenerator(CExeCode):
                     if aOId in tPlAtmIds:
                         overlapAtms.append(aOId)
                 if len(overlapAtms) == nOrigAtoms:
-                    tModAddPls.append(tPl)
+                    #tModAddPls.append(tPl)
+                    print("HereP")
                     break
-
+        """
     def checkPlMod2(self, tPl, tComboPls, tModDelPls):
 
         tPlAtmIds = []
@@ -5796,9 +5809,10 @@ class CovLinkGenerator(CExeCode):
             aName   = tLinkedObj.stdLigand1["list"]["name"]
             aNameL  = len(aName) + 6
             aGrp    = tLinkedObj.stdLigand1["list"]["group"]
+            aGrpL   = len(aGrp)  + 4
             NA      = tLinkedObj.stdLigand1["list"]["number_atoms_all"]
             NAH     = tLinkedObj.stdLigand1["list"]["number_atoms_nh"]
-            aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
+            aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(aGrpL), NA.ljust(10), NAH)
             tOutFile.write(aL) 
         
         if tLinkedObj.stdLigand2["compOut"]:          
@@ -5812,9 +5826,10 @@ class CovLinkGenerator(CExeCode):
             aName   = tLinkedObj.stdLigand2["list"]["name"]
             aNameL  = len(aName) + 6
             aGrp    = tLinkedObj.stdLigand2["list"]["group"]
+            aGrpL   = len(aGrp)  + 4
             NA      = tLinkedObj.stdLigand2["list"]["number_atoms_all"]
             NAH     = tLinkedObj.stdLigand2["list"]["number_atoms_nh"]
-            aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(20), NA.ljust(10), NAH)
+            aL="%s%s%s%s%s%s\n"%(aNL.ljust(10), aN3.ljust(10), aName.ljust(aNameL), aGrp.ljust(aGrpL), NA.ljust(10), NAH)
             tOutFile.write(aL) 
         if tLinkedObj.stdLigand1["compOut"] or tLinkedObj.stdLigand2["compOut"]: 
             tOutFile.write("\n")

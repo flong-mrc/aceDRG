@@ -1345,21 +1345,21 @@ class metalMode(CExeCode):
         elif self.workMode == 2:
             if os.path.isfile(self.inSmiName) :
                 print("input file is %s"%self.inSmiName)
-                initMols('smi', self.inSmiName, self.mols)
+                self.initMols('smi', self.inSmiName, self.mols)
                 idxMol = 0
                 self.metalAtoms={}
                 self.metalConnAtoms={}
                 for aMol in self.mols:
                     self.metalAtoms[idxMol]      = []
                     self.metalConnAtoms[idxMol]  = []
-                    modiMol(aMol, self.metalAtoms[idxMol],  self.metalConnAtoms[idxMol],
+                    self.modiMol(aMol, self.metalAtoms[idxMol],  self.metalConnAtoms[idxMol],
                             self.organicSec, self.defaultBo)
                     
                     
                
 
-def main():
-    hemTObj = hemT(sys.argv[1:])
+#def main():
+#    hemTObj = hemT(sys.argv[1:])
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()

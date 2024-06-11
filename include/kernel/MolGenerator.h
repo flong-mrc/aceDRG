@@ -357,6 +357,8 @@ namespace LIBMOL
                          std::vector<Molecule> & tFinMols,
                          std::vector<Molecule> & tInfMols);
         void outHRelatedBonds(FileName tOutName);
+        void out3NRelatedBondsAndAngs(FileName tOutName,
+                                      Molecule & tMol);
 
         void contMetal2NB(int & tNB, int & tNA);
 

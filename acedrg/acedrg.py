@@ -120,7 +120,8 @@ class Acedrg(CExeCode ):
         #self.refmacMinFValueList["fileName"] =""
         
         self.servalcat        = "servalcat "
-        #self.servalcat        = "python -m servalcat.command_line refine_geom "
+        
+        self.metalCoord       = "metalCoord "
         
 
         self.linkInstructions = ""

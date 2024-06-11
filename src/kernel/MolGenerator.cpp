@@ -7675,12 +7675,19 @@ namespace LIBMOL {
     {
         // setAtomsAltId(tMol.atoms);
         int numH=0;
+        bool lN3 = false;
         for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
         {
             if (iAt->chemType.compare("H")==0)
             {
                 numH++;
+            }
+            else if (iAt->chemType.compare("N")==0)
+            {
+                if (iAt->connAtoms.size()==3)
+                {
+                }
             }
         }
         std::string tName(tOutName);
@@ -8463,6 +8470,12 @@ namespace LIBMOL {
             HBondF.close();
 
         }
+    }
+
+    void MolGenerator::out3NRelatedBondsAndAngs(FileName tOutName,
+                                                Molecule & tMol)
+    {
+
     }
 
     void MolGenerator::checkInfMols(std::vector<Molecule> & aSetInfMols,
