@@ -355,22 +355,22 @@ namespace LIBMOL
 
         // Check
 
-        if (tPlanes.size() !=0)
-        {
-            std::cout << "There are " << tPlanes.size()
-                      << " planes " << std::endl;
-            for (std::vector<PlaneDict>::iterator iPl=tPlanes.begin();
-                     iPl !=tPlanes.end(); iPl++)
-            {
-                std::cout << "One Plane. It has " << iPl->atoms.size()
-                          << " They are : " << std::endl;
-                for (std::map<ID, int>::iterator iAt=iPl->atoms.begin();
-                        iAt !=iPl->atoms.end(); iAt++)
-                {
-                    std::cout << "Atom " << iAt->first << std::endl;
-                }
-            }
-        }
+        //if (tPlanes.size() !=0)
+        //{
+            //std::cout << "There are " << tPlanes.size()
+            //          << " planes " << std::endl;
+            //for (std::vector<PlaneDict>::iterator iPl=tPlanes.begin();
+            //         iPl !=tPlanes.end(); iPl++)
+            //{
+                //std::cout << "One Plane. It has " << iPl->atoms.size()
+                //          << " They are : " << std::endl;
+                //for (std::map<ID, int>::iterator iAt=iPl->atoms.begin();
+                //        iAt !=iPl->atoms.end(); iAt++)
+                //{
+                    //std::cout << "Atom " << iAt->first << std::endl;
+                //}
+            //}
+        //}
 
     }
 
@@ -417,6 +417,7 @@ namespace LIBMOL
         // Other small planes are determined via torsion angles.
 
         // Check
+        /*
 
         if (tPlanes.size() !=0)
         {
@@ -425,8 +426,8 @@ namespace LIBMOL
             for (std::vector<PlaneDict>::iterator iPl=tPlanes.begin();
                      iPl !=tPlanes.end(); iPl++)
             {
-                std::cout << "One Plane. It has " << iPl->atoms.size()
-                          << " They are : " << std::endl;
+                //std::cout << "One Plane. It has " << iPl->atoms.size()
+                //          << " They are : " << std::endl;
                 for (std::map<ID, int>::iterator iAt=iPl->atoms.begin();
                         iAt !=iPl->atoms.end(); iAt++)
                 {
@@ -434,6 +435,7 @@ namespace LIBMOL
                 }
             }
         }
+        */
 
     }
 

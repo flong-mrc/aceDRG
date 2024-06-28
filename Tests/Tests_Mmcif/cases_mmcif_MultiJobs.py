@@ -24,7 +24,7 @@ doneNames = []
 failNames = []
 
 lib1 = "/Users/flong/DB/PDB_related/PDB_Ligands/Cif"
-lib2 = "/Users/flong/CCP4/ccp4-8.0/lib/data/monomers"
+lib2 = "/Users/flong/CCP4/ccp4-9/lib/data/monomers"
 inRoot = os.getcwd()
 
 inListFN = os.path.join(inRoot, "inMmcifCCD", "in.list")

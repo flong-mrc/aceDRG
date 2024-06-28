@@ -135,7 +135,7 @@ def libcheck():
         mon = istream.readline().strip()
 
       if not mon.isalnum():
-        mon = 'UNL'
+        mon = 'LIG'
 
       sys.argv[:] = (acedrg_sh, '-m', params.FILE_MOL, '-r', mon, '-o', prefix)
 

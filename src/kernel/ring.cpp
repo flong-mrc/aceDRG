@@ -853,7 +853,7 @@ namespace LIBMOL
         {
             lAr = true;
         }
-        std::cout << "lAr = " << lAr << std::endl;
+        // std::cout << "lAr = " << lAr << std::endl;
         return lAr;
 
     }
@@ -1712,8 +1712,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             }
         }
 
-        std::cout << "atom " << tAtoms[tIdx].id << " has "
-                  << nonMC << "  bonding " << std::endl;
+        //std::cout << "atom " << tAtoms[tIdx].id << " has "
+        //          << nonMC << "  bonding " << std::endl;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
 
@@ -1909,7 +1909,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                     if (nonMC ==3)
                     {                        // Place holder in case for future.
                         aN=1.0;
-                        std::cout << "should be here " << std::endl;
+                        //std::cout << "should be here " << std::endl;
                     }
                     else
                     {
@@ -1943,12 +1943,12 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
         }
 
 
-        std::cout << "atom " << tAtoms[tIdx].id << std::endl;
-        std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
-        std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
-        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
-                  << std::endl;
-        std::cout << "Pi atom added " << aN  << std::endl;
+        //std::cout << "atom " << tAtoms[tIdx].id << std::endl;
+        //std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
+        //std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
+        //std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+        //          << std::endl;
+        //std::cout << "Pi atom added " << aN  << std::endl;
 
 
         return aN;
@@ -2056,8 +2056,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 pyroRings.push_back(i);
             }
         }
-        std::cout << "Here number of py rings is " << pyroRings.size()
-                  << std::endl;
+        //std::cout << "Here number of py rings is " << pyroRings.size()
+        //          << std::endl;
 
         if (pyroRings.size()==4)
         {
@@ -2093,8 +2093,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                     iAt !=iR->atoms.end(); iAt++)
             {
                 atmIdx.push_back(iAt->seriNum);
-                std::cout<< "Atom " << iAt->id << std::endl;
-                std::cout << "sp " << iAt->bondingIdx << std::endl;
+                //std::cout<< "Atom " << iAt->id << std::endl;
+                //std::cout << "sp " << iAt->bondingIdx << std::endl;
             }
 
             if (iR->isPlanar)
@@ -2120,8 +2120,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                         iR->isAntiAroma = true;
 
                     }
-                    std::cout << "2 number of pi elecs is "
-                                  <<numPi << std::endl;
+                    //std::cout << "2 number of pi elecs is "
+                    //              <<numPi << std::endl;
                     std::cout << fabs(fmod(numPi, 4.0)) << std::endl;
                     std::cout << iR->isAntiAroma << std::endl;
                     // std::cout << "It is not an aromatic ring " << std::endl;
@@ -2131,7 +2131,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 {
                     iR->isAromaticP = true;
                     tAroRings.push_back(*iR);
-                    std::cout << "3 It is an aromatic ring " << std::endl;
+                    // std::cout << "3 It is an aromatic ring " << std::endl;
                 }
                 //std::cout << std::endl;
             }
@@ -2139,7 +2139,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             {
 
                 bool lNBUnR=checkUndRing(atmIdx, tAtoms);
-                std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
+                // std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
 
                 if (lNBUnR)
                 {
@@ -2201,7 +2201,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
         std::cout << "There are "         << tPlanes.size()
                   << " planes. They are " << std::endl;
 
-
+        /*
         for (std::vector<PlaneDict>::iterator iPl= tPlanes.begin();
                 iPl !=tPlanes.end(); iPl++)
         {
@@ -2214,6 +2214,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             }
             std::cout << std::endl;
         }
+        */
 
     }
 
@@ -2354,7 +2355,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
         std::cout << "There are "         << tPlanes.size()
                   << " planes. They are " << std::endl;
 
-
+        /*
         for (std::vector<PlaneDict>::iterator iPl= tPlanes.begin();
                 iPl !=tPlanes.end(); iPl++)
         {
@@ -2367,7 +2368,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             }
             std::cout << std::endl;
         }
-
+        */
     }
 
 
@@ -2613,12 +2614,12 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                                 //          << iR->atoms[j].id << " is aromatic "
                                 //          << std::endl;
                             }
-                            else
-                            {
-                                std::cout << "Bug. can not find the bond between "
-                                          << iR->atoms[i].id << " and "
-                                          << iR->atoms[j].id << std::endl;
-                            }
+                            //else
+                            //{
+                                //std::cout << "Bug. can not find the bond between "
+                                //          << iR->atoms[i].id << " and "
+                                //          << iR->atoms[j].id << std::endl;
+                            //}
                         }
                     }
                 }

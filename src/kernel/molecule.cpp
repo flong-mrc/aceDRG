@@ -274,12 +274,12 @@ namespace LIBMOL
             {
                 iAtm->formType.clear();
                 iAtm->formType.push_back(iAtm->chemType);
-                if (iAtm->isInAromRing)
-                {
-                    std::cout << "Atom " << iAtm->id
-                              << " is at least in one aromatic ring "
-                              << std::endl;
-                }
+                //if (iAtm->isInAromRing)
+                //{
+                //    std::cout << "Atom " << iAtm->id
+                //              << " is at least in one aromatic ring "
+                //              << std::endl;
+                //}
                 std::string sAll="", s1="", s2="", s3="";
                 s1 = iAtm->chemType + "_sp" + IntToStr(iAtm->bondingIdx);
                 if (iAtm->isInAromRing)

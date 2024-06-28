@@ -467,7 +467,7 @@ namespace LIBMOL
 
             if (checkR)
             {
-                std::cout << "tRAllLine.size " <<  tRAllLines.size() << std::endl;
+                // std::cout << "tRAllLine.size " <<  tRAllLines.size() << std::endl;
                 checkRFact(tRAllLines);
             }
             else
@@ -577,13 +577,13 @@ namespace LIBMOL
                     getHAtomIdxs();
 
                     std::cout << "there are " << allHAtomIdx.size()
-                              << "H atom in the initial atom set " << std::endl;
-                    for (std::vector<int>::iterator iH=allHAtomIdx.begin();
-                            iH != allHAtomIdx.end(); iH++)
-                    {
-                        std::cout << "Atom " << allAtoms[*iH].id
-                                  << " is a H atom" << std::endl;
-                    }
+                              << " H atom in the initial atom set " << std::endl;
+                    //for (std::vector<int>::iterator iH=allHAtomIdx.begin();
+                    //        iH != allHAtomIdx.end(); iH++)
+                    //{
+                    //    std::cout << "Atom " << allAtoms[*iH].id
+                    //              << " is a H atom" << std::endl;
+                    //}
 
 
 
@@ -958,7 +958,7 @@ namespace LIBMOL
             std::vector<std::string> tBuf;
             if (tLines[i].find("_refine_ls_R_factor_all") !=std::string::npos)
             {
-                std::cout << "R factor line: " << tLines[i] << std::endl;
+                // std::cout << "R factor line: " << tLines[i] << std::endl;
 
                 StrTokenize(tLines[i],  tBuf);
 
@@ -969,15 +969,15 @@ namespace LIBMOL
                     {
                         tROK1 = tROK1/100.0;
                     }
-                    std::cout << "_refine_ls_R_factor_all="
-                              << tROK1 << std::endl;
+                    //std::cout << "_refine_ls_R_factor_all="
+                    //          << tROK1 << std::endl;
                     allR=tROK1;
                 }
             }
             else if (tLines[i].find("_refine_ls_R_factor_gt")
                      !=std::string::npos)
             {
-                std::cout << "R factor line: " << tLines[i] << std::endl;
+                //std::cout << "R factor line: " << tLines[i] << std::endl;
                 StrTokenize(tLines[i],  tBuf);
                 if (tBuf.size()==2)
                 {
@@ -986,15 +986,15 @@ namespace LIBMOL
                     {
                         tROK2 = tROK2/100.0;
                     }
-                    std::cout << "_refine_ls_R_factor_gt="
-                              << tROK2 << std::endl;
+                    //std::cout << "_refine_ls_R_factor_gt="
+                    //          << tROK2 << std::endl;
                     gtR = tROK2;
                 }
             }
             else if (tLines[i].find("_refine_ls_R_factor_obs")
                      !=std::string::npos)
             {
-                std::cout << "R factor line: " << tLines[i] << std::endl;
+                //std::cout << "R factor line: " << tLines[i] << std::endl;
 
                 StrTokenize(tLines[i],  tBuf);
                 if (tBuf.size()==2)
@@ -1004,15 +1004,15 @@ namespace LIBMOL
                     {
                         tROK3 = tROK3/100.0;
                     }
-                    std::cout << "_refine_ls_R_factor_obs="
-                              << tROK3 << std::endl;
+                    // std::cout << "_refine_ls_R_factor_obs="
+                    //          << tROK3 << std::endl;
                     obsR = tROK3;
 
                 }
             }
             else if (tLines[i].find("_refine_ls_wR_factor_all") !=std::string::npos)
             {
-                std::cout << "R factor line: " << tLines[i] << std::endl;
+                //std::cout << "R factor line: " << tLines[i] << std::endl;
 
                 StrTokenize(tLines[i],  tBuf);
 
@@ -1023,15 +1023,15 @@ namespace LIBMOL
                     {
                         tROK4 = tROK4/100.0;
                     }
-                    std::cout << "_refine_ls_wR_factor_all="
-                              << tROK4 << std::endl;
+                    //std::cout << "_refine_ls_wR_factor_all="
+                    //          << tROK4 << std::endl;
                     allWR=tROK4;
                 }
             }
             else if (tLines[i].find("_refine_ls_wR_factor_gt")
                      !=std::string::npos)
             {
-                std::cout << "wR_gt factor line: " << tLines[i] << std::endl;
+                //std::cout << "wR_gt factor line: " << tLines[i] << std::endl;
                 StrTokenize(tLines[i],  tBuf);
                 if (tBuf.size()==2)
                 {
@@ -1040,8 +1040,8 @@ namespace LIBMOL
                     {
                         tROK5 = tROK5/100.0;
                     }
-                    std::cout << "_refine_ls_wR_factor_gt="
-                              << tROK5 << std::endl;
+                    //std::cout << "_refine_ls_wR_factor_gt="
+                    //          << tROK5 << std::endl;
                     gtWR = tROK5;
                 }
             }
@@ -1436,7 +1436,7 @@ namespace LIBMOL
             //    iA->matType = 2;
             //
             iA->isMetal = isMetal(allMetals, iA->chemType);
-            std::cout << iA->id << " is metal " << iA->isMetal  << std::endl;
+            //std::cout << iA->id << " is metal " << iA->isMetal  << std::endl;
             if (iA->isMetal)
             {
                 if (!hasMetal)

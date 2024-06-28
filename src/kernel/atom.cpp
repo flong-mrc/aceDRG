@@ -1179,30 +1179,57 @@ namespace LIBMOL
         return lFind;
     }
 
+
     extern void setAtomsAltId(std::vector<AtomDict> & tAtoms)
     {
-        std::map<std::string, int> elemDistr;
+        bool lDub = false;
+
+        std::map<std::string, std::vector<std::string> >  atomNameDistri;
 
         for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
-                iAt !=tAtoms.end(); iAt++)
+             iAt !=tAtoms.end(); iAt++)
         {
-            if (elemDistr.find(iAt->chemType)==elemDistr.end())
+            atomNameDistri[iAt->id].push_back(iAt->id);
+            if (atomNameDistri[iAt->id].size() > 1)
             {
-                elemDistr[iAt->chemType] =1;
-            }
-            else
-            {
-                elemDistr[iAt->chemType] +=1;
+                lDub= true;
+                break;
             }
         }
 
-        for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
-                iAt !=tAtoms.end(); iAt++)
+        if (lDub)
         {
-            iAt->altId = iAt->chemType + IntToStr(elemDistr[iAt->chemType]);
-            elemDistr[iAt->chemType]--;
-        }
 
+            std::map<std::string, int> elemDistr;
+
+            for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                 iAt !=tAtoms.end(); iAt++)
+            {
+                if (elemDistr.find(iAt->chemType)==elemDistr.end())
+                {
+                    elemDistr[iAt->chemType] =1;
+                }
+                else
+                {
+                    elemDistr[iAt->chemType] +=1;
+                }
+            }
+
+            for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                 iAt !=tAtoms.end(); iAt++)
+            {
+                iAt->altId = iAt->chemType + IntToStr(elemDistr[iAt->chemType]);
+                elemDistr[iAt->chemType]--;
+            }
+        }
+        else
+        {
+            for (std::vector<AtomDict>::iterator iAt=tAtoms.begin();
+                 iAt !=tAtoms.end(); iAt++)
+            {
+                iAt->altId = iAt->id;
+            }
+        }
         // Check
         //std::cout << "Now atoms are renamed " << std::endl;
 

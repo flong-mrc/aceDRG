@@ -1285,7 +1285,7 @@ class metalMode(CExeCode):
                    if len(self.fileConv.dataDescriptor):
                        self.setMonoRoot(self.fileConv.dataDescriptor)
                    else:
-                       self.monomRoot = "UNL"
+                       self.monomRoot = "LIG"
                    print("Mon-root is ", self.monomRoot)
                    
                    self.getNewMolWithoutMetal2(self.fileConv.atoms, 

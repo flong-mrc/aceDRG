@@ -625,7 +625,7 @@ class Acedrg(CExeCode ):
                 
     def setMonoRoot(self, tDataDesc=None):
    
-        if len(self.monomRoot) !=0 and self.monomRoot.find("UNL")==-1:
+        if len(self.monomRoot) !=0 and self.monomRoot.find("LIG")==-1:
             
             return
  
@@ -647,7 +647,7 @@ class Acedrg(CExeCode ):
                 tF.close()
                 #print tL
                 if tL.find("#") !=-1:
-                    self.monomRoot="UNL"
+                    self.monomRoot="LIG"
                 else:
                     if len(tL) ==3:
                         self.monomRoot= tL
@@ -671,7 +671,7 @@ class Acedrg(CExeCode ):
                                 self.monomRoot = strs[2]
                                 break
         if len(self.monomRoot) ==0:
-            self.monomRoot = "UNL"
+            self.monomRoot = "LIG"
 
     def checkNAFromMmcif(self, tDataDesc=None):
 
@@ -966,7 +966,7 @@ class Acedrg(CExeCode ):
         else:
             #print self.monomRoot
             self.setMonoRoot()
-            # self.monomRoot   = "UNL"
+            # self.monomRoot   = "LIG"
         #print "monomRoot: ", self.monomRoot
         if t_inputOptionsP.outRoot:
             self.outRoot   = t_inputOptionsP.outRoot
@@ -1193,7 +1193,7 @@ class Acedrg(CExeCode ):
                               self.upperSigForAngles, self.lowSigForAngles)
             if os.path.isfile(self.inMtConnFile):
                 self._cmdline += " -u %s "%self.inMtConnFile
-            print(self._cmdline)
+            # print(self._cmdline)
             print("===================================================================") 
             print("| Generate the dictionary file using the internal database        |")
             print("===================================================================") 
@@ -1219,19 +1219,19 @@ class Acedrg(CExeCode ):
             #os.system(self._cmdline)
             self.runExitCode = self.subExecute()
         if self.workMode==113:
-            print("self.monomRoot=", self.monomRoot)
+            #print("self.monomRoot=", self.monomRoot)
             self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot)
             self._cmdline +=" -c %s -r %s -x yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
-            print(self._cmdline)
+            #print(self._cmdline)
         
             self.runExitCode = self.subExecute()
         
         if self.workMode==114:
-            print("self.monomRoot=", self.monomRoot)
+            #print("self.monomRoot=", self.monomRoot)
             self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot)
             self._cmdline +=" -c %s -r %s -w yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
             #self._cmdline +=" -c %s -r %s -x yes -o %s "%(self.inMmCifName, self.monomRoot, self.outRstCifName)
-            print(self._cmdline)
+            #print(self._cmdline)
         
             self.runExitCode = self.subExecute()
             
@@ -1256,7 +1256,7 @@ class Acedrg(CExeCode ):
                 self.inPdbName = tIn
             self._cmdline += " -p %s "%(self.inPdbName)
             self._cmdline += " -q yes -o %s "%(self.outRstCifName)
-            print(self._cmdline)
+            #print(self._cmdline)
             
             self.runExitCode = self.subExecute()
 
@@ -1324,7 +1324,7 @@ class Acedrg(CExeCode ):
                     self.outAtmTypeName = os.path.join(self.scrDir, "atomTypes_"+aStr+ ".txt")
                 elif self.workMode ==311 or self.workMode == 32 or self.workMode==33:
                     self.outAtmTypeName = self.outRoot + "_atomTypes.cif"
-                    print("Output file name : %s "%self.outAtmTypeName)
+                    #print("Output file name : %s "%self.outAtmTypeName)
                 self._cmdline +=" -A yes -D %s -c %s -r %s -o %s "\
                     %(self.acedrgTables, inFileName, self.monomRoot, self.outAtmTypeName)
                 self.subExecute()
@@ -1772,7 +1772,7 @@ class Acedrg(CExeCode ):
         self._cmdline += "  --logfile %s  "%log2
         #self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  \n"%(tInCif, aRoot)
         self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  --randomize 0.01 \n"%(tInCif, aRoot)
-        print(self._cmdline)
+        #print(self._cmdline)
         self.subExecute() 
         
     def runServalcatVersionInfo(self):
@@ -2030,7 +2030,7 @@ class Acedrg(CExeCode ):
             cifCont['others'] =[]
             monoId = ""
 
-            if self.monomRoot.find("UNL") ==-1:
+            if self.monomRoot.find("LIG") ==-1:
                 #if len(self.monomRoot) >=3:
                 #    monoId = self.monomRoot[:3]
                 #else:
@@ -2039,7 +2039,7 @@ class Acedrg(CExeCode ):
             elif tDataDescriptor:
                 monoId = tDataDescriptor[-1].strip().split()[0]
             else:
-                monoId = "UNL"
+                monoId = "LIG"
                 
 
             
@@ -2155,7 +2155,7 @@ class Acedrg(CExeCode ):
         cifCont['head'] = []
         monoId = ""
 
-        if self.monomRoot.find("UNL") ==-1:
+        if self.monomRoot.find("LIG") ==-1:
             #if len(self.monomRoot) >=3:
             #    monoId = self.monomRoot[:3]
             #else:
@@ -2164,7 +2164,7 @@ class Acedrg(CExeCode ):
         elif tDataDescriptor:
             monoId = tDataDescriptor[-1].strip().split()[0]
         else:
-            monoId = "UNL"
+            monoId = "LIG"
             
 
         #print("monoId ", monoId)
@@ -2676,14 +2676,14 @@ class Acedrg(CExeCode ):
         # (3) Description of bonds in the molecule
     
         # This file is mainly used as an input file for Acedrg
-        print("Ligand ID ", tMonoName)
+        #print("Ligand ID ", tMonoName)
        
         allAtoms = tMonomer["atoms"] 
         nAt  = len(allAtoms)
-        print("number of atoms", nAt)
+        #print("number of atoms", nAt)
         allBonds = tMonomer["bonds"]
         nBo  = len(allBonds)
-        print("number of bonds", nBo)
+        #print("number of bonds", nBo)
 
         tGroupName="non-polymer"    # place-holder, will not  be used 
         nHAt = nAt                  # place-holder, will not  be used
@@ -3177,9 +3177,9 @@ class Acedrg(CExeCode ):
     def executeWithRDKit(self):
  
         self.printJobs()
-        if self.useExistCoords or self.workMode==16 or self.workMode==161:
-            print("One of output conformers will using input coordinates as the initial one")
-        print("workMode : ", self.workMode)
+        #if self.useExistCoords or self.workMode==16 or self.workMode==161:
+        #    print("One of output conformers will using input coordinates as the initial one")
+        #print("workMode : ", self.workMode)
         
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
@@ -3206,7 +3206,7 @@ class Acedrg(CExeCode ):
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)
                 else:
-                    self.monomRoot = "UNL"
+                    self.monomRoot = "LIG"
                 
                 
                 #print(self.fileConv.atoms[0])
@@ -3561,7 +3561,7 @@ class Acedrg(CExeCode ):
         if self.workMode in [11,  111, 112, 114, 51] :  #  and not self.isAA :
             #print("Number of molecule ", len(self.rdKit.molecules))
             if len(self.rdKit.molecules):
-                print("Ligand ID ", self.monomRoot)
+                #print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)
                 self.rdKit.hasCCP4Type = self.fileConv.hasCCP4Type
             for iMol in range(len(self.rdKit.molecules)):
@@ -3570,8 +3570,8 @@ class Acedrg(CExeCode ):
                 #if self.monomRoot.upper() in self.chemCheck.aminoAcids:
                 #    self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, "L-peptide")
                 #else:
-                if self.workMode in [11,  111, 112]:
-                    print("Using coords ", self.rdKit.useExistCoords)
+                #if self.workMode in [11,  111, 112]:
+                    #print("Using coords ", self.rdKit.useExistCoords)
                 self.rdKit.MolToSimplifiedMmcif(self.rdKit.molecules[iMol], self.inMmCifName, self.chemCheck, self.monomRoot, self.fileConv.chiralPre)
                 if os.path.isfile(self.inMmCifName):
                     if not self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
@@ -3746,7 +3746,7 @@ class Acedrg(CExeCode ):
                 if len(self.fileConv.dataDescriptor):
                     self.setMonoRoot(self.fileConv.dataDescriptor)
                 else:
-                    self.monomRoot = "UNL"
+                    self.monomRoot = "LIG"
                 aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
                 self.fileConv.MmCifToMolFile(self.inMmCifName, aIniMolName, 2)
                 if os.path.isfile(aIniMolName):

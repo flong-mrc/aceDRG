@@ -517,7 +517,7 @@ class FileTransformer(object) :
         #print ("\n") 
        
 
-    def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="UNL"):
+    def getCCP4DataDescritor(self, tMol, tChemCheck, tMonomRoot="LIG"):
 
         # Get a CCP4 monomer lib data descriptor
         s1 =tMonomRoot
@@ -1104,7 +1104,7 @@ class FileTransformer(object) :
         if tMode==0: 
             self.mmCifReader(tInFileName)
 
-        print("Num of atoms ", len(self.atoms))
+        #print("Num of atoms ", len(self.atoms))
         #for aA in self.atoms:
         #    print(aA["_chem_comp_atom.atom_id"], "xxx charge ",  aA["_chem_comp_atom.charge"])
         
@@ -1133,11 +1133,11 @@ class FileTransformer(object) :
                 
                 tOutFile.write(self.dataDescriptor[nId][1]+ "\n")
             else:
-                tOutFile.write("UNL\n")
+                tOutFile.write("LIG\n")
             if nName !=-1:
                 tOutFile.write(self.dataDescriptor[nName][1]+ "\n")
             else:
-                tOutFile.write("UNL\n")
+                tOutFile.write("LIG\n")
             tOutFile.write("\n")
    
             # The Counts Line
@@ -1265,7 +1265,7 @@ class FileTransformer(object) :
                     nCharge =0
                     if aAtom["_chem_comp_atom.charge"].find("?") ==-1:
                         nCharge = int(aAtom["_chem_comp_atom.charge"])
-                        print("Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"])
+                        #print("Atom ", aAtom["_chem_comp_atom.atom_id"], " has charge  ", aAtom["_chem_comp_atom.charge"])
                         #print(" converted to charge symbol ", chargeMap[nCharge]) 
                     if nCharge in list(chargeMap.keys()):
                         charge  = " %d "%chargeMap[nCharge]
@@ -1503,7 +1503,7 @@ class FileTransformer(object) :
                 
             
 
-    def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="UNL", idxConf=0, tDelSign="", tUsingCoords=False):
+    def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="LIG", idxConf=0, tDelSign="", tUsingCoords=False):
 
         try:
             tPDB = open(tOutFileName, "w")
@@ -1517,11 +1517,11 @@ class FileTransformer(object) :
            
             self.PdbForMols    = {}
             # Head section 
-            tClassification="UNL"
+            tClassification="LIG"
             tDate =time.strftime("%d/%m/%Y")
             
-            tIdCode = "UNL"
-            if tMonoRoot != "UNL":
+            tIdCode = "LIG"
+            if tMonoRoot != "LIG":
                 tIdCode = str(tMonoRoot) 
             elif tDataDiscriptor:
                 for aIdx in list(tDataDiscriptor.keys()):
@@ -1675,7 +1675,7 @@ class FileTransformer(object) :
 
     def getResNameFromPDB(self, tInFileName):
 
-        aResName = "UNL"
+        aResName = "LIG"
         try:
             inPDB = open(tInFileName, "r")
         except IOError:

@@ -27,6 +27,7 @@ namespace LIBMOL {
     {
 
 
+
         myNBDepth = tNBDepth;
         lColid = false;
         lHasMetal = false;
@@ -392,7 +393,7 @@ namespace LIBMOL {
                     */
 
                     getOverallBondAndAnglesNew();
-                    setBondOrderAndChargeInMols(allMolecules);
+                    // setBondOrderAndChargeInMols(allMolecules);
                     outTables(tOutName, allMolecules, aSetOfInfMols);
 
                 }
@@ -5062,7 +5063,8 @@ namespace LIBMOL {
                             << std::endl << "It contains " << aMol.atoms.size()
                             << " atoms" << std::endl;
                 }
-                else {
+                else
+                {
                     std::string aMsg = aMolErrInfo + "\n"
                             + "Molecule " + IntToStr(aMol.seriNum)
                             + " is rejected\n";
@@ -5361,21 +5363,43 @@ namespace LIBMOL {
     bool MolGenerator::checkAtomOcp(Molecule & tMol,
             std::string & tErrInfo) {
 
+        bool lSth=true;
+        double nSth = 0.3;
+
+        std::vector<std::string> lowOcpIds;
         for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                 iAt != tMol.atoms.end(); iAt++) {
             //std::cout << "Atom " << iAt->id << " occupancy "
             //           << iAt->ocp << std::endl;
-
+            /*
             if (iAt->ocp < 0.99 && iAt->chemType !="H") {
                 tErrInfo = "Atom " + iAt->id + " has an occupancy "
                         + RealToStr(iAt->ocp) + ", small than 1.0!";
 
                 return false;
             }
-
+            */
+            if (iAt->ocp < 0.99 && iAt->chemType !="H")
+            {
+                lowOcpIds.push_back(iAt->id);
+            }
         }
 
-        return true;
+        //std::cout << "Number of atoms in the mol is " << tMol.atoms.size() << std::endl;
+        //std::cout << "Number of low ocp atoms is " << lowOcpIds.size() << std::endl;
+        //std::cout << "ratio is " << float(lowOcpIds.size())/float(tMol.atoms.size()) << std::endl;
+
+        if (float(lowOcpIds.size())/float(tMol.atoms.size()) >=nSth)
+        {
+            lSth=false;
+            tErrInfo = "A distorted structure. too many non-H atoms with ocp < 0.99\n";
+            for (unsigned iO=0; iO < lowOcpIds.size(); iO++)
+            {
+                tErrInfo+= "Atom " + lowOcpIds[iO] + " has an occupancy  small than 0.99!\n";
+            }
+        }
+
+        return lSth;
 
     }
 
@@ -6036,7 +6060,7 @@ namespace LIBMOL {
                 }
                 else
                 {
-                    std::cout << iBo->value << " under check " << std::endl;
+                    // std::cout << iBo->value << " under check " << std::endl;
                     if (!tMol.atoms[iBo->atomsIdx[0]].isMetal
                             && !tMol.atoms[iBo->atomsIdx[1]].isMetal)
                     {
@@ -6101,7 +6125,7 @@ namespace LIBMOL {
                     }
                     else
                     {
-                        std::cout << iBo->value << " under check " << std::endl;
+                        //std::cout << iBo->value << " under check " << std::endl;
 
                         if (outVectAbsDiff(aBondMap[aCombID], iBo->value,
                                 diffThreshold))
@@ -6398,11 +6422,11 @@ namespace LIBMOL {
             {
                 std::cout << "atom " << iAt->id << " is read-in atom "
                           << std::endl;
-                std::cout << "number of atom connections "
-                          << iAt->connAtoms.size() << std::endl;
-                std::cout << "atom sp " << iAt->bondingIdx << std::endl
-                          << "atomType " << iAt->codClass
-                          << std::endl;
+                //std::cout << "number of atom connections "
+                //          << iAt->connAtoms.size() << std::endl;
+                //std::cout << "atom sp " << iAt->bondingIdx << std::endl
+                //          << "atomType " << iAt->codClass
+                //          << std::endl;
             }
             else
             {
@@ -6425,11 +6449,11 @@ namespace LIBMOL {
 
             std::cout << "Atom " << iAt->id << " has COD class id "
                                  << iAt->codClass << std::endl;
-            if (iAt->inRings.size() !=0)
-            {
-                std::cout << "it is in " << iAt->inRings.size()
-                          << " ring(s) " << std::endl;
-            }
+            //if (iAt->inRings.size() !=0)
+            //{
+            //    std::cout << "it is in " << iAt->inRings.size()
+            //              << " ring(s) " << std::endl;
+            //}
 
         }
 
@@ -6693,21 +6717,21 @@ namespace LIBMOL {
                     aIdxSet.push_back(iBo->atomsIdx[0]);
                     aIdxSet.push_back(iBo->atomsIdx[1]);
 
-                    std::cout << "Check a bond " << std::endl;
-                    std::cout << "atom 1 "       << iMol->atoms[iBo->atomsIdx[0]].id
-                              << " with type "
-                              << iMol->atoms[iBo->atomsIdx[0]].codClass
-                              << std::endl
-                              << "atom 2 " << iMol->atoms[iBo->atomsIdx[1]].id
-                              << " with type "
-                              << iMol->atoms[iBo->atomsIdx[1]].codClass
-                              << std::endl << "OrderN " << iBo->orderN
-                              << std::endl;
+                    //std::cout << "Check a bond " << std::endl;
+                    //std::cout << "atom 1 "       << iMol->atoms[iBo->atomsIdx[0]].id
+                    //          << " with type "
+                    //          << iMol->atoms[iBo->atomsIdx[0]].codClass
+                    //          << std::endl
+                    //          << "atom 2 " << iMol->atoms[iBo->atomsIdx[1]].id
+                    //          << " with type "
+                    //          << iMol->atoms[iBo->atomsIdx[1]].codClass
+                    //          << std::endl << "OrderN " << iBo->orderN
+                    //          << std::endl;
 
                     if (!connMetal1stNB(aIdxSet, iMol->atoms))
                     {
-                        std::cout << "bond contains no metal up to the 1st NB "
-                                  << std::endl;
+                        //std::cout << "bond contains no metal up to the 1st NB "
+                        //          << std::endl;
                         std::vector<sortMap3> tVec;
                         struct sortMap3 tMap;
                         tMap.key  = iMol->atoms[iBo->atomsIdx[0]].codClass;
@@ -6727,8 +6751,8 @@ namespace LIBMOL {
                         std::string tKey = tVec[0].key + "_" + tVec[1].key;
 
 
-                        std::cout << "new key " << tKey << std::endl
-                                  << "value is " << iBo->value << std::endl;
+                        //std::cout << "new key " << tKey << std::endl
+                        //          << "value is " << iBo->value << std::endl;
                         iBo->atoms.clear();
                         iBo->atomsElem.clear();
                         iBo->atomsIdx.clear();
@@ -6748,19 +6772,19 @@ namespace LIBMOL {
                         if (aBM.find(tKey) == aBM.end())
                         {
                             bonds.push_back(*iBo);
-                            std::cout << "The bond is included " << std::endl;
+                            //std::cout << "The bond is included " << std::endl;
                             aBM[tKey].push_back(iBo->value);
 
                         }
                         else if (!inVectABS(aBM[tKey], iBo->value, 0.00001))
                         {
-                            std::cout << "new value " << iBo->value
-                                      << std::endl
-                                      << "Key is "    << tKey << std::endl;
+                            //std::cout << "new value " << iBo->value
+                            //          << std::endl
+                            //          << "Key is "    << tKey << std::endl;
 
                             bonds.push_back(*iBo);
                             aBM[tKey].push_back(iBo->value);
-                            std::cout << "The bond is included " << std::endl;
+                            //std::cout << "The bond is included " << std::endl;
                         }
                     }
                     else
@@ -6967,10 +6991,10 @@ namespace LIBMOL {
 
         std::string atm0Sp = tBo->atomSPs[tBo->atoms[0]];
         std::string atm1Sp = tBo->atomSPs[tBo->atoms[1]];
-        std::cout << "The Bond contain atom " << tBo->atoms[0]
-                  << " with hybr " << atm0Sp << std::endl
-                  << " and atom " << tBo->atoms[1]
-                  << " with hybr " << atm1Sp << std::endl;
+        //std::cout << "The Bond contain atom " << tBo->atoms[0]
+        //          << " with hybr " << atm0Sp << std::endl
+        //          << " and atom " << tBo->atoms[1]
+        //          << " with hybr " << atm1Sp << std::endl;
         bool lToDo=false;
         std::string idA="";
         if ((atm0Sp.find("SP2") !=atm0Sp.npos
@@ -7054,8 +7078,8 @@ namespace LIBMOL {
                                 std::string tKeyAll = tVec14[0].key + "_"
                                                      + tKey23 + "_"
                                                      + tVec14[1].key;
-                                std::cout << "Torsion key is "
-                                          << tKeyAll << std::endl;
+                                //std::cout << "Torsion key is "
+                                //          << tKeyAll << std::endl;
 
                                 std::vector<AtomDict> torAtms;
                                 torAtms.push_back(tMol->atoms[*iN0]);
@@ -7076,16 +7100,16 @@ namespace LIBMOL {
 
                                     torsions.push_back(aTor);
                                     tTorM[tKeyAll].push_back(aTor.value);
-                                    std::cout << "The torsion is included "
-                                              << std::endl;
+                                    //std::cout << "The torsion is included "
+                                    //          << std::endl;
                                 }
                                 else if (!inVectABS(tTorM[tKeyAll],
                                                     aTor.value, 0.0001))
                                 {
                                     torsions.push_back(aTor);
                                     tTorM[tKeyAll].push_back(aTor.value);
-                                    std::cout << "The torsion is included "
-                                              << std::endl;
+                                    //std::cout << "The torsion is included "
+                                    //          << std::endl;
                                 }
                             }
                         }
@@ -8380,6 +8404,14 @@ namespace LIBMOL {
                 for (unsigned i = 0; i < tFinMols.size(); i++)
                 {
                     std::string aMolIdx(IntToStr(i+1));
+                    for (std::vector<BondDict>::iterator iBo=tFinMols[i].bonds.begin();
+                         iBo !=  tFinMols[i].bonds.end(); iBo++)
+                    {
+                        if (iBo->order.size()==0)
+                        {
+                            iBo->order = "SINGLE";
+                        }
+                    }
                     outTableMols(aMolTable, tFinMols[i]);
                     outPreCellAtomUs(preCellAtomU, tFinMols[i]);
                     std::string aMolName(aMolRootName);

@@ -1904,7 +1904,7 @@ class AcedrgRDKit(object):
         print("A molecule with residue name %s is generated" %
               tMol.GetProp("ResidueName"))
         nAtoms = tMol.GetNumAtoms()
-        print("Number of atoms in the molecule is ", nAtoms)
+        #print("Number of atoms in the molecule is ", nAtoms)
         initAtoms = tMol.GetAtoms()
         # check Atom elements
         elemList = []
@@ -2109,7 +2109,7 @@ class AcedrgRDKit(object):
     def showInfoAboutAtomsAndBonds(self, tMol, tLev=0):
 
         allAtoms = tMol.GetAtoms()
-        print("Number of atoms in the molecule is ", len(allAtoms))
+        #print("Number of atoms in the molecule is ", len(allAtoms))
         aConf = 0
         lConf = False
 
@@ -2319,7 +2319,7 @@ class AcedrgRDKit(object):
             else:
                 tDelAtomIdxs.append(aAt.GetIdx())
 
-    def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="UNL", tChiDes=None, tGroupName="non-polymer", tIdxConform=0):
+    def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="LIG", tChiDes=None, tGroupName="non-polymer", tIdxConform=0):
 
         # A simplified mmcif file contains:
         # (1) Header section
@@ -2329,8 +2329,8 @@ class AcedrgRDKit(object):
         # (5) Description of chiral centers in the molecules
         # This file is mainly used as an input file for Acedrg
         #print("cif_in name ", tMmcifName)
-        print("Ligand ID ", tMonoName)
-        print("Group Name ", tGroupName)
+        #print("Ligand ID ", tMonoName)
+        #print("Group Name ", tGroupName)
 
         allAtoms = []
         allAtoms1 = tMol.GetAtoms()
@@ -2478,7 +2478,7 @@ class AcedrgRDKit(object):
                 
             aMmCif.close()
             
-    def outChiralSection(self, delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName="UNL", tChiDes=None, 
+    def outChiralSection(self, delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName="LIG", tChiDes=None, 
                           tGroupName="non-polymer", tIdxConform=0):
         # chiral center section
         atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
@@ -2488,11 +2488,12 @@ class AcedrgRDKit(object):
             aChiralSignMap = self.setChiralsByMultiConformers(
                 tChemCheck, tMol, atomNBCIPMap)
             self.doubleCheckRDKitChiralCenters(aChiralSignMap, atomNBCIPMap)
+            """
             for aId in sorted(aChiralSignMap.keys()):
                 if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
-                    print("==============================================")
-                    print("| Centered atom :     %s" % aId)
-                    print("----------------------------------------------")
+                    #print("==============================================")
+                    #print("| Centered atom :     %s" % aId)
+                    #print("----------------------------------------------")
                     for aPair in atomNBCIPMap[aId]:
                         print("NB Atom %s : CIPRank %s " %
                               (aPair[0].GetProp("Name"), aPair[1]))
@@ -2508,6 +2509,7 @@ class AcedrgRDKit(object):
                     print("==============================================")
                     print("| Centered atom :     %s with no C sign " % aId)
                     print("----------------------------------------------")
+            """
         else:
             aChiralSignMap = {}
         chiCenAtmIds1 = []
@@ -2897,54 +2899,54 @@ class AcedrgRDKit(object):
                     #    print("a bond of ", aB.GetBondType())
 
 
-        print("Is the molecule contains peptides %s ?" % self.isPEP)
+        print("Is the molecule contains peptides ? %s " % self.isPEP)
         self.getAllFuncGroupAtoms(tMol)
         if len(self.funcGroups):
             for aFuncG in list(self.funcGroups.keys()):
-                print("check ", aFuncG)
+                #print("check ", aFuncG)
                 if aFuncG.find("CARBOXY-AMINO-TERS") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeC_A_T(
                         tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 if aFuncG.find("CARBOXY-ARO") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeC_A_T(
                         tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-TER") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeC_T(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-ASP") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeC_ASP(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("AMINO-TER") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeA_T(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("CARBOXY-AMINO-GLY") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeGLY(
                         tMol, aFuncG,  self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("VAR-A-TER") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeV_A_T(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-LYS") != -1:
                     if self.isPEP:
-                        print("Doing ", aFuncG)
+                        #print("Doing ", aFuncG)
                         self.setFormalChargeNH_LYS(
                             tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-HIS") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeNH_HIS(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-PRO") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeNH_PRO(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NH-ARG") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeNH_ARG(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SH-CYS") != -1:
@@ -2952,46 +2954,46 @@ class AcedrgRDKit(object):
                     self.setFormalChargeSH_CYS(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-TYR") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeBZ_TYR(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-NH") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeBZ_NH(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("BZ-NHA") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeBZ_NHA(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SO3") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeSO3(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("SO4") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargeSO4(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO4") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     self.setFormalChargePO4(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO3R") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     # print self.funcGroups[aFuncG]
                     self.setFormalChargePO3R(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO3N") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     # print self.funcGroups[aFuncG]
                     self.setFormalChargePO3N(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NITROMETHANE0") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     # print self.funcGroups[aFuncG]
                     self.setFormalChargeNITROMETHANE(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("NITROMETHANE1") != -1:
-                    print("Doing ", aFuncG)
+                    #print("Doing ", aFuncG)
                     # print self.funcGroups[aFuncG]
                     self.setFormalChargeC_T(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
@@ -3012,8 +3014,8 @@ class AcedrgRDKit(object):
                                 and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
-                            print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
-                                                                tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
+                            #print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
+                            #                                    tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
 
     def setFormalChargeC_A_T(self, tMol, tFunG, tAtomIdxs, tPH):
 
@@ -3026,14 +3028,14 @@ class AcedrgRDKit(object):
                            and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
-                            print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
-                                                                tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
+                            #print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
+                            #                                    tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
-                            print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
-                                                                tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
+                            #print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
+                            #                                    tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
 
     def setFormalChargeC_ASP(self, tMol, tFunG, tAtomIdxs, tPH):
 
