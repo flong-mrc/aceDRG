@@ -100,6 +100,7 @@ class Acedrg(CExeCode ):
         self.outRstPdb        = ""
         self.outAtmTypeName   = ""
         self.monomRoot        = ""
+        self.inMetalPDBName   = ""        # For metalCoord 
 
 
         self.acedrgTables     = ""
@@ -110,9 +111,7 @@ class Acedrg(CExeCode ):
         self.libmolMatched    = ""
         self.libcheck         = ""
         self.libcheckLogName  = ""
-        self.refmac           = ""
-        self.refmacV          = ""
-        self.refmacLogName    = ""
+     
 
         self.refmacXYSList    = {}
         self.refmacMinFValueList = []
@@ -216,7 +215,7 @@ class Acedrg(CExeCode ):
             
         self.chemCheck        = ChemCheck() 
         
-        self.metalMode        = metalMode()
+        self.metalMode        = metalMode(self.acedrgTables)
         
         self.initMmcifMolMap  = {}
 
@@ -416,6 +415,11 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-T",  "--tempo", dest="testMode",  
                                     action="store_true",  default=False,  
                                     help="The mode temporarily exists in Acedrg, for some purposes")
+        
+        self.inputParser.add_option("--metalPDB", dest="inMetalPDBName",  metavar="FILE", 
+                                    action="store", type="string",
+                                    help="a pdb file containing metal elements, required by metalCoord")
+        
 
         (inputOptionsP, inputOptionsU) = self.inputParser.parse_args(t_argvs)
 
@@ -456,16 +460,6 @@ class Acedrg(CExeCode ):
             sys.exit()
                                 
         if "CCP4" in os.environ:
-            tRefmac = os.path.join(os.environ['CBIN'], "refmac5")
-            #tRefmac  = os.path.join(os.environ['CBIN'], "refmacat")
-            tRefmacV = os.path.join(os.environ['CBIN'], "refmac5")
-            if platform.system()=="Windows": tRefmac += ".exe"
-            if not glob.glob(tRefmac):
-                print("refmac5 could not be found")
-                sys.exit()
-            else:
-                self.refmac  = tRefmac
-                self.refmacV = tRefmacV
 
             #tLibcheck = os.path.join(os.environ['CBIN'], "libcheck")
             #if platform.system()=="Windows": tLibcheck += ".exe"
@@ -545,30 +539,7 @@ class Acedrg(CExeCode ):
                         self.versionInfo["SERVALCAT_VERSION"] = strs[1].strip()
                         #print("Servalcat  Version: ", self.versionInfo["SERVALCAT_VERSION"]) 
                 
-        # Refmac version info 
-        """
-        self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
-        self.runRefmacVersionInfo()
         
-        if os.path.isfile(self._log_name):
-            fRV = open(self._log_name, "r")
-            allLs = fRV.readlines()
-            fRV.close()
-            for aL in allLs:
-                strs = aL.strip().split()
-                if len(strs)== 4 and aL.find("Program") !=-1:
-                    self.versionInfo["REFMAC_NAME"] = strs[1].strip()[0:-1]
-                    #print "REFMAC NAME : ", self.versionInfo["REFMAC_NAME"] 
-                    self.versionInfo["REFMAC_VERSION"] = strs[3].strip()
-                    #print "REFMAC VERSION : ", self.versionInfo["REFMAC_VERSION"] 
-                    
-        else: 
-            print("Refmac version info is not available")
-
-        if "REFMAC_VERSION" not in self.versionInfo:
-            print("Refmac version info is not available")
-           
-        """     
     def setOutCifGlobSec(self):
        
         #if not self.fileConv.hasStrDescriptors:
@@ -592,11 +563,7 @@ class Acedrg(CExeCode ):
 
         self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(8), "rdkit".ljust(21), rdBase.rdkitVersion.ljust(12), '\"Chemoinformatics tool\"' )) 
   
-        #if "REFMAC_NAME" in self.versionInfo:
-        #    self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), self.versionInfo["REFMAC_NAME"].ljust(21), self.versionInfo["REFMAC_VERSION"].ljust(12),\
-        #                               '\"optimization tool\"'.ljust(40)))
-        #else:
-        #    self.outCifGlobSect.append("%s%s%s%s\n"%(self.monomRoot.ljust(4), "refmac".ljust(21), "?".ljust(12), '\"optimization tool\"'.ljust(40)))
+        
         
          
     def checInputFormat(self):
@@ -836,7 +803,8 @@ class Acedrg(CExeCode ):
                     if t_inputOptionsP.keku:
                         self.workMode = 114
                     else:
-                        self.workMode    = 11            
+                        self.workMode    = 11       
+                
                 elif t_inputOptionsP.inSmiName: 
                     self.inSmiName = t_inputOptionsP.inSmiName
                     self.workMode    = 12            
@@ -853,6 +821,9 @@ class Acedrg(CExeCode ):
                     self.inPdbName = t_inputOptionsP.inPdbName
                     self.workMode    = 16
                     self.useExistCoords = True
+                    
+                if t_inputOptionsP.inMetalPDBName:
+                    self.inMetalPDBName = t_inputOptionsP.inMetalPDBName
             else:
                 if t_inputOptionsP.inMmCifName:
                     if t_inputOptionsP.keku:
@@ -1109,8 +1080,7 @@ class Acedrg(CExeCode ):
         else:
             print("| ACEDRG Database version is not available                          |")
         print("| RDKit version:  %s|"%rdBase.rdkitVersion.ljust(50))
-        if "REFMAC_NAME" in self.versionInfo and "REFMAC_VERSION" in self.versionInfo:
-            print("| %s  %s|"%((self.versionInfo["REFMAC_NAME"] + ":").ljust(15), self.versionInfo["REFMAC_VERSION"].ljust(49)))
+        
         print("=====================================================================") 
         if self.workMode in [11, 12, 13, 14, 15, 16, 111, 121, 131, 141, 151, 161] :
         #if self.workMode == 11 or self.workMode==12 or self.workMode ==13 or self.workMode==14 or self.workMode==15 \
@@ -1645,123 +1615,7 @@ class Acedrg(CExeCode ):
         self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot) 
         self.subExecute()
 
-    def setRefmacCom1(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
-     
-        self._cmdline = "\""+self.refmac+"\""
-        self._cmdline += "  xyzin %s libin %s xyzout %s"%(tPdbIn, tLibIn, tPdbOut)
-        if platform.system()!="Windows": self._cmdline += " <<eof\n"
-        if tStage==0:
-            tLog = os.path.join(self.scrDir, "init_cif.log")
-            if platform.system()=="Windows":
-                self._cmdline = "(ECHO ligand && ECHO ncyc 40 && ECHO make hout yes && ECHO make hydr full && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "ligand    \n"
-                self._cmdline += "ncyc 10   \n"
-                self._cmdline += "make hout yes    \n"
-                self._cmdline += "make hydr full \n"
-                self._cmdline += "chir 4 \n"
-        elif tStage==1:
-            if platform.system()=="Windows":
-                self._cmdline = "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO vdwr 2.0 && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "ligand    \n"
-                self._cmdline += "make hout yes    \n"
-                self._cmdline += "make hydr full \n"
-                self._cmdline += "ncyc 30    \n"
-                self._cmdline += "vdwr 2.0   \n"
-        elif tStage==2:
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO mode newe && ECHO make hydr no && ECHO make news && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "mode newe \n"
-                self._cmdline += "make hydr no"
-                self._cmdline += "make news"
-        elif tStage==3:
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "make hout yes    \n"
-                self._cmdline += "make hydr full \n"
-                self._cmdline += "ncyc 40    \n"
-        else: 
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO mode newe && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "mode newe \n"
 
-        if platform.system()!="Windows":
-            self._cmdline += "end       \n"
-            self._cmdline += "eof       \n"
-
-        #print self._cmdline
-
-    def setRefmacCom2(self, tPdbIn, tLibIn, tPdbOut, tStage=2):
-     
-        self._cmdline = self.refmac
-        self._cmdline += "  xyzin %s libin %s xyzout %s"%(tPdbIn, tLibIn, tPdbOut)
-        if platform.system()!="Windows": self._cmdline += " <<eof\n"
-        if tStage==1:
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO mode newe && ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "mode newe \n"
-                self._cmdline += "make hout yes    \n"
-                self._cmdline += "make hydr full \n"
-                self._cmdline += "ncyc 40    \n"
-        elif tStage==2: 
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO mode newe && ECHO make hydr no && ECHO make news && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "mode newe \n"
-                self._cmdline += "make hydr no"
-                self._cmdline += "make news"
-        elif tStage==3: 
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO make hout yes && ECHO make hydr full && ECHO ncyc 40 && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "make hout yes    \n"
-                self._cmdline += "make hydr full \n"
-                self._cmdline += "ncyc 40    \n"
-        else:
-            if platform.system()=="Windows":
-                self._cmdline += "(ECHO mode newe && ECHO end) | " + self._cmdline
-            else:
-                self._cmdline += "mode newe \n"
-
-        if platform.system()!="Windows":
-            self._cmdline += "end       \n"
-            self._cmdline += "eof       \n"
-        #print self._cmdline
-
-    def runRefmac(self, tPdbIn, tLibIn, tStage=2):
-      
-        print("| Stage  %d        |"%tStage)
-        self._log_name    = os.path.join(self.scrDir, self.baseRoot + "_refmac_stage_"+ str(tStage) + ".log")
-        self.refmacXYZOUTName = os.path.join(self.scrDir, self.baseRoot + "_refmac_stage_"+ str(tStage) + ".pdb")
-        self.setRefmacCom1(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
-        self.subExecute()
-    
-    def runRefmac(self, tPdbIn, tLibIn, tRoot, tStage=2):
-      
-        #print "| Stage  %d        |"%tStage
-        #self._log_name    = os.path.join(self.scrDir, tRoot + "_refmac_stage_"+ str(tStage) + ".log")
-        #if tStage ==0:
-        #    self._log_name    = os.path.join(self.scrDir, "init_cif.log")
-        #    self.refmacXYZOUTName = os.path.join(self.scrDir, tRoot+ "_init" + ".cif")
-        #else:
-        self._log_name    = os.path.join(self.scrDir, tRoot + "_refmac_stage_"+ str(tStage) + ".log")
-        self.refmacXYZOUTName = os.path.join(self.scrDir, tRoot+ "_refmac_stage_"+ str(tStage) + ".pdb")
-        self.setRefmacCom1(tPdbIn, tLibIn, self.refmacXYZOUTName, tStage)
-        self.subExecute()
-
-    def runRefmacVersionInfo(self):
-
-        if self._log_name == "":
-            self._log_name    = os.path.join(self.scrDir, "refmac_version.log")
-
-        self._cmdline = self.refmacV  + " -i "
-        self.subExecute()
-    
     def runServalcat(self, tRoot, tInCif=None):
         
         aRoot = os.path.join(self.scrDir, tRoot)
@@ -1779,8 +1633,21 @@ class Acedrg(CExeCode ):
         
         
         self._log_name    = os.path.join(self.scrDir, "servalcat_version.log")
-        self._cmdline = "servalcat -v "
+        self._cmdline     = "servalcat -v "
         self.subExecute()
+        
+    def runMetalCoord(self, tInCifName):
+        
+        if os.path.isfile(self.inMetalPDBName):
+            aRoot = os.path.join(self.scrDir, self.monomRoot)
+            self._log_name  = aRoot +   "_metalCoord.log"
+            aOutCif         = self.monomRoot + "_metalCoord.cif" 
+            self._cmdline   = self.metalCoord 
+            self._cmdline += "  update -i %s   -o  %s -p %s "%(tInCifName, aOutCif, self.inMetalPDBName)
+            self.subExecute()       
+        else:
+            print("Program metalCoord requres an input pdb file containing your metal Ligand")
+            print("Please provide that file using --metalPDB your_pdb_file")
    
     def getFvalFromJson(self, tJSFN):
         
@@ -1826,62 +1693,16 @@ class Acedrg(CExeCode ):
                         aF.write(aL)
                     elif not lS :
                         aF.write(aL)
-            
-    def runGeoOpt(self):
-        
-        # Geometrical optimization
-        if os.path.isfile(self.outRstCifName) and os.path.isfile(self.outRstPdbName):
-            if os.path.getsize(self.outRstPdbName) > 100 and os.path.getsize(self.outRstCifName) > 50:
-                stageNow = 1
-                self.runRefmac(self.outRstPdbName, self.outRstCifName, stageNow)
-                if os.path.isfile(self.refmacXYZOUTName):
-                    tPdb1 = self.refmacXYZOUTName
-                    stageNow = 2
-                    self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                    if os.path.isfile(self.refmacXYZOUTName):
-                        tPdb1 = self.refmacXYZOUTName
-                        stageNow = 3
-                        self.runRefmac(tPdb1, self.outRstCifName, stageNow)
-                        if os.path.isfile(self.refmacXYZOUTName):
-                            finPdb = self.outRoot + ".pdb"
-                            finRst = self.outRoot + ".cif"
-                            #os.system("cp %s   %s "%(self.refmacXYZOUTName, finPdb))
-                            shutil.copy(self.refmacXYZOUTName, finPdb)
-                            #os.system("cp %s   %s "%(self.outRstCifName, finRst))
-                            if os.path.isfile(finPdb):
-                                self.inPdbName        = finPdb 
-                                self.inMmCifName      = self.outRstCifName
-                                self.outRstCifName    = finRst
-                                
-                                self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-                                print("===================================================================") 
-                            else:
-                                print("Failed to produce %s after final geometrical optimization"%finPdb)
-                        else:
-                            print("Failed to produce the  coordinates at stage 3 optimization") 
-                    else:
-                        print("Failed to produce the coordinates at stage 2 optimization") 
-                else:
-                    print("Failed to produce the coordinates at stage 1 optimization") 
-            else:
-                print("No dictionary file produced ! ") 
-        else:
-            print("No dictionary file produced ! ") 
                         
     def runGeoOpt(self, tRoot, tCifLibIn):
        
         # Geometrical optimization
         if os.path.isfile(tCifLibIn):
             if os.path.getsize(tCifLibIn) > 50:
-                #stageNow = 0
-                #self.runRefmac(tPdbIn, tCifLibIn, tRoot, stageNow)
+                
                 print("Servalcat is running")
                 self.runServalcat(tRoot, tCifLibIn)
-                #tPdbIn1 = self.refmacXYZOUTName 
-                #tPdbIn1 = tPdbIn 
-                #stageNow = 1
-                #self.runRefmac(tPdbIn1, tCifLibIn, tRoot, stageNow)
-                #self.refmacXYZOUTName
+                
                 
                 aOutDictCif = os.path.join(self.scrDir, tRoot + "_updated.cif")
                 #print("updated cif is ", aOutDictCif)
@@ -3460,6 +3281,7 @@ class Acedrg(CExeCode ):
                                                 self.fileConv.inputCharge) 
             
             elif len(self.fileConv.atoms) > 1 and not self.lOrg:
+                # Metal related 
                 print("Metal atoms are found")
                 print("outRoot ", self.outRoot)
                 aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
@@ -3472,9 +3294,15 @@ class Acedrg(CExeCode ):
                     self.runServalcat(self.outRoot, aFinInCif)
                     aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
                     if os.path.isfile(aSOutName):
-                        aFinCif = self.outRoot + "_final.cif"
-                        self.cleanSFile(aSOutName, aFinCif)
-                        print("The final output is %s "%aFinCif)
+                        aTmp3Cif = self.outRoot + "_tmp3.cif"
+                        self.cleanSFile(aSOutName, aTmp3Cif)
+                        print("The tmp3 output is %s "%aTmp3Cif)
+                        
+                        if os.path.isfile(aTmp3Cif):
+                            print("MetalCoord is running")
+                            self.runMetalCoord(aTmp3Cif)
+                            
+                            
                         print("=====================================================================")
                         print("|               Finished                                            |")
                         print("=====================================================================")
@@ -3618,28 +3446,6 @@ class Acedrg(CExeCode ):
             else:
                 print("The input %s does not exist"%self.inPdbName)
                 sys.exit()
-            #if self.workMode == 16: 
-            #    if not self.runExitCode :
-            #        # Stage 2: optimization
-            #        print("===================================================================") 
-            #        print("| Geometrical Optimization                                        |")
-            #        print("===================================================================") 
-            #            
-            #        if os.path.isfile(self.outRstCifName):
-            #            self.refmacXYZOUTName = ""
-            #            self.runRefmac(self.iniLigandPdbName, self.outRstCifName, self.baseRoot, 1)
-            #            if not self.runExitCode and os.path.isfile(self.refmacXYZOUTName):
-            #                finPdb = self.outRoot + ".pdb"
-            #                finRst = self.outRoot + ".cif"
-            #                shutil.copy(self.refmacXYZOUTName, finPdb)
-            #                if os.path.isfile(finPdb):
-            #                    self.inPdbName        = finPdb
-            #                    self.inMmCifName      = self.outRstCifName
-            #                    self.outRstCifName    = finRst
-            #                    self.transCoordsPdbToCif(self.inPdbName, self.inMmCifName, self.outRstCifName)
-            #                    #print "==================================================================="
-            #                else:
-            #                    print("Failed to produce %s after final geometrical optimization"%finPdb)
 
         if self.workMode in [21, 211]:
             

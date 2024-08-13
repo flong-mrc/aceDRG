@@ -393,7 +393,7 @@ namespace LIBMOL {
                     */
 
                     getOverallBondAndAnglesNew();
-                    // setBondOrderAndChargeInMols(allMolecules);
+                    setBondOrderAndChargeInMols(allMolecules);
                     outTables(tOutName, allMolecules, aSetOfInfMols);
 
                 }
@@ -7245,6 +7245,7 @@ namespace LIBMOL {
     void MolGenerator::outTableMols(std::ofstream & tMolTabs,
             Molecule & tMol)
     {
+
         if (tMol.atoms.size() > 0) {
             tMol.calcSumExcessElecs();
             tMol.calcSumCharges();
@@ -7594,14 +7595,22 @@ namespace LIBMOL {
                         tStr32= "0";
                     }
                     int aW =10;
+
                     if (tStr22.size() >aW)
                     {
                         aW=tStr2.size() + 4;
+                    }
+
+                    if (tStr3.size() >aW)
+                    {
+                        aW=tStr3.size() + 4;
                     }
                     if (tStr32.size() >aW)
                     {
                         aW=tStr32.size() + 4;
                     }
+
+
 
                     tMolTabs << std::setw(25) << iTor->id
                              << std::setw(6) << iTor->fullAtoms[0].chemType
@@ -7620,7 +7629,7 @@ namespace LIBMOL {
                              << std::setw(22) << tStr1
                              << std::setw(16) << tStr2
                              << std::setw(aW) << tStr22
-                             << std::setw(16) << tStr3
+                             << std::setw(aW) << tStr3
                              << std::setw(aW) << tStr32 << std::endl;
             }
 

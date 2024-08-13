@@ -135,8 +135,8 @@ namespace LIBMOL
             int t_len =0;
             int t_m_len =0;
 
-            //std::cout << "Atom " << iAt->id << " with Charge "
-            //          << iAt->charge << std::endl;
+            std::cout << "Atom " << iAt->id << " with Charge "
+                      << iAt->charge << std::endl;
 
             for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
                     iConn !=iAt->connAtoms.end(); iConn++)
@@ -151,6 +151,8 @@ namespace LIBMOL
                 }
             }
 
+
+
             if (iAt->connMAtoms.size()>0)
             {
                 t_m_len = iAt->connMAtoms.size();
@@ -160,6 +162,8 @@ namespace LIBMOL
             {
                 t_len=3;
             }
+            std::cout << "t_len " << t_len << std::endl;
+            std::cout << "t_m_len " << t_m_len << std::endl;
 
             numConnMap[iAt->id].push_back(t_len);
             numConnMap[iAt->id].push_back(t_m_len);
@@ -213,6 +217,10 @@ namespace LIBMOL
                     else if (t_m_len==1 || iAt->charge==-1.0)
                     {
                         iAt->bondingIdx = 2;
+                    }
+                    else if (t_m_len==1 || iAt->charge==-2.0)
+                    {
+                        iAt->bondingIdx = 1;
                     }
                     else
                     {
@@ -346,7 +354,7 @@ namespace LIBMOL
                     {
                         iAt->chiralIdx  = 2;
                     }
-                    iAt->bondingIdx = 3;
+                    iAt->bondingIdx = 2;
                 }
                 else if (t_len==3 || t_len==4)
                 {
@@ -653,7 +661,7 @@ namespace LIBMOL
 
         // Check
 
-        /*
+
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -667,7 +675,7 @@ namespace LIBMOL
         }
         //std::cout << "Chiral and plane feather for atoms in the system"
         //          << std::endl;
-
+        /*
 
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
@@ -5331,6 +5339,8 @@ namespace LIBMOL
         setAllMetalBO(tAtoms, tBonds, curValMap, outElectronMap,
                       chargeMap, elemMap, allAtmBondingMap, doneAtoms, doneBonds);
 
+        //PickSingBonds(tAtoms, tBonds, tRings, curValMap, outElectronMap,
+        //              chargeMap, elemMap, allAtmBondingMap, doneAtoms, doneBonds);
         //std::cout << "Those atoms are set MetalBo" << std::endl;
         //    for (std::vector<int>::iterator iD= doneAtoms.begin();
         //         iD != doneAtoms.end(); iD++)
@@ -5339,7 +5349,10 @@ namespace LIBMOL
         //    }
 
         std::vector<int> aFused3Set;
-        setOneBondFusedRing(tAtoms, tBonds, tRings, allAtmBondingMap, doneAtoms,
+
+        std::cout << "Before setOneBondFusedRing " << std::endl;
+
+        setOneBondFusedRing(tAtoms, tBonds, tRings, allAtmBondingMap, curValMap, doneAtoms,
                             doneFAtoms, doneBonds, aFused3Set);
 
         std::cout << "After setOneBondFusedRing " << std::endl;
@@ -5762,8 +5775,8 @@ namespace LIBMOL
             std::cout << " atom serial number " << iAt->seriNum << std::endl;
             std::cout << "The valence of " << iAt->id << " of " << iAt->chemType
                       << " is " << tCurVal[iAt->seriNum] << std::endl;
-            std::cout << " The number of out-shell electrons is "
-                      << tOutEMap[iAt->seriNum] << std::endl;
+            //std::cout << " The number of out-shell electrons is "
+            //          << tOutEMap[iAt->seriNum] << std::endl;
             std::cout << "it bonds to " << iAt->connAtoms.size()
                       << " atoms " << std::endl;
 
@@ -6164,6 +6177,9 @@ namespace LIBMOL
                     }
                     else if (iAt->chemType=="O")
                     {
+                        std::cout << "here 1 " << std::endl;
+                        if (tAtoms[iAt->seriNum].connMAtoms.size()==0)
+                        {
                         if (tAtoms[nonMConn].chemType=="N" )
                         {
                             if (tAtoms[nonMConn].connAtoms.size() >=3)
@@ -6207,7 +6223,7 @@ namespace LIBMOL
                                 else if (remVal==3)
                                 {
                                     int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
-                                    if (N0<2)
+                                    if (N0<3)
                                     {
                                         tBonds[idxB].orderN = 2;
                                         tDoneBonds.push_back(idxB);
@@ -6248,6 +6264,12 @@ namespace LIBMOL
                                     tDoneAtoms.push_back(iAt->seriNum);
                                 }
                             }
+                        }
+                        }
+                        else
+                        {
+                            int idxB = tAllAtmBondingMap[iAt->seriNum][nonMConn];
+                            tBonds[idxB].orderN = 1;
                         }
                     }
 
@@ -6327,8 +6349,7 @@ namespace LIBMOL
                     for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
                          iNB != iAt->connAtoms.end(); iNB++)
                     {
-                        ///std::cout << "HereNB " << tAtoms[*iNB].id << std::endl;
-                        std::cout << tAtoms[*iNB].isMetal << std::endl;
+                        // std::cout << tAtoms[*iNB].isMetal << std::endl;
                         //std::cout << "Charge " << tAtoms[*iNB].charge << std::endl;
                         if (!tAtoms[*iNB].isMetal)
                         {
@@ -6364,9 +6385,9 @@ namespace LIBMOL
                     //{
                     //    remBO-=iAt->charge;
                     //}
-                    //std::cout << "Remained val is " << remBO << std::endl;
-                    //std::cout << "Non assigned bonds are " << nonAssBos.size()
-                    //          << std::endl;
+                    std::cout << "Remained val is " << remBO << std::endl;
+                    std::cout << "Non assigned bonds are " << nonAssBos.size()
+                              << std::endl;
                     //std::cout  << "connected atoms are "
                     //           << iAt->connAtoms.size() << std::endl;
                     //std::cout << "bonding to metal " <<  metalNB.size()
@@ -6403,7 +6424,6 @@ namespace LIBMOL
                         int idxNB =  nonAssAtms[0];
                         std::vector<int> nonAssBosNB;
                         int assBONB =0;
-                        // std::cout << "Here0 " << std::endl;
                         for (std::vector<int>::iterator iNNB = tAtoms[idxNB].connAtoms.begin();
                              iNNB != tAtoms[idxNB].connAtoms.end(); iNNB++)
                         {
@@ -6431,11 +6451,11 @@ namespace LIBMOL
                             remBONB-=tAtoms[idxNB].charge;
                         }
                         int allowBO = remBONB - remBO;
-                        //std::cout << "Check NB atom " << tAtoms[idxNB].id << std::endl;
-                        //std::cout << "Remained val is " << remBONB << std::endl;
-                        //std::cout << "Non assigned bonds are " << nonAssBosNB.size()
-                        //          << std::endl;
-                        //std::cout << "allow BO is " << allowBO << std::endl;
+                        std::cout << "Check NB atom " << tAtoms[idxNB].id << std::endl;
+                        std::cout << "Remained val is " << remBONB << std::endl;
+                        std::cout << "Non assigned bonds are " << nonAssBosNB.size()
+                                  << std::endl;
+                        std::cout << "allow BO is " << allowBO << std::endl;
                         if (nonAssBosNB.size()==0 && remBONB==remBO)
                         {
                             tBonds[nonAssBos[0]].orderN = remBO;
@@ -6493,7 +6513,8 @@ namespace LIBMOL
                                 {
                                     if (metalNB.size() ==0)
                                     {
-                                        tBonds[nonAssBos[0]].orderN = remBO;
+                                        tBonds[nonAssBos[0]].orderN = 1;
+                                        iAt->charge = tBonds[nonAssBos[0]].orderN - remBO;
                                     }
                                     else
                                     {
@@ -6533,6 +6554,7 @@ namespace LIBMOL
         }while(lCh && numIs < maxNumIs);
 
         std::cout << "After PickSingBonds stage 1 : " << std::endl;
+
         for (std::vector<BondDict>::iterator iBo= tBonds.begin();
                 iBo != tBonds.end(); iBo++)
         {
@@ -6663,24 +6685,37 @@ namespace LIBMOL
                     {
                         std::cout << "non assigned bonds for " << iAt->id
                                   << " is " << nR << std::endl;
-                        int nNBOrder =0;
-                        for (std::vector<int>::iterator
-                            iNBAt = tAtoms[nNonAs[0]].connAtoms.begin();
-                            iNBAt != tAtoms[nNonAs[0]].connAtoms.end(); iNBAt++)
-                        {
-                            int idxNNBond = tAllAtmBondingMap[nNonAs[0]][*iNBAt];
-                            nNBOrder+=tBonds[idxNNBond].orderN;
-                        }
+                        int nRV2 =0;
+                        int nNBUnSetBonds=0;
+                        setResValAndUnsetBondsForAtom(tAtoms[nNonAs[0]], tBonds, tAllAtmBondingMap,
+                                                      tCurVal,  nRV2, nNBUnSetBonds);
+                        //for (std::vector<int>::iterator
+                        //    iNBAt = tAtoms[nNonAs[0]].connAtoms.begin();
+                        //    iNBAt != tAtoms[nNonAs[0]].connAtoms.end(); iNBAt++)
+                        //{
+                        //    int idxNNBond = tAllAtmBondingMap[nNonAs[0]][*iNBAt];
+                        //    nNBOrder+=tBonds[idxNNBond].orderN;
+                        //}
 
-                        int nRV2 = tCurVal[nNonAs[0]] - nNBOrder + tAtoms[nNonAs[0]].charge;
+                        //int nRV2 = tCurVal[nNonAs[0]] - nNBOrder + tAtoms[nNonAs[0]].charge;
                         std::cout << "NB atom " <<  tAtoms[nNonAs[0]].id << std::endl;
-                        std::cout << "NB Left order is " << nRV2 << std::endl;
+                        std::cout << "NB Left order is " << nRV2<< std::endl;
+                        std::cout << "NB undecidedBonds is " << nNBUnSetBonds << std::endl;
                         int idxBo = tAllAtmBondingMap[iAt->seriNum][nNonAs[0]];
                         if (nRV <=nRV2)
                         {
-                            OrderToStr(nRV, tBonds[idxBo].order);
-                            tBonds[idxBo].orderN = nRV;
-                            tDoneBonds.push_back(idxBo);
+                            //OrderToStr(nRV, tBonds[idxBo].order);
+                            if (nRV >= nNBUnSetBonds)
+                            {
+                                tBonds[idxBo].orderN = nRV - nNBUnSetBonds +1;
+                                tDoneBonds.push_back(idxBo);
+                            }
+                            else
+                            {
+                                tBonds[idxBo].orderN = nRV;
+                                tDoneBonds.push_back(idxBo);
+                            }
+
                         }
                         else
                         {
@@ -6872,6 +6907,8 @@ namespace LIBMOL
                     std::cout << "Size-6 ring:  " << tRings[idxRs[j]].rep << std::endl;
                     int numCs =0;
                     int numNC3 =0;
+                    int numNC4 =0;
+                    int idxNC4 = -1;
                     std::vector<int> idxAtms;
                     for (std::vector<AtomDict>::iterator iAt= tRings[idxRs[j]].atoms.begin();
                          iAt != tRings[idxRs[j]].atoms.end(); iAt++)
@@ -6899,10 +6936,17 @@ namespace LIBMOL
                                 numCs++;
                                 numNC3++;
                             }
+                            else if (nonMAC==3)
+                            {
+                                numCs++;
+                                numNC4++;
+                                idxNC4 = iAt->seriNum;
+                            }
                             //std::cout << " numNC3 " << numNC3 << std::endl;
                         }
                     }
                     std::cout << "numCs=" << numCs << std::endl;
+                    std::cout << "numNC3=" << numNC3 << std::endl;
                     std::cout << "numNC3=" << numNC3 << std::endl;
                     if (numCs==6 && numNC3==6)
                     {
@@ -6910,14 +6954,26 @@ namespace LIBMOL
                         {
 
                             setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
-                                                tAllAtmBondingMap, tDoneAtoms,
+                                                tAllAtmBondingMap, tCurVal, tDoneAtoms,
                                                 tDoneFAtoms, tDoneBonds);
+                        }
+                    }
+                    else if (numCs==6 && numNC3==5 && numNC4==1 && idxNC4 >=0)
+                    {
+                        if (std::find(tExcFRings.begin(), tExcFRings.end(), idxRs[j])==tExcFRings.end())
+                        {
+                            std::cout << "NewFeature " << std::endl;
+                            tAtoms[idxNC4].charge= 1.0;
+                            setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
+                                            tAllAtmBondingMap, tCurVal, tDoneAtoms,
+                                            tDoneFAtoms, tDoneBonds);
                         }
                     }
                     else if (numCs==6)
                     {
+
                         setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
-                                            tAllAtmBondingMap, tDoneAtoms,
+                                            tAllAtmBondingMap, tCurVal, tDoneAtoms,
                                             tDoneFAtoms, tDoneBonds);
                     }
                 }
@@ -7054,6 +7110,7 @@ namespace LIBMOL
                                          RingDict                    & tRing,
                                          std::map<int,
                                 std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds)
@@ -7087,25 +7144,28 @@ namespace LIBMOL
             {
                 //std::cout << "check atom " << tRing.atoms[idxStart].id << std::endl;
                 int idxAA= tRing.atoms[idxStart].seriNum;
-                for (std::vector<int>::iterator iCA=tRing.atoms[idxStart].connAtoms.begin();
-                     iCA!=tRing.atoms[idxStart].connAtoms.end(); iCA++)
+                if (getUnsetBondsForAtom(tAtoms[idxAA], tBonds, tAllAtmBondingMap) >0)
                 {
-                    // std::cout << "connnected atom " << tAtoms[*iCA].id << std::endl;
-                    if (std::find(idxRiAtms.begin(), idxRiAtms.end(), *iCA) !=idxRiAtms.end())
+                    for (std::vector<int>::iterator iCA=tRing.atoms[idxStart].connAtoms.begin();
+                         iCA!=tRing.atoms[idxStart].connAtoms.end(); iCA++)
                     {
-                        int idxBB=tAllAtmBondingMap[idxAA][*iCA];
-                        //std::cout << "Bond idx " << idxBB << std::endl;
-
-                        if (std::find(tDoneBonds.begin(), tDoneBonds.end(), idxBB)
-                            !=tDoneBonds.end())
+                        // std::cout << "connnected atom " << tAtoms[*iCA].id << std::endl;
+                        if (std::find(idxRiAtms.begin(), idxRiAtms.end(), *iCA) !=idxRiAtms.end())
                         {
-                            //std::cout << "it is done " << std::endl;
-                            idxRStart = idxStart;
-                            lPart = true;
-                            break;
+                            int idxBB=tAllAtmBondingMap[idxAA][*iCA];
+                            //std::cout << "Bond idx " << idxBB << std::endl;
+
+                            if (std::find(tDoneBonds.begin(), tDoneBonds.end(), idxBB)
+                            !=tDoneBonds.end())
+                            {
+                                //std::cout << "it is done " << std::endl;
+                                idxRStart = idxStart;
+                                lPart = true;
+                                break;
+                            }
                         }
-                    }
                     //std::cout << "lPart " << lPart << std::endl;
+                    }
                 }
             }
             if (lPart)
@@ -7143,13 +7203,31 @@ namespace LIBMOL
                         if (std::find(tDoneBonds.begin(), tDoneBonds.end(), idxB)
                             ==tDoneBonds.end())
                         {
-                            tBonds[idxB].orderN = 2;
-                            tDoneBonds.push_back(idxB);
-                            iSt=*iC;
-                            nPre =2;
-                            //std::cout << "sset 1" << std::endl;
+                            int curResVal =0;
+                            int curNumUnsetBonds = 0;
+                            setResValAndUnsetBondsForAtom(tAtoms[idxA],  tBonds, tAllAtmBondingMap,
+                                                          tCurVal, curResVal, curNumUnsetBonds);
+                            std::cout << "ResVal :" << curResVal << std::endl;
+                            std::cout << "NumUnsetBonds :" <<  curNumUnsetBonds << std::endl;
+                            if (curResVal > curNumUnsetBonds)
+                            {
+                                tBonds[idxB].orderN = 2;
+                                tDoneBonds.push_back(idxB);
+                                iSt=*iC;
+                                nPre =2;
+                                std::cout << "sset 1" << std::endl;
+                            }
+                            else if (curResVal <= curNumUnsetBonds)
+                            {
+                                tBonds[idxB].orderN = 1;
+                                tDoneBonds.push_back(idxB);
+                                iSt=*iC;
+                                nPre =1;
+                                std::cout << "sset 2" << std::endl;
+                            }
                             i++;
                         }
+
                     }
                     else
                     {
@@ -7784,13 +7862,8 @@ namespace LIBMOL
             }
             */
         }
-
-
-
-
-
-
     }
+
 
 
     void KekulizeMol::setOneBondFusedRing(std::vector<AtomDict>    & tAtoms,
@@ -7798,6 +7871,7 @@ namespace LIBMOL
                                          std::vector<RingDict>     & tRings,
                                          std::map<int,
                                 std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds,
@@ -7805,13 +7879,51 @@ namespace LIBMOL
     {
 
         std::vector<std::vector<int> >  mergedRingSets;
-        mergePlaneRings(tRings, mergedRingSets, tAtoms);
+        std::cout << "Number of rings " << tRings.size() << std::endl;
+        std::cout << "mergePlaneRings " << std::endl;
+        mergePlaneRings2(tRings, mergedRingSets, tAtoms);
         bool allowSys = true;
-        if (mergedRingSets.size() !=0)
+        std::cout << "Number of merged sys is " << mergedRingSets.size() << std::endl;
+        // Test
+        if (mergedRingSets.size() > 0)
         {
             for (std::vector<std::vector<int> >::iterator iMr=mergedRingSets.begin();
                     iMr != mergedRingSets.end(); iMr++)
             {
+                if (iMr->size() >1 )
+                {
+                    for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                    {
+                        if (tRings[*iR].atoms.size() ==6)
+                        {
+                            std::cout << "entered 6 mem ring" << std::endl;
+                            int numCs = 0;
+                            for (std::vector<AtomDict>::iterator iAt=tRings[*iR].atoms.begin();
+                                 iAt!=tRings[*iR].atoms.end(); iAt++)
+                            {
+                                if (iAt->chemType =="C")
+                                {
+                                    numCs++;
+                                }
+                            }
+                            if (numCs==6)
+                            {
+                                std:: cout << "a 6-m C ring is selected " << std::endl;
+                                std::cout << "The ring is " << tRings[*iR].rep << std::endl;
+                                setOneIsolateC6Ring(tAtoms,tBonds, tRings[*iR],
+                                                tAllAtmBondingMap, tCurVal, tDoneAtoms,
+                                                tDoneFAtoms, tDoneBonds);
+                                allowSys = false;
+                                break;
+                            }
+                        }
+                    }
+                    allowSys = false;
+                }
+                else
+                {
+
                 for (std::vector<int>::iterator iR=iMr->begin();
                         iR != iMr->end(); iR++)
                 {
@@ -7842,12 +7954,13 @@ namespace LIBMOL
                     break;
                 }
             }
+            }
         }
         else
         {
             allowSys = false;
         }
-
+        std::cout << "allowSys " << allowSys  << std::endl;
         if (allowSys)
         {
 
@@ -7934,6 +8047,7 @@ namespace LIBMOL
                                 std::vector<RingDict>      & tRings,
                                 std::map<int,
                                 std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds)
@@ -7966,19 +8080,24 @@ namespace LIBMOL
 
             std::cout << "nC3R6 " << nC3R6 << std::endl;
             std::cout << "nCha " << nCha << std::endl;
-            if (nC3R6==6 && nCha !=0)
+            if (nC3R6==6 && nCha ==2)
             {
                 idxRings.push_back(idxR);
                 std::cout << "ring " << tRings[idxR].rep
                           << " is selected " << std::endl;
+                adjustC6Charged2Ring(idxR, tAtoms, tBonds, tRings, tAllAtmBondingMap,
+                                      tCurVal, tDoneAtoms, tDoneFAtoms,tDoneBonds);
+
             }
 
         }
+
+        /*
         std::cout << "idxRings " << idxRings.size() << std::endl;
         if (idxRings.size()> 0)
         {
             for (int i=0; i < idxRings.size(); i++)
-            {
+           {
                 int idxA1 =-1, idxA2=-1, idxA3=-1;
                 int idxB1 =-1;
                 std::vector<int> idxAR;
@@ -8086,12 +8205,94 @@ namespace LIBMOL
 
 
                 }
+
             }
+
         }
+        */
 
     }
 
+    void  KekulizeMol::adjustC6Charged2Ring(
+                                int                        tIdxRing,
+                                std::vector<AtomDict>      & tAtoms,
+                                std::vector<BondDict>      & tBonds,
+                                std::vector<RingDict>      & tRings,
+                                std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds)
+    {
+        // re-set those ring bonds as unDone
+        std::vector<int> idxRAtms;
+        std::vector<int> tReBIdx;
+        std::cout << "number of in-ring atoms " << tRings[tIdxRing].atoms.size() << std::endl;
 
+        for (std::vector<AtomDict>::iterator iA=tRings[tIdxRing].atoms.begin();
+                iA != tRings[tIdxRing].atoms.end(); iA++)
+        {
+            idxRAtms.push_back(iA->seriNum);
+            tAtoms[iA->seriNum].charge = 0;
+        }
+
+        for (std::vector<AtomDict>::iterator iA=tRings[tIdxRing].atoms.begin();
+                iA != tRings[tIdxRing].atoms.end(); iA++)
+        {
+            for (std::vector<int>::iterator iNB = iA->connAtoms.begin();
+                         iNB != iA->connAtoms.end(); iNB++)
+            {
+                if (std::find(idxRAtms.begin(), idxRAtms.end(), *iNB) !=idxRAtms.end())
+                {
+                    int idxB=tAllAtmBondingMap[iA->seriNum][*iNB];
+                    if (std::find(tReBIdx.begin(), tReBIdx.end(), idxB)==tReBIdx.end())
+                    {
+                        tReBIdx.push_back(idxB);
+                    }
+                }
+            }
+        }
+
+        // Set ring bonds to undone
+        std::vector<int> tmpDoneBonds;
+
+        for (std::vector<int>::iterator aB=tDoneBonds.begin();
+              aB!=tDoneBonds.end(); aB++)
+        {
+            if (std::find(tReBIdx.begin(), tReBIdx.end(), *aB) == tReBIdx.end())
+            {
+                tmpDoneBonds.push_back(*aB);
+            }
+        }
+
+        tDoneBonds.clear();
+
+        for (std::vector<int>::iterator aB=tmpDoneBonds.begin();
+              aB!=tmpDoneBonds.end(); aB++)
+        {
+            tDoneBonds.push_back(*aB);
+        }
+
+        // redo the ring.
+        setOneIsolateC6Ring(tAtoms, tBonds, tRings[tIdxRing],
+                            tAllAtmBondingMap, tCurVal, tDoneAtoms,
+                            tDoneFAtoms, tDoneBonds);
+
+        /*
+        std::cout << "number of in-ring bonds " << tRings[tIdxRing].bondIdxs.size() << std::endl;
+        for (std::vector<int>::iterator iBo=tRings[tIdxRing].bondIdxs.begin();
+                iBo != tRings[tIdxRing].bondIdxs.end(); iBo++)
+        {
+            tReBIdx.push_back(*iBo);
+            std::cout << "Bond between atom " <<  tAtoms[tBonds[*iBo].atomsIdx[0]].id
+                      << " and " <<   tAtoms[tBonds[*iBo].atomsIdx[0]].id
+                      << " will be reset " << std::endl;
+        }
+        */
+
+
+    }
 
     void KekulizeMol::FurtheAssignBandC(
                            std::vector<AtomDict>         & tAtoms,
@@ -8292,6 +8493,35 @@ namespace LIBMOL
             std::cout << "Atom " << iAt->id << " has a charge of "
                       << iAt->charge << std::endl;
         }
+
+    }
+
+    void KekulizeMol::setResValAndUnsetBondsForAtom(
+                             AtomDict                 & tAtom,
+                             std::vector<BondDict>    & tBonds,
+                             std::map<int,
+                             std::map<int, int> >     & tAllAtmBondingMap,
+                             std::map<int, int>       & tCurVal,
+                             int                      &  tResVal,
+                             int                      &  tNumUnSetBonds)
+    {
+
+        int aSumBo =0;
+
+        for (std::vector<int>::iterator iNB = tAtom.connAtoms.begin();
+                         iNB != tAtom.connAtoms.end(); iNB++)
+        {
+            int idxBo = tAllAtmBondingMap[tAtom.seriNum][*iNB];
+            aSumBo  += tBonds[idxBo].orderN;
+             if (tBonds[idxBo].orderN==0)
+            {
+                tNumUnSetBonds+=1;
+            }
+
+        }
+
+        tResVal = tCurVal[tAtom.seriNum] - aSumBo + tAtom.charge;
+
 
     }
 
@@ -8572,6 +8802,9 @@ namespace LIBMOL
 
         }
 
+        adjustC6ChargedRing(tAtoms, tBonds, tRings, tAllAtmBondingMap,
+                            tCurVal, tDoneAtoms, tDoneFAtoms, tDoneBonds);
+
         modChargeAndBOforSpecialCases(tAtoms, tBonds, tRings);
         /*
         // Adjust charges on atoms C if needed
@@ -8651,7 +8884,7 @@ namespace LIBMOL
         }
 
         //adjustC6ChargedRing(tAtoms, tBonds, tRings, tAllAtmBondingMap,
-        //                     tDoneAtoms, tDoneFAtoms, tDoneBonds);
+        //                    tCurVal, tDoneAtoms, tDoneFAtoms, tDoneBonds);
 
         modAromRings(tRings);
     }

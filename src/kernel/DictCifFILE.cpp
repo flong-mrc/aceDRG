@@ -2795,7 +2795,7 @@ namespace LIBMOL
                 }
                 else
                 {
-                    std::cout << "Line: " << (*iAtm) << std::endl
+                    std::cout << "atom Line: " << (*iAtm) << std::endl
                              << " is not consistent with the following tags of this loop_ "
                              << std::endl;
                     for (std::vector<std::string>::iterator iLab=tOnePropGroup["lab"].begin();

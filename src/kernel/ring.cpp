@@ -448,8 +448,6 @@ namespace LIBMOL
                                 std::vector<std::vector<int> > & tRingAtoms)
     {
 
-        // std::cout << "Number of rings " << tAllRings.size() << std::endl;
-
 
         // Connected planar rings
         std::vector<int> DoneList;
@@ -457,6 +455,7 @@ namespace LIBMOL
 
         for (unsigned i=0; i < tAllRings.size(); i++)
         {
+
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
 
@@ -543,13 +542,14 @@ namespace LIBMOL
         */
         // Connected planar rings
 
+
         std::vector<int> DoneList;
         std::vector<std::vector<int> > mergedRings;       // The inside vector represents a set of merged rings
         // std::cout << "Number of rings " << tAllRings.size() << std::endl;
         for (unsigned i=0; i < tAllRings.size(); i++)
         {
-            //std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
-            //std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
+            std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
+            std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
 
@@ -559,13 +559,13 @@ namespace LIBMOL
                 std::vector<int> curLinkedRing;
                 curLinkedRing.push_back(i);
                 findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing);
-                /*
+
                 std::cout << "those are connected : " << std::endl;
                 for (unsigned cr=0; cr < curLinkedRing.size(); cr++)
                 {
                     std::cout << tAllRings[curLinkedRing[cr]].rep << std::endl;
                 }
-                */
+
                 if (curLinkedRing.size() > 1)
                 {
                     mergedRings.push_back(curLinkedRing);
@@ -706,6 +706,120 @@ namespace LIBMOL
 
     }
 
+    extern void mergePlaneRings2(std::vector<RingDict>          & tAllRings,
+                                std::vector<std::vector<int> >  & tMergedRings,
+                                std::vector<AtomDict >          & tAtoms)
+    {
+
+        /*
+        for (unsigned i=0; i < tAllRings.size(); i++)
+        {
+            std::cout << "Is ring " << i+1 << " planar ring ? "
+                      << tAllRings[i].isPlanar << std::endl;
+        }
+        */
+        // Connected planar rings
+
+
+        std::vector<int> DoneList;
+
+        // std::cout << "Number of rings " << tAllRings.size() << std::endl;
+        for (unsigned i=0; i < tAllRings.size(); i++)
+        {
+            std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
+            std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
+            if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
+            {
+
+                // std::cout << "Planar ring " << tAllRings[i].rep << std::endl;
+
+                DoneList.push_back(i);
+                std::vector<int> curLinkedRing;
+                curLinkedRing.push_back(i);
+                findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing);
+
+                std::cout << "those are connected : " << std::endl;
+                for (unsigned cr=0; cr < curLinkedRing.size(); cr++)
+                {
+                    std::cout << tAllRings[curLinkedRing[cr]].rep << std::endl;
+                }
+
+                if (curLinkedRing.size() > 1)
+                {
+                    tMergedRings.push_back(curLinkedRing);
+                }
+            }
+
+        }
+
+
+        if (tMergedRings.size() !=0)
+        {
+
+            //std::cout << "number of Merged planar rings : "
+            //          << mergedRings.size() << std::endl;
+            for (std::vector<std::vector<int> >::iterator iMr=tMergedRings.begin();
+                    iMr != tMergedRings.end(); iMr++)
+            {
+                std::vector<int> atmIdxs;
+                //std::cout << "A merged system contains " << iMr->size()
+                //          << " rings. They are:  " << std::endl;
+                for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                {
+                    // std::cout << "The Ring with atoms " << std::endl;
+                    for (std::vector<AtomDict>::iterator iA=tAllRings[*iR].atoms.begin();
+                            iA != tAllRings[*iR].atoms.end(); iA++)
+                    {
+                        // std::cout << iA->id << std::endl;
+                        if(std::find(atmIdxs.begin(), atmIdxs.end(), iA->seriNum)
+                            ==atmIdxs.end())
+                        {
+                            atmIdxs.push_back(iA->seriNum);
+                        }
+                    }
+                }
+
+                //std::cout << "Overall, The merged system contains "
+                //          << atmIdxs.size() << " atoms " << std::endl;
+
+
+                if(checkAromaSys(atmIdxs, tAtoms))
+                {
+                    // std::cout << "It is an aromatic system" << std::endl;
+                    for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                    {
+                        tAllRings[*iR].isAromatic = true;
+                    }
+                }
+                else
+                {
+                    //std::cout << "It is not aromatic system for the merged system"
+                    //          << std::endl;
+                    // Further check
+                    std::vector<int> atmIdxsOR;
+                    for (std::vector<int>::iterator iR=iMr->begin();
+                        iR != iMr->end(); iR++)
+                    {
+                        if (!tAllRings[*iR].isAromatic)
+                        {
+                           for (std::vector<AtomDict>::iterator iRAt=tAllRings[*iR].atoms.begin();
+                                   iRAt !=tAllRings[*iR].atoms.end(); iRAt++)
+                           {
+                               atmIdxsOR.push_back(iRAt->seriNum);
+                           }
+                           if (checkAromaSys(atmIdxsOR, tAtoms))
+                           {
+                               tAllRings[*iR].isAromatic = true;
+                           }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
 
     // A recursive function that get a set of planar rings sharing edges

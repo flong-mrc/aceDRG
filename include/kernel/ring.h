@@ -158,6 +158,12 @@ namespace LIBMOL
                                 std::vector<std::vector<int> > & tRingAtoms,
                                 std::vector<AtomDict>          & tAtoms);
 
+    // a copy mergePlaneRings used to kekulization so that its changes would not
+    // affect other sections in libmol
+    extern void mergePlaneRings2(std::vector<RingDict>          & tAllRings,
+                                std::vector<std::vector<int> > & tRingAtoms,
+                                std::vector<AtomDict>          & tAtoms);
+
     extern void findAllRingsConnectedOneRing(int tCurIdx, std::vector<RingDict> & tRings,
                                              std::vector<int>                   & DoneList,
                                              std::vector<int>                   & curLinkedRing);

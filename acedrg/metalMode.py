@@ -17,7 +17,9 @@ from .  utility    import getLinkedGroups
 
 class metalMode(CExeCode):
 
-    def __init__( self):
+    def __init__( self, tTabLoc):
+        
+        self.acedrgTables         = tTabLoc
         
         self.remainAtoms          = []
         self.metalAtoms           = []
@@ -134,9 +136,44 @@ class metalMode(CExeCode):
             if os.path.isfile(outTmpCifName):
                 aRet = outTmpCifName
                 
-        return aRet         
+        return aRet
+
+    def getRadii(self):
+
+        aFN = os.path.join(self.acedrgTables, "radii.table") 
+        if os.path.isfile(aFN):
+            aF = open(aFN, "r")
+            allLs = aF.readlines()
+            aF.close()
+            
+            self.radii = {}
+            for aL in allLs:
+                strs = aL.strip().split()
+                if len (aL) > 0 and len(strs)==3 and aL[0].find("#")==-1:
+                    strs[0] = strs[0].upper()
+                    if not strs[0] in self.radii.keys():
+                        self.radii[strs[0]] = {}
+                    self.radii[strs[0]][strs[1]] = float(strs[2].strip())
+    
+    def setBondValueFromRadii(self, tAtom1, tAtom2, tBond):
+        
+        aElem1 = tAtom1['_chem_comp_atom.type_symbol'] 
+        aElem2 = tAtom2['_chem_comp_atom.type_symbol'] 
+        
+        
+        if aElem1 in self.radii and aElem2 in self.radii:
+            if "cova" in self.radii[aElem1] and "cova" in self.radii[aElem2]:
+                aVal = self.radii[aElem1]["cova"] + self.radii[aElem2]["cova"]      
+                tBond["_chem_comp_bond.value_dist"] = "%4.3f"%aVal
+            else:
+                tBond["_chem_comp_bond.value_dist"] = "2.0"
+        else:
+            tBond["_chem_comp_bond.value_dist"]  = "2.0"
         
     def getNewMolWithoutMetal(self, tAtoms, tBonds, tChem):
+        
+        
+        self.getRadii()
         
         metalIds = []
         for aAtom in tAtoms:
@@ -150,6 +187,8 @@ class metalMode(CExeCode):
                     metalIds.append(aAtom['_chem_comp_atom.atom_id'])
                 else:
                     self.remainAtoms.append(aAtom)
+                    
+                    
         print("number of all atoms is ", len(tAtoms))
         print("number of metal atoms is ", len(self.metalAtoms))
         print("number of org atoms is ", len(self.remainAtoms))
@@ -164,6 +203,7 @@ class metalMode(CExeCode):
                 if not aBond['_chem_comp_bond.atom_id_1'] in self.metalConnAtomsMap:
                     self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']] = []
                 self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
+                self.setBondValueFromRadii(atm1, atm2, aBond)
                 self.metalBonds.append(aBond)
                 if not aBond['_chem_comp_bond.atom_id_2'] in metalIds:
                     if not aBond['_chem_comp_bond.atom_id_2'] in self.connMAMap:
@@ -178,6 +218,13 @@ class metalMode(CExeCode):
                     if not aBond['_chem_comp_bond.atom_id_1'] in self.connMAMap:
                         self.connMAMap[aBond['_chem_comp_bond.atom_id_1']] = []
                     self.connMAMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
+            
+            # Check here 
+            for aMA in  self.metalConnAtomsMap.keys():
+                print("Metal atom ", aMA, " connects: ")
+                print(self.metalConnAtomsMap[aMA])
+            
+            
                 
             if not aBond['_chem_comp_bond.atom_id_1'] in metalIds and not aBond['_chem_comp_bond.atom_id_2'] in metalIds:
                 self.remainBonds.append(aBond)
@@ -192,9 +239,8 @@ class metalMode(CExeCode):
                     atmConnsMap[aBond['_chem_comp_bond.atom_id_2']].append(aBond['_chem_comp_bond.atom_id_1'])
                 
                 if atm1 and atm2:
-                    
                     aElem1 = atm1['_chem_comp_atom.type_symbol'] 
-                    aElem2 = atm2['_chem_comp_atom.type_symbol'] 
+                    aElem2 = atm2['_chem_comp_atom.type_symbol']          
                     aId1   = atm1['_chem_comp_atom.atom_id']
                     aId2   = atm2['_chem_comp_atom.atom_id'] 
                     
@@ -509,7 +555,7 @@ class metalMode(CExeCode):
         
         numBO = 0
         aId = tAtom['_chem_comp_atom.atom_id']
-        #print("For atom ", aId)
+        #print(" Here For atom ", aId)
         if aId in self.mcAtomBonds:
             for aB in self.mcAtomBonds[aId]:
                 if "_chem_comp_bond.type" in aB.keys():
@@ -1142,8 +1188,8 @@ class metalMode(CExeCode):
                   % (self.monomRoot.ljust(8),
                      aB['_chem_comp_bond.atom_id_1'].ljust(10), 
                      aB['_chem_comp_bond.atom_id_2'].ljust(10),  
-                     aType.ljust(10), "n".ljust(8), "2.0".ljust(10), "0.04".ljust(10),
-                     "2.0".ljust(10), "0.04".ljust(10))
+                     aType.ljust(10), "n".ljust(8), aB["_chem_comp_bond.value_dist"].ljust(10), 
+                     "0.04".ljust(10), aB["_chem_comp_bond.value_dist"].ljust(10), "0.04".ljust(10))
             tLines.append(aLine)
     
     def writeNewAngCifLine(self, tLines):
@@ -1267,6 +1313,9 @@ class metalMode(CExeCode):
         self._cmdline += "eof       \n"
         
         self.runExitCode = self.subExecute()
+        
+   
+    
 
         
     

@@ -683,6 +683,8 @@ namespace LIBMOL
 
         getCCP4BondAndAngles();
 
+
+
         // std::vector<RingDict>          tmpRings;
         // std::vector<std::vector<int> > tmpAtoms;
 
@@ -7188,6 +7190,10 @@ namespace LIBMOL
         sp_1   = tV12[0][1];
         elem_2 = tV12[1][0];
         sp_2   = tV12[1][1];
+        std::cout << "elem_1 is " << elem_1 << std::endl;
+        std::cout << "sp_1 is " << sp_1 << std::endl;
+        std::cout << "elem_2 is " << elem_2 << std::endl;
+        std::cout << "sp_2 is " << sp_2 << std::endl;
 
         if (allENBonds.find(elem_1) != allENBonds.end())
         {

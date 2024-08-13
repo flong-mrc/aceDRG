@@ -271,10 +271,10 @@ class AcedrgRDKit(object):
                 else:
                     print("Stage 1 : Molecules can not generated  from file %s ! " % tFileName)
                     print("Check your file format ")
-                    sys.exit()
+                    sys.exit(1)
             else:
                 print("File %s does not exist " % tFileName)
-                sys.exit()
+                sys.exit(1)
 
         elif tFileType == "mol2":
             if os.path.isfile(tFileName):
@@ -291,7 +291,7 @@ class AcedrgRDKit(object):
                 # self.chemCheck.addHs(aMolT)
             else:
                 print("File %s does not exist " % tFileName)
-                sys.exit()
+                sys.exit(1)
 
         elif tFileType == "smi":
             if os.path.isfile(tFileName):
@@ -300,7 +300,7 @@ class AcedrgRDKit(object):
                     fSmi = open(tFileName, "r")
                 except IOError:
                     print("% can not be open for reading " % tFileName)
-                    sys.exit()
+                    sys.exit(1)
                 else:
                     aSmiStrT = fSmi.read()
                     strGrp = aSmiStrT.strip().split()
@@ -315,7 +315,7 @@ class AcedrgRDKit(object):
 
                     else:
                         print("SMILES string formation error ")
-                        sys.exit()
+                        sys.exit(1)
 
             else:
                 # SMILES string in from a commandline
@@ -328,7 +328,7 @@ class AcedrgRDKit(object):
                     aMolT.SetProp("SmilesIn", self.smiOrig)
                 else:
                     print("No molecule is generated using SMILES str ", self.smiOrig) 
-                    sys.exit()
+                    sys.exit(1)
                 # if self.reSetSmi:
                 #    self.modifySmiTmp()
                 #    self.smiMod = self.smiMod.strip()
@@ -340,8 +340,8 @@ class AcedrgRDKit(object):
                 #    aMolT = self.checkAAAndSetAAAtomNames(aMolT0)
                 #    aMolT.SetProp("fixedName", "YES")
                 #else:
-                    print("No molecule is generated using SMILES str ", self.smiOrig)
-                    sys.exit()
+                    #print("No molecule is generated using SMILES str ", self.smiOrig)
+                    #sys.exit()
         elif tFileType == "sdf":
             if os.path.isfile(tFileName):
                 if platform.system() == "Windows":
@@ -374,7 +374,7 @@ class AcedrgRDKit(object):
         if not aMolT:
             print("Molecules can not generated  from file %s ! " % tFileName)
             print("Check your file format ")
-            sys.exit()
+            sys.exit(1)
         else:
             aMolT.SetProp("ResidueName", tMonoRoot)
             if not aMolT.HasProp("fiexedName"):
@@ -1153,7 +1153,7 @@ class AcedrgRDKit(object):
                             "Can not find the non-H atom that connects to H atom of serial number ", idxH)
                 else:
                     print("One H atom connect more than one atoms, check")
-                    sys.exit()
+                    sys.exit(1)
         print("Total number of H atoms is ", nh)
         # for aKey in HConns.keys():
         #    print "Atom ", aKey, " bonds to ", len(HConns[aKey]), " H atoms "
@@ -1371,11 +1371,11 @@ class AcedrgRDKit(object):
                 if len(aB) == 0:
                     print(
                         "Bug: a H atom of index %d does not bond to any atom " % aIdxH)
-                    sys.exit()
+                    sys.exit(1)
                 elif len(aB) > 1:
                     print(
                         "Bug: a H atom of index %d bond to more than one atom " % aIdxH)
-                    sys.exit()
+                    sys.exit(1)
                 else:
                     tIdxBH = -1
                     tBH1 = aB[0].GetBeginAtomIdx()
@@ -1387,7 +1387,7 @@ class AcedrgRDKit(object):
                     else:
                         print("Bug: a H atom of index %d is not in the bond of index %d " % (
                             aB.GetIdx()))
-                        sys.exit()
+                        sys.exit(1)
 
                     # print "It bonds atom ", tIdxBH
 
@@ -1588,7 +1588,7 @@ class AcedrgRDKit(object):
                                 i += 1
                     else:
                         print("Atom name %s can not be handled " % name1)
-                        sys.exit()
+                        sys.exit(1)
         """
         print("Check:")  
         allAtoms = tMol.GetAtoms()          
@@ -1687,7 +1687,7 @@ class AcedrgRDKit(object):
 
         if len(tMols) != len(self.molecules):
             print("Bug in setInitConformersAllMols ")
-            sys.exit()
+            sys.exit(1)
         else:
             self.molecules = []
             for aM in tMols:
@@ -1973,7 +1973,7 @@ class AcedrgRDKit(object):
         if len(aErrDict["wrongOrder"]) > 0:
             for aErr in aErrDict["wrongOrder"]:
                 print(aErr)
-            sys.exit()
+            sys.exit(1)
         if len(aErrDict["needMod"]) > 0:
             print("Number of atoms need to modified ",
                   len(aErrDict["needMod"]))
@@ -2836,7 +2836,7 @@ class AcedrgRDKit(object):
             tFuncF = open(tFuncFileName, "r")
         except IOError:
             print("%s can not be open for reading " % tFuncFileName)
-            sys.exit()
+            sys.exit(1)
         else:
             allFLs = tFuncF.readlines()
             tFuncF.close()

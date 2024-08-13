@@ -297,6 +297,7 @@ namespace LIBMOL
                                           std::vector<ID>  & bCTs,
                                           std::vector<int>  & bRis,
                                           std::vector<int>  & bPls);
+
         int codAtomsNumNBDist(std::vector<int> & tNB2s,
                               std::vector<int> & bNB2s);
 
@@ -309,6 +310,7 @@ namespace LIBMOL
                              AtomDict              & curAto,
                              int                   iMax,
                              std::vector<AtomDict>::iterator iAto);
+
         void checkOnePathSec(AtomDict                & curAto,
                              int                       iMax,
                              std::vector<AtomDict>::iterator iOriAto,

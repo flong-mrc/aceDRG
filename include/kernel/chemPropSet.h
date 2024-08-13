@@ -571,6 +571,7 @@ namespace LIBMOL
                                 RingDict                    & tRing,
                                 std::map<int,
                                 std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds);
@@ -600,6 +601,7 @@ namespace LIBMOL
                                 std::vector<RingDict>      & tRings,
                                 std::map<int,
                                 std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds,
@@ -610,9 +612,22 @@ namespace LIBMOL
                                 std::vector<RingDict>      & tRings,
                                 std::map<int,
                                 std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
                                 std::vector<int>           & tDoneAtoms,
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds);
+
+        void adjustC6Charged2Ring(int                       tIdxRing,
+                                std::vector<AtomDict>      & tAtoms,
+                                std::vector<BondDict>      & tBonds,
+                                std::vector<RingDict>      & tRings,
+                                std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
+
 
         void FurtheAssignBandC(std::vector<AtomDict>         & tAtoms,
                            std::vector<BondDict>             & tBonds,
@@ -626,6 +641,17 @@ namespace LIBMOL
                            std::vector<int>           & tDoneAtoms,
                            std::vector<int>           & tDoneFAtoms,
                            std::vector<int>           & tDoneBonds);
+
+        // will replace etResValForAtom and getUnsetBondsForAtom
+
+        void setResValAndUnsetBondsForAtom(
+                             AtomDict                 & tAtom,
+                             std::vector<BondDict>    & tBonds,
+                             std::map<int,
+                             std::map<int, int> >     & tAllAtmBondingMap,
+                             std::map<int, int>       & tCurVal,
+                             int                      &  tResVal,
+                             int                      &  tNumUnSetBonds);
 
         int getResValForAtom(AtomDict                 & tAtom,
                              std::vector<BondDict>    & tBonds,
