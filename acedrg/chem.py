@@ -177,7 +177,13 @@ class ChemCheck(object):
     def isOrganicMol(self, tMol):
 
         pass 
-
+    
+    def getMetalAtoms(self, tCifAtoms, tMetalAtoms):
+        
+        for aAtm in tCifAtoms:
+            if "_chem_comp_atom.type_symbol" in aAtm.keys():
+                 if not aAtm["_chem_comp_atom.type_symbol"] in self.organicSec :
+                     tMetalAtoms.append(aAtm)             
 
     def addHs(self, tMol):
 

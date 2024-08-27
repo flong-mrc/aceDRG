@@ -268,17 +268,18 @@ class FileTransformer(object) :
             #        print("Key : ", aK)
             #        print("values ", self.dataDescriptor[aK])
             
+            """
+            idKey = "_chem_comp_atom.atom_id"
+            for aAtom in self.atoms:
+                if idKey in aAtom.keys():
+                    print ("===============================")
+                    print ("For atom ", aAtom[idKey], " : ")
+                    print ("-------------------------------")  
+                    for aKey in aAtom.keys():
+                        print ("label : ", aKey, " Value : ", aAtom[aKey])
+                    print ("===============================")
+            """
             
-            #idKey = "_chem_comp_atom.atom_id"
-            #for aAtom in self.atoms:
-            #    if aAtom.has_key(idKey):
-            #        print ("===============================")
-            #        print ("For atom ", aAtom[idKey], " : ")
-            #        print ("-------------------------------")  
-            #        for aKey in aAtom.keys():
-            #            print ("label : ", aKey, " Value : ", aAtom[aKey])
-            #        print ("===============================")
-
     def TmpChemCheck(self):
 
         """ 
@@ -1955,6 +1956,14 @@ class FileTransformer(object) :
                                                "0.000".ljust(10), "0.000".ljust(10))
                     aCif.write(aL)
 
+                if len(self.bonds)==1:
+                     for aB in self.bonds:
+                         for aK in aB.keys():
+                             aL = "%s%s\n"%(aK.ljust(len(aK)+6), aB[aK]) 
+                             aCif.write(aL)
+                elif len(self.bonds) > 1:
+                    # Later  
+                    pass      
                 aCif.write("loop_\n")
                 aCif.write("_pdbx_chem_comp_description_generator.comp_id\n")
                 aCif.write("_pdbx_chem_comp_description_generator.program_name\n")

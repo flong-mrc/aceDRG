@@ -628,6 +628,27 @@ namespace LIBMOL
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds);
 
+        void checkC4N1RingCharge(
+                                 std::vector<AtomDict>      & tAtoms,
+                                 std::vector<BondDict>      & tBonds,
+                                  std::vector<RingDict>      & tRings,
+                                   std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
+
+        void adjustC4N1RingCharge(int                       tIdxRing,
+                                 std::vector<AtomDict>      & tAtoms,
+                                 std::vector<BondDict>      & tBonds,
+                                 std::vector<RingDict>      & tRings,
+                                 std::map<int,
+                                std::map<int, int> >       & tAllAtmBondingMap,
+                                std::map<int, int>         & tCurVal,
+                                std::vector<int>           & tDoneAtoms,
+                                std::vector<int>           & tDoneFAtoms,
+                                std::vector<int>           & tDoneBonds);
 
         void FurtheAssignBandC(std::vector<AtomDict>         & tAtoms,
                            std::vector<BondDict>             & tBonds,

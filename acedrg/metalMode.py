@@ -52,6 +52,8 @@ class metalMode(CExeCode):
         
         self.monomRoot        = ""
         self.outRoot          = ""
+
+        self.getRadii() 
         
         """
         check
@@ -169,11 +171,25 @@ class metalMode(CExeCode):
                 tBond["_chem_comp_bond.value_dist"] = "2.0"
         else:
             tBond["_chem_comp_bond.value_dist"]  = "2.0"
+            
+    
+    def setMMBond(self, tAtoms, tBonds):
+        
+        for aBond in tBonds:
+            if not "_chem_comp_bond.value_dist" in aBond.keys():
+                atm1 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_1'])
+                atm2 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_2'])
+                self.setBondValueFromRadii(atm1, atm2, aBond)
+                aBond['_chem_comp_bond.value_dist_esd'] = "0.01"
+                aBond['_chem_comp_bond.value_dist_nucleus']     = aBond['_chem_comp_bond.value_dist']
+                aBond['_chem_comp_bond.value_dist_nucleus_esd'] = "0.01"
+                
+                
         
     def getNewMolWithoutMetal(self, tAtoms, tBonds, tChem):
         
         
-        self.getRadii()
+        
         
         metalIds = []
         for aAtom in tAtoms:
@@ -181,8 +197,8 @@ class metalMode(CExeCode):
                 print("Atom ", aAtom['_chem_comp_atom.atom_id'], 
                       " is ", aAtom["_chem_comp_atom.type_symbol"])
                 if not aAtom['_chem_comp_atom.type_symbol'] in tChem.organicSec:
-                    print("atom %s is a metal atom of elem %s "
-                          %(aAtom['_chem_comp_atom.atom_id'], aAtom['_chem_comp_atom.type_symbol'])) 
+                    #print("atom %s is a metal atom of elem %s "
+                    #      %(aAtom['_chem_comp_atom.atom_id'], aAtom['_chem_comp_atom.type_symbol'])) 
                     self.metalAtoms.append(aAtom)
                     metalIds.append(aAtom['_chem_comp_atom.atom_id'])
                 else:
@@ -192,6 +208,9 @@ class metalMode(CExeCode):
         print("number of all atoms is ", len(tAtoms))
         print("number of metal atoms is ", len(self.metalAtoms))
         print("number of org atoms is ", len(self.remainAtoms))
+        #for aA in tAtoms:
+        #    print(aA.keys())
+        
         
         atmConnsMap = {} 
     
@@ -218,12 +237,6 @@ class metalMode(CExeCode):
                     if not aBond['_chem_comp_bond.atom_id_1'] in self.connMAMap:
                         self.connMAMap[aBond['_chem_comp_bond.atom_id_1']] = []
                     self.connMAMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
-            
-            # Check here 
-            for aMA in  self.metalConnAtomsMap.keys():
-                print("Metal atom ", aMA, " connects: ")
-                print(self.metalConnAtomsMap[aMA])
-            
             
                 
             if not aBond['_chem_comp_bond.atom_id_1'] in metalIds and not aBond['_chem_comp_bond.atom_id_2'] in metalIds:
@@ -258,7 +271,6 @@ class metalMode(CExeCode):
                             self.atmNonHMap[aId2].append(aId1)
                             
                     
-        
         # Check 
         #for aMAtm in self.metalConnAtomsMap:
         #    print("%s is a metal atom "%aMAtm)
@@ -351,15 +363,16 @@ class metalMode(CExeCode):
                     
             idxH =0
             doneOrgAtms = []
+            
             for aMA in self.metalConnAtomsMap:
                 print("For a metal atom : ", aMA)
                 for aMCId in self.metalConnAtomsMap[aMA]:
                     print("For metal bonding atom ", aMCId)
                     aMCAtom = self.getAtomById(tAtoms, aMCId)
-                    self.metalConnFullAtoms.append(aMCAtom)
                     if aMCAtom['_chem_comp_atom.type_symbol'] in tChem.organicSec\
                        and not aMCId in doneOrgAtms:
                         doneOrgAtms.append(aMCId)
+                        self.metalConnFullAtoms.append(aMCAtom)
                         aMCAtom['_chem_comp_atom.charge'] = 0
                         if aMCAtom !=None:
                             #numC   = -self.checkVal(aMCAtom)
@@ -914,14 +927,13 @@ class metalMode(CExeCode):
         for aHA in self.addedHs:
             hIds.append(aHA['_chem_comp_atom.atom_id'])
             
-        cIds ={}
         
         for aA in self.metalConnFullAtoms:
             #numC   = -self.checkVal(aA)
             #aA['_chem_comp_atom.charge'] = numC
             #if numC !=0:
             print(aA['_chem_comp_atom.atom_id'], " carries ", aA['_chem_comp_atom.charge'], " charge")
-        
+        print("number of metal conn atoms ", len(self.metalConnFullAtoms))
         for aMA in self.metalAtoms:
             print("Metal Atom ", aMA['_chem_comp_atom.atom_id'])
             numC =0
@@ -1297,7 +1309,7 @@ class metalMode(CExeCode):
         
         self._cmdline   = "acedrg -c %s  -r %s -o %s --mtList %s "%(tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
         self._log_name  = tOutRoot + "_acedrg.log"
-        print(self._cmdline)
+        #print(self._cmdline)
         self.runExitCode = self.subExecute()
     
     def runRefmac(self, tInCif, tInPdb, tOutRoot):

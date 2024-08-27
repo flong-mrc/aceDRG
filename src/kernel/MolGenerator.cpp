@@ -201,8 +201,6 @@ namespace LIBMOL {
                     }
                 }
 
-                //outPDB("initAtoms.pdb", "UNL", initAtoms);
-
                 std::cout << "Number of atoms read from the input file "
                         << initAtoms.size() << std::endl;
 
@@ -314,8 +312,6 @@ namespace LIBMOL {
                         //<< iA->isInPreCell << std::endl;
                     }
                 }
-
-                //outPDB("initAtoms.pdb", "UNL", initAtoms);
 
                 std::cout << "Number of atoms read from the input file "
                           << initAtoms.size() << std::endl;
@@ -443,8 +439,6 @@ namespace LIBMOL {
                     }
                 }
 
-                //outPDB("initAtoms.pdb", "UNL", initAtoms);
-
                 std::cout << "Number of atoms read from the input file "
                           << initAtoms.size() << std::endl;
 
@@ -526,7 +520,6 @@ namespace LIBMOL {
                     }
                 }
 
-                //outPDB("initAtoms.pdb", "UNL", initAtoms);
 
                 std::cout << "Number of atoms read from the input file "
                         << initAtoms.size() << std::endl;
@@ -628,8 +621,6 @@ namespace LIBMOL {
                         // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
                     }
 
-                    //outPDB("initAtoms.pdb", "UNL", initAtoms);
-
                     std::cout << "Number of atoms read from the input file "
                             << initAtoms.size() << std::endl;
 
@@ -701,8 +692,6 @@ namespace LIBMOL {
                         refAtoms.push_back(*iA);
                         // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
                     }
-
-                    //outPDB("initAtoms.pdb", "UNL", initAtoms);
 
                     std::cout << "Number of atoms read from the input file "
                             << initAtoms.size() << std::endl;
@@ -802,8 +791,6 @@ namespace LIBMOL {
                         // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
                     }
 
-                    //outPDB("initAtoms.pdb", "UNL", initAtoms);
-
                     std::cout << "Number of atoms read from the input file "
                             << initAtoms.size() << std::endl;
 
@@ -898,7 +885,7 @@ namespace LIBMOL {
                     // std::cout << "Is in preCell " << iA->isInPreCell << std::endl;
                 }
 
-                //outPDB("initAtoms.pdb", "UNL", initAtoms);
+
 
                 std::cout << "Number of atoms read from the input file "
                           << initAtoms.size() << std::endl;
@@ -1246,7 +1233,7 @@ namespace LIBMOL {
                 {
                     Name metalSPhFName(tOutName);
                     metalSPhFName.append("_"+allAtoms[iMet->first].id + "_NB");
-                    outPDB(metalSPhFName.c_str(), "UNL", iMet->second, aMode);
+                    outPDB(metalSPhFName.c_str(), "LIG", iMet->second, aMode);
                 }
             }
         }
@@ -1356,7 +1343,7 @@ namespace LIBMOL {
             {
                 Name atmSPhFName(tOutName);
                 atmSPhFName.append("_"+allAtoms[iAtm->first].id + "_NB");
-                outPDB(atmSPhFName.c_str(), "UNL", iAtm->second, aMode);
+                outPDB(atmSPhFName.c_str(), "LIG", iAtm->second, aMode);
             }
         }
 
@@ -7260,15 +7247,15 @@ namespace LIBMOL {
             }
             tMolTabs << "data_mol_" << IntToStr(tMol.seriNum)
                     << std::endl;
-            tMolTabs  << "_is_infinite_molecule " << "\t";
-            if (tMol.isInf) {
-                tMolTabs << "yes";
-            } else {
-                tMolTabs << "no";
-            }
-            tMolTabs << std::endl;
-            tMolTabs << "_total_number_of_atoms\t"
-                    << tMol.atoms.size() << std::endl;
+            //tMolTabs  << "_is_infinite_molecule " << "\t";
+            //if (tMol.isInf) {
+            //    tMolTabs << "yes";
+            //} else {
+            //    tMolTabs << "no";
+            //}
+            //tMolTabs << std::endl;
+            //tMolTabs << "_total_number_of_atoms\t"
+            //        << tMol.atoms.size() << std::endl;
 
             if (metAtms.size() > 0)
             {
@@ -7298,7 +7285,7 @@ namespace LIBMOL {
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_atom.atom_id " << std::endl
                     << "_chem_comp_atom.atom_alt_id" << std::endl
-                    << "_chem_comp_atom.element_symbol" << std::endl
+                    << "_chem_comp_atom.type_symbol" << std::endl
                     << "_chem_comp_atom.x" << std::endl
                     << "_chem_comp_atom.y" << std::endl
                     << "_chem_comp_atom.z" << std::endl
@@ -7400,12 +7387,12 @@ namespace LIBMOL {
             // the molecule is connected
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_bond.bond_serial_number" << std::endl
-                    << "_chem_comp_bond.atom1_serial_number" << std::endl
-                    << "_chem_comp_bond.atom2_serial_number" << std::endl
-                    << "_chem_comp_bond.atom1_id" << std::endl
-                    << "_chem_comp_bond.atom2_id" << std::endl
-                    << "_chem_comp_bond.atom1_element_symbol" << std::endl
-                    << "_chem_comp_bond.atom2_element_symbol" << std::endl
+                    << "_chem_comp_bond.atom_serial_number_1" << std::endl
+                    << "_chem_comp_bond.atom_serial_number_2" << std::endl
+                    << "_chem_comp_bond.atom_id_1" << std::endl
+                    << "_chem_comp_bond.atom_id_2" << std::endl
+                    << "_chem_comp_bond.atom_type_symbol_1 "<< std::endl
+                    << "_chem_comp_bond.atom_type_symbol_2" << std::endl
                     << "_chem_comp_bond.value_order" << std::endl
                     << "_chem_comp_bond.value_dist" << std::endl;
                     //<< "_chem_comp_bond.is_in_same_ring" << std::endl;
@@ -7462,12 +7449,12 @@ namespace LIBMOL {
         if (tMol.angles.size() > 0) {
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_angle.angle_serial_number" << std::endl
-                    << "_chem_comp_angle.atom1_serial_number" << std::endl
-                    << "_chem_comp_angle.atom2_serial_number" << std::endl
-                    << "_chem_comp_angle.atom3_serial_number" << std::endl
-                    << "_chem_comp_angle.atom1_id" << std::endl
-                    << "_chem_comp_angle.atom2_id" << std::endl
-                    << "_chem_comp_angle.atom3_id" << std::endl
+                    << "_chem_comp_angle.atom_serial_number_1" << std::endl
+                    << "_chem_comp_angle.atom_serial_number_2" << std::endl
+                    << "_chem_comp_angle.atom_serial_number_3" << std::endl
+                    << "_chem_comp_angle.atom_id_1" << std::endl
+                    << "_chem_comp_angle.atom_id_2" << std::endl
+                    << "_chem_comp_angle.atom_id_3" << std::endl
                     << "_chem_comp_angle.value_angle" << std::endl
                     << "_chem_comp_angle.ring_size_of_angle" << std::endl;
 
@@ -7494,18 +7481,18 @@ namespace LIBMOL {
         {
             tMolTabs << "loop_" << std::endl
                      << "_chem_comp_torsion.id " << std::endl
-                     << "_chem_comp_torsion.atom1_element_symbol" << std::endl
-                     << "_chem_comp_torsion.atom2_element_symbol" << std::endl
-                     << "_chem_comp_torsion.atom3_element_symbol" << std::endl
-                     << "_chem_comp_torsion.atom4_element_symbol" << std::endl
-                     << "_chem_comp_torsion.atom1_serial_number" << std::endl
-                     << "_chem_comp_torsion.atom2_serial_number" << std::endl
-                     << "_chem_comp_torsion.atom3_serial_number" << std::endl
-                     << "_chem_comp_torsion.atom4_serial_number" << std::endl
-                     << "_chem_comp_torsion.atom1_id" << std::endl
-                     << "_chem_comp_torsion.atom2_id" << std::endl
-                     << "_chem_comp_torsion.atom3_id" << std::endl
-                     << "_chem_comp_torsion.atom4_id" << std::endl
+                     << "_chem_comp_torsion.atom_type_symbol_1" << std::endl
+                     << "_chem_comp_torsion.atom_type_symbol_2" << std::endl
+                     << "_chem_comp_torsion.atom_type_symbol_3" << std::endl
+                     << "_chem_comp_torsion.atom_type_symbol_4" << std::endl
+                     << "_chem_comp_torsion.atom_serial_number_1" << std::endl
+                     << "_chem_comp_torsion.atom_serial_number_2" << std::endl
+                     << "_chem_comp_torsion.atom_serial_number_3" << std::endl
+                     << "_chem_comp_torsion.atom_serial_number_4" << std::endl
+                     << "_chem_comp_torsion.atom_id_1" << std::endl
+                     << "_chem_comp_torsion.atom_id_2" << std::endl
+                     << "_chem_comp_torsion.atom_id_3" << std::endl
+                     << "_chem_comp_torsion.atom_id_4" << std::endl
                      << "_chem_comp_torsion.value"    << std::endl
                      << "_chem_comp_torsion.BondBetweenAtom2and3" << std::endl
                      << "_chem_comp_torsion.AromaticyForAtom2"<< std::endl
@@ -7723,11 +7710,12 @@ namespace LIBMOL {
                 }
             }
         }
+
         std::string tName(tOutName);
         std::vector<std::string> parts;
         StrTokenize(tName, parts, '.');
-        std::string outMmcifName = parts[0] + ".cif";
-        std::ofstream aOutCif(outMmcifName.c_str());
+        //std::string outMmcifName = parts[0] + ".cif";
+        std::ofstream aOutCif(tOutName);
 
         if(aOutCif.is_open())
         {
@@ -8407,8 +8395,13 @@ namespace LIBMOL {
             preCellAtomUName.append("_all_pre_atoms_u.list");
             std::ofstream preCellAtomU(preCellAtomUName.c_str());
 
+            Name molsListFName(tRootName);
+            molsListFName.append("_all_mols.list");
+            std::ofstream molsListF(molsListFName.c_str());
+            std::cout << "MolList is " << molsListFName << std::endl;
             if (tFinMols.size() > 0)
             {
+                std::vector<std::string> outMolList;
                 int aMode = 0;
                 for (unsigned i = 0; i < tFinMols.size(); i++)
                 {
@@ -8425,9 +8418,23 @@ namespace LIBMOL {
                     outPreCellAtomUs(preCellAtomU, tFinMols[i]);
                     std::string aMolName(aMolRootName);
                     aMolName.append(aMolIdx);
-                    outMolMmcif(aMolName.c_str(), "UNL", tFinMols[i], aMode);
-                    outPDB(aMolName.c_str(), "UNL", tFinMols[i].atoms, aMode);
+                    std::vector<std::string> parts;
+                    StrTokenize(aMolName, parts, '.');
+                    std::string outMmcifName = parts[0] + ".cif";
+                    outMolMmcif(outMmcifName.c_str(), "LIG", tFinMols[i], aMode);
+                    tFinMols[i].checkMetalElem();
+                    std::string sMetal("NoMetal");
+                    if (tFinMols[i].hasMetal)
+                    {
+                        sMetal = "HasMetal";
+                    }
+                    molsListF << outMmcifName <<  "     "
+                              << sMetal << std::endl;
+                    // outMolMmcif(aMolName.c_str(), "LIG", tFinMols[i], aMode);
+                    outPDB(aMolName.c_str(), "LIG", tFinMols[i].atoms, aMode);
+
                 }
+                molsListF.close();
             }
 
             /*
@@ -9131,7 +9138,7 @@ namespace LIBMOL {
                 int aMode =1;
                 Name metalNBFName(rootFName);
                 metalNBFName.append("_"+allAtoms[iNBM->first].id + "_NB");
-                outPDB(metalNBFName.c_str(), "UNL", aSetAtoms, aMode);
+                outPDB(metalNBFName.c_str(), "LIG", aSetAtoms, aMode);
                 outMetalClusterMmcif(metalNBFName.c_str(), aSetAtoms);
 
             }
@@ -9205,7 +9212,7 @@ namespace LIBMOL {
 
         if(aOutCif.is_open() && tSetAtoms.size()>0)
         {
-            std::string aMonoRootName ="UNL";
+            std::string aMonoRootName ="LIG";
 
             aOutCif << "data_comp_" << aMonoRootName << std::endl;
             aOutCif << "_chem_comp.pdbx_type        HETAIN" << std::endl;

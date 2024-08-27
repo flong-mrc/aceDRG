@@ -699,7 +699,7 @@ namespace LIBMOL
                     // tmpRings.push_back(*iR);
 
                     iR->setPlaneProp();
-
+                    std::cout << "Hello " << std::endl;
                     //setSugarRingInitComf(allAtoms, allTorsions, iR);
 
                     checkOneSugarRing(allAtoms, iR);

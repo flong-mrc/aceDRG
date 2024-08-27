@@ -61,6 +61,8 @@ class CExeCode(object) :
     def logModeLin(self, mode = 0, err_str=""):
         """ execute self._cmdline and output to a log file (self._log_name)  
         in a nonblocking way"""
+        
+        aRet = True
 
         logfile = open(self._log_name, 'w+')
         logfile.write("\n============ PROCESS INFORMATION =============\n")
@@ -137,20 +139,23 @@ class CExeCode(object) :
         #    for item in allProcInfo:
         #        logfile.write(item)
 
+        outfile_sub.close()
+        
         logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
         logfile.close()
 
-        outfile_sub.close()
+        
 
         if self.exitCode:
             print("#-----------------------------------------------------------------#")
             print("The process stoped.\nCheck the associated log file '%s'\nfor the error information!"%self._log_name)
             print("#-----------------------------------------------------------------#")
-            if not err_str:
-                # if normal runtime errors, stop the program(using log. no err_str)  
-                sys.exit(1)
+            aRet = False
+            #if not err_str:
+            #    # if normal runtime errors, stop the program(using log. no err_str)  
+            #    sys.exit(1)
                 
-        return True
+        return aRet
 
     def logModeWin(self, mode = 0, err_str=""):
         """ execute self._cmdline and output to a log file (self._log_name)  

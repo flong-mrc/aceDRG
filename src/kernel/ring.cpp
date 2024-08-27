@@ -309,6 +309,8 @@ namespace LIBMOL
         {
             isPlanar = lSP2;
         }
+        std::cout << "Here ring " << rep << std::endl;
+        std::cout << " is planar " << lSP2 << std::endl;
     }
 
     void RingDict::setBondIdxs(std::vector<BondDict> & tBonds, int & tStartIdx)
@@ -549,7 +551,7 @@ namespace LIBMOL
         for (unsigned i=0; i < tAllRings.size(); i++)
         {
             std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
-            std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
+            std::cout << "A: Is planar " << tAllRings[i].isPlanar << std::endl;
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
 
@@ -1974,7 +1976,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                             {
                                 // For atom classification. It will be
                                 // calcelled once the charge problem in COO solved
-                                aN = 2.0;                 // aN = 2.0;
+                                //aN = 2.0; Cancelled now when charge is correctly added
+                                aN = 1.0;
                             }
                             //aN=1.0;
 
@@ -2253,8 +2256,9 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             {
 
                 bool lNBUnR=checkUndRing(atmIdx, tAtoms);
-                // std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
-
+                std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
+                std::cout << "Is it a planar ring " << iR->isPlanar << std::endl;
+                /*
                 if (lNBUnR)
                 {
                     bool lAroP = checkAromaSys(atmIdx, tAtoms,1);
@@ -2287,9 +2291,10 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 {
                     iR->isAromatic =false;
                 }
+                */
             }
 
-            // std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
+            std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
         }
 
         // Test: extra-step for pyrole rings
@@ -2401,8 +2406,8 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             {
 
                 bool lNBUnR=checkUndRing(atmIdx, tAtoms);
-                // std::cout << "Ring with sp3 atom " << lNBUnR << std::endl;
-
+                std::cout << "Here, Ring with sp3 atom " << lNBUnR << std::endl;
+                /*
                 if (lNBUnR)
                 {
                     bool lAroP = checkAromaSys(atmIdx, tAtoms,1);
@@ -2435,9 +2440,10 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 {
                     iR->isAromatic =false;
                 }
+                */
             }
 
-            // std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
+            std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
         }
 
         //std::cout << "A: Number of rings "

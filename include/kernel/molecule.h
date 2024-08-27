@@ -101,6 +101,7 @@ namespace LIBMOL
         void calcSumExcessElecs();
         void calcSumCharges();
         void setAtomFormTypes();
+        void checkMetalElem();
 
         void getAllTorsions();
 
@@ -125,6 +126,7 @@ namespace LIBMOL
         int                              sumCharges;
         REAL                             atomCovRadMax;
         bool                             hasCoords;
+        bool                             hasMetal;
         bool                             validated;
         bool                             isInf;
         bool                             stateChanged;

@@ -101,6 +101,7 @@ class Acedrg(CExeCode ):
         self.outAtmTypeName   = ""
         self.monomRoot        = ""
         self.inMetalPDBName   = ""        # For metalCoord 
+        self.initMetalAtoms   = []
 
 
         self.acedrgTables     = ""
@@ -111,13 +112,18 @@ class Acedrg(CExeCode ):
         self.libmolMatched    = ""
         self.libcheck         = ""
         self.libcheckLogName  = ""
+        self.acedrg           = ""
      
 
         self.refmacXYSList    = {}
         self.refmacMinFValueList = []
         #self.refmacMinFValueList["value"] =100000.00
         #self.refmacMinFValueList["fileName"] =""
-        
+        if "CCP4" in os.environ:
+            self.aAcedrg           = os.path.join(os.environ['CBIN'], "acedrg")
+        else :
+            self.aAcedrg           = "acedrg"
+            
         self.servalcat        = "servalcat "
         
         self.metalCoord       = "metalCoord "
@@ -931,7 +937,14 @@ class Acedrg(CExeCode ):
                 self.inMmCifName = t_inputOptionsP.inMmCifName
                 self.workMode    = 1001
             
- 
+        # Newly run a small molecule cif to generate dictionaries
+        if t_inputOptionsP.inMmCifName:
+            if os.path.isfile(t_inputOptionsP.inMmCifName):
+                if self.checkStdCif(t_inputOptionsP.inMmCifName):
+                    self.workMode = 1111
+                    
+                
+        
         if t_inputOptionsP.monomRoot:
             self.monomRoot   = t_inputOptionsP.monomRoot
         else:
@@ -990,7 +1003,23 @@ class Acedrg(CExeCode ):
         if t_inputOptionsP.inMtConnFile:
             self.inMtConnFile = t_inputOptionsP.inMtConnFile
         
-
+    
+    def checkStdCif(self, tInCif):
+        
+        aRet = False
+        if os.path.isfile(tInCif):
+            fT = open(tInCif, "r")
+            allLs = fT.readlines()
+            fT.close()
+            
+            for aL in allLs:
+                if aL.find("_atom_site_fract_x") !=-1:
+                    aRet = True
+                    break
+        else:
+            print("Check the file %s does not exis"%tInCif)
+            sys.exit(1)
+        return aRet
 
     def setInputProcPara(self, t_inputOptionsP = None):
        
@@ -1322,7 +1351,13 @@ class Acedrg(CExeCode ):
             self._cmdline += " -T yes -X %s -Y %s"%(self.libmolAT1, self.libmolAT2)
             self._cmdline += " -o %s "%self.libmolMatched
             self.subExecute()
-
+        
+        if self.workMode == 1111:
+            
+            self._cmdline += " -b %s -r %s -o %s -m yes "%(self.inMmCifName, self.monomRoot, self.outRoot)
+            #print(self._cmdline)
+            self.subExecute()
+            
     def getBondsAndAngles(self, tFName, tMolTabs):
         
         for aMonTab in tMolTabs:
@@ -1615,7 +1650,23 @@ class Acedrg(CExeCode ):
         self.setLibcheckBat(self.inSmiName,  self.libcheckOutRoot) 
         self.subExecute()
 
-
+    def runAcedrg(self, tMol, tIdxMol):
+        
+        if self.workMode ==1111:
+            
+            aOutRoot = self.outRoot + "_%s_dictionary"%tIdxMol
+            aOutFile = aOutRoot + ".cif"
+            self._log_name        = os.path.join(self.scrDir, aOutRoot + ".log")
+            self._cmdline         = self.aAcedrg
+            if os.path.isfile(tMol[0]):
+                self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
+                if tMol[1].find("HasMetal") !=-1:
+                    self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
+            print(self._cmdline)
+            self.subExecute()
+            if os.path.isfile(aOutFile):
+                print("The dictionary file for the molecules is %s"%aOutFile)
+            
     def runServalcat(self, tRoot, tInCif=None):
         
         aRoot = os.path.join(self.scrDir, tRoot)
@@ -1641,13 +1692,53 @@ class Acedrg(CExeCode ):
         if os.path.isfile(self.inMetalPDBName):
             aRoot = os.path.join(self.scrDir, self.monomRoot)
             self._log_name  = aRoot +   "_metalCoord.log"
-            aOutCif         = self.monomRoot + "_metalCoord.cif" 
+            aOutCif         = self.outRoot + "_metalCoord.cif" 
             self._cmdline   = self.metalCoord 
             self._cmdline += "  update -i %s   -o  %s -p %s "%(tInCifName, aOutCif, self.inMetalPDBName)
-            self.subExecute()       
+            #print(self._cmdline)
+            #print("The log is ", self._log_name)
+            runNotOK = self.subExecute()
+            if  runNotOK :
+                print("metalCoord stopped.")
         else:
             print("Program metalCoord requres an input pdb file containing your metal Ligand")
             print("Please provide that file using --metalPDB your_pdb_file")
+            
+    
+    def getMRunStatus(self, tErrInfo):
+        
+        aRet = True
+        aMJsonFName = self.outRoot + "_metalCoord.cif.status.json"
+        try:
+            aMJsonF=open(aMJsonFName, "r")
+        except  IOError:
+            print("Failed to open the json file %s "%aMJsonFName)
+            aRet = False
+        else:
+            aSetData = json.load(aMJsonF)
+            if len(aSetData) >0 :
+                #print(aSetData)
+                if "status" in aSetData.keys():
+                    if aSetData["status"].upper().find("SUCCESS") != -1:
+                        aRet = True
+                    else:
+                        aRet = False
+                else:
+                    print("%s does not have status key"%aMJsonFName)
+                    aRet = False
+                
+                if "Reason" in aSetData.keys():
+                    print("MetalCoord does not produce the results")
+                    print("The reason is : ")
+                    tErrInfo = aSetData["Reason"]
+                    print(tErrInfo)
+                
+            else:
+                print("%s has no content"%aMJsonFName)
+                aRet = False
+        return aRet 
+            
+            
    
     def getFvalFromJson(self, tJSFN):
         
@@ -3000,7 +3091,7 @@ class Acedrg(CExeCode ):
         self.printJobs()
         #if self.useExistCoords or self.workMode==16 or self.workMode==161:
         #    print("One of output conformers will using input coordinates as the initial one")
-        #print("workMode : ", self.workMode)
+        print("workMode : ", self.workMode)
         
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
@@ -3033,6 +3124,8 @@ class Acedrg(CExeCode ):
                 #print(self.fileConv.atoms[0])
                 if len(self.fileConv.atoms) > 0:
                     self.lOrg = self.chemCheck.isOrganicInCif(self.fileConv.atoms)
+                    self.chemCheck.getMetalAtoms(self.fileConv.atoms, self.initMetalAtoms)
+                    
                 else:
                     self.lOrg = False    
             
@@ -3283,29 +3376,70 @@ class Acedrg(CExeCode ):
             elif len(self.fileConv.atoms) > 1 and not self.lOrg:
                 # Metal related 
                 print("Metal atoms are found")
-                print("outRoot ", self.outRoot)
-                aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
+                if self.fileConv.atoms != self.initMetalAtoms:
+                    #print("outRoot ", self.outRoot)
+                    aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
                                                    self.outRoot, self.fileConv, self.chemCheck, self.versionInfo)
                     
                 
-                if os.path.isfile(aFinInCif):
-                    print("HereC ", aFinInCif)
-                    print("outRoot ", self.outRoot)
-                    self.runServalcat(self.outRoot, aFinInCif)
-                    aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
-                    if os.path.isfile(aSOutName):
-                        aTmp3Cif = self.outRoot + "_tmp3.cif"
-                        self.cleanSFile(aSOutName, aTmp3Cif)
-                        print("The tmp3 output is %s "%aTmp3Cif)
+                    if os.path.isfile(aFinInCif):
+                        #self.runServalcat(self.outRoot, aFinInCif)
+                        #aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                        #if os.path.isfile(aSOutName):
+                            #aTmp3Cif = self.outRoot + "_tmp3.cif"
+                            #self.cleanSFile(aSOutName, aTmp3Cif)
+                            #print("The tmp3 output is %s "%aTmp3Cif)
                         
-                        if os.path.isfile(aTmp3Cif):
-                            print("MetalCoord is running")
-                            self.runMetalCoord(aTmp3Cif)
+                            #if os.path.isfile(aTmp3Cif) and os.path.isfile(self.inMetalPDBName):
+                            if os.path.isfile(self.inMetalPDBName):
+                                print("MetalCoord is running")
+                                #self.runMetalCoord(aTmp3Cif)
+                                self.runMetalCoord(aFinInCif)
+                                self.aErrInfoM=""
+                                if self.getMRunStatus(self.aErrInfoM):
+                                    aMetCoordInCif  = self.outRoot + "_metalCoord.cif" 
+                                    #print("aMetCoordInCif=", aMetCoordInCif)
+                                    if os.path.isfile(aMetCoordInCif):
+                                        self.runServalcat(self.outRoot, aMetCoordInCif)  
+                                        aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif") 
+                                        if os.path.isfile(aSOutName):
+                                            finalOutName = self.outRoot + "_final.cif"
+                                            shutil.copy(aSOutName, finalOutName) 
+                                            print("The final output cif is ", finalOutName)
+                                    else:
+                                        print("No %s. metalCoord runtime error"%aMetCoordInCif)
+                                else:
+                                    print("continue without metalCoord")
+                                    self.runServalcat(self.outRoot, aFinInCif)
+                                    aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                                    if os.path.isfile(aSOutName):
+                                        finalOutName = self.outRoot + "_final.cif"
+                                        self.cleanSFile(aSOutName, finalOutName)
+                                        #print("The tmp3 output is %s "%aTmp3Cif)
+                                        print("The final output cif is %s"%finalOutName)
+                                        
+                                
+                            else:
+                                self.runServalcat(self.outRoot, aFinInCif)
+                                aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                                if os.path.isfile(aSOutName):
+                                    finalOutName = self.outRoot + "_final.cif"
+                                    self.cleanSFile(aSOutName, finalOutName)
+                                    #print("The tmp3 output is %s "%aTmp3Cif)
+                                    print("The final output cif is %s"%finalOutName)
                             
-                            
-                        print("=====================================================================")
-                        print("|               Finished                                            |")
-                        print("=====================================================================")
+                else:
+                    print("Number of atoms", len(self.fileConv.atoms))
+                    print("Number of metal atoms", len(self.initMetalAtoms))
+                    print("Number of bonds", len(self.fileConv.bonds))
+                    finCif = self.outRoot + ".cif"
+                    # acedrg does nothing. Check what basic thing is missing 
+                    self.metalMode.setMMBond(self.fileConv.atoms, self.fileConv.bonds)
+                    self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
+                    
+                print("=====================================================================")
+                print("|               Finished                                            |")
+                print("=====================================================================")
                 #else:
                 #    print("acedrg failed to produce a metal contained mmcif file")
                 #sys.exit()
@@ -3568,8 +3702,8 @@ class Acedrg(CExeCode ):
                     print("%s Could not be opened for writing"%outDiffFile)
                 else:
                     diffMF.write("%s%s%s%s%s%s\n"%("SerialNum".ljust(15), "Element".ljust(15),
-                                                 "origCharge".ljust(15), "newCharge".ljust(15),
-                                                 "origHatoms".ljust(15), "newHAtoms".ljust(15)))
+                                                   "origCharge".ljust(15), "newCharge".ljust(15),
+                                                   "origHatoms".ljust(15), "newHAtoms".ljust(15)))
                     
                     for aMol in  self.rdKit.molecules:
                         print ("The diff in A Molecule: ")
@@ -3592,7 +3726,44 @@ class Acedrg(CExeCode ):
                                         oriH.ljust(15), newH.ljust(15)))
                     
                         diffMF.close()
-                        
+        
+        if self.workMode ==1111:
+            
+            print("=====================================================================")
+            print("|   Generate molecule dictionary files from a small molecule cif    |")
+            print("=====================================================================")
+            
+            self.runLibmol()
+            
+            sumFN = self.outRoot + "_all_mols.list"
+            print (sumFN)
+            if os.path.isfile(sumFN):
+                try:
+                    sumF = open(sumFN, "r")
+                    
+                except IOError:
+                    print("Bug: %s does not exist"%sumFN)
+                    sys.exit(1)
+                else:
+                    allLs = sumF.readlines()
+                    sumF.close()
+                    if len(allLs) > 0:
+                        aSetMols = []
+                        for aL in allLs:
+                            strs=aL.strip().split()
+                            if len(strs)==2:
+                                 aSetMols.append([strs[0], strs[1]])
+                        print("number of mols is ", len(aSetMols))
+                        idxMol = 1
+                        for aMol in aSetMols:
+                            print("acedrg works on molecule ", idxMol)
+                            self.runAcedrg(aMol, str(idxMol))
+                            idxMol+=1
+        
+            print("=====================================================================")
+            print("|               Finished                                            |")
+            print("=====================================================================")
+                
     def SetNewMolWithoutMetal(self):
         
         pass 

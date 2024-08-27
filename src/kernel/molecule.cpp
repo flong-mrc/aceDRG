@@ -17,6 +17,7 @@ namespace LIBMOL
             sumExcessElecs(ZeroInt),
             sumCharges(ZeroInt),
             hasCoords(true),
+            hasMetal(false),
             validated(true),
             isInf(false),
             stateChanged(false)
@@ -27,6 +28,7 @@ namespace LIBMOL
             id(tMol.id),
             formula(tMol.formula),
             hasCoords(tMol.hasCoords),
+            hasMetal(tMol.hasMetal),
             sumExcessElecs(tMol.sumExcessElecs),
             sumCharges(tMol.sumCharges),
             validated(tMol.validated),
@@ -349,6 +351,22 @@ namespace LIBMOL
                 }
 
                 iAtm->formType.push_back(aS);
+            }
+        }
+    }
+
+    void Molecule::checkMetalElem()
+    {
+        std::vector<ID> allMetals;
+        initMetalTab(allMetals);
+        hasMetal = false;
+        for (std::vector<AtomDict>::iterator iAt =atoms.begin();
+             iAt !=atoms.end(); iAt++)
+        {
+            if (isMetal(allMetals, iAt->chemType))
+            {
+                hasMetal = true;
+                break;
             }
         }
     }
