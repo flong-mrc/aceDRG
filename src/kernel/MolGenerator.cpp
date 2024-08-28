@@ -80,12 +80,17 @@ namespace LIBMOL {
             AtomDict aAtom(*iA);
             allAtoms.push_back(*iA);
         }
+
+        setAtomsMetalType(allAtoms);
+
         for (std::vector<AtomDict>::iterator iA = allAtoms.begin();
                 iA != allAtoms.end(); iA++)
         {
+            iA->charge =0;
             std::cout << "Atom " << iA->id << std::endl
                       << "its serial number " << iA->seriNum << std::endl
                       << "its element " << iA->chemType << std::endl
+                      << "is it a metal atom " << iA->isMetal << std::endl
                       << "its x " << iA->coords[0] << std::endl
                       << "its y " << iA->coords[1] << std::endl
                       << "its z " << iA->coords[2] << std::endl;

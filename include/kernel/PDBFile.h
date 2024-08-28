@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   PDBFile.h
  * Author: flong
  *
@@ -69,12 +69,19 @@
 #include "crystInfo.h"
 #endif
 
+#ifndef CHEMPROPSET_H
+#include "chemPropSet.h"
+#endif
+
+#ifndef UTILITY_H
+#include "utility.h"
+#endif
 
 namespace LIBMOL
 {
     class Atom;
     class AtomDict;
-    
+
     class Residue;
     class ModRes;
     class Chain;
@@ -84,13 +91,13 @@ namespace LIBMOL
     class Sheet;
     class Strand;
     class Turn;
-    
+
     class SSBond;
     class Link;
-    
+
     class CrystInfo;
-    
-    enum PDBRecordType 
+
+    enum PDBRecordType
     {
         UnknownType = 0,
         AnisouType,
@@ -109,7 +116,7 @@ namespace LIBMOL
         ExpDtaType,
         ForMulType,
         FtNoteType,
-        HeadType, 
+        HeadType,
         HelixType,
         HetType,
         HetatmType,
@@ -139,7 +146,7 @@ namespace LIBMOL
         SheetType,
         SigAtmType,
         SigUijType,
-        SiteType, 
+        SiteType,
         SltBrgType,
         SourceType,
         SprsdeType,
@@ -149,29 +156,29 @@ namespace LIBMOL
         TurnType,
         TVectType
     };
-        
-    
+
+
     class PDBFile : public File
     {
     public :
-        
-        // default constructor 
+
+        // default constructor
         PDBFile();
-        
-        // copy constructor 
-        PDBFile(Name               tFname, 
+
+        // copy constructor
+        PDBFile(Name               tFname,
                 std::ios_base::openmode tOpenMode);
-        
+
         PDBFile(FileName            tFname,
                 std::ios_base::openmode tOpenMode);
-        
+
         // destructor
         virtual ~PDBFile();
-        
-        
+
+
 
         std::vector<std::string>  PDBRecordHeader;
-        
+
         void setPDBRecordHeader();
 
         // structure that stores the records in the coordinate section.
@@ -180,88 +187,88 @@ namespace LIBMOL
         {
            Name               recordName;
            SeriNumber         seriNum;
-           std::string        name;       
+           std::string        name;
            std::string        altLoc;    // alternate location indicator
            std::string        resName;   // amino acid abbreviation for an atom
            ID                 atomID;        // atom role name. See PDB convention
            ID                 chainID;   // the chain ID for an atom
            SeriNumber         segNum;    // segment serial number
            std::string        insCode;   //  Code for insertion of residues
-           std::string        elementType; // the element type of an atom    
-    
-           std::string        itsSegID;       // segment identifier 
-                   
+           std::string        elementType; // the element type of an atom
+
+           std::string        itsSegID;       // segment identifier
+
         };
-             
-        
+
+
         // Extract information from a PDB file
-        
-        // Read line by line from a PDB file and 
-        // and get all information needed from it 
+
+        // Read line by line from a PDB file and
+        // and get all information needed from it
         void setupSystem();
-        
+
         // Get a record type from the first 6 letters in a PDB line
         int  getRecordType(ALine         tLine);
-        
-        /* The following member functions get different 
-           information from different type of record-lines 
+
+        /* The following member functions get different
+           information from different type of record-lines
         */
         bool extractTitleInfo(ALine          tLine);
         // Primary Structure Section
-        bool extractSEQRESInfo(ALine         tLine); // get chains 
+        bool extractSEQRESInfo(ALine         tLine); // get chains
         bool extractMODRESInfo(ALine         tLine);
-        
+
         // Secondary Structure Section
         bool extractHelixInfo(ALine          tLine);
-        bool extractSheetInfo(ALine          tLine);  
-        
+        bool extractSheetInfo(ALine          tLine);
+
          // Connectivity Annotation Section
         bool extractSSBondInfo(ALine          tLine);
-        
+
         bool extractLinkInfo(ALine          tLine);
-              
+
         // Crystallographic and Coordinate Transformation Section
         bool extractCryst1Info(ALine         tLine);
         bool extractOrigXNInfo(ALine         tLine);
         bool extractScaleNInfo(ALine         tLine);
         bool extractMatrixNInfo(ALine         tLine);
-        
+
         // Coordinate Section
         void initOneModel();
         void initOneModel(ALine               tLine);
-        
+
         bool extractAtomInfo(ALine          tLine);
         bool extractAtomInfo(Atom      &    tAtom,
                              Residue   &    tResidue,
-                             Chain     &    tChain, 
+                             Chain     &    tChain,
                              ALine          tLine);
-        
+
         bool extractAnisouInfo(ALine          tLine);
         bool extractTerInfo(ALine          tLine);
         bool extractHetatmInfo(ALine          tLine);
         bool extractEndMdlInfo(ALine          tLine);
-          
-        
+
+
         bool extractConnectInfo(ALine          tLine);
-        
+
         bool extractBookeepInfo(ALine          tLine);
-        
+
         // access some general information
         ID   getPDBID() const;
-       
+
         Date getDepositedDate() const;
-        
+
         std::string getDesciption();
-        
+
         ObsoleteInfo getObsoleteInfo();
-        
+
         std::vector<Model> getModelList();
         void               setModelList();
-        
+
         void setResidueGroupType(FileName tF);
-        
+
         // output a structure to a PDB file
-        
+
         void writeTitleSection();
         void writePrimaryStructureSection();
         void writeHeterogenSection();
@@ -272,7 +279,7 @@ namespace LIBMOL
         void writeCoordinateSection();
         void writeConnectivitySection();
         void writeBookKeepingSection();
-        
+
         // related bonds, bond angle, torsion angles, residues, chain. models
         std::vector<Model>      allModels;
         std::vector<Chain>      allChains;
@@ -283,76 +290,75 @@ namespace LIBMOL
         std::vector<Link>       allLinks;
         std::vector<Helix>      allHelices;
         std::vector<Sheet>      allSheets;
-        
+
         HeadSec                 allHeaderInfo;
-        
+
         std::ofstream           outFile;
         std::ifstream           inFile;
-        
+
     private :
-        
-        
+
+
         PDBRecordType           itsTempRecordType;
-        
+
         Model                *  itsCurrentModel;
         Atom                 *  itsCurrentAtom;
         bool                    itsCurrentAltLoc;
         Atom                 *  itsCurrentHetAtm;
-        
-        
+
+
         Residue              *  itsCurrentResidue;
         ModRes               *  itsCurrentModRes;
         Chain                *  itsCurrentChain;
-        
+
         Helix                *  itsCurrentHelix;
         Sheet                *  itsCurrentSheet;
-        
-        
-        SSBond               *  itsCurrentSSBond; 
-        
+
+
+        SSBond               *  itsCurrentSSBond;
+
         CrystInfo            *   itsCrystInfo;
-        
+
     };
-    
-    
+
+
     // A simple version of PDB processor, extract only atom information
-    // in particular, atomic coordinates 
-    class DictPDBFile 
+    // in particular, atomic coordinates
+    class DictPDBFile
     {
     public :
-        
-        // default constructor 
+
+        // default constructor
         DictPDBFile();
-        
-        // copy constructor 
-        DictPDBFile(Name                    tFname, 
+
+        // copy constructor
+        DictPDBFile(Name                    tFname,
                     std::ios_base::openmode tOpenMode);
-        
+
         inline ~DictPDBFile()
         {
         }
-        
-                
+
+
         // Extract information from a PDB file
-        
-        // Read line by line from a PDB file and 
-        // and get all information needed from it 
-        void setupSystem();   
-        
+
+        // Read line by line from a PDB file and
+        // and get all information needed from it
+        void setupSystem();
+
         // atoms only
         std::map<ID, std::vector<REAL> >       allHetAtmList;
-        
+
         std::ifstream                          inFile;
-        
- 
+
+
     };
-    
-    void extern outPDB(FileName tFName, 
+
+    void extern outPDB(FileName tFName,
                        ID tMonoRootName,
                        std::vector<LIBMOL::AtomDict>& tAtoms,
                        int tMode);
-    
+
 }
 
 #endif	/* PDBFILE_H */
-

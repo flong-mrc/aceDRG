@@ -347,6 +347,8 @@ namespace LIBMOL
                              & tHCandAtom,
                              double    tDist);
 
+    extern void setAtomsMetalType(std::vector<AtomDict> & tAtoms);
+
     class HuckelMOSuite
     {
     public :

@@ -142,6 +142,8 @@ namespace LIBMOL
 
     class Molecule;
 
+    class DictPDBFile;
+
 
     struct DictCifHead {
         Name   libName;

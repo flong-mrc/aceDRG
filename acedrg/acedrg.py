@@ -1255,7 +1255,7 @@ class Acedrg(CExeCode ):
                 self.inPdbName = tIn
             self._cmdline += " -p %s "%(self.inPdbName)
             self._cmdline += " -q yes -o %s "%(self.outRstCifName)
-            #print(self._cmdline)
+            print(self._cmdline)
             
             self.runExitCode = self.subExecute()
 
@@ -1655,6 +1655,21 @@ class Acedrg(CExeCode ):
         if self.workMode ==1111:
             
             aOutRoot = self.outRoot + "_%s_dictionary"%tIdxMol
+            aOutFile = aOutRoot + ".cif"
+            self._log_name        = os.path.join(self.scrDir, aOutRoot + ".log")
+            self._cmdline         = self.aAcedrg
+            if os.path.isfile(tMol[0]):
+                self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
+                if tMol[1].find("HasMetal") !=-1:
+                    self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
+            print(self._cmdline)
+            self.subExecute()
+            if os.path.isfile(aOutFile):
+                print("The dictionary file for the molecules is %s"%aOutFile)
+            
+    def runAcedrgGen(self, tInCif):
+        
+            aOutRoot =  + "_%s_dictionary"%tIdxMol
             aOutFile = aOutRoot + ".cif"
             self._log_name        = os.path.join(self.scrDir, aOutRoot + ".log")
             self._cmdline         = self.aAcedrg
@@ -3570,7 +3585,7 @@ class Acedrg(CExeCode ):
         elif self.workMode == 16 or self.workMode == 161:
             if os.path.isfile(self.inPdbName):
                 self.runLibmol()
-                newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.cif")
+                newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")
                 print(newInCifName)
                 
                 if os.path.isfile(newInCifName):

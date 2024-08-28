@@ -3571,7 +3571,19 @@ namespace LIBMOL
         }
         else if (tAtm->chemType.compare("C")==0)
         {
+        }
+    }
 
+    extern void setAtomsMetalType(std::vector<AtomDict> & tAtoms)
+    {
+        std::vector<ID>  allMetals;
+        initMetalTab(allMetals);
+        for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
+                     iA !=tAtoms.end(); iA++)
+        {
+            std::cout << "Here " << iA->chemType << std::endl;
+            iA->isMetal = isMetal(allMetals, iA->chemType);
+            std::cout << "metal ? " << iA->isMetal << std::endl;
         }
     }
 
@@ -9019,9 +9031,31 @@ namespace LIBMOL
             {
                 std::cout << "Here4 " << iAt->id << ", its charge "
                           << iAt->charge << std::endl;
+                bool aDone = false;
                 for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
                      iNB != iAt->connAtoms.end(); iNB++)
                 {
+                    if (tAtoms[*iNB].chemType=="O" &&
+                    tAtoms[*iNB].charge == iAt->charge)
+                    {
+                        int idxB=tAllAtmBondingMap[iAt->seriNum][*iNB];
+                        tBonds[idxB].orderN++;
+                        iAt->charge =0;
+                        tAtoms[*iNB].charge = 0;
+                        aDone = true;
+                        std::cout << "Bond order between atoms "
+                                      << iAt->id << " and "
+                                      << tAtoms[*iNB].id << " modified to "
+                                      << tBonds[idxB].orderN << std::endl;
+
+                    }
+                }
+                if (!aDone)
+                {
+                for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                     iNB != iAt->connAtoms.end(); iNB++)
+                {
+
                     if (tAtoms[*iNB].chemType=="N" || tAtoms[*iNB].chemType=="S")
                     {
                         int idxB=tAllAtmBondingMap[iAt->seriNum][*iNB];
@@ -9067,6 +9101,7 @@ namespace LIBMOL
                             break;
                         }
                     }
+                }
                 }
             }
         }

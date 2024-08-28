@@ -2148,12 +2148,12 @@ namespace LIBMOL
     {
         bool aRet = false;
         std::vector<ID>::iterator iFind = std::find(tMeTab.begin(), tMeTab.end(), tID);
-        // std::cout << "HereElem " << tID << std::endl;
+        std::cout << "HereElem " << tID << std::endl;
         if (iFind != tMeTab.end())
         {
             aRet=true;
         }
-        // std::cout << aRet << std::endl;
+        std::cout << aRet << std::endl;
         return aRet;
     }
 
@@ -2168,6 +2168,8 @@ namespace LIBMOL
 
         return false;
     }
+
+
 
     extern void fromIdToChemType(ID tId, ID & tChemType)
     {
