@@ -161,8 +161,8 @@ class metalMode(CExeCode):
         
         aElem1 = tAtom1['_chem_comp_atom.type_symbol'] 
         aElem2 = tAtom2['_chem_comp_atom.type_symbol'] 
-        
-        
+        #print ("Atom1 ", tAtom1['_chem_comp_atom.atom_id'], " and Atom2 ", tAtom2['_chem_comp_atom.atom_id'])
+        #print("Elem1 ", aElem1, " and Elem2 ", aElem2)
         if aElem1 in self.radii and aElem2 in self.radii:
             if "cova" in self.radii[aElem1] and "cova" in self.radii[aElem2]:
                 aVal = self.radii[aElem1]["cova"] + self.radii[aElem2]["cova"]      
@@ -171,6 +171,7 @@ class metalMode(CExeCode):
                 tBond["_chem_comp_bond.value_dist"] = "2.0"
         else:
             tBond["_chem_comp_bond.value_dist"]  = "2.0"
+        #print("Bond length %s "%tBond["_chem_comp_bond.value_dist"])
             
     
     def setMMBond(self, tAtoms, tBonds):
@@ -180,7 +181,7 @@ class metalMode(CExeCode):
                 atm1 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_1'])
                 atm2 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_2'])
                 self.setBondValueFromRadii(atm1, atm2, aBond)
-                aBond['_chem_comp_bond.value_dist_esd'] = "0.01"
+                aBond['_chem_comp_bond.value_dist_esd'] = "0.04"
                 aBond['_chem_comp_bond.value_dist_nucleus']     = aBond['_chem_comp_bond.value_dist']
                 aBond['_chem_comp_bond.value_dist_nucleus_esd'] = "0.01"
                 
@@ -232,6 +233,7 @@ class metalMode(CExeCode):
                 if not aBond['_chem_comp_bond.atom_id_2'] in self.metalConnAtomsMap:
                     self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_2']] = []
                 self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_2']].append(aBond['_chem_comp_bond.atom_id_1'])
+                self.setBondValueFromRadii(atm1, atm2, aBond)
                 self.metalBonds.append(aBond)
                 if not aBond['_chem_comp_bond.atom_id_1'] in metalIds:
                     if not aBond['_chem_comp_bond.atom_id_1'] in self.connMAMap:
@@ -281,12 +283,13 @@ class metalMode(CExeCode):
         
         
         
+                
         for aAtm in self.remainAtoms:
             aId = aAtm['_chem_comp_atom.atom_id']
             if not aId in atmConnsMap:
                 # Isolated atoms
                 atmConnsMap[aId] = {}
-            aN  = len(atmConnsMap[aId])
+            #aN  = len(atmConnsMap[aId])
             #print("Atom %s has %d non metal atom connections."%(aId, aN))
             #if aN > 0:
                 #print("They are: ")
@@ -872,8 +875,8 @@ class metalMode(CExeCode):
                                 aBond['_chem_comp_bond.atom_id_2']))
                         sys.exit()
                     
-                    bLen = "2.0"
-                    dBLen = "0.01"
+                    bLen = "%s"%aBond["_chem_comp_bond.value_dist"]
+                    dBLen = "0.04"
                     aMmCif.write("%s%s%s%s%s%s%s%s\n"
                                  % (self.monomRoot.ljust(8),
                                  aBond['_chem_comp_bond.atom_id_1'].ljust(10), 
@@ -1184,7 +1187,7 @@ class metalMode(CExeCode):
                     % (self.monomRoot.ljust(8), aMA['_chem_comp_atom.atom_id'].ljust(10),
                        aMA['_chem_comp_atom.atom_id'].ljust(10),
                        aMA['_chem_comp_atom.type_symbol'].ljust(6), 
-                       aMA['_chem_comp_atom.type_symbol'].ljust(6),
+                       aMA['_chem_comp_atom.type_symbol'].upper().ljust(6),
                        float(aMA['_chem_comp_atom.charge']), posX, posY, posZ, posX, posY, posZ)
             tLines.append(aLine)
             
