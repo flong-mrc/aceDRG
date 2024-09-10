@@ -106,6 +106,7 @@ namespace LIBMOL
         bool                                     isAromaticP;
         bool                                     isAntiAroma;
         bool                                     isSugar;
+        bool                                     doneBO;
         std::string                              sugarType;
         std::string                              rep;
         std::string                              sRep;

@@ -1901,7 +1901,7 @@ class FileTransformer(object) :
     def outputSingleAtomCif(self, tOutFileName, tVersionInfo):
    
         lF = False
-        print("The output single molecule cif file is ", tOutFileName)
+        #print("The output single molecule cif file is ", tOutFileName)
         headerSec = {}
         for aK in self.dataDescriptor.keys():
             if self.dataDescriptor[aK][0].find("_chem_comp.id") !=-1:
@@ -1948,11 +1948,12 @@ class FileTransformer(object) :
                 aCif.write("_chem_comp_atom.x\n")
                 aCif.write("_chem_comp_atom.y\n")
                 aCif.write("_chem_comp_atom.z\n")
- 
+                
                 for aA in self.atoms:
+                    tCh = str(aA["_chem_comp_atom.charge"]) 
                     aL = "%s%s%s%s%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(8), aA["_chem_comp_atom.atom_id"].ljust(8),\
                                                aA["_chem_comp_atom.type_symbol"].ljust(8), aA["_chem_comp_atom.type_symbol"].ljust(8),\
-                                               aA["_chem_comp_atom.charge"].ljust(6), "0.000".ljust(10),\
+                                               tCh.ljust(6), "0.000".ljust(10),\
                                                "0.000".ljust(10), "0.000".ljust(10))
                     aCif.write(aL)
 
@@ -1962,13 +1963,41 @@ class FileTransformer(object) :
                              aL = "%s%s\n"%(aK.ljust(len(aK)+6), aB[aK]) 
                              aCif.write(aL)
                 elif len(self.bonds) > 1:
-                    # Later  
-                    pass      
+                    aCif.write("loop_\n")
+                    aCif.write("_chem_comp_bond.comp_id\n")
+                    aCif.write("_chem_comp_bond.atom_id_1\n")
+                    aCif.write("_chem_comp_bond.atom_id_2\n")
+                    aCif.write("_chem_comp_bond.value_order\n")
+                    aCif.write("_chem_comp_bond.value_dist_nucleus\n")
+                    aCif.write("_chem_comp_bond.value_dist_nucleus_esd\n")
+                    aCif.write("_chem_comp_bond.value_dist\n")
+                    aCif.write("_chem_comp_bond.value_dist_esd\n")
+                    
+                    for aB in self.bonds:
+                        aType = ""
+                        if '_chem_comp_bond.value_order' in aB.keys():
+                            aType = aB['_chem_comp_bond.value_order']
+                        elif '_chem_comp_bond.type' in aB.keys():
+                            aType = aB['_chem_comp_bond.type']
+                        else:
+                            print("No bond-order for the bond between atoms %s and %s"
+                                 %(aB['_chem_comp_bond.atom_id_1'],
+                                   aB['_chem_comp_bond.atom_id_2']))
+                    
+                        bLen = "%s"%aB["_chem_comp_bond.value_dist"]
+                        dBLen = "0.04"
+                        aCif.write("%s%s%s%s%s%s%s%s\n"
+                                   % (aB["_chem_comp_bond.comp_id"].ljust(8),
+                                     aB['_chem_comp_bond.atom_id_1'].ljust(10), 
+                                     aB['_chem_comp_bond.atom_id_2'].ljust(10),  
+                                     aType.ljust(10), bLen.ljust(10), dBLen.ljust(10), 
+                                     bLen.ljust(10), dBLen.ljust(10)))
+                    
                 aCif.write("loop_\n")
-                aCif.write("_pdbx_chem_comp_description_generator.comp_id\n")
-                aCif.write("_pdbx_chem_comp_description_generator.program_name\n")
-                aCif.write("_pdbx_chem_comp_description_generator.program_version\n")
-                aCif.write("_pdbx_chem_comp_description_generator.descriptor\n")
+                aCif.write("_acedrg_chem_comp_description_generator.comp_id\n")
+                aCif.write("_acedrg_chem_comp_description_generator.program_name\n")
+                aCif.write("_acedrg_chem_comp_description_generator.program_version\n")
+                aCif.write("_acedrg_chem_comp_description_generator.descriptor\n")
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg".ljust(21),\
                            tVersionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg_database".ljust(21),\

@@ -2148,12 +2148,12 @@ namespace LIBMOL
     {
         bool aRet = false;
         std::vector<ID>::iterator iFind = std::find(tMeTab.begin(), tMeTab.end(), tID);
-        std::cout << "HereElem " << tID << std::endl;
+
         if (iFind != tMeTab.end())
         {
             aRet=true;
         }
-        std::cout << aRet << std::endl;
+
         return aRet;
     }
 

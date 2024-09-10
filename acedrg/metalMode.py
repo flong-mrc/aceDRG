@@ -101,7 +101,7 @@ class metalMode(CExeCode):
             self.outInterMCif(outInterMCifName, tAtoms, tBonds, tVersionInfo)
             print("==============================================")
             print("No non-metal related bonds exist in the molecule")
-            print("The final output file is %s"%outInterMCifName)
+            #print("The final output file is %s"%outInterMCifName)
             print("==============================================")
         elif not os.path.isfile(tmpMmcifName):
             print("==============================================")
@@ -159,8 +159,8 @@ class metalMode(CExeCode):
     
     def setBondValueFromRadii(self, tAtom1, tAtom2, tBond):
         
-        aElem1 = tAtom1['_chem_comp_atom.type_symbol'] 
-        aElem2 = tAtom2['_chem_comp_atom.type_symbol'] 
+        aElem1 = tAtom1['_chem_comp_atom.type_symbol'].upper()
+        aElem2 = tAtom2['_chem_comp_atom.type_symbol'].upper() 
         #print ("Atom1 ", tAtom1['_chem_comp_atom.atom_id'], " and Atom2 ", tAtom2['_chem_comp_atom.atom_id'])
         #print("Elem1 ", aElem1, " and Elem2 ", aElem2)
         if aElem1 in self.radii and aElem2 in self.radii:
@@ -223,6 +223,7 @@ class metalMode(CExeCode):
                 if not aBond['_chem_comp_bond.atom_id_1'] in self.metalConnAtomsMap:
                     self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']] = []
                 self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']].append(aBond['_chem_comp_bond.atom_id_2'])
+                
                 self.setBondValueFromRadii(atm1, atm2, aBond)
                 self.metalBonds.append(aBond)
                 if not aBond['_chem_comp_bond.atom_id_2'] in metalIds:

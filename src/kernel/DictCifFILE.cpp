@@ -33,7 +33,8 @@ namespace LIBMOL
             checkR(true),
             checkResol(true),
             RTHRESHOLD_U(0.10),
-            RESOLTHRESHOLD_U(0.842),
+            //RESOLTHRESHOLD_U(0.842),
+            RESOLTHRESHOLD_U(1.0),
             allR(-1.0),
             gtR(-1.0),
             obsR(-1.0),
@@ -66,7 +67,8 @@ namespace LIBMOL
                            checkR(true),
                            checkResol(true),
                            RTHRESHOLD_U(0.10),
-                           RESOLTHRESHOLD_U(0.842),
+                           //RESOLTHRESHOLD_U(0.842),
+                           RESOLTHRESHOLD_U(1.0),
                            allR(-1.0),
                            gtR(-1.0),
                            obsR(-1.0),
@@ -128,7 +130,8 @@ namespace LIBMOL
                            allWR(-1.0),
                            gtWR(-1.0),
                            refWR(-1.0),
-                           RESOLTHRESHOLD_U(0.842),
+                           //RESOLTHRESHOLD_U(0.842),
+                           RESOLTHRESHOLD_U(1.0),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurBlock(""),
@@ -211,7 +214,8 @@ namespace LIBMOL
                            gtWR(-1.0),
                            refWR(-1.0),
                            RTHRESHOLD_U(0.10),
-                           RESOLTHRESHOLD_U(0.842),
+                           //RESOLTHRESHOLD_U(0.842),
+                           RESOLTHRESHOLD_U(1.0),
                            itsCurAtomSeriNum(ZeroInt),
                            itsCurAtom(NullPoint),
                            itsCurCryst(NullPoint)
@@ -1169,11 +1173,11 @@ namespace LIBMOL
                 aRet=false;
             }
         }
-        else if (//tWorkMode==31
-             //|| tWorkMode==311
-             // || tWorkMode ==312
-             // || tWorkMode ==313
-             tWorkMode ==314
+        else if (tWorkMode==31
+             || tWorkMode==311
+             || tWorkMode ==312
+             || tWorkMode ==313
+             || tWorkMode ==314
              || tWorkMode==32
              || tWorkMode==33)
         {
@@ -1363,19 +1367,20 @@ namespace LIBMOL
 
     void GenCifFile::checkNonHAtomOccp()
     {
+        // Now execluding even when H atom is not ocp 1.0, e.g 1100463
         float nAll = 0.0, nColid=0.0;
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                      iA !=allAtoms.end(); iA++)
         {
-            if (iA->chemType.find("H")==std::string::npos)
-            {
+            //if (iA->chemType.find("H")==std::string::npos)
+            //{
                 nAll +=1.0;
 
                 if (iA->ocp < 0.99)
                 {
                     nColid+=1.0;
                 }
-            }
+            //}
         }
 
         //if (nColid/nAll >0.2)
@@ -3142,7 +3147,7 @@ namespace LIBMOL
         }
         else if (!colidOK)
         {
-            errMsg.push_back("REJECTED STRUCTURE: Non-H atoms have less than 1.0 occp.\n");
+            errMsg.push_back("REJECTED STRUCTURE: Some of Atoms have less than 1.0 occp.\n");
         }
         else if (hasHeavyCalcAtoms)
         {

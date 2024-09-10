@@ -5378,7 +5378,7 @@ namespace LIBMOL
         }
 
         std::cout << "setIsolateRings begins " << std::endl;
-
+        std::cout << "Number of rings " << tRings.size() << std::endl;
         setIsolateRings(tAtoms, tBonds, tRings, allAtmBondingMap, curValMap,
                         doneAtoms, doneFAtoms, doneBonds, aExclRingSet);
 
@@ -6973,12 +6973,14 @@ namespace LIBMOL
                     {
                         if (std::find(tExcFRings.begin(), tExcFRings.end(), idxRs[j])==tExcFRings.end())
                         {
-
-                            setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
-                                                tAllAtmBondingMap, tCurVal, tDoneAtoms,
-                                                tDoneFAtoms, tDoneBonds);
-                            tExcFRings.push_back(idxRs[j]);
-
+                            if (!tRings[idxRs[j]].doneBO)
+                            {
+                                setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
+                                                    tAllAtmBondingMap, tCurVal, tDoneAtoms,
+                                                    tDoneFAtoms, tDoneBonds);
+                                 tRings[idxRs[j]].doneBO = true;
+                                tExcFRings.push_back(idxRs[j]);
+                            }
                         }
                     }
                     else if (numCs==6 && numNC3==5 && numNC4==1 && idxNC4 >=0)
@@ -6995,11 +6997,14 @@ namespace LIBMOL
                     }
                     else if (numCs==6)
                     {
-
-                        setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
+                        if (!tRings[idxRs[j]].doneBO)
+                        {
+                            setOneIsolateC6Ring(tAtoms,tBonds, tRings[idxRs[j]],
                                             tAllAtmBondingMap, tCurVal, tDoneAtoms,
                                             tDoneFAtoms, tDoneBonds);
-                        tExcFRings.push_back(idxRs[j]);
+                            tRings[idxRs[j]].doneBO = true;
+                            tExcFRings.push_back(idxRs[j]);
+                        }
                     }
                 }
                 else if (tRings[idxRs[j]].atoms.size()==5)
@@ -7947,11 +7952,15 @@ namespace LIBMOL
                             {
                                 std:: cout << "a 6-m C ring is selected " << std::endl;
                                 std::cout << "The ring is " << tRings[*iR].rep << std::endl;
-                                setOneIsolateC6Ring(tAtoms,tBonds, tRings[*iR],
-                                                tAllAtmBondingMap, tCurVal, tDoneAtoms,
-                                                tDoneFAtoms, tDoneBonds);
-                                allowSys = false;
-                                break;
+                                if (!tRings[*iR].doneBO)
+                                {
+                                    setOneIsolateC6Ring(tAtoms,tBonds, tRings[*iR],
+                                            tAllAtmBondingMap, tCurVal, tDoneAtoms,
+                                            tDoneFAtoms, tDoneBonds);
+                                    tRings[*iR].doneBO = true;
+                                    allowSys = false;
+                                    break;
+                                }
                             }
                         }
                     }

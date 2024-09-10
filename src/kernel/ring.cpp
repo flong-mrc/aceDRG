@@ -61,6 +61,7 @@ namespace LIBMOL
             isAromaticP(false),
             isAntiAroma(false),
             isSugar(false),
+            doneBO(false),
             sugarType(NullString),
             rep(NullString),
             sRep(NullString),
@@ -73,6 +74,7 @@ namespace LIBMOL
             isAromaticP(tR.isAromaticP),
             isAntiAroma(tR.isAntiAroma),
             isSugar(tR.isSugar),
+            doneBO(tR.doneBO),
             sugarType(tR.sugarType),
             rep(tR.rep),
             sRep(tR.sRep),
@@ -140,6 +142,8 @@ namespace LIBMOL
         }
         isAromatic  = false;
         isAromaticP = false;
+        isSugar = false;
+        doneBO =false;
 
     }
 

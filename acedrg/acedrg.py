@@ -1255,7 +1255,7 @@ class Acedrg(CExeCode ):
                 self.inPdbName = tIn
             self._cmdline += " -p %s "%(self.inPdbName)
             self._cmdline += " -q yes -o %s "%(self.outRstCifName)
-            print(self._cmdline)
+            #print(self._cmdline)
             
             self.runExitCode = self.subExecute()
 
@@ -1662,26 +1662,13 @@ class Acedrg(CExeCode ):
                 self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
                 if tMol[1].find("HasMetal") !=-1:
                     self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
-            print(self._cmdline)
+            print("here1 ", self._cmdline)
             self.subExecute()
             if os.path.isfile(aOutFile):
                 print("The dictionary file for the molecules is %s"%aOutFile)
             
-    def runAcedrgGen(self, tInCif):
-        
-            aOutRoot =  + "_%s_dictionary"%tIdxMol
-            aOutFile = aOutRoot + ".cif"
-            self._log_name        = os.path.join(self.scrDir, aOutRoot + ".log")
-            self._cmdline         = self.aAcedrg
-            if os.path.isfile(tMol[0]):
-                self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
-                if tMol[1].find("HasMetal") !=-1:
-                    self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
-            print(self._cmdline)
-            self.subExecute()
-            if os.path.isfile(aOutFile):
-                print("The dictionary file for the molecules is %s"%aOutFile)
-            
+      
+    
     def runServalcat(self, tRoot, tInCif=None):
         
         aRoot = os.path.join(self.scrDir, tRoot)
@@ -1753,8 +1740,24 @@ class Acedrg(CExeCode ):
                 aRet = False
         return aRet 
             
-            
-   
+    def aCombRunMS(self, tInCif):
+
+        aRet = ""
+
+        if os.path.isfile(tInCif) and os.path.isfile(self.inMetalPDBName):
+            print("MetalCoord is running")
+            self.runMetalCoord(tInCif)
+            self.aErrInfoM=""
+            if self.getMRunStatus(self.aErrInfoM):
+                aMetCoordInCif = self.outRoot + "_metalCoord.cif" 
+                #print("aMetCoordInCif=", aMetCoordInCif)
+                if os.path.isfile(aMetCoordInCif):
+                    self.runServalcat(self.outRoot, aMetCoordInCif)  
+                    aRet = os.path.join(self.scrDir, self.outRoot + "_updated.cif") 
+                    
+             
+        return aRet 
+    
     def getFvalFromJson(self, tJSFN):
         
         retFval = 100000000
@@ -3112,7 +3115,7 @@ class Acedrg(CExeCode ):
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
             if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
                 # The input file is an mmcif file 
-                print("inName : ", self.inMmCifName)
+                #print("inName : ", self.inMmCifName)
                 self.fileConv.mmCifReader(self.inMmCifName)
                 print("Number of atoms in the cif file ", len(self.fileConv.atoms))
                 #for aA in self.fileConv.atoms:
@@ -3443,15 +3446,38 @@ class Acedrg(CExeCode ):
                                     #print("The tmp3 output is %s "%aTmp3Cif)
                                     print("The final output cif is %s"%finalOutName)
                             
-                else:
-                    print("Number of atoms", len(self.fileConv.atoms))
-                    print("Number of metal atoms", len(self.initMetalAtoms))
-                    print("Number of bonds", len(self.fileConv.bonds))
-                    finCif = self.outRoot + ".cif"
+                    else:
+                        print("Number of atoms", len(self.fileConv.atoms))
+                        print("Number of metal atoms", len(self.initMetalAtoms))
+                        print("Number of bonds", len(self.fileConv.bonds))
+                        self.metalMode.setMMBond(self.fileConv.atoms, self.fileConv.bonds)
+                        aTmpOutCif =os.path.join(self.scrDir, self.outRoot + "_tmp.cif")
+                        self.fileConv.outputSingleAtomCif(aTmpOutCif, self.versionInfo)
+                        finCif = self.outRoot + "_final.cif"
+                        if os.path.isfile(self.inMetalPDBName):
+                            aCombResult=self.aCombRunMS(aTmpOutCif)
+                            if os.path.isfile(aCombResult):
+                                shutil.copy(aCombResult, finCif) 
+                            else:
+                                self.runServalcat(self.outRoot, aTmpOutCif)
+                                aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                                if os.path.isfile(aSOutName):
+                                    self.cleanSFile(aSOutName, finCif)
+                                else:
+                                    shutil.copy(aTmpOutCif, finCif)
+                        else:
+                            self.runServalcat(self.outRoot, aTmpOutCif)
+                            aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                            if os.path.isfile(aSOutName):
+                                self.cleanSFile(aSOutName, finCif)
+                            else:
+                                shutil.copy(aTmpOutCif, finCif)
+                        print("The final output cif is %s"%finCif)
+                else:    
                     # acedrg does nothing. Check what basic thing is missing 
-                    self.metalMode.setMMBond(self.fileConv.atoms, self.fileConv.bonds)
+                    finCif = self.outRoot + ".cif"
                     self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
-                    
+                    print("The final output cif is %s"%finCif)
                 print("=====================================================================")
                 print("|               Finished                                            |")
                 print("=====================================================================")
@@ -3586,11 +3612,12 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inPdbName):
                 self.runLibmol()
                 newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")
-                print(newInCifName)
-                
+                #print(newInCifName)
                 if os.path.isfile(newInCifName):
-                    self.cmdline   = "acedrg -c %s   -o %s -p"%(newInCifName, self.baseRoot)
-                    print(self.cmdline)
+                    if os.path.isfile(self.inMetalPDBName):
+                        self.cmdline   = "acedrg -c %s --metalPDB %s  -o %s -p"%(newInCifName, self.inMetalPDBName, self.baseRoot)
+                    else:
+                        self.cmdline   = "acedrg -c %s   -o %s -p"%(newInCifName, self.baseRoot)
                     os.system(self.cmdline)
             else:
                 print("The input %s does not exist"%self.inPdbName)

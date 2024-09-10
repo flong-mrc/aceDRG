@@ -5265,9 +5265,8 @@ namespace LIBMOL {
             {
                  aMol.atoms.push_back(*iAt);
             }
-
+            getAtomTypeOneMolNew(aMol);
             allMolecules.push_back(aMol);
-
             setBondOrderAndChargeInMols(allMolecules);
 
 

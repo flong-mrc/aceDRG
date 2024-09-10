@@ -1149,10 +1149,10 @@ class AcedrgRDKit(object):
                             HConns[nonH_Id] = []
                         HConns[nonH_Id].append(idxH)
                     else:
-                        print(
-                            "Can not find the non-H atom that connects to H atom of serial number ", idxH)
+                        print("Can not find the non-H atom that connects to H atom of serial number ", idxH)
                 else:
-                    print("One H atom connect more than one atoms, check")
+                    print("Here1")
+                    print("H atom %s connect more than one atoms, check!"%aAtom.GetProp("Name"))
                     sys.exit(1)
         print("Total number of H atoms is ", nh)
         # for aKey in HConns.keys():
@@ -1910,6 +1910,10 @@ class AcedrgRDKit(object):
         elemList = []
         for aAtom in initAtoms:
             elemList.append(aAtom.GetSymbol())
+            print("atom idx ", aAtom.GetIdx())
+            print("atom element ", aAtom.GetSymbol())
+            print("atom val ", aAtom.GetTotalValence())
+            print("atom charge ", aAtom.GetFormalCharge())
         # print("number of props in the mol ", len(tMol.GetPropNames()))
         if not len(elemList):
             print("No atoms in from your file, check your file format")
@@ -1986,7 +1990,7 @@ class AcedrgRDKit(object):
                 print("before : num of explicit Hs ", oldExHs)
                 tMol.GetAtomWithIdx(aGrp[1]).SetNumExplicitHs(aGrp[0]+oldExHs)
                 tMol.GetAtomWithIdx(aGrp[1]).UpdatePropertyCache()
-        tMol.UpdatePropertyCache()
+        #tMol.UpdatePropertyCache()
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
         # self.checkSugar(tMol)
         
@@ -1995,7 +1999,7 @@ class AcedrgRDKit(object):
                 self.setAllFormalChargeFuncGroupAtoms(tMol, tPH[1])
             else:
                 self.setAllFormalChargeFuncGroupAtoms(tMol)
-            tMol.UpdatePropertyCache()
+                
         # print("fixed Name ", tMol.GetProp("fixedName"))
 
         if tMol.GetProp("fixedName") == "NO":
@@ -2006,8 +2010,12 @@ class AcedrgRDKit(object):
                 aMol = Chem.AddHs(tMol)
         else:
             aMol = tMol
-
-        tMol.UpdatePropertyCache()
+       
+        try:
+            tMol.UpdatePropertyCache()
+        except rdchem.AtomValenceException:
+            pass 
+            
         #self.showInfoAboutAtomsAndBonds(aMol, 1)
         # Make SMILES before Hs are added
         if tMol.HasProp('SmilesIn'):
