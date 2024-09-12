@@ -8433,7 +8433,7 @@ namespace LIBMOL
             }
             else if (!ld)
             {
-                if (iAt->chemType =="C" and tAtoms[iAt->seriNum].charge !=0)
+                if (iAt->chemType =="C" && tAtoms[iAt->seriNum].charge !=0)
                 {
                     tAtoms[iAt->seriNum].charge =0;
                 }
