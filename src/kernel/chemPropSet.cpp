@@ -8351,6 +8351,7 @@ namespace LIBMOL
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds)
     {
+        std::cout << "entered here " << std::endl;
         std::vector<int> idxRings;
         for (int idxR=0;   idxR<tRings.size(); idxR++)
         {
@@ -8397,6 +8398,7 @@ namespace LIBMOL
 
             }
 
+
         }
     }
 
@@ -8433,12 +8435,12 @@ namespace LIBMOL
             }
             else if (!ld)
             {
-                if (iAt->chemType =="C" and tAtoms[iAt->seriNum].charge !=0)
+                if (iAt->chemType =="C" && tAtoms[iAt->seriNum].charge !=0)
                 {
                     tAtoms[iAt->seriNum].charge =0;
                 }
-                std::cout << "atom is " << iAt->id << std::endl;
-                std::cout << " HEREX " << iAt->charge << std::endl;
+                //std::cout << "atom is " << iAt->id << std::endl;
+                //std::cout << " HEREX " << iAt->charge << std::endl;
                 for (std::vector<int>::iterator iConn= iAt->connAtoms.begin();
                      iConn != iAt->connAtoms.end(); iConn++)
                 {
@@ -8626,11 +8628,11 @@ namespace LIBMOL
                 }
 
                 numIts2++;
-            }while(lCh && numIts2 <  maxIts);
+            }while(lCh && (numIts2 <  maxIts));
 
             std::cout << "Afte  stage FurtheAssignBandC 1 : " << std::endl;
             for (std::vector<BondDict>::iterator iBo= tBonds.begin();
-                 iBo != tBonds.end(); iBo++)
+                  iBo != tBonds.end(); iBo++)
             {
                 std::cout << "Bond-order between atoms " << iBo->atoms[0]
                           << " and " << iBo->atoms[1]
@@ -9023,10 +9025,10 @@ namespace LIBMOL
             }
 
         }
-
+        std::cout << "adjustC6ChargedRing " << std::endl;
         adjustC6ChargedRing(tAtoms, tBonds, tRings, tAllAtmBondingMap,
                             tCurVal, tDoneAtoms, tDoneFAtoms, tDoneBonds);
-
+        std::cout << "checkC4N1RingCharge " << std::endl;
         checkC4N1RingCharge(tAtoms, tBonds, tRings, tAllAtmBondingMap,
                             tCurVal, tDoneAtoms, tDoneFAtoms, tDoneBonds);
 
