@@ -1939,6 +1939,7 @@ class FileTransformer(object) :
                 
                 
                 aCif.write("data_comp_%s\n"%headerSec["_chem_comp.id"])
+                aCif.write("_chem_comp.pdbx_type              HETAIN\n")
                 aCif.write("loop_\n")
                 aCif.write("_chem_comp_atom.comp_id\n")
                 aCif.write("_chem_comp_atom.atom_id\n")
@@ -1948,13 +1949,30 @@ class FileTransformer(object) :
                 aCif.write("_chem_comp_atom.x\n")
                 aCif.write("_chem_comp_atom.y\n")
                 aCif.write("_chem_comp_atom.z\n")
-                
+                aCif.write("_chem_comp_atom.pdbx_model_Cartn_x_ideal\n")
+                aCif.write("_chem_comp_atom.pdbx_model_Cartn_y_ideal\n")
+                aCif.write("_chem_comp_atom.pdbx_model_Cartn_z_ideal\n")
                 for aA in self.atoms:
+                    aX=""
+                    aY=""
+                    aZ=""
+                    if "_chem_comp_atom.x" in aA.keys():
+                        aX=str(aA["_chem_comp_atom.x"])
+                        aY=str(aA["_chem_comp_atom.y"])
+                        aZ=str(aA["_chem_comp_atom.z"])
+                    elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aA.keys():
+                        aX=str(aA["_chem_comp_atom.pdbx_model_Cartn_x_ideal"])
+                        aY=str(aA["_chem_comp_atom.pdbx_model_Cartn_y_ideal"])
+                        aZ=str(aA["_chem_comp_atom.pdbx_model_Cartn_z_ideal"])
+                    else:
+                        aX="0.000"
+                        aY="0.000"
+                        aZ="0.000"
                     tCh = str(aA["_chem_comp_atom.charge"]) 
-                    aL = "%s%s%s%s%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(8), aA["_chem_comp_atom.atom_id"].ljust(8),\
+                    aL = "%s%s%s%s%s%s%s%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(8), aA["_chem_comp_atom.atom_id"].ljust(8),\
                                                aA["_chem_comp_atom.type_symbol"].ljust(8), aA["_chem_comp_atom.type_symbol"].ljust(8),\
-                                               tCh.ljust(6), "0.000".ljust(10),\
-                                               "0.000".ljust(10), "0.000".ljust(10))
+                                               tCh.ljust(6), aX.ljust(10), aY.ljust(10), aZ.ljust(10),\
+                                               aX.ljust(10), aY.ljust(10), aZ.ljust(10))
                     aCif.write(aL)
 
                 if len(self.bonds)==1:
