@@ -1230,9 +1230,9 @@ class FileTransformer(object) :
             idxAtom = 1
             for aAtom in self.atoms:
                 if self.mmCifHasCoords :
-                    x = aAtom["_chem_comp_atom.x"]
-                    y = aAtom["_chem_comp_atom.y"]
-                    z = aAtom["_chem_comp_atom.z"]
+                    x = "%7.4f"%float(aAtom["_chem_comp_atom.x"])
+                    y = "%7.4f"%float(aAtom["_chem_comp_atom.y"])
+                    z = "%7.4f"%float(aAtom["_chem_comp_atom.z"])
                 else:
                     x = "0.0000"
                     y = "0.0000"
@@ -1280,7 +1280,7 @@ class FileTransformer(object) :
                 #    elif aAtom["_chem_comp_atom.pdbx_stereo_config"].find("R") !=-1:
                 #        cha = "2"
 
-                tOutFile.write("%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10), \
+                tOutFile.write("%s%s%s %s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(x.rjust(10), y.rjust(10), z.rjust(10),\
                                                                      id.ljust(3), md.rjust(2), charge.rjust(3), \
                                                                      cha.rjust(3), hhh.rjust(3), bbb.rjust(3), \
                                                                      vvv.rjust(3), HHH.rjust(3), rrr.rjust(3), \
