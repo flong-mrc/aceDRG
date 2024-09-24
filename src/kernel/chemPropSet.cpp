@@ -8439,8 +8439,7 @@ namespace LIBMOL
                 {
                     tAtoms[iAt->seriNum].charge =0;
                 }
-                //std::cout << "atom is " << iAt->id << std::endl;
-                //std::cout << " HEREX " << iAt->charge << std::endl;
+
                 for (std::vector<int>::iterator iConn= iAt->connAtoms.begin();
                      iConn != iAt->connAtoms.end(); iConn++)
                 {

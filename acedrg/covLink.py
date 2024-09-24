@@ -275,7 +275,7 @@ class MondRes(object):
 
 class CovLinkGenerator(CExeCode):
 
-    def __init__(self, tSetParas, tInstructions, tScrDir, tOutRoot, tVerInfo=None, tTestMode=None):
+    def __init__(self, tSetParas, tInstructions, tScrDir, tOutRoot, tTabLoc, tVerInfo=None, tTestMode=None):
 
         
         if tTestMode:
@@ -320,6 +320,9 @@ class CovLinkGenerator(CExeCode):
         self.subRoot          = ""
         self.outRoot          = tOutRoot
         
+        self.exeAcedrg        = "acedrg " 
+        #self.exeAcedrg       = "/lmb/home/flong/workplace/LIBMOL/bin/acedrg"
+        
         self.instructions     = tInstructions
         
         # Links related 
@@ -336,7 +339,7 @@ class CovLinkGenerator(CExeCode):
 
         self.chemCheck        = ChemCheck()
         self.fileTool         = FileTransformer()
-        self.metalMode        = metalMode()
+        self.metalMode        = metalMode(tTabLoc)
 
 
         if os.path.isfile(self.instructions):
@@ -2789,7 +2792,7 @@ class CovLinkGenerator(CExeCode):
                 aNL = "LIG"
                 self._log_name  = os.path.join(self.scrDir, aNL + "_for_link.log")
                 self.subRoot    = os.path.join(self.scrDir, aNL + "_for_link")
-                self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)   
+                self._cmdline   = "%s -c %s  -r %s -o %s "%(self.exeAcedrg, tMonomer["inCif"], aNL, self.subRoot)   
                 if "modifiedPlanes" in self.setParas.keys():
                     self._cmdline   += " -M "
             elif tMode ==2:
@@ -2797,22 +2800,22 @@ class CovLinkGenerator(CExeCode):
                 self._log_name  = os.path.join(self.scrDir, aNL + "_for_Mod.log")
                 #self.subRoot    = os.path.join(self.scrDir, aNL + "_for_Mod")
                 self.subRoot     = aNL + "_for_Mod"
-                self._cmdline   = "acedrg -c %s  -r %s -o %s -K "%(tMonomer["inCif"], aNL, self.subRoot)
+                self._cmdline   = "%s -c %s  -r %s -o %s -K "%(self.exeAcedrg, tMonomer["inCif"], aNL, self.subRoot)
             elif tMode ==21:
                 aNL = tMonomer["name"]
                 self._log_name  = os.path.join(self.scrDir, aNL + "_for_Mod.log")
                 #self.subRoot    = os.path.join(self.scrDir, aNL + "_for_Mod")
                 self.subRoot  = aNL + "_for_Mod"
-                self._cmdline   = "acedrg -c %s  -r %s -o %s --keku -K "%(tMonomer["inCif"], aNL, self.subRoot)
+                self._cmdline   = "%s -c %s  -r %s -o %s --keku -K "%(self.exeAcedrg, tMonomer["inCif"], aNL, self.subRoot)
             elif tMode ==3:
                 aNL = tMonomer["name"]
                 self._log_name  = os.path.join(self.scrDir, aNL + ".log")
                 self.subRoot    = os.path.join(self.scrDir, aNL)
-                self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)
+                self._cmdline   = "%s -c %s  -r %s -o %s "%(self.exeAcedrg, tMonomer["inCif"], aNL, self.subRoot)
             elif tMode ==4:
                 aNL = tMonomer["name"]
                 self._log_name  = os.path.join(self.scrDir, aNL + ".log")
-                self._cmdline   = "acedrg -c %s  -r %s -o %s "%(tMonomer["inCif"], aNL, self.subRoot)
+                self._cmdline   = "%s -c %s  -r %s -o %s "%(self.exeAcedrg, tMonomer["inCif"], aNL, self.subRoot)
             if tMode ==1 :
                 print ("Link generation")
             elif tMode==2 or tMode==21:
@@ -5736,7 +5739,9 @@ class CovLinkGenerator(CExeCode):
     def outOneLinkInfo(self, tLinkedObj):
 
         #aOutCifName = tLinkedObj.combLigand["name"] + "_link.cif"
+        
         aOutCifName = self.outRoot + "_link.cif"
+        
         
         try: 
             aOutCif = open(aOutCifName, "w")

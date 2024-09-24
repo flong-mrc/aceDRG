@@ -120,11 +120,14 @@ class Acedrg(CExeCode ):
         #self.refmacMinFValueList["value"] =100000.00
         #self.refmacMinFValueList["fileName"] =""
         if "CCP4" in os.environ:
-            self.aAcedrg           = os.path.join(os.environ['CBIN'], "acedrg")
+            self.exeAcedrg           = os.path.join(os.environ['CBIN'], "acedrg")
         else :
-            self.aAcedrg           = "acedrg"
+            self.exeAcedrg           = "acedrg"
+        
+        #self.exeAcedrg          = "/lmb/home/flong/workplace/LIBMOL/bin/acedrg"
             
         self.servalcat        = "servalcat "
+        #self.servalcat        = "/lmb/home/kyamashita/app/dials-upstream-3.10/build/bin/servalcat "
         
         self.metalCoord       = "metalCoord "
         
@@ -1657,7 +1660,7 @@ class Acedrg(CExeCode ):
             aOutRoot = self.outRoot + "_%s_dictionary"%tIdxMol
             aOutFile = aOutRoot + ".cif"
             self._log_name        = os.path.join(self.scrDir, aOutRoot + ".log")
-            self._cmdline         = self.aAcedrg
+            self._cmdline         = self.exeAcedrg
             if os.path.isfile(tMol[0]):
                 self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
                 if tMol[1].find("HasMetal") !=-1:
@@ -3615,9 +3618,9 @@ class Acedrg(CExeCode ):
                 #print(newInCifName)
                 if os.path.isfile(newInCifName):
                     if os.path.isfile(self.inMetalPDBName):
-                        self.cmdline   = "acedrg -c %s --metalPDB %s  -o %s -p"%(newInCifName, self.inMetalPDBName, self.baseRoot)
+                        self.cmdline   = "%s -c %s --metalPDB %s  -o %s -p"%(self.exeAcedrg, newInCifName, self.inMetalPDBName, self.baseRoot)
                     else:
-                        self.cmdline   = "acedrg -c %s   -o %s -p"%(newInCifName, self.baseRoot)
+                        self.cmdline   = "%s -c %s   -o %s -p"%(self.exeAcedrg, newInCifName, self.baseRoot)
                     os.system(self.cmdline)
             else:
                 print("The input %s does not exist"%self.inPdbName)
@@ -3695,10 +3698,10 @@ class Acedrg(CExeCode ):
                 if self.modifiedPlanes:
                     aSetParas["modifiedPlanes"] = self.modifiedPlanes
                 
-                aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot, self.versionInfo)
+                aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot, self.acedrgTables, self.versionInfo)
             else:
                 aCLinkGenerator = CovLinkGenerator(aSetParas, self.linkInstructions, self.scrDir, self.outRoot,\
-                                                   self.versionInfo, self.testMode)
+                                                   self.acedrgTables, self.versionInfo, self.testMode)
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
                 tCif = self.outRoot + ".cif"

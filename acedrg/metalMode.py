@@ -20,6 +20,8 @@ class metalMode(CExeCode):
     def __init__( self, tTabLoc):
         
         self.acedrgTables         = tTabLoc
+        self.exeAcedrg            = "acedrg"
+        # self.exeAcedrg          = "/lmb/home/flong/workplace/LIBMOL/bin/acedrg" 
         
         self.remainAtoms          = []
         self.metalAtoms           = []
@@ -517,10 +519,11 @@ class metalMode(CExeCode):
         
     def setMetalPA(self):
         
+        """
         rAndPMap1 = {}
         rAndPMap2 = {} 
         
-        """
+        
         for aR in self.simpR:
             rAndPMap1[aR] = {}
             for aOA in self.simpR[aR]: 
@@ -552,7 +555,7 @@ class metalMode(CExeCode):
                         if not aP in self.metalInPs[aMA]:
                             self.metalInPs[aMA].append(aP)
         
-        #print(self.metalInPs)
+        print(self.metalInPs)
         
     def getAtomById(self, tAtoms, tId):
         
@@ -1052,9 +1055,9 @@ class metalMode(CExeCode):
                     if lExistAng:
                         self.writeNewAngCifLine(newLines)
                     lANG=False
-                elif lP and aL.find('_chem_comp_plane_atom.')==-1:
-                    self.writeNewPlCifLine(newLines)
-                    lP=False
+                #elif lP and aL.find('_chem_comp_plane_atom.')==-1:
+                #    self.writeNewPlCifLine(newLines)
+                #    lP=False
                 elif not  lA and aL.find('_chem_comp_atom') != -1:
                     lA=True
                     lB=False
@@ -1252,7 +1255,7 @@ class metalMode(CExeCode):
                      aMA.ljust(10),
                      pl_esd.ljust(10))
                     
-            tLines.append(aLine)
+                tLines.append(aLine)
         
     def writeNewAtomPdbLines(self, tLines):
         
@@ -1311,7 +1314,7 @@ class metalMode(CExeCode):
                 aMC.write("BONDING  %s%s\n"%(aK.ljust(10), aM.ljust(10)))
         aMC.close()    
         
-        self._cmdline   = "acedrg -c %s  -r %s -o %s --mtList %s "%(tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
+        self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
         self._log_name  = tOutRoot + "_acedrg.log"
         #print(self._cmdline)
         self.runExitCode = self.subExecute()

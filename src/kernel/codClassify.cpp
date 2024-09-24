@@ -15592,7 +15592,12 @@ namespace LIBMOL
             StrTokenize(iTorsB->first, idxs, '_');
             int idxN1 =StrToInt(idxs[0]);
             int idxN2 =StrToInt(idxs[1]);
-
+            selectOneTorFromOneBond(iTorsB->first, iTorsB->second);
+            // The following codes taken out on 23/09/2024, basically
+            // cancelled sp2-sp2 torsion angles from one per branch to one torsion per
+            // bond. For torsion angles of other kinds (e.g. sp2-sp3 or sp3-sp3)
+            // always one torsion per bond.
+            /*
             if (allAtoms[idxN1].bondingIdx==2
                 && allAtoms[idxN2].bondingIdx==2)
             {
@@ -15620,6 +15625,7 @@ namespace LIBMOL
             {
                 selectOneTorFromOneBond(iTorsB->first, iTorsB->second);
             }
+            */
         }
 
         std::cout << "Total number of torsions is " << allTorsions.size()
