@@ -2012,10 +2012,10 @@ class FileTransformer(object) :
                                      bLen.ljust(10), dBLen.ljust(10)))
                     
                 aCif.write("loop_\n")
-                aCif.write("_acedrg_chem_comp_description_generator.comp_id\n")
-                aCif.write("_acedrg_chem_comp_description_generator.program_name\n")
-                aCif.write("_acedrg_chem_comp_description_generator.program_version\n")
-                aCif.write("_acedrg_chem_comp_description_generator.descriptor\n")
+                aCif.write("_acedrg_chem_comp_descriptor.comp_id\n")
+                aCif.write("_acedrg_chem_comp_descriptor.program_name\n")
+                aCif.write("_acedrg_chem_comp_descriptor.program_version\n")
+                aCif.write("_acedrg_chem_comp_descriptor.descriptor\n")
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg".ljust(21),\
                            tVersionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg_database".ljust(21),\

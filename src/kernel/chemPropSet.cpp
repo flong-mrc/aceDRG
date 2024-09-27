@@ -354,7 +354,7 @@ namespace LIBMOL
                     {
                         iAt->chiralIdx  = 2;
                     }
-                    iAt->bondingIdx = 2;
+                    iAt->bondingIdx = 3;
                 }
                 else if (t_len==3 || t_len==4)
                 {
@@ -591,6 +591,35 @@ namespace LIBMOL
                     {
                         iAt->chiralIdx  =  0;
                         iAt->bondingIdx =  2;
+                    }
+                }
+            }
+            if (iAt->chemType.compare("S")==0)
+            {
+                if(t_len==2)
+                {
+                    if (iAt->charge ==0.0)
+                    {
+
+                        bool l_sp2 = false;
+                        for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
+                                 iCA != iAt->connAtoms.end(); iCA++)
+                        {
+                            //if(tAtoms[*iCA].bondingIdx == 2)
+                            if (preBondingIdx[*iCA]==2 && tAtoms[*iCA].chemType !="O")
+                            {
+                                l_sp2 = true;
+                                break;
+                            }
+                        }
+                        //std::cout << "Here atom " << iAt->id << "is sp2 "
+                        //          << l_sp2 << std::endl;
+                        if (l_sp2)
+                        {
+                            // Now we can say this atom is in sp2 orbits
+                            iAt->chiralIdx  =  0;
+                            iAt->bondingIdx =  2;
+                        }
                     }
                 }
             }

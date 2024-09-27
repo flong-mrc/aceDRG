@@ -98,6 +98,7 @@ class metalMode(CExeCode):
                 self.modiCif(outTmpCifName, outTmp2CifName)
                 if os.path.isfile(outTmp2CifName):
                     aRet = outTmp2CifName
+                    
         elif nBonds==0:
             outInterMCifName = self.outRoot   + "_final.cif"
             self.outInterMCif(outInterMCifName, tAtoms, tBonds, tVersionInfo)
@@ -105,11 +106,12 @@ class metalMode(CExeCode):
             print("No non-metal related bonds exist in the molecule")
             #print("The final output file is %s"%outInterMCifName)
             print("==============================================")
+            aRet = outInterMCifName
         elif not os.path.isfile(tmpMmcifName):
             print("==============================================")
             print("Bug: no input file %s "%outTmpCifName)
             print("==============================================")
-                
+               
         return aRet         
     
     def executeStage1Only(self, tAtoms, tBonds, tMonomRoot, tOutRoot, tFileConv, tChem):
@@ -555,7 +557,7 @@ class metalMode(CExeCode):
                         if not aP in self.metalInPs[aMA]:
                             self.metalInPs[aMA].append(aP)
         
-        print(self.metalInPs)
+        #print(self.metalInPs)
         
     def getAtomById(self, tAtoms, tId):
         
@@ -796,6 +798,7 @@ class metalMode(CExeCode):
     
     def outInterMCif(self, tMmcifName, tAtoms, tBonds, tVersionInfo):
         
+        print("outInterMCif", tMmcifName)
         try:
             aMmCif = open(tMmcifName, "w")
         except IOError:
@@ -853,8 +856,9 @@ class metalMode(CExeCode):
                                 aAtom['_chem_comp_atom.type_symbol'].ljust(6), 
                                 float(aAtom['_chem_comp_atom.charge']), posX, posY, posZ))
                 
-                
+            
             # Bond section
+        
             if len(tBonds):
                 aMmCif.write("#\n")
                 aMmCif.write("loop_\n")
@@ -887,6 +891,7 @@ class metalMode(CExeCode):
                                  aBond['_chem_comp_bond.atom_id_2'].ljust(10),  
                                  aType.ljust(10), bLen.ljust(10), dBLen.ljust(10), 
                                  bLen.ljust(10), dBLen.ljust(10)))
+            
             if len(tVersionInfo):
                 aMmCif.write("loop_\n")
                 aMmCif.write("_acedrg_chem_comp_descriptor.comp_id\n")
@@ -1034,7 +1039,7 @@ class metalMode(CExeCode):
                         #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
                         self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
             
-            self.setMetalPA()
+            #self.setMetalPA()
             
             
             
@@ -1124,6 +1129,7 @@ class metalMode(CExeCode):
                 for aL in newLines:
                     aOutCif.write(aL)
                 aOutCif.close()
+            
         
    
     def noNewHLine(self, tLine, tHIds):

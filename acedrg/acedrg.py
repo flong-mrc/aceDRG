@@ -149,6 +149,7 @@ class Acedrg(CExeCode ):
         self.workMode         = 0
         self.useExistCoords   = False
         self.useExistCoords2  = False
+        self.useCoordsOnly    = False
         self.modifiedPlanes   = False
 
         self.isOrg            = True
@@ -387,6 +388,10 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("-v",  "--version", dest="versionInfo",  
                                     action="store_true",  default=False,
                                     help="The option for checking version information of acedrg")
+        
+        self.inputParser.add_option("-w",  "--coordsOnly", dest="useCoordsOnly",  
+                                    action="store_true",  default=False,
+                                    help="Using the coordinates in the input file to generate bonds, angles etc in the dictionary files")
 
         self.inputParser.add_option("-x",  "--pdb", dest="inPdbName", metavar="FILE", 
                                     action="store", type="string", 
@@ -830,7 +835,9 @@ class Acedrg(CExeCode ):
                     self.inPdbName = t_inputOptionsP.inPdbName
                     self.workMode    = 16
                     self.useExistCoords = True
-                    
+                    if t_inputOptionsP.useCoordsOnly:
+                        self.workMode = 162
+                        self.useCoordsOnly =True
                 if t_inputOptionsP.inMetalPDBName:
                     self.inMetalPDBName = t_inputOptionsP.inMetalPDBName
             else:
@@ -1674,9 +1681,13 @@ class Acedrg(CExeCode ):
     
     def runServalcat(self, tRoot, tInCif=None):
         
+        print("self.scrDir ", self.scrDir)
+        tRoot = os.path.basename(tRoot)
+        print("tRoot ", tRoot)
         aRoot = os.path.join(self.scrDir, tRoot)
+        print("aRoot ", aRoot)
         self._log_name       = aRoot +   "_.servalcat_geom.log"
-        #print("servalcat log name ", self._log_name)
+        print("servalcat log name ", self._log_name)
         log2  = os.path.join(self.scrDir, "servalcat.log")
         self._cmdline = self.servalcat
         self._cmdline += "  --logfile %s  "%log2
@@ -3402,8 +3413,11 @@ class Acedrg(CExeCode ):
                     aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
                                                    self.outRoot, self.fileConv, self.chemCheck, self.versionInfo)
                     
-                
-                    if os.path.isfile(aFinInCif):
+                    
+                    
+                    if len(self.fileConv.bonds)==1:
+                         print("The fianl file is ", aFinInCif)
+                    elif os.path.isfile(aFinInCif):
                         #self.runServalcat(self.outRoot, aFinInCif)
                         #aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
                         #if os.path.isfile(aSOutName):
@@ -3412,6 +3426,7 @@ class Acedrg(CExeCode ):
                             #print("The tmp3 output is %s "%aTmp3Cif)
                         
                             #if os.path.isfile(aTmp3Cif) and os.path.isfile(self.inMetalPDBName):
+                            
                             if os.path.isfile(self.inMetalPDBName):
                                 print("MetalCoord is running")
                                 #self.runMetalCoord(aTmp3Cif)
@@ -3431,7 +3446,8 @@ class Acedrg(CExeCode ):
                                         print("No %s. metalCoord runtime error"%aMetCoordInCif)
                                 else:
                                     print("continue without metalCoord")
-                                    self.runServalcat(self.outRoot, aFinInCif)
+                                    aRoot=os.path.basename(self.outRoot)
+                                    self.runServalcat(aRoot, aFinInCif)
                                     aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
                                     if os.path.isfile(aSOutName):
                                         finalOutName = self.outRoot + "_final.cif"
@@ -3441,8 +3457,12 @@ class Acedrg(CExeCode ):
                                         
                                 
                             else:
-                                self.runServalcat(self.outRoot, aFinInCif)
-                                aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                                aRoot=os.path.basename(self.outRoot)
+                                print("self.outRoot ", self.outRoot)
+                                print("aFinInCif ", aFinInCif)
+                                self.runServalcat(aRoot, aFinInCif)
+                                aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
+                                print("aSOutName", aSOutName)
                                 if os.path.isfile(aSOutName):
                                     finalOutName = self.outRoot + "_final.cif"
                                     self.cleanSFile(aSOutName, finalOutName)
@@ -3611,7 +3631,7 @@ class Acedrg(CExeCode ):
                     else:
                         print("Error: No dictionary cif file is generated by Acedrg ")
 
-        elif self.workMode == 16 or self.workMode == 161:
+        elif self.workMode == 16 or self.workMode == 161 or self.workMode==162:
             if os.path.isfile(self.inPdbName):
                 self.runLibmol()
                 newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")
