@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
         || AJob.workMode ==13
         || AJob.workMode ==14)
     {
-        if (AJob.workMode == 11 || AJob.workMode ==12)
+        if (AJob.workMode == 11 || AJob.workMode ==12 ||AJob.workMode==1116)
         {
             if (AJob.workMode ==12)
             {
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
                 aTargetSystem.isPeptide = true;
             }
 
-            if ( (int)aTargetSystem.allAtoms.size() > 0)
+            if ( (int)aTargetSystem.allAtoms.size() > 0 && AJob.workMode != 11162)
             {
 
                  aTargetSystem.setupAllTargetValuesFromCOD2(
@@ -200,6 +200,26 @@ int main(int argc, char** argv) {
                                           aTargetSystem.allAtoms,
                                           aTargetSystem.allBonds,
                                           aTargetSystem.allAngles);
+            }
+            else if (AJob.workMode == 11162)
+            {
+
+                LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
+                                  AJob.IOEntries["monoRootName"],
+                                  aTargetSystem.propComp,
+                                  aTargetSystem.allAtoms,
+                                  // aTargetSystem.allHAtomIdx,
+                                  aTargetSystem.allBonds,
+                                  aTargetSystem.allAngles,
+                                  aTargetSystem.miniTorsions,
+                                  aTargetSystem.allRingsV,
+                                  aTargetSystem.allPlanes,
+                                  aTargetSystem.allChirals,
+                                  aTargetSystem.upperBondSig,
+                                  aTargetSystem.lowBondSig,
+                                  aTargetSystem.upperAngleSig,
+                                  aTargetSystem.lowAngleSig,
+                                  aTargetSystem.HydrDistTable);
             }
             else
             {

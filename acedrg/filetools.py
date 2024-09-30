@@ -1976,6 +1976,7 @@ class FileTransformer(object) :
                     aCif.write(aL)
 
                 if len(self.bonds)==1:
+                     aCif.write("loop_\n")
                      for aB in self.bonds:
                          for aK in aB.keys():
                              aL = "%s%s\n"%(aK.ljust(len(aK)+6), aB[aK]) 

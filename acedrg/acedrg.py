@@ -1681,13 +1681,11 @@ class Acedrg(CExeCode ):
     
     def runServalcat(self, tRoot, tInCif=None):
         
-        print("self.scrDir ", self.scrDir)
+        
         tRoot = os.path.basename(tRoot)
-        print("tRoot ", tRoot)
         aRoot = os.path.join(self.scrDir, tRoot)
-        print("aRoot ", aRoot)
         self._log_name       = aRoot +   "_.servalcat_geom.log"
-        print("servalcat log name ", self._log_name)
+        #print("servalcat log name ", self._log_name)
         log2  = os.path.join(self.scrDir, "servalcat.log")
         self._cmdline = self.servalcat
         self._cmdline += "  --logfile %s  "%log2
@@ -3409,11 +3407,9 @@ class Acedrg(CExeCode ):
                 # Metal related 
                 print("Metal atoms are found")
                 if self.fileConv.atoms != self.initMetalAtoms:
-                    #print("outRoot ", self.outRoot)
+                    
                     aFinInCif = self.metalMode.execute(self.fileConv.atoms, self.fileConv.bonds, self.monomRoot,\
                                                    self.outRoot, self.fileConv, self.chemCheck, self.versionInfo)
-                    
-                    
                     
                     if len(self.fileConv.bonds)==1:
                          print("The fianl file is ", aFinInCif)
@@ -3497,8 +3493,9 @@ class Acedrg(CExeCode ):
                                 shutil.copy(aTmpOutCif, finCif)
                         print("The final output cif is %s"%finCif)
                 else:    
-                    # acedrg does nothing. Check what basic thing is missing 
-                    finCif = self.outRoot + ".cif"
+                    # acedrg just set metal bonds. Check what basic thing is missing 
+                    finCif = self.outRoot + "_final.cif"
+                    self.metalMode.setMMBond(self.fileConv.atoms, self.fileConv.bonds)
                     self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
                     print("The final output cif is %s"%finCif)
                 print("=====================================================================")
@@ -3508,7 +3505,7 @@ class Acedrg(CExeCode ):
                 #    print("acedrg failed to produce a metal contained mmcif file")
                 #sys.exit()
             elif len(self.fileConv.atoms) == 1:
-                finCif = self.outRoot + ".cif"
+                finCif = self.outRoot + "_final.cif"
                 self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
                     
 
@@ -3606,7 +3603,11 @@ class Acedrg(CExeCode ):
                         sys.exit()
                     if os.path.isfile(self.inMtConnFile):
                         self.runLibmol(self.inMmCifName, iMol)
+                    tmpWorkMode = self.workMode
+                    if self.useCoordsOnly:
+                        self.workMode =11162
                     self.runLibmol(self.inMmCifName, iMol)
+                    self.workMode = tmpWorkMode 
                     
                 else:
                     print("The input %s does not exist"%self.inMmCifName)
@@ -3635,7 +3636,8 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inPdbName):
                 self.runLibmol()
                 newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")
-                #print(newInCifName)
+                print(newInCifName)
+                
                 if os.path.isfile(newInCifName):
                     if os.path.isfile(self.inMetalPDBName):
                         self.cmdline   = "%s -c %s --metalPDB %s  -o %s -p"%(self.exeAcedrg, newInCifName, self.inMetalPDBName, self.baseRoot)

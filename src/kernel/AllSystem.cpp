@@ -5583,6 +5583,17 @@ namespace LIBMOL
         */
 
 
+    }
+
+    void AllSystem::setupAllTargetValuesFromCoords(ID tOutName, ID tMonoName)
+    {
+        std::string aLibmolDir = "";
+        CodClassify  aCodSystem(allAtoms, allHAtomIdx, allBonds, allAngles,
+                                allTorsions, allChirals, allPlanes, allRings,
+                                aLibmolDir, 2, lMdPls);
+        aCodSystem.setupAllTargetValues2();
+
+        resetSystem2(aCodSystem);
 
     }
 
