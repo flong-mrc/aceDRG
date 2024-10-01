@@ -798,7 +798,7 @@ class metalMode(CExeCode):
     
     def outInterMCif(self, tMmcifName, tAtoms, tBonds, tVersionInfo):
         
-        print("outInterMCif", tMmcifName)
+        
         try:
             aMmCif = open(tMmcifName, "w")
         except IOError:
@@ -831,6 +831,7 @@ class metalMode(CExeCode):
             aMmCif.write("_chem_comp_atom.comp_id\n")
             aMmCif.write("_chem_comp_atom.atom_id\n")
             aMmCif.write("_chem_comp_atom.type_symbol\n")
+            aMmCif.write("_chem_comp_atom.type_energy\n")
             aMmCif.write("_chem_comp_atom.charge\n")
             aMmCif.write("_chem_comp_atom.model_Cartn_x\n")
             aMmCif.write("_chem_comp_atom.model_Cartn_y\n")
@@ -851,9 +852,12 @@ class metalMode(CExeCode):
                     posY = float(aAtom['_chem_comp_atom.y'])
                     posZ = float(aAtom['_chem_comp_atom.z'])
                 
-                aMmCif.write("%s%s%s%10.2f%10.4f%10.4f%10.4f\n"
+                if not "_chem_comp_atom.type_energy" in aAtom.keys():
+                    aAtom['_chem_comp_atom.type_energy'] = aAtom["_chem_comp_atom.type_symbol"]
+                   
+                aMmCif.write("%s%s%s%s%10.2f%10.4f%10.4f%10.4f\n"
                              % (self.monomRoot.ljust(8), aAtom['_chem_comp_atom.atom_id'].ljust(10),
-                                aAtom['_chem_comp_atom.type_symbol'].ljust(6), 
+                                aAtom['_chem_comp_atom.type_symbol'].ljust(6), aAtom['_chem_comp_atom.type_energy'].ljust(6),
                                 float(aAtom['_chem_comp_atom.charge']), posX, posY, posZ))
                 
             

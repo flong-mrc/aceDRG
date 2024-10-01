@@ -3412,7 +3412,7 @@ class Acedrg(CExeCode ):
                                                    self.outRoot, self.fileConv, self.chemCheck, self.versionInfo)
                     
                     if len(self.fileConv.bonds)==1:
-                         print("The fianl file is ", aFinInCif)
+                         print("The finalfile is ", aFinInCif)
                     elif os.path.isfile(aFinInCif):
                         #self.runServalcat(self.outRoot, aFinInCif)
                         #aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")

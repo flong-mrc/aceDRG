@@ -2016,7 +2016,7 @@ class FileTransformer(object) :
                 aCif.write("_acedrg_chem_comp_descriptor.comp_id\n")
                 aCif.write("_acedrg_chem_comp_descriptor.program_name\n")
                 aCif.write("_acedrg_chem_comp_descriptor.program_version\n")
-                aCif.write("_acedrg_chem_comp_descriptor.descriptor\n")
+                aCif.write("_acedrg_chem_comp_descriptor.type\n")
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg".ljust(21),\
                            tVersionInfo["ACEDRG_VERSION"].strip().ljust(12), '\"dictionary generator\"'.ljust(40)))
                 aCif.write("%s%s%s%s\n"%(headerSec["_chem_comp.id"].ljust(6), "acedrg_database".ljust(21),\
