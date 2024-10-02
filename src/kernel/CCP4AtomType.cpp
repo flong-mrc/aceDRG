@@ -1231,5 +1231,20 @@ namespace LIBMOL
     {
     }
 
+    extern void setAtomsCCP4Type(std::vector<AtomDict> & tAtoms,
+                                std::vector<RingDict>  & tRings)
+    {
+        CCP4AtomType  aCPP4TypeTool(tAtoms, tRings);
+        aCPP4TypeTool.setAllAtomsCCP4Type();
+        for (int i=0; i < (int)aCPP4TypeTool.allAtoms.size(); i++)
+        {
+            tAtoms[i].enerType = aCPP4TypeTool.allAtoms[i].ccp4Type;
+            tAtoms[i].ccp4Type = tAtoms[i].enerType;
+            //std::cout << "Atom " << allAtoms[i].id
+            //          << " CCP4 atom type is " << allAtoms[i].ccp4Type
+            //          << std::endl;
+        }
+    }
+
 
 }

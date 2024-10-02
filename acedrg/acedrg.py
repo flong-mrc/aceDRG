@@ -1196,7 +1196,8 @@ class Acedrg(CExeCode ):
            or self.workMode==15 or self.workMode==16\
            or self.workMode == 111 or self.workMode==112\
            or self.workMode == 121 or self.workMode == 131 \
-           or self.workMode==141 or self.workMode==151 or self.workMode ==161:
+           or self.workMode==141 or self.workMode==151 or self.workMode ==161\
+           or self.workMode ==162:
             self._cmdline += " -1 %f -2 %f -3 %f -4 %f "\
                             %(self.upperSigForBonds, self.lowSigForBonds,\
                               self.upperSigForAngles, self.lowSigForAngles)
@@ -1260,15 +1261,18 @@ class Acedrg(CExeCode ):
             # print self._cmdline  
             self.runExitCode = self.subExecute()
          
-        if self.workMode == 16 or self.workMode == 161 :
+        if self.workMode == 16 or self.workMode == 161 or self.workMode==162:
             if tIn:
                 self.inPdbName = tIn
             self._cmdline += " -p %s "%(self.inPdbName)
             self._cmdline += " -q yes -o %s "%(self.outRstCifName)
-            #print(self._cmdline)
+            if self.workMode ==162:
+                self._cmdline += " -E yes "    
             
+            print(self._cmdline)
+        
             self.runExitCode = self.subExecute()
-
+            
         if self.workMode in [21, 211] :
             if tIn:
                 self.inStdCifName = tIn
@@ -3122,7 +3126,7 @@ class Acedrg(CExeCode ):
         #if self.useExistCoords or self.workMode==16 or self.workMode==161:
         #    print("One of output conformers will using input coordinates as the initial one")
         print("workMode : ", self.workMode)
-        
+    
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
             if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
@@ -3603,11 +3607,11 @@ class Acedrg(CExeCode ):
                         sys.exit()
                     if os.path.isfile(self.inMtConnFile):
                         self.runLibmol(self.inMmCifName, iMol)
-                    tmpWorkMode = self.workMode
-                    if self.useCoordsOnly:
-                        self.workMode =11162
+                    #tmpWorkMode = self.workMode
+                    #if self.useCoordsOnly:
+                    #    self.workMode =11162
                     self.runLibmol(self.inMmCifName, iMol)
-                    self.workMode = tmpWorkMode 
+                    #self.workMode = tmpWorkMode 
                     
                 else:
                     print("The input %s does not exist"%self.inMmCifName)
@@ -3636,6 +3640,9 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inPdbName):
                 self.runLibmol()
                 newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")
+                if self.workMode==162:
+                    sys.exit()
+                    
                 print(newInCifName)
                 
                 if os.path.isfile(newInCifName):

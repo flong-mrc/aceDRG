@@ -429,7 +429,9 @@ namespace LIBMOL
         void executeHBondCands(FileName tInParaName,
                                FileName tOutName);
 
-        void executePdb(FileName tOutName);
+        void executePdb(FileName tOutName, int tMode);
+        void setAllPropsFromCoords(Molecule & tMol);
+
 
 
         std::string                     aLibmolTabDir;

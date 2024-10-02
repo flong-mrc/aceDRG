@@ -105,7 +105,6 @@ int main(int argc, char** argv) {
     //    std::cout << iKW->first << "\t" << iKW->second << std::endl;
     //}
 
-
     if (AJob.workMode == 11
         || AJob.workMode ==12
         || AJob.workMode ==13
@@ -552,7 +551,7 @@ int main(int argc, char** argv) {
         }
 
     }
-    else if (AJob.workMode == 350)
+    else if (AJob.workMode == 350 || AJob.workMode == 351)
     {
         if (AJob.IOEntries.find("inPdbName") !=AJob.IOEntries.end())
         {
@@ -560,7 +559,7 @@ int main(int argc, char** argv) {
                       << AJob.IOEntries["inPdbName"] << std::endl;
             LIBMOL::PDBFile dataFromPdb(AJob.IOEntries["inPdbName"].c_str(), std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromPdb);
-            aMolCreator.executePdb(AJob.IOEntries["userOutName"].c_str());
+            aMolCreator.executePdb(AJob.IOEntries["userOutName"].c_str(), AJob.workMode);
         }
     }
     else if (AJob.workMode == 41)

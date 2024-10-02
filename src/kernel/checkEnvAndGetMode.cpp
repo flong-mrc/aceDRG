@@ -481,7 +481,14 @@ namespace LIBMOL
         }
         else if (IOEntries.find("CoordToDict") !=IOEntries.end())
         {
-            workMode = 350;
+            if (IOEntries.find("CoordsForAll") != IOEntries.end())
+            {
+                workMode = 351;
+            }
+            else
+            {
+                workMode = 350;
+            }
         }
 
         else if (IOEntries.find("HUMO")!=IOEntries.end())
@@ -601,15 +608,15 @@ namespace LIBMOL
                     }
                     else
                     {
-                        if (IOEntries.find("CoordsForAll") != IOEntries.end())
-                        {
-                            workMode =11162;
-                        }
-                        else
-                        {
-                            // This is default restraint generation mode
-                            workMode = 11;
-                        }
+                        //if (IOEntries.find("CoordsForAll") != IOEntries.end())
+                        //{
+                        //    workMode =11162;
+                        //}
+                        //else
+                        //{
+                        // This is default restraint generation mode
+                        workMode = 11;
+                        //}
                         if (IOEntries.find("userOutName") ==IOEntries.end())
                         {
                             IOEntries["userOutName"] = "libmol.out";

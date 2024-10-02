@@ -1034,14 +1034,15 @@ class metalMode(CExeCode):
             
             for aMA in self.metalConnAtomsMap.keys():
                 #print("For metal atom ", aMA)
-                for aMN in self.metalConnAtomsMap[aMA]:
-                    aSP = self.atmHybr[aMN]
-                    #print("atom ", aMN, " hybr ", aSP)
-                    #if aMN in self.atmNonHMap.keys():
-                    for aNN in self.nonMAtmConnsMap[aMN]:
-                        #print("NB atom ", aMN, " has the following angles: ")
-                        #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
-                        self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
+                if self.checkExtraConns(aMA):
+                    for aMN in self.metalConnAtomsMap[aMA]:
+                        aSP = self.atmHybr[aMN]
+                        #print("atom ", aMN, " hybr ", aSP)
+                        #if aMN in self.atmNonHMap.keys():
+                        for aNN in self.nonMAtmConnsMap[aMN]:
+                            #print("NB atom ", aMN, " has the following angles: ")
+                            #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
+                            self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
             
             #self.setMetalPA()
             
@@ -1134,8 +1135,16 @@ class metalMode(CExeCode):
                     aOutCif.write(aL)
                 aOutCif.close()
             
+    
+    def checkExtraConns(self, tMAId):
         
-   
+        aRet = True
+        for aMN in self.metalConnAtomsMap[tMAId]:
+            for aNN in self.nonMAtmConnsMap[aMN]:
+                if aNN in self.metalConnAtomsMap[tMAId]:
+                    aRet = False
+                    break
+        return aRet
     def noNewHLine(self, tLine, tHIds):
         
         aRet = True

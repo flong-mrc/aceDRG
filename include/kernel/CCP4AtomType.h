@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   CCP4AtomType.h
  * Author: flong
  *
@@ -38,7 +38,7 @@
 
 namespace LIBMOL
 {
-    
+
     class AtomDict;
     class BondDict;
     class AngleDict;
@@ -47,30 +47,30 @@ namespace LIBMOL
     class Chiral;
     class Ring;
     class RingDict;
-    
+
     class PeriodicTable;
-    
+
     class CCP4AtomType
     {
     public:
-        
+
         // Default constructor
         CCP4AtomType();
-        
+
         // Copy constructor
         CCP4AtomType(const CCP4AtomType & tC);
-        
+
         // Another constructor
         CCP4AtomType(const std::vector<AtomDict> & tAllAtoms,
                      const std::map<ID, std::vector<RingDict> > & tAllRings);
-        
+
         // Another constructor
         CCP4AtomType(const std::vector<AtomDict> & tAllAtoms,
                      const std::vector<RingDict> & tAllRingsV);
-        
+
         // Default destructor
         ~CCP4AtomType();
-        
+
         // The following should be done with COD atom types as well
         void setHydroAtomCCP4Type(AtomDict & tAtom);       // H
         void setOrgAtomCCP4Type(AtomDict & tAtom);  // C, N, O, P, S, Se
@@ -84,70 +84,72 @@ namespace LIBMOL
         void SetInertGasesAtomCCP4Type(AtomDict & tAtom);
         void setOneAtomCCP4Type(PeriodicTable & tP, AtomDict & tAtom);
         void setAllAtomsCCP4Type();
-        
+
         std::vector<AtomDict>                    allAtoms;
         std::map<ID, std::vector<RingDict> >     allRings;
         std::vector<RingDict>                    allRingsV;
     };
-    
+
     class CCP4DictParas
     {
     public :
-        
-        // Default constructor 
+
+        // Default constructor
         CCP4DictParas();
-        
+
         // Destructor
         ~CCP4DictParas();
-        
-        
+
+
         void getAtomPropsTable(std::vector<std::vector<std::string> >::iterator  tData);
         void getBondPropsTable(std::vector<std::vector<std::string> >::iterator  tData);
         void getAnglePropsTable(std::vector<std::vector<std::string> >::iterator  tData);
-        
+
         std::map<std::string, std::string>                    atomTypeElementTable;
         std::map<std::string, std::map<std::string, REAL> >   atomPropsTable;
-        std::map<std::string, std::map<std::string, 
+        std::map<std::string, std::map<std::string,
                  std::map<std::string, REAL> > >              bondPropsTable;
-        std::map<std::string, std::map<std::string, std::map<std::string, 
+        std::map<std::string, std::map<std::string, std::map<std::string,
         std::map<std::string, REAL> > > >                     anglePropsTable;
-        
-        
+
+
     };
-    
-    
+
+
     class AtomTypeTool
     {
     public:
-        
+
         //Default constructor
         AtomTypeTool();
-        
-        // The constructor using a file name, file type indicator, which an integer 
+
+        // The constructor using a file name, file type indicator, which an integer
         // File types are e.g. CIF, MOL/SDF, PDB, SMILE, inChi etc
         // Atom types are COD, CCP4 etc
         AtomTypeTool(FileName  tFname, FileType tFType);
-        
+
         // The constructor using atoms, bonds, and rings
         AtomTypeTool(std::vector<AtomDict>                  & tAtoms,
                      std::vector<BondDict>                  & tBonds,
                      std::map<ID, std::vector<RingDict> >   & tRings);
-        
-        // Default destructor 
+
+        // Default destructor
         ~AtomTypeTool();
-        
+
         void execute();
-        
-        
+
+
         std::vector<AtomDict>                    allAtoms;
         std::vector<BondDict>                    allBonds;
         std::map<ID, std::vector<RingDict> >     allRings;
-        
+
     };
+
+    extern void setAtomsCCP4Type(std::vector<AtomDict> & tAtoms,
+                                std::vector<RingDict>  & tRings);
 
 }
 
 
 
 #endif	/* CCP4ATOMTYPE_H */
-

@@ -10,6 +10,7 @@
 
 namespace LIBMOL
 {
+     // Not use Angle class, using AngleDict instead.
      Angle::Angle():isItTouched(false),
              itsName(NullString),
              itsID(NullString),
@@ -138,7 +139,7 @@ namespace LIBMOL
         for (int i = 0; i < (int)tA1.coords.size(); i++)
         {
             tV1.push_back(tA1.coords[i]-tA2.coords[i]);
-            tV2.push_back(tA2.coords[i]-tA2.coords[i]);
+            tV2.push_back(tA3.coords[i]-tA2.coords[i]);
         }
 
         itsValue = getAngle2V(tV1, tV2);
@@ -277,6 +278,7 @@ namespace LIBMOL
             approxLevel(10),
             isInSameRing(ZeroInt)
     {
+        // The first atom is center atom.
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -285,37 +287,51 @@ namespace LIBMOL
         }
     }
 
+    AngleDict::AngleDict(ID tAnchID, int tAnchPos,
+            std::vector<int>& tAtmIdxs): seriNum(-1),
+            value(ZeroReal),
+            sigValue(ZeroReal),
+            valueST(ZeroReal),
+            sigValueST(ZeroReal),
+            hasCodValue(false),
+            numCodValues(ZeroInt),
+            anchorID(tAnchID),
+            anchorPos(tAnchPos),
+            isFixed(false),
+            approxLevel(10),
+            isInSameRing(ZeroInt)
+    {
+        // The first atom is center atom.
+        for (std::vector<int>::iterator iAt = tAtmIdxs.begin();
+                iAt != tAtmIdxs.end(); iAt++)
+        {
+            atoms.push_back(*iAt);
+        }
+    }
+
     AngleDict::~AngleDict()
     {
     }
 
 
-
-    /*
-    void AngleDict::setValue()
+    void AngleDict::setValue(std::vector<AtomDict> & tAtoms)
     {
         std::vector<REAL> vect1, vect2;
 
-        if ((int)atoms.size() == 3)
-        {
-            for (int i=0; i < (int)atoms[1].coords.size(); i++)
-            {
-                REAL t1, t2;
-                t1 = atoms[0].coords[i] - atoms[1].coords[i];
-                t2 = atoms[2].coords[i] - atoms[1].coords[i];
-                vect1.push_back(t1);
-                vect2.push_back(t2);
-            }
 
-            value = getAngle2V(vect1, vect2);
-        }
-        else
+        for (int i=0; i < (int)tAtoms[atoms[0]].coords.size(); i++)
         {
-            std::cout << "number of atoms constructing this angle is less than 3."
-                    <<std::endl;
+            REAL t1, t2;
+            t1 = tAtoms[atoms[1]].coords[i] - tAtoms[atoms[0]].coords[i];
+            t2 = tAtoms[atoms[2]].coords[i] - tAtoms[atoms[0]].coords[i];
+            vect1.push_back(t1);
+            vect2.push_back(t2);
         }
+
+        value = getAngle2V(vect1, vect2)*PID180;
+
     }
-    */
+
 
     extern int getAngle(std::vector<AngleDict> & tAngs,
                         int cAt, int tAt1, int tAt2)

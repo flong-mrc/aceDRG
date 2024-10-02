@@ -11,6 +11,7 @@
 #include "codClassify.h"
 #include "chemPropSet.h"
 #include <iterator>
+#include <ostream>
 #include <string>
 
 namespace LIBMOL {
@@ -916,7 +917,7 @@ namespace LIBMOL {
         }
     }
 
-    void MolGenerator::executePdb(FileName tOutName)
+    void MolGenerator::executePdb(FileName tOutName, int tMode)
     {
         CCP4DictParas tCCP4EnergParas;
         ccp4DictParas.push_back(tCCP4EnergParas);
@@ -928,17 +929,98 @@ namespace LIBMOL {
 
         if (allAtoms.size() > 1)
         {
+
             getUniqueAtomLinksPdb(aPTable);
             buildMolsPdb(aPTable);
+            if (tMode==351)
+            {
+                for (unsigned i=0; i < allMolecules.size(); i++)
+                {
+
+                    setAtomsBondingAndChiralCenter(allMolecules[i].atoms);
+                    setAtomsCCP4Type(allMolecules[i].atoms, allMolecules[i].rings);
+                    setAllPropsFromCoords(allMolecules[i]);
+
+                }
+            }
             int aMode =1;
             for (unsigned i=0; i < allMolecules.size(); i++)
             {
                 outMolMmcif(tOutName, allMolecules[i].id, allMolecules[i], aMode);
             }
         }
-
+        exit(1);
     }
 
+    void MolGenerator::setAllPropsFromCoords(Molecule & tMol)
+    {
+        std::cout << "Mol id " << tMol.id << std::endl;
+        std::cout << "Number of atoms " << tMol.atoms.size() << std::endl;
+        /*
+        std::cout << "The coordinates of them are: " << std::endl;
+        for (std::vector<AtomDict>::iterator iA =tMol.atoms.begin();
+             iA != tMol.atoms.end(); iA++)
+        {
+            std::cout << "atom " << iA->id << std::endl;
+            std::cout << "element " << iA->chemType << std::endl;
+            std::cout << "number of atoms connected " << iA->connAtoms.size() << std::endl;
+            std::cout << "hybr  " << iA->bondingIdx << std::endl;
+            std::cout << "charge " << iA->charge << std::endl;
+            std::cout << "enerType " << iA->enerType << std::endl;
+            std::cout << "coordinate size " << iA->coords.size() << std::endl;
+            if (iA->coords.size()==3)
+            {
+                std::cout << "x :  " << iA->coords[0] << std::endl
+                          << "y :  " << iA->coords[1] << std::endl
+                          << "z :  " << iA->coords[2] << std::endl;
+            }
+        }
+        */
+        std::cout << "Number of bonds " << tMol.bonds.size() << std::endl;
+        std::cout << "Number of rings " << tMol.rings.size() << std::endl;
+        for (std::vector<BondDict>::iterator iB = tMol.bonds.begin();
+             iB != tMol.bonds.end(); iB++)
+        {
+            //std::cout << "Bond between " << iB->atoms[0]
+            //          << " and " << iB->atoms[1] << std::endl;
+
+            if (iB->atomsIdx.size()==2)
+            {
+                iB->value =distanceV(tMol.atoms[iB->atomsIdx[0]].coords,
+                                     tMol.atoms[iB->atomsIdx[1]].coords);
+                iB->sigValue = 0.01;
+                //std::cout << "bond length is " << iB->value << std::endl;
+            }
+        }
+
+        for (std::vector<AtomDict>::iterator iA =tMol.atoms.begin();
+             iA != tMol.atoms.end(); iA++)
+        {
+            for (int i=0;  i < iA->connAtoms.size(); i++)
+            {
+                for (int j=i+1; j < iA->connAtoms.size(); j++)
+                {
+
+                    int idx1 = iA->connAtoms[i];
+                    int idx2 = iA->connAtoms[j];
+
+                    std::vector<int> aSetAtms;
+                    aSetAtms.push_back(iA->seriNum);
+                    aSetAtms.push_back(idx1);
+                    aSetAtms.push_back(idx2);
+                    AngleDict aAng(iA->id, iA->seriNum, aSetAtms);
+                    aAng.setValue(tMol.atoms);
+                    aAng.sigValue = 3.00;
+                    tMol.angles.push_back(aAng);
+
+                }
+            }
+        }
+
+        std::cout << "number of angles " << tMol.angles.size() << std::endl;
+
+
+    }
 
     void MolGenerator::getUserParasList(FileName tInName,
                                         std::map<std::string,
@@ -5263,12 +5345,12 @@ namespace LIBMOL {
             for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                  iAt !=allAtoms.end(); iAt++)
             {
-                 aMol.atoms.push_back(*iAt);
+                aMol.atoms.push_back(*iAt);
             }
+
             getAtomTypeOneMolNew(aMol);
             allMolecules.push_back(aMol);
             setBondOrderAndChargeInMols(allMolecules);
-
 
         }
 
@@ -7785,6 +7867,10 @@ namespace LIBMOL {
                 aOutCif << "_chem_comp_atom.atom_alt_id"  << std::endl;
             }
             aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
+            if (tMode==1)
+            {
+                aOutCif << "_chem_comp_atom.type_energy" << std::endl;
+            }
             aOutCif << "_chem_comp_atom.charge" << std::endl;
             aOutCif << "_chem_comp_atom.U_iso_or_equiv" << std::endl;
             // aOutCif << "_chem_comp_atom.excess_electrons" << std::endl;
@@ -7826,6 +7912,11 @@ namespace LIBMOL {
                 //aOutCif << std::left << iAt->id;
                 aOutCif.width(6);
                 aOutCif << std::left << iAt->chemType;
+                if (tMode==1)
+                {
+                    aOutCif.width(10);
+                    aOutCif << std::left << iAt->enerType;
+                }
                 aOutCif.width(10);
                 aOutCif << std::left << iAt->charge;
                 aOutCif.width(12);
@@ -7850,11 +7941,37 @@ namespace LIBMOL {
                 aOutCif << std::endl;
             }
 
+            if (tMode==1)
+            {
+
+                aOutCif << "loop_" << std::endl;
+                aOutCif << "_chem_comp_acedrg.comp_id" << std::endl
+                        << "_chem_comp_acedrg.atom_id" << std::endl
+                        << "_chem_comp_acedrg.atom_type" << std::endl;
+                for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
+                    iAt != tMol.atoms.end(); iAt++)
+                {
+                    aOutCif.width(8);
+                    aOutCif << std::left <<  tMonoRootName1;
+                    aOutCif.width(10);
+                    aOutCif << std::left << iAt->id;
+                    aOutCif.width(iAt->codClass.size()+4);
+                    aOutCif << std::left << iAt->codClass << std::endl;
+                }
+            }
+
             aOutCif << "loop_" << std::endl;
             aOutCif << "_chem_comp_bond.comp_id"     << std::endl
                     << "_chem_comp_bond.atom_id_1"   << std::endl
                     << "_chem_comp_bond.atom_id_2"   << std::endl
                     << "_chem_comp_bond.value_order" << std::endl;
+            if (tMode==1)
+            {
+                aOutCif << "_chem_comp_bond.value_dist"     << std::endl
+                        << "_chem_comp_bond.value_dist_esd" << std::endl
+                        << "_chem_comp_bond.value_dist_nucleus" << std::endl
+                        << "_chem_comp_bond.value_dist_nucleus_esd" << std::endl;
+            }
 
             for (std::vector<BondDict>::iterator iBo = tMol.bonds.begin();
                     iBo != tMol.bonds.end(); iBo++)
@@ -7873,31 +7990,52 @@ namespace LIBMOL {
                     aOutCif
                          << std::setw(10)  << tMol.atoms[iBo->atomsIdx[0]].id
                          << std::setw(10)  << tMol.atoms[iBo->atomsIdx[1]].id        // iBo->atoms[1]
-                         << std::setw(12)  << iBo->order
-                         << std::endl;
+                         << std::setw(12)  << iBo->order;
+                    if (tMode==1)
+                    {
+                        aOutCif.width(16);
+                        aOutCif << std::left << std::setprecision(4)
+                        <<std::fixed << iBo->value;
+                        aOutCif.width(16);
+                        aOutCif << std::left << std::setprecision(4)
+                        <<std::fixed << iBo->sigValue;
+                        aOutCif.width(16);
+                        aOutCif << std::left << std::setprecision(4)
+                        <<std::fixed << iBo->value;
+                        aOutCif.width(16);
+                        aOutCif << std::left << std::setprecision(4)
+                        <<std::fixed << iBo->sigValue;
+                    }
+                    aOutCif << std::endl;
                  }
             }
 
-            /*
-
-            for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
-                    iAt != tMol.atoms.end(); iAt++)
+            if (tMode==1)
             {
-                for (unsigned i=0; i < iAt->connAtoms.size(); i++)
+                aOutCif << "loop_" << std::endl
+                        << "_chem_comp_angle.comp_id" << std::endl
+                        << "_chem_comp_angle.atom_id_1" << std::endl
+                        << "_chem_comp_angle.atom_id_2" << std::endl
+                        << "_chem_comp_angle.atom_id_3" << std::endl
+                        << "_chem_comp_angle.value_angle" << std::endl
+                        << "chem_comp_angle.value_angle_esd" << std::endl;
+
+                for (std::vector<AngleDict>::iterator iAn = tMol.angles.begin();
+                     iAn !=tMol.angles.end(); iAn++)
                 {
-                    if (iAt->connAtoms[i] > iAt->seriNum)
-                    {
-                        //REAL dist = distanceV(iAt->coords,
-                        //            tMol.atoms[iAt->connAtoms[i]].coords);
-                        aOutCif << std::setw(8) << tMonoRootName1
-                                << std::setw(8) << iAt->altId
-                                << std::setw(8)
-                                << tMol.atoms[iAt->connAtoms[i]].altId
-                                << std::endl;
-                    }
+                    aOutCif << std::setw(8)  << tMonoRootName1;
+                     aOutCif
+                         << std::setw(10)  << tMol.atoms[iAn->atoms[1]].id
+                         << std::setw(10)  << tMol.atoms[iAn->atoms[0]].id
+                         << std::setw(10)  << tMol.atoms[iAn->atoms[2]].id;
+                    aOutCif.width(16);
+                    aOutCif << std::left << std::setprecision(4)
+                            <<std::fixed << iAn->value;
+                    aOutCif.width(10);
+                    aOutCif << std::left << std::setprecision(4)
+                            <<std::fixed << iAn->sigValue << std::endl;
                 }
             }
-            */
 
         }
 

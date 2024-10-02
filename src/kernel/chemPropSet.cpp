@@ -135,8 +135,8 @@ namespace LIBMOL
             int t_len =0;
             int t_m_len =0;
 
-            std::cout << "Atom " << iAt->id << " with Charge "
-                      << iAt->charge << std::endl;
+            //std::cout << "Atom " << iAt->id << " with Charge "
+            //          << iAt->charge << std::endl;
 
             for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
                     iConn !=iAt->connAtoms.end(); iConn++)
@@ -162,8 +162,8 @@ namespace LIBMOL
             {
                 t_len=3;
             }
-            std::cout << "t_len " << t_len << std::endl;
-            std::cout << "t_m_len " << t_m_len << std::endl;
+            //std::cout << "t_len " << t_len << std::endl;
+            //std::cout << "t_m_len " << t_m_len << std::endl;
 
             numConnMap[iAt->id].push_back(t_len);
             numConnMap[iAt->id].push_back(t_m_len);
@@ -690,7 +690,7 @@ namespace LIBMOL
 
         // Check
 
-
+        /*
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
         {
@@ -704,7 +704,7 @@ namespace LIBMOL
         }
         //std::cout << "Chiral and plane feather for atoms in the system"
         //          << std::endl;
-        /*
+
 
         for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
                 iAt != tAtoms.end(); iAt++)
@@ -8380,22 +8380,22 @@ namespace LIBMOL
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds)
     {
-        std::cout << "entered here " << std::endl;
+        //std::cout << "entered here " << std::endl;
         std::vector<int> idxRings;
         for (int idxR=0;   idxR<tRings.size(); idxR++)
         {
             int nC3R5=0;
             int nN3R5=0;
             int nCha =0;
-            std::cout << "ring.rep " << tRings[idxR].rep << std::endl;
+            //std::cout << "ring.rep " << tRings[idxR].rep << std::endl;
             for (std::vector<AtomDict>::iterator iAt=tRings[idxR].atoms.begin();
                          iAt!=tRings[idxR].atoms.end(); iAt++)
             {
-                std::cout << "atom " << iAt->id << std::endl;
-                std::cout << iAt->connAtoms.size() << std::endl;
-                std::cout << iAt->connMAtoms.size() << std::endl;
-                std::cout << "charge " << tAtoms[iAt->seriNum].charge
-                          << std::endl;
+                //std::cout << "atom " << iAt->id << std::endl;
+                //std::cout << iAt->connAtoms.size() << std::endl;
+                //std::cout << iAt->connMAtoms.size() << std::endl;
+                //std::cout << "charge " << tAtoms[iAt->seriNum].charge
+                //          << std::endl;
                 if (iAt->chemType=="C" && iAt->connAtoms.size()==3
                     && tAtoms[iAt->seriNum].connMAtoms.size()==0)
                 {
@@ -8414,9 +8414,10 @@ namespace LIBMOL
                 }
             }
 
-            std::cout << "nC3R5 " << nC3R5 << std::endl;
-            std::cout << "nN3R5 " << nN3R5 << std::endl;
-            std::cout << "nCha " << nCha << std::endl;
+            //std::cout << "nC3R5 " << nC3R5 << std::endl;
+            //std::cout << "nN3R5 " << nN3R5 << std::endl;
+            //std::cout << "nCha " << nCha << std::endl;
+
             if (nC3R5==4 && nCha ==1 && nN3R5 ==1)
             {
                 idxRings.push_back(idxR);
@@ -8498,7 +8499,7 @@ namespace LIBMOL
         std::cout << "idxCExc " <<  idxCExc << std::endl;
         if (idxN !=-1 && idxCExc !=-1)
         {
-            std::cout << "Here " << std::endl;
+            //std::cout << "Here " << std::endl;
             int idxCSel = -1;
             for (std::vector<int>::iterator iConn= tAtoms[idxN].connAtoms.begin();
                     iConn != tAtoms[idxN].connAtoms.end(); iConn++)
@@ -9068,8 +9069,8 @@ namespace LIBMOL
         {
             if (iAt->charge !=0 && iAt->chemType=="C")
             {
-                std::cout << "Here4 " << iAt->id << ", its charge "
-                          << iAt->charge << std::endl;
+                //std::cout << "Here4 " << iAt->id << ", its charge "
+                //          << iAt->charge << std::endl;
                 bool aDone = false;
                 for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
                      iNB != iAt->connAtoms.end(); iNB++)
