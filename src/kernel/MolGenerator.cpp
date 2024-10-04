@@ -934,20 +934,48 @@ namespace LIBMOL {
             buildMolsPdb(aPTable);
             if (tMode==351)
             {
+                /*
                 for (unsigned i=0; i < allMolecules.size(); i++)
                 {
-
-                    setAtomsBondingAndChiralCenter(allMolecules[i].atoms);
-                    setAtomsCCP4Type(allMolecules[i].atoms, allMolecules[i].rings);
+                    //setAtomsBondingAndChiralCenter(allMolecules[i].atoms);
+                    //setAtomsCCP4Type(allMolecules[i].atoms, allMolecules[i].rings);
                     setAllPropsFromCoords(allMolecules[i]);
 
+
                 }
+                */
+                std::string tmpLib = "";
+                AllSystem  aTargetMol( allMolecules[0], tmpLib);
+
+                aTargetMol.setupAllAngleValuesFromCoords();
+
+                // aTargetMol.resetMinTorsions();
+                std::cout << "Number of atoms " << aTargetMol.allAtoms.size() << std::endl;
+                std::cout << "Number of bonds " << aTargetMol.allBonds.size() << std::endl;
+                std::cout << "Number of angles " << aTargetMol.allAngles.size() << std::endl;
+                std::cout << "Number of all torsions " << aTargetMol.allTorsions.size() << std::endl;
+                std::cout << "Number of mini torsions " << aTargetMol.miniTorsions.size() << std::endl;
+                std::cout << "Number of all planes " << aTargetMol.allPlanes.size() << std::endl;
+                std::cout << "Number of all rings " << aTargetMol.allRingsV.size() << std::endl;
+                std::cout << "OutName is " << tOutName << std::endl;
+                exit(1);
+                outMMCif2(  tOutName,
+                            allMolecules[0].id,
+                            aTargetMol.allAtoms,
+                            aTargetMol.allBonds,
+                            aTargetMol.allAngles,
+                            aTargetMol.allTorsions,
+                            aTargetMol.allRingsV,
+                            aTargetMol.allPlanes,
+                            aTargetMol.allChirals);
+
+
             }
-            int aMode =1;
-            for (unsigned i=0; i < allMolecules.size(); i++)
-            {
-                outMolMmcif(tOutName, allMolecules[i].id, allMolecules[i], aMode);
-            }
+            //int aMode =1;
+            //for (unsigned i=0; i < allMolecules.size(); i++)
+            //{
+            //    outMolMmcif(tOutName, allMolecules[i].id, allMolecules[i], aMode);
+            //}
         }
         exit(1);
     }
@@ -978,20 +1006,6 @@ namespace LIBMOL {
         */
         std::cout << "Number of bonds " << tMol.bonds.size() << std::endl;
         std::cout << "Number of rings " << tMol.rings.size() << std::endl;
-        for (std::vector<BondDict>::iterator iB = tMol.bonds.begin();
-             iB != tMol.bonds.end(); iB++)
-        {
-            //std::cout << "Bond between " << iB->atoms[0]
-            //          << " and " << iB->atoms[1] << std::endl;
-
-            if (iB->atomsIdx.size()==2)
-            {
-                iB->value =distanceV(tMol.atoms[iB->atomsIdx[0]].coords,
-                                     tMol.atoms[iB->atomsIdx[1]].coords);
-                iB->sigValue = 0.01;
-                //std::cout << "bond length is " << iB->value << std::endl;
-            }
-        }
 
         for (std::vector<AtomDict>::iterator iA =tMol.atoms.begin();
              iA != tMol.atoms.end(); iA++)
@@ -5348,9 +5362,10 @@ namespace LIBMOL {
                 aMol.atoms.push_back(*iAt);
             }
 
-            getAtomTypeOneMolNew(aMol);
+            // getAtomTypeOneMolNew(aMol);
             allMolecules.push_back(aMol);
             setBondOrderAndChargeInMols(allMolecules);
+
 
         }
 
@@ -7270,7 +7285,7 @@ namespace LIBMOL {
             // from symmetry-generated atoms. But this one shows how the
             // the molecule is connected
 
-         tMol.bonds.clear();
+        tMol.bonds.clear();
         int nBo = 0;
 
         for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
@@ -7292,6 +7307,7 @@ namespace LIBMOL {
 
                     aBond.value = distanceV(iAt->coords,
                                       tMol.atoms[iAt->connAtoms[i]].coords);
+                    aBond.sigValue = 0.01;
                     tMol.bonds.push_back(aBond);
                     nBo++;
                 }
@@ -7309,7 +7325,7 @@ namespace LIBMOL {
             reGenMolBondsAtomTypes(tFinMols[i]);
             std::cout << "Kekulize molecule " << tFinMols[i].seriNum << std::endl;
             aKTool.executeBC(tFinMols[i].atoms, tFinMols[i].bonds, tFinMols[i].rings);
-            std::cout << " The second round " << std::endl;
+            std::cout << " The second round for atom types " << std::endl;
             getAtomTypeOneMolNew(tFinMols[i]);
         }
 
@@ -7965,6 +7981,7 @@ namespace LIBMOL {
                     << "_chem_comp_bond.atom_id_1"   << std::endl
                     << "_chem_comp_bond.atom_id_2"   << std::endl
                     << "_chem_comp_bond.value_order" << std::endl;
+
             if (tMode==1)
             {
                 aOutCif << "_chem_comp_bond.value_dist"     << std::endl

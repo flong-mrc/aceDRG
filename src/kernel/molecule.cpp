@@ -122,7 +122,7 @@ namespace LIBMOL
         }
     }
 
-    void Molecule::setAllBondsFromCartCoord()
+    void Molecule::setAllBondLengsFromCartCoord()
     {
         for (std::vector<AtomDict>::iterator iAtm=atoms.begin();
                 iAtm != atoms.end(); iAtm++)
@@ -133,7 +133,6 @@ namespace LIBMOL
                 {
                     if (iAtm->connAtoms[j] > iAtm->connAtoms[i])
                     {
-
 
                     }
                 }

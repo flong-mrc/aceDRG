@@ -680,7 +680,6 @@ namespace LIBMOL
 
     extern void outMMCif2(FileName tFName,
                          ID tMonoRootName,
-                         ChemComp  &         tPropComp,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
                          // std::vector<int>    & tHydroAtoms,
                          std::vector<LIBMOL::BondDict>& tBonds,

@@ -9287,7 +9287,6 @@ namespace LIBMOL
 
     extern void outMMCif2(FileName tFName,
                          ID tMonoRootName,
-                         ChemComp  &         tPropComp,
                          std::vector<LIBMOL::AtomDict>& tAtoms,
                          // std::vector<int>    & tHydroAtoms,
                          std::vector<LIBMOL::BondDict>& tBonds,
@@ -9329,10 +9328,10 @@ namespace LIBMOL
             srand((unsigned)std::time( NULL ));
             // Temp
             // 1. Global section
-            outRestrF << "global_" << std::endl
-                    << "_lib_name         ?" << std::endl
-                    << "_lib_version      ?" << std::endl
-                    << "_lib_update       ?" << std::endl;
+           // outRestrF << "global_" << std::endl
+           //         << "_lib_name         ?" << std::endl
+           //        << "_lib_version      ?" << std::endl
+           //         << "_lib_update       ?" << std::endl;
 
 
 
@@ -9404,13 +9403,12 @@ namespace LIBMOL
                       << std::endl;
 
             outRestrF <<"# ------------------------------------------------------" << std::endl
-                      <<"# ------------------------------------------------------" << std::endl
                       <<"#" << std::endl
                       <<"# --- DESCRIPTION OF MONOMERS ---" << std::endl
                       <<"#" << std::endl
                       <<"data_comp_" << longName << std::endl
                       <<"#" << std::endl;
-
+            outRestrF <<"_chem_comp.pdbx_type        HETAIN" << std::endl;
             if (tAtoms.size() >0)
             {
                 // atom info section
@@ -9422,7 +9420,10 @@ namespace LIBMOL
                           << "_chem_comp_atom.charge" << std::endl
                           << "_chem_comp_atom.x" << std::endl
                           << "_chem_comp_atom.y" << std::endl
-                          << "_chem_comp_atom.z" << std::endl;
+                          << "_chem_comp_atom.z" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_x_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_y_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_model_Cartn_z_ideal" << std::endl;
 
 
 
@@ -9463,9 +9464,33 @@ namespace LIBMOL
                               << std::setw(12) << std::setprecision(3) << std::fixed
                               << iA->coords[1]
                               << std::setw(12) << std::setprecision(3) << std::fixed
-                              << iA->coords[2] << std::endl;
+                              << iA->coords[2]
+                               << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[0]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[1]
+                              << std::setw(12) << std::setprecision(3) << std::fixed
+                              << iA->coords[2]
+                              << std::endl;
 
                 }
+
+                outRestrF << "loop_" << std::endl;
+                outRestrF << "_chem_comp_acedrg.comp_id" << std::endl
+                          << "_chem_comp_acedrg.atom_id" << std::endl
+                          << "_chem_comp_acedrg.atom_type" << std::endl;
+
+                for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+                     iAt!= tAtoms.end(); iAt++)
+                {
+                    outRestrF.width(8);
+                    outRestrF << std::left <<  longName;
+                    outRestrF.width(10);
+                    outRestrF << std::left << iAt->id;
+                    outRestrF.width(iAt->codClass.size()+4);
+                    outRestrF << std::left << iAt->codClass << std::endl;
+                }
+
             }
 
             if (tBonds.size() >0)
@@ -9478,10 +9503,12 @@ namespace LIBMOL
                           << "_chem_comp_bond.comp_id" << std::endl
                           << "_chem_comp_bond.atom_id_1" << std::endl
                           << "_chem_comp_bond.atom_id_2" << std::endl
-                          << "_chem_comp_bond.type" << std::endl
+                          << "_chem_comp_bond.value_order" << std::endl
                           << "_chem_comp_bond.aromatic"  << std::endl
                           << "_chem_comp_bond.value_dist"<< std::endl
-                          << "_chem_comp_bond.value_dist_esd" << std::endl;
+                          << "_chem_comp_bond.value_dist_esd" << std::endl
+                          << "_chem_comp_bond.value_dist_nucleus" << std::endl
+                          << "_chem_comp_bond.value_dist_nucleus_esd" << std::endl;
                           // << "_chem_comp_bond.exact_cod_dist" << std::endl;
 
 
@@ -9503,11 +9530,15 @@ namespace LIBMOL
                         tAr = "n";
                     }
 
-                    outRestrF <<  longName
+                    outRestrF <<  longName << "       "
                               << std::setw(12)  << tAtoms[iB->atomsIdx[0]].id
                               << std::setw(12)  << tAtoms[iB->atomsIdx[1]].id
                               << std::setw(12)  << iB->order
                               << std::setw(8)   << tAr
+                              << std::setw(10)  << std::setprecision(3)
+                              << iB->value
+                              << std::setw(8) << std::setprecision(3)
+                              << iB->sigValue
                               << std::setw(10)  << std::setprecision(3)
                               << iB->value
                               << std::setw(8) << std::setprecision(3)
@@ -9554,7 +9585,8 @@ namespace LIBMOL
                         for (std::vector<REAL>::iterator iCA=iA->codAngleValues.begin();
                                 iCA !=iA->codAngleValues.end(); iCA++)
                         {
-                            outRestrF << tMonoRootName.substr(0,3) << std::setw(12)
+                            outRestrF << tMonoRootName  << "    "
+                                      << std::setw(12)
                                       << tAtoms[iA->atoms[1]].id << std::setw(12)
                                       << tAtoms[iA->atoms[0]].id << std::setw(12)
                                       << tAtoms[iA->atoms[2]].id << std::setw(12) << std::setprecision(3) <<  *iCA << "    "
@@ -9563,7 +9595,7 @@ namespace LIBMOL
                     }
                     else
                     {
-                        outRestrF << longName
+                        outRestrF << longName  << "     "
                                   << std::setw(12) << tAtoms[iA->atoms[1]].id
                                   << std::setw(12) << tAtoms[iA->atoms[0]].id
                                   << std::setw(12) << tAtoms[iA->atoms[2]].id;
@@ -9776,13 +9808,51 @@ namespace LIBMOL
                             {
                                 tID = iAt->first;
                             }
-                            outRestrF << longName
+                            outRestrF << longName << "      "
                                       << std::setw(10) << idxPStr
                                       << std::setw(12)  << tID
                                       << std::setw(8)  << "0.020" << std::endl;
                         }
                         idxP++;
                     }
+                }
+            }
+
+            if ((int)tRings.size() >0)
+            {
+                outRestrF << "loop_" << std::endl
+                          << "_chem_comp_ring_atom.comp_id"  << std::endl
+                          << "_chem_comp_ring_atom.ring_serial_number" << std::endl
+                          << "_chem_comp_ring_atom.atom_id"  << std::endl
+                          << "_chem_comp_ring_atom.is_aromatic_ring" << std::endl;
+                int idxR = 1;
+                for (std::vector<RingDict>::iterator iR=tRings.begin();
+                        iR !=tRings.end(); iR++)
+                {
+
+                    std::string aAR;
+                    if (iR->isAromatic)
+                    {
+                        aAR="YES";
+                    }
+                    else
+                    {
+                        aAR="NO";
+                    }
+
+                    std::string idxRStr = IntToStr(idxR);
+                    idxRStr = "ring-" + idxRStr;
+
+                    for (std::vector<AtomDict>::iterator iA=iR->atoms.begin();
+                        iA != iR->atoms.end(); iA++)
+                    {
+                        outRestrF << longName << "      "
+                                  << std::setw(10) << idxRStr
+                                  << std::setw(8) << iA->id
+                                  << std::setw(8) << aAR
+                                  << std::endl;
+                    }
+                    idxR++;
                 }
             }
             outRestrF.close();

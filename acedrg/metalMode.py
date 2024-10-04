@@ -821,10 +821,10 @@ class metalMode(CExeCode):
             aMmCif.write(self.dataDiescriptor[0]+"\n")
             
             aLigId = ""
-            if len(self.monomRoot) < 3:
-                aLigId = self.monomRoot
-            else:
-                aLigId = self.monomRoot[:3]                
+            #if len(self.monomRoot) < 3:
+            #    aLigId = self.monomRoot
+            #else:
+            aLigId = self.monomRoot                
             aMmCif.write("data_comp_%s\n"%aLigId)
             # Atom section
             aMmCif.write("loop_\n")

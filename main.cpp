@@ -299,7 +299,6 @@ int main(int argc, char** argv) {
 
                 LIBMOL::outMMCif2(AJob.IOEntries["userOutName"].c_str(),
                                      AJob.IOEntries["monoRootName"],
-                                     aTargetSystem.propComp,
                                      aTargetSystem.allAtoms,
                                      // aTargetSystem.allHAtomIdx,
                                      aTargetSystem.allBonds,
