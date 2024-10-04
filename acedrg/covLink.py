@@ -4725,7 +4725,6 @@ class CovLinkGenerator(CExeCode):
 
     def checkChemInMonomer(self, tMonomer, tMode):
 
-        print("Here")
         tDelAtomIds = []
         for aAtom in tMonomer["atoms"]:
             atmId = aAtom["atom_id"]
@@ -5077,11 +5076,11 @@ class CovLinkGenerator(CExeCode):
         
         if "tors" in tLinkedObj.outCombLigand["cifObj"]["comps"]["LIG"]:
             for aTor in tLinkedObj.outCombLigand["cifObj"]["comps"]["LIG"]["tors"]:
-                #print("A torsion ")
-                #print("atom %s in residue %d "%(aTor["atom_id_1"], aTor["atom_id_1_resNum"]))   
-                #print("atom %s in residue %d "%(aTor["atom_id_2"], aTor["atom_id_2_resNum"]))   
-                #print("atom %s in residue %d "%(aTor["atom_id_3"], aTor["atom_id_3_resNum"]))  
-                #print("atom %s in residue %d "%(aTor["atom_id_4"], aTor["atom_id_4_resNum"]))  
+                print("A torsion ")
+                print("atom %s in residue %d "%(aTor["atom_id_1"], aTor["atom_id_1_resNum"]))   
+                print("atom %s in residue %d "%(aTor["atom_id_2"], aTor["atom_id_2_resNum"]))   
+                print("atom %s in residue %d "%(aTor["atom_id_3"], aTor["atom_id_3_resNum"]))  
+                print("atom %s in residue %d "%(aTor["atom_id_4"], aTor["atom_id_4_resNum"]))  
                 if aTor["atom_id_1_resNum"]==1 and aTor["atom_id_2_resNum"]==1\
                    and aTor["atom_id_3_resNum"]==1 and aTor["atom_id_4_resNum"]==1:
                     if not aTor["atom_id_1"] in addedSet1 and not aTor["atom_id_2"] in addedSet1\
@@ -5096,6 +5095,19 @@ class CovLinkGenerator(CExeCode):
                         self.checkTorMod(tLinkedObj.stdLigand2["remainTors"], aTor, tLinkedObj.modLigand2["changed"]["tors"], torIdNumLig2)
                     else: 
                         tLinkedObj.modLigand2["added"]["tors"].append(aTor)
+                elif aTor["atom_id_1_resNum"]==1 and aTor["atom_id_2_resNum"]==1\
+                   and aTor["atom_id_3_resNum"]==1 and aTor["atom_id_4_resNum"]==2:
+                       self.checkTorDelId(tLinkedObj.stdLigand1["remainTors"], aTor, tLinkedObj.modLigand1["deleted"]["tors"])
+                elif aTor["atom_id_1_resNum"]==2 and aTor["atom_id_2_resNum"]==1\
+                   and aTor["atom_id_3_resNum"]==1 and aTor["atom_id_4_resNum"]==1:
+                       self.checkTorDelId(tLinkedObj.stdLigand1["remainTors"], aTor, tLinkedObj.modLigand1["deleted"]["tors"])
+                elif aTor["atom_id_1_resNum"]==2 and aTor["atom_id_2_resNum"]==2\
+                   and aTor["atom_id_3_resNum"]==2 and aTor["atom_id_4_resNum"]==1:
+                       self.checkTorDelId(tLinkedObj.stdLigand2["remainTors"], aTor, tLinkedObj.modLigand2["deleted"]["tors"])
+                elif aTor["atom_id_1_resNum"]==1 and aTor["atom_id_2_resNum"]==2\
+                   and aTor["atom_id_3_resNum"]==2 and aTor["atom_id_4_resNum"]==2:
+                       print("Here")
+                       self.checkTorDelId(tLinkedObj.stdLigand2["remainTors"], aTor, tLinkedObj.modLigand2["deleted"]["tors"])
     
             print("Number of changed tors in residue 1 is %d "%len(tLinkedObj.modLigand1["changed"]["tors"]))  
             print("Number of added tors in residue 1 is %d "%len(tLinkedObj.modLigand1["added"]["tors"]))  
@@ -5295,7 +5307,9 @@ class CovLinkGenerator(CExeCode):
         
         speTorIds = ["chi1", "chi2", "chi3", "chi4", "chi5", "hh", "hh1", "hh2"]
         
+        
         for aTor in tOrigTors:
+            
             if not aTor["id"] in speTorIds:
                 if (aTor["atom_id_2"]==id2 and aTor["atom_id_3"]==id3):
                     if (aTor["atom_id_1"]==id1 and aTor["atom_id_4"]==id4):
@@ -5360,6 +5374,16 @@ class CovLinkGenerator(CExeCode):
                 aStr = "%d"%(tTorIdNum["SP3_SP3"]+1)
                 tTor["id"] = "sp3_sp3_" + aStr
                 
+    def checkTorDelId(self, tOrigTors, tTor, tModTors):
+        
+        id2 = tTor["atom_id_2"]
+        id3 = tTor["atom_id_3"]
+        for aTor in tOrigTors:
+            
+            if ((aTor["atom_id_2"]==id2 and aTor["atom_id_3"]==id3)
+                or (aTor["atom_id_2"]==id3 and aTor["atom_id_3"]==id2)):
+                # delet the torsion where its bond appearing in the link section
+                tModTors.append(aTor)
         
     def checkChiMod(self, tOrigChirs, tChi, tModChi):
 
@@ -6024,7 +6048,7 @@ class CovLinkGenerator(CExeCode):
                 elif  aBond["atom_id_2"]==tLinkedObj.stdLigand2["atomName"]:
                     if not aBond["atom_id_1"] in aPoolAtoms2:
                         aPoolAtoms2.append(aBond["atom_id_1"])
-        print("aPoolAtoms2 ", aPoolAtoms2)
+        
         self.outOneMod(tOutFile, tLinkedObj.modLigand2, tLinkedObj.describLevel, aPoolAtoms2)
 
         

@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Torsion.h
  * Author: flong
  *
@@ -22,28 +22,28 @@
 
 namespace LIBMOL
 {
-    
+
     class Atom;
     class AtomDict;
     class Bond;
     class BondDict;
-    
+
     /* class Torsion describes torsion angles formed by 4 atoms
      *
-     * 
+     *
      *
      */
-    class Torsion 
+    class Torsion
     {
     public:
-        
+
         // default constructor
         Torsion();
         // copy constructor
         Torsion(const Torsion & tT);
         // constructor by 4 atoms
         Torsion(Atom& tAtm1, Atom & tAtm2, Atom& tAtm3, Atom& tAtm4);
-        
+
         // destructor
         virtual ~Torsion();
 
@@ -53,32 +53,32 @@ namespace LIBMOL
         void setID(ID tID);
         SeriNumber getSeriNum() const;
         void setSeriNum(SeriNumber tSer);
-        
+
         Torsion create(Atom& tAtm1, Atom& tAtm2, Atom& tAtm3, Atom& tAtm4);
         void    destroy();
- 
+
         REAL getValue(bool tB) const;
-        void setValue(REAL tT, bool tB); 
-        void setValue();       
+        void setValue(REAL tT, bool tB);
+        void setValue();
         // calculate the torsion angle value
-        // from 4 atoms       
-        REAL setValue(Atom & tA1, Atom & tA2, Atom & tA3, Atom & tA4);  
-        
+        // from 4 atoms
+        REAL setValue(Atom & tA1, Atom & tA2, Atom & tA3, Atom & tA4);
+
         REAL getSigValue() const;
         void setSigValue(REAL tS);
-        
+
         REAL getValuePre() const;
         void setValuePre(REAL tVP);
-        
+
         REAL getForceConst() const;
         void setForceConst(REAL tF);
-        
+
         int  getPeriod() const;
         void setPeriod(int tP);
-        
- 
-  
-        // here are a group variables without initialization 
+
+
+
+        // here are a group variables without initialization
         // when the object is created
         REAL  disAtmSE;
         REAL  disAtmSEDev;
@@ -86,61 +86,61 @@ namespace LIBMOL
         REAL  veloPre;
         REAL  accel;
         REAL  accelPre;
-        
-        
+
+
         // Variables linked only with a tree structure
-        
-        int        varFlag;  
-                                     
+
+        int        varFlag;
+
         bool       isItTouched;
-        
+
         std::vector<REAL>     normalUnit;
         std::vector<int>      torsUpAtomList;
         std::vector<Atom>     atoms;
-        
+
         std::map<std::string, bool> states;
         /* main key-types are
          * isPhi
          * isPsi
-         * isOmg    
-         */  
-        
-        
-        
+         * isOmg
+         */
+
+
+
     private:
-        
-       
+
+
         Name           itsName;
         ID             itsID;
         SeriNumber     itsSeriNum;
-           
-        
+
+
         REAL         itsValue;
         REAL         itsValueSt;
         REAL         itsSigValue;
         REAL         itsValuePre;
-        
-        REAL         itsForceConst;    
-        
-        int          itsPeriod;  
-        
-        
-               
+
+        REAL         itsForceConst;
+
+        int          itsPeriod;
+
+
+
     };
-    
+
     class TorsionDict
     {
     public :
-        
+
         //Default constructor
         TorsionDict();
-        // Copy constructor 
+        // Copy constructor
         TorsionDict(const TorsionDict & tTorsion);
         // Constructor using atoms
         TorsionDict(std::vector<AtomDict> & tAtoms);
         // Default destructor
         ~TorsionDict();
-        
+
         int                   seriNum;
         REAL                  value;
         REAL                  sigValue;
@@ -148,31 +148,40 @@ namespace LIBMOL
         REAL                  sigValueST;
         int                   period;
         ID                    id;
-        
+
         std::vector<int>      atoms;
         std::vector<AtomDict> fullAtoms;
         std::vector<ID>       atomCodClasses;
         std::vector<BondDict> bonds;
-        std::vector<REAL>     codTorsionValues;  
-        
+        std::vector<REAL>     codTorsionValues;
+
     };
-    
+
     // Get the index of a torsion in a vector of torsions
     extern int getTorsion(std::vector<TorsionDict> & tTors,
                           int tAt1, int tAt2, int tAt3, int tAt4);
-    
-    // Get the value of the existing torsion based atom tree 
+
+    // Get the value of the existing torsion based atom tree
     extern REAL getTorsion(std::vector<AtomDict> & tAtoms,
                            int iCur, int iNext, std::vector<int> tDoneSet);
-    
+
     // calculate the value of a torsion base on coords of its 4 atoms
-    extern REAL getTorsion(AtomDict & tA1, 
-                           AtomDict & tA2, 
-                           AtomDict & tA3, 
+    extern REAL getTorsion(AtomDict & tA1,
+                           AtomDict & tA2,
+                           AtomDict & tA3,
                            AtomDict & tA4);
-    
-    
+
+    extern void setupMiniTorsions(std::vector<TorsionDict> & tAllTorsions,
+                                  std::vector<AtomDict>    & tAtoms,
+                                  std::vector<BondDict>    & tBonds,
+                                  std::vector<TorsionDict> & tMiniTorsions);
+
+    extern void selectOneTorFromOneBond(ID tS, std::vector<TorsionDict> & tTorsB,
+                                        std::vector<TorsionDict>        & tAllTorsions,
+                                        std::vector<AtomDict>           & tAtoms,
+                                        std::vector<TorsionDict>        & tMiniTorsions);
+
+
 }
 
 #endif	/* TORSION_H */
-

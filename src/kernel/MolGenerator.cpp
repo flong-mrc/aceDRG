@@ -948,8 +948,11 @@ namespace LIBMOL {
                 AllSystem  aTargetMol( allMolecules[0], tmpLib);
 
                 aTargetMol.setupAllAngleValuesFromCoords();
+                setupMiniTorsions(aTargetMol.allTorsions,
+                                  aTargetMol.allAtoms,
+                                  aTargetMol.allBonds,
+                                  aTargetMol.miniTorsions);
 
-                // aTargetMol.resetMinTorsions();
                 std::cout << "Number of atoms " << aTargetMol.allAtoms.size() << std::endl;
                 std::cout << "Number of bonds " << aTargetMol.allBonds.size() << std::endl;
                 std::cout << "Number of angles " << aTargetMol.allAngles.size() << std::endl;
@@ -958,16 +961,16 @@ namespace LIBMOL {
                 std::cout << "Number of all planes " << aTargetMol.allPlanes.size() << std::endl;
                 std::cout << "Number of all rings " << aTargetMol.allRingsV.size() << std::endl;
                 std::cout << "OutName is " << tOutName << std::endl;
-                exit(1);
                 outMMCif2(  tOutName,
                             allMolecules[0].id,
                             aTargetMol.allAtoms,
                             aTargetMol.allBonds,
                             aTargetMol.allAngles,
-                            aTargetMol.allTorsions,
+                            aTargetMol.miniTorsions,
                             aTargetMol.allRingsV,
                             aTargetMol.allPlanes,
                             aTargetMol.allChirals);
+                exit(1);
 
 
             }
