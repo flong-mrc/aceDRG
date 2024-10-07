@@ -506,9 +506,13 @@ class metalMode(CExeCode):
         if tSP==1:
             aAng["_chem_comp_angle.value_angle"] = "180.00"
         elif tSP==2:
-            aVal = (360.0-tAngSum[tMN])/2.0
-            aSV  = "%8.4f"%aVal
-            aAng["_chem_comp_angle.value_angle"] = aSV
+            if tMN in tAngSum.keys():
+                aVal = (360.0-tAngSum[tMN])/2.0
+                aSV  = "%8.4f"%aVal
+                aAng["_chem_comp_angle.value_angle"] = aSV
+            else:
+                # assume two lone pairs missing
+                aAng["_chem_comp_angle.value_angle"] = "109.47"
         elif tSP==3:
             aAng["_chem_comp_angle.value_angle"] = "109.47"
         else:
@@ -1020,7 +1024,7 @@ class metalMode(CExeCode):
             
             aFSYS = FileTransformer()
             aFSYS.mmCifReader(tInCif)
-            
+            #print(tInCif)
             angSumMap = {}
             for aAng in aFSYS.angles: 
                 idCen = aAng["_chem_comp_angle.atom_id_2"] 
@@ -1031,16 +1035,16 @@ class metalMode(CExeCode):
             
             #for aA in angSumMap:
             #    print(" ang sum for ", aA, " is ", angSumMap[aA])
-            
+            #print("angSumMap ", angSumMap)
             for aMA in self.metalConnAtomsMap.keys():
                 #print("For metal atom ", aMA)
                 if self.checkExtraConns(aMA):
                     for aMN in self.metalConnAtomsMap[aMA]:
                         aSP = self.atmHybr[aMN]
                         #print("atom ", aMN, " hybr ", aSP)
+                        #print("NB atom ", aMN, " has the following angles: ")
                         #if aMN in self.atmNonHMap.keys():
                         for aNN in self.nonMAtmConnsMap[aMN]:
-                            #print("NB atom ", aMN, " has the following angles: ")
                             #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
                             self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
             
@@ -1333,7 +1337,7 @@ class metalMode(CExeCode):
                 aMC.write("BONDING  %s%s\n"%(aK.ljust(10), aM.ljust(10)))
         aMC.close()    
         
-        self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
+        self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s -K "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
         self._log_name  = tOutRoot + "_acedrg.log"
         #print(self._cmdline)
         self.runExitCode = self.subExecute()
