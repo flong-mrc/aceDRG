@@ -408,14 +408,15 @@ class metalMode(CExeCode):
         # First round
         for aAtm in tAtoms:
             aId = aAtm['_chem_comp_atom.atom_id']
-            #print(aId)
+            print(aId)
             self.atmHybr[aId] =0
             if aId in self.nonMAtmConnsMap.keys():
                 aM=0
                 if aId in self.connMAMap:
                     aM = len(self.connMAMap[aId])
                 aL = len(self.nonMAtmConnsMap[aId])
-                #print("conn ", aL)
+                print("conn ", aL)
+                print("Mconn", aM)
                 if aL > 4 :
                     self.atmHybr[aId] = aL
                 #elif aL < 2:
@@ -438,7 +439,10 @@ class metalMode(CExeCode):
                          else:
                              self.atmHybr[aId] = 1
                      elif aL==1:
-                         self.atmHybr[aId] = 1
+                         if aM==2:
+                             self.atmHybr[aId] = 2
+                         else:
+                             self.atmHybr[aId] = 1
                 elif aAtm['_chem_comp_atom.type_symbol']=="N" or \
                      aAtm['_chem_comp_atom.type_symbol']=="AS" or\
                      aAtm['_chem_comp_atom.type_symbol']=="As":
@@ -493,11 +497,14 @@ class metalMode(CExeCode):
                         break
                 if lSp:
                     self.atmHybr[aId]=2
-                
-                        
-                
+    
+        for aAtm in tAtoms:               
+            aId = aAtm['_chem_comp_atom.atom_id']
+            aSp = self.atmHybr[aId]
+            print("Atom %s has a sp %s"%(aId, aSp))
                          
-    def setASpeAng(self, tMA, tMN, tNN, tSP, tAngSum):
+    def setASpeAng(self, tMA, tMN, tNN, tSP):
+        
         
         aAng = {}
         aAng["_chem_comp_angle.atom_id_1"] = tMA 
@@ -506,13 +513,14 @@ class metalMode(CExeCode):
         if tSP==1:
             aAng["_chem_comp_angle.value_angle"] = "180.00"
         elif tSP==2:
-            if tMN in tAngSum.keys():
-                aVal = (360.0-tAngSum[tMN])/2.0
-                aSV  = "%8.4f"%aVal
-                aAng["_chem_comp_angle.value_angle"] = aSV
-            else:
-                # assume two lone pairs missing
-                aAng["_chem_comp_angle.value_angle"] = "109.47"
+            #if tMN in tAngSum.keys():
+            #    aVal = (360.0-tAngSum[tMN])/2.0
+            #    aSV  = "%8.4f"%aVal
+            #    aAng["_chem_comp_angle.value_angle"] = aSV
+            aAng["_chem_comp_angle.value_angle"] = "120.00"
+            #else:
+            #    # assume two lone pairs missing
+            #    aAng["_chem_comp_angle.value_angle"] = "109.47"
         elif tSP==3:
             aAng["_chem_comp_angle.value_angle"] = "109.47"
         else:
@@ -1022,19 +1030,19 @@ class metalMode(CExeCode):
     
     
             
-            aFSYS = FileTransformer()
-            aFSYS.mmCifReader(tInCif)
+            #aFSYS = FileTransformer()
+            #aFSYS.mmCifReader(tInCif)
             #print(tInCif)
-            angSumMap = {}
-            for aAng in aFSYS.angles: 
-                idCen = aAng["_chem_comp_angle.atom_id_2"] 
-                if not idCen in angSumMap.keys():
-                    angSumMap[idCen]=float(aAng['_chem_comp_angle.value_angle'])
-                else:
-                    angSumMap[idCen]+=float(aAng['_chem_comp_angle.value_angle'])
+            #angSumMap = {}
+            #for aAng in aFSYS.angles: 
+            #    idCen = aAng["_chem_comp_angle.atom_id_2"] 
+            #    if not idCen in angSumMap.keys():
+            #        angSumMap[idCen]=float(aAng['_chem_comp_angle.value_angle'])
+            #        
+            #    else:
+            #        angSumMap[idCen]+=float(aAng['_chem_comp_angle.value_angle'])
+                
             
-            #for aA in angSumMap:
-            #    print(" ang sum for ", aA, " is ", angSumMap[aA])
             #print("angSumMap ", angSumMap)
             for aMA in self.metalConnAtomsMap.keys():
                 #print("For metal atom ", aMA)
@@ -1046,7 +1054,7 @@ class metalMode(CExeCode):
                         #if aMN in self.atmNonHMap.keys():
                         for aNN in self.nonMAtmConnsMap[aMN]:
                             #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
-                            self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
+                            self.setASpeAng(aMA, aMN, aNN, aSP)
             
             #self.setMetalPA()
             

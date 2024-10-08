@@ -158,9 +158,12 @@ namespace LIBMOL
                 t_m_len = iAt->connMAtoms.size();
             }
 
-            if (iAt->chemType=="C" && t_len==2 && t_m_len==1)
+            if (iAt->chemType=="C" )
             {
-                t_len=3;
+                if  ((t_len==2 && t_m_len==1) || (t_len==3 && t_m_len==2))
+                {
+                    t_len=3;
+                }
             }
             //std::cout << "t_len " << t_len << std::endl;
             //std::cout << "t_m_len " << t_m_len << std::endl;
