@@ -417,9 +417,241 @@ namespace LIBMOL
         return 0.0;
     }
 
-
-    extern void fixTorIDs(std::vector<TorsionDict> & tAllTorsions)
+    extern bool checkATorsAtomsInPla(std::vector<int> & tAtms,
+                                     std::vector<AtomDict>  & tAllAtoms,
+                                     std::vector<PlaneDict> & tAllPlanes)
     {
+
+        for (std::vector<PlaneDict>::iterator iP=tAllPlanes.begin();
+                        iP !=tAllPlanes.end(); iP++)
+        {
+            std::vector<ID> inPlAtoms;
+            for (std::vector<int>::iterator iA=tAtms.begin();
+                    iA !=tAtms.end(); iA++)
+            {
+                std::map<ID, int>::iterator iFind =iP->atoms.find(tAllAtoms[*iA].id);
+                if (iFind !=iP->atoms.end())
+                {
+                    inPlAtoms.push_back(tAllAtoms[*iA].id);
+                }
+            }
+
+            if ((int)inPlAtoms.size() == (int)tAtms.size())
+            {
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
+    extern int  checkATorsAtomsInAroRing(int tAtm1, int tAtm2,
+                                         std::vector<AtomDict>  & tAllAtoms,
+                                         std::vector<BondDict> & tAllBonds)
+    {
+        //std::cout << "Check arom for atom "
+        //          << allAtoms[tAtm1].id << " of sp "<< allAtoms[tAtm1].bondingIdx
+        //          << " and " << allAtoms[tAtm2].id << " of sp "
+        //          << allAtoms[tAtm2].bondingIdx << std::endl;
+        int aRet  = 0;                      // not in any ring
+        if (tAllAtoms[tAtm1].bondingIdx==2
+            && tAllAtoms[tAtm2].bondingIdx==2)
+        {
+
+            int aBIdx = getBond(tAllBonds, tAtm1, tAtm2);
+            //std::cout << "bond " << aBIdx << std::endl;
+            //std::cout << "atom " << allBonds[aBIdx].atoms[0] << " and "
+            //          << allBonds[aBIdx].atoms[1] << std::endl;
+            //std::cout << "Its order " << allBonds[aBIdx].order << std::endl;
+            if (aBIdx !=-1)
+            {
+                if (tAllBonds[aBIdx].isInSameRing)
+                {
+                    //std::cout << "It is in the same ring" << std::endl;
+
+                    if (tAllBonds[aBIdx].order.find("arom") !=tAllBonds[aBIdx].order.npos)
+                    {
+                        aRet = 3;
+                    }
+                    else
+                    {
+                        aRet = 2;
+                    }
+                }
+                else
+                {
+                    aRet=1;
+                }
+            }
+        }
+        return aRet;
+    }
+
+    extern void fixTorIDs(std::vector<TorsionDict> & tAllTorsions,
+                          std::vector<AtomDict>  & tAllAtoms,
+                          std::vector<BondDict>  & tAllBonds,
+                          std::vector<PlaneDict> & tAllPlanes,
+                          bool                   & tLMdPls)
+    {
+
+        int idxTors  = 1, idxPTors = 1, idxSp3Sp3=1, idxSp2Sp3=1, idxSp2Sp2=1;
+        //std::cout << "There are " << (int)allTorsions.size()
+        //          << "Torsions" << std::endl;
+
+
+        for (std::vector<TorsionDict>::iterator iT=tAllTorsions.begin();
+                        iT !=tAllTorsions.end(); iT++)
+        {
+            //std::cout << "look at torsion " << iT->seriNum << std::endl;
+            //std::cout << "atom1 " << allAtoms[iT->atoms[0]].id
+            //          << "  atom2 " << allAtoms[iT->atoms[1]].id
+            //          << "  atom3 " << allAtoms[iT->atoms[2]].id
+            //          << "  atom4 " << allAtoms[iT->atoms[3]].id << std::endl;
+
+            int aFlag =checkATorsAtomsInAroRing(iT->atoms[1], iT->atoms[2],
+                                                tAllAtoms, tAllBonds);
+            //std::cout << "aFlag == " << aFlag << std::endl;
+            if (aFlag == 3)
+            {
+                // in a aromatic ring
+                if (tLMdPls)
+                {
+                    iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =1.0;
+                }
+                else
+                {
+                    iT->id = "const_sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =0;
+                    if (iT->id.size() >=16 )
+                    {
+                        // iT->id = IntToStr(idxPTors);
+                        iT->id = "const_" + IntToStr(idxPTors);
+                    }
+                }
+
+
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+
+                iT->period   =1;
+                idxPTors +=1;
+            }
+            else if (aFlag == 2)
+            {
+                // in an all-sp2 ring
+                if (tLMdPls)
+                {
+                    iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =1.0;
+                }
+                else
+                {
+                    iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                    iT->sigValue =5.0;
+                    //if (iT->id.size() >=16 )
+                    //{
+                        // iT->id = IntToStr(idxPTors);
+                        // iT->id = "const_" + IntToStr(idxPTors);
+                    //}
+                    // std::cout << "Here 2" << std::endl;
+                }
+                /*
+                iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                //if (iT->id.size() >=16 )
+                //{
+                    //iT->id = "const_" + IntToStr(idxPTors);
+                //}
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->sigValue =1.0;
+                */
+                iT->period   =1;
+                idxPTors +=1;
+            }
+            else if (aFlag == 1)
+            {
+                iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+                int aBIdx12 = getBond(tAllBonds, iT->atoms[0], iT->atoms[1]);
+                int aBIdx34 = getBond(tAllBonds, iT->atoms[2], iT->atoms[3]);
+                //std::cout << "Flag1" << std::endl;
+                //std::cout << "aBIdx12 " << aBIdx12 << std::endl;
+                //std::cout << "aBIdx34 " << aBIdx34 << std::endl;
+                if (aBIdx12 !=-1 && aBIdx34 !=-1)
+                {
+
+                    if (tAllBonds[aBIdx12].isInSameRing || tAllBonds[aBIdx34].isInSameRing)
+                    {
+                        iT->sigValue =20.0;
+                    }
+                    else
+                    {
+                        iT->sigValue =5.0;
+                    }
+                }
+                else
+                {
+                    iT->sigValue =5.0;
+                }
+                //if (iT->id.size() >=16 )
+                //{
+                    //iT->id = "const_" + IntToStr(idxPTors);
+                //}
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+
+                idxPTors +=1;
+            }
+            else if(checkATorsAtomsInPla(iT->atoms, tAllAtoms, tAllPlanes))
+            {
+                iT->id = "sp2_sp2_" + IntToStr(idxPTors);
+
+                //if (iT->id.size() >=16 )
+                //{
+                //    iT->id = "const_" + IntToStr(idxPTors);
+                //}
+                //iT->id = "P_sp2_sp2_" + IntToStr(idxPTors);
+                iT->sigValue =5.0;
+                idxPTors +=1;
+            }
+            else
+            {
+                if (iT->period ==3 )
+                {
+                    iT->id = "sp3_sp3_" + IntToStr(idxSp3Sp3);
+                    idxSp3Sp3+=1;
+                }
+                else if (iT->period == 6)
+                {
+                    iT->id= "sp2_sp3_"+IntToStr(idxSp2Sp3);
+                    idxSp2Sp3+=1;
+                }
+                else if (iT->period == 2)
+                {
+                    if ((tAllAtoms[iT->atoms[1]].chemType!="O"  && tAllAtoms[iT->atoms[2]].chemType !="O" )
+                       && (tAllAtoms[iT->atoms[1]].chemType!="S"  && tAllAtoms[iT->atoms[2]].chemType !="S"))
+                    {
+                        iT->id = "sp2_sp2_"+IntToStr(idxSp2Sp2);
+                        idxSp2Sp2+=1;
+                    }
+                    else
+                    {
+                        iT->id = "other_tor_"+IntToStr(idxSp2Sp2);
+                        iT->sigValue =20.0;
+                        idxTors++;
+                    }
+                    std::cout << "Torsion label " << iT->id << std::endl;
+
+                }
+                else
+                {
+                    iT->id = "other_tor_" + IntToStr(idxTors);
+                    iT->sigValue =20.0;
+                    idxTors++;
+                }
+            }
+            //std::cout << "its ID now is " << iT->id << "and sig is "
+            //          <<   iT->sigValue << std::endl;
+        }
+
     }
 
     extern void setupMiniTorsions(std::vector<TorsionDict> & tAllTorsions,

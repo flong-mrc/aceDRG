@@ -20,6 +20,10 @@
 #include "bond.h"
 #endif
 
+#ifndef PLANE_H
+#include "plane.h"
+#endif
+
 namespace LIBMOL
 {
 
@@ -27,6 +31,7 @@ namespace LIBMOL
     class AtomDict;
     class Bond;
     class BondDict;
+    class PlaneDict;
 
     /* class Torsion describes torsion angles formed by 4 atoms
      *
@@ -171,7 +176,19 @@ namespace LIBMOL
                            AtomDict & tA3,
                            AtomDict & tA4);
 
-    extern void fixTorIDs(std::vector<TorsionDict> & tAllTorsions);
+    extern bool checkATorsAtomsInPla(std::vector<int> & tAtms,
+                                     std::vector<AtomDict>  & tAllAtoms,
+                                     std::vector<PlaneDict> & tAllPlanes);
+
+    extern int  checkATorsAtomsInAroRing(int tAtm1, int tAtm2,
+                                         std::vector<AtomDict>  & tAllAtoms,
+                                         std::vector<BondDict>  & tAllBonds);
+
+    extern void fixTorIDs(std::vector<TorsionDict> & tAllTorsions,
+                          std::vector<AtomDict>  & tAllAtoms,
+                          std::vector<BondDict>  & tAllBonds,
+                          std::vector<PlaneDict> & tAllPlanes,
+                          bool                   & tLMdPls);
 
     extern void setupMiniTorsions(std::vector<TorsionDict> & tAllTorsions,
                                   std::vector<AtomDict>    & tAtoms,

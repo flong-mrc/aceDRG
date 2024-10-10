@@ -456,6 +456,13 @@ class metalMode(CExeCode):
                              self.atmHybr[aId] = 2
                          else:
                              self.atmHybr[aId] = 1
+                     elif aL==0:
+                         # a organic atom connecting all metal atoms
+                         if aM==3:
+                             self.atmHybr[aId] = 2 
+                         elif aM==4:
+                             self.atmHybr[aId] = 3
+                             
                 elif aAtm['_chem_comp_atom.type_symbol']=="N" or \
                      aAtm['_chem_comp_atom.type_symbol']=="AS" or\
                      aAtm['_chem_comp_atom.type_symbol']=="As":
@@ -468,6 +475,11 @@ class metalMode(CExeCode):
                              self.atmHybr[aId] = 1
                      elif aL==1:
                          self.atmHybr[aId] = 1
+                     else:
+                         if aM==2:
+                             self.atmHybr[aId] = 1
+                         elif aM > 2 and aM <5 :
+                             self.atmHybr[aId] = 3
                 elif aAtm['_chem_comp_atom.type_symbol']=="B":
                      if aL==4:
                          self.atmHybr[aId] = 3
@@ -483,6 +495,8 @@ class metalMode(CExeCode):
                 elif aAtm['_chem_comp_atom.type_symbol']=="O":
                      if aL==2 or aL ==1:
                          self.atmHybr[aId] = 3
+                     elif aM > 0 :
+                         self.atmHybr[aId] = 3 
                 elif aAtm['_chem_comp_atom.type_symbol']=="P":
                      if aL > 1 and aL <6:
                          self.atmHybr[aId] = 3     
@@ -543,7 +557,7 @@ class metalMode(CExeCode):
             aAng["_chem_comp_angle.value_angle"] = "0.0"
         
         aAng["_chem_comp_angle.value_angle_esd"] = "5.0"
-        #print("add metal related angle:", aAng)
+        # print("add metal related angle:", aAng)
     
         self.speAngs.append(aAng)
         
@@ -1062,17 +1076,17 @@ class metalMode(CExeCode):
             #print("angSumMap ", angSumMap)
             aDoneMA =[]
             for aMA in self.metalConnAtomsMap.keys():
-                print("For metal atom ", aMA)
+                #print("For metal atom ", aMA)
                 for aMN in self.metalConnAtomsMap[aMA]:
                     if self.checkExtraConns(aMA, aMN):
                         aSP = self.atmHybr[aMN]
-                        print("conne atom ", aMN, " hybr ", aSP)
+                        #print("conne atom ", aMN, " hybr ", aSP)
                         #print("NB atom ", aMN, " has the following angles: ")
                         #if aMN in self.atmNonHMap.keys():
                         #for aNN in self.nonMAtmConnsMap[aMN]:
                         for aNN in self.atomsAllConnMap[aMN]:
                             if aNN !=aMA and not aNN in aDoneMA:
-                                print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
+                                #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
                                 self.setASpeAng(aMA, aMN, aNN, aSP)
                 aDoneMA.append(aMA)
             #self.setMetalPA()
