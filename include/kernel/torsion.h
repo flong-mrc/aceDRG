@@ -171,6 +171,8 @@ namespace LIBMOL
                            AtomDict & tA3,
                            AtomDict & tA4);
 
+    extern void fixTorIDs(std::vector<TorsionDict> & tAllTorsions);
+
     extern void setupMiniTorsions(std::vector<TorsionDict> & tAllTorsions,
                                   std::vector<AtomDict>    & tAtoms,
                                   std::vector<BondDict>    & tBonds,

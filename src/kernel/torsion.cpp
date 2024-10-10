@@ -417,6 +417,11 @@ namespace LIBMOL
         return 0.0;
     }
 
+
+    extern void fixTorIDs(std::vector<TorsionDict> & tAllTorsions)
+    {
+    }
+
     extern void setupMiniTorsions(std::vector<TorsionDict> & tAllTorsions,
                                   std::vector<AtomDict>    & tAtoms,
                                   std::vector<BondDict>    & tBonds,
@@ -447,7 +452,7 @@ namespace LIBMOL
                     //std::cout << "torsion " << iTor->seriNum
                     //          << " is included " << std::endl;
                     TorsionSetOneBond[tLab].push_back(*iTor);
-                    
+
                 }
                 else
                 {

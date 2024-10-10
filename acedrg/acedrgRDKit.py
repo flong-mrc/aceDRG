@@ -1939,7 +1939,7 @@ class AcedrgRDKit(object):
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
         
 
-        Chem.SanitizeMol(tMol)
+        Chem. Mol(tMol)
         Chem.Kekulize(tMol)
         # Check 
         for aAtom in tMol.GetAtoms():

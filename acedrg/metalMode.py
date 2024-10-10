@@ -23,6 +23,7 @@ class metalMode(CExeCode):
         self.exeAcedrg            = "acedrg"
         # self.exeAcedrg          = "/lmb/home/flong/workplace/LIBMOL/bin/acedrg" 
         
+        self.atomsAllConnMap      = {}
         self.remainAtoms          = []
         self.metalAtoms           = []
         self.metalConnAtoms       = []
@@ -223,6 +224,18 @@ class metalMode(CExeCode):
             atm1 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_1'])
             atm2 = self.getAtomById(tAtoms, aBond['_chem_comp_bond.atom_id_2'])
             
+            id1  = aBond['_chem_comp_bond.atom_id_1']
+            id2  = aBond['_chem_comp_bond.atom_id_2']
+            if not id1 in self.atomsAllConnMap.keys():
+                self.atomsAllConnMap[id1] = []
+            if not id2 in self.atomsAllConnMap[id1]:
+                self.atomsAllConnMap[id1].append(id2)
+                
+            if not id2 in self.atomsAllConnMap.keys():
+                self.atomsAllConnMap[id2] = []
+            if not id1 in self.atomsAllConnMap[id2]:
+                self.atomsAllConnMap[id2].append(id1)
+                
             if aBond['_chem_comp_bond.atom_id_1'] in metalIds:
                 if not aBond['_chem_comp_bond.atom_id_1'] in self.metalConnAtomsMap:
                     self.metalConnAtomsMap[aBond['_chem_comp_bond.atom_id_1']] = []
@@ -484,8 +497,7 @@ class metalMode(CExeCode):
                          self.atmHybr[aId] = 2
                      else:
                          self.atmHybr[aId] = 3
-                
-                         
+        
         # second round
         for aAtm in tAtoms:
             if aAtm['_chem_comp_atom.type_symbol']=="N":
@@ -495,7 +507,11 @@ class metalMode(CExeCode):
                     if self.atmHybr[aNM]== 2:
                         lSp=True
                         break
-                if lSp:
+                if aId in self.connMAMap.keys():
+                    totalL=len(self.connMAMap[aId])+len(self.nonMAtmConnsMap[aId])
+                else:
+                    totalL=len(self.nonMAtmConnsMap[aId])
+                if lSp and totalL < 4:
                     self.atmHybr[aId]=2
     
         for aAtm in tAtoms:               
@@ -1044,18 +1060,21 @@ class metalMode(CExeCode):
                 
             
             #print("angSumMap ", angSumMap)
+            aDoneMA =[]
             for aMA in self.metalConnAtomsMap.keys():
-                #print("For metal atom ", aMA)
-                if self.checkExtraConns(aMA):
-                    for aMN in self.metalConnAtomsMap[aMA]:
+                print("For metal atom ", aMA)
+                for aMN in self.metalConnAtomsMap[aMA]:
+                    if self.checkExtraConns(aMA, aMN):
                         aSP = self.atmHybr[aMN]
-                        #print("atom ", aMN, " hybr ", aSP)
+                        print("conne atom ", aMN, " hybr ", aSP)
                         #print("NB atom ", aMN, " has the following angles: ")
                         #if aMN in self.atmNonHMap.keys():
-                        for aNN in self.nonMAtmConnsMap[aMN]:
-                            #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
-                            self.setASpeAng(aMA, aMN, aNN, aSP)
-            
+                        #for aNN in self.nonMAtmConnsMap[aMN]:
+                        for aNN in self.atomsAllConnMap[aMN]:
+                            if aNN !=aMA and not aNN in aDoneMA:
+                                print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
+                                self.setASpeAng(aMA, aMN, aNN, aSP)
+                aDoneMA.append(aMA)
             #self.setMetalPA()
             
             
@@ -1148,15 +1167,16 @@ class metalMode(CExeCode):
                 aOutCif.close()
             
     
-    def checkExtraConns(self, tMAId):
+    def checkExtraConns(self, tMAId, tMN):
         
         aRet = True
-        for aMN in self.metalConnAtomsMap[tMAId]:
-            for aNN in self.nonMAtmConnsMap[aMN]:
-                if aNN in self.metalConnAtomsMap[tMAId]:
+        
+        for aNN in self.nonMAtmConnsMap[tMN]:
+            if aNN in self.metalConnAtomsMap[tMAId]:
                     aRet = False
                     break
         return aRet
+    
     def noNewHLine(self, tLine, tHIds):
         
         aRet = True
