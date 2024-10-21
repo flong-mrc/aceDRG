@@ -554,8 +554,10 @@ int main(int argc, char** argv) {
     {
         if (AJob.IOEntries.find("inPdbName") !=AJob.IOEntries.end())
         {
+
             std::cout << "Input coordinate file "
                       << AJob.IOEntries["inPdbName"] << std::endl;
+            std::cout << "Output dict file is " << AJob.IOEntries["userOutName"] << std::endl;
             LIBMOL::PDBFile dataFromPdb(AJob.IOEntries["inPdbName"].c_str(), std::ios::in);
             LIBMOL::MolGenerator  aMolCreator(dataFromPdb);
             aMolCreator.executePdb(AJob.IOEntries["userOutName"].c_str(), AJob.workMode);

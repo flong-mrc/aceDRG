@@ -948,6 +948,13 @@ namespace LIBMOL {
                 AllSystem  aTargetMol( allMolecules[0], tmpLib);
 
                 aTargetMol.setupAllAngleValuesFromCoords();
+
+                fixTorIDs(aTargetMol.allTorsions,
+                          aTargetMol.allAtoms,
+                          aTargetMol.allBonds,
+                          aTargetMol.allPlanes,
+                          aTargetMol.lMdPls);
+
                 setupMiniTorsions(aTargetMol.allTorsions,
                                   aTargetMol.allAtoms,
                                   aTargetMol.allBonds,
@@ -970,17 +977,16 @@ namespace LIBMOL {
                             aTargetMol.allRingsV,
                             aTargetMol.allPlanes,
                             aTargetMol.allChirals);
-                exit(1);
-
 
             }
-            //int aMode =1;
-            //for (unsigned i=0; i < allMolecules.size(); i++)
-            //{
-            //    outMolMmcif(tOutName, allMolecules[i].id, allMolecules[i], aMode);
-            //}
+            else
+            {
+                int aMode =0;
+
+                outMolMmcif(tOutName, allMolecules[0].id, allMolecules[0], aMode);
+
+            }
         }
-        exit(1);
     }
 
     void MolGenerator::setAllPropsFromCoords(Molecule & tMol)
@@ -3435,9 +3441,11 @@ namespace LIBMOL {
             //if (allAtoms[i].sId=="555")
             //{
             //j++;
-            //std::cout << "Look for bonds to atom " << allAtoms[i].id
-            //          << "(serial number  " << allAtoms[i].seriNum
-            //          << ") " << std::endl;
+            std::cout << "=====================================" << std::endl;
+            std::cout << "Look for bonds to atom " << allAtoms[i].id
+                      << "(serial number  " << allAtoms[i].seriNum
+                      << ") " << std::endl;
+            std::cout << "=====================================" << std::endl;
             bool lMetal = false;
             if (allAtoms[i].isMetal)
             {
@@ -3526,14 +3534,14 @@ namespace LIBMOL {
                     covalent_sensitivity = covalent_sensitivity2;
                 }
 
-                // std::cout << "covalent_sensitivity="
+                //std::cout << "covalent_sensitivity="
                 //           << covalent_sensitivity << std::endl;
 
                 getBondingRangePairAtoms2(allAtoms[i], allAtoms[(*iNB)],
                                           covalent_sensitivity, tPTab,
                                           bondRange);
 
-                /*
+
                 if (lMetal)
                 {
 
@@ -3574,7 +3582,7 @@ namespace LIBMOL {
                                       << " and " << bondRange[1] << std::endl;
 
                 }
-                */
+
 
                 if (bondRange[0] > 0.20 && bondRange[1] > 0.20)
                 {

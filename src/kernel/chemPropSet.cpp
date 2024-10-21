@@ -199,8 +199,16 @@ namespace LIBMOL
                 {
                     if (iAt->charge==-1.0)
                     {
-                        iAt->chiralIdx  = 2;
-                        iAt->bondingIdx = 3;
+                        if (t_m_len==1)
+                        {
+                            iAt->chiralIdx  = 0;
+                            iAt->bondingIdx = 2;
+                        }
+                        else
+                        {
+                            iAt->chiralIdx  = 2;
+                            iAt->bondingIdx = 3;
+                        }
                     }
                     else
                     {

@@ -9646,7 +9646,7 @@ namespace LIBMOL
                     //          << iT->atoms[2] << std::endl
                     //          << iT->atoms[3] << std::endl;
 
-                    outRestrF << longName
+                    outRestrF << longName      << "      "
                               << std::setw(22) << iT->id
                               << std::setw(12)  << tAtoms[iT->atoms[0]].id
                               << std::setw(12)  << tAtoms[iT->atoms[1]].id
@@ -9692,25 +9692,22 @@ namespace LIBMOL
 
                 // First the input chirals
                 std::vector<ID>   inputChiralID;
+
                 for (std::vector<ChiralDict>::iterator iCh = tChs.begin();
                         iCh != tChs.end(); iCh++)
                 {
-
-                        inputChiralID.push_back(iCh->archID);
+                    if (iCh->sign.find("zero") == std::string::npos)
+                    {
                         outRestrF << longName << "    "
-                                  << iCh->id  << "    ";
-                        int numCh=0;
+                                  << iCh->id  << "    "
+                                  << tAtoms[iCh->archPos].id << "    ";
                         for (std::vector<int>::iterator iAt=iCh->atoms.begin();
                                iAt != iCh->atoms.end(); iAt++)
                         {
-                            if (numCh < 4)
-                            {
-                                outRestrF << tAtoms[*iAt].id << "    ";
-                                numCh++;
-                            }
+                            outRestrF << tAtoms[*iAt].id << "    ";
                         }
                         outRestrF << iCh->sign << std::endl;
-
+                    }
                 }
                 // New chiral that are not in the input list
                 /*

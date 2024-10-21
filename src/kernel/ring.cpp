@@ -301,6 +301,7 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=atoms.begin();
                 iA !=atoms.end(); iA++)
         {
+            //std::cout << iA->id << "   " << iA->bondingIdx << std::endl;
             if (iA->bondingIdx !=2 && iA->chemType.compare("N") !=0)
             {
 
@@ -313,8 +314,8 @@ namespace LIBMOL
         {
             isPlanar = lSP2;
         }
-        std::cout << "Here ring " << rep << std::endl;
-        std::cout << " is planar " << lSP2 << std::endl;
+        //std::cout << "1. Here ring " << rep << std::endl;
+        //std::cout << " is planar " << lSP2 << std::endl;
     }
 
     void RingDict::setBondIdxs(std::vector<BondDict> & tBonds, int & tStartIdx)
@@ -732,8 +733,8 @@ namespace LIBMOL
         // std::cout << "Number of rings " << tAllRings.size() << std::endl;
         for (unsigned i=0; i < tAllRings.size(); i++)
         {
-            std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
-            std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
+            //std::cout << "Ring " <<  tAllRings[i].rep << std::endl;
+            //std::cout << "Is planar " << tAllRings[i].isPlanar << std::endl;
             if (tAllRings[i].isPlanar && std::find(DoneList.begin(), DoneList.end(), i) ==DoneList.end())
             {
 
@@ -744,11 +745,11 @@ namespace LIBMOL
                 curLinkedRing.push_back(i);
                 findAllRingsConnectedOneRing(i, tAllRings,DoneList, curLinkedRing);
 
-                std::cout << "those are connected : " << std::endl;
-                for (unsigned cr=0; cr < curLinkedRing.size(); cr++)
-                {
-                    std::cout << tAllRings[curLinkedRing[cr]].rep << std::endl;
-                }
+                //std::cout << "those are connected : " << std::endl;
+                //for (unsigned cr=0; cr < curLinkedRing.size(); cr++)
+                //{
+                //    std::cout << tAllRings[curLinkedRing[cr]].rep << std::endl;
+                // }
 
                 if (curLinkedRing.size() > 1)
                 {
@@ -1004,10 +1005,10 @@ namespace LIBMOL
             numOneAtm2 = setPiForOneAtomAll(*iAt, tAtoms, tMode);
             //}
 
-            std::cout << "XXX here Atom " << tAtoms[*iAt].id
-                  << " its charge " << tAtoms[*iAt].charge << std::endl
-                  << " add " << numOneAtm1 << " or "
-                  <<  numOneAtm2 << " pi atoms" << std::endl;
+            //std::cout << "XXX here Atom " << tAtoms[*iAt].id
+            //      << " its charge " << tAtoms[*iAt].charge << std::endl
+            //      << " add " << numOneAtm1 << " or "
+            //      <<  numOneAtm2 << " pi atoms" << std::endl;
 
             if (numOneAtm1 > 0.0)
             {
@@ -1028,8 +1029,8 @@ namespace LIBMOL
         {
             numPiAll= numPiAll1;
         }
-        std::cout << "number of pi electron in the system is "
-                  <<  numPiAll << std::endl;
+        //std::cout << "number of pi electron in the system is "
+        //          <<  numPiAll << std::endl;
 
         return numPiAll;
 
@@ -1054,17 +1055,17 @@ namespace LIBMOL
             //}
             //else
             //{
-            std::cout << "2 Atom " << tAtoms[*iAt].id
-                      << " its charge " << tAtoms[*iAt].charge << std::endl
-                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            //std::cout << "2 Atom " << tAtoms[*iAt].id
+            //          << " its charge " << tAtoms[*iAt].charge << std::endl
+            //          << " add " << numOneAtm << " pi atoms" << std::endl;
 
             numOneAtm = setPiForOneAtom(*iAt, tAtoms, tBonds);
             //}
 
 
-            std::cout << "3 Atom " << tAtoms[*iAt].id
-                      << " its charge " << tAtoms[*iAt].charge << std::endl
-                      << " add " << numOneAtm << " pi atoms" << std::endl;
+            //std::cout << "3 Atom " << tAtoms[*iAt].id
+            //          << " its charge " << tAtoms[*iAt].charge << std::endl
+            //          << " add " << numOneAtm << " pi atoms" << std::endl;
             if (numOneAtm > 0.0)
             {
                 numPiAll +=numOneAtm;
@@ -1090,6 +1091,17 @@ namespace LIBMOL
         //std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         //std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
         //          << std::endl;
+
+        int mConn = 0;
+        for (std::vector<int>::iterator iC=tAtoms[tIdx].connAtoms.begin();
+                  iC != tAtoms[tIdx].connAtoms.end(); iC++)
+        {
+            if (tAtoms[*iC].isMetal)
+            {
+                mConn +=1;
+            }
+        }
+
         if (tAtoms[tIdx].bondingIdx ==2)
         {
 
@@ -1202,7 +1214,18 @@ namespace LIBMOL
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==3)
                         {
-                            aN =2.0;
+                            if (mConn==1)
+                            {
+                                aN=1.0;
+                            }
+                            else if (mConn==2)
+                            {
+                                aN=0.0;
+                            }
+                            else
+                            {
+                                aN =2.0;
+                            }
                         }
                         else if (tAtoms[tIdx].connAtoms.size() ==2)
                         {
@@ -1308,17 +1331,30 @@ namespace LIBMOL
         /*
         std::cout << "atom " << tAtoms[tIdx].id << std::endl;
         std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
+        std::cout << "mConn is " << mConn << std::endl;
         std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
         std::cout << "Pi atom added " << aN  << std::endl;
         */
+
         return aN;
     }
 
     extern REAL setPiForOneAtom(int tIdx, std::vector<AtomDict> & tAtoms,
                                 int tMode)
     {
+
+        int mConn = 0;
+        for (std::vector<int>::iterator iC=tAtoms[tIdx].connAtoms.begin();
+                  iC != tAtoms[tIdx].connAtoms.end(); iC++)
+        {
+            if (tAtoms[*iC].isMetal)
+            {
+                mConn +=1;
+            }
+        }
+
         REAL aN=0.0;
         if (tAtoms[tIdx].bondingIdx ==2)
         {
@@ -1432,7 +1468,18 @@ namespace LIBMOL
                     {
                         if (tAtoms[tIdx].connAtoms.size() ==3)
                         {
-                            aN =2.0;
+                            if (mConn==1)
+                            {
+                                aN=1.0;
+                            }
+                            else if (mConn==2)
+                            {
+                                aN=0.0;
+                            }
+                            else
+                            {
+                                aN =2.0;
+                            }
                         }
                         else if (tAtoms[tIdx].connAtoms.size() ==2)
                         {
@@ -1537,20 +1584,19 @@ namespace LIBMOL
             {
                 if (tAtoms[tIdx].connAtoms.size()==4)
                 {
-
                     aN=1.0;
                 }
             }
         }
 
-
+        /*
         std::cout << "atom " << tAtoms[tIdx].id << std::endl;
         std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
         std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
         std::cout << "Pi atom added " << aN  << std::endl;
-
+        */
 
         return aN;
     }
@@ -1806,8 +1852,8 @@ namespace LIBMOL
         std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
                   << std::endl;
         std::cout << "Pi atom added " << aN  << std::endl;
-
         */
+
 
         return aN;
     }
@@ -2063,14 +2109,15 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             }
         }
 
-
-        //std::cout << "atom " << tAtoms[tIdx].id << std::endl;
-        //std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
-        //std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
-        //std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
-        //          << std::endl;
-        //std::cout << "Pi atom added " << aN  << std::endl;
-
+        /*
+        std::cout << "HereM2 " << std::endl;
+        std::cout << "atom "  << tAtoms[tIdx].id << std::endl;
+        std::cout << "bond idx " << tAtoms[tIdx].bondingIdx <<std::endl;
+        std::cout << "charge is " << tAtoms[tIdx].charge << std::endl;
+        std::cout << "formalCharge is " << tAtoms[tIdx].formalCharge
+                  << std::endl;
+        std::cout << "Pi atom added " << aN  << std::endl;
+        */
 
         return aN;
     }
@@ -2080,7 +2127,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
     {
         REAL aN=0.0;
 
-         std::cout << "NOT " << std::endl;
+         //std::cout << "NOT " << std::endl;
 
         return aN;
     }
@@ -2089,7 +2136,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
     extern REAL setPiForOne_S_Sp3_Atom(int tIdx, std::vector<int>  & tAtmIdx,
                                       std::vector<AtomDict> & tAtoms)
     {
-        std::cout << "find num of pi electrons for sp3 S " << std::endl;
+        //std::cout << "find num of pi electrons for sp3 S " << std::endl;
 
         REAL aN=1.0;
 
@@ -2203,12 +2250,13 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
         // Check aromaticity for individual rings
 
         std::vector<RingDict> tAroRings;
-        std::cout << "\nCheck aromaticity for individual ring " << std::endl;
+        std::cout << "\n1. Check aromaticity for individual ring " << std::endl;
         for (std::vector<RingDict>::iterator iR=tAllRings.begin();
                 iR !=tAllRings.end(); iR++)
         {
             // bool lS_sp3 = false;
             std::cout << "Ring " << iR->rep << std::endl;
+            std::cout << "is Planar " << iR->isPlanar << std::endl;
             std::vector<int> atmIdx;
             for (std::vector<AtomDict>::iterator iAt=iR->atoms.begin();
                     iAt !=iR->atoms.end(); iAt++)

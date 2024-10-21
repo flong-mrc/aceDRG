@@ -5608,6 +5608,90 @@ namespace LIBMOL
             iAn->setValue(allAtoms);
             iAn->sigValue = 3.00;
         }
+        int idxCh=1;
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+             iAt != allAtoms.end(); iAt++)
+        {
+            // extra conditions in case of O and S may be in sp3 states
+            ;
+            if (iAt->bondingIdx==3 && iAt->connAtoms.size() >2)
+            {
+                if (iAt->connHAtoms.size() <2)
+                {
+                    int idxH=-1;
+                    std::vector<int> idxNonH;
+                    for (std::vector<int>::iterator iConn=iAt->connAtoms.begin();
+                         iConn !=iAt->connAtoms.end(); iConn++)
+                    {
+                        if(allAtoms[*iConn].chemType !="H")
+                        {
+                            idxNonH.push_back(*iConn);
+                        }
+                        else
+                        {
+                            idxH = *iConn;
+                        }
+                    }
+
+                    ChiralDict aChiral;
+                    std::vector<std::vector<double> > aSetVects;
+                    aChiral.archPos = iAt->seriNum;
+                    if (idxNonH.size() >=3)
+                    {
+                        for (unsigned i=0; i < 3; i++)
+                        {
+                            aChiral.atoms.push_back(idxNonH[i]);
+                        }
+                    }
+                    else if (idxNonH.size()==2 && idxH !=-1)
+                    {
+                        for (unsigned i=0; i < 2; i++)
+                        {
+                            aChiral.atoms.push_back(idxNonH[i]);
+                        }
+                        aChiral.atoms.push_back(idxH);
+                    }
+
+                    if (aChiral.atoms.size()==3)
+                    {
+                        if (iAt->coords.size() ==3 &&
+                            allAtoms[aChiral.atoms[0]].coords.size()==3 &&
+                            allAtoms[aChiral.atoms[1]].coords.size()==3 &&
+                            allAtoms[aChiral.atoms[2]].coords.size()==3)
+                        {
+                            std::vector<double> v1, v2, v3;
+                            for (unsigned j=0; j < 3; j++)
+                            {
+                                v1.push_back(allAtoms[aChiral.atoms[0]].coords[j]
+                                        - iAt->coords[j]);
+                                v2.push_back(allAtoms[aChiral.atoms[1]].coords[j]
+                                        - iAt->coords[j]);
+                                v3.push_back(allAtoms[aChiral.atoms[2]].coords[j]
+                                        - iAt->coords[j]);
+                            }
+                            aChiral.value = calChiralVol(v1, v2, v3);
+                            if (aChiral.value > 0.0001)
+                            {
+                                aChiral.sign = "positive";
+                            }
+                            else if (aChiral.value < -0.0001)
+                            {
+                                aChiral.sign = "negative";
+                            }
+                            else
+                            {
+                                aChiral.sign = "zero";
+                            }
+                            aChiral.id = "chir_" + IntToStr(idxCh);
+                            std::cout << "chiral " << aChiral.id << std::endl;
+                            allChirals.push_back(aChiral);
+                            idxCh++;
+
+                        }
+                    }
+                }
+            }
+        }
 
     }
 

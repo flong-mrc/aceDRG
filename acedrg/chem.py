@@ -126,6 +126,7 @@ class ChemCheck(object):
             if not aAtomElem in self.organicSec:
                 organicOnly = False
                 break;
+        """
         if not organicOnly :
             print("The input ligands/molecules contains metal or other heavier atoms ")
             print("Acedrg currently deals with ligands/molecules with following elements only ")
@@ -135,7 +136,8 @@ class ChemCheck(object):
             print ("Can not get the element symbols of atoms. Check input file format")
             print("Error : The job stops because of errors")
             organicOnly = False
-
+        """
+        
         return organicOnly 
 
      
@@ -325,7 +327,7 @@ class ChemCheck(object):
             # SMILES string in from a commandline  
             aSmiStr = tFileName.strip()
         if len(aSmiStr):
-            checkMol=Chem.MolFromSmiles(aSmiStr)
+            checkMol=Chem.MolFromSmiles(aSmiStr, sanitize=False)
   
             if checkMol:
                 for aAtom in checkMol.GetAtoms():

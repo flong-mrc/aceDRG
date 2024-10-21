@@ -146,6 +146,7 @@ class AcedrgRDKit(object):
         # if self.numSelectForRefConfs < 25:
         #    self.numSelectForRefConfs = 25
         self.numSelectForRefConfs = 20
+        
 
     def setRepSign(self):
 
@@ -394,7 +395,82 @@ class AcedrgRDKit(object):
                 self.molecules = []
             """
 
-    def checkAAAndSetAAAtomNames(self, tMol):
+    def setSimpleCifFromOneMol(self, tFileType, tInFileName, tOutFileName, tMonoRoot, tChemCheck):
+        
+        if tFileType=="smi":
+            if os.path.isfile(tInFileName):
+                # SMILES string in a file
+                try:
+                    fSmi = open(tInFileName, "r")
+                except IOError:
+                    print("% can not be open for reading "%tInFileName)
+                    sys.exit()
+                else:
+                    aSmiStr = fSmi.read()
+                    tSmiStr = aSmiStr.strip().split()
+                    if len(tSmiStr) >0 :
+                        aSmiStr = tSmiStr[0].strip()
+                    else:
+                        print("String format error")
+                        sys.exit()    
+                    fSmi.close()
+            else:
+                # SMILES string in from a commandline  
+                aSmiStr = tInFileName.strip()
+
+            if len(aSmiStr):
+                aMol1=Chem.MolFromSmiles(aSmiStr, sanitize=False)
+                aMol2=self.set_all_metal_dative_bonds(aMol1)
+                aMol3=Chem.AddHs(aMol2)
+                Chem.Kekulize(aMol3)
+                if not aMol3:
+                    print("Molecules can not generated  from file %s ! " % tInFileName)
+                    print("Check your file format ")
+                    sys.exit(1)
+                else:
+                    aMol3.SetProp("ResidueName", tMonoRoot)
+                    print("A molecule with residue name %s is generated" %
+                    aMol3.GetProp("ResidueName"))
+                    self.MolToSimplifiedMmcifNoComf(aMol3, tOutFileName, tChemCheck, tMonoRoot)
+                    
+    def is_metal(self, at):
+        # Change that to all metal later on 
+        n = at.GetAtomicNum()
+        return (n>2 and n<5) or (n>10 and n < 14) or (n>18 and n<=30) or (n>=37 and n<=52) \
+               or (n>=55 and n<=85) or (n>=87 and n<=103)
+        
+    
+    def is_transition_metal(self, at):
+        # Change that to all metal later on 
+        n = at.GetAtomicNum()
+        return (n>=22 and n<=29) or (n>=40 and n<=47) or (n>=72 and n<=79)
+    
+    def set_all_metal_dative_bonds(self, mol):
+        """ convert some bonds to dative
+
+        Replaces some single bonds between metals and atoms with atomic numbers in fomAtoms
+        with dative bonds. The replacement is only done if the atom has "too many" bonds.
+
+        Returns the modified molecule.
+
+        """
+
+        pt = Chem.GetPeriodicTable()
+        rwmol = Chem.RWMol(mol)
+        rwmol.UpdatePropertyCache(strict=False)
+        #metals = [at for at in rwmol.GetAtoms() if self.is_transition_metal(at)]
+        metals = [at for at in rwmol.GetAtoms() if self.is_metal(at)]
+        for metal in metals:
+            for nbr in metal.GetNeighbors():
+                if nbr.GetExplicitValence()>pt.GetDefaultValence(nbr.GetAtomicNum()) and \
+                   rwmol.GetBondBetweenAtoms(nbr.GetIdx(),metal.GetIdx()).GetBondType() == Chem.BondType.SINGLE:
+                   rwmol.RemoveBond(nbr.GetIdx(),metal.GetIdx())
+                   rwmol.AddBond(nbr.GetIdx(),metal.GetIdx(),Chem.BondType.DATIVE)
+        return rwmol
+    
+    
+            
+    def checkAAAndSetAAAtomNames(self, tMol, tOutFileName, tChemCheck):
 
         nMax = 0
         maxM = {}
@@ -1697,10 +1773,15 @@ class AcedrgRDKit(object):
 
         #  Setup conformers for the molecules
         if self.useExistCoords:
-            confIds = AllChem.EmbedMultipleConfs(
+            if self.numInitConformers <=10:
+                confIds = AllChem.EmbedMultipleConfs(
                 tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1, clearConfs=False)
+            else:
+                confIds = AllChem.EmbedMultipleConfs(
+                tMol, self.numInitConformers, maxAttempts=0, randomSeed=-1)
             tReq = self.numInitConformers
             nNewCon = len(confIds)
+            #print("nNewCon=", nNewCon)
             while nNewCon == 0 and tReq <= 5:
                 tReq += 1
                 confIds = AllChem.EmbedMultipleConfs(
@@ -1724,8 +1805,9 @@ class AcedrgRDKit(object):
             confIds = self.generateMultiComformersByRDKit(tMol)
         
         nConf = tMol.GetNumConformers()
+        #print("nConf=", nConf)
         if nConf:
-            #print("Number of initial conformers requested", self.numInitConformers)
+            print("Number of initial conformers requested", self.numInitConformers)
             #print("Number of number of opt step requested for each conformer ", self.numRDKitOptmSteps)
             #print("Number of new conformers ", len(confIds))
             #print("Number of initial conformers obtained", nConf)
@@ -1758,7 +1840,7 @@ class AcedrgRDKit(object):
                         tMol, self.numRDKitOptmSteps, self.nMaxIters, aCIdx)
                 except:
                     # If RDKit can not optimize the conformers, then use the existing conformers and use the formal energies
-                    print("Conformer ", aCIdx, " not optimized ")
+                    #print("Conformer ", aCIdx, " not optimized ")
                     #aForceField = AllChem.UFFGetMoleculeForceField(tMol, confId=aCIdx)
                     #aEng        = aForceField.CalcEnergy()
                     if iFormalE == 0:
@@ -1770,15 +1852,16 @@ class AcedrgRDKit(object):
                         # print "Conf : ", aCIdx, " Engergy : ", formalE
                         rdmolops.AssignAtomChiralTagsFromStructure(tMol, aCIdx)
                 else:
-                    # print "opted id ", aId
+                    #print("opted id ", aCIdx)
                     aForceField = AllChem.UFFGetMoleculeForceField(
                         tMol, confId=aCIdx)
                     aEng = aForceField.CalcEnergy()
                     if aEng not in self.conformerEngMap:
                         self.conformerEngMap[aEng] = []
                     self.conformerEngMap[aEng].append(aCIdx)
-                    # print "Conf : ", aCIdx, " Engergy : ", aEng
+                    #print("Conf : ", aCIdx, " Engergy : ", aEng)
                     rdmolops.AssignAtomChiralTagsFromStructure(tMol, aCIdx)
+            #print(self.conformerEngMap)
             if len(self.conformerEngMap):
                 # print "Current conformers have %d energy levels from UFF force field "%len(self.conformerEngMap)
                 # print "They are : "
@@ -1809,7 +1892,7 @@ class AcedrgRDKit(object):
                         for aCId in self.conformerEngMap[aEng]:
                             if nID < self.numSelectForRefConfs:
                                 self.selecConformerIds.append(aCId)
-                                #print("Conformer ID: ", aCId, " UFF energy : ", aEng)
+                                print("Conformer ID: ", aCId, " UFF energy : ", aEng)
                                 nID += 1
                             else:
                                 break
@@ -1939,7 +2022,7 @@ class AcedrgRDKit(object):
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
         
 
-        Chem. Mol(tMol)
+        Chem.SanitizeMol(tMol)
         Chem.Kekulize(tMol)
         # Check 
         for aAtom in tMol.GetAtoms():
@@ -2070,6 +2153,8 @@ class AcedrgRDKit(object):
                 # print "Atom ", aAtom.GetProp("Name")
                 # print "Is it a temporal chiral center ", aAtom.HasProp("TmpChiral")
             # self.showInfoAboutAtomsAndBonds(aMol, 2)
+            #print("self.useExistCoords2 ", self.useExistCoords2)
+            #print("self.useExistCoords ", self.useExistCoords)
             if not self.useExistCoords2:
                 self.setInitConformersOneMol(aMol)
             else:
@@ -2485,6 +2570,139 @@ class AcedrgRDKit(object):
                 self.outChiralSection(delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName, tChiDes, tGroupName, tIdxConform )
                 
             aMmCif.close()
+            
+    def MolToSimplifiedMmcifNoComf(self, tMol, tMmcifName, tChemCheck, tMonoName="LIG", tChiDes=None, tGroupName="non-polymer"):
+        
+        
+        # A simplified mmcif file contains:
+        # (1) Header section
+        # (2) Description of atoms in the molecule
+        # (3) Description of bonds in the molecule
+        # This file is mainly used as an input file for Acedrg
+        #print("cif_in name ", tMmcifName)
+        #print("Ligand ID ", tMonoName)
+        #print("Group Name ", tGroupName)
+
+        # if self.reSetSmi:
+        #    self.modifyMol(tMol, allAtoms, allBonds, allChirals, delAtomIdxs, atomsBondedToDel)
+        #    nAt  = len(allAtoms)
+        #    nHAt = tMol.GetNumHeavyAtoms() - len(delAtomIdxs)
+        # else:
+        #Chem.AddHs(tMol)
+        allAtoms = tMol.GetAtoms()
+        allBonds = tMol.GetBonds()
+        nAt = len(allAtoms)
+        nHAt = tMol.GetNumHeavyAtoms()
+        tNameMap = None 
+        self.setNamesForAtomsInMol(tMol, tChemCheck, tNameMap)
+        #Chem.Kekulize(tMol)
+        
+        # print "number of atoms with pseudo-atoms is ", tMol.GetNumAtoms()
+        #print("number of atoms  initially  ", len(allAtoms))
+        try:
+            aMmCif = open(tMmcifName, "w")
+        except IOError:
+            print(tMmcifName, " Could not be opened for reading")
+        else:
+
+            """
+            # Header section
+
+            aMmCif.write("global_\n")
+            aMmCif.write("_lib_name         ?\n")
+            aMmCif.write("_lib_version      ?\n")
+            aMmCif.write("_lib_update       ?\n")
+            aMmCif.write(
+                "# ------------------------------------------------\n")
+            aMmCif.write("#\n")
+            """
+            
+            
+            # Monomer description
+            aMmCif.write("# ---   LIST OF MONOMERS ---\n")
+            aMmCif.write("#\n")
+            aMmCif.write("data_comp_list\n")
+            aMmCif.write("loop_\n")
+            aMmCif.write("_chem_comp.id\n")
+            aMmCif.write("_chem_comp.three_letter_code\n")
+            aMmCif.write("_chem_comp.name\n")
+            aMmCif.write("_chem_comp.group\n")
+            aMmCif.write("_chem_comp.number_atoms_all\n")
+            aMmCif.write("_chem_comp.number_atoms_nh\n")
+            aMmCif.write("_chem_comp.desc_level\n")
+            aMmCif.write("%s       %s        %s        %s       %d     %d   %s\n"
+                         % (tMonoName, tMonoName, "\'.             \'",  tGroupName, nAt, nHAt, "."))
+            aMmCif.write(
+                "# ------------------------------------------------------\n")
+            aMmCif.write(
+                "# ------------------------------------------------------\n")
+            aMmCif.write("#\n")
+            aMmCif.write("# --- DESCRIPTION OF MONOMERS ---\n")
+            aMmCif.write("#\n")
+            aMmCif.write("data_comp_%s\n" % tMonoName)
+            aMmCif.write("#\n")
+
+
+            # Atom section
+            aMmCif.write("loop_\n") 
+            aMmCif.write("_chem_comp_atom.comp_id\n")
+            aMmCif.write("_chem_comp_atom.atom_id\n")
+            aMmCif.write("_chem_comp_atom.alt_atom_id\n")
+            aMmCif.write("_chem_comp_atom.type_symbol\n")
+            aMmCif.write("_chem_comp_atom.type_energy\n")
+            aMmCif.write("_chem_comp_atom.charge\n")
+            aMmCif.write("_chem_comp_atom.x\n")
+            aMmCif.write("_chem_comp_atom.y\n")
+            aMmCif.write("_chem_comp_atom.z\n")
+            #nTetraChi = 0
+            for aAtom in allAtoms:
+                
+                #aChi = aAtom.GetChiralTag()
+                # if aChi != rdchem.ChiralType.CHI_UNSPECIFIED:
+                #print("xxxx Atom ", aAtom.GetProp("Name"))
+                # print "Chiral center ? ", aChi
+                #nTetraChi +=1
+                # elif aAtom.HasProp("TmpChiral") !=0:
+                #    nTetraChi +=1
+                aName    = aAtom.GetProp("Name")
+                aAltName = ""
+                if aAtom.HasProp("altName"):
+                    aAltName = aAtom.GetProp("altName")
+                else:
+                    aAltName = aName
+                aElem = aAtom.GetSymbol().upper()    
+                x =0.0
+                y =0.0
+                z =0.0
+                
+                aMmCif.write("%s         %s      %s      %s     %s     %3.2f   %5.4f    %5.4f     %5.4f\n"
+                             % (tMonoName, aName, aAltName, aElem,
+                                aAtom.GetSymbol(), float(aAtom.GetFormalCharge()), x, y, z))
+            # Bond section
+            aMmCif.write("loop_\n")
+            aMmCif.write("_chem_comp_bond.comp_id\n")
+            aMmCif.write("_chem_comp_bond.atom_id_1\n")
+            aMmCif.write("_chem_comp_bond.atom_id_2\n")
+            aMmCif.write("_chem_comp_bond.type\n")
+            
+            for aBond in allBonds:
+                atom1 = aBond.GetBeginAtom()
+                name1 = atom1.GetProp("Name")
+                atom2 = aBond.GetEndAtom()
+                name2 = atom2.GetProp("Name")
+
+                bType = ""
+                # print "Bond between atoms %s and %s is %s "%(name1, name2, aBond.GetBondType())
+                if aBond.HasProp("SpecialBond"):
+                    bType = aBond.GetProp("SpecialBond")
+                else:
+                    bType = aBond.GetBondType()
+
+                
+                aMmCif.write("%s       %s       %s       %s    \n"
+                             % (tMonoName, name1, name2,  bType))
+        
+        
             
     def outChiralSection(self, delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName="LIG", tChiDes=None, 
                           tGroupName="non-polymer", tIdxConform=0):

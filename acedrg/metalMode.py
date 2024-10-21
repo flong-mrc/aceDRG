@@ -17,7 +17,7 @@ from .  utility    import getLinkedGroups
 
 class metalMode(CExeCode):
 
-    def __init__( self, tTabLoc):
+    def __init__( self, tTabLoc, tInitConfs=10):
         
         self.acedrgTables         = tTabLoc
         self.exeAcedrg            = "acedrg"
@@ -55,6 +55,8 @@ class metalMode(CExeCode):
         
         self.monomRoot        = ""
         self.outRoot          = ""
+        
+        self.initConfs        = int(tInitConfs)
 
         self.getRadii() 
         
@@ -1263,11 +1265,11 @@ class metalMode(CExeCode):
     def writeNewBondCifLine(self, tLines):
         
         for aB in self.metalBonds:
-            aType = ""
-            if '_chem_comp_bond.value_order' in aB.keys():
-                aType = aB['_chem_comp_bond.value_order']
-            elif '_chem_comp_bond.type' in aB.keys():
-                aType = aB['_chem_comp_bond.type']
+            aType = "SINGLE"
+            #if '_chem_comp_bond.value_order' in aB.keys():
+            #    aType = aB['_chem_comp_bond.value_order']
+            #elif '_chem_comp_bond.type' in aB.keys():
+            #    aType = aB['_chem_comp_bond.type']
             aLine = "%s%s%s%s%s%s%s%s%s\n"\
                   % (self.monomRoot.ljust(8),
                      aB['_chem_comp_bond.atom_id_1'].ljust(10), 
@@ -1378,8 +1380,11 @@ class metalMode(CExeCode):
             for aM in self.connMAMap[aK]:
                 aMC.write("BONDING  %s%s\n"%(aK.ljust(10), aM.ljust(10)))
         aMC.close()    
-        
-        self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s -K "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
+        if self.initConfs <=10:
+            self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s -K "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
+        else:
+            self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s -K -j %d"%(self.exeAcedrg, tInCif, 
+                                                                            self.monomRoot, tOutRoot, aMtConnFileName, self.initConfs)
         self._log_name  = tOutRoot + "_acedrg.log"
         #print(self._cmdline)
         self.runExitCode = self.subExecute()

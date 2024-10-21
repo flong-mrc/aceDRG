@@ -218,14 +218,14 @@ class Acedrg(CExeCode ):
 
         #print "input RDKit: userExistCoords ? ", self.rdKit.useExistCoords
         #print "input RDKit: number of optimization iters ", self.rdKit.numRDKitOptmSteps
-        #print "input RDKit: number of initial conformers ", self.rdKit.numInitConformers
+        print("input RDKit: number of initial conformers ", self.rdKit.numInitConformers)
         #print "input RDKit: number of output conformers ", self.rdKit.numConformers
 
         self.fileConv         = FileTransformer()   
             
         self.chemCheck        = ChemCheck() 
         
-        self.metalMode        = metalMode(self.acedrgTables)
+        self.metalMode        = metalMode(self.acedrgTables, self.rdKit.numInitConformers)
         
         self.initMmcifMolMap  = {}
 
@@ -817,8 +817,7 @@ class Acedrg(CExeCode ):
                     if t_inputOptionsP.keku:
                         self.workMode = 114
                     else:
-                        self.workMode    = 11       
-                
+                        self.workMode    = 11            
                 elif t_inputOptionsP.inSmiName: 
                     self.inSmiName = t_inputOptionsP.inSmiName
                     self.workMode    = 12            
@@ -1207,12 +1206,20 @@ class Acedrg(CExeCode ):
             print("===================================================================") 
             print("| Generate the dictionary file using the internal database        |")
             print("===================================================================") 
-            if tIdxMol !=-1: 
-                self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.rst")   
-                self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.pdb")
+            if self.workMode != 16 and self.workMode != 162:
+                if tIdxMol !=-1: 
+                    self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.rst")   
+                    self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod.pdb")
+                else:
+                    self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")   
+                    self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_cod.pdb")
             else:
-                self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")   
-                self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_cod.pdb")
+                if tIdxMol !=-1: 
+                    self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod_ku.rst")   
+                    self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_mol_" + str(tIdxMol) + "_cod_ku.pdb")
+                else:
+                    self.outRstCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod_ku.rst")   
+                    self.outRstPdbName   = os.path.join(self.scrDir, self.baseRoot + "_cod_ku.pdb")
         if self.workMode == 51:
             self.outRstCifName   =  self.baseRoot + "_bondOrder.list"
         if self.workMode == 11 or self.workMode == 12 \
@@ -1269,9 +1276,11 @@ class Acedrg(CExeCode ):
             if self.workMode ==162:
                 self._cmdline += " -E yes "    
             
-            print(self._cmdline)
-        
-            self.runExitCode = self.subExecute()
+            #print(self._cmdline)
+            
+            self.runExitCode =os.system(self._cmdline + ">%s"%self._log_name)
+            #print(self.runExitCode)
+            #self.runExitCode = self.subExecute()
             
         if self.workMode in [21, 211] :
             if tIn:
@@ -1676,13 +1685,19 @@ class Acedrg(CExeCode ):
                 self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
                 if tMol[1].find("HasMetal") !=-1:
                     self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
-            print("here1 ", self._cmdline)
             self.subExecute()
             if os.path.isfile(aOutFile):
                 print("The dictionary file for the molecules is %s"%aOutFile)
-            
-      
-    
+                
+        elif self.workMode ==1211:  
+            if os.path.isfile(tMol):
+                self._log_name        = os.path.join(self.scrDir,  self.baseRoot + "_acedrg.log")
+                self._cmdline         = self.exeAcedrg
+                self._cmdline +=      " -c %s   -r %s -o %s -j 100 "%(tMol, self.monomRoot, self.baseRoot)
+                #print(self._cmdline)
+                self.subExecute()
+                
+                 
     def runServalcat(self, tRoot, tInCif=None):
         
         
@@ -2093,7 +2108,31 @@ class Acedrg(CExeCode ):
                         tOutCif.write(aSLine) 
                     
                 
-                
+    def getFinalOutputFiles3(self, tCifInName, tCifOutName):
+        
+        if os.path.isfile(tCifInName):
+            try: 
+                tCifIn = open(tCifInName, "r")
+            except IOError:
+                print("%s can not be opened for reading"%tCifInName)
+                sys.exit(1)
+            else:
+                allCifLines = tCifIn.readlines()
+                tCifIn.close()
+                try:
+                    tOutCif = open(tCifOutName, "w")
+                    print("The final output cif name ", tCifOutName)
+                except IOError:
+                    print("%s can not be opened for write"%tCifOutName)
+                    sys.exit()
+                else:
+                    for aL in allCifLines:
+                        tOutCif.write(aL)
+                    if len(self.outCifGlobSect):
+                        tOutCif.write("\n")
+                        for aL in self.outCifGlobSect:
+                            tOutCif.write(aL)
+                    tOutCif.close()
 
     def transCoordsPdbToCif(self, tPdbInName, tCifInName, tCifOutName, tMol=-1, tDataDescriptor=None, tStrDescriptors=None,tDelocList=None):
         
@@ -3126,7 +3165,7 @@ class Acedrg(CExeCode ):
         #if self.useExistCoords or self.workMode==16 or self.workMode==161:
         #    print("One of output conformers will using input coordinates as the initial one")
         print("workMode : ", self.workMode)
-    
+        
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
             if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
@@ -3439,7 +3478,8 @@ class Acedrg(CExeCode ):
                                         self.runServalcat(self.outRoot, aMetCoordInCif)  
                                         aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif") 
                                         if os.path.isfile(aSOutName):
-                                            finalOutName = self.outRoot + "_final.cif"
+                                            #finalOutName = self.outRoot + "_final.cif"
+                                            finalOutName = self.outRoot + ".cif"
                                             shutil.copy(aSOutName, finalOutName) 
                                             print("The final output cif is ", finalOutName)
                                     else:
@@ -3450,7 +3490,8 @@ class Acedrg(CExeCode ):
                                     self.runServalcat(aRoot, aFinInCif)
                                     aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
                                     if os.path.isfile(aSOutName):
-                                        finalOutName = self.outRoot + "_final.cif"
+                                        #finalOutName = self.outRoot + "_final.cif"
+                                        finalOutName = self.outRoot + ".cif"
                                         self.cleanSFile(aSOutName, finalOutName)
                                         #print("The tmp3 output is %s "%aTmp3Cif)
                                         print("The final output cif is %s"%finalOutName)
@@ -3464,7 +3505,8 @@ class Acedrg(CExeCode ):
                                 aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
                                 print("aSOutName", aSOutName)
                                 if os.path.isfile(aSOutName):
-                                    finalOutName = self.outRoot + "_final.cif"
+                                    #finalOutName = self.outRoot + "_final.cif"
+                                    finalOutName = self.outRoot + ".cif"
                                     self.cleanSFile(aSOutName, finalOutName)
                                     #print("The tmp3 output is %s "%aTmp3Cif)
                                     print("The final output cif is %s"%finalOutName)
@@ -3526,13 +3568,21 @@ class Acedrg(CExeCode ):
                                          self.fileConv.inputCharge) 
                     
         if self.workMode == 12 or self.workMode == 121 or self.workMode==52 :
-          
             # The input file is  a SMILES file
-            if os.path.isfile(self.inSmiName) : # and self.chemCheck.isOrganic(self.inSmiName, self.workMode):
-                self.rdKit.reSetSmi = True
-                self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
-                if len(self.rdKit.monoName) !=0:
-                    self.monomRoot = self.rdKit.monoName  
+            if os.path.isfile(self.inSmiName) : 
+                
+                if self.chemCheck.isOrganic(self.inSmiName, self.workMode):
+                    self.rdKit.reSetSmi = True
+                    self.rdKit.initMols("smi", self.inSmiName, self.monomRoot, self.chemCheck, self.inputPara["PH"], self.numConformers)
+                    if len(self.rdKit.monoName) !=0:
+                        self.monomRoot = self.rdKit.monoName
+                else:
+                    interMedCifName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.cif")
+                    self.rdKit.setSimpleCifFromOneMol("smi", self.inSmiName, interMedCifName, self.monomRoot, self.chemCheck)
+                    self.workMode =1211
+                    
+                    
+            
          
         if self.workMode == 13 or self.workMode == 131 or self.workMode==53:
                 
@@ -3639,21 +3689,28 @@ class Acedrg(CExeCode ):
         elif self.workMode == 16 or self.workMode == 161 or self.workMode==162:
             if os.path.isfile(self.inPdbName):
                 self.runLibmol()
-                newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod.rst")
-                if self.workMode==162:
-                    sys.exit()
-                    
-                print(newInCifName)
                 
-                if os.path.isfile(newInCifName):
+                newInCifName   = os.path.join(self.scrDir, self.baseRoot + "_cod_ku.rst")
+                #print(newInCifName)
+            
+                if self.workMode==162:
+                    if os.path.isfile(newInCifName):
+                        aFinalOutCifName = self.outRoot + ".cif"
+                        self.getFinalOutputFiles3(newInCifName, aFinalOutCifName)
+                elif os.path.isfile(newInCifName):
                     if os.path.isfile(self.inMetalPDBName):
-                        self.cmdline   = "%s -c %s --metalPDB %s  -o %s -p"%(self.exeAcedrg, newInCifName, self.inMetalPDBName, self.baseRoot)
+                        self._log_name        = os.path.join(self.scrDir,  self.baseRoot + "_met.log")
+                        self._cmdline   = "%s -c %s --metalPDB %s  -o %s -p"%(self.exeAcedrg, newInCifName, self.inMetalPDBName, self.baseRoot)
                     else:
-                        self.cmdline   = "%s -c %s   -o %s -p"%(self.exeAcedrg, newInCifName, self.baseRoot)
-                    os.system(self.cmdline)
+                        self._log_name        = os.path.join(self.scrDir,  self.baseRoot + "_dict.log")
+                        self._cmdline   = "%s -c %s   -o %s -p"%(self.exeAcedrg, newInCifName, self.baseRoot)
+                    self.subExecute()
             else:
                 print("The input %s does not exist"%self.inPdbName)
                 sys.exit()
+            print("=====================================================================")
+            print("|               Finished                                            |")
+            print("=====================================================================")
 
         if self.workMode in [21, 211]:
             
@@ -3833,11 +3890,20 @@ class Acedrg(CExeCode ):
                             print("acedrg works on molecule ", idxMol)
                             self.runAcedrg(aMol, str(idxMol))
                             idxMol+=1
-        
             print("=====================================================================")
             print("|               Finished                                            |")
             print("=====================================================================")
-                
+        
+        if self.workMode ==1211:
+            
+            self.runAcedrg(interMedCifName, 0)
+            
+            print("=====================================================================")
+            print("|               Finished                                            |")
+            print("=====================================================================")
+            
+        
+        
     def SetNewMolWithoutMetal(self):
         
         pass 

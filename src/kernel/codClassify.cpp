@@ -10524,7 +10524,7 @@ namespace LIBMOL
     {
         time_t tStart, tEnd;
         std::time (&tStart);
-        std::cout << "Search for target angles started at " << std::ctime(&tStart);
+        std::cout << "1. Search for target angles started at " << std::ctime(&tStart);
 
         std::map<int, std::vector<AngleDict> > specialAngs;
 
@@ -10624,12 +10624,12 @@ namespace LIBMOL
         // Final check all constraints
         checkAngConstraints();
 
-        //std::time(&tEnd);
-        //std::cout << "Search target angles finished at " << std::ctime(&tEnd);
-        //REAL tDiff;
-        //tDiff = std::difftime(tEnd,tStart);
-        //std::cout  << "it takes " << std::setprecision(3) <<tDiff
-        //           << " to search for all target angles " << std::endl;
+        std::time(&tEnd);
+        std::cout << "Search target angles finished at " << std::ctime(&tEnd);
+        REAL tDiff;
+        tDiff = std::difftime(tEnd,tStart);
+        std::cout  << "it takes " << std::setprecision(3) <<tDiff
+                   << " to search for all target angles " << std::endl;
 
     }
 
