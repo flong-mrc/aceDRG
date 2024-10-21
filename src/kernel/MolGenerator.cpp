@@ -3570,13 +3570,13 @@ namespace LIBMOL {
                                       << "Atom 1 " << allAtoms[i].id
                                       << " of serial number "
                                       << allAtoms[i].seriNum
-                                      << " from original atom "
-                                      << allAtoms[allAtoms[i].fromOrig].id
+                                      //<< " from original atom "
+                                      //<< allAtoms[allAtoms[i].fromOrig].id
                                       << std::endl
                                       << "Atom 2 " << allAtoms[*iNB].id
                                       << " of serial number " << allAtoms[*iNB].seriNum
-                                      << " from original atom "
-                                      << allAtoms[allAtoms[*iNB].fromOrig].id
+                                      //<< " from original atom "
+                                      //<< allAtoms[allAtoms[*iNB].fromOrig].id
                                       << " is " << rD << std::endl;
                     std::cout << "Range between " << bondRange[0]
                                       << " and " << bondRange[1] << std::endl;
@@ -3621,13 +3621,13 @@ namespace LIBMOL {
                                       << "Atom 1 " << allAtoms[i].id
                                       << " of serial number "
                                       << allAtoms[i].seriNum
-                                      << " from original atom "
-                                      << allAtoms[allAtoms[i].fromOrig].id
+                                      //<< " from original atom "
+                                      //<< allAtoms[allAtoms[i].fromOrig].id
                                       << std::endl
                                       << "Atom 2 " << allAtoms[*iNB].id
                                       << " of serial number " << allAtoms[*iNB].seriNum
-                                      << " from original atom "
-                                      << allAtoms[allAtoms[*iNB].fromOrig].id
+                                      //<< " from original atom "
+                                      //<< allAtoms[allAtoms[*iNB].fromOrig].id
                                       << " is " << std::endl << rD
                                       << std::endl;
                             std::cout << "Range between " << bondRange[0]
