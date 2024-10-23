@@ -603,7 +603,7 @@ namespace LIBMOL
             }
         }
 
-        /*
+
         std::cout << "There are " << allRingsV.size() << " rings " << std::endl
                   << "These are: " << std::endl;
         for (std::map<ID, std::vector<RingDict> >::iterator iR=allRings.begin();
@@ -621,7 +621,7 @@ namespace LIBMOL
                 }
             }
         }
-        */
+
         // Double check
         /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();

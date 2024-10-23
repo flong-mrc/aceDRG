@@ -5371,14 +5371,17 @@ namespace LIBMOL
         //{
         //    std::cout << tAtoms[*iD].id << std::endl;
         //}
+
+
+
         setOneLinkAtoms(tAtoms, tBonds, curValMap, outElectronMap,
                       chargeMap, elemMap, allAtmBondingMap, doneAtoms, doneBonds);
         std::cout << "Those atoms are set OneLink " << std::endl;
-            for (std::vector<int>::iterator iD= doneAtoms.begin();
+        for (std::vector<int>::iterator iD= doneAtoms.begin();
                  iD != doneAtoms.end(); iD++)
-            {
-                std::cout << tAtoms[*iD].id << std::endl;
-            }
+        {
+            std::cout << tAtoms[*iD].id << std::endl;
+        }
         std::cout << "after setOneLinkAtom" << std::endl;
         for (std::vector<BondDict>::iterator iBo= tBonds.begin();
                 iBo != tBonds.end(); iBo++)
@@ -5388,8 +5391,11 @@ namespace LIBMOL
                       << " is "  << iBo->orderN << std::endl;
         }
 
+        std::cout << "Set metal bonds " << std::endl;
         setAllMetalBO(tAtoms, tBonds, curValMap, outElectronMap,
                       chargeMap, elemMap, allAtmBondingMap, doneAtoms, doneBonds);
+
+
 
         //PickSingBonds(tAtoms, tBonds, tRings, curValMap, outElectronMap,
         //              chargeMap, elemMap, allAtmBondingMap, doneAtoms, doneBonds);
@@ -5487,8 +5493,13 @@ namespace LIBMOL
                 iAt != tAtoms.end(); iAt++)
         {
             // 1. +NOO
-            std::cout << iAt->id << " element " << iAt->chemType << std::endl;
-            if (iAt->chemType=="N")
+            // std::cout << iAt->id << " element " << iAt->chemType << std::endl;
+            if (iAt->chemType=="B")
+            {
+                setSpecStrB(tAtoms, tBonds, tDoneAtoms, tDoneAtoms, tDoneBonds,
+                             tAllAtmBondingMap, iAt);
+            }
+            else if (iAt->chemType=="N")
             {
                 setSpecStrN(tAtoms, tBonds, tDoneAtoms, tDoneAtoms, tDoneBonds,
                              tAllAtmBondingMap, iAt);
@@ -5500,6 +5511,63 @@ namespace LIBMOL
                              tAllAtmBondingMap, iAt);
             }
         }
+    }
+
+    void KekulizeMol::setSpecStrB(std::vector<AtomDict>         & tAtoms,
+                                  std::vector<BondDict>         & tBonds,
+                                  std::vector<int>           & tDoneAtoms,
+                                  std::vector<int>           & tDoneFAtoms,
+                                  std::vector<int>           & tDoneBonds,
+                                  std::map<int,
+                                  std::map<int, int> >       & tAllAtmBondingMap,
+                                  std::vector<AtomDict>::iterator tAt)
+    {
+        // Set potentially charged positions
+        // BNNXX structures
+        if (tAt->connAtoms.size()==4 && tAt->connMAtoms.size()==0)
+        {
+            std::map<ID, std::vector<int> > aSetNB;
+            for (std::vector<int>::iterator iNB = tAt->connAtoms.begin();
+                        iNB != tAt->connAtoms.end(); iNB++)
+            {
+                int idxB = tAllAtmBondingMap[tAt->seriNum][*iNB];
+                tBonds[idxB].orderN = 1;
+                tDoneBonds.push_back(idxB);
+                std::cout << "Bond Order between atoms "
+                          << tAt->id << " and "
+                          << tAtoms[*iNB].id << " is "
+                          << tBonds[idxB].orderN << std::endl;
+                aSetNB[tAtoms[*iNB].chemType].push_back(*iNB);
+            }
+            tAt->charge = -1;
+            tDoneAtoms.push_back(tAt->seriNum);
+
+            if (aSetNB.find("N") != aSetNB.end())
+            {
+                if (aSetNB["N"].size()==2)
+                {
+                    int idx1 = aSetNB["N"][0];
+                    int idx2 = aSetNB["N"][1];
+                    if (tAtoms[idx1].connAtoms.size()==3  &&
+                        tAtoms[idx1].connMAtoms.size()==0 &&
+                        tAtoms[idx2].connAtoms.size()==3  &&
+                        tAtoms[idx2].connMAtoms.size()==0)
+                    {
+                        // Global variables potAtomCharges will be change
+                        // later if the results are not right
+                        potAtomCharges[idx1] = 1;
+                        // first try
+                        tAtoms[idx1].charge =1;
+                        std::cout << "X1 Charge on atom " << tAtoms[idx1].id
+                                  << " is " <<  tAtoms[idx1].charge
+                                  << std::endl;
+                    }
+                }
+            }
+
+
+        }
+
     }
 
     void KekulizeMol::setSpecStrN(std::vector<AtomDict>         & tAtoms,
@@ -5822,8 +5890,7 @@ namespace LIBMOL
                 }
             }
 
-
-            std::cout << "=======================================" << std::endl;
+            /*
             std::cout << " atom serial number " << iAt->seriNum << std::endl;
             std::cout << "The valence of " << iAt->id << " of " << iAt->chemType
                       << " is " << tCurVal[iAt->seriNum] << std::endl;
@@ -5831,6 +5898,7 @@ namespace LIBMOL
             //          << tOutEMap[iAt->seriNum] << std::endl;
             std::cout << "it bonds to " << iAt->connAtoms.size()
                       << " atoms " << std::endl;
+            */
 
         }
 
@@ -6355,7 +6423,7 @@ namespace LIBMOL
                         tBonds[idxB].orderN = 1;
                         tDoneBonds.push_back(idxB);
                         std::cout << "Bond between atoms " << tBonds[idxB].atoms[0]
-                                  << " and " <<tBonds[idxB].atoms[1] << "is set to "
+                                  << " and " <<tBonds[idxB].atoms[1] << " is set to "
                                   << tBonds[idxB].orderN << std::endl;
                     }
                     tDoneAtoms.push_back(iAt->seriNum);
@@ -8620,6 +8688,14 @@ namespace LIBMOL
                         int idxA2 = tBonds[idxB].atomsIdx[1];
                         std::cout << "For bond between atoms " << tAtoms[idxA1].id
                                   << " and " << tAtoms[idxA2].id << std::endl;
+                        int r1, r2;
+                        int resVal1=0, resVal2=0;
+                        int numUnSetBonds1=0, numUnSetBonds2=0;
+                        setResValAndUnsetBondsForAtom(tAtoms[idxA1], tBonds, tAllAtmBondingMap,
+                                                      tCurVal, resVal1,  numUnSetBonds1);
+                        setResValAndUnsetBondsForAtom(tAtoms[idxA2], tBonds, tAllAtmBondingMap,
+                                                      tCurVal, resVal2, numUnSetBonds2);
+                        /*
                         int sumA1 =0;
                         for (int iC=0; iC < tAtoms[idxA1].connAtoms.size(); iC++)
                         {
@@ -8631,6 +8707,10 @@ namespace LIBMOL
                             }
                         }
                         int r1 = tCurVal[idxA1]-sumA1;
+                        if (tAtoms[idxA1].chemType=="N" || tAtoms[idxA1].chemType=="C")
+                        {
+                            r1 = r1 +tAtoms[idxA1].charge;
+                        }
                         std::cout << "curVal1=" << tCurVal[idxA1] << std::endl;
                         std::cout << "sumA1="  << sumA1 << std::endl;
                         std::cout << "r1 " << r1 << std::endl;
@@ -8647,11 +8727,40 @@ namespace LIBMOL
                         }
 
                         int r2 = tCurVal[idxA2]-sumA2;
+                        if (tAtoms[idxA2].chemType=="N" || tAtoms[idxA2].chemType=="C")
+                        {
+                            r2 = r2 +tAtoms[idxA2].charge;
+                        }
                         std::cout << "curVal2=" << tCurVal[idxA2] << std::endl;
                         std::cout << "sumA2="  << sumA2 << std::endl;
                         std::cout << "r2 " << r2 << std::endl;
+                        */
+                        //if (r1 >0 && r2 >0)
 
-                        if (r1 >0 && r2 >0)
+                        std::cout << "resVal1=" << resVal1 << std::endl;
+                        std::cout << "numUnSetBonds1="  << numUnSetBonds1 << std::endl;
+
+                        std::cout << "resVal2=" << resVal2 << std::endl;
+                        std::cout << "numUnSetBonds2="  << numUnSetBonds2 << std::endl;
+
+                        if (potAtomCharges[idxA1] !=0 || potAtomCharges[idxA2] !=0)
+                        {
+                            if ((resVal1 > numUnSetBonds1 ) && (resVal2 > numUnSetBonds2 ) )
+                            {
+                                tBonds[idxB].orderN=2;
+                                std::cout << "bond order now is " << tBonds[idxB].orderN
+                                      << std::endl;
+                                 lCh = true;
+                            }
+                            else if ( resVal1>0 && resVal2 >0)
+                            {
+                                tBonds[idxB].orderN+=1;
+                                std::cout << "bond order now is " << tBonds[idxB].orderN
+                                      << std::endl;
+                                lCh = true;
+                            }
+                        }
+                        else if ( resVal1>0 && resVal2 >0)
                         {
                             tBonds[idxB].orderN+=1;
                             std::cout << "bond order now is " << tBonds[idxB].orderN

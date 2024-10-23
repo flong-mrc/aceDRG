@@ -483,6 +483,15 @@ namespace LIBMOL
                          std::map<int,
                          std::map<int, int> >       & tAllAtmBondingMap);
 
+        void setSpecStrB(std::vector<AtomDict>         & tAtoms,
+                         std::vector<BondDict>         & tBonds,
+                         std::vector<int>           & tDoneAtoms,
+                         std::vector<int>           & tDoneFAtoms,
+                         std::vector<int>           & tDoneBonds,
+                         std::map<int,
+                         std::map<int, int> >       & tAllAtmBondingMap,
+                         std::vector<AtomDict>::iterator tAt);
+
         void setSpecStrN(std::vector<AtomDict>         & tAtoms,
                          std::vector<BondDict>         & tBonds,
                          std::vector<int>           & tDoneAtoms,
@@ -932,7 +941,8 @@ namespace LIBMOL
 
         std::vector<int>                       zeroExAtomIdxs;
         std::vector<int>                       withExAtomIdxs;
-        std::map<int, int>                     oddAtomIdxs;
+        //std::map<int, int>                     oddAtomIdxs;
+        std::map<int, int>                     potAtomCharges;
         std::map<int, std::vector<int> >       allSubGraphs;
 
         std::vector<std::string>               doneAtoms;

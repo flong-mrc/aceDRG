@@ -5373,7 +5373,7 @@ namespace LIBMOL {
                 aMol.atoms.push_back(*iAt);
             }
 
-            // getAtomTypeOneMolNew(aMol);
+            getAtomTypeOneMolNew(aMol);
             allMolecules.push_back(aMol);
             setBondOrderAndChargeInMols(allMolecules);
 
