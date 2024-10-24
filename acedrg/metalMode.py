@@ -632,11 +632,11 @@ class metalMode(CExeCode):
                     #print("numBO is ", numBO)
         #print("def val is ", self.defaultBo[tAtom['_chem_comp_atom.type_symbol']])     
         #print("charge is ", int(tAtom['_chem_comp_atom.charge']))
-            retH = tDefBo[tAtom['_chem_comp_atom.type_symbol']]\
+            retH = tDefBo[tAtom['_chem_comp_atom.type_symbol'].upper()]\
                    -numBO + int(tAtom['_chem_comp_atom.charge'])
             #print("number H need ", retH)
         else :
-            retH = tDefBo[tAtom['_chem_comp_atom.type_symbol']]
+            retH = tDefBo[tAtom['_chem_comp_atom.type_symbol'].upper()]
         return retH
     
     def setCCP4MonDataDescritor(self, tDataDescriptor):

@@ -115,6 +115,8 @@ namespace LIBMOL
         std::vector<TorsionDict>         nonHNonMetTorsions;           // No H atoms in the ends of torsion angles.
         std::vector<RingDict>            rings;
         std::vector<ChiralDict>          chirals;
+        std::vector<PlaneDict>           planes;
+
         std::vector<AtomDict>            extraHAtoms;
 
         std::map<ID, std::vector<ID> >   propData;

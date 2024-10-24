@@ -6648,8 +6648,14 @@ namespace LIBMOL
                                         }
                                         else
                                         {
-                                            tBonds[nonAssBos[0]].orderN = remBO;
-
+                                            if (remBO > 2 && iAt->inRings.size() >0)
+                                            {
+                                                tBonds[nonAssBos[0]].orderN = 2;
+                                            }
+                                            else
+                                            {
+                                                tBonds[nonAssBos[0]].orderN = remBO;
+                                            }
                                         }
 
                                     }

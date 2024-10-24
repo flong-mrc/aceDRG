@@ -170,7 +170,7 @@ namespace LIBMOL
         //elements["Br"]["vdw"]     = 1.85;
         //elements["Br"]["cova"]    = 1.21;
         elemProps["Br"]["vdw"]    = 1.85;
-        elemProps["Br"]["cova"]    = 1.14;
+        elemProps["Br"]["cova"]    = 1.33;   //1.14;
         elemProps["Br"]["ionM-"]  = 1.96;
 
         elements["I"]["row"]      = 5;

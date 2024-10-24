@@ -932,6 +932,7 @@ namespace LIBMOL {
 
             getUniqueAtomLinksPdb(aPTable);
             buildMolsPdb(aPTable);
+            std::cout << "2 Number of mols " << allMolecules.size() << std::endl;
             if (tMode==351)
             {
                 /*
@@ -945,8 +946,9 @@ namespace LIBMOL {
                 }
                 */
                 std::string tmpLib = "";
+                std::cout << "Go into aTargetMol " << std::endl;
                 AllSystem  aTargetMol( allMolecules[0], tmpLib);
-
+                std::cout << "Number of rings " << aTargetMol.allRingsV.size() << std::endl;
                 aTargetMol.setupAllAngleValuesFromCoords();
 
                 fixTorIDs(aTargetMol.allTorsions,
@@ -974,7 +976,7 @@ namespace LIBMOL {
                             aTargetMol.allBonds,
                             aTargetMol.allAngles,
                             aTargetMol.miniTorsions,
-                            aTargetMol.allRingsV,
+                            allMolecules[0].rings,
                             aTargetMol.allPlanes,
                             aTargetMol.allChirals);
 
@@ -5373,8 +5375,30 @@ namespace LIBMOL {
                 aMol.atoms.push_back(*iAt);
             }
 
-            getAtomTypeOneMolNew(aMol);
+            //getAtomTypeOneMolNew(aMol);
+            setAtomsBondingAndChiralCenter(aMol.atoms);
+            setAtomRingProps(aMol.atoms, aMol.rings);
+            /*
+            //std::cout << "Number of rings " << aMol.rings.size() << std::endl;
+            for (std::vector<RingDict>::iterator iR=aMol.rings.begin();
+                        iR !=aMol.rings.end(); iR++)
+            {
+                iR->setPlaneProp();
+                //std::cout << "Ring " << iR->rep << std::endl
+                //          << "Is planar " << iR->isPlanar << std::endl;
+            }
+            bool aMdPls = true;
+
+            checkAndSetupPlanes(aMol.rings, aMol.planes, aMol.atoms, aMdPls);
+            for (std::vector<RingDict>::iterator iR=aMol.rings.begin();
+                        iR !=aMol.rings.end(); iR++)
+            {
+                std::cout << "Ring " << iR->rep << std::endl
+                          << "Is aroma " << iR->isAromatic << std::endl;
+            }
+            */
             allMolecules.push_back(aMol);
+            std::cout << "Number of mols " << allMolecules.size() << std::endl;
             setBondOrderAndChargeInMols(allMolecules);
 
 
@@ -6512,7 +6536,7 @@ namespace LIBMOL {
 
 
 
-
+        /*
 
         for (std::vector<AtomDict>::iterator iAt=aCodSys.allAtoms.begin();
                 iAt !=aCodSys.allAtoms.end(); iAt++)
@@ -6533,6 +6557,7 @@ namespace LIBMOL {
                           << std::endl;
             }
         }
+        */
 
         tMol.atoms.clear();
         for (std::vector<AtomDict>::iterator iAt = aCodSys.allAtoms.begin();
@@ -6597,7 +6622,7 @@ namespace LIBMOL {
         tMol.setAtomFormTypes();
 
         // check
-        /*
+        std::cout << "Check again " << std::endl;
         for (std::vector<AtomDict>::iterator iAt=tMol.atoms.begin();
                 iAt != tMol.atoms.end(); iAt++)
         {
@@ -6609,10 +6634,12 @@ namespace LIBMOL {
                         idxR !=iAt->inRings.end(); idxR++)
                 {
                     std::cout << tMol.rings[*idxR].rep << std::endl;
+                    std::cout << "Is it aroma " << tMol.rings[*idxR].isAromatic
+                              << std::endl;
                 }
             }
         }
-         */
+
     }
 
     void MolGenerator::setBondOrderAndFormalChargeByExcessEl(Molecule& tMol,
@@ -7331,6 +7358,7 @@ namespace LIBMOL {
     {
 
         KekulizeMol aKTool;
+        //std::cout << "Number of molecules " << tFinMols.size() << std::endl;
         for (unsigned i=0; i < tFinMols.size(); i++)
         {
             reGenMolBondsAtomTypes(tFinMols[i]);

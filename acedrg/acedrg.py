@@ -3704,6 +3704,7 @@ class Acedrg(CExeCode ):
                     else:
                         self._log_name        = os.path.join(self.scrDir,  self.baseRoot + "_dict.log")
                         self._cmdline   = "%s -c %s   -o %s -p"%(self.exeAcedrg, newInCifName, self.baseRoot)
+                        #print(self._cmdline)
                     self.subExecute()
             else:
                 print("The input %s does not exist"%self.inPdbName)

@@ -77,6 +77,12 @@ namespace LIBMOL
             chirals.push_back(*iC);
         }
 
+        for (std::vector<PlaneDict>::const_iterator iP=tMol.planes.begin();
+             iP!=tMol.planes.end();  iP++)
+        {
+            planes.push_back(*iP);
+        }
+
         for (std::vector<AtomDict>::const_iterator iHA=tMol.extraHAtoms.begin();
                 iHA !=tMol.extraHAtoms.end(); iHA++)
         {

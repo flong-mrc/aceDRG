@@ -297,7 +297,7 @@ namespace LIBMOL
     void RingDict::setPlaneProp()
     {
         bool lSP2=true;
-
+        //std::cout << "1. Here ring " << rep << std::endl;
         for (std::vector<AtomDict>::iterator iA=atoms.begin();
                 iA !=atoms.end(); iA++)
         {
@@ -314,8 +314,8 @@ namespace LIBMOL
         {
             isPlanar = lSP2;
         }
-        //std::cout << "1. Here ring " << rep << std::endl;
-        //std::cout << " is planar " << lSP2 << std::endl;
+
+        // std::cout << " is planar " << lSP2 << std::endl;
     }
 
     void RingDict::setBondIdxs(std::vector<BondDict> & tBonds, int & tStartIdx)
@@ -2346,7 +2346,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 */
             }
 
-            std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
+            std::cout << "1. Is the ring aromatic ? " << iR->isAromatic << std::endl;
         }
 
         // Test: extra-step for pyrole rings
@@ -2495,7 +2495,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 */
             }
 
-            std::cout << "Is the ring aromatic ? " << iR->isAromatic << std::endl;
+            std::cout << "2. Is the ring aromatic ? " << iR->isAromatic << std::endl;
         }
 
         //std::cout << "A: Number of rings "
@@ -2541,6 +2541,13 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             std::cout << std::endl;
         }
         */
+
+        for (std::vector<RingDict>::iterator iR=tAllRings.begin();
+                iR !=tAllRings.end(); iR++)
+        {
+
+        }
+
     }
 
 
