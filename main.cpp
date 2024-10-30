@@ -191,9 +191,9 @@ int main(int argc, char** argv) {
                                   aTargetSystem.HydrDistTable);
 
 
-                //LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
-                //               AJob.IOEntries["monoRootName"],
-                //               aTargetSystem.allAtoms, );
+                LIBMOL::outPDB(AJob.IOEntries["userOutName"].c_str(),
+                               AJob.IOEntries["monoRootName"],
+                               aTargetSystem.allAtoms, 1);
 
                 LIBMOL::outB_and_A_Levels(AJob.IOEntries["userOutName"].c_str(),
                                           aTargetSystem.allAtoms,
@@ -276,9 +276,9 @@ int main(int argc, char** argv) {
                                                  aTargetSystem.HydrDistTable);
 
 
-                        //LIBMOL::outPDB(tOutName.c_str(),
-                        //        AJob.IOEntries["monoRootName"],
-                        //        aTargetSystem.allAtoms);
+                        LIBMOL::outPDB(tOutName.c_str(),
+                                AJob.IOEntries["monoRootName"],
+                                aTargetSystem.allAtoms, 1);
                     }
                     i++;
                 }

@@ -17,6 +17,20 @@ namespace LIBMOL
      * string processing
      */
 
+    extern std::string getCurTime()
+    {
+        time_t rawtime;
+        struct tm * timeinfo;
+        char buffer[100];
+
+        time (&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        strftime(buffer,sizeof(buffer),"%d-%m-%Y %H:%M:%S",timeinfo);
+        std::string aStr(buffer);
+        return aStr;
+    }
+
     bool isInt(std::string tS)
     {
         for (int i =0; i < (int)tS.size(); i++)

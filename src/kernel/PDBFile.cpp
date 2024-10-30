@@ -1169,6 +1169,9 @@ namespace LIBMOL
     {
         // This is a temporary one, the method should be defined outside
         // this class.
+
+
+
         std::string tName(tFName);
 
         std::vector<std::string> parts;
@@ -1176,21 +1179,26 @@ namespace LIBMOL
         std::string outPDBName = parts[0] + ".pdb";
 
         std::ofstream outPDB(outPDBName.c_str());
-
+        //std::cout << "HERENOW" << std::endl;
         if(outPDB.is_open())
         {
+            std::string curTime =getCurTime();
             // Header section
-            srand((unsigned)std::time( NULL ));
+            //srand((unsigned)std::time( NULL ));
             outPDB.width(10);
             outPDB << std::left << "HEADER";
-            outPDB.width(30);
-            outPDB << std::left << " MONOMER tests " << tMonoRootName;
             outPDB.width(10);
-            outPDB << std::left << " Date:";
-            outPDB.width(6);
-            outPDB << std::left << tMonoRootName;
-            outPDB.width(14);
-            outPDB << std::left <<"" <<std::endl;
+            outPDB << std::left << "MODRES: ";
+            outPDB.width(10);
+            outPDB << TrimSpaces(tMonoRootName);
+            outPDB.width(10);
+            outPDB << std::left << "Date:";
+            outPDB.width(30);
+            outPDB << std::left << curTime << std::endl;
+            //outPDB.width(20);
+            //outPDB << std::left << ;
+            //outPDB.width(14);
+            //outPDB << std::left <<"" <<std::endl;
 
             // CRYST1 section
             outPDB.width(80);

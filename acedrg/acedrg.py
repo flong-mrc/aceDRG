@@ -89,6 +89,7 @@ class Acedrg(CExeCode ):
         self.inStdCifName     = ""
         self.inStdCifDir      = ""
         self.inMmCifName      = ""
+        self.inCoordMmCifName = ""
         self.inSmiName        = ""
         self.inMdlName        = ""
         self.inPdbName        = ""
@@ -376,6 +377,9 @@ class Acedrg(CExeCode ):
         self.inputParser.add_option("--keku",  dest="keku",  
                                     action="store_true",  default=False,
                                     help="Rekekulize the bond order in the molecule")
+        
+        self.inputParser.add_option("--c0", dest="inCoordMmCifName", metavar="FILE", 
+                                    action="store", type="string", help="Input MMCIF File within which, the coordinates will be output")
         
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
@@ -987,7 +991,14 @@ class Acedrg(CExeCode ):
       
         if t_inputOptionsP.useExistCoords:
             self.useExistCoords = t_inputOptionsP.useExistCoords
-
+            
+        
+        if t_inputOptionsP.inCoordMmCifName:
+            if os.path.isfile(t_inputOptionsP.inCoordMmCifName):
+                self.inCoordMmCifName =  t_inputOptionsP.inCoordMmCifName
+            else:
+                print("%s does not exist. Check? "%t_inputOptionsP.inCoordMmCifName)
+                sys.exit(1)
         
 
         self.scrDir = self.outRoot + "_TMP"
@@ -2859,6 +2870,38 @@ class Acedrg(CExeCode ):
                 aBl.append(aL)
         t3B.append(aBl) 
         
+    def splitCif3Blocks(self, tCif, t3B, tId):
+
+          fM = open(tCif, "r")
+          allLs = fM.readlines()
+          fM.close()
+
+          lB2 = False
+          lB3 = False
+          aBl = []
+          for aL in allLs:
+              if aL.find(tId) !=-1 and not lB2 and not lB3:
+                  t3B.append(aBl)
+                  lB2 = True
+                  lB3 = False
+                  aBl = []
+                  aBl.append(aL)
+              elif  lB2 :
+                  if aL.find("loop_") != -1  :
+                      t3B.append(aBl)
+                      lB2 = False
+                      lB3 = True 
+                      aBl = []
+                      aBl.append(aL)
+                  else:
+                      aBl.append(aL)
+              else:    
+                  aBl.append(aL)
+                  
+          t3B.append(aBl) 
+    
+    
+
 
     def readProTab(self, tBondSet):
  
@@ -2968,6 +3011,30 @@ class Acedrg(CExeCode ):
                                         self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
                                         self.fileConv.nameMapingCifMol, self.fileConv.inputCharge)
 
+    def usingCoordsInCif(self, tFinInCif, tRoot):
+        
+        fC1 = FileTransformer()
+        fC1.mmCifReader(self.inCoordMmCifName)
+        
+        fC2 = FileTransformer()
+        fC2.mmCifReader(tFinInCif)
+        
+        
+        aFinalOutN = self.baseRoot + ".cif"
+        print("The final file name is ", aFinalOutN)
+        a3B = []
+        self.splitCif3Blocks(tFinInCif, a3B, "_chem_comp_atom.")
+        fC2.replaceAtomCoords(a3B, fC1.atoms, aFinalOutN)
+        if len(fC1.atoms) != len(fC2.atoms):
+            print("HereREP")
+            aRoot=os.path.basename(self.outRoot)
+            self.runServalcat(aRoot, aFinalOutN)
+            aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
+            if os.path.isfile(aSOutName):
+                #finalOutName = self.outRoot + "_final.cif"
+                finalOutName = self.outRoot + ".cif"
+                self.cleanSFile(aSOutName, finalOutName)
+                
     def execute(self):
         
         self.printJobs()
@@ -3278,9 +3345,10 @@ class Acedrg(CExeCode ):
                                 self.rdKit.chiralPre =[]
                                 for aChi in self.fileConv.chiralPre:
                                     self.rdKit.chiralPre.append(aChi) 
+                            #print("Here ", self.inMtConnFile)
                             self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
                                                 self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
-                                                self.fileConv.nameMapingCifMol, self.fileConv.inputCharge) 
+                                                self.fileConv.nameMapingCifMol, self.fileConv.inputCharge, self.inMtConnFile) 
                     elif "props" in self.fileConv.strDescriptors \
                        and "entries" in self.fileConv.strDescriptors:
 
@@ -3428,7 +3496,7 @@ class Acedrg(CExeCode ):
                                         #self.rdKit.reSetChirals = True
                                     self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
                                                         self.numConformers, 0, self.fileConv.nameMapingCifMol,\
-                                                        self.fileConv.inputCharge) 
+                                                        self.fileConv.inputCharge, self.inMtConnFile) 
                     
                     else:
                         aIniMolName = os.path.join(self.scrDir, self.baseRoot + "_initTransMol.mol")
@@ -3444,7 +3512,7 @@ class Acedrg(CExeCode ):
                                     #self.rdKit.reSetChirals = True
                                 self.rdKit.initMols("mol", aIniMolName, self.monomRoot, self.chemCheck, self.inputPara["PH"],\
                                                 self.numConformers, 0, self.fileConv.nameMapingCifMol,\
-                                                self.fileConv.inputCharge) 
+                                                self.fileConv.inputCharge, self.inMtConnFile) 
             
             elif len(self.fileConv.atoms) > 1 and not self.lOrg:
                 # Metal related 
@@ -3487,29 +3555,37 @@ class Acedrg(CExeCode ):
                                 else:
                                     print("continue without metalCoord")
                                     aRoot=os.path.basename(self.outRoot)
+                                    if not self.inCoordMmCifName:
+                                        self.runServalcat(aRoot, aFinInCif)
+                                        aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                                        if os.path.isfile(aSOutName):
+                                            #finalOutName = self.outRoot + "_final.cif"
+                                            finalOutName = self.outRoot + ".cif"
+                                            self.cleanSFile(aSOutName, finalOutName)
+                                            #print("The tmp3 output is %s "%aTmp3Cif)
+                                            print("The final output cif is %s"%finalOutName)
+                                    else:
+                                        
+                                        pass
+                                        
+                                
+                            else:
+                                aRoot=os.path.basename(self.outRoot)
+                                #print("self.outRoot ", self.outRoot)
+                                print("aFinInCif ", aFinInCif)
+                                if not self.inCoordMmCifName:
                                     self.runServalcat(aRoot, aFinInCif)
-                                    aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
+                                    aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
+                                    print("aSOutName", aSOutName)
                                     if os.path.isfile(aSOutName):
                                         #finalOutName = self.outRoot + "_final.cif"
                                         finalOutName = self.outRoot + ".cif"
                                         self.cleanSFile(aSOutName, finalOutName)
                                         #print("The tmp3 output is %s "%aTmp3Cif)
                                         print("The final output cif is %s"%finalOutName)
-                                        
-                                
-                            else:
-                                aRoot=os.path.basename(self.outRoot)
-                                print("self.outRoot ", self.outRoot)
-                                print("aFinInCif ", aFinInCif)
-                                self.runServalcat(aRoot, aFinInCif)
-                                aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
-                                print("aSOutName", aSOutName)
-                                if os.path.isfile(aSOutName):
-                                    #finalOutName = self.outRoot + "_final.cif"
-                                    finalOutName = self.outRoot + ".cif"
-                                    self.cleanSFile(aSOutName, finalOutName)
-                                    #print("The tmp3 output is %s "%aTmp3Cif)
-                                    print("The final output cif is %s"%finalOutName)
+                                else:
+                                    self.usingCoordsInCif(aFinInCif, aRoot)
+                                    pass
                             
                     else:
                         print("Number of atoms", len(self.fileConv.atoms))

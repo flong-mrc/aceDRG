@@ -1896,6 +1896,87 @@ class FileTransformer(object) :
         for aK in sorted(self.nameMapingMol2["H"].keys()):
             for aH in self.nameMapingMol2["H"][aK]:
                 print("%s  connects to %s "%(aK, aH))
+                
+    
+    def replaceAtomCoords(self, t3B, tAtoms, tOutFName):
+        
+        try:
+            aCif = open(tOutFName, "w")
+        except IOError:
+            print("%s can not be open for writing "%tOutFName)
+            sys.exit()
+        else:
+            for aL in t3B[0]:
+                aCif.write(aL)
+            
+            self.writeNewAtomSection(tAtoms, aCif)
+            
+            for aL in t3B[2]:
+                aCif.write(aL)
+            
+    def writeNewAtomSection(self, tAtoms, tCif):
+                 
+        atomMap1 = {}
+        atomMap2 = {}
+        for idx1 in range(len(self.atoms)):
+            id1 = self.atoms[idx1]["_chem_comp_atom.atom_id"]
+            atomMap1[id1] = idx1
+            
+        for idx2 in range(len(tAtoms)):
+            id2 = tAtoms[idx2]["_chem_comp_atom.atom_id"]
+            atomMap2[id2] = idx2
+            
+        for aId in atomMap1.keys():
+            if aId in atomMap2.keys():
+                idx1 = atomMap1[aId]
+                idx2 = atomMap2[aId]
+                if "_chem_comp_atom.x" in tAtoms[idx1].keys():
+                    self.atoms[idx1]["_chem_comp_atom.x"] = tAtoms[idx2]["_chem_comp_atom.x"]
+                    self.atoms[idx1]["_chem_comp_atom.y"] = tAtoms[idx2]["_chem_comp_atom.y"]   
+                    self.atoms[idx1]["_chem_comp_atom.z"] = tAtoms[idx2]["_chem_comp_atom.z"] 
+                elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in  tAtoms[idx1].keys():
+                    self.atoms[idx1]["_chem_comp_atom.x"] = tAtoms[idx2]["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
+                    self.atoms[idx1]["_chem_comp_atom.y"] = tAtoms[idx2]["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]   
+                    self.atoms[idx1]["_chem_comp_atom.z"] = tAtoms[idx2]["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
+                else:
+                    self.atoms[idx1]["_chem_comp_atom.x"] = 0.0
+                    self.atoms[idx1]["_chem_comp_atom.y"] = 0.0  
+                    self.atoms[idx1]["_chem_comp_atom.z"] = 0.0
+            else:
+                # newly added atoms, mostly H atoms
+                self.atoms[idx1]["_chem_comp_atom.x"] = 0.0
+                self.atoms[idx1]["_chem_comp_atom.y"] = 0.0  
+                self.atoms[idx1]["_chem_comp_atom.z"] = 0.0
+        
+        tCif.write("_chem_comp_atom.comp_id\n")
+        tCif.write("_chem_comp_atom.atom_id\n")
+        tCif.write("_chem_comp_atom.alt_atom_id\n")
+        tCif.write("_chem_comp_atom.type_symbol\n")
+        tCif.write("_chem_comp_atom.type_energy\n")
+        tCif.write("_chem_comp_atom.charge\n")
+        tCif.write("_chem_comp_atom.x\n")
+        tCif.write("_chem_comp_atom.y\n")
+        tCif.write("_chem_comp_atom.z\n")
+        tCif.write("_chem_comp_atom.pdbx_model_Cartn_x_ideal\n")
+        tCif.write("_chem_comp_atom.pdbx_model_Cartn_y_ideal\n")
+        tCif.write("_chem_comp_atom.pdbx_model_Cartn_z_ideal\n")    
+        for aAtm in self.atoms:
+            x= str(aAtm["_chem_comp_atom.x"])
+            y= str(aAtm["_chem_comp_atom.y"])
+            z= str(aAtm["_chem_comp_atom.z"])
+            C= str(aAtm["_chem_comp_atom.charge"])
+            aL="%s%s%s%s%s%s%s%s%s%s%s%s\n"%(aAtm["_chem_comp_atom.comp_id"].ljust(8), aAtm["_chem_comp_atom.atom_id"].ljust(8),
+                                             aAtm["_chem_comp_atom.alt_atom_id"].ljust(8), aAtm["_chem_comp_atom.type_symbol"].ljust(6),
+                                             aAtm["_chem_comp_atom.type_energy"].ljust(8), C.ljust(6),
+                                             x.ljust(10), y.ljust(10), z.ljust(10),
+                                             x.ljust(10), y.ljust(10), z.ljust(10))
+            tCif.write(aL)
+            
+    def replaceBonds(self, t3B, tBonds):
+        
+        pass
+   
+    # etc other convienient functions
 
 
     def outputSingleAtomCif(self, tOutFileName, tVersionInfo):

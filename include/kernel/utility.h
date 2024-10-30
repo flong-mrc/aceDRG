@@ -63,7 +63,9 @@ namespace LIBMOL
     }
     
     */
-    
+    // time related
+    extern std::string getCurTime();
+ 
     // numerical transform 
     extern bool isInt(std::string tS);
     extern int StrToInt(std::string tS);

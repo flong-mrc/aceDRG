@@ -197,13 +197,11 @@ class metalMode(CExeCode):
     def getNewMolWithoutMetal(self, tAtoms, tBonds, tChem):
         
         
-        
-        
         metalIds = []
         for aAtom in tAtoms:
             if "_chem_comp_atom.type_symbol" in aAtom.keys():
-                print("Atom ", aAtom['_chem_comp_atom.atom_id'], 
-                      " is ", aAtom["_chem_comp_atom.type_symbol"])
+                #print("Atom ", aAtom['_chem_comp_atom.atom_id'], 
+                #      " is ", aAtom["_chem_comp_atom.type_symbol"])
                 if not aAtom['_chem_comp_atom.type_symbol'] in tChem.organicSec:
                     #print("atom %s is a metal atom of elem %s "
                     #      %(aAtom['_chem_comp_atom.atom_id'], aAtom['_chem_comp_atom.type_symbol'])) 
@@ -370,6 +368,9 @@ class metalMode(CExeCode):
             cKeys = ['_chem_comp_atom.atom_id',  '_chem_comp_atom.type_symbol',
                      '_chem_comp_atom.charge', '_chem_comp_atom.x', 
                      '_chem_comp_atom.y', '_chem_comp_atom.z']
+            
+            
+            
             otherKeys = []
             for aK in tAtoms[0].keys():
                 if not aK in cKeys:
@@ -379,6 +380,7 @@ class metalMode(CExeCode):
                      '_chem_comp_bond.value_order', '_chem_comp_bond.type',
                      '_chem_comp_bond.value_dist_nucleus', '_chem_comp_bond.value_dist_nucleus_esd',
                      '_chem_comp_bond.value_dist', '_chem_comp_bond.value_dist_esd']
+            
             bOtherKeys = []
             for aBK in tBonds[0].keys():
                 if not aBK in bKeys:
@@ -423,15 +425,15 @@ class metalMode(CExeCode):
         # First round
         for aAtm in tAtoms:
             aId = aAtm['_chem_comp_atom.atom_id']
-            print(aId)
+            #print(aId)
             self.atmHybr[aId] =0
             if aId in self.nonMAtmConnsMap.keys():
                 aM=0
                 if aId in self.connMAMap:
                     aM = len(self.connMAMap[aId])
                 aL = len(self.nonMAtmConnsMap[aId])
-                print("conn ", aL)
-                print("Mconn", aM)
+                #print("conn ", aL)
+                #print("Mconn", aM)
                 if aL > 4 :
                     self.atmHybr[aId] = aL
                 #elif aL < 2:
@@ -530,10 +532,10 @@ class metalMode(CExeCode):
                 if lSp and totalL < 4:
                     self.atmHybr[aId]=2
     
-        for aAtm in tAtoms:               
-            aId = aAtm['_chem_comp_atom.atom_id']
-            aSp = self.atmHybr[aId]
-            print("Atom %s has a sp %s"%(aId, aSp))
+        #for aAtm in tAtoms:               
+        #    aId = aAtm['_chem_comp_atom.atom_id']
+        #    aSp = self.atmHybr[aId]
+        #    print("Atom %s has a sp %s"%(aId, aSp))
                          
     def setASpeAng(self, tMA, tMN, tNN, tSP):
         
@@ -838,8 +840,50 @@ class metalMode(CExeCode):
             
             aMmCif.close()
     
- 
     
+    def setMetalInitCoords(self, tAtoms):
+        
+        tmpMAtoms = []
+        for aMA in self.metalAtoms:
+            if not aMA['_chem_comp_atom.atom_id'] in self.metalConnAtomsMap:
+                tmpMAtoms.append(aMA)
+                
+        for aMA in self.metalConnAtomsMap:
+            #print("For a metal atom : ", aMA)
+            aMAtom = self.getAtomById(self.metalAtoms, aMA)
+            aMAtom["_chem_comp_atom.x"] = 0.0
+            aMAtom["_chem_comp_atom.y"] = 0.0
+            aMAtom["_chem_comp_atom.z"] = 0.0
+            aveX =0.0
+            aveY =0.0
+            aveZ =0.0
+            for aMCId in self.metalConnAtomsMap[aMA]: 
+                #print("For metal bonding atom ", aMCId) 
+                aMCAtom = self.getAtomById(tAtoms, aMCId) 
+                if "_chem_comp_atom.x" in aMCAtom.keys():
+                    aveX += float(aMCAtom["_chem_comp_atom.x"]) 
+                    aveY += float(aMCAtom["_chem_comp_atom.y"])
+                    aveZ += float(aMCAtom["_chem_comp_atom.z"])
+                elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aMCAtom.keys():
+                    aveX += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]) 
+                    aveY += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"])
+                    aveZ += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"])
+            if len(self.metalConnAtomsMap[aMA]) > 0:
+                d = len(self.metalConnAtomsMap[aMA])
+                aMAtom["_chem_comp_atom.x"] = aveX/d
+                aMAtom["_chem_comp_atom.y"] = aveY/d
+                aMAtom["_chem_comp_atom.z"] = aveZ/d
+                aMAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"] = aMAtom["_chem_comp_atom.x"]
+                aMAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"] = aMAtom["_chem_comp_atom.y"]
+                aMAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"] = aMAtom["_chem_comp_atom.z"]
+                
+            tmpMAtoms.append(aMAtom)
+            
+            
+        self.metalAtoms = []
+        for aMA in tmpMAtoms: 
+            self.metalAtoms.append(aMA)
+            
     def outInterMCif(self, tMmcifName, tAtoms, tBonds, tVersionInfo):
         
         
@@ -1007,6 +1051,9 @@ class metalMode(CExeCode):
             print("Its charge ", aMA['_chem_comp_atom.charge'])
             
         
+        fC = FileTransformer()
+        fC.mmCifReader(tInCif)
+        self.setMetalInitCoords(fC.atoms)
         
         
         # Modify cif 
@@ -1231,6 +1278,10 @@ class metalMode(CExeCode):
         tLines.append(aNewL)
         
         
+    
+    
+        
+        
     def writeNewAtomCifLine(self, tLines):
         
         
@@ -1240,7 +1291,11 @@ class metalMode(CExeCode):
             posY =0.0
             posZ =0.0
             
-            if "_chem_comp_atom.model_Cartn_x" in aMA.keys():
+            if '_chem_comp_atom.x' in aMA.keys():
+                posX = float(aMA['_chem_comp_atom.x'])
+                posY = float(aMA['_chem_comp_atom.y'])
+                posZ = float(aMA['_chem_comp_atom.z'])
+            elif "_chem_comp_atom.model_Cartn_x" in aMA.keys():
                 if  aMA['_chem_comp_atom.model_Cartn_x'].find("?")==-1:
                      posX = float(aMA['_chem_comp_atom.model_Cartn_x'])
                      posY = float(aMA['_chem_comp_atom.model_Cartn_y'])
@@ -1250,10 +1305,7 @@ class metalMode(CExeCode):
                         posX = float(aMA['_chem_comp_atom.pdbx_model_Cartn_x_ideal'])
                         posY = float(aMA['_chem_comp_atom.pdbx_model_Cartn_y_ideal'])
                         posZ = float(aMA['_chem_comp_atom.pdbx_model_Cartn_z_ideal'])
-            elif '_chem_comp_atom.x' in aMA.keys():
-                posX = float(aMA['_chem_comp_atom.x'])
-                posY = float(aMA['_chem_comp_atom.y'])
-                posZ = float(aMA['_chem_comp_atom.z'])
+            
             aLine = "%s%s%s%s%s%10.2f%10.4f%10.4f%10.4f%10.4f%10.4f%10.4f\n"\
                     % (self.monomRoot.ljust(8), aMA['_chem_comp_atom.atom_id'].ljust(10),
                        aMA['_chem_comp_atom.atom_id'].ljust(10),
@@ -1381,9 +1433,9 @@ class metalMode(CExeCode):
                 aMC.write("BONDING  %s%s\n"%(aK.ljust(10), aM.ljust(10)))
         aMC.close()    
         if self.initConfs <=10:
-            self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s -K "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
+            self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
         else:
-            self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s -K -j %d"%(self.exeAcedrg, tInCif, 
+            self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s  -j %d"%(self.exeAcedrg, tInCif, 
                                                                             self.monomRoot, tOutRoot, aMtConnFileName, self.initConfs)
         self._log_name  = tOutRoot + "_acedrg.log"
         #print(self._cmdline)
@@ -1438,6 +1490,7 @@ class metalMode(CExeCode):
                    
                    if os.path.isfile(tmpMmcifName):
                        print("acedrg is running")
+                       
                        outTmpRootName = self.outRoot + "_tmp"
                        self.runAcedrg(tmpMmcifName, outTmpRootName)
                        

@@ -82,6 +82,7 @@ class AcedrgRDKit(object):
         self.conformerEngMap = {}
         self.numSelectForRefConfs = 25
         self.selecConformerIds = []
+        self.maConn      = {}
         
         self.atomPDPCMap = {}
 
@@ -96,10 +97,10 @@ class AcedrgRDKit(object):
         self.defaultComfId = -10
 
         # TMP variables
-        self.smiOrig = ""
-        self.smiMod = ""
-        self.repSign = ""
-        self.reSetSmi = False
+        self.smiOrig    = ""
+        self.smiMod     = ""
+        self.repSign    = ""
+        self.reSetSmi   = False
         self.reSetChirals = False
 
         self.monoName = ""
@@ -245,11 +246,12 @@ class AcedrgRDKit(object):
         # print "New repUnit ", tRepStr
         # print "New Unit ", tNewStrs
 
-    def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tMode=0, tNameMap=None, tChargeList=None):
+    def initMols(self, tFileType, tFileName, tMonoRoot, tChemCheck, tPH, tNumConf, tMode=0, tNameMap=None, tChargeList=None, tMtList=None):
 
         aTmpMode = 0
         aMolT = None
         aMolName = ""
+        
         #print("Input File for rdkit is ", tFileName)
         if tFileType == "mol":
             if os.path.isfile(tFileName):
@@ -383,7 +385,7 @@ class AcedrgRDKit(object):
             #print("file %s aTmpMode %d"%(tFileName,  aTmpMode))
             #aMolT = self.checkAAAndSetAAAtomNames(aMolT)
             self.setOtherMolInfo(aMolT, tNumConf, tChemCheck,
-                                 tPH, tNameMap, tMode, tChargeList, aTmpMode)
+                                 tPH, tNameMap, tMode, tChargeList, aTmpMode, tMtList)
         
             
             """
@@ -1979,7 +1981,7 @@ class AcedrgRDKit(object):
         #    print("y:  ", aPos.y)
         #    print("z:  ", aPos.z)
 
-    def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None, tMapMode=0):
+    def setOtherMolInfo(self, tMol, tNumConf, tChemCheck, tPH, tNameMap, tMode=0, tChargeList=None, tMapMode=0, tMtList=None):
 
         # For molecule diff between  in/out in prot/de-prot or charges 
         self.atomPDPCMap.clear()
@@ -2021,6 +2023,23 @@ class AcedrgRDKit(object):
                 self.setNamesForAtomsInMol(tMol, ChemCheck,  tNameMap, 0)
         # self.showInfoAboutAtomsAndBonds(aMol, 1)
         
+        if tMtList:
+            try:
+                fM=open(tMtList, "r")
+            except IOError :
+                print("%s does not exist"%tMtList)
+            else:
+                allM = fM.readlines()
+                fM.close()
+                for aL in allM:
+                    strs = aL.strip().split()
+                    if len(strs)==3:
+                        if not strs[1] in self.maConn:
+                            self.maConn[strs[1]] = []
+                        self.maConn[strs[1]].append(strs[2])
+        
+        
+        
 
         Chem.SanitizeMol(tMol)
         Chem.Kekulize(tMol)
@@ -2040,7 +2059,6 @@ class AcedrgRDKit(object):
         # Make sure an atom in the molecule has the same charge in the input file.
         # RDKit sometimes change it when initiating the molecule
         if tChargeList:
-            print("Here ", tChargeList)
             for aAtom in tMol.GetAtoms():
                 if aAtom.GetSymbol() != "H":
                     name = aAtom.GetProp("Name")
@@ -3097,13 +3115,20 @@ class AcedrgRDKit(object):
                 #print("Those atoms in this molecule are found in functional group: ")
                 allAs = tMol.GetAtoms()
                 #for i in range(len(atmGrpIdxs)):
-                #    for aIdx in atmGrpIdxs[i]:
+                #   for aIdx in atmGrpIdxs[i]:
                 #        print("atom ", allAs[aIdx].GetProp("Name"))
-                if aTri[0] not in self.funcGroups:
-                    self.funcGroups[aTri[0]] = []
+                
                 for oneAtmIdxGrp in atmGrpIdxs:
+                    lAdd = True
+                    for aIdx in oneAtmIdxGrp:
+                        if allAs[aIdx].GetProp("Name") in self.maConn:
+                            lAdd = False
+                            break
                     # print aTri[0], "add func atoms"
-                    self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
+                    if lAdd :
+                        if aTri[0] not in self.funcGroups:
+                            self.funcGroups[aTri[0]] = []
+                        self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
                 # print ""
     
     # The following methods are migrated from Acedrg c++ section
