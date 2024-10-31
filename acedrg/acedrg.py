@@ -379,7 +379,7 @@ class Acedrg(CExeCode ):
                                     help="Rekekulize the bond order in the molecule")
         
         self.inputParser.add_option("--c0", dest="inCoordMmCifName", metavar="FILE", 
-                                    action="store", type="string", help="Input MMCIF File within which, the coordinates will be output")
+                                    action="store", type="string", help="Input MMCIF File within which, the coordinates will be output. Internal use only")
         
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
@@ -1988,6 +1988,7 @@ class Acedrg(CExeCode ):
     
     def getFinalOutputFiles2(self, tRoot, tMol, tCifInName, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
         
+        print("It is HERE")
         if os.path.isfile(tCifInName):
             if tRoot !="":
                 #self.outRstCifName = self.outRoot +  "_"+ tRoot +".cif"
@@ -3026,7 +3027,6 @@ class Acedrg(CExeCode ):
         self.splitCif3Blocks(tFinInCif, a3B, "_chem_comp_atom.")
         fC2.replaceAtomCoords(a3B, fC1.atoms, aFinalOutN)
         if len(fC1.atoms) != len(fC2.atoms):
-            print("HereREP")
             aRoot=os.path.basename(self.outRoot)
             self.runServalcat(aRoot, aFinalOutN)
             aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")

@@ -258,6 +258,7 @@ class FileTransformer(object) :
             self.TmpChemCheck()
             
             
+            
             self.selectAtomCoordinates()
 
             self.checkBondOrder()
@@ -279,7 +280,7 @@ class FileTransformer(object) :
                         print ("label : ", aKey, " Value : ", aAtom[aKey])
                     print ("===============================")
             """
-            
+    
     def TmpChemCheck(self):
 
         """ 
@@ -1947,7 +1948,7 @@ class FileTransformer(object) :
                 self.atoms[idx1]["_chem_comp_atom.x"] = 0.0
                 self.atoms[idx1]["_chem_comp_atom.y"] = 0.0  
                 self.atoms[idx1]["_chem_comp_atom.z"] = 0.0
-        
+                
         tCif.write("_chem_comp_atom.comp_id\n")
         tCif.write("_chem_comp_atom.atom_id\n")
         tCif.write("_chem_comp_atom.alt_atom_id\n")
@@ -1961,6 +1962,12 @@ class FileTransformer(object) :
         tCif.write("_chem_comp_atom.pdbx_model_Cartn_y_ideal\n")
         tCif.write("_chem_comp_atom.pdbx_model_Cartn_z_ideal\n")    
         for aAtm in self.atoms:
+            if not "_chem_comp_atom.alt_atom_id" in aAtm:
+                if "_chem_comp_atom.atom_id" in aAtm:
+                    aAtm["_chem_comp_atom.alt_atom_id"] = aAtm["_chem_comp_atom.atom_id"]
+                else:
+                    aAtm["_chem_comp_atom.atom_id"] =  aAtm["_chem_comp_atom.type_symbol"]
+                    aAtm["_chem_comp_atom.alt_atom_id"] = aAtm["_chem_comp_atom.atom_id"]
             x= str(aAtm["_chem_comp_atom.x"])
             y= str(aAtm["_chem_comp_atom.y"])
             z= str(aAtm["_chem_comp_atom.z"])

@@ -1131,10 +1131,10 @@ class AcedrgRDKit(object):
             for i in range(tMol.GetNumAtoms()):
                 conf.SetAtomPosition(i, self.initCoords[i])
             for aA in aSetAtoms:
-                print("atom element type: ", aA.GetSymbol())
-                print("It connects to ", len(aA.GetNeighbors()))
+                #print("atom element type: ", aA.GetSymbol())
+                #print("It connects to ", len(aA.GetNeighbors()))
                 pos = conf.GetAtomPosition(aA.GetIdx())
-                print("x=%5.4f y=%5.4f z=%5.4f" % (pos.x, pos.y, pos.z))
+                #print("x=%5.4f y=%5.4f z=%5.4f" % (pos.x, pos.y, pos.z))
 
     def setNamesForAtomsInMol(self, tMol, tChemCheck, tNameMap, tStage=0):
 
@@ -1995,10 +1995,10 @@ class AcedrgRDKit(object):
         elemList = []
         for aAtom in initAtoms:
             elemList.append(aAtom.GetSymbol())
-            print("atom idx ", aAtom.GetIdx())
-            print("atom element ", aAtom.GetSymbol())
-            print("atom val ", aAtom.GetTotalValence())
-            print("atom charge ", aAtom.GetFormalCharge())
+            #print("atom idx ", aAtom.GetIdx())
+            #print("atom element ", aAtom.GetSymbol())
+            #print("atom val ", aAtom.GetTotalValence())
+            #print("atom charge ", aAtom.GetFormalCharge())
         # print("number of props in the mol ", len(tMol.GetPropNames()))
         if not len(elemList):
             print("No atoms in from your file, check your file format")
