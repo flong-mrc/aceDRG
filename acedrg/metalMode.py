@@ -515,7 +515,13 @@ class metalMode(CExeCode):
                          self.atmHybr[aId] = 2
                      else:
                          self.atmHybr[aId] = 3
-        
+                elif aAtm['_chem_comp_atom.type_symbol'].upper()=="CL" or\
+                     aAtm['_chem_comp_atom.type_symbol'].upper()=="F" or\
+                    aAtm['_chem_comp_atom.type_symbol'].upper()=="BR" or\
+                    aAtm['_chem_comp_atom.type_symbol'].upper()=="I" or\
+                    aAtm['_chem_comp_atom.type_symbol'].upper()=="AT":
+                    if aL > 1 or aM > 1:
+                        self.atmHybr[aId] = 3
         # second round
         for aAtm in tAtoms:
             if aAtm['_chem_comp_atom.type_symbol']=="N":
