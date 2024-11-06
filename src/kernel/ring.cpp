@@ -944,10 +944,10 @@ namespace LIBMOL
             numOneAtm2 = setPiForOneAtomAll(*iAt, tAtoms, tMode);
             //}
 
-            //std::cout << "XXX here Atom " << tAtoms[*iAt].id
-            //      << " its charge " << tAtoms[*iAt].charge << std::endl
-            //      << " add " << numOneAtm1 << " or "
-            //      <<  numOneAtm2 << " pi atoms" << std::endl;
+            std::cout << "XXX here Atom " << tAtoms[*iAt].id
+                      << " its charge " << tAtoms[*iAt].charge << std::endl
+                      << " add " << numOneAtm1 << " or "
+                      <<  numOneAtm2 << " pi atoms" << std::endl;
 
             if (numOneAtm1 > 0.0)
             {
@@ -1744,6 +1744,18 @@ namespace LIBMOL
                             aN=1.0;
                         }
                     }
+                    else
+                    {
+                        if (tAtoms[tIdx].charge==-2.0)
+                        {
+                            if (nonMC ==2)
+                            {
+                                // Place holder in case for future.
+                                aN=2.0;
+                            }
+                        }
+
+                    }
                 }
                 else if (tAtoms[tIdx].chemType.compare("N") ==0)
                 {
@@ -2272,7 +2284,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             {
                 std::cout << "One Planar Ring! It contains " << iR->atoms.size()
                           << " atoms. " << std::endl;
-
+                std::cout << "HereP" << std::endl;
                 bool lAro = checkAromaSys(atmIdx, tAtoms, 0);
                 if (lAro)
                 {
@@ -2446,7 +2458,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 {
                     iR->isAromatic = true;
                     tAroRings.push_back(*iR);
-                    // std::cout << "It is an aromatic ring " << std::endl;
+                    std::cout << "It is an aromatic ring " << std::endl;
                 }
                 else
                 {
@@ -2469,7 +2481,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
                 {
                     iR->isAromaticP = true;
                     tAroRings.push_back(*iR);
-                    // std::cout << "It is an aromatic ring " << std::endl;
+                    std::cout << "It is an aromaticP ring " << std::endl;
                 }
                 //std::cout << std::endl;
             }

@@ -547,7 +547,7 @@ class metalMode(CExeCode):
         #    aSp = self.atmHybr[aId]
         #    print("Atom %s has a sp %s"%(aId, aSp))
                          
-    def setASpeAng(self, tMA, tMN, tNN, tSP):
+    def setASpeAng(self, tMA, tMN, tNN, tSP, tAngSum):
         
         
         aAng = {}
@@ -557,11 +557,12 @@ class metalMode(CExeCode):
         if tSP==1:
             aAng["_chem_comp_angle.value_angle"] = "180.00"
         elif tSP==2:
-            #if tMN in tAngSum.keys():
-            #    aVal = (360.0-tAngSum[tMN])/2.0
-            #    aSV  = "%8.4f"%aVal
-            #    aAng["_chem_comp_angle.value_angle"] = aSV
-            aAng["_chem_comp_angle.value_angle"] = "120.00"
+            if tMN in tAngSum.keys():
+                aVal = (360.0-tAngSum[tMN])/2.0
+                aSV  = "%8.4f"%aVal
+                aAng["_chem_comp_angle.value_angle"] = aSV
+            else:
+                aAng["_chem_comp_angle.value_angle"] = "120.00"
             #else:
             #    # assume two lone pairs missing
             #    aAng["_chem_comp_angle.value_angle"] = "109.47"
@@ -574,6 +575,23 @@ class metalMode(CExeCode):
         # print("add metal related angle:", aAng)
     
         self.speAngs.append(aAng)
+        
+    def setASpePl(self, tMA, tSetAtms, idxP):
+        
+        
+        aIdxStr = "plan-" + str(idxP)
+        if not tMA in self.metalInPs:
+            self.metalInPs[tMA] = []
+        aPL = []
+        aL = "%s%s%s%s\n"%(self.monomRoot.ljust(8), aIdxStr.ljust(8), 
+                         tMA.ljust(8), "0.020".ljust(6))
+        aPL.append(aL)
+        
+        for aId in tSetAtms:
+            aL = "%s%s%s%s\n"%(self.monomRoot.ljust(8), aIdxStr.ljust(8), 
+                               aId.ljust(8), "0.020".ljust(6))
+            aPL.append(aL)
+        self.metalInPs[tMA].append(aPL) 
         
     def setMetalPA(self):
         
@@ -863,7 +881,6 @@ class metalMode(CExeCode):
                 tmpMAtoms.append(aMA)
         #print(self.metalAtoms)        
         for aMA in self.metalConnAtomsMap:
-            print("For a metal atom : ", aMA)
             aMAtom = self.getAtomById(self.metalAtoms, aMA)
             aMAtom["_chem_comp_atom.x"] = 0.0
             aMAtom["_chem_comp_atom.y"] = 0.0
@@ -872,7 +889,6 @@ class metalMode(CExeCode):
             aveY =0.0
             aveZ =0.0
             for aMCId in self.metalConnAtomsMap[aMA]: 
-                print("For metal bonding atom ", aMCId) 
                 aMCAtom = self.getAtomById(tAtoms, aMCId)
                 if aMCAtom:    # exclude NB Metal atoms
                     if "_chem_comp_atom.x" in aMCAtom.keys():
@@ -1118,32 +1134,35 @@ class metalMode(CExeCode):
                 elif aL.find('_chem_comp_ring_atom.is_aromatic_ring') !=-1:
                     lSR = True
                     lSP = False
-                    
+            
+            
             #print(self.simpP)
             #print(self.simpR)
     
     
             
-            #aFSYS = FileTransformer()
-            #aFSYS.mmCifReader(tInCif)
-            #print(tInCif)
-            #angSumMap = {}
-            #for aAng in aFSYS.angles: 
-            #    idCen = aAng["_chem_comp_angle.atom_id_2"] 
-            #    if not idCen in angSumMap.keys():
-            #        angSumMap[idCen]=float(aAng['_chem_comp_angle.value_angle'])
-            #        
-            #    else:
-            #        angSumMap[idCen]+=float(aAng['_chem_comp_angle.value_angle'])
+            aFSYS = FileTransformer()
+            aFSYS.mmCifReader(tInCif)
+            angSumMap = {}
+            for aAng in aFSYS.angles: 
+                idCen = aAng["_chem_comp_angle.atom_id_2"] 
+                if not idCen in angSumMap.keys():
+                    angSumMap[idCen]=float(aAng['_chem_comp_angle.value_angle'])
+                    
+                else:
+                    angSumMap[idCen]+=float(aAng['_chem_comp_angle.value_angle'])
                 
             
             #print("angSumMap ", angSumMap)
+            numP=len(self.simpP) +1 
             aDoneMA =[]
             for aMA in self.metalConnAtomsMap.keys():
                 #print("For metal atom ", aMA)
                 for aMN in self.metalConnAtomsMap[aMA]:
                     if self.checkExtraConns(aMA, aMN):
                         aSP = self.atmHybr[aMN]
+                        if aSP == 2:
+                            aSetAtms = [aMN]
                         #print("conne atom ", aMN, " hybr ", aSP)
                         #print("NB atom ", aMN, " has the following angles: ")
                         #if aMN in self.atmNonHMap.keys():
@@ -1151,10 +1170,15 @@ class metalMode(CExeCode):
                         for aNN in self.atomsAllConnMap[aMN]:
                             if aNN !=aMA and not aNN in aDoneMA:
                                 #print("Angle among %s and %s and %s"%(aMA, aMN, aNN))
-                                self.setASpeAng(aMA, aMN, aNN, aSP)
+                                self.setASpeAng(aMA, aMN, aNN, aSP, angSumMap)
+                                if not aNN in self.metalConnAtomsMap[aMA] and aSP == 2:
+                                    aSetAtms.append(aNN)
+                        if len(aSetAtms) > 1:
+                            self.setASpePl(aMA, aSetAtms, numP)
+                            numP+=1
+                        aSetAtms = []
                 aDoneMA.append(aMA)
             #self.setMetalPA()
-            
             
             
             lA = False
@@ -1174,9 +1198,9 @@ class metalMode(CExeCode):
                     if lExistAng:
                         self.writeNewAngCifLine(newLines)
                     lANG=False
-                #elif lP and aL.find('_chem_comp_plane_atom.')==-1:
-                #    self.writeNewPlCifLine(newLines)
-                #    lP=False
+                elif lP and aL.find('_chem_comp_plane_atom.')==-1:
+                    self.writeNewPlCifLine(newLines)
+                    lP=False
                 elif not  lA and aL.find('_chem_comp_atom') != -1:
                     lA=True
                     lB=False
@@ -1243,6 +1267,7 @@ class metalMode(CExeCode):
                 for aL in newLines:
                     aOutCif.write(aL)
                 aOutCif.close()
+            
             
     
     def checkExtraConns(self, tMAId, tMN):
@@ -1383,16 +1408,21 @@ class metalMode(CExeCode):
     
     def writeNewPlCifLine(self, tLines):
         
-        pl_esd = "0.020"
         for aMA in self.metalInPs:
-            for aPl in self.metalInPs[aMA]:
-                aLine = "%s%s%s%s\n"\
-                  % (self.monomRoot.ljust(8),
-                     aPl.ljust(10), 
-                     aMA.ljust(10),
-                     pl_esd.ljust(10))
-                    
-                tLines.append(aLine)
+            for aPL in self.metalInPs[aMA]:
+                for aL in aPL:
+                    tLines.append(aL)
+        #pl_esd = "0.020"
+        #for aMA in self.metalInPs:
+        #    for aPl in self.metalInPs[aMA]:
+        #        aLine = "%s%s%s%s\n"\
+        #          % (self.monomRoot.ljust(8),
+        #             aPl.ljust(10), 
+        #             aMA.ljust(10),
+        #             pl_esd.ljust(10))
+        #            
+        #        tLines.append(aLine)
+    
         
     def writeNewAtomPdbLines(self, tLines):
         
