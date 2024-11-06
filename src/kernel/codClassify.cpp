@@ -1229,8 +1229,8 @@ namespace LIBMOL
             allAtoms[i].codClass = "";
             setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
 
-            //std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl
-            //          << "class is " << allAtoms[i].codClass << std::endl;
+            std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl
+                      << "class is " << allAtoms[i].codClass << std::endl;
         }
 
         // merge into above late on
@@ -1245,7 +1245,6 @@ namespace LIBMOL
         setAtomsNBSymb2();
 
         // hashingAtoms2();
-
 
 
     }

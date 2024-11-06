@@ -56,6 +56,8 @@ class metalMode(CExeCode):
         self.monomRoot        = ""
         self.outRoot          = ""
         
+        self.inCoordForChir   = False
+        
         self.initConfs        = int(tInitConfs)
 
         self.getRadii() 
@@ -509,6 +511,8 @@ class metalMode(CExeCode):
                          self.atmHybr[aId] = 3
                      elif aL==6:
                          self.atmHybr[aId] = 5  
+                     elif aM > 1 and aL < 3 :
+                         self.atmHybr[aId] = 3
                 elif aAtm['_chem_comp_atom.type_symbol']=="SE" or\
                     aAtm['_chem_comp_atom.type_symbol']=="Se":
                      if aL==3:
@@ -755,8 +759,12 @@ class metalMode(CExeCode):
                 posX =0.0
                 posY =0.0
                 posZ =0.0
-                
-                if "_chem_comp_atom.model_Cartn_x" in aAtom.keys() and \
+                if "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aAtom.keys()\
+                    and aAtom['_chem_comp_atom.pdbx_model_Cartn_x_ideal'].find("?")==-1:
+                     posX = float(aAtom['_chem_comp_atom.pdbx_model_Cartn_x_ideal'])
+                     posY = float(aAtom['_chem_comp_atom.pdbx_model_Cartn_y_ideal'])
+                     posZ = float(aAtom['_chem_comp_atom.pdbx_model_Cartn_z_ideal'])   
+                elif "_chem_comp_atom.model_Cartn_x" in aAtom.keys() and \
                     aAtom['_chem_comp_atom.model_Cartn_x'].find("?")==-1:
                     posX = float(aAtom['_chem_comp_atom.model_Cartn_x'])
                     posY = float(aAtom['_chem_comp_atom.model_Cartn_y'])
@@ -853,9 +861,9 @@ class metalMode(CExeCode):
         for aMA in self.metalAtoms:
             if not aMA['_chem_comp_atom.atom_id'] in self.metalConnAtomsMap:
                 tmpMAtoms.append(aMA)
-                
+        #print(self.metalAtoms)        
         for aMA in self.metalConnAtomsMap:
-            #print("For a metal atom : ", aMA)
+            print("For a metal atom : ", aMA)
             aMAtom = self.getAtomById(self.metalAtoms, aMA)
             aMAtom["_chem_comp_atom.x"] = 0.0
             aMAtom["_chem_comp_atom.y"] = 0.0
@@ -864,16 +872,17 @@ class metalMode(CExeCode):
             aveY =0.0
             aveZ =0.0
             for aMCId in self.metalConnAtomsMap[aMA]: 
-                #print("For metal bonding atom ", aMCId) 
-                aMCAtom = self.getAtomById(tAtoms, aMCId) 
-                if "_chem_comp_atom.x" in aMCAtom.keys():
-                    aveX += float(aMCAtom["_chem_comp_atom.x"]) 
-                    aveY += float(aMCAtom["_chem_comp_atom.y"])
-                    aveZ += float(aMCAtom["_chem_comp_atom.z"])
-                elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aMCAtom.keys():
-                    aveX += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]) 
-                    aveY += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"])
-                    aveZ += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"])
+                print("For metal bonding atom ", aMCId) 
+                aMCAtom = self.getAtomById(tAtoms, aMCId)
+                if aMCAtom:    # exclude NB Metal atoms
+                    if "_chem_comp_atom.x" in aMCAtom.keys():
+                        aveX += float(aMCAtom["_chem_comp_atom.x"]) 
+                        aveY += float(aMCAtom["_chem_comp_atom.y"])
+                        aveZ += float(aMCAtom["_chem_comp_atom.z"])
+                    elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aMCAtom.keys():
+                        aveX += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]) 
+                        aveY += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"])
+                        aveZ += float(aMCAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"])
             if len(self.metalConnAtomsMap[aMA]) > 0:
                 d = len(self.metalConnAtomsMap[aMA])
                 aMAtom["_chem_comp_atom.x"] = aveX/d
@@ -1239,11 +1248,14 @@ class metalMode(CExeCode):
     def checkExtraConns(self, tMAId, tMN):
         
         aRet = True
-        
-        for aNN in self.nonMAtmConnsMap[tMN]:
-            if aNN in self.metalConnAtomsMap[tMAId]:
+        if tMN in self.nonMAtmConnsMap:
+            for aNN in self.nonMAtmConnsMap[tMN]:
+                if aNN in self.metalConnAtomsMap[tMAId]:
                     aRet = False
                     break
+        else:
+            aRet = False
+            
         return aRet
     
     def noNewHLine(self, tLine, tHIds):
@@ -1440,9 +1452,12 @@ class metalMode(CExeCode):
         aMC.close()    
         if self.initConfs <=10:
             self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s "%(self.exeAcedrg, tInCif, self.monomRoot, tOutRoot, aMtConnFileName)
+            
         else:
             self._cmdline   = "%s -c %s  -r %s -o %s --mtList %s  -j %d"%(self.exeAcedrg, tInCif, 
                                                                             self.monomRoot, tOutRoot, aMtConnFileName, self.initConfs)
+        if self.inCoordForChir:
+                    self._cmdline += " --c1 "
         self._log_name  = tOutRoot + "_acedrg.log"
         #print(self._cmdline)
         self.runExitCode = self.subExecute()

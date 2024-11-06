@@ -78,6 +78,7 @@ class AcedrgRDKit(object):
         self.numConformers = 1
         self.useExistCoords = False
         self.useExistCoords2 = False
+        self.useCoordsForChir = False
         self.noProtonation = False
         self.conformerEngMap = {}
         self.numSelectForRefConfs = 25
@@ -105,6 +106,8 @@ class AcedrgRDKit(object):
 
         self.monoName = ""
         self.longName = ""
+        
+        self.inputCoordMap = {}
 
     def setProcPara(self, tProcessParaSet):
 
@@ -147,6 +150,9 @@ class AcedrgRDKit(object):
         # if self.numSelectForRefConfs < 25:
         #    self.numSelectForRefConfs = 25
         self.numSelectForRefConfs = 20
+  
+        if "inCoordForChir" in tProcessParaSet:
+            self.useCoordsForChir = True    
         
 
     def setRepSign(self):
@@ -2178,8 +2184,8 @@ class AcedrgRDKit(object):
             else:
                 confId = aMol.GetConformer()
                 self.selecConformerIds.append(confId)
-            #print("AAA: Number of conformers selected for refinement is ",
-            #      len(self.selecConformerIds))
+            print("AAA: Number of conformers selected for refinement is ",
+                  len(self.selecConformerIds))
             nConf = aMol.GetNumConformers()
             #print("number of conformers in Conf", nConf)
         
@@ -2584,9 +2590,10 @@ class AcedrgRDKit(object):
                              % (tMonoName, name1, name2,  bType,
                                  isAro, bLen, dBlen))
             
-            if not self.noConformers:
+            if not self.noConformers and not self.useCoordsForChir:
                 self.outChiralSection(delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName, tChiDes, tGroupName, tIdxConform )
-                
+            elif self.useCoordsForChir:
+                self.outChiralSectionInCoords(delAtomIdxs, tMol, aMmCif, tChemCheck)
             aMmCif.close()
             
     def MolToSimplifiedMmcifNoComf(self, tMol, tMmcifName, tChemCheck, tMonoName="LIG", tChiDes=None, tGroupName="non-polymer"):
@@ -2879,8 +2886,40 @@ class AcedrgRDKit(object):
                     aMmCif.write(aLine)
                     # print(aLine)
                     chiralIdx += 1
+    
+    def outChiralSectionInCoords(self, delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName="LIG"):
         
-
+        atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
+        aChiralSignMap = self.setChiralsByInputCoords(tChemCheck, tMol, atomNBCIPMap)
+        
+        if len(aChiralSignMap.keys()) > 0:
+            aMmCif.write("#\n")
+            aMmCif.write("_chem_comp_chir.comp_id\n")
+            aMmCif.write("_chem_comp_chir.id\n")
+            aMmCif.write("_chem_comp_chir.atom_id_centre\n")
+            aMmCif.write("_chem_comp_chir.atom_id_1\n")
+            aMmCif.write("_chem_comp_chir.atom_id_2\n")
+            aMmCif.write("_chem_comp_chir.atom_id_3\n")
+            aMmCif.write("_chem_comp_chir.volume_sign\n")
+            
+            chiralIdx = 1
+            for aId in aChiralSignMap:
+                if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
+                    aCTName = "chir_" + str(chiralIdx)
+                    aLine = "%s%s%s%s%s%s%s\n"\
+                        % (tMonoName.ljust(12), aCTName.ljust(12),
+                           aId.ljust(12),
+                           atomNBCIPMap[aId][0][0].GetProp(
+                                   "Name").ljust(12),
+                           atomNBCIPMap[aId][1][0].GetProp(
+                                   "Name").ljust(12),
+                           atomNBCIPMap[aId][2][0].GetProp(
+                                   "Name").ljust(12),
+                           aChiralSignMap[aId]["finalChiVolSign"])
+                    aMmCif.write(aLine)
+                    chiralIdx += 1
+               
+    
     def checkUncertainChirals(self, tNBAtoms):
 
         tPass = True
@@ -3054,6 +3093,76 @@ class AcedrgRDKit(object):
                 self.selecConformerIds.append(aCid)
 
         return aChiralSetMap
+    
+    def setChiralsByInputCoords(self, tChemCheck, tMol, tNBCIPMap):
+        
+        aChiralSetMap = {} 
+        allAtoms = tMol.GetAtoms()
+        # Using rdkit to decide which atoms are chiraled 
+        if len(self.selecConformerIds):
+            tmpBadCid = []
+            for aCid in self.selecConformerIds:
+                #print("aCid ", aCid)
+                try:
+                    rdmolops.AssignAtomChiralTagsFromStructure(
+                        tMol, confId=aCid)
+                except:
+                    tmpBadCid.append(aCid)
+                    print("pass conformer id ", aCid)
+                else:
+                    for aAtom in allAtoms:
+                        aId = aAtom.GetProp("Name")
+                        aElem = aAtom.GetSymbol()
+                        aCT = aAtom.GetChiralTag()
+                        aHyb = aAtom.GetHybridization()
+                        nNB = len(aAtom.GetNeighbors())
+                        nConnHs = self.chemCheck.getNumNBHAtoms(aAtom)
+                        if aId not in aChiralSetMap:
+                            aChiralSetMap[aId] = {}
+                            if aCT != rdchem.ChiralType.CHI_UNSPECIFIED :
+                                aChiralSetMap[aId]["isChiraled"] = True
+                            elif aHyb == rdchem.HybridizationType.SP3 and nConnHs < 3 and nNB > 2:
+                                aChiralSetMap[aId]["isChiraled"] = True
+                            else:
+                                aChiralSetMap[aId]["isChiraled"] = False
+
+                        if aChiralSetMap[aId]["isChiraled"]:
+                            if aElem == "N" and nNB ==3 and nConnHs <2: 
+                                aChiralSetMap[aId]["finalChiVolSign"] = "both"
+                            else:
+                                if aId in tNBCIPMap and len(tNBCIPMap[aId]) > 2 and nConnHs < 2 :
+                                    print("atom ", aId)
+                                    if aId in self.inputCoordMap:
+                                        coordsCen = [float(self.inputCoordMap[aId][0]),\
+                                                     float(self.inputCoordMap[aId][1]),\
+                                                     float(self.inputCoordMap[aId][2])]
+                                        print("coords ", coordsCen)
+                                    aId1 = tNBCIPMap[aId][0][0].GetProp("Name")
+                                    if aId1 in self.inputCoordMap:
+                                        print("NB atom ", aId1)
+                                        coords1 = [float(self.inputCoordMap[aId1][0]),\
+                                                   float(self.inputCoordMap[aId1][1]),\
+                                                   float(self.inputCoordMap[aId1][2])]
+                                        print("coords ", coords1)
+                                    aId2 = tNBCIPMap[aId][1][0].GetProp("Name")
+                                    if aId2 in self.inputCoordMap:
+                                        coords2 = [float(self.inputCoordMap[aId2][0]),\
+                                                   float(self.inputCoordMap[aId2][1]),\
+                                                   float(self.inputCoordMap[aId2][2])]        
+                                    aId3 = tNBCIPMap[aId][2][0].GetProp("Name")
+                                    if aId3 in self.inputCoordMap:
+                                        coords3 = [float(self.inputCoordMap[aId3][0]),\
+                                                   float(self.inputCoordMap[aId3][1]),\
+                                                   float(self.inputCoordMap[aId3][2])] 
+                                    if len(coordsCen)==3 and len(coords1)==3 and\
+                                       len(coords2)==3 and len(coords3)==3:
+                                        aChiralSetMap[aId]["finalChiVolSign"]\
+                                        =tChemCheck.getChiralVolumeSign(coordsCen, coords1, coords2, coords3)
+                                        print("atom ", aId, " chiral sign ", aChiralSetMap[aId]["finalChiVolSign"])
+        
+        return aChiralSetMap
+    
+    
 
     def doubleCheckRDKitChiralCenters(self, tChiralSetMap, tNBCIPMap):
 

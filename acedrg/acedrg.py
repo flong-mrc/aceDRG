@@ -150,6 +150,7 @@ class Acedrg(CExeCode ):
         self.workMode         = 0
         self.useExistCoords   = False
         self.useExistCoords2  = False
+        self.inCoordForChir   = False
         self.useCoordsOnly    = False
         self.modifiedPlanes   = False
 
@@ -227,6 +228,7 @@ class Acedrg(CExeCode ):
         self.chemCheck        = ChemCheck() 
         
         self.metalMode        = metalMode(self.acedrgTables, self.rdKit.numInitConformers)
+        self.metalMode.inCoordForChir = self.inCoordForChir 
         
         self.initMmcifMolMap  = {}
 
@@ -281,6 +283,13 @@ class Acedrg(CExeCode ):
 
         self.inputParser.add_option("-c",  "--mmcif", dest="inMmCifName", metavar="FILE", 
                                     action="store", type="string", help="Input MMCIF File containing coordinates and bonds")
+        
+        self.inputParser.add_option("--c0", dest="inCoordMmCifName", metavar="FILE", 
+                                    action="store", type="string", help="Input MMCIF File within which the coordinates will be output. Internal use only")
+                                    
+        self.inputParser.add_option("--c1", dest="inCoordForChir", 
+                                    action="store_true",  default=False,
+                                    help="Input MMCIF File within which the coordinates will be used to calculate output chiral centers.")
 
         self.inputParser.add_option("-d",  "--cifdir", dest="inStdCifDir", metavar="FILE", 
                                     action="store", type="string", 
@@ -378,9 +387,8 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,
                                     help="Rekekulize the bond order in the molecule")
         
-        self.inputParser.add_option("--c0", dest="inCoordMmCifName", metavar="FILE", 
-                                    action="store", type="string", help="Input MMCIF File within which, the coordinates will be output. Internal use only")
-        
+
+                                    
         self.inputParser.add_option("-t",  "--tab", dest="acedrgTables", metavar="FILE", 
                                     action="store", type="string", 
                                     help="Input path that stores all bond and angle tables (if no input, default CCP4 location will be used)")
@@ -999,7 +1007,9 @@ class Acedrg(CExeCode ):
             else:
                 print("%s does not exist. Check? "%t_inputOptionsP.inCoordMmCifName)
                 sys.exit(1)
-        
+                
+        if t_inputOptionsP.inCoordForChir:
+            self.inCoordForChir = t_inputOptionsP.inCoordForChir
 
         self.scrDir = self.outRoot + "_TMP"
         if not os.path.isdir(self.scrDir):
@@ -1083,6 +1093,10 @@ class Acedrg(CExeCode ):
         if t_inputOptionsP.numInitConformers and t_inputOptionsP.numConformers:
             if t_inputOptionsP.numConformers > t_inputOptionsP.numInitConformers:
                 self.inputPara["numInitConformers"] = t_inputOptionsP.numConformers
+        
+        if self.inCoordForChir:
+            self.inputPara["inCoordForChir"] = self.inCoordForChir 
+        
 
     def setSigmaBounds(self):
         
@@ -1696,6 +1710,9 @@ class Acedrg(CExeCode ):
                 self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
                 if tMol[1].find("HasMetal") !=-1:
                     self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
+                if self.inCoordForChir:
+                    self._cmdline += " --c1 "
+            print(self._cmdline)
             self.subExecute()
             if os.path.isfile(aOutFile):
                 print("The dictionary file for the molecules is %s"%aOutFile)
@@ -1988,7 +2005,6 @@ class Acedrg(CExeCode ):
     
     def getFinalOutputFiles2(self, tRoot, tMol, tCifInName, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
         
-        print("It is HERE")
         if os.path.isfile(tCifInName):
             if tRoot !="":
                 #self.outRstCifName = self.outRoot +  "_"+ tRoot +".cif"
@@ -3233,6 +3249,7 @@ class Acedrg(CExeCode ):
         #    print("One of output conformers will using input coordinates as the initial one")
         print("workMode : ", self.workMode)
         
+        
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
             if os.path.isfile(self.inMmCifName) : # and self.chemCheck.isOrganic(self.inMmCifName, self.workMode):
@@ -3265,7 +3282,12 @@ class Acedrg(CExeCode ):
                 if len(self.fileConv.atoms) > 0:
                     self.lOrg = self.chemCheck.isOrganicInCif(self.fileConv.atoms)
                     self.chemCheck.getMetalAtoms(self.fileConv.atoms, self.initMetalAtoms)
-                    
+                    if self.fileConv.mmCifHasCoords:
+                        self.useExistCoords    = True
+                        if self.inCoordForChir:
+                            self.fileConv.keepCoordsForChira() 
+                            if self.fileConv.atomCoordMap:
+                                self.rdKit.inputCoordMap = self.fileConv.atomCoordMap
                 else:
                     self.lOrg = False    
             
@@ -3302,7 +3324,7 @@ class Acedrg(CExeCode ):
                         aC = int(aA["_chem_comp_atom.charge"])
                         if aC !=0:
                             self.fileConv.inputCharge[aA["_chem_comp_atom.atom_id"]] = aC
-                    print("Here2 ", self.fileConv.inputCharge)
+                    
                 self.workMode =11    
                 if len(self.fileConv.dataDescriptor):
                     
@@ -3332,6 +3354,7 @@ class Acedrg(CExeCode ):
                                     break
                     elif self.fileConv.mmCifHasCoords:
                         self.useExistCoords    = True
+                        
                     #print("is this monomer a peptide ", self.isPEP)
                 if  len(self.fileConv.bonds) !=0 :   #and not self.isAA:
                     
@@ -3345,7 +3368,7 @@ class Acedrg(CExeCode ):
                                 self.rdKit.chiralPre =[]
                                 for aChi in self.fileConv.chiralPre:
                                     self.rdKit.chiralPre.append(aChi) 
-                            #print("Here ", self.inMtConnFile)
+                            
                             self.rdKit.initMols("mol", aIniMolName, self.monomRoot, \
                                                 self.chemCheck, self.inputPara["PH"], self.numConformers, 0,\
                                                 self.fileConv.nameMapingCifMol, self.fileConv.inputCharge, self.inMtConnFile) 
@@ -3713,6 +3736,7 @@ class Acedrg(CExeCode ):
         
         if self.workMode in [11,  111, 112, 114, 51] :  #  and not self.isAA :
             #print("Number of molecule ", len(self.rdKit.molecules))
+            
             if len(self.rdKit.molecules):
                 #print("Ligand ID ", self.monomRoot)
                 self.fileConv.getCCP4DataDescritor(self.rdKit.molecules[0],  self.chemCheck, self.monomRoot)

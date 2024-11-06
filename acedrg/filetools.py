@@ -73,6 +73,7 @@ class FileTransformer(object) :
         self.atomTypeMaps    = {}
         self.atomTypeMaps["atomTypes"]    = {}
         self.atomTypeMaps["connections"] = {}
+        self.atomCoordMap  = {}                                                 # 
 
         self.allBlockLs      = []
 
@@ -1017,7 +1018,30 @@ class FileTransformer(object) :
                         self.mmCifHasCoords   = True
                     else:
                         self.mmCifHasCoords = False  
-
+                        
+    def keepCoordsForChira(self):
+        
+        
+        if len(self.atoms) > 0:
+            if "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in self.atoms[0] and\
+               "_chem_comp_atom.atom_id" in self.atoms[0]:
+                for aAtm in self.atoms:
+                    if not "_chem_comp_atom.atom_id" in self.atomCoordMap:
+                        self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]] = []
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.pdbx_model_Cartn_x_ideal"])
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.pdbx_model_Cartn_y_ideal"])
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.pdbx_model_Cartn_z_ideal"])
+                    
+            elif "_chem_comp_atom.x" in self.atoms[0] and\
+               "_chem_comp_atom.atom_id" in self.atoms[0]:
+                for aAtm in self.atoms:
+                    if not "_chem_comp_atom.atom_id" in self.atomCoordMap:
+                        self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]] = []
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.x"])
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.y"])
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.z"])
+                    
+         
     def checkBondOrder(self ):
         
         if self.atoms and self.bonds:
