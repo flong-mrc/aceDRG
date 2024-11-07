@@ -3204,9 +3204,9 @@ class AcedrgRDKit(object):
         # Generate molecules and  check
         # print "Number of functional groups is ", len(self.funcGroupTab)
         for aKey in sorted(self.funcGroupTab.keys()):
-            # print "SMARTS string for functional group %s is %s "%(aKey, self.funcGroupTab[aKey][0])
-            # print "Its pKa value is  %5.3f "%(self.funcGroupTab[aKey][1])
-            # print "Number of atoms in Smarts ",  Chem.MolFromSmarts(self.funcGroupTab[aKey][0]).GetNumAtoms()
+            #print("SMARTS string for functional group %s is %s "%(aKey, self.funcGroupTab[aKey][0]))
+            #print("Its pKa value is  %5.3f "%(self.funcGroupTab[aKey][1]))
+            #print("Number of atoms in Smarts ",  Chem.MolFromSmarts(self.funcGroupTab[aKey][0]).GetNumAtoms())
             # print "Number of atoms in Smiles ",  Chem.MolFromSmiles(self.funcGroupTab[aKey][0]).GetNumAtoms()
             self.stdFuncGroupMols.append([aKey, Chem.MolFromSmarts(
                 self.funcGroupTab[aKey][0]),  Chem.MolFromSmiles(self.funcGroupTab[aKey][0])])
@@ -3216,6 +3216,8 @@ class AcedrgRDKit(object):
         self.funcGroups = {}
         for aTri in self.stdFuncGroupMols:
             atmGrpIdxs = tMol.GetSubstructMatches(aTri[1])
+            #print("FGroup ", aTri[0], " get the following ")
+            #print(atmGrpIdxs)
             #if len(atmGrpIdxs) == 0:
             #    atmGrpIdxs = tMol.GetSubstructMatches(aTri[2])
             if len(atmGrpIdxs):
@@ -3228,16 +3230,16 @@ class AcedrgRDKit(object):
                 #        print("atom ", allAs[aIdx].GetProp("Name"))
                 
                 for oneAtmIdxGrp in atmGrpIdxs:
-                    lAdd = True
-                    for aIdx in oneAtmIdxGrp:
-                        if allAs[aIdx].GetProp("Name") in self.maConn:
-                            lAdd = False
-                            break
+                    #lAdd = True
+                    #for aIdx in oneAtmIdxGrp:
+                    #    if allAs[aIdx].GetProp("Name") in self.maConn:
+                    #        lAdd = False
+                    #        break
                     # print aTri[0], "add func atoms"
-                    if lAdd :
-                        if aTri[0] not in self.funcGroups:
-                            self.funcGroups[aTri[0]] = []
-                        self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
+                    # if lAdd :
+                    if aTri[0] not in self.funcGroups:
+                        self.funcGroups[aTri[0]] = []
+                    self.funcGroups[aTri[0]].append(oneAtmIdxGrp)
                 # print ""
     
     # The following methods are migrated from Acedrg c++ section
@@ -3334,7 +3336,7 @@ class AcedrgRDKit(object):
                     self.setFormalChargeSO4(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO4") != -1:
-                    #print("Doing ", aFuncG)
+                    print("Doing ", aFuncG)
                     self.setFormalChargePO4(
                         tMol, aFuncG, self.funcGroups[aFuncG], tPH)
                 elif aFuncG.find("PO3R") != -1:
@@ -3371,7 +3373,8 @@ class AcedrgRDKit(object):
                         # print "Total H ", tMol.GetAtomWithIdx(aIdx).GetTotalNumHs()
                         # print "Exp   H ", tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs()
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
-                                and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                             and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                             and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                             #print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
@@ -3385,13 +3388,15 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
-                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                             #print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
                             #                                    tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N":
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                             #print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
@@ -3413,7 +3418,8 @@ class AcedrgRDKit(object):
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
                             and (tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 1
-                                 or tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs() == 1):
+                                 or tMol.GetAtomWithIdx(aIdx).GetNumImplicitHs() == 1)\
+                                and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNumExplicitHs(0)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
@@ -3428,7 +3434,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N":
                         # implicit H included in the count
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                             # print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
@@ -3443,7 +3450,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N":
                         # implicit H included in the count
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2:
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() >= 2\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             # print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
                             #       tMol.GetAtomWithIdx(aIdx).GetFormalCharge())
@@ -3458,7 +3466,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
-                                and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                                and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                                 and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                             print("atom %s has a charge %d " % (tMol.GetAtomWithIdx(aIdx).GetProp("Name"),
@@ -3479,7 +3488,8 @@ class AcedrgRDKit(object):
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N" \
-                            and len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 1:
+                            and len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 1\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                         tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                         # print "atom %s has a charge %d "%(tMol.GetAtomWithIdx(aIdx).GetProp("Name"), \
@@ -3506,7 +3516,8 @@ class AcedrgRDKit(object):
                             or \
                            (tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 and
                             len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 2 and
-                                tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() == 0):
+                                tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() == 0)\
+                             and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                         else:
@@ -3530,7 +3541,8 @@ class AcedrgRDKit(object):
                         print("num of neighbor ", len(
                             tMol.GetAtomWithIdx(aIdx).GetNeighbors()))
                         if tMol.GetAtomWithIdx(aIdx).GetFormalCharge() > 0\
-                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                           and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(
                                 0)       # de-protonation
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
@@ -3563,7 +3575,8 @@ class AcedrgRDKit(object):
                                   tMol.GetAtomWithIdx(aIdx).GetFormalCharge()))
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
-                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
@@ -3590,7 +3603,8 @@ class AcedrgRDKit(object):
                             tMol.GetAtomWithIdx(aIdx).GetNeighbors()))
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() == 1     \
                            and tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3 \
-                           and len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 1:
+                           and len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 1\
+                           and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
                             print("Its formal charge ", tMol.GetAtomWithIdx(
@@ -3605,7 +3619,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "S":
                         # implicit H included in the count
-                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0:
+                        if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
 
     def setFormalChargeSO3(self, tMol, tFunG, tAtomIdxs, tPH):
@@ -3624,7 +3639,8 @@ class AcedrgRDKit(object):
                     for aIdx in aSetIdxs:
                         if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                             if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
-                               and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                               and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                                and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                                 tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                                 tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
                                 break
@@ -3645,7 +3661,8 @@ class AcedrgRDKit(object):
                     for aIdx in aSetIdxs:
                         if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                             if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
-                               and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                               and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                                and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                                 tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                                 tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
 
@@ -3659,7 +3676,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O":
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() > 0\
-                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                           and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
 
@@ -3670,7 +3688,8 @@ class AcedrgRDKit(object):
             for aSetIdxs in tAtomIdxs:
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N":
-                        if len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 3:
+                        if len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 3\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
 
@@ -3682,7 +3701,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "N":
                         if len(tMol.GetAtomWithIdx(aIdx).GetBonds()) == 2 \
-                           and tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3:
+                           and tMol.GetAtomWithIdx(aIdx).GetTotalValence() == 3\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(1)
                             tMol.GetAtomWithIdx(aIdx).UpdatePropertyCache()
 
@@ -3696,7 +3716,8 @@ class AcedrgRDKit(object):
                 for aIdx in aSetIdxs:
                     if tMol.GetAtomWithIdx(aIdx).GetSymbol() == "O" and\
                        tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
-                       and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                       and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                       and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn:
                         # need to deprotonation for the O atom
                         tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                         tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)
@@ -3729,7 +3750,8 @@ class AcedrgRDKit(object):
                         print("num of neighbor ", len(
                             tMol.GetAtomWithIdx(aIdx).GetNeighbors()))
                         if tMol.GetAtomWithIdx(aIdx).GetTotalNumHs() != 0\
-                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0:
+                           and tMol.GetAtomWithIdx(aIdx).GetNumExplicitHs() == 0\
+                            and not tMol.GetAtomWithIdx(aIdx).GetProp("Name") in self.maConn :
                             # need to deprotonation for the O atom
                             tMol.GetAtomWithIdx(aIdx).SetFormalCharge(-1)
                             tMol.GetAtomWithIdx(aIdx).SetNoImplicit(True)

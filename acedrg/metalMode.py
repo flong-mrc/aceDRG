@@ -105,7 +105,7 @@ class metalMode(CExeCode):
                     aRet = outTmp2CifName
                     
         elif nBonds==0:
-            outInterMCifName = self.outRoot   + "_final.cif"
+            outInterMCifName = self.outRoot   + ".cif"
             self.outInterMCif(outInterMCifName, tAtoms, tBonds, tVersionInfo)
             print("==============================================")
             print("No non-metal related bonds exist in the molecule")

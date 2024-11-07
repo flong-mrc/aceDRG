@@ -3047,7 +3047,6 @@ class Acedrg(CExeCode ):
             self.runServalcat(aRoot, aFinalOutN)
             aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
             if os.path.isfile(aSOutName):
-                #finalOutName = self.outRoot + "_final.cif"
                 finalOutName = self.outRoot + ".cif"
                 self.cleanSFile(aSOutName, finalOutName)
                 
@@ -3569,7 +3568,6 @@ class Acedrg(CExeCode ):
                                         self.runServalcat(self.outRoot, aMetCoordInCif)  
                                         aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif") 
                                         if os.path.isfile(aSOutName):
-                                            #finalOutName = self.outRoot + "_final.cif"
                                             finalOutName = self.outRoot + ".cif"
                                             shutil.copy(aSOutName, finalOutName) 
                                             print("The final output cif is ", finalOutName)
@@ -3582,7 +3580,6 @@ class Acedrg(CExeCode ):
                                         self.runServalcat(aRoot, aFinInCif)
                                         aSOutName = os.path.join(self.scrDir, self.outRoot + "_updated.cif")
                                         if os.path.isfile(aSOutName):
-                                            #finalOutName = self.outRoot + "_final.cif"
                                             finalOutName = self.outRoot + ".cif"
                                             self.cleanSFile(aSOutName, finalOutName)
                                             #print("The tmp3 output is %s "%aTmp3Cif)
@@ -3599,9 +3596,8 @@ class Acedrg(CExeCode ):
                                 if not self.inCoordMmCifName:
                                     self.runServalcat(aRoot, aFinInCif)
                                     aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
-                                    print("aSOutName", aSOutName)
+                                    #print("aSOutName", aSOutName)
                                     if os.path.isfile(aSOutName):
-                                        #finalOutName = self.outRoot + "_final.cif"
                                         finalOutName = self.outRoot + ".cif"
                                         self.cleanSFile(aSOutName, finalOutName)
                                         #print("The tmp3 output is %s "%aTmp3Cif)
@@ -3617,7 +3613,7 @@ class Acedrg(CExeCode ):
                         self.metalMode.setMMBond(self.fileConv.atoms, self.fileConv.bonds)
                         aTmpOutCif =os.path.join(self.scrDir, self.outRoot + "_tmp.cif")
                         self.fileConv.outputSingleAtomCif(aTmpOutCif, self.versionInfo)
-                        finCif = self.outRoot + "_final.cif"
+                        finCif = self.outRoot + ".cif"
                         if os.path.isfile(self.inMetalPDBName):
                             aCombResult=self.aCombRunMS(aTmpOutCif)
                             if os.path.isfile(aCombResult):
@@ -3639,7 +3635,7 @@ class Acedrg(CExeCode ):
                         print("The final output cif is %s"%finCif)
                 else:    
                     # acedrg just set metal bonds. Check what basic thing is missing 
-                    finCif = self.outRoot + "_final.cif"
+                    finCif = self.outRoot + ".cif"
                     self.metalMode.setMMBond(self.fileConv.atoms, self.fileConv.bonds)
                     self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
                     print("The final output cif is %s"%finCif)
@@ -3650,7 +3646,7 @@ class Acedrg(CExeCode ):
                 #    print("acedrg failed to produce a metal contained mmcif file")
                 #sys.exit()
             elif len(self.fileConv.atoms) == 1:
-                finCif = self.outRoot + "_final.cif"
+                finCif = self.outRoot + ".cif"
                 self.fileConv.outputSingleAtomCif(finCif, self.versionInfo)
                     
 

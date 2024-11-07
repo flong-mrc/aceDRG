@@ -141,7 +141,7 @@ class CExeCode(object) :
 
         outfile_sub.close()
         
-        logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
+        logfile.write("=========END OF PROCESS INFORMATION ==========\n")
         logfile.close()
 
         
@@ -191,7 +191,7 @@ class CExeCode(object) :
 
         self.exitCode = subProcess.wait()
 
-        logfile.write("=========END OF PROCESS INFORMATION\n ==========\n")
+        logfile.write("=========END OF PROCESS INFORMATION ==========\n")
         logfile.close()
 
         #outfile_sub.close()
