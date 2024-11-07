@@ -584,12 +584,12 @@ class metalMode(CExeCode):
             self.metalInPs[tMA] = []
         aPL = []
         aL = "%s%s%s%s\n"%(self.monomRoot.ljust(8), aIdxStr.ljust(8), 
-                         tMA.ljust(8), "0.020".ljust(6))
+                         tMA.ljust(8), "0.060".ljust(6))
         aPL.append(aL)
         
         for aId in tSetAtms:
             aL = "%s%s%s%s\n"%(self.monomRoot.ljust(8), aIdxStr.ljust(8), 
-                               aId.ljust(8), "0.020".ljust(6))
+                               aId.ljust(8), "0.060".ljust(6))
             aPL.append(aL)
         self.metalInPs[tMA].append(aPL) 
         
