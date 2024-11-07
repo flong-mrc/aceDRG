@@ -1161,8 +1161,9 @@ class metalMode(CExeCode):
                 for aMN in self.metalConnAtomsMap[aMA]:
                     if self.checkExtraConns(aMA, aMN):
                         aSP = self.atmHybr[aMN]
+                        aSetAtms = [] 
                         if aSP == 2:
-                            aSetAtms = [aMN]
+                            aSetAtms.append(aMN)
                         #print("conne atom ", aMN, " hybr ", aSP)
                         #print("NB atom ", aMN, " has the following angles: ")
                         #if aMN in self.atmNonHMap.keys():
