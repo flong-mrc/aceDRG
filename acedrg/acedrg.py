@@ -3033,16 +3033,19 @@ class Acedrg(CExeCode ):
         fC1 = FileTransformer()
         fC1.mmCifReader(self.inCoordMmCifName)
         
+        
         fC2 = FileTransformer()
         fC2.mmCifReader(tFinInCif)
-        
         
         aFinalOutN = self.baseRoot + ".cif"
         print("The final file name is ", aFinalOutN)
         a3B = []
-        self.splitCif3Blocks(tFinInCif, a3B, "_chem_comp_atom.")
-        fC2.replaceAtomCoords(a3B, fC1.atoms, aFinalOutN)
-        if len(fC1.atoms) != len(fC2.atoms):
+        if fC1.mmCifHasCoords:
+            self.splitCif3Blocks(tFinInCif, a3B, "_chem_comp_atom.")           
+            fC2.replaceAtomCoords(a3B, fC1.atoms, aFinalOutN)
+        else:
+            shutil.copy(tFinInCif,aFinalOutN)
+        if len(fC1.atoms) != len(fC2.atoms) or not fC1.mmCifHasCoords:
             aRoot=os.path.basename(self.outRoot)
             self.runServalcat(aRoot, aFinalOutN)
             aSOutName = os.path.join(self.scrDir, aRoot + "_updated.cif")
@@ -3285,8 +3288,11 @@ class Acedrg(CExeCode ):
                         self.useExistCoords    = True
                         if self.inCoordForChir:
                             self.fileConv.keepCoordsForChira() 
+                            self.fileConv.setChirBothList()
                             if self.fileConv.atomCoordMap:
                                 self.rdKit.inputCoordMap = self.fileConv.atomCoordMap
+                            if self.fileConv.chirBothList:
+                                self.rdKit.chirBothList = self.fileConv.chirBothList
                 else:
                     self.lOrg = False    
             
@@ -3603,8 +3609,9 @@ class Acedrg(CExeCode ):
                                         #print("The tmp3 output is %s "%aTmp3Cif)
                                         print("The final output cif is %s"%finalOutName)
                                 else:
+                                    print("HERA")
                                     self.usingCoordsInCif(aFinInCif, aRoot)
-                                    pass
+                                
                             
                     else:
                         print("Number of atoms", len(self.fileConv.atoms))

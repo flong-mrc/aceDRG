@@ -1085,8 +1085,7 @@ class metalMode(CExeCode):
         fC = FileTransformer()
         fC.mmCifReader(tInCif)
         self.setMetalInitCoords(fC.atoms)
-        
-        
+        #print("tInCif=", tInCif)
         # Modify cif 
         try:
             aMmCif = open(tInCif, "r")
@@ -1138,8 +1137,9 @@ class metalMode(CExeCode):
             
             #print(self.simpP)
             #print(self.simpR)
-    
-    
+            aChirBothList = {}
+            self.setChirBothList(fC.chiralPre, aChirBothList)
+            #print(aChirBothList)
             
             aFSYS = FileTransformer()
             aFSYS.mmCifReader(tInCif)
@@ -1180,6 +1180,9 @@ class metalMode(CExeCode):
                         aSetAtms = []
                 aDoneMA.append(aMA)
             #self.setMetalPA()
+            
+            # Keep chiral centers with sign "both"
+            
             
             
             lA = False
@@ -1270,6 +1273,16 @@ class metalMode(CExeCode):
                 aOutCif.close()
             
             
+    def setChirBothList(self, tChirPre, tChirBothList):
+        
+        for aChir in tChirPre:
+            strs = aChir.strip().split()
+            #print(strs)
+            if len(strs)==7:
+                if strs[6].lower().find("both") !=-1:
+                    #print(strs[6])
+                    tChirBothList[strs[2]] = [aChir] 
+                    
     
     def checkExtraConns(self, tMAId, tMN):
         

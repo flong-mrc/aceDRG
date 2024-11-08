@@ -73,7 +73,9 @@ class FileTransformer(object) :
         self.atomTypeMaps    = {}
         self.atomTypeMaps["atomTypes"]    = {}
         self.atomTypeMaps["connections"] = {}
-        self.atomCoordMap  = {}                                                 # 
+        self.atomCoordMap  = {}     
+
+        self.chirBothList  = {}                                            # 
 
         self.allBlockLs      = []
 
@@ -258,10 +260,7 @@ class FileTransformer(object) :
 
             self.TmpChemCheck()
             
-            
-            
             self.selectAtomCoordinates()
-
             self.checkBondOrder()
  
             # check
@@ -968,61 +967,76 @@ class FileTransformer(object) :
 
         self.mmCifHasCoords = False  
         if len(self.atoms) > 0:
-            if "_chem_comp_atom.model_Cartn_x" in self.atoms[0] and\
-               "_chem_comp_atom.model_Cartn_y" in self.atoms[0] and\
-               "_chem_comp_atom.model_Cartn_z" in self.atoms[0]:
-                for aAtom in self.atoms:
-                    if aAtom["_chem_comp_atom.model_Cartn_x"].find("?") != -1\
-                       or aAtom["_chem_comp_atom.model_Cartn_y"].find("?") != -1\
-                       or aAtom["_chem_comp_atom.model_Cartn_z"].find("?") != -1:
-                        lq1 = True
-                        break
-                if not lq1 : 
-                    self.mmCifHasCoords   = True
-                    for aAtom in self.atoms:
-                        aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.model_Cartn_x"]
-                        aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.model_Cartn_y"]
-                        aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.model_Cartn_z"]
-                       
+            
             if not self.mmCifHasCoords :
                 #print("Not _chem_comp_atom.pdbx_model_Cartn_x")
+                if "_chem_comp_atom.x" in self.atoms[0] and\
+                   "_chem_comp_atom.y" in self.atoms[0] and\
+                   "_chem_comp_atom.z" in self.atoms[0]:
+                    for aAtom in self.atoms:
+                        if aAtom["_chem_comp_atom.type_symbol"] !="H":
+                            if aAtom["_chem_comp_atom.x"].find("?") !=-1\
+                               or aAtom["_chem_comp_atom.y"].find("?") !=-1\
+                               or aAtom["_chem_comp_atom.z"].find("?") !=-1:
+                                lq3 = True
+                                break
+                    if not lq3:
+                        self.mmCifHasCoords   = True
+            
+            if not self.mmCifHasCoords:
+                if "_chem_comp_atom.model_Cartn_x" in self.atoms[0] and\
+                   "_chem_comp_atom.model_Cartn_y" in self.atoms[0] and\
+                   "_chem_comp_atom.model_Cartn_z" in self.atoms[0]:
+                    for aAtom in self.atoms:
+                        if aAtom["_chem_comp_atom.type_symbol"] !="H":
+                            if aAtom["_chem_comp_atom.model_Cartn_x"].find("?") != -1\
+                               or aAtom["_chem_comp_atom.model_Cartn_y"].find("?") != -1\
+                               or aAtom["_chem_comp_atom.model_Cartn_z"].find("?") != -1:
+                              
+                               lq1 = True
+                               break
+                    if not lq1 : 
+                        self.mmCifHasCoords   = True
+                        for aAtom in self.atoms:
+                            aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.model_Cartn_x"]
+                            aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.model_Cartn_y"]
+                            aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.model_Cartn_z"]
+            if not self.mmCifHasCoords:
                 if "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in self.atoms[0]\
                    and "_chem_comp_atom.pdbx_model_Cartn_y_ideal" in self.atoms[0]\
                    and "_chem_comp_atom.pdbx_model_Cartn_z_ideal" in self.atoms[0]:
                     for aAtom in self.atoms:           
-                        if aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"].find("?") !=-1\
-                           or aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"].find("?") !=-1\
-                           or aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"].find("?") !=-1:
-                            lq2 = True
-                            break
+                        if aAtom["_chem_comp_atom.type_symbol"] !="H":
+                            if aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"].find("?") !=-1\
+                               or aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"].find("?") !=-1\
+                               or aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"].find("?") !=-1:
+                                lq2 = True
+                                break
                     if not lq2:
                         self.mmCifHasCoords   = True
                         for aAtom in self.atoms:           
                             aAtom["_chem_comp_atom.x"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
                             aAtom["_chem_comp_atom.y"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
                             aAtom["_chem_comp_atom.z"] = aAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
-
+                            
             if not self.mmCifHasCoords :
-                #print("not _chem_comp_atom.model_Cartn_x_ideal")
-                if "_chem_comp_atom.x" in self.atoms[0] and\
-                   "_chem_comp_atom.y" in self.atoms[0] and\
-                   "_chem_comp_atom.z" in self.atoms[0]:
-                    for aAtom in self.atoms:
-                        if aAtom["_chem_comp_atom.x"].find("?") !=-1\
-                           or aAtom["_chem_comp_atom.y"].find("?") !=-1\
-                           or aAtom["_chem_comp_atom.z"].find("?") !=-1:
-                            lq3 = True
-                            break
-                    if not lq3:
-                        #print("Using _chem_comp_atom.x,y,z")
-                        self.mmCifHasCoords   = True
-                    else:
-                        self.mmCifHasCoords = False  
+                print("No qualified coordinates. The file should not be used with option --c0 ")
+                
                         
     def keepCoordsForChira(self):
         
         
         if len(self.atoms) > 0:
+            self.selectAtomCoordinates()
+            if self.mmCifHasCoords:
+                for aAtm in self.atoms:
+                    if not "_chem_comp_atom.atom_id" in self.atomCoordMap:
+                        self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]] = []
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.x"])
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.y"])
+                    self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.z"])
+            self.selectAtomCoordinates()
+            
             if "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in self.atoms[0] and\
                "_chem_comp_atom.atom_id" in self.atoms[0]:
                 for aAtm in self.atoms:
@@ -1041,6 +1055,14 @@ class FileTransformer(object) :
                     self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.y"])
                     self.atomCoordMap[aAtm["_chem_comp_atom.atom_id"]].append(aAtm["_chem_comp_atom.z"])
                     
+    def setChirBothList(self):
+        
+        for aChir in self.chiralPre:
+            strs = aChir.strip().split()
+            if len(strs)==7:
+                if strs[6].lower().find("both") !=-1:
+                    self.chirBothList[strs[2]] = strs[6]
+        print("CHIBO ", self.chirBothList)
          
     def checkBondOrder(self ):
         
