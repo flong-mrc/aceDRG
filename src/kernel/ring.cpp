@@ -1741,7 +1741,15 @@ namespace LIBMOL
                         else if (nonMC ==2)
                         {
                             // Place holder in case for future.
-                            aN=1.0;
+                            if (tMode ==1)
+                            {
+                                //For aromatic ring plane.
+                                aN=1.0;
+                            }
+                            else
+                            {
+                                aN=2.0;
+                            }
                         }
                     }
                     else
