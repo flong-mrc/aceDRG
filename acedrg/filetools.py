@@ -67,6 +67,7 @@ class FileTransformer(object) :
         self.angles          = []
         self.chirals         = []
         self.chiralPre       = []
+        self.chiralBoth      = []
 
         self.group           =""
 
@@ -665,6 +666,8 @@ class FileTransformer(object) :
                 self.atoms.append(aAtom)
             for aAtom in tHAtoms:
                 self.atoms.append(aAtom)
+            if len(self.atoms)> 0:
+                self.setChirBothList2()
         elif tProp =="chiral":
             for aChiral in self.chirals:
                 aStr = ""
@@ -797,7 +800,7 @@ class FileTransformer(object) :
                     aAtom.SetProp("Name", nameMap[oldName]) 
                     print("Atom: old name %s : new name %s"%(oldName, aAtom.GetProp("Name")))
 
-    def addAtomOrigChiralSign(self, tMol):
+    def addAtomOrigChiralSign(self, tMol=None):
 
         nameMap = {}
    
@@ -805,13 +808,18 @@ class FileTransformer(object) :
             if "_chem_comp_atom.atom_id" in self.atoms[i]:
                 nameMap[self.atoms[i]["_chem_comp_atom.atom_id"].strip()] = i
  
-        for aAtom in tMol.GetAtoms():
-            atomId = aAtom.GetProp("Name").strip()
-            if atomId in nameMap:
-                if "_chem_comp_atom.pdbx_stereo_config" in self.atoms[nameMap[atomId]]:
-                    tSign = self.atoms[nameMap[atomId]]["_chem_comp_atom.pdbx_stereo_config"].strip() 
-                    aAtom.SetProp("pdb_stereo", tSign)
-                    #print "atom %s now has pdb_stereo %s"%(aAtom.GetProp("Name"), aAtom.GetProp("pdb_stereo"))
+        if tMol:
+            for aAtom in tMol.GetAtoms():
+                atomId = aAtom.GetProp("Name").strip()
+                if atomId in nameMap:
+                    if "_chem_comp_atom.pdbx_stereo_config" in self.atoms[nameMap[atomId]]:
+                        tSign = self.atoms[nameMap[atomId]]["_chem_comp_atom.pdbx_stereo_config"].strip() 
+                        aAtom.SetProp("pdb_stereo", tSign)
+                        #print "atom %s now has pdb_stereo %s"%(aAtom.GetProp("Name"), aAtom.GetProp("pdb_stereo"))
+        
+    
+
+        
 
     def setAtomDicts(self, tFileName, tAtomTypeMaps):
 
@@ -1062,7 +1070,17 @@ class FileTransformer(object) :
             if len(strs)==7:
                 if strs[6].lower().find("both") !=-1:
                     self.chirBothList[strs[2]] = strs[6]
-        print("CHIBO ", self.chirBothList)
+        
+
+    def setChirBothList2(self):
+        
+        selectElems = ["B", "C", "N", "S"]
+        for aAtm in self.atoms:
+            if "_chem_comp_atom.atom_id" in aAtm and "_chem_comp_atom.pdbx_stereo_config" in aAtm\
+                and "_chem_comp_atom.type_symbol" in aAtm:
+                if aAtm["_chem_comp_atom.type_symbol"] in selectElems:
+                    if aAtm["_chem_comp_atom.pdbx_stereo_config"].strip().upper().find("N") !=-1:
+                        self.chiralBoth.append(aAtm["_chem_comp_atom.atom_id"])
          
     def checkBondOrder(self ):
         

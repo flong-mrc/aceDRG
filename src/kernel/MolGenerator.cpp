@@ -7724,16 +7724,16 @@ namespace LIBMOL {
                     }
                     int aW =10;
 
-                    if (tStr22.size() >aW)
+                    if (tStr22.size() >=aW)
                     {
                         aW=tStr2.size() + 4;
                     }
 
-                    if (tStr3.size() >aW)
+                    if (tStr3.size() >= aW)
                     {
                         aW=tStr3.size() + 4;
                     }
-                    if (tStr32.size() >aW)
+                    if (tStr32.size() >=aW)
                     {
                         aW=tStr32.size() + 4;
                     }

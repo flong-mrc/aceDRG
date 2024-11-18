@@ -38,7 +38,6 @@ from rdkit.Chem import rdchem
 from rdkit.Chem import rdmolfiles
 from rdkit.Chem import rdMolTransforms
 from rdkit.Chem import rdmolops
-from rdkit.Chem import Pharm3D
 from rdkit.Chem.Pharm3D import EmbedLib
 from rdkit.Geometry import rdGeometry
 
@@ -2432,7 +2431,7 @@ class AcedrgRDKit(object):
             else:
                 tDelAtomIdxs.append(aAt.GetIdx())
 
-    def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="LIG", tChiDes=None, tGroupName="non-polymer", tIdxConform=0):
+    def MolToSimplifiedMmcif(self, tMol, tMmcifName, tChemCheck, tMonoName="LIG", tChiDes=None, tChiBo=None, tGroupName="non-polymer", tIdxConform=0):
 
         # A simplified mmcif file contains:
         # (1) Header section
@@ -2587,7 +2586,7 @@ class AcedrgRDKit(object):
                                  isAro, bLen, dBlen))
             
             if not self.noConformers and not self.useCoordsForChir:
-                self.outChiralSection(delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName, tChiDes, tGroupName, tIdxConform )
+                self.outChiralSection(delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName, tChiDes, tChiBo, tGroupName, tIdxConform )
             elif self.useCoordsForChir:
                 self.outChiralSectionInCoords(delAtomIdxs, tMol, aMmCif, tChemCheck)
             aMmCif.close()
@@ -2725,9 +2724,11 @@ class AcedrgRDKit(object):
         
         
             
-    def outChiralSection(self, delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName="LIG", tChiDes=None, 
+    def outChiralSection(self, delAtomIdxs, tMol, aMmCif, tChemCheck, tMonoName="LIG", tChiDes=None, tChiBo=None,
                           tGroupName="non-polymer", tIdxConform=0):
-        # chiral center section
+        # chiral center sectio
+        
+        print("HeretChiBo, ", tChiBo)
         atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
         allAtoms = tMol.GetAtoms()
         allBonds = tMol.GetBonds()
@@ -2815,11 +2816,15 @@ class AcedrgRDKit(object):
                 aMmCif.write(aChiral+"\n")
         nID = len(aChiralSignMap.keys())
         if nTetraChi and nID > 0:
-            #print("Chiral centres with sign")
+            print("1 Chiral centres with sign")
+            print("Here atom name ", aId)
             # output all chiral centers in form of mmCif
             chiralIdx = nChiPre + 1
             for aId in chiCenAtmIds2:
                 if not aId in chiCenAtmIds1:
+                    if aId in tChiBo:
+                        aChiralSignMap[aId]["finalChiVolSign"] = "both"
+                        print(aChiralSignMap[aId]["finalChiVolSign"])
                     if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
                         #print("Chiral center %s is not in predefined chiral centers"%aId)
                         aCTName = "chir_" + str(chiralIdx)
@@ -2836,11 +2841,15 @@ class AcedrgRDKit(object):
                         aMmCif.write(aLine)
                         chiralIdx += 1
         if nChiWithSign and nID > 0:
-            #print("Chiral centres with sign")
+            print("2 Chiral centres with sign")
             for aAtom in chiCenAtms3:
                 aId = aAtom.GetProp("Name")
-                #print("atom name ", aId)
-                if not aId in chiCenAtmIds1:
+                print("Here atom name ", aId)
+                if aId in tChiBo:
+                    aChiralSignMap[aId]["finalChiVolSign"] = "both"
+                    print(aChiralSignMap[aId]["finalChiVolSign"])
+                if not aId in chiCenAtmIds1 :
+                    
                     aCTName = "chir_" + str(chiralIdx)
                     aLine = "%s%s%s%s%s%s%s\n"\
                         % (tMonoName.ljust(12), aCTName.ljust(12),
