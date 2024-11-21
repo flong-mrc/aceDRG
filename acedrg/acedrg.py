@@ -132,6 +132,8 @@ class Acedrg(CExeCode ):
         
         self.metalCoord       = "metalCoord "
         
+        self.gemmi            = "gemmi"
+        
 
         self.linkInstructions = ""
         self.linkInsMap       = {}
@@ -1227,7 +1229,6 @@ class Acedrg(CExeCode ):
                               self.upperSigForAngles, self.lowSigForAngles)
             if os.path.isfile(self.inMtConnFile):
                 self._cmdline += " -u %s "%self.inMtConnFile
-            # print(self._cmdline)
             print("===================================================================") 
             print("| Generate the dictionary file using the internal database        |")
             print("===================================================================") 
@@ -1259,6 +1260,7 @@ class Acedrg(CExeCode ):
             if self.modifiedPlanes:
                 self._cmdline += " -W yes "
             #os.system(self._cmdline)
+            #print(self._cmdline)
             self.runExitCode = self.subExecute()
         if self.workMode==113:
             #print("self.monomRoot=", self.monomRoot)
@@ -1712,7 +1714,7 @@ class Acedrg(CExeCode ):
                     self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
                 if self.inCoordForChir:
                     self._cmdline += " --c1 "
-            print(self._cmdline)
+            #print(self._cmdline)
             self.subExecute()
             if os.path.isfile(aOutFile):
                 print("The dictionary file for the molecules is %s"%aOutFile)
@@ -1747,6 +1749,14 @@ class Acedrg(CExeCode ):
         self._log_name    = os.path.join(self.scrDir, "servalcat_version.log")
         self._cmdline     = "servalcat -v "
         self.subExecute()
+
+    def runGemmiCif2Pdb(self, tInCif, tOutPdb):
+    
+        if os.path.isfile(tInCif):
+            self._log_name       = os.path.join(self.scrDir, self.outRoot + "_gemmiCif2Pdb.log")
+            self._cmdline = self.gemmi
+            self._cmdline += " convert  %s   %s \n"%(tInCif, tOutPdb)
+            self.subExecute() 
         
     def runMetalCoord(self, tInCifName):
         
@@ -1764,6 +1774,9 @@ class Acedrg(CExeCode ):
         else:
             print("Program metalCoord requres an input pdb file containing your metal Ligand")
             print("Please provide that file using --metalPDB your_pdb_file")
+            
+    
+    
             
     
     def getMRunStatus(self, tErrInfo):
@@ -1901,8 +1914,11 @@ class Acedrg(CExeCode ):
         aLibCifIn = self.outRstCifName
         if nConf==1:
             self.runGeoOpt(self.monomRoot, aLibCifIn)
-            self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
-            
+            self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], 
+                                      self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+            if os.path.isfile(self.outRstCifName)  and len(self.monomRoot) <=3 :
+                aOutRstPdb = os.path.basename(self.outRstCifName).split(".")[0] + ".pdb"            
+                self.runGemmiCif2Pdb(self.outRstCifName, aOutRstPdb)
         else:
             inCifNamesRoot =[]
             #for idxConf in range(nConf): 
@@ -1940,6 +1956,10 @@ class Acedrg(CExeCode ):
                 #print "Come to output final info"
                 self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
                 # self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+                if os.path.isfile(self.outRstCifName) and len(self.monomRoot) <=3:
+                    aOutRstPdb = os.path.basename(self.outRstCifName).split(".")[0] + ".pdb"            
+                    self.runGemmiCif2Pdb(self.outRstCifName, aOutRstPdb)
+                    
             else:
                 for i in range(self.numConformers):
                     aRoot = "Mol" + str(tIdxMol) + "_conformer" + str(i+1) 
@@ -2006,11 +2026,12 @@ class Acedrg(CExeCode ):
     def getFinalOutputFiles2(self, tRoot, tMol, tCifInName, tDataDescriptor=None, tStrDescriptors=None, tDelocList=None):
         
         if os.path.isfile(tCifInName):
+            
             if tRoot !="":
                 #self.outRstCifName = self.outRoot +  "_"+ tRoot +".cif"
                 self.outRstCifName = self.outRoot +  ".cif"
             else:
-                self.outRstCifName = self.outRoot +  ".cif"
+                self.outRstCifName = tRoot +  ".cif"
             
             
             cifCont = {}
@@ -3052,6 +3073,10 @@ class Acedrg(CExeCode ):
             if os.path.isfile(aSOutName):
                 finalOutName = self.outRoot + ".cif"
                 self.cleanSFile(aSOutName, finalOutName)
+        
+        aFinalPdbN = self.baseRoot +  ".pdb"
+        if os.path.isfile(finalOutName) and len(self.monomRoot) <=3:
+            self.runGemmiCif2Pdb(aFinalOutN, aFinalPdbN)
                 
     def execute(self):
         
@@ -3577,6 +3602,9 @@ class Acedrg(CExeCode ):
                                             finalOutName = self.outRoot + ".cif"
                                             shutil.copy(aSOutName, finalOutName) 
                                             print("The final output cif is ", finalOutName)
+                                            if os.path.isfile(finalOutName) and len(self.monomRoot) <=3:
+                                                finalPdbName = self.outRoot + ".pdb"
+                                                self.runGemmiCif2Pdb(finalOutName, finalPdbName)
                                     else:
                                         print("No %s. metalCoord runtime error"%aMetCoordInCif)
                                 else:
@@ -3590,6 +3618,10 @@ class Acedrg(CExeCode ):
                                             self.cleanSFile(aSOutName, finalOutName)
                                             #print("The tmp3 output is %s "%aTmp3Cif)
                                             print("The final output cif is %s"%finalOutName)
+                                            if os.path.isfile(finalOutName) and len(self.monomRoot) <=3:
+                                                finalPdbName = self.outRoot + ".pdb"
+                                                self.runGemmiCif2Pdb(finalOutName, finalPdbName)
+                                            
                                     else:
                                         
                                         pass
@@ -3605,11 +3637,14 @@ class Acedrg(CExeCode ):
                                     #print("aSOutName", aSOutName)
                                     if os.path.isfile(aSOutName):
                                         finalOutName = self.outRoot + ".cif"
+                                        
                                         self.cleanSFile(aSOutName, finalOutName)
                                         #print("The tmp3 output is %s "%aTmp3Cif)
                                         print("The final output cif is %s"%finalOutName)
+                                        if len(self.monomRoot) <=3:
+                                            finalPdbName = self.outRoot + ".pdb"
+                                            self.runGemmiCif2Pdb(finalOutName, finalPdbName)
                                 else:
-                                    print("HERA")
                                     self.usingCoordsInCif(aFinInCif, aRoot)
                                 
                             
@@ -3754,8 +3789,8 @@ class Acedrg(CExeCode ):
                         print("The input system contains metal or other heavier element")
                         print("The current version deals only with the atoms in the set of 'organic' elements") 
                         sys.exit()
-                    if os.path.isfile(self.inMtConnFile):
-                        self.runLibmol(self.inMmCifName, iMol)
+                    #if os.path.isfile(self.inMtConnFile):
+                    #    self.runLibmol(self.inMmCifName, iMol)
                     #tmpWorkMode = self.workMode
                     #if self.useCoordsOnly:
                     #    self.workMode =11162
@@ -3779,6 +3814,7 @@ class Acedrg(CExeCode ):
                                     inPdbNamesRoot[idxMol] = []
                                 print("Number of atoms in molecule %d is %d "%(idxMol+1, self.rdKit.molecules[idxMol].GetNumAtoms()))
                                 #nConf = self.rdKit.molecules[idxMol].GetNumConformers()
+                            
                                 self.runGeoOptOneMolFull(idxMol)
                                 if not self.useExistCoords:
                                     self.outEnergyGeoMap(idxMol)

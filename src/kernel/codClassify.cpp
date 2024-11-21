@@ -699,7 +699,7 @@ namespace LIBMOL
                     // tmpRings.push_back(*iR);
 
                     iR->setPlaneProp();
-                    std::cout << "Hello " << std::endl;
+
                     //setSugarRingInitComf(allAtoms, allTorsions, iR);
 
                     checkOneSugarRing(allAtoms, iR);
@@ -1035,8 +1035,6 @@ namespace LIBMOL
         for (int i=0; i < (int)allAtoms.size(); i++)
         {
             setAtomCodClassName2(allAtoms[i], allAtoms[i], dLev);
-            std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl
-                      << "class is " << allAtoms[i].codClass << std::endl;
         }
 
         // set a hashing code and primeNB symbol to each atom.
@@ -1044,18 +1042,6 @@ namespace LIBMOL
         hashingAtoms();
 
         setAtomsNBSymb();
-
-        /*
-        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
-               iA !=allAtoms.end(); iA++)
-        {
-            setAtomCodClassName(*iA, *iA, iLev);
-            std::cout <<std::endl << "For atom " << iA->id << std::endl
-                      << "class is " << iA->codClass << std::endl;
-
-        }
-        */
-
 
     }
 
@@ -1176,8 +1162,6 @@ namespace LIBMOL
         {
             allAtoms[i].codClass = "";
             setAtomCodClassNameNew(allAtoms[i], allAtoms[i], dLev);
-            std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl
-                      << "class is " << allAtoms[i].codClass << std::endl;
         }
 
     }
@@ -1228,9 +1212,6 @@ namespace LIBMOL
         {
             allAtoms[i].codClass = "";
             setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
-
-            std::cout <<std::endl << "For atom " << allAtoms[i].id << std::endl
-                      << "class is " << allAtoms[i].codClass << std::endl;
         }
 
         // merge into above late on
@@ -1238,8 +1219,6 @@ namespace LIBMOL
                 iAt !=  allAtoms.end(); iAt++)
         {
            setSpecial3NBSymb2(iAt);
-           //std::cout << "Now atom " << iAt->id << std::endl
-            //         << "class is " << iAt->codClass << std::endl;
         }
 
         setAtomsNBSymb2();
@@ -1293,16 +1272,12 @@ namespace LIBMOL
         {
             allAtoms[i].codClass = "";
             setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
-            //std::cout << std::endl << "Here For atom " << allAtoms[i].id << std::endl
-            //          << "class is " << allAtoms[i].codClass << std::endl;
         }
 
         for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
                iAt !=  allAtoms.end(); iAt++)
         {
             setSpecial3NBSymb2(iAt);
-            //std::cout << "Now atom " << iAt->id << std::endl
-            //          << "class is " << iAt->codClass << std::endl;
         }
 
         setAtomsNBSymb2();

@@ -2728,7 +2728,7 @@ class AcedrgRDKit(object):
                           tGroupName="non-polymer", tIdxConform=0):
         # chiral center sectio
         
-        print("HeretChiBo, ", tChiBo)
+        #print("HeretChiBo, ", tChiBo)
         atomNBCIPMap = self.setCIPCodeSerialForNBAtoms(tMol, delAtomIdxs)
         allAtoms = tMol.GetAtoms()
         allBonds = tMol.GetBonds()
@@ -2816,15 +2816,15 @@ class AcedrgRDKit(object):
                 aMmCif.write(aChiral+"\n")
         nID = len(aChiralSignMap.keys())
         if nTetraChi and nID > 0:
-            print("1 Chiral centres with sign")
-            print("Here atom name ", aId)
+            #print("1 Chiral centres with sign")
+            #print("Here atom name ", aId)
             # output all chiral centers in form of mmCif
             chiralIdx = nChiPre + 1
             for aId in chiCenAtmIds2:
                 if not aId in chiCenAtmIds1:
                     if aId in tChiBo:
                         aChiralSignMap[aId]["finalChiVolSign"] = "both"
-                        print(aChiralSignMap[aId]["finalChiVolSign"])
+                        #print(aChiralSignMap[aId]["finalChiVolSign"])
                     if aChiralSignMap[aId]["isChiraled"] and "finalChiVolSign" in aChiralSignMap[aId]:
                         #print("Chiral center %s is not in predefined chiral centers"%aId)
                         aCTName = "chir_" + str(chiralIdx)
@@ -2841,13 +2841,13 @@ class AcedrgRDKit(object):
                         aMmCif.write(aLine)
                         chiralIdx += 1
         if nChiWithSign and nID > 0:
-            print("2 Chiral centres with sign")
+            #print("2 Chiral centres with sign")
             for aAtom in chiCenAtms3:
                 aId = aAtom.GetProp("Name")
-                print("Here atom name ", aId)
+                #print("Here atom name ", aId)
                 if aId in tChiBo:
                     aChiralSignMap[aId]["finalChiVolSign"] = "both"
-                    print(aChiralSignMap[aId]["finalChiVolSign"])
+                    #print(aChiralSignMap[aId]["finalChiVolSign"])
                 if not aId in chiCenAtmIds1 :
                     
                     aCTName = "chir_" + str(chiralIdx)

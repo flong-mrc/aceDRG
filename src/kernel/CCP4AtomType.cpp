@@ -804,16 +804,16 @@ namespace LIBMOL
             StrUpper(tAtom.ccp4Type);
         }
 
-        std::cout << "========================================" << std::endl;
-        std::cout << "Atom Name " << tAtom.id << " bonding index "
-                      << tAtom.bondingIdx << std::endl;
-        std::cout << "Its element type " << tAtom.chemType << std::endl;
+        //std::cout << "========================================" << std::endl;
+        //std::cout << "Atom Name " << tAtom.id << " bonding index "
+        //              << tAtom.bondingIdx << std::endl;
+        //std::cout << "Its element type " << tAtom.chemType << std::endl;
 
-        if (!tAtom.codClass.empty())
-        {
-            std::cout << " Cod type" << tAtom.codClass << std::endl;
-        }
-        std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
+        //if (!tAtom.codClass.empty())
+        //{
+        //    std::cout << " Cod type" << tAtom.codClass << std::endl;
+        // }
+        //std::cout << " Its ccp4 type " << tAtom.ccp4Type << std::endl;
 
     }
 

@@ -944,10 +944,10 @@ namespace LIBMOL
             numOneAtm2 = setPiForOneAtomAll(*iAt, tAtoms, tMode);
             //}
 
-            std::cout << "XXX here Atom " << tAtoms[*iAt].id
-                      << " its charge " << tAtoms[*iAt].charge << std::endl
-                      << " add " << numOneAtm1 << " or "
-                      <<  numOneAtm2 << " pi atoms" << std::endl;
+            //std::cout << "XXX here Atom " << tAtoms[*iAt].id
+            //          << " its charge " << tAtoms[*iAt].charge << std::endl
+            //          << " add " << numOneAtm1 << " or "
+            //          <<  numOneAtm2 << " pi atoms" << std::endl;
 
             if (numOneAtm1 > 0.0)
             {
@@ -959,11 +959,11 @@ namespace LIBMOL
             }
         }
 
-        std::cout << "number of pi electron in the system numPiAll1 is "
-                  <<  numPiAll1 << std::endl;
+        //std::cout << "number of pi electron in the system numPiAll1 is "
+        //          <<  numPiAll1 << std::endl;
 
-        std::cout << "number of pi electron in the system numPiAll2 is "
-                  <<  numPiAll2 << std::endl;
+        //std::cout << "number of pi electron in the system numPiAll2 is "
+        //          <<  numPiAll2 << std::endl;
 
         if (numPiAll1 > 0.0 && fabs(fmod(numPiAll1, 4.0)-2.0) < 0.001)
         {
@@ -2292,7 +2292,7 @@ extern REAL setPiForOneAtomAll(int tIdx, std::vector<AtomDict> & tAtoms,
             {
                 std::cout << "One Planar Ring! It contains " << iR->atoms.size()
                           << " atoms. " << std::endl;
-                std::cout << "HereP" << std::endl;
+                //std::cout << "HereP" << std::endl;
                 bool lAro = checkAromaSys(atmIdx, tAtoms, 0);
                 if (lAro)
                 {

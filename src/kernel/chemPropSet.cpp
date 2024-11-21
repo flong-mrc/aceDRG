@@ -160,13 +160,18 @@ namespace LIBMOL
 
             if (iAt->chemType=="C" )
             {
-                if  ((t_len==2 && t_m_len==1) || (t_len==3 && t_m_len==2))
+
+                if  (t_len==3 && t_m_len==2)
                 {
                     t_len=3;
                 }
+                else
+                {
+                    t_len = t_len + t_m_len;
+                }
             }
-            //std::cout << "t_len " << t_len << std::endl;
-            //std::cout << "t_m_len " << t_m_len << std::endl;
+
+
 
             numConnMap[iAt->id].push_back(t_len);
             numConnMap[iAt->id].push_back(t_m_len);
@@ -449,9 +454,10 @@ namespace LIBMOL
                  */
             }
             //std::cout << "Atom " << iAt->id << " is initially set to sp "
-            //              << iAt->bondingIdx  << std::endl;
+            //          << iAt->bondingIdx  << std::endl;
             // std::cout << "its chiralIdx " << iAt->chiralIdx << std::endl;
         }
+
 
         // more conditions
         // Do oxygen atom first, to see if an Oxygen atom of two connections
@@ -530,6 +536,7 @@ namespace LIBMOL
             //}
 
         }
+
 
         // Then N, B, and C atoms
         std::map<int, int> preBondingIdx;
@@ -640,7 +647,7 @@ namespace LIBMOL
                 //std::cout << "For " << iAt->id << std::endl;
                 //std::cout << "t_len = " << t_len << std::endl;
                 //std::cout << "Its charge is " << iAt->charge << std::endl;
-                if(t_len==3 && iAt->charge ==-1.0)
+                if(t_len==3 && iAt->charge ==-1.0 )
                 {
 
                     bool l_sp2 = false;
