@@ -1754,10 +1754,26 @@ class Acedrg(CExeCode ):
     
         if os.path.isfile(tInCif):
             self._log_name       = os.path.join(self.scrDir, self.outRoot + "_gemmiCif2Pdb.log")
+            aTmpPdb              = os.path.join(self.scrDir, self.outRoot + "_gemmiCif2Pdb.pdb")
             self._cmdline = self.gemmi
-            self._cmdline += " convert  %s   %s \n"%(tInCif, tOutPdb)
+            self._cmdline += " convert  %s   %s \n"%(tInCif, aTmpPdb)
             self.subExecute() 
-        
+            ### temporarily codes 
+            if os.path.isfile(aTmpPdb):
+                ft = open(aTmpPdb)
+                allLs = ft.readlines()
+                ft.close()
+                fo = open(tOutPdb, "w")
+                lB = False
+                for aL in allLs:
+                    if aL.find("ENDMDL") !=-1 and not lB:
+                        fo.write(aL)
+                        lB = True
+                    elif aL.find("NUMMDL")==-1 and not lB:
+                        fo.write(aL)
+                fo.close()
+                
+                        
     def runMetalCoord(self, tInCifName):
         
         if os.path.isfile(self.inMetalPDBName):
