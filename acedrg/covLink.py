@@ -2996,25 +2996,28 @@ class CovLinkGenerator(CExeCode):
                     tRes["comp"]["atoms"][idxAtm1]["charge"]=0
                     tMod["changed"]["atoms"].append(tRes["comp"]["atoms"][idxAtm1])         
                     print("Atom ",  tRes["comp"]["atoms"][idxAtm1]["atom_id"], " charge : ",  tRes["comp"]["atoms"][idxAtm1]["charge"])
-                    
+        
+        changeId = []
+        for aTmpAtm in tMod["changed"]["atoms"]:
+            changeId.append(aTmpAtm["atom_id"])
+         
         for aFC in tMod["changed"]["charges"]:
             aId = aFC["atom_id"].strip().upper()
-            print("aId ", aId)
-            print("charge ", aFC["charge"])
             for aAt in tRes["comp"]["atoms"]:
                 if aAt["atom_id"].strip().upper() ==aId:
                     aAt["charge"] = aFC["charge"]
-                    tMod["changed"]["atoms"].append(aAt)
-                    #if not aId in changeAtms:
-                    #    addedHs=self.checkAssocHAtoms(tRes, tMod, aAt)
-                    break
+                    if not aAt["atom_id"] in  changeId:
+                        tMod["changed"]["atoms"].append(aAt)
+                        #if not aId in changeAtms:
+                        #    addedHs=self.checkAssocHAtoms(tRes, tMod, aAt)
+                        break
     
         
         #for aAt in tRes["comp"]["atoms"]:
         #    print("aId ", aAt["atom_id"])
         #    print("Its charge ", aAt["charge"])
         if len(tMod["changed"]["atoms"]) > 0:
-            print("The following atoms are changed: ")
+            print("2. The following atoms are changed: ")
             for aAt in tMod["changed"]["atoms"]:
                 print("Atom ",aAt["atom_id"]) 
                 print("Formal charge ", aAt["charge"])
@@ -5202,8 +5205,9 @@ class CovLinkGenerator(CExeCode):
                 if self.compare2Atoms(aAtm, tAtom) and not aId in tExistChangedAtoms:
                     print(aId, " changed")
                     tModAtoms.append(tAtom)
-                    tExistChangedAtoms.append(aId)
-                    print(len(tModAtoms))
+                    if not aId in tExistChangedAtoms:
+                        tExistChangedAtoms.append(aId)
+        
                 
    
     def compare2Atoms(self, tOriAtom, tAtom):
