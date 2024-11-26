@@ -1450,6 +1450,7 @@ namespace LIBMOL
                 }
             }
 
+            /*
             std::string TP="organic ";
 
             if (iA->matType ==1)
@@ -1463,7 +1464,7 @@ namespace LIBMOL
 
             std::cout << "Atom " << iA->id << " of " << iA->chemType
                       << " is a " << TP << " atom " << std::endl;
-
+            */
         }
 
     }

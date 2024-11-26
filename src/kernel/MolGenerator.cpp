@@ -6272,8 +6272,9 @@ namespace LIBMOL {
     }
 
     bool MolGenerator::validateAtomLinks(Molecule & tMol,
-            PeriodicTable & tPTab,
-            std::string & tErrInfo) {
+                                         PeriodicTable & tPTab,
+                                         std::string & tErrInfo)
+    {
         for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                 iAt != tMol.atoms.end(); iAt++) {
             if (iAt->isInPreCell) {

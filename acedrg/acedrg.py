@@ -1930,7 +1930,7 @@ class Acedrg(CExeCode ):
         aLibCifIn = self.outRstCifName
         if nConf==1:
             self.runGeoOpt(self.monomRoot, aLibCifIn)
-            self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], 
+            self.getFinalOutputFiles2(self.outRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], 
                                       self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
             if os.path.isfile(self.outRstCifName)  and len(self.monomRoot) <=3 :
                 aOutRstPdb = os.path.basename(self.outRstCifName).split(".")[0] + ".pdb"            
@@ -1969,17 +1969,21 @@ class Acedrg(CExeCode ):
                 #    print("======")
                 #    print("FValue: ", aPair[0], "  File name ", aPair[1])  
             if self.numConformers==1: 
+                
                 #print "Come to output final info"
-                self.getFinalOutputFiles2(self.monomRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
+                self.getFinalOutputFiles2(self.outRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
                 # self.getFinalOutputFiles("", self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[0][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
                 if os.path.isfile(self.outRstCifName) and len(self.monomRoot) <=3:
                     aOutRstPdb = os.path.basename(self.outRstCifName).split(".")[0] + ".pdb"            
                     self.runGemmiCif2Pdb(self.outRstCifName, aOutRstPdb)
                     
             else:
+                print("ref list leng ", len(self.refmacMinFValueList))
                 for i in range(self.numConformers):
-                    aRoot = "Mol" + str(tIdxMol) + "_conformer" + str(i+1) 
+                    aRoot =self.outRoot +  "_Mol" + str(tIdxMol) + "_conformer" + str(i+1)
                     self.getFinalOutputFiles2(aRoot, self.rdKit.molecules[tIdxMol], self.refmacMinFValueList[i][1], self.fileConv.ccp4DataDes, self.fileConv.strDescriptors, self.fileConv.delocBondList)
+                    aOutRstPdb = os.path.basename(self.outRstCifName).split(".")[0] + ".pdb"
+                    self.runGemmiCif2Pdb(self.outRstCifName, aOutRstPdb)
                     #self.getFinalOutputFiles(aRoot, self.rdKit.molecules[tIdxMol], aLibCifIn, self.refmacMinFValueList[i][1], self.fileConv.ccp4DataDes,self.fileConv.strDescriptors,self.fileConv.delocBondList)
         print("=====================================================================")
         print("|               Finished                                            |")
@@ -2043,13 +2047,14 @@ class Acedrg(CExeCode ):
         
         if os.path.isfile(tCifInName):
             
-            if tRoot !="":
+            if tRoot =="":
                 #self.outRstCifName = self.outRoot +  "_"+ tRoot +".cif"
                 self.outRstCifName = self.outRoot +  ".cif"
             else:
                 self.outRstCifName = tRoot +  ".cif"
             
-            
+            print("tRoot ", tRoot)
+            print("outName ", self.outRstCifName)
             cifCont = {}
             cifCont['head']   = []
             cifCont['bulk']   = []
@@ -2132,7 +2137,7 @@ class Acedrg(CExeCode ):
                 
                 try:
                     tOutCif = open(self.outRstCifName, "w")
-                    print("Out cif name ", self.outRstCifName)
+                    #print("Out cif name ", self.outRstCifName)
                 except IOError:
                     print("%s can not be opened for write"%self.outRstCifName)
                     sys.exit()

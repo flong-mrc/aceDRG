@@ -5332,6 +5332,7 @@ namespace LIBMOL
         {
             iAt->seriNum = idxA;
             idxA++;
+            /*
             std::cout << "Atom " << iAt->id << " is ";
             if (iAt->isMetal)
             {
@@ -5344,6 +5345,7 @@ namespace LIBMOL
             //std::cout << "Atom idx is " << iAt->seriNum << std::endl;
             //std::cout << "Atom id " << iAt->id << std::endl;
             //std::cout << "Atom elem " << iAt->chemType << std::endl;
+            */
         }
 
 

@@ -80,7 +80,7 @@ class AcedrgRDKit(object):
         self.useCoordsForChir = False
         self.noProtonation = False
         self.conformerEngMap = {}
-        self.numSelectForRefConfs = 25
+        self.numSelectForRefConfs = 1
         self.selecConformerIds = []
         self.maConn      = {}
         
@@ -149,7 +149,7 @@ class AcedrgRDKit(object):
         #self.numSelectForRefConfs = self.numInitConformers/20
         # if self.numSelectForRefConfs < 25:
         #    self.numSelectForRefConfs = 25
-        self.numSelectForRefConfs = 20
+        self.numSelectForRefConfs = self.numInitConformers
   
         if "inCoordForChir" in tProcessParaSet:
             self.useCoordsForChir = True    
@@ -1892,7 +1892,7 @@ class AcedrgRDKit(object):
                         aCId = aConf.GetId()
                         self.selecConformerIds.append(aCId)
                         n = n+1
-                        if n > 0:
+                        if n > 0 and self.noConformers==1:
                             break
                 else:
                     nID = 0
