@@ -247,6 +247,8 @@ namespace LIBMOL
                                            std::vector<BondDict> & tBonds,
                                            REAL tPH, std::vector<int> tDoneAtoms);
 
+    extern bool checkNonHAtomSet(std::vector<AtomDict> & tAtoms);
+
     // The following function overwrites addHAtoms in MolSdfFile class
     extern void adjustHAtoms(std::vector<AtomDict> & tAtoms,
                           std::vector<BondDict> & tBonds,
@@ -348,6 +350,10 @@ namespace LIBMOL
                              double    tDist);
 
     extern void setAtomsMetalType(std::vector<AtomDict> & tAtoms);
+
+    extern bool checkWrongSP1CAtom(std::vector<AtomDict>   & tAtoms,
+                                  std::vector<BondDict>  & tBonds,
+                                  std::vector<AngleDict>  & tAngs);
 
     class HuckelMOSuite
     {

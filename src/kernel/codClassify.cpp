@@ -572,6 +572,14 @@ namespace LIBMOL
 
     }
 
+    CodClassify::CodClassify(const std::string       tValiFN,
+                             const std::string       tLibmolTabDir):
+                             libmolTabDir(tLibmolTabDir)
+    {
+        pPeriodictable = new PeriodicTable();
+
+    }
+
 
     CodClassify::~CodClassify()
     {
@@ -595,6 +603,8 @@ namespace LIBMOL
         return -1;
 
     }
+
+
 
     void CodClassify::setupSystem()
     {
@@ -679,7 +689,13 @@ namespace LIBMOL
 
         codAtomClassifyNew2(cLev);
 
+        std::cout << "Set sp again " << std::endl;
         setAtomsBondingAndChiralCenter(allAtoms);
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+                iAt != allAtoms.end(); iAt++)
+        {
+            std::cout << "atom " << iAt->id << " has sp " << iAt->bondingIdx << std::endl;
+        }
 
         getCCP4BondAndAngles();
 

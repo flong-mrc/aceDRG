@@ -755,11 +755,12 @@ int main(int argc, char** argv) {
                 aKTool.outBandC(AJob.IOEntries["userOutName"].c_str(),
                          dataFromCif.allAtoms,
                          dataFromCif.allBonds);
-
-
-
             }
         }
+
+    }
+    else if (AJob.workMode == 940)
+    {
 
     }
     /*

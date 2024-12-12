@@ -65,6 +65,7 @@ class CovLink(object):
         self.stdLigand1["remainChirs"]      = []
         self.stdLigand1["linkChir"]         = []       # It will be [aChi, delAtmIdx]
         self.stdLigand1["remainPls"]        = []
+        self.stdLigand1["origCharge"]       = {}
         self.stdLigand2                     = {}
         self.stdLigand2["fromScr"]          = False
         self.stdLigand2["userIn"]           = False
@@ -82,6 +83,7 @@ class CovLink(object):
         self.stdLigand2["remainChirs"]      = []
         self.stdLigand2["linkChir"]         = []       # It will be [aChi, delAtmIdx]
         self.stdLigand2["remainPls"]        = []
+        self.stdLigand2["origCharge"]       = {}
         self.suggestBonds                   = []
         self.combLigand                     = {}
         self.combLigand["atoms"]            = []
@@ -2521,6 +2523,7 @@ class CovLinkGenerator(CExeCode):
                 if not tLinkIns.stdLigand2["fromScr"]:
                     print("Here inCif ", tLinkIns.stdLigand2["inCif"])
                     self.setOneCompFromCif(tLinkIns.stdLigand2["inCif"], tLinkIns.stdLigand2) 
+                    
                     if not self.errLevel:   
                         print("Comp 2 ", tLinkIns.stdLigand2["name"], " contains ") 
                         if "atoms" in tLinkIns.stdLigand2["comp"]:
@@ -2531,6 +2534,7 @@ class CovLinkGenerator(CExeCode):
                             print(len(tLinkIns.stdLigand2["comp"]["chirs"]), " chiral centres.")
                         #tLinkIns.stdLigand2["ccp4MmCifObj"].printOneComp(tLinkIns.stdLigand2["name"])
                         self.selectHAtoms(tLinkIns.stdLigand2["comp"])
+                        
                         #print("Number of H atoms in residue %s is %d "%(tLinkIns.stdLigand2["name"], len(tLinkIns.stdLigand2["comp"]["hAtoms"])))
                 else:
                     self.setOneMonomer(tLinkIns.stdLigand2,3)
@@ -2542,6 +2546,8 @@ class CovLinkGenerator(CExeCode):
                 print("#  Build a combo-ligand combining both monomers via the link     #")    
                 print("#                                                                #")
                 print("##################################################################")
+                
+                
                 tLinkIns.cLink["name"] = tLinkIns.stdLigand1["name"] + "-" + tLinkIns.stdLigand2["name"]
                 self.buildComboLigand(tLinkIns)
                 
@@ -2901,11 +2907,12 @@ class CovLinkGenerator(CExeCode):
             self.addjustFormalChargeInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1)
         elif len(tLinkedObj.modLigand2["changed"]["formal_charges"]) > 0:
             self.addjustFormalChargeInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2)
-        
-        
+            
         self.setAddedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
-        #self.setAddedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
-    
+        
+        self.setAddedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+        
+        
         
         if not self.errLevel:
             self.setDeletedInOneResForModification(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
@@ -2913,13 +2920,14 @@ class CovLinkGenerator(CExeCode):
                 self.setLinkChir(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.stdLigand2)
             if not self.errLevel:
                 self.setDeletedInOneResForModification(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
+                
                 if len(tLinkedObj.stdLigand2["linkChir"]) ==2:
                     self.setLinkChir(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.stdLigand1)
                 #if not self.errLevel:
                     #self.setChargeInLinkAtom(tLinkedObj.stdLigand1, tLinkedObj.modLigand1, tLinkedObj.suggestBonds)
                     #if not self.errLevel:
                         #self.setChargeInLinkAtom(tLinkedObj.stdLigand2, tLinkedObj.modLigand2, tLinkedObj.suggestBonds)
-
+        
         if self.errLevel:
             print("Error level is ", self.errLevel)
             print("Error message is : ")
@@ -3024,6 +3032,9 @@ class CovLinkGenerator(CExeCode):
         
          
     def addjustFormalChargeInOneResForModification(self, tRes, tMod):
+        
+        
+   
     
         changeAtms = []
         if len(tMod["changed"]["atoms"]) > 0:
@@ -3032,21 +3043,27 @@ class CovLinkGenerator(CExeCode):
         for aAt in tRes["remainAtoms"]:
             print("Remain id ", aAt["atom_id"], " charge ", aAt["charge"]), " "
             if aAt["atom_id"] == tRes["atomName"]:
+                tRes["origCharge"][aAt["atom_id"]] = aAt["charge"]
                 aAt["charge"] = "0"
+        
         for aFC in tMod["changed"]["formal_charges"]:
             aId = aFC["atom_id"].strip().upper()
             for aAt in tRes["comp"]["atoms"]:
                 if aAt["atom_id"].strip().upper() ==aId:
+                    
+                    tRes["origCharge"][aAt["atom_id"]] = aAt["charge"]
                     aAt["charge"] = aFC["formal_charge"]
+                    
                     if not aId in changeAtms and aAt["atom_id"] != tRes["atomName"]:
                         addedHs=self.checkAssocHAtoms(tRes, tMod, aAt)
                     break
-                
+        
+       
         if len(tMod["changed"]["atoms"]) > 0:
             print("The following atoms are changed: ")
             for aAt in tMod["changed"]["atoms"]:
                 print("Atom ",aAt["atom_id"]) 
-                print("Formal charge ", aAt["charge"])
+                print("Charge ", aAt["charge"])
     
     def checkAssocHAtoms(self, tRes, tMod, tAt):
         
@@ -3061,8 +3078,10 @@ class CovLinkGenerator(CExeCode):
         [bondAtomSet, aLABonds] =  self.getBondSetForOneAtomById(tAt["atom_id"], tRes["comp"]["atoms"], tRes["remainBonds"], tDelAtomIds)
         nTotalVa=self.getTotalBondOrderInOneMmcifAtom(tAt["atom_id"], tRes["remainAtoms"], aLABonds)  
         aCharge = 0
+    
         if "charge" in tAt:
             aCharge = int(tAt["charge"])
+           
         if aCharge != 0: 
             nTotalVa = nTotalVa - aCharge
         if tAt["type_symbol"] in self.chemCheck.orgVal:
@@ -3177,11 +3196,11 @@ class CovLinkGenerator(CExeCode):
                 
     def setAddedInOneResForModification(self, tRes, tMod, tLinkBonds):
 
-        print("For residue ", tRes["name"])
+        #print("For residue ", tRes["name"])
         
         if len(tMod["added"]["atoms"]) > 0:
             for aAtom in tMod["added"]["atoms"]:
-                print("Add atom ", aAtom["atom_id"])
+                #print("Add atom ", aAtom["atom_id"])
                 aBool = self.checkDubAtomNameInOneRes(tRes, aAtom)
                 if not aBool : 
                     self.addOneAtomAndConnectedBonds(tRes, tMod, tLinkBonds, aAtom)
@@ -3454,10 +3473,10 @@ class CovLinkGenerator(CExeCode):
         
         # Delecte bonds as instructed directly by the input file
     
-        
+    
         self.setDeletedBondInOneResForModification(tRes, tMod)
     
-        
+    
         # Delecte atoms 
         print("For residue ", tRes["name"])
         delAtomIdSet =[]
@@ -3471,6 +3490,7 @@ class CovLinkGenerator(CExeCode):
         print("Number of deleted atoms according to the instruction file is ", len(delAtomIdSet))
         
         self.resetChargeForLinkedNAtom(tRes, tMod, tLinkBonds, delAtomIdSet) 
+        
         self.adjustAtomsAroundOneAtom(tRes["atomName"], tRes, tMod, tLinkBonds, delAtomIdSet, 1)
         extraAtomSet = []
         if len(tMod["changed"]["bonds"]) > 0:
@@ -4014,10 +4034,14 @@ class CovLinkGenerator(CExeCode):
                 self.getHAtomConnected(aName, tRes, connectedH)
                 
                 if len(aTmpLABonds)==4 and len(connectedH) >0:
+                    
                     if "charge" in tRes["comp"]["atoms"][aLAtmSerial]:
+                        #tRes["origCharge"][aLAtmId] = tRes["comp"]["atoms"][aLAtmSerial]["charge"]
                         tRes["comp"]["atoms"][aLAtmSerial]["charge"] = "0"
                     elif "form_charge" in tRes["comp"]["atoms"][aLAtmSerial]:
+                        #tRes["origCharge"][aLAtmId] =tRes["comp"]["atoms"][aLAtmSerial]["formal_charge"]
                         tRes["comp"]["atoms"][aLAtmSerial]["form_charge"] = "0"
+                     
                     print("Charges in atom %s is set to 0 "%aLAtmId)  
            
     def adjustAtomsAroundOneAtom(self, tCenAtomId, tRes, tMod, tLinkBonds, tDelAtomIds, tMode):
@@ -4443,6 +4467,7 @@ class CovLinkGenerator(CExeCode):
  
         idxA2      = 0
         for aAtom in tLinkedObj.stdLigand2["remainAtoms"]:
+            #print("Atom id ", aAtom["atom_id"], "   Charge ", aAtom["charge"])
             aAtom["idx"]             = idxA2
             aAtom["idxCombo"]        = idxAtmComb
             if aAtom["type_symbol"]=="H":
@@ -4866,7 +4891,7 @@ class CovLinkGenerator(CExeCode):
     def buildComboLigand(self, tLinkedObj):
 
         if not self.errLevel:
-        
+            
             self.adjustAtomsAndOthersForComboLigand(tLinkedObj)
             
             tLinkedObj.combLigand["name"] = tLinkedObj.stdLigand1["name"].strip() + "-" + tLinkedObj.stdLigand2["name"].strip()
@@ -4922,7 +4947,15 @@ class CovLinkGenerator(CExeCode):
         #    print aAtom["atom_id"]
         #    print "Atom %s is in residue %s "%(aAtom["atom_id"], aAtom["res_idx"])
         #    print "Is it added ? ", aAtom["is_added"]
-
+        for aAt in tLinkedObj.stdLigand1["remainAtoms"]:
+            if aAt["atom_id"] in tLinkedObj.stdLigand1["origCharge"]:
+                aAt["charge"] = tLinkedObj.stdLigand1["origCharge"][aAt["atom_id"]] 
+        for aAt in tLinkedObj.stdLigand2["remainAtoms"]:
+            if aAt["atom_id"] in tLinkedObj.stdLigand2["origCharge"]:
+                aAt["charge"] = tLinkedObj.stdLigand2["origCharge"][aAt["atom_id"]]
+             
+            
+        
         addedSet1 = []
         addedSet2 = []
         # Atoms
@@ -5199,9 +5232,10 @@ class CovLinkGenerator(CExeCode):
     def checkAtomMod(self, tOriAtoms, tAtom, tModAtoms, tExistChangedAtoms):
 
         aId = tAtom["atom_id"]
- 
+        print("comp atom id ", aId)
         for aAtm in tOriAtoms:
             if aAtm["atom_id"] == aId:
+                print("comp id ", aAtm["atom_id"])
                 if self.compare2Atoms(aAtm, tAtom) and not aId in tExistChangedAtoms:
                     print(aId, " changed")
                     tModAtoms.append(tAtom)
@@ -5217,9 +5251,11 @@ class CovLinkGenerator(CExeCode):
             if tOriAtom["type_energy"] !=tAtom["type_energy"]: 
                 tOriAtom["type_energy"] =tAtom["type_energy"]
                 lChange = True
+        print("O: Is charge a key ", "charge" in tOriAtom)
+        print("C: Is charge a key ", "charge" in tAtom)
         if "charge" in tOriAtom and "charge" in tAtom:
-            #print("charge1 ", tOriAtom["charge"])
-            #print("charge2 ", tAtom["charge"])
+            print("charge1 ", tOriAtom["charge"])
+            print("charge2 ", tAtom["charge"])
             if tOriAtom["charge"] !=tAtom["charge"]:
                 lChange = True
         return lChange

@@ -5152,17 +5152,36 @@ namespace LIBMOL {
                     //getAtomTypeOneMol(aMol);
                     getUniqAngleMols(aMol, tCryst);
                     setAnglesSPSigns(aMol.atoms, aMol.angles);
-                    // Change the molecule serial number
-                    allMolecules.push_back(aMol);
-                    std::string aMsg;
-                    aMsg = "Molecule " + IntToStr(aMol.seriNum) + " is included.\n"
-                            + "It contains " + IntToStr(aMol.atoms.size())
-                            + " atoms\n";
-                    validedMolMsg[aMol.seriNum] = aMsg;
+                    if (checkWrongSP1CAtom(aMol.atoms, aMol.bonds,
+                                           aMol.angles) )
+                    {
+                        // Change the molecule serial number
+                        allMolecules.push_back(aMol);
+                        std::string aMsg;
+                        aMsg = "Molecule " + IntToStr(aMol.seriNum) + " is included.\n"
+                               + "It contains " + IntToStr(aMol.atoms.size())
+                               + " atoms\n";
+                        validedMolMsg[aMol.seriNum] = aMsg;
 
-                    std::cout << "Molecule " << aMol.seriNum << " is included "
-                            << std::endl << "It contains " << aMol.atoms.size()
-                            << " atoms" << std::endl;
+                        std::cout << "Molecule " << aMol.seriNum << " is included "
+                                  << std::endl << "It contains " << aMol.atoms.size()
+                                  << " atoms" << std::endl;
+                    }
+                    else
+                    {
+                        aMolErrInfo = "Molecule " + IntToStr(aMol.seriNum)
+                                      + "contains at least one wrong SP1 C atom";
+
+                        std::string aMsg = aMolErrInfo + "\n"
+                                  + "Molecule " + IntToStr(aMol.seriNum)
+                                  + " is rejected\n";
+                        errMolMsg[aMol.seriNum] = aMsg;
+
+                        std::cout << aMolErrInfo << std::endl;
+                        std::cout << "Molecule " << aMol.seriNum
+                            << " is rejected " << std::endl;
+                    }
+
                 }
                 else
                 {
@@ -7426,7 +7445,7 @@ namespace LIBMOL {
             setAtomsAltId(tMol.atoms);
             tMolTabs << "loop_" << std::endl
                     << "_chem_comp_atom.atom_id " << std::endl
-                    << "_chem_comp_atom.atom_alt_id" << std::endl
+                    << "_chem_comp_atom.orig_atom_id" << std::endl
                     << "_chem_comp_atom.type_symbol" << std::endl
                     << "_chem_comp_atom.x" << std::endl
                     << "_chem_comp_atom.y" << std::endl
@@ -7449,23 +7468,25 @@ namespace LIBMOL {
                 {
                     strCalc = "YES";
                 }
-                tMolTabs << std::setw(8)  << iAt->id
-                         << std::setw(8)  << iAt->altId
-                        << std::setw(4)  << iAt->chemType
-                        << std::setw(16) << iAt->coords[0]
-                        << std::setw(16) << iAt->coords[1]
-                        << std::setw(16) << iAt->coords[2]
-                        << std::setw(6)  << iAt->charge
-                        << std::setw(10) << iAt->hybrid << "    "
-                        << std::setw(16) << iAt->isoB
-                        << std::setw(6) << iAt->ocp
-                        << std::setw(8) << strCalc
-                        << std::setw(iAt->codNB1NB2_SP.size() + 4)
-                        << iAt->codNB1NB2_SP << "    "
-                        //<< std::setw(5) << iAt->excessElec << "    "
-                        //<< std::setw(iAt->codNB1NB2_ExElec.size() + 4)
-                        //<< iAt->codNB1NB2_ExElec << "    "
-                        << iAt->codClass << std::endl;
+
+                tMolTabs << std::setw(iAt->altId.size()+4)  << iAt->altId
+                         << std::setw(iAt->id.size()+4)     << iAt->id
+                         << std::setw(4)  << iAt->chemType
+                         << std::setw(16) << std::setprecision(6) << iAt->coords[0]
+                         << std::setw(16) << std::setprecision(6) << iAt->coords[1]
+                         << std::setw(16) << std::setprecision(6) << iAt->coords[2]
+                         << std::setw(6)  << iAt->charge
+                         << std::setw(10) << iAt->hybrid << "    "
+                         << std::setw(16) << iAt->isoB
+                         << std::setw(6) << std::setprecision(4) << iAt->ocp
+                         << std::setw(8) << strCalc
+                         << std::setw(iAt->codNB1NB2_SP.size()+4)
+                         << iAt->codNB1NB2_SP
+                         //<< std::setw(5) << iAt->excessElec << "    "
+                         //<< std::setw(iAt->codNB1NB2_ExElec.size() + 4)
+                         //<< iAt->codNB1NB2_ExElec << "    "
+                         << std::setw(iAt->codClass.size()+4)
+                         << iAt->codClass << std::endl;
             }
             tMolTabs << std::endl;
         }
@@ -7571,15 +7592,19 @@ namespace LIBMOL {
             for (std::vector<BondDict>::iterator iBo = tMol.bonds.begin();
                     iBo != tMol.bonds.end(); iBo++)
             {
+
                 tMolTabs << std::setw(8) << iBo->seriNum
                          << std::setw(6) << iBo->atomsIdx[0]
                          << std::setw(6) << iBo->atomsIdx[1]
-                         << std::setw(10) << iBo->atoms[0]
-                         << std::setw(10) << iBo->atoms[1]
+                         << std::setw(tMol.atoms[iBo->atomsIdx[0]].altId.size()+4)
+                         << tMol.atoms[iBo->atomsIdx[0]].altId
+                         << std::setw(tMol.atoms[iBo->atomsIdx[1]].altId.size()+4)
+                         << tMol.atoms[iBo->atomsIdx[1]].altId
                          << std::setw(6) << iBo->atomsElem[0]
                          << std::setw(6) << iBo->atomsElem[1]
-                         << std::setw(12) << iBo->order
-                         << std::setw(10) << iBo->value << std::endl;
+                         << std::setw(10) << iBo->order
+                         << std::setw(25) << std::setprecision(18)
+                         << iBo->value << std::endl;
             }
             std::cout << std::endl;
         }
@@ -7605,13 +7630,13 @@ namespace LIBMOL {
                     iAn != tMol.angles.end(); iAn++)
             {
                 tMolTabs << std::setw(6) << nAn
-                        << std::setw(6) << iAn->atoms[0]
-                        << std::setw(6) << iAn->atoms[1]
+                        << std::setw(8) << iAn->atoms[0]
+                        << std::setw(8) << iAn->atoms[1]
                         << std::setw(6) << iAn->atoms[2]
                         << std::setw(4) << tMol.atoms[iAn->atoms[0]].chemType
                         << std::setw(4) << tMol.atoms[iAn->atoms[1]].chemType
                         << std::setw(4) << tMol.atoms[iAn->atoms[2]].chemType
-                        << std::setw(10) << iAn->value * PID180
+                        << std::setw(20) << std::setprecision(12) << iAn->value * PID180
                         << std::setw(6) << iAn->isInSameRing << std::endl;
                 nAn++;
             }
@@ -7723,25 +7748,23 @@ namespace LIBMOL {
                         tStr3 = "NoInAnyRing";
                         tStr32= "0";
                     }
-                    int aW =10;
 
-                    if (tStr22.size() >=aW)
+                    //std::cout << "Here ---- aW= " << aW << std::endl;
+                    //std::cout << "tStr32.size()=" << tStr32.size() << std::endl;
+                    std::cout << "Torsion atom1 id "<< iTor->fullAtoms[0].id << std::endl
+                              << " and altId " << iTor->fullAtoms[0].altId << std::endl
+                              << " and idx " << iTor->fullAtoms[0].seriNum << std::endl
+                              << " and id again " << tMol.atoms[iTor->fullAtoms[0].seriNum].id
+                              << " and alt id again " <<  tMol.atoms[iTor->fullAtoms[0].seriNum].altId << std::endl;
+                    std::string id0 = tMol.atoms[iTor->fullAtoms[0].seriNum].altId;
+                    std::string id1 = tMol.atoms[iTor->fullAtoms[1].seriNum].altId;
+                    std::string id2 = tMol.atoms[iTor->fullAtoms[2].seriNum].altId;
+                    std::string id3 = tMol.atoms[iTor->fullAtoms[3].seriNum].altId;
+                    if (abs(iTor->value) < 0.000001)
                     {
-                        aW=tStr2.size() + 4;
+                        iTor->value = 0.0;
                     }
-
-                    if (tStr3.size() >= aW)
-                    {
-                        aW=tStr3.size() + 4;
-                    }
-                    if (tStr32.size() >=aW)
-                    {
-                        aW=tStr32.size() + 4;
-                    }
-
-
-
-                    tMolTabs << std::setw(25) << iTor->id
+                    tMolTabs << std::setw(iTor->id.size()+4) << iTor->id
                              << std::setw(6) << iTor->fullAtoms[0].chemType
                              << std::setw(6) << iTor->fullAtoms[1].chemType
                              << std::setw(6) << iTor->fullAtoms[2].chemType
@@ -7750,16 +7773,16 @@ namespace LIBMOL {
                              << std::setw(6) << iTor->fullAtoms[1].seriNum
                              << std::setw(6) << iTor->fullAtoms[2].seriNum
                              << std::setw(6) << iTor->fullAtoms[3].seriNum
-                             << std::setw(9) << iTor->fullAtoms[0].id
-                             << std::setw(9) << iTor->fullAtoms[1].id
-                             << std::setw(9) << iTor->fullAtoms[2].id
-                             << std::setw(9) << iTor->fullAtoms[3].id
-                             << std::setw(16) << iTor->value
-                             << std::setw(22) << tStr1
-                             << std::setw(16) << tStr2
-                             << std::setw(aW) << tStr22
-                             << std::setw(aW) << tStr3
-                             << std::setw(aW) << tStr32 << std::endl;
+                             << std::setw(id0.size()+4) << id0
+                             << std::setw(id1.size()+4) << id1
+                             << std::setw(id2.size()+4) << id2
+                             << std::setw(id3.size()+4) << id3
+                             << std::setw(16) << std::setprecision(8) << iTor->value
+                             << std::setw(tStr1.size()+4) << tStr1
+                             << std::setw(tStr2.size()+4) << tStr2
+                             << std::setw(tStr22.size()+4) << tStr22
+                             << std::setw(tStr3.size()+4) << tStr3
+                             << std::setw(tStr32.size()+4) << tStr32 << std::endl;
             }
 
         }
@@ -7794,7 +7817,7 @@ namespace LIBMOL {
                         iA != iRi->atoms.end(); iA++)
                 {
                     tMolTabs << std::setw(8) << iA->seriNum
-                             << std::setw(8) << iA->id
+                             << std::setw(iA->altId.size()+4) << iA->altId
                              << std::setw(8) << nRi
                              << std::setw(8) << aAR
                              << std::endl;
@@ -7920,7 +7943,7 @@ namespace LIBMOL {
             aOutCif << "_chem_comp_atom.atom_id"  << std::endl;
             if (tMode==0)
             {
-                aOutCif << "_chem_comp_atom.atom_alt_id"  << std::endl;
+                aOutCif << "_chem_comp_atom.orig_atom_id"  << std::endl;
             }
             aOutCif << "_chem_comp_atom.type_symbol" << std::endl;
             if (tMode==1)
@@ -7951,15 +7974,15 @@ namespace LIBMOL {
                 aOutCif << std::left << tMonoRootName1;
                 if (tMode==0)
                 {
-                    aOutCif.width(12);
+                    aOutCif.width(iAt->altId.size()+4);
                     aOutCif << std::left << iAt->altId;
                     //aOutCif << std::left << iAt->altId;
-                    aOutCif.width(12);
+                    aOutCif.width(iAt->id.size()+4);
                     aOutCif << std::left << iAt->id;
                 }
                 else
                 {
-                    aOutCif.width(12);
+                    aOutCif.width(iAt->id.size()+4);
                     aOutCif << std::left << iAt->id;
                     //aOutCif << std::left << iAt->altId;
                     //aOutCif.width(12);
@@ -7992,6 +8015,7 @@ namespace LIBMOL {
                 //aOutCif.width(iAt->codClass.size()+4);
                 if (tMode==0)
                 {
+                    aOutCif.width(iAt->codClass.size()+4);
                     aOutCif << std::left << iAt->codClass;
                 }
                 aOutCif << std::endl;
@@ -8007,7 +8031,7 @@ namespace LIBMOL {
                 for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
                 {
-                    aOutCif.width(8);
+                    aOutCif.width(tMonoRootName1.size()+4);
                     aOutCif << std::left <<  tMonoRootName1;
                     aOutCif.width(10);
                     aOutCif << std::left << iAt->id;
@@ -8037,8 +8061,10 @@ namespace LIBMOL {
                  if (tMode ==0)
                  {
                     aOutCif
-                         << std::setw(10)  << tMol.atoms[iBo->atomsIdx[0]].altId
-                         << std::setw(10)  << tMol.atoms[iBo->atomsIdx[1]].altId        // iBo->atoms[1]
+                         << std::setw(tMol.atoms[iBo->atomsIdx[0]].altId.size()+4)
+                         << tMol.atoms[iBo->atomsIdx[0]].altId
+                         << std::setw(tMol.atoms[iBo->atomsIdx[1]].altId.size()+4)
+                         << tMol.atoms[iBo->atomsIdx[1]].altId        // iBo->atoms[1]
                          << std::setw(12) << iBo->order
                          << std::endl;
                  }
@@ -8080,11 +8106,15 @@ namespace LIBMOL {
                 for (std::vector<AngleDict>::iterator iAn = tMol.angles.begin();
                      iAn !=tMol.angles.end(); iAn++)
                 {
-                    aOutCif << std::setw(8)  << tMonoRootName1;
+                    aOutCif << std::setw(tMonoRootName1.size()+4)
+                            << tMonoRootName1;
                      aOutCif
-                         << std::setw(10)  << tMol.atoms[iAn->atoms[1]].id
-                         << std::setw(10)  << tMol.atoms[iAn->atoms[0]].id
-                         << std::setw(10)  << tMol.atoms[iAn->atoms[2]].id;
+                         << std::setw( tMol.atoms[iAn->atoms[1]].id.size()+4)
+                         << tMol.atoms[iAn->atoms[1]].id
+                         << std::setw(tMol.atoms[iAn->atoms[0]].id.size()+4)
+                         << tMol.atoms[iAn->atoms[0]].id
+                         << std::setw(tMol.atoms[iAn->atoms[2]].id.size()+4)
+                         << tMol.atoms[iAn->atoms[2]].id;
                     aOutCif.width(16);
                     aOutCif << std::left << std::setprecision(4)
                             <<std::fixed << iAn->value;
@@ -8613,7 +8643,16 @@ namespace LIBMOL {
                             iBo->order = "SINGLE";
                         }
                     }
-                    outTableMols(aMolTable, tFinMols[i]);
+                    if (checkWrongSP1CAtom(tFinMols[i].atoms, tFinMols[i].bonds,
+                                           tFinMols[i].angles) )
+                    {
+                        outTableMols(aMolTable, tFinMols[i]);
+                    }
+                    else
+                    {
+                        std::cout << "A molecule containing at least one wrong sp1 C atom is deleted"
+                                  << std::endl;
+                    }
                     outPreCellAtomUs(preCellAtomU, tFinMols[i]);
                     std::string aMolName(aMolRootName);
                     aMolName.append(aMolIdx);

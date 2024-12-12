@@ -242,6 +242,9 @@ namespace LIBMOL
                     const  double                               tUAS,
                     const  double                               tLAS);
 
+        CodClassify(const std::string                           tValiFN,
+                    const std::string                           tLibmolTabDir);
+
 
         // Constructor by a DictCifFile object
         CodClassify(const DictCifFile & tCifObj,

@@ -444,6 +444,10 @@ class Acedrg(CExeCode ):
                                     action="store_true",  default=False,  
                                     help="The mode temporarily exists in Acedrg, for some purposes")
         
+        self.inputParser.add_option("--valiJson", dest="bondsJsonName",  metavar="FILE", 
+                                    action="store", type="string",
+                                    help="a json file containing a set of bonds")
+        
         self.inputParser.add_option("--metalPDB", dest="inMetalPDBName",  metavar="FILE", 
                                     action="store", type="string",
                                     help="a pdb file containing metal elements, required by metalCoord")
@@ -780,7 +784,8 @@ class Acedrg(CExeCode ):
         # Sequnence for check the locations of acedrg tables 
         # (1) Check if the user provides the location
         # (2) If not, check CCP4 suite default location.
-        # (3) If not, check if the environment variable LIBMOL_ROOT is defined in the user's machine.
+        # (3) If not, check if the environmen
+        #t variable LIBMOL_ROOT is defined in the user's machine.
         # (4) If none of them, program exits.   
         if not t_inputOptionsP.acedrgTables: 
             if self.acedrgDir !="" and os.path.isdir(self.acedrgDir):
@@ -822,6 +827,7 @@ class Acedrg(CExeCode ):
         
         
         if not t_inputOptionsP.molGen and not t_inputOptionsP.repCrd and not t_inputOptionsP.typeOut\
+           and not t_inputOptionsP.bondsJsonName\
            and not t_inputOptionsP.HMO and not t_inputOptionsP.linkInstructions and\
            not t_inputOptionsP.qmInstructions and not t_inputOptionsP.testMode\
            and not t_inputOptionsP.protCol and not t_inputOptionsP.molDiff: 
@@ -910,6 +916,9 @@ class Acedrg(CExeCode ):
             if t_inputOptionsP.inStdCifName:
                 self.inStdCifName = t_inputOptionsP.inStdCifName
                 self.workMode     = 35
+        elif t_inputOptionsP.bondsJsonName:
+            self.bondsJsonName = t_inputOptionsP.bondsJsonName
+            self.workMode = 36
         elif t_inputOptionsP.repCrd :
             if t_inputOptionsP.inPdbName and t_inputOptionsP.inMmCifName: 
                 self.inMmCifName = t_inputOptionsP.inMmCifName
@@ -1379,6 +1388,15 @@ class Acedrg(CExeCode ):
                 self.subExecute()
             elif self.workMode == 35 :
                 pass       
+        
+        if self.workMode ==36:
+            
+            aTmpFN = os.path.join(self.scrDir, self.outRoot +"_tmpBandA.txt")
+            self._log_name = os.path.join(self.scrDir, self.outRoot +"_tmpBandA.log")
+            self._cmdline += " -D  %s -v  %s "%(self.acedrgTables,  aTmpFN) 
+            print(self._cmdline)
+            self.subExecute() 
+            
         if self.workMode == 41 :
 
             self._cmdline += " -p %s -c %s "%(self.inPdbName, self.inMmCifName)
@@ -1405,8 +1423,34 @@ class Acedrg(CExeCode ):
         if self.workMode == 1111:
             
             self._cmdline += " -b %s -r %s -o %s -m yes "%(self.inMmCifName, self.monomRoot, self.outRoot)
-            #print(self._cmdline)
             self.subExecute()
+    
+    def getAtomsAndBondsFromJson(self, tBJsonFN, tBAFN):
+        
+        if os.path.isfile(tBJsonFN):
+            aSetAtoms = {}
+            aSetBonds = []
+            aSetObjs   =json.load(open(tBJsonFN,"r"))
+            if len(aSetObjs) > 0:
+                for aObj in aSetObjs:
+                    if "type" in aObj:
+                        if aObj["type"] == "bond":
+                            aSetBonds.append(aObj)
+                if len(aSetBonds) > 0:
+                    for aBond in aSetBonds:
+                        if not aBond["atom_id_1"] in aSetAtoms:
+                            aSetAtoms[aBond["atom_id_1"]] = aBond["atom_type_1"]
+                        if not aBond["atom_id_2"] in aSetAtoms:
+                            aSetAtoms[aBond["atom_id_2"]] = aBond["atom_type_2"]            
+                if len(aSetBonds) or len(aSetAtoms.keys()) > 0:  
+                    aBAF = open(tBAFN, "w")
+                    for aId in aSetAtoms:
+                        aBAF.write("%s%s%s\n"%("ATOM".ljust(8), aId.ljust(8), aSetAtoms[aId]))
+                    for aB in aSetBonds:
+                        aBAF.write("%s%s%s%s\n"%("BOND".ljust(8), aB["atom_id_1"].ljust(8),
+                                           aB["atom_id_2"].ljust(8), aB["bond_length"]))
+                    aBAF.close()
+                    
             
     def getBondsAndAngles(self, tFName, tMolTabs):
         
@@ -1711,7 +1755,7 @@ class Acedrg(CExeCode ):
             if os.path.isfile(tMol[0]):
                 self._cmdline +=      " -c %s   -r %s -o %s -p "%(tMol[0], self.monomRoot, aOutRoot)
                 if tMol[1].find("HasMetal") !=-1:
-                    self._cmdline +=      "  --metalPDB %s "%self.tMol[0] 
+                    self._cmdline +=      "  --metalPDB %s "%tMol[0] 
                 if self.inCoordForChir:
                     self._cmdline += " --c1 "
             #print(self._cmdline)
@@ -3249,7 +3293,9 @@ class Acedrg(CExeCode ):
         if self.workMode == 35:
             print("work mode ", self.workMode)
             if os.path.isfile(self.inStdCifName):
-                self.runLibmol()    
+                self.runLibmol() 
+
+        
 
         if self.workMode ==111 or self.workMode ==121 or self.workMode ==131 or self.workMode ==141:
             if os.path.isfile(self.outRstCifName):
@@ -3935,6 +3981,12 @@ class Acedrg(CExeCode ):
             if os.path.isfile(self.inStdCifName):
                 self.runLibmol()    
         
+        if self.workMode ==36:
+            aTmpFN = os.path.join(self.scrDir, self.outRoot +"_tmpBandA.txt")
+            print(aTmpFN)
+            self.getAtomsAndBondsFromJson(self.bondsJsonName, aTmpFN)
+            self.runLibmol()
+            
         if self.workMode == 61:
             if not self.testMode: 
                 aSetParas = {}
@@ -4045,6 +4097,7 @@ class Acedrg(CExeCode ):
                         idxMol = 1
                         for aMol in aSetMols:
                             print("acedrg works on molecule ", idxMol)
+                            print("The molecule file is ", aMol[0])
                             self.runAcedrg(aMol, str(idxMol))
                             idxMol+=1
             print("=====================================================================")

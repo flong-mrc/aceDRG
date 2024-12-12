@@ -1264,6 +1264,16 @@ namespace LIBMOL
         elemProps["Lr"]["cova"]     = 1.80;       // not sure
         elemProps["Lr"]["ionM+"]    = 1.08;
 
+         // https://www.rsc.org/periodic-table/element/54/xenon
+        elements["Xe"]["row"]       = 5;
+        elements["Xe"]["group"]     = 18;
+        elements["Xe"]["matType"]   = 10;
+        elements["Xe"]["atomNum"]   = 54;
+        elements["Xe"]["val"]       = 1;
+        elemProps["Xe"]["vdw"]      = 2.16;
+        elemProps["Xe"]["cova"]     = 1.36;
+        elemProps["Xe"]["ionM+"]    = 1.08;
+
         //Organic elements which have multiple valences
 
         extraValences["P"].push_back(3);

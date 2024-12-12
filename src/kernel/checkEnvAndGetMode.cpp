@@ -72,7 +72,7 @@ namespace LIBMOL
 
         // opterr = 0;
 
-        if (numArg  < 5)
+        if (numArg  < 3)
         {
             // temporarily interface
             std::cerr << "Command line syntax: " << std::endl
@@ -174,6 +174,11 @@ namespace LIBMOL
                     IOEntries["inMC"] = optarg;
                     std::cout << "inPut MC  :  "
                               << IOEntries["inMC"] << std::endl;
+                    break;
+                case 'v':
+                    IOEntries["inVali"] = optarg;
+                    std::cout << "inPut validation file  :  "
+                              << IOEntries["inVali"] << std::endl;
                     break;
                 case 'w':
                     IOEntries["BandC"] = optarg;
@@ -548,6 +553,10 @@ namespace LIBMOL
         else if (IOEntries.find("BandC") !=IOEntries.end())
         {
             workMode = 930;
+        }
+        else if (IOEntries.find("inVali") !=IOEntries.end())
+        {
+            workMode = 940;
         }
 
         else if ( IOEntries.find("inCifName")!=IOEntries.end() )

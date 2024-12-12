@@ -165,13 +165,15 @@ namespace LIBMOL
                 {
                     t_len=3;
                 }
-                else
-                {
-                    t_len = t_len + t_m_len;
-                }
+                //else
+                //{
+                //    t_len = t_len + t_m_len;
+                //}
             }
 
-
+            std::cout << iAt->id << std::endl;
+            std::cout << "t_len =" << t_len << std::endl;
+            std::cout << "t_m_len = " << t_m_len << std::endl;
 
             numConnMap[iAt->id].push_back(t_len);
             numConnMap[iAt->id].push_back(t_m_len);
@@ -204,21 +206,36 @@ namespace LIBMOL
                 {
                     if (iAt->charge==-1.0)
                     {
+                        std::cout << "XXX1 " << std::endl;
                         if (t_m_len==1)
                         {
+                            std::cout << "XXX2" << std::endl;
+                            std::cout << iAt->id << std::endl;
+                        std::cout << iAt->bondingIdx << std::endl;
                             iAt->chiralIdx  = 0;
                             iAt->bondingIdx = 2;
                         }
                         else
                         {
+                            std::cout << "XXX3" << std::endl;
+                            std::cout << iAt->id << std::endl;
+                        std::cout << iAt->bondingIdx << std::endl;
                             iAt->chiralIdx  = 2;
-                            iAt->bondingIdx = 3;
+                            iAt->bondingIdx = 2;
                         }
+                    }
+                    else if (iAt->charge==1.0)
+                    {
+                        iAt->chiralIdx  = 0;
+                        iAt->bondingIdx = 2;
                     }
                     else
                     {
                         iAt->chiralIdx  = 0;
                         iAt->bondingIdx = 2;
+                        std::cout << "XXX4" << std::endl;
+                        std::cout << iAt->id << std::endl;
+                        std::cout << iAt->bondingIdx << std::endl;
                     }
                 }
                 else if(t_len==2)
@@ -641,6 +658,7 @@ namespace LIBMOL
                     }
                 }
             }
+
             if (iAt->chemType.compare("C")==0 )
             {
                 // int t_len = (int)iAt->connAtoms.size();
@@ -651,36 +669,45 @@ namespace LIBMOL
                 {
 
                     bool l_sp2 = false;
+                    std::vector<int> sp2Set;
                     for (std::vector<int>::iterator iCA=iAt->connAtoms.begin();
                                  iCA != iAt->connAtoms.end(); iCA++)
                     {
-                        // if(tAtoms[*iCA].bondingIdx == 2)
+                        if(tAtoms[*iCA].bondingIdx == 2)
 
-                        if (preBondingIdx[*iCA]==2.0)
+                        //if (preBondingIdx[*iCA]==2.0)
                         {
-                            l_sp2 = true;
-                            break;
+                            sp2Set.push_back(*iCA);
+
+                            //break;
                         }
                     }
 
-                    if (l_sp2)
+                    if (iAt->charge==-1.0)
                     {
-                        // Now we can say this atom is in sp2 orbits
-                        iAt->chiralIdx  =  0;
-                        iAt->bondingIdx =  2;
-                    }
-                    else
-                    {
-                        if (iAt->chiralIdx ==0)
+
+                        if (sp2Set.size()==2)
                         {
-                            iAt->chiralIdx  = 2;
+                            // Now we can say this atom is in sp2 orbits
+                            iAt->chiralIdx  =  0;
+                            iAt->bondingIdx =  2;
                         }
+                        else
+                        {
+                            if (iAt->chiralIdx ==0)
+                            {
+                                iAt->chiralIdx  = 2;
+                            }
 
-                        iAt->bondingIdx =  3;
+                            iAt->bondingIdx =  3;
+                        }
                     }
-
+                    std::cout << "XXX5" << std::endl;
+                        std::cout << iAt->id << std::endl;
+                        std::cout << iAt->bondingIdx << std::endl;
                 }
             }
+
         }
 
         // Further check if a chiral center is a real one
@@ -3344,9 +3371,24 @@ namespace LIBMOL
             }
         }
 
-
-
     }
+
+    extern bool checkNonHAtomSet(std::vector<AtomDict> & tAtoms)
+    {
+        bool aRet = true;
+        for (std::vector<AtomDict>::iterator iAt = tAtoms.begin();
+             iAt != tAtoms.end(); iAt++)
+        {
+            if (iAt->chemType=="H")
+            {
+                aRet = false;
+                break;
+            }
+        }
+
+        return aRet;
+    }
+
 
     // The following function overwrites addHAtoms in MolSdfFile class.
     // Add or delete H atoms
@@ -3628,10 +3670,107 @@ namespace LIBMOL
         for (std::vector<AtomDict>::iterator iA=tAtoms.begin();
                      iA !=tAtoms.end(); iA++)
         {
-            std::cout << "Here " << iA->chemType << std::endl;
+            //std::cout << "Here " << iA->chemType << std::endl;
             iA->isMetal = isMetal(allMetals, iA->chemType);
-            std::cout << "metal ? " << iA->isMetal << std::endl;
+            //std::cout << "metal ? " << iA->isMetal << std::endl;
         }
+    }
+
+    extern bool checkWrongSP1CAtom(std::vector<AtomDict>  & tAtoms,
+                                   std::vector<BondDict>  & tBonds,
+                                   std::vector<AngleDict>  & tAngs)
+    {
+        bool aRet = true;
+
+        std::vector<std::string>         aOrgTab;
+        initOrgTable(aOrgTab);
+
+        std::map<int, std::vector<int> > aOrgConn;
+        std::map<int, int>               aMetConn;
+
+        for (std::vector<BondDict>::iterator iBo = tBonds.begin();
+                iBo != tBonds.end(); iBo++)
+        {
+            std::string elem1 =tAtoms[iBo->atomsIdx[0]].chemType;
+            std::string elem2 =tAtoms[iBo->atomsIdx[1]].chemType;
+            int idx1 = iBo->atomsIdx[0];
+            int idx2 = iBo->atomsIdx[1];
+            if (elem1=="C")
+            {
+                if (isOrganc(aOrgTab, elem2))
+                {
+                    if (std::find(aOrgConn[idx1].begin(),aOrgConn[idx1].end(), idx2)
+                        ==aOrgConn[idx1].end())
+                    {
+                        aOrgConn[idx1].push_back(idx2);
+                    }
+                }
+                else
+                {
+                    if (aMetConn.find(idx1) == aMetConn.end())
+                    {
+                        aMetConn[idx1] = 1;
+                    }
+                    else
+                    {
+                        aMetConn[idx1]++;
+                    }
+                }
+            }
+
+            if (elem2=="C")
+            {
+                if (isOrganc(aOrgTab, elem1))
+                {
+                    if (std::find(aOrgConn[idx2].begin(),aOrgConn[idx2].end(), idx1)
+                        ==aOrgConn[idx2].end())
+                    {
+                        aOrgConn[idx2].push_back(idx1);
+                    }
+                }
+                else
+                {
+                    if (aMetConn.find(idx2) == aMetConn.end())
+                    {
+                        aMetConn[idx2] = 1;
+                    }
+                    else
+                    {
+                        aMetConn[idx2]++;
+                    }
+                }
+            }
+        }
+
+        REAL aAng = 180.00;
+        std::vector<REAL> smallAngs;
+
+        for (std::map<int, std::vector<int> >::iterator iAt = aOrgConn.begin();
+             iAt != aOrgConn.end(); iAt++)
+        {
+            if (iAt->second.size() == 2 && aMetConn.find(iAt->first) == aMetConn.end())
+            {
+                int idxAng = getAngle(tAngs, iAt->first, iAt->second[0], iAt->second[1]);
+                if (idxAng !=-1)
+                {
+                    double angV = tAngs[idxAng].value*PID180;
+                    if(abs(angV)< 150.00)
+                    {
+                        smallAngs.push_back(angV);
+                    }
+
+                }
+            }
+        }
+
+        if (smallAngs.size() > 0)
+        {
+            aRet = false;
+        }
+
+        return aRet;
+
+
     }
 
     HuckelMOSuite::HuckelMOSuite():lUpdate(false)
