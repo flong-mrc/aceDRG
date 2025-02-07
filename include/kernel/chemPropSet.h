@@ -355,6 +355,15 @@ namespace LIBMOL
                                   std::vector<BondDict>  & tBonds,
                                   std::vector<AngleDict>  & tAngs);
 
+    extern void addDumyHs(std::vector<AtomDict>  & tAtoms,
+                          std::vector<BondDict>  & tBonds,
+                          int                      tIdxC);
+
+    extern void mendMissingHCases(std::vector<AtomDict>   & tAtoms,
+                                  std::vector<BondDict>  & tBonds);
+
+
+
     class HuckelMOSuite
     {
     public :
@@ -537,16 +546,16 @@ namespace LIBMOL
                            std::vector<int>           & tDoneAtoms,
                            std::vector<int>           & tDoneBonds);
 
-        void setOneLinkAtoms(std::vector<AtomDict>         & tAtoms,
+        void setOneLinkAtoms(std::vector<AtomDict>       & tAtoms,
                            std::vector<BondDict>         & tBonds,
                            std::map<int, int>            & tCurVal,
                            std::map<int, int>            & tOutEMap,
                            std::map<int, double>         & tChargeMap,
                            std::map<int, std::string>    & tElemMap,
                            std::map<int,
-                           std::map<int, int> >       & tAllAtmBondingMap,
-                           std::vector<int>           & tDoneAtoms,
-                           std::vector<int>           & tDoneBonds);
+                           std::map<int, int> >          & tAllAtmBondingMap,
+                           std::vector<int>              & tDoneAtoms,
+                           std::vector<int>              & tDoneBonds);
 
         void setAllMetalBO(std::vector<AtomDict>         & tAtoms,
                            std::vector<BondDict>         & tBonds,

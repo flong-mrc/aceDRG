@@ -121,7 +121,6 @@ namespace LIBMOL
     {
         if (tOpenMode == std::ios::in)
         {
-            std::cout << "Here " << std::endl;
             inFile.open(tFname, tOpenMode);
             itsCurrentModel   = new Model();
             itsCurrentAtom    = new Atom();
@@ -137,9 +136,6 @@ namespace LIBMOL
             std::cout << "Number of input atoms " << allHetAtmList.size()
                       << std::endl;
             // all check
-
-            //std::cout << "There are " << allAtomList.size()
-            //        << "  atoms " << std::endl;
 
             //std::cout<< "There are(is) " << allModels.size()
             //        << " model in the system" << std::endl;

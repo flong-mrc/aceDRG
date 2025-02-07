@@ -6308,11 +6308,16 @@ namespace LIBMOL {
                             + " has connections " + IntToStr((int) iAt->connAtoms.size());
                     return false;
                 }// C
-                else if (iAt->chemType.compare("C") == 0 && iAt->connAtoms.size() < 2) {
-                    tErrInfo = "Reject Molecule! Atom " + iAt->id
+                else if (iAt->chemType.compare("C") == 0)
+                {
+                    if (iAt->connAtoms.size() < 2 ) //||
+                        // (iAt->connAtoms.size() >6 && !connMetal(iAt->connAtoms, tMol.atoms)))
+                    {
+                        tErrInfo = "Reject Molecule! Atom " + iAt->id
                             + " serial number " + IntToStr(iAt->seriNum)
                             + " has connections " + IntToStr((int) iAt->connAtoms.size());
-                    return false;
+                        return false;
+                    }
                 }// O
                 else if (iAt->chemType.compare("O") == 0 && iAt->connAtoms.size() > 2) {
                     bool tFind = false;
@@ -7397,6 +7402,7 @@ namespace LIBMOL {
         if (tMol.atoms.size() > 0) {
             tMol.calcSumExcessElecs();
             tMol.calcSumCharges();
+            mendMissingHCases(tMol.atoms, tMol.bonds);
             std::map<std::string, std::vector<std::string> > metAtms;
             for (std::vector<AtomDict>::iterator iAt = tMol.atoms.begin();
                     iAt != tMol.atoms.end(); iAt++)
@@ -7619,9 +7625,9 @@ namespace LIBMOL {
                     << "_chem_comp_angle.atom_serial_number_1" << std::endl
                     << "_chem_comp_angle.atom_serial_number_2" << std::endl
                     << "_chem_comp_angle.atom_serial_number_3" << std::endl
-                    << "_chem_comp_angle.atom_id_1" << std::endl
-                    << "_chem_comp_angle.atom_id_2" << std::endl
-                    << "_chem_comp_angle.atom_id_3" << std::endl
+                    << "_chem_comp_angle.atom_type_symbol_1" << std::endl
+                    << "_chem_comp_angle.atom_type_symbol_2" << std::endl
+                    << "_chem_comp_angle.atom_type_symbol_3" << std::endl
                     << "_chem_comp_angle.value_angle" << std::endl
                     << "_chem_comp_angle.ring_size_of_angle" << std::endl;
 
@@ -8644,7 +8650,7 @@ namespace LIBMOL {
                         }
                     }
                     if (checkWrongSP1CAtom(tFinMols[i].atoms, tFinMols[i].bonds,
-                                           tFinMols[i].angles) )
+                                           tFinMols[i].angles))
                     {
                         outTableMols(aMolTable, tFinMols[i]);
                     }

@@ -3831,6 +3831,7 @@ namespace LIBMOL
 
             setAtomsCChemType();
 
+            /*
             for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
                     iAt != allAtoms.end(); iAt++)
             {
@@ -3841,11 +3842,11 @@ namespace LIBMOL
                             << iAt->bondingIdx << std::endl;
                 }
             }
+            */
 
             setAtomsMetalType();
 
             setAtomsVDWRadius();
-
             setAtomsPartialCharges();
 
             for (std::vector<AtomDict>::iterator iAt = allAtoms.begin();
@@ -3858,6 +3859,7 @@ namespace LIBMOL
                             << iAt->bondingIdx << std::endl;
                 }
             }
+
             ringDetecting();
 
             setAtomFormTypes(allAtoms);
@@ -5062,6 +5064,7 @@ namespace LIBMOL
 
         }
 
+        /*
         for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
                 iA != allAtoms.end(); iA++)
         {
@@ -5074,6 +5077,7 @@ namespace LIBMOL
                 std::cout << iA->id << " is a organic atom " << std::endl;
             }
         }
+        */
 
     }
 

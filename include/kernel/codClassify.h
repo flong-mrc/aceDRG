@@ -634,6 +634,8 @@ namespace LIBMOL
         std::vector<AtomDict>                    allAtoms;
         std::vector<int>                         allHAtomIdx;
 
+        // coded atom-types
+        std::map<ID, ID>                         allCodedAtomTypes;
 
         // bonds
         std::vector<BondDict>                    allBonds;

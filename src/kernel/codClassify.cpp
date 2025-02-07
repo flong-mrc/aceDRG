@@ -699,8 +699,6 @@ namespace LIBMOL
 
         getCCP4BondAndAngles();
 
-
-
         // std::vector<RingDict>          tmpRings;
         // std::vector<std::vector<int> > tmpAtoms;
 
@@ -5142,9 +5140,31 @@ namespace LIBMOL
 
     void CodClassify::setOrgBondHeadHashList2()
     {
+        // Get atom-type table from the tables. Newly added for tables of new format
 
         std::map<ID, std::map<ID, ID> >  allBoIdx;
 
+        std::string fA = libmolTabDir  + "/allAtomTypesFromMolsCoded.list";
+
+        std::ifstream codAtomTypeFile(fA.c_str());
+        if (codAtomTypeFile.is_open())
+        {
+            std::string tRecord="";
+            while(!codAtomTypeFile.eof())
+            {
+                std::getline(codAtomTypeFile, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                std::vector<std::string> tBuf;
+                StrTokenize(tRecord, tBuf);
+                if ((int)tBuf.size() ==2)
+                {
+                    allCodedAtomTypes[tBuf[0]] = tBuf[1];
+                }
+            }
+            codAtomTypeFile.close();
+        }
+        std::cout << "Number of atom-type is " << allCodedAtomTypes.size()
+                  << std::endl;
         //std::string clibMonDir(std::getenv("CLIBD_MON"));
         //std::string fRoot = clibMonDir + "allOrgBondTables/";
         // std::string clibMonDir(std::getenv("LIBMOL_ROOT"));
@@ -5549,6 +5569,7 @@ namespace LIBMOL
 
     void  CodClassify::groupCodOrgBonds2()
     {
+
         setOrgBondHeadHashList2();
         time_t tStart, tEnd;
 
@@ -5565,7 +5586,7 @@ namespace LIBMOL
                 // std::string clibMonDir(std::getenv("CLIBD_MON"));
                 // std::string codBondFileName = clibMonDir + "/allOrgBonds.table";
                 // std::ifstream codBondFile(codBondFileName.c_str());
-
+                std::cout << "Bond file " << iBF->second.c_str() << std::endl;
                 std::ifstream codBondFile(iBF->second.c_str());
                 if(codBondFile.is_open())
                 {
@@ -5580,28 +5601,61 @@ namespace LIBMOL
                         // std::cout << tRecord << std::endl;
 
 
-                        if ((int)tBuf.size() ==18)
+                        //if ((int)tBuf.size() ==18)
+                        if ((int)tBuf.size() ==16)
                         {
                             int ha1, ha2;
 
                             ha1 = StrToInt(tBuf[0]);
                             ha2 = StrToInt(tBuf[1]);
 
+                            std::string aA1TypeF ="",  aA1TypeM ="",
+                                        aA2TypeF = "", aA2TypeM ="";
+                            std::vector<std::string> tBuf1;
+                            std::vector<std::string> tBuf2;
+
+                            if (allCodedAtomTypes.find(tBuf[8]) !=allCodedAtomTypes.end())
+                            {
+                                aA1TypeF = allCodedAtomTypes[tBuf[8]];
+
+                                StrTokenize(aA1TypeF, tBuf1, '{');
+                                aA1TypeM = tBuf1[0];
+                            }
+                            else
+                            {
+                                std::cout << "Bug in BondTable atom1 : could not recover atom-type code "
+                                          << tBuf[8] << std::endl;
+                                exit(1);
+                            }
+
+                            if (allCodedAtomTypes.find(tBuf[9]) !=allCodedAtomTypes.end())
+                            {
+                                aA2TypeF = allCodedAtomTypes[tBuf[9]];
+
+                                StrTokenize(aA2TypeF, tBuf2, '{');
+                                aA2TypeM = tBuf2[0];
+                            }
+                            else
+                            {
+                                std::cout << "Bug in BondTable atom2 : could not recover atom-type code "
+                                          << tBuf[9] << std::endl;
+                                exit(1);
+                            }
 
                             allDictBondsIdxD[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]]
-                                    [tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]] = nline;
+                                     [tBuf[7]][aA1TypeM][aA2TypeM][aA1TypeF][aA2TypeF] = nline;
 
                             aValueSet tB;
 
-                            tB.value      = StrToReal(tBuf[12]);
-                            tB.sigValue   = StrToReal(tBuf[13]);
+                            tB.value      = StrToReal(tBuf[10]);             //StrToReal(tBuf[12]);
+                            tB.sigValue   = StrToReal(tBuf[11]);             //StrToReal(tBuf[13]);
                             //aBond.valueP     = StrToReal(tBuf[11]);
                             //aBond.sigValueP  = StrToReal(tBuf[12]);
                             //if(tB.sigValue < 0.01)
                             //{
                             //    tB.sigValue = 0.01;
                             //}
-                            tB.numCodValues  = StrToInt(tBuf[14]);
+                            tB.numCodValues  = StrToInt(tBuf[12]);           // StrToInt(tBuf[14]);
 
 
                             allDictBondsD.push_back(tB);
@@ -5611,20 +5665,19 @@ namespace LIBMOL
                             //std::cout << tBuf[14] << "  " << tBuf[15]
                             //          << "  " << tBuf[16] << std::endl;
 
-
                             aValueSet tB1;
-                            ID a = TrimSpaces(tBuf[15]);
+                            std::string a = TrimSpaces(tBuf[13]);
                             tB1.value    = StrToReal(a);
-                            tB1.sigValue = StrToReal(tBuf[16]);
+                            tB1.sigValue = StrToReal(tBuf[14]);
 
                             //if (tB1.sigValue <0.01)
                             //{
                             //    tB1.sigValue = 0.01;
                             //}
-                            tB1.numCodValues = StrToInt(tBuf[17]);
+                            tB1.numCodValues = StrToInt(tBuf[15]);
 
                             allDictBondsIdx1D[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]]
-                                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]].push_back(tB1);
+                                              [tBuf[6]][tBuf[7]][aA1TypeM][aA2TypeM].push_back(tB1);
 
                             allDictBondsIdx2D[ha1][ha2][tBuf[2]][tBuf[3]][tBuf[4]][tBuf[5]]
                                               [tBuf[6]][tBuf[7]].push_back(tB);
@@ -10006,10 +10059,7 @@ namespace LIBMOL
                                 !=allAngIdx[ha0][iAX->first].end())
                             {
                                 haNum = allAngIdx[ha0][iAX->first][ha2];
-                                std::cout << "XXXX ha2=" << ha2 << std::endl;
 
-                                std::cout << "file number is " << haNum
-                                      << std::endl;
                                 if (codOrgAngleFiles2.find(haNum) ==codOrgAngleFiles2.end())
                                 {
                                     codOrgAngleFiles2[haNum] =
@@ -10201,13 +10251,60 @@ namespace LIBMOL
                     StrTokenize(tRecord, tBuf);
 
 
-                    if ((int)tBuf.size() ==37)
+                    //if ((int)tBuf.size() ==37)
+                    if ((int)tBuf.size() ==34)
                     {
                         int ha1, ha2, ha3;
 
                         ha1 = StrToInt(tBuf[0]);
                         ha2 = StrToInt(tBuf[1]);
                         ha3 = StrToInt(tBuf[2]);
+
+                        std::string aA1TypeF ="",  aA1TypeM ="",
+                                    aA2TypeF = "", aA2TypeM ="",
+                                    aA3TypeF = "", aA3TypeM ="";
+
+                        if (allCodedAtomTypes.find(tBuf[13]) !=allCodedAtomTypes.end())
+                        {
+                            aA1TypeF = allCodedAtomTypes[tBuf[13]];
+                            std::vector<std::string> tBuf1;
+                            StrTokenize(aA1TypeF, tBuf1, '{');
+                            aA1TypeM = tBuf1[0];
+                        }
+                        else
+                        {
+                            std::cout << "Bug : could not recover atom-type code "
+                                      << tBuf[13] << std::endl;
+                            exit(1);
+                        }
+
+                        if (allCodedAtomTypes.find(tBuf[14]) !=allCodedAtomTypes.end())
+                        {
+                            aA2TypeF = allCodedAtomTypes[tBuf[14]];
+                            std::vector<std::string> tBuf2;
+                            StrTokenize(aA2TypeF, tBuf2, '{');
+                            aA2TypeM = tBuf2[0];
+                        }
+                        else
+                        {
+                            std::cout << "Bug : could not recover atom-type code "
+                                      << tBuf[14] << std::endl;
+                            exit(1);
+                        }
+
+                        if (allCodedAtomTypes.find(tBuf[15]) !=allCodedAtomTypes.end())
+                        {
+                            aA3TypeF = allCodedAtomTypes[tBuf[15]];
+                            std::vector<std::string> tBuf3;
+                            StrTokenize(aA3TypeF, tBuf3, '{');
+                            aA3TypeM = tBuf3[0];
+                        }
+                        else
+                        {
+                            std::cout << "Bug : could not recover atom-type code "
+                                      << tBuf[15] << std::endl;
+                            exit(1);
+                        }
 
 
 
@@ -10231,13 +10328,13 @@ namespace LIBMOL
 
                         // AxM values, AxC not found
                         aValueSet aAngS1;
-                        aAngS1.value        = StrToReal(tBuf[22]);
-                        aAngS1.sigValue     = StrToReal(tBuf[23]);
+                        aAngS1.value        = StrToReal(tBuf[19]); //StrToReal(tBuf[22]);
+                        aAngS1.sigValue     = StrToReal(tBuf[20]);  //StrToReal(tBuf[23]);
                         //if(aAngS1.sigValue <0.0001 || aAngS1.sigValue > 3.0)
                         //{
                         //    aAngS1.sigValue = 3.0;
                         //}
-                        aAngS1.numCodValues = StrToInt(tBuf[24]);
+                        aAngS1.numCodValues = StrToReal(tBuf[21]);  //StrToInt(tBuf[24]);
 
                         if (allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]]
@@ -10246,7 +10343,7 @@ namespace LIBMOL
 
                             allDictAnglesIdx1D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]]
-                              [tBuf[12]][tBuf[13]][tBuf[14]][tBuf[15]].push_back(aAngS1);
+                              [tBuf[12]][aA1TypeM][aA2TypeM][aA3TypeM].push_back(aAngS1);
                         }
 
 
@@ -10254,13 +10351,13 @@ namespace LIBMOL
 
                         // A_NB values, AxM not found
                         aValueSet aAngS2;
-                        aAngS2.value        = StrToReal(tBuf[25]);
-                        aAngS2.sigValue     = StrToReal(tBuf[26]);
+                        aAngS2.value        = StrToReal(tBuf[22]); //StrToReal(tBuf[25]);
+                        aAngS2.sigValue     = StrToReal(tBuf[23]); //StrToReal(tBuf[26]);
                         //if(aAngS2.sigValue <0.0001 || aAngS2.sigValue > 3.0)
                         //{
                         //    aAngS2.sigValue = 3.0;
                         //}
-                        aAngS2.numCodValues = StrToInt(tBuf[27]);
+                        aAngS2.numCodValues =  StrToReal(tBuf[24]);//StrToInt(tBuf[27]);
 
                         if (allDictAnglesIdx2D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]][tBuf[10]][tBuf[11]][tBuf[12]].size()==0)
@@ -10271,13 +10368,13 @@ namespace LIBMOL
 
                         // A_NB2 values, A_NB not found
                         aValueSet aAngS3;
-                        aAngS3.value        = StrToReal(tBuf[28]);
-                        aAngS3.sigValue     = StrToReal(tBuf[29]);
+                        aAngS3.value        = StrToReal(tBuf[25]); //StrToReal(tBuf[28]);
+                        aAngS3.sigValue     = StrToReal(tBuf[26]); // StrToReal(tBuf[29]);
                         //if(aAngS3.sigValue <0.0001 || aAngS3.sigValue > 3.0)
                         //{
                         //    aAngS3.sigValue = 3.0;
                         //}
-                        aAngS3.numCodValues = StrToInt(tBuf[30]);
+                        aAngS3.numCodValues = StrToReal(tBuf[27]); //StrToInt(tBuf[30]);
 
                         if (allDictAnglesIdx3D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]]
                              [tBuf[6]][tBuf[7]][tBuf[8]][tBuf[9]].size()==0)
@@ -10288,13 +10385,13 @@ namespace LIBMOL
 
                         // a1R, a2R, a3R values, A_NB2 not found
                         aValueSet aAngS4;
-                        aAngS4.value        = StrToReal(tBuf[31]);
-                        aAngS4.sigValue     = StrToReal(tBuf[32]);
+                        aAngS4.value        = StrToReal(tBuf[28]);    //StrToReal(tBuf[31]);
+                        aAngS4.sigValue     = StrToReal(tBuf[29]);    //StrToReal(tBuf[32]);
                         //if(aAngS4.sigValue <0.0001 || aAngS4.sigValue > 3.0)
                         //{
                         //    aAngS4.sigValue = 3.0;
                         //}
-                        aAngS4.numCodValues = StrToInt(tBuf[33]);
+                        aAngS4.numCodValues = StrToReal(tBuf[30]);    //StrToInt(tBuf[33]);
 
                         if (allDictAnglesIdx4D[ha1][ha2][ha3][tBuf[3]][tBuf[4]][tBuf[5]][tBuf[6]].size()==0)
                         {
@@ -10303,13 +10400,13 @@ namespace LIBMOL
 
                         // R3A values, a1R, a2R, a3R not found
                         aValueSet aAngS5;
-                        aAngS5.value        = StrToReal(tBuf[34]);
-                        aAngS5.sigValue     = StrToReal(tBuf[35]);
+                        aAngS5.value        = StrToReal(tBuf[31]); //StrToReal(tBuf[34]);
+                        aAngS5.sigValue     = StrToReal(tBuf[32]); //StrToReal(tBuf[35]);
                         //if(aAngS5.sigValue <0.0001 || aAngS5.sigValue > 3.0)
                         //{
                         //    aAngS5.sigValue = 3.0;
                         //}
-                        aAngS5.numCodValues = StrToInt(tBuf[36]);
+                        aAngS5.numCodValues = StrToReal(tBuf[33]);  //StrToInt(tBuf[36]);
 
                         if (allDictAnglesIdx5D[ha1][ha2][ha3][tBuf[3]].size()==0)
                         {

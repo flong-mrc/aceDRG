@@ -5320,8 +5320,8 @@ class CovLinkGenerator(CExeCode):
         dS = math.fabs(s1-s2)
         if  dV > s1:
             lChanged = True
-        elif dS > 0.3*s1:
-            lChanged = True
+        #elif dS > 0.3*s1:
+        #    lChanged = True
             
         return lChanged
     
@@ -5367,8 +5367,8 @@ class CovLinkGenerator(CExeCode):
         lChanged = False
         if float(tOrigTor["value_angle"]) !=float(tTor["value_angle"]):
             lChanged = True
-        elif float(tOrigTor["value_angle_esd"]) !=float(tTor["value_angle_esd"]):
-            lChanged = True
+        #elif float(tOrigTor["value_angle_esd"]) !=float(tTor["value_angle_esd"]):
+        #    lChanged = True
         elif tOrigTor["period"] != tTor["period"]:
             lChanged = True
         

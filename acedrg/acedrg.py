@@ -1312,7 +1312,7 @@ class Acedrg(CExeCode ):
             if self.workMode ==162:
                 self._cmdline += " -E yes "    
             
-            #print(self._cmdline)
+            print(self._cmdline)
             
             self.runExitCode =os.system(self._cmdline + ">%s"%self._log_name)
             #print(self.runExitCode)
@@ -1797,6 +1797,7 @@ class Acedrg(CExeCode ):
     def runGemmiCif2Pdb(self, tInCif, tOutPdb):
     
         if os.path.isfile(tInCif):
+            print("cif2pdb infile ", tInCif)
             self._log_name       = os.path.join(self.scrDir, self.outRoot + "_gemmiCif2Pdb.log")
             aTmpPdb              = os.path.join(self.scrDir, self.outRoot + "_gemmiCif2Pdb.pdb")
             self._cmdline = self.gemmi
@@ -3342,7 +3343,6 @@ class Acedrg(CExeCode ):
         #if self.useExistCoords or self.workMode==16 or self.workMode==161:
         #    print("One of output conformers will using input coordinates as the initial one")
         print("workMode : ", self.workMode)
-        
         
         # Stage 1: initiate a mol file for RDKit obj
         if self.workMode == 11 or self.workMode == 111 or self.workMode == 114:
