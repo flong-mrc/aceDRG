@@ -16,37 +16,15 @@ from builtins import str
 from builtins import range
 from builtins import object
 import os,os.path,sys
-import platform
-import glob,shutil
-import re,string
 import time
 import math
-import select
-import random
 
-from rdkit      import rdBase
 
-from rdkit      import Chem
-from rdkit.Chem import AllChem
-from rdkit.Chem import rdchem
-from rdkit.Chem import rdmolfiles
-from rdkit.Chem import rdMolTransforms
-from rdkit.Chem import rdmolops
-from rdkit.Chem import Pharm3D 
-from rdkit.Chem.Pharm3D import EmbedLib
-from rdkit.Geometry import rdGeometry 
-
-from . utility  import listComp
-from . utility  import listComp2
-from . utility  import listCompDes
-from . utility  import listCompAcd
 from . utility  import countPrime
 from . utility  import setBoolDict
 from . utility  import splitLineSpa
-from . utility  import splitLineSpa2
 from . utility  import aLineToAlist
 from . utility  import aLineToAlist2
-from . utility  import aLineToAList2
 
 class FileTransformer(object) :
 
@@ -153,8 +131,6 @@ class FileTransformer(object) :
             tFile.close()
             self.allBolcLs = []
             aBlockLs     = []
-            allContLinesList1 = {}
-            allContLinesList2 = {}
             all2ColLines = []
             filtedAllLines = []
   
@@ -173,7 +149,8 @@ class FileTransformer(object) :
                             elif len(a2ColList)== 1:
                                 j = i + 1
                                 if len(tAllLs[j]) and tAllLs[j][0].find("#")==-1:
-                                    if tAllLs[j][0].find(";") !=-1:
+                                    # check a further line to see if a line is broken into several lines
+                                    if tAllLs[j][0].find(";") !=-1 :
                                         aTmpLine=tAllLs[j].strip(";").strip()
                                         lBr = True
                                         while lBr:
@@ -188,6 +165,9 @@ class FileTransformer(object) :
                                         if len(aTmpLine) > 30 and aTmpLine.find("\"") ==-1:
                                             aTmpLine = "\"" + aTmpLine + "\""
                                         all2ColLines.append([2, tAllLs[i], aTmpLine]) 
+                                        i = j+1
+                                    elif tAllLs[j][0].find("\"") !=-1:
+                                        all2ColLines.append([1, tAllLs[i], tAllLs[j]])
                                         i = j+1
                                     else:
                                         filtedAllLines.append(tAllLs[i])
@@ -281,6 +261,8 @@ class FileTransformer(object) :
                         print ("label : ", aKey, " Value : ", aAtom[aKey])
                     print ("===============================")
             """
+            
+            
     
     def TmpChemCheck(self):
 
@@ -1194,14 +1176,13 @@ class FileTransformer(object) :
                     nName = aKey
           
             # Header section 
-            
             if nId !=-1:
                 
                 tOutFile.write(self.dataDescriptor[nId][1]+ "\n")
             else:
                 tOutFile.write("LIG\n")
             if nName !=-1:
-                tOutFile.write(self.dataDescriptor[nName][1]+ "\n")
+                tOutFile.write(self.dataDescriptor[nName][1].strip()+ "\n")
             else:
                 tOutFile.write("LIG\n")
             tOutFile.write("\n")
@@ -1423,7 +1404,6 @@ class FileTransformer(object) :
    
             tOutFile.write("M  END\n")
             
-
     # Mol files related 
     def CheckElemSymbolsInMolFile(self, tInFileName, tOutFileName):
 

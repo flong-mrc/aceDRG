@@ -18,7 +18,6 @@ import re,string
 from optparse import OptionParser 
 import time
 import math
-import select
 import random
 
 # Functions for numbers
@@ -41,7 +40,7 @@ def isFloat(t_string):
 
     t_string = t_string.strip()
     try:
-        aInt = flaot(t_string)
+        aInt = float(t_string)
     except ValueError:
         aRet = False
 
