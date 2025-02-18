@@ -1,4 +1,4 @@
-#!/usr/bin/env ccp4-python
+#!/usr/bin/env python
 # Python script
 #
 #
@@ -188,13 +188,15 @@ class Acedrg(CExeCode ):
         self.allBondsAndAngles["angles"]      = {}
 
         self.naTorsList                       = {}
-
+        
         self.acedrg    = os.path.abspath(sys.argv[0])
+       
         self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
         #self.acedrg    = ""
         #print "files ", glob.glob(sys.exec_prefix + "/*")
         #self.acedrgDir = sys.exec_prefix
         #print "files ", glob.glob(self.acedrgDir + "/*")
+        
         self.qmInstructions   = ""
         self.qmSysDict        = {}
         inputOptionsP         = self.InputParser(t_argvs) 
@@ -464,7 +466,7 @@ class Acedrg(CExeCode ):
         return inputOptionsP 
 
     def checkDependency(self):
-    
+        print("1. ", self.acedrgDir)
         if self.acedrgDir !="" and os.path.isdir(self.acedrgDir):
             tLibmol = os.path.join(self.acedrgDir, "libexec","libmol")
             if platform.system()=="Windows": tLibmol += ".exe"
@@ -506,10 +508,10 @@ class Acedrg(CExeCode ):
                 if platform.system()=="Windows": tLibmol += ".exe"
                 if glob.glob(tLibmol):
                     self.libmol = tLibmol
-        else :
-            print("You need to install CCP4 suite")
-            print("or activate ccp4.setup")
-            sys.exit()
+        #else :
+        #    print("You need to install CCP4 suite")
+        #    print("or activate ccp4.setup")
+        #    sys.exit()
         if not self.acedrgTables:
             if "LIBMOL_ROOT" in os.environ:
                 tAcedrgTables = os.path.join(os.environ['LIBMOL_ROOT'], "share","acedrg","tables")
@@ -534,7 +536,7 @@ class Acedrg(CExeCode ):
             
         #print("The path to Acedrg tables is at ", self.acedrgTables)
         #print("Libmol used is at ", self.libmol)
-
+        
     def checkVersionInfo(self):
   
         # Acedrg version info 

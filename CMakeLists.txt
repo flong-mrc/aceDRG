@@ -77,7 +77,7 @@ endif (MSVC)
 add_executable(libmol ${SRC})
 
 install(TARGETS libmol      DESTINATION libexec)
-install(DIRECTORY ../build/_deps/acedrgtables-src/tables DESTINATION share/acedrg)
+install(DIRECTORY ../build/_deps/acedrgtables-src/tables DESTINATION ${Python_SITELIB})
 install(DIRECTORY acedrg    DESTINATION ${Python_SITELIB})
 install(DIRECTORY utils     DESTINATION ${Python_SITELIB}/acedrg)
 install(PROGRAMS bin/acedrg DESTINATION bin)
