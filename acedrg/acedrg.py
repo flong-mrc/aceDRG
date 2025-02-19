@@ -194,9 +194,10 @@ class Acedrg(CExeCode ):
         self.acedrgDir = os.path.dirname(self.acedrg)
         
         self.libmol    = os.path.join(self.acedrgDir, "libexec", "libmol")
+        
         print(self.acedrgDir)
         print(self.libmol)
-    
+        print(self.acedrgTables)
         #self.acedrg    = ""
         #print "files ", glob.glob(sys.exec_prefix + "/*")
         #self.acedrgDir = sys.exec_prefix
@@ -1791,7 +1792,7 @@ class Acedrg(CExeCode ):
         self._cmdline = self.servalcat
         self._cmdline += "  --logfile %s  "%log2
         #self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  \n"%(tInCif, aRoot)
-        self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  --randomize 0.01 \n"%(tInCif, aRoot)
+        self._cmdline += " refine_geom  --update_dictionary  %s -o  %s  --randomize 0.01 --monlib  %s \n"%(tInCif, aRoot, self.acedrgTables)
         #print(self._cmdline)
         self.subExecute() 
         
