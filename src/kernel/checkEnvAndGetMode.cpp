@@ -13,6 +13,8 @@ namespace LIBMOL
     CheckEnvAndGetMode::CheckEnvAndGetMode():workMode(0)
     {
 
+        /*
+
         // Currently CCP4 suite is the only requited thing
         char * pClibdMon = std::getenv("CLIBD_MON");
         if (pClibdMon !=NULL)
@@ -28,11 +30,13 @@ namespace LIBMOL
             std::cerr << "You need to setup CCP4 suite first " << std::endl;
             exit(1);
         }
+        */
 
     }
 
     CheckEnvAndGetMode::CheckEnvAndGetMode(int numArg, char** ArgVars) :workMode(0)
     {
+        /*
         // Currently CCP4 suite is the only requited thing
         char * pClibdMon = std::getenv("CLIBD_MON");
         if (pClibdMon !=NULL)
@@ -49,7 +53,6 @@ namespace LIBMOL
             exit(1);
         }
 
-        /*
         char * pLibMon = std::getenv("LIBMOL_ROOT");
         if (pLibMon !=NULL)
         {

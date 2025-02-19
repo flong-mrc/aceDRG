@@ -191,7 +191,12 @@ class Acedrg(CExeCode ):
         
         self.acedrg    = os.path.abspath(sys.argv[0])
        
-        self.acedrgDir = os.path.dirname(os.path.dirname(self.acedrg))
+        self.acedrgDir = os.path.dirname(self.acedrg)
+        
+        self.libmol    = os.path.join(self.acedrgDir, "libexec", "libmol")
+        print(self.acedrgDir)
+        print(self.libmol)
+    
         #self.acedrg    = ""
         #print "files ", glob.glob(sys.exec_prefix + "/*")
         #self.acedrgDir = sys.exec_prefix
@@ -211,6 +216,7 @@ class Acedrg(CExeCode ):
         self.setInputProcPara(inputOptionsP)
 
         self.checkDependency()
+        
         self.checkVersionInfo()
         self.showAcedrgPapers()
 
@@ -534,8 +540,8 @@ class Acedrg(CExeCode ):
             if os.path.isfile(tFuncGroupTable):
                 self.funcGroupTable = tFuncGroupTable
             
-        #print("The path to Acedrg tables is at ", self.acedrgTables)
-        #print("Libmol used is at ", self.libmol)
+        print("The path to Acedrg tables is at ", self.acedrgTables)
+        print("Libmol used is at ", self.libmol)
         
     def checkVersionInfo(self):
   
@@ -1271,7 +1277,7 @@ class Acedrg(CExeCode ):
             if self.modifiedPlanes:
                 self._cmdline += " -W yes "
             #os.system(self._cmdline)
-            #print(self._cmdline)
+            print(self._cmdline)
             self.runExitCode = self.subExecute()
         if self.workMode==113:
             #print("self.monomRoot=", self.monomRoot)
