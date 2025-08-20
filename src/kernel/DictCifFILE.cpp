@@ -3669,6 +3669,7 @@ namespace LIBMOL
 
         initCifKeys();
 
+
         if (inFile.is_open() )
         {
             bool tOK       = true;
@@ -4411,6 +4412,12 @@ namespace LIBMOL
                     //curBlockLine++;
                     //std::cout << curBlockLine << std::endl;
                 }
+                else if (tF1[1].compare("pdbx_leaving_atom_flag") ==0)
+                {
+                    hasProps["atom"].insert(std::pair<std::string, int>("pdbx_leaving_atom_flag",curBlockLine));
+
+                    //curBlockLine++;
+                }
                 curBlockLine++;
             }
         }
@@ -4520,6 +4527,12 @@ namespace LIBMOL
                     // std::cout << "Its coord z : " << itsCurAtom->coords[2] << std::endl;
                 }
             }
+            if (hasProps["atom"].find("pdbx_leaving_atom_flag") != hasProps["atom"].end())
+            {
+                itsCurAtom->existProps["pdbx_leaving_atom_flag"] = hasProps["atom"]["pdbx_leaving_atom_flag"];
+                itsCurAtom->leaving_flag=tF[itsCurAtom->existProps["pdbx_leaving_atom_flag"]];
+            }
+
             if (!coordsDone)
             {
                 if (hasProps["atom"].find("model_Cartn_x") != hasProps["atom"].end())
@@ -8596,7 +8609,8 @@ namespace LIBMOL
                           << "_chem_comp_atom.z" << std::endl
                           << "_chem_comp_atom.pdbx_model_Cartn_x_ideal" << std::endl
                           << "_chem_comp_atom.pdbx_model_Cartn_y_ideal" << std::endl
-                          << "_chem_comp_atom.pdbx_model_Cartn_z_ideal" << std::endl;
+                          << "_chem_comp_atom.pdbx_model_Cartn_z_ideal" << std::endl
+                          << "_chem_comp_atom.pdbx_leaving_atom_flag"   << std::endl;
 
 
 
@@ -8606,6 +8620,7 @@ namespace LIBMOL
                     //double r1 =  (double) rand()/RAND_MAX;
                     //double r2 =  (double) rand()/RAND_MAX;
                     //double r3 =  (double) rand()/RAND_MAX;
+                    std::cout << "atom " << iA->id << " leaving_flag " << iA->leaving_flag << std::endl;
                     REAL tCharge =0.0;
                     //if (iA->charge !=0.0)
                     //{
@@ -8645,6 +8660,7 @@ namespace LIBMOL
                               << std::setw(12) << std::setprecision(3) << std::fixed << iA->coords[0]
                               << std::setw(12) << std::setprecision(3) << std::fixed << iA->coords[1]
                               << std::setw(12) << std::setprecision(3) << std::fixed << iA->coords[2]
+                              << std::setw(6)  << iA->leaving_flag
                               << std::endl;
 
                 }
@@ -9260,7 +9276,7 @@ namespace LIBMOL
                 {
 
                     std::string aAR;
-                    if (iR->isAromatic)
+                    if (iR->isAromaticP)
                     {
                         aAR="YES";
                     }
@@ -10283,10 +10299,10 @@ namespace LIBMOL
                 std::string longName =tMonoRootName.substr(0,3);
                 outTempF << "data_comp_" << longName << std::endl;
                 outTempF << "loop_" << std::endl
-                         << "_chem_comp_acedrg_atom.comp_id" << std::endl
-                         << "_chem_comp_acedrg_atom.type_symbol" << std::endl
-                         << "_chem_comp_acedrg_atom.atom_id" << std::endl
-                         << "_chem_comp_acedrg_atom.atom_type" << std::endl;
+                         << "_chem_comp_atom.comp_id" << std::endl
+                         << "_chem_comp_atom.type_symbol" << std::endl
+                         << "_chem_comp_atom.atom_id" << std::endl
+                         << "_chem_comp_atom.atom_type" << std::endl;
                 // outTempF << "ATOMS:" << std::endl;
                 //int nA=0;
                 //std::map<int, int> seriMap;
@@ -10333,9 +10349,9 @@ namespace LIBMOL
                 */
                 outTempF << "loop_" << std::endl
                 // outTempF << "CONNECTIONS:" << std::endl;
-                << "_chem_comp_acedrg_bond.comp_id" << std::endl
-                << "_chem_comp_acedrg_bond.atom_id_1" << std::endl
-                << "_chem_comp_acedrg_bond.atom_id_2" << std::endl;
+                << "_chem_comp_bond.comp_id" << std::endl
+                << "_chem_comp_bond.atom_id_1" << std::endl
+                << "_chem_comp_bond.atom_id_2" << std::endl;
                 for (std::vector<BondDict>::iterator iB=tBonds.begin();
                           iB !=tBonds.end(); iB++)
                 {
@@ -10348,10 +10364,10 @@ namespace LIBMOL
                 if (tRings.size() > 0)
                 {
                     outTempF << "loop_" << std::endl
-                    << "_chem_comp_acedrg_ring.comp_id" << std::endl
-                    << "_chem_comp_acedrg_ring.ring_id" << std::endl
-                    << "_chem_comp_acedrg_ring.atom_id" << std::endl
-                    << "_chem_comp_acedrg_ring.aromatic" << std::endl;
+                    << "_chem_comp_ring.comp_id" << std::endl
+                    << "_chem_comp_ring.ring_id" << std::endl
+                    << "_chem_comp_ring.atom_id" << std::endl
+                    << "_chem_comp_ring.aromatic" << std::endl;
                     // outTempF << "Ring Information: " << std::endl;
                     int  idxR = 1;
                     std::string aR = "RING_";

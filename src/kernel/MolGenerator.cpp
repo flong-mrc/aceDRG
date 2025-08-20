@@ -352,13 +352,32 @@ namespace LIBMOL {
                             iMol != aSetOfFiniteMols.end(); iMol++)
                     {
                         iMol->setAtomCartCoordFromFracCoord(iCryst);
-                        iMol->getAllTorsions();
+                        // iMol->getAllTorsions();
+                        /*                   // temp disable, check and put back
+                        std::cout << "number of rings "
+                                  << (*iMol).rings.size() << std::endl;
+                        int nR=1;
+                        for (std::vector<RingDict>::iterator iRi = (*iMol).rings.begin();
+                                  iRi !=(*iMol).rings.end(); iRi++)
+                        {
+                            std::cout << "ring " << nR << std::endl;
+                            for (std::vector<AtomDict>::iterator iA=iRi->atoms.begin();
+                                 iA != iRi->atoms.end(); iA++)
+                            {
+                                 std::cout << std::setw(8) << iA->seriNum
+                                           << std::setw(iA->id.size()+4) << iA->id
+                                           << std::endl;
+                            }
+                            nR++;
+                        }
+                        */
                         allMolecules.push_back(*iMol);
                     }
 
                     std::cout << "number of moles after checking inf-moles "
                               << allMolecules.size()
                               << std::endl;
+
                     /*
                     HuckelMOSuite aHuTool;
                     for (std::vector<Molecule>::iterator iMol=allMolecules.begin();
@@ -369,8 +388,7 @@ namespace LIBMOL {
 
                         setBondOrderAndFormalChargeByExcessEl((*iMol), aHuTool);
                     }
-                    */
-                    /*
+
                     HuckelMOSuite aMoTool;
                     aMoTool.setWorkMode(2);
                     for (std::vector<Molecule>::iterator iMol
@@ -393,9 +411,19 @@ namespace LIBMOL {
 
                     }
                     */
-
                     getOverallBondAndAnglesNew();
-                    setBondOrderAndChargeInMols(allMolecules);
+                    setBondOrderAndChargeInMols(allMolecules); // Temp disable for Carbo cases, put back afterward
+                    /*
+                    for (unsigned i=0; i < allMolecules.size(); i++)
+                    {
+                         for (std::vector<BondDict>::iterator iBo= allMolecules[i].bonds.begin();
+                              iBo != allMolecules[i].bonds.end(); iBo++)
+                         {
+                              iBo->orderN=1;
+                              iBo->order = "SINGLE";
+                         }
+                    }
+                    */
                     outTables(tOutName, allMolecules, aSetOfInfMols);
 
                 }
@@ -6550,7 +6578,7 @@ namespace LIBMOL {
     {
         //std::cout << "XXX Number of atoms in this molecule is "
         //          << tMol.atoms.size() << std::endl;
-
+        setAtomsAltId(tMol.atoms);
         CodClassify aCodSys(tMol.atoms);
         //std::cout << "XXXX here " << std::endl;
         setAtomsBondingAndChiralCenter(aCodSys.allAtoms);
@@ -8788,7 +8816,6 @@ namespace LIBMOL {
         }
         std::cout << "numb uniq-moles " << aSetUniqMols.size()
                   << std::endl;
-
         if (aSetUniqMols.size() != 0) {
             for (std::vector<Molecule>::iterator iMol = aSetUniqMols.begin();
                     iMol != aSetUniqMols.end(); iMol++) {
@@ -8800,7 +8827,6 @@ namespace LIBMOL {
                 }
             }
         }
-
     }
 
     bool MolGenerator::checkOneMolInf(std::vector<Molecule>::iterator tMol)

@@ -289,6 +289,7 @@ namespace LIBMOL // temp
         REAL     ocp;
         int      symmMult;
         int      excessElec;
+        ID       leaving_flag;
 
 
 

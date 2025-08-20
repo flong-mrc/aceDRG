@@ -5552,6 +5552,7 @@ namespace LIBMOL
 
        aCodSystem.setupAllTargetValues();
 
+
        //resetSystem(aCodSystem);
        resetSystem2(aCodSystem);
        /*
@@ -5579,6 +5580,9 @@ namespace LIBMOL
 
         aCodSystem.setupAllTargetValues2();
 
+
+        // Put atomType back to with charge statues
+        aCodSystem.reDoAtomCodClassNames(2);
 
         resetSystem2(aCodSystem);
 

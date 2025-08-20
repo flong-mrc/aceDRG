@@ -1298,6 +1298,40 @@ namespace LIBMOL
 
     }
 
+    void CodClassify::reDoAtomCodClassNames(int dLev)
+    {
+        for (std::vector<RingDict>::iterator iR=allRingsV.begin();
+                iR !=allRingsV.end(); iR++)
+        {
+            iR->isAromatic = iR->isAromaticP;
+        }
+        ringTools aRingTool;
+        aRingTool.setAtomsRingRepreS(allAtoms, allRingsV);
+
+        for (int i=0; i < (int)allAtoms.size(); i++)
+        {
+            allAtoms[i].codClass = "";
+            setAtomCodClassNameNew2(allAtoms[i], allAtoms[i], dLev);
+        }
+
+        for (std::vector<AtomDict>::iterator iAt=allAtoms.begin();
+               iAt !=  allAtoms.end(); iAt++)
+        {
+            setSpecial3NBSymb2(iAt);
+        }
+
+        setAtomsNBSymb2();
+
+        std::cout << "CheckHere" << std::endl;
+        for (std::vector<AtomDict>::iterator iA=allAtoms.begin();
+               iA !=allAtoms.end(); iA++)
+        {
+            std::cout << "atom " << iA->id << " has type "
+                      << iA->codClass << std::endl;
+        }
+
+    }
+
     void CodClassify::getSmallFamily(std::string tInStr, NB1stFam& aNBFam)
     {
         std::vector<std::string> ch_list;
@@ -3939,6 +3973,31 @@ namespace LIBMOL
         }
 
         return tS1;
+    }
+
+    void CodClassify::getAtomTypesFromATab()
+    {
+        std::string fA = libmolTabDir  + "/allAtomTypesFromMolsCoded.list";
+
+        std::ifstream codAtomTypeFile(fA.c_str());
+        if (codAtomTypeFile.is_open())
+        {
+            std::string tRecord="";
+            while(!codAtomTypeFile.eof())
+            {
+                std::getline(codAtomTypeFile, tRecord);
+                tRecord = TrimSpaces(tRecord);
+                std::vector<std::string> tBuf;
+                StrTokenize(tRecord, tBuf);
+                if ((int)tBuf.size() ==2)
+                {
+                    allCodedAtomTypes[tBuf[0]] = tBuf[1];
+                }
+            }
+            codAtomTypeFile.close();
+        }
+        std::cout << "Number of atom-type is " << allCodedAtomTypes.size()
+                  << std::endl;
     }
 
     void CodClassify::detectPlaneGroups()
@@ -8906,7 +8965,6 @@ namespace LIBMOL
             //std::string enerFName(pClibdMon);
             std::string enerFName(libmolTabDir);
             enerFName.append("/ener_lib.cif");
-            std::cout << "Here "<<  enerFName << std::endl;
             std::ifstream   enerF(enerFName.c_str());
             int nBond = 0;
             int nAng  = 0;
@@ -13198,12 +13256,15 @@ namespace LIBMOL
             else
             {
                 // could not find three exact matches on 3 atomic hashing values
-
+                std::cout << "could not find three exact matches on 3 atomic hashing values"
+                          << std::endl;
                 std::vector<aValueSet> aAngSet;
                 if (allDictAnglesIdx5D.find(ha1)!=allDictAnglesIdx5D.end())
                 {
+                    std::cout << "Find ha1 " << ha1 << std::endl;
                     if (allDictAnglesIdx5D[ha1].find(ha2)!=allDictAnglesIdx5D[ha1].end())
                     {
+                        std::cout << "Find ha2 " << ha2 << std::endl;
                         for (std::map<int, std::map<ID,
                              std::vector<aValueSet> > >::iterator
                              iA1=allDictAnglesIdx5D[ha1][ha2].begin();
@@ -13278,6 +13339,7 @@ namespace LIBMOL
                         }
                     }
                     // }
+                    std::cout << "aAngSet size " << aAngSet.size() << std::endl;
                     if (aAngSet.size()> 0)
                     {
                         double tSum1=0.0, tSum2=0.0;
@@ -13305,11 +13367,25 @@ namespace LIBMOL
                             iAN->numCodValues= tNum;
                         }
                     }
+                    else
+                    {
+                        std::cout << " Using defualt angle values " << std::endl;
+                        if (allAtoms[iAN->atoms[0]].bondingIdx <4)
+                        {
+                            std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;
+                            iAN->value = DefaultOrgAngles[allAtoms[iAN->atoms[0]].bondingIdx];
+                            iAN->sigValue      = 3.0;
+                            iAN->numCodValues  = 0;
+                            iAN-> approxLevel = 6;
+                            lDef = true;
+                        }
+                    }
+
                 }
                 else
                 {
                     // not a single hash is found, using approximate default values
-
+                    std::cout << "not a single hash is found" << std::endl;
                     if (allAtoms[iAN->atoms[0]].bondingIdx <4)
                     {
                         std::cout << "Center atom bond index is  " << allAtoms[iAN->atoms[0]].bondingIdx<< std::endl;

@@ -466,9 +466,18 @@ namespace LIBMOL
                 }
                  */
             }
-            //std::cout << "Atom " << iAt->id << " is initially set to sp "
-            //          << iAt->bondingIdx  << std::endl;
-            // std::cout << "its chiralIdx " << iAt->chiralIdx << std::endl;
+            else if (iAt->chemType.compare("BR")==0
+                     || iAt->chemType.compare("Br")==0)
+            {
+                if (t_len==3)
+                {
+                    iAt->chiralIdx  = 3;
+                    iAt->bondingIdx = 3;
+                }
+            }
+            std::cout << "Atom " << iAt->id << " is initially set to sp "
+                      << iAt->bondingIdx  << std::endl;
+            std::cout << "its bondingIdx " << iAt->bondingIdx << std::endl;
         }
 
 
@@ -7305,6 +7314,7 @@ namespace LIBMOL
                     int numCs =0;
                     int numNC3 =0;
                     int numNC4 =0;
+                    int numDO  =0;
                     int idxNC4 = -1;
                     std::vector<int> idxAtms;
                     for (std::vector<AtomDict>::iterator iAt= tRings[idxRs[j]].atoms.begin();
@@ -7341,10 +7351,20 @@ namespace LIBMOL
                             }
                             //std::cout << " numNC3 " << numNC3 << std::endl;
                         }
+                        for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
+                             iNB != iAt->connAtoms.end(); iNB++)
+                        {
+                            int idxB=tAllAtmBondingMap[iAt->seriNum][*iNB];
+                            if (tBonds[idxB].orderN==2)
+                            {
+                                numDO++;
+                            }
+                        }
                     }
                     std::cout << "numCs=" << numCs << std::endl;
                     std::cout << "numNC3=" << numNC3 << std::endl;
                     std::cout << "numNC3=" << numNC3 << std::endl;
+                    std::cout << "numDO" << numDO << std::endl;
                     if (numCs==6 && numNC3==6)
                     {
                         if (std::find(tExcFRings.begin(), tExcFRings.end(), idxRs[j])==tExcFRings.end())
@@ -7371,7 +7391,7 @@ namespace LIBMOL
                             tExcFRings.push_back(idxRs[j]);
                         }
                     }
-                    else if (numCs==6)
+                    else if (numCs==6 && numDO==0)
                     {
                         if (!tRings[idxRs[j]].doneBO)
                         {
@@ -7521,7 +7541,7 @@ namespace LIBMOL
                                 std::vector<int>           & tDoneFAtoms,
                                 std::vector<int>           & tDoneBonds)
     {
-
+        std::cout << "setOneIsolateC6Ring" << std::endl;
         std::vector<int>    idxRiAtms;
         for (std::vector<AtomDict>::iterator iAt= tRing.atoms.begin();
              iAt != tRing.atoms.end(); iAt++)
@@ -9543,16 +9563,16 @@ namespace LIBMOL
         {
             if (iAt->isMetal)
             {
-                int sumCh =0;
+                double sumCh =0;
                 std::cout << "Metal Atom " << iAt->id
                           << " initial charge : " << iAt->charge << std::endl;
                 std::cout << " sumCh " << sumCh << std::endl;
                 for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
                                      iNB != iAt->connAtoms.end(); iNB++)
                 {
-                    double addC  =0.0;       // real charge contributed to metal atoms
                     if (!tAtoms[*iNB].isMetal)
                     {
+                        double addC  =0.0;
                         std::cout << "NB atom : " << tAtoms[*iNB].id << std::endl;
                         if (tAtoms[*iNB].connMAtoms.size()> 1 )
                         {
@@ -9562,8 +9582,11 @@ namespace LIBMOL
                         {
                             addC = tAtoms[*iNB].charge;
                         }
-                        sumCh += addC;                                   //tAtoms[*iNB].charge;
-                        std::cout << " sumCh " << sumCh << std::endl;
+                        std::cout << "It conn to " << tAtoms[*iNB].connMAtoms.size() << " metal atoms" << std::endl;
+                        std::cout << "add Charge is " << addC << std::endl;
+                        sumCh += addC;
+                        // sumCh +=tAtoms[*iNB].charge;
+                        std::cout << "here sumCh " << sumCh << std::endl;
                     }
 
                 }

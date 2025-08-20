@@ -374,115 +374,42 @@ namespace LIBMOL
 
                 if (tAtom.connAtoms.size() == 3 )
                 {
-                    if (R5)
+                    if (tAtom.connHAtoms.size() == 1)
                     {
-                        if (nC >1)
-                        {
-                            if (tAtom.connHAtoms.size() == 1)
-                            {
-                                tAtom.ccp4Type = "NR15";
-                            }
-                            else
-                            {
-                                tAtom.ccp4Type = "NR5";
-                            }
-                        }
-                        else
-                        {
-                            if (tAtom.connHAtoms.size() == 0)
-                            {
-                                tAtom.ccp4Type ="NH0";
-                            }
-                            else if (tAtom.connHAtoms.size() == 1)
-                            {
-                                tAtom.ccp4Type ="NH1";
-                            }
-                            else if (tAtom.connHAtoms.size() == 1)
-                            {
-                                tAtom.ccp4Type ="NH2";
-                            }
-                        }
+
+                       tAtom.ccp4Type ="NH1";
 
                     }
-                    else if (R6)
+                    else if (tAtom.connHAtoms.size() == 2)
                     {
-                        if (tAtom.connHAtoms.size() == 1)
-                        {
-                            tAtom.ccp4Type = "NR16";
-                        }
-                        else
-                        {
-                            tAtom.ccp4Type = "NR6";
-                        }
+
+                        tAtom.ccp4Type ="NH2";
+
+                    }
+                    else if (tAtom.connHAtoms.size() == 0)
+                    {
+                        tAtom.ccp4Type ="NH0";
                     }
                     else
                     {
-                        if (tAtom.connHAtoms.size() == 1)
-                        {
-                            if (iFC !=chargedGrp.end())
-                            {
-                                tAtom.ccp4Type ="NC1";
-                            }
-                            else
-                            {
-                                tAtom.ccp4Type ="NH1";
-                            }
-                        }
-                        else if (tAtom.connHAtoms.size() == 2)
-                        {
-                            if (iFC !=chargedGrp.end())
-                            {
-                                tAtom.ccp4Type ="NC2";
-                            }
-                            else
-                            {
-                                tAtom.ccp4Type ="NH2";
-                            }
-                        }
-                        else if (tAtom.connHAtoms.size() == 0)
-                        {
-                            tAtom.ccp4Type ="NH0";
-                        }
-                        else
-                        {
-                            tAtom.ccp4Type = "N";
-                        }
+                        tAtom.ccp4Type = "N";
                     }
                 }
                 else if (tAtom.connAtoms.size() == 2)
                 {
-                    if (R5)
+                    if (tAtom.connHAtoms.size() == 1)
                     {
-                        tAtom.ccp4Type = "NRD5";
+                        tAtom.ccp4Type = "N21";
                     }
-                    else if (R6)
+                    else if (tAtom.connHAtoms.size() == 0)
                     {
-                        tAtom.ccp4Type = "NRD6";
+                        tAtom.ccp4Type = "N20";
                     }
                     else
                     {
-                        if (tAtom.connHAtoms.size() == 1)
-                        {
-                            tAtom.ccp4Type = "NH1";
-                        }
-                        else
-                        {
-                            tAtom.ccp4Type = "N";
-                        }
+                        tAtom.ccp4Type = "N";
                     }
                 }
-                //if (tAtom.connAtoms.size() == 2 && R6)
-                //    {
-                //        tAtom.ccp4Type = "NRD6";
-                //    }
-                //    else if (tAtom.connAtoms.size() == 2 && R5)
-                //    {
-                //
-                //    }
-                //    else
-                //    {
-                //        tAtom.ccp4Type = "N";
-                //     }
             }
             else if (tAtom.bondingIdx ==3)  // SP3
             {

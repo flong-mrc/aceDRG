@@ -34,12 +34,12 @@ namespace LIBMOL
             monoRootName(NullString),
             workMode(1)
     {
-        std::string clibMonDir(std::getenv("CLIBD_MON"));
-        if (clibMonDir.empty())
-        {
-            std::cerr << "You need to setup CCP4 suite first " << std::endl;
-            exit(1);
-        }
+        //std::string clibMonDir(std::getenv("CLIBD_MON"));
+        //if (clibMonDir.empty())
+        //{
+            //std::cerr << "You need to setup CCP4 suite first " << std::endl;
+            //exit(1);
+        //}
         
         if ( comArgc < 2)
         {

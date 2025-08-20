@@ -342,6 +342,11 @@ namespace LIBMOL
         std::string outRingSecStr(AtomDict &tAtom);
 
 
+        void reDoAtomCodClassNames(int dLev);
+
+        void getAtomTypesFromATab();
+
+
         // Methods related to planarity generation (depending
         // also on if rings have been detected
 

@@ -172,7 +172,6 @@ int main(int argc, char** argv) {
                                 AJob.IOEntries["monoRootName"],
                                 AJob.IOEntries["libMolTabDir"]);
 
-
                  LIBMOL::outMMCif(AJob.IOEntries["userOutName"].c_str(),
                                   AJob.IOEntries["monoRootName"],
                                   aTargetSystem.propComp,
