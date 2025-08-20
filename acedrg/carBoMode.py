@@ -2,170 +2,174 @@
 # Python script
 
 import os,os.path,sys
-
-
-from functools  import cmp_to_key
-
+import shutil
 
 from .  exebase    import CExeCode
 
-from . filetools   import FileTransformer
+from . chem        import ChemCheck
+
+from . filetools   import outputOneMolInACif2
+from . filetools   import fromCifTorMolGemmi
+from . filetools   import outputOneMolFullDictInACif
 
 from .  utility    import BondOrderS2N
 from .  utility    import getLinkedGroups
 
 
-class metalMode(CExeCode):
+class carBoMode(CExeCode):
 
-    def __init__( self, tTabLoc, tInitConfs=10):
+    def __init__( self, tTabLoc, tWorkDir, tMonoRoot):
         
         self.acedrgTables         = tTabLoc
         self.exeAcedrg            = "acedrg"
         # self.exeAcedrg          = "/lmb/home/flong/workplace/LIBMOL/bin/acedrg" 
         
-        self.atomsAllConnMap      = {}
-        self.remainAtoms          = []
-        self.metalAtoms           = []
-        self.metalConnAtoms       = []
-        self.metalConnAtomsMap    = {}
-        self.metalConnFullAtoms   = []
-        self.nonMAtmConnsMap      = {}
-        self.connMAMap            = {}
-        self.atmNonHMap           = {}
-        
-        self.addedHs          = []
-        
-        self.remainBonds      = []
-        self.metalBonds       = []
-        self.mcAtomBonds      = {}
-        self.addedHBs         = []
-        
-        self.speAngs          = []
-        self.metalPA          = []
-        self.atmHybr          = {}
-        self.simpP            = {}
-        self.simpR            = {}   # simple rings (full fledge rings are in c++ libmol )
-        self.metalInPs        = {}
-        
-        self.dataDiescriptor  = []
-        
-        self.outRstCifName    = ""
-        
-        self.mols             = []
-        
-        self.monomRoot        = ""
-        self.outRoot          = ""
-        
-        self.inCoordForChir   = False
-        
-        self.initConfs        = int(tInitConfs)
-
-        self.getRadii() 
-        
-        """
-        check
-        """
+        self.monomRoot            = tMonoRoot 
+        self.workDir              = tWorkDir
+        self.outRoot              = ""
+    
+        self.chemCheck        = ChemCheck() 
         
     def execute(self, tAtoms, tBonds, tMonomRoot, tOutRoot, tFileConv, tChem, tProcParas, tVersionInfo):
         
-        aRet = ""
-        self.monomRoot = tMonomRoot
-        self.outRoot   = tOutRoot 
         
-        print("Stage 1 ")
+        print("Get Carbo database ")
+        self.chemCheck.getCB_Graph_DB(self.acedrgTables)
         
         
-        self.getNewMolWithoutMetal(tAtoms, tBonds, tChem)
+        self.chemCheck.getNewMols(tAtoms, tBonds, self.workDir, self.monomRoot)
         
-        tmpMmcifName = self.monomRoot + "_tmpIn.cif"
-    
-        self.setCCP4MonDataDescritor(tFileConv.dataDescriptor)
-        
-        self.outInitModifiedCif(tmpMmcifName)
-        
-        nBonds = len(self.remainBonds) 
-        
-        if os.path.isfile(tmpMmcifName) and nBonds:
-            print("Stage 2 ")
-            print("acedrg is running")
-            outTmpRootName = self.outRoot + "_tmp"
-            self.runAcedrg(tmpMmcifName, outTmpRootName, tProcParas)
-            outTmpCifName  =  outTmpRootName + ".cif"
-            print("Here passed 2")
-            
-            #for aA in self.metalAtoms:
-            #    print("Metal atom ", aA['_chem_comp_atom.atom_id'], 
-            #          " carries ", aA['_chem_comp_atom.charge'], 
-            #          " formal charge ")
-    
-            if os.path.isfile(outTmpCifName):
-                outTmp2CifName = self.outRoot   + "_tmp2.cif"
-                self.modiCif(outTmpCifName, outTmp2CifName)
-                if os.path.isfile(outTmp2CifName):
-                    aRet = outTmp2CifName
-            print("Here passed 2")        
-        elif nBonds==0:
-            outInterMCifName = self.outRoot   + ".cif"
-            self.outInterMCif(outInterMCifName, tAtoms, tBonds, tVersionInfo)
-            print("==============================================")
-            print("No non-metal related bonds exist in the molecule")
-            #print("The final output file is %s"%outInterMCifName)
-            print("==============================================")
-            aRet = outInterMCifName
-        elif not os.path.isfile(tmpMmcifName):
-            print("==============================================")
-            print("Bug: no input file %s "%outTmpCifName)
-            print("==============================================")
-               
-        return aRet         
-    
-    def executeStage1Only(self, tAtoms, tBonds, tMonomRoot, tOutRoot, tFileConv, tChem):
-        
-        aRet = ""
-        self.monomRoot = tMonomRoot
-        self.outRoot   = tOutRoot 
-        
-        print("Stage 1 : prepare input file for ", )
+        # run the mols by different methods (CB mol or not)
+        aCombNonCBMol = {}
+        aCombNonCBMol["fileIdx"]  = self.chemCheck.aSetNewMols[0]["fileIdx"]
+        aCombNonCBMol["atoms"]    = []
+        aCombNonCBMol["bonds"]    = []
         
         
-        self.getNewMolWithoutMetal(tAtoms, tBonds, tChem)
+        aIdCoordMap = self.getExistCoordsIdMapping(tAtoms)
         
-        tmpMmcifName = self.monomRoot + "_tmpIn.cif"
-    
-        self.setCCP4MonDataDescritor(tFileConv.dataDescriptor)
+        aSetCBMols    = []
+        aSetNonCBMols = []
         
-        self.outInitModifiedCif(tmpMmcifName)
+        for aMol in self.chemCheck.aSetNewMols:
+            aMol["tempCif"] = ""
+            if not aMol["isCBMol"]:
+                print(aMol["fileIdx"], " IS NOT CB mol")
+                #if "atoms" in aMol:
+                #    for aAt in aMol["atoms"]:
+                #         aCombNonCBMol["atoms"].append(aAt)
+                #if "bonds" in aMol:
+                #    for aB in aMol["bonds"]:
+                #        aCombNonCBMol["bonds"].append(aB)
+                        
+                aInCif = os.path.join(self.scrDir, aMol["fileIdx"] + ".cif")
+                aOutRoot = os.path.join(self.scrDir, aMol["fileIdx"] + "_out")
+                self._log_name        = os.path.join(self.scrDir, aMol["fileIdx"] + ".log")
+                self._cmdline         = self.exeAcedrg 
+                self._cmdline +=      " -c %s   -r %s -o %s -K "%(aInCif, self.monomRoot, aOutRoot)
+                #print(self._cmdline)
+                print("Run mol : ", aMol["fileIdx"])
+                aOutCif = aOutRoot + ".cif"
+                print("The output file is ", aOutCif)
+                self.subExecute() 
+                if os.path.isfile(aOutCif):
+                    aMol["tempCif"] = aOutCif
+                    print("monomRoot is ", self.monomRoot)
+                    fromCifTorMolGemmi(aOutCif, self.monomRoot, self.monomRoot, aSetNonCBMols)
+                    print("Number of nonCB mols with dictionary ", len(aSetNonCBMols))
+            else:
+                aSetCBMols.append(aMol)
+                for aAt in aSetCBMols[0]["atoms"]:
+                    aAt["_chem_comp_atom.tmp_atom_conn"] = []
+                    #print("5:Now atom ", aAt["_chem_comp_atom.atom_id"], " conn : ")
+                    for aIdxNew in aAt["_chem_comp_atom.atom_conn"]:
+                        aAt["_chem_comp_atom.tmp_atom_conn"].append(aIdxNew)
+                        #print(aMol["atoms"][aIdxNew]["_chem_comp_atom.atom_id"])
+                print(aMol["fileIdx"], " Is CB mol")
         
-        nBonds = len(self.remainBonds) 
-        
-        if os.path.isfile(tmpMmcifName) and nBonds:
-            print("Stage 2 ")
-            print("acedrg is running")
-            outTmpRootName = self.outRoot + "_tmp"
-            self.runAcedrg(tmpMmcifName, outTmpRootName, tProcParas)
-            outTmpCifName  =  outTmpRootName + ".cif"
-            if os.path.isfile(outTmpCifName):
-                aRet = outTmpCifName
+        if len(aSetCBMols) > 0:
+            for aMol in aSetCBMols:
+                self.chemCheck.processOneCBMol(aMol)
+                aTmpCifN = os.path.join(self.scrDir, aMol["fileIdx"] + "_out.cif")
+                aTmpCif  = open(aTmpCifN, "w")
+                outputOneMolInACif2(aTmpCif, self.monomRoot, aMol["remainAtoms"], aMol["remainBonds"], aMol["remainAngs"])
+                aMol["tempCif"] = aTmpCifN
                 
-        return aRet
+                
 
-    def getRadii(self):
-
-        aFN = os.path.join(self.acedrgTables, "radii.table") 
-        if os.path.isfile(aFN):
-            aF = open(aFN, "r")
-            allLs = aF.readlines()
-            aF.close()
+            print("Number of nonCB mols with dictionary ", len(aSetNonCBMols))
+            print("Number of CB mols with dictionary ", len(aSetCBMols))
+            print("using coords ", self.useExistCoords)
             
-            self.radii = {}
-            for aL in allLs:
-                strs = aL.strip().split()
-                if len (aL) > 0 and len(strs)==3 and aL[0].find("#")==-1:
-                    strs[0] = strs[0].upper()
-                    if not strs[0] in self.radii.keys():
-                        self.radii[strs[0]] = {}
-                    self.radii[strs[0]][strs[1]] = float(strs[2].strip())
+            if len(self.chemCheck.aSetNewMols) > 0:
+                aComboMol = {}
+                self.chemCheck.assembleNewMods(tAtoms, tBonds,
+                                       aSetNonCBMols, aSetCBMols, self.scrDir, self.monomRoot, aComboMol)
+                
+                if self.useExistCoords:
+            
+                    if len(aIdCoordMap) > 0:
+                        for aAt in aComboMol["atoms"]:
+                            aId =  aAt["_chem_comp_atom.atom_id"]
+                            aAt["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]= aIdCoordMap[aId][0]
+                            aAt["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]= aIdCoordMap[aId][1]
+                            aAt["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]= aIdCoordMap[aId][2]
+                            aAt["_chem_comp_atom.x"]                       = aIdCoordMap[aId][0] 
+                            aAt["_chem_comp_atom.y"]                       = aIdCoordMap[aId][1]
+                            aAt["_chem_comp_atom.z"]                       = aIdCoordMap[aId][2]
+                            aAt["_chem_comp_atom.model_Cartn_x"]           = aIdCoordMap[aId][0]
+                            aAt["_chem_comp_atom.model_Cartn_y"]           = aIdCoordMap[aId][1]
+                            aAt["_chem_comp_atom.model_Cartn_z"]           = aIdCoordMap[aId][2]
+                
+                        if len(aComboMol["atoms"]) > 0 and len(aComboMol["bonds"]) > 0:
+                            aInCifN = os.path.join(self.scrDir, "inComboLig.cif")
+                            print(aInCifN)
+                            aInCif  = open(aInCifN, "w")
+                            outputOneMolFullDictInACif(aInCif, self.monomRoot, aComboMol)
+                            aInCif.close()
+                            aRoot = "outComboLig"
+                            aOutCifS =  os.path.join(self.scrDir, aRoot+"_updated.cif")
+                            self.runServalcat(aRoot, aInCifN)
+                            if os.path.isfile(aOutCifS):
+                                finOutCif = self.outRoot + ".cif"
+                                shutil.copy(aOutCifS, finOutCif)
+                                print("The final output cif is %s"%finOutCif)
+                            else:
+                                print("File %s does not exist."%aOutCifS)
+                                print("Problems in geometry optimisation. Check")
+                        #self.chemCheck.comboMolRefine(aComboMol, self.scrDir, self.monomRoot)
     
+    def getExistCoordsIdMapping(self, tAtoms):
+        
+        aSetIdCoordMap = {}
+        
+        for aAt in self.fileConv.atoms:
+            aId = aAt["_chem_comp_atom.atom_id"]
+            lHasCoords = False
+            if "_chem_comp_atom.model_Cartn_x" in aAt:
+                lHasCoords = True
+                        
+                x = aAt["_chem_comp_atom.model_Cartn_x"]
+                y = aAt["_chem_comp_atom.model_Cartn_y"]
+                z = aAt["_chem_comp_atom.model_Cartn_z"]
+            elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aAt:
+                lHasCoords = True
+                x   = aAt["_chem_comp_atom.pdbx_model_Cartn_x_ideal"]
+                y   = aAt["_chem_comp_atom.pdbx_model_Cartn_y_ideal"]
+                z   = aAt["_chem_comp_atom.pdbx_model_Cartn_z_ideal"]
+            elif "_chem_comp_atom.x" in aAt:
+                lHasCoords = True 
+                x = aAt["_chem_comp_atom.x"]
+                y = aAt["_chem_comp_atom.y"]
+                z = aAt["_chem_comp_atom.z"]
+                    
+            if lHasCoords:
+                aSetIdCoordMap[aId] = [x,y,z]        
+
+        return aSetIdCoordMap
+    
+    
+        
     def setBondValueFromRadii(self, tAtom1, tAtom2, tBond):
         
         aElem1 = tAtom1['_chem_comp_atom.type_symbol'].upper()
@@ -787,6 +791,7 @@ class metalMode(CExeCode):
                     posY = float(aAtom['_chem_comp_atom.model_Cartn_y'])
                     posZ = float(aAtom['_chem_comp_atom.model_Cartn_z'])
                 elif '_chem_comp_atom.x' in aAtom.keys() and aAtom['_chem_comp_atom.x'].find("?")==-1:
+                    print("here")
                     posX = float(aAtom['_chem_comp_atom.x'])
                     posY = float(aAtom['_chem_comp_atom.y'])
                     posZ = float(aAtom['_chem_comp_atom.z'])

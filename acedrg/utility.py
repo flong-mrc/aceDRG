@@ -18,7 +18,14 @@ import re,string
 from optparse import OptionParser 
 import time
 import math
+import select
 import random
+
+import numpy    as np
+import networkx as nx
+
+from rdkit import Chem
+from rdkit.Chem import AllChem
 
 # Functions for numbers
 
@@ -464,6 +471,220 @@ def checkRepAtomTypes(tFileName, tS):
 
     return aRet
 
+# Transfer datas-tructures such as atoms and bonds from the rdkit style to dictionary style (gemmi style)
+
+def DataStrTransferAtomsAndBonds(tMol, tDAtoms, tDBonds, tMonoRoot):
+    
+    allAtoms = tMol.GetAtoms()
+    conf = tMol.GetConformer()
+    
+    aIdSet = {}
+    for aAt in allAtoms:
+        aDAt = {}
+        aDAt["_chem_comp_atom.comp_id"] = tMonoRoot
+        aDAt["_chem_comp_atom.type_symbol"] = aAt.GetSymbol().upper()
+        aName = ""
+        if not aDAt["_chem_comp_atom.type_symbol"] in aIdSet:
+            aIdSet[aDAt["_chem_comp_atom.type_symbol"]] = 1
+        else:
+            aIdSet[aDAt["_chem_comp_atom.type_symbol"]] +=1
+        if aIdSet[aDAt["_chem_comp_atom.type_symbol"]] == 1:
+            aName = aDAt["_chem_comp_atom.type_symbol"] 
+        else:
+            aName = aDAt["_chem_comp_atom.type_symbol"] + str(aIdSet[aDAt["_chem_comp_atom.type_symbol"]])
+        aDAt["_chem_comp_atom.atom_id"] = aName
+
+                
+        aDAt["_chem_comp_atom.type_energy"] = aDAt["_chem_comp_atom.type_symbol"]
+        aDAt["_chem_comp_atom.atom_serial_number"] = aAt.GetIdx()
+        aDAt["_chem_comp_atom.atom_conn"] = []
+        pos = conf.GetAtomPosition(aAt.GetIdx())
+        #print("x=%5.4f y=%5.4f z=%5.4f" % (pos.x, pos.y, pos.z))  
+        aDAt["_chem_comp_atom.x"] = pos.x
+        aDAt["_chem_comp_atom.y"] = pos.y
+        aDAt["_chem_comp_atom.z"] = pos.z
+        aDAt["_chem_comp_atom.model_Cartn_x"] = pos.x
+        aDAt["_chem_comp_atom.model_Cartn_y"] = pos.y
+        aDAt["_chem_comp_atom.model_Cartn_z"] = pos.z
+        aDAt["_chem_comp_atom.pdbx_model_Cartn_x_ideal"] = pos.x
+        aDAt["_chem_comp_atom.pdbx_model_Cartn_y_ideal"] = pos.y
+        aDAt["_chem_comp_atom.pdbx_model_Cartn_z_ideal"] = pos.z
+        
+        tDAtoms.append(aDAt)
+    
+    for aBo in tMol.GetBonds():
+        aDB = {}
+        aDB["_chem_comp_bond.bond_serial_number"] = aBo.GetIdx()
+        idx1 = aBo.GetBeginAtomIdx()
+        id1  = tDAtoms[idx1]["_chem_comp_atom.atom_id"]
+        idx2 = aBo.GetEndAtomIdx()
+        id2  = tDAtoms[idx2]["_chem_comp_atom.atom_id"]
+        aDB["_chem_comp_bond.atom_serial_number_1"] = idx1
+        aDB["_chem_comp_bond.atom_serial_number_2"] = idx2
+        aDB["_chem_comp_bond.atom_id_1"] = id1
+        aDB["_chem_comp_bond.atom_id_2"] = id2
+        
+        aDB["_chem_comp_bond.value_order"] =str(aBo.GetBondType()) 
+        tDAtoms[idx1]["_chem_comp_atom.atom_conn"].append(idx2)
+        tDAtoms[idx2]["_chem_comp_atom.atom_conn"].append(idx1)
+        tDBonds.append(aDB)
+        
+     
+# Geometries releated
+
+def getLengBetween2Pos(tPos1, tPos2):
+    
+    aVec = np.array([tPos1[0] - tPos2[0], tPos1[1] - tPos2[1], tPos1[2] - tPos2[2]])
+    aLeng = np.linalg.norm(aVec)
+    
+    return aLeng
+
+def getPlaneNormal(tPos1, tPos2, tPos3):
+    # Return a unit normal vector of the plane by 3-points
+    pts = np.array([[tPos1[0], tPos1[1], tPos1[2]],
+                   [tPos2[0], tPos2[1], tPos2[2]],
+                   [tPos3[0], tPos3[1], tPos3[2]]])
+    
+    vec1 = pts[0, :] - pts[1, :]
+    v1l  = np.linalg.norm(vec1)
+    vec1   = vec1/v1l
+    vec2 = pts[0, :] - pts[2, :]
+    v2l  = np.linalg.norm(vec2)
+    vec2   = vec2/v2l
+    vec3 = np.cross(vec1, vec2)
+    vec3 = vec3/np.linalg.norm(vec3)
+    return vec3
+
+def getMassCenterPos(tSetPos):
+    
+    
+    xSum=0.0
+    ySum=0.0
+    zSum=0.0
+    
+    for aP in tSetPos:
+        xSum += aP[0]
+        ySum += aP[1]
+        zSum += aP[2]
+        
+    numPs = len(tSetPos)
+    
+    return [xSum/numPs, ySum/numPs, zSum/numPs]
+    
+def getAUnitDirVec2P(tPos1, tPos2):
+    
+    aDV = np.array([tPos1[0] - tPos2[0], tPos1[1] - tPos2[1], tPos1[2] - tPos2[2]])
+    nL  = np.linalg.norm(aDV)
+    
+    return aDV/nL
+
+def getAUnitDirFromCrossProd(tVec1, tVec2):
+    
+    aV1 = np.array(tVec1)
+    aV2 = np.array(tVec1)
+
+    aCP = np.linalg.cross(aV1, aV2)
+    aCPL = np.linalg.norm(aCP)
+    aRet = None 
+    if aCPL > 0:
+        aRet = aCP/aCPL
+        
+    return aRet
+    
+    
+
+def getAUnitDirVec(tPos1, tSetPos):
+    
+    Pos2 = getMassCenterPos(tSetPos)
+    
+    return getAUnitDirVec2P(tPos1, Pos2)
+
+
+def getAAngFrom3Ps(tPosC, tPos1, tPos2):
+    
+    a = np.array([tPos1[0],  tPos1[1], tPos1[2]])
+    b = np.array([tPosC[0], tPosC[1], tPosC[2]])
+    c = np.array([tPos2[0],  tPos2[1], tPos2[2]])
+
+    ba = a - b
+    l_ba = np.linalg.norm(ba)
+    bc = c - b
+    l_bc = np.linalg.norm(bc)
+    
+    cosine_angle = np.dot(ba/l_ba, bc/l_bc)
+    angle = np.arccos(cosine_angle)
+
+    return np.degrees(angle)
+
+def setOneAtomCoordsOutCB(tIdxCB, tIdxNonCB, tAtomsCB, tAtomsNCB, tLeng):
+    print("here ", tAtomsCB[tIdxCB]["_chem_comp_atom.atom_id"])
+    print(tAtomsCB[tIdxCB]["_chem_comp_atom.atom_conn"])
+    if len(tAtomsCB[tIdxCB]["_chem_comp_atom.atom_conn"]) > 3:
+        aSetPos = []
+        for aIdx in tAtomsCB[tIdxCB]["_chem_comp_atom.atom_conn"]:
+            x = float(tAtomsCB[aIdx]["_chem_comp_atom.model_Cartn_x"])
+            y = float(tAtomsCB[aIdx]["_chem_comp_atom.model_Cartn_y"])
+            z = float(tAtomsCB[aIdx]["_chem_comp_atom.model_Cartn_z"])
+            aPos = [x,y,z]
+            aSetPos.append(aPos)
+            
+        x1 = float(tAtomsCB[tIdxCB]["_chem_comp_atom.model_Cartn_x"])
+        y1 = float(tAtomsCB[tIdxCB]["_chem_comp_atom.model_Cartn_y"])
+        z1 = float(tAtomsCB[tIdxCB]["_chem_comp_atom.model_Cartn_z"])
+        aPosNonH = [x1, y1, z1]
+        aDirV= getAUnitDirVec(aPosNonH, aSetPos)
+        
+        oldX = float(tAtomsNCB[tIdxNonCB]["_chem_comp_atom.x"]) 
+        oldY = float(tAtomsNCB[tIdxNonCB]["_chem_comp_atom.y"]) 
+        oldZ = float(tAtomsNCB[tIdxNonCB]["_chem_comp_atom.z"])
+        
+        
+        newX = x1 + tLeng*aDirV[0]
+        newY = y1 + tLeng*aDirV[1]
+        newZ = z1 + tLeng*aDirV[2]
+        
+        
+        replaceAtomCoords(tAtomsNCB[tIdxNonCB], newX, newY, newZ)
+        
+        #print("new coords for ", tAtomsNCB[tIdxNonCB]["_chem_comp_atom.atom_id"])
+        #print("X: ", newX)
+        #print("Y: ", newY)
+        #print("Z: ", newZ)
+        #print("conn atom ", tAtomsCB[tIdxCB]["_chem_comp_atom.atom_id"])
+        #print("Its x ", x1)
+        #print("Its y ", y1)
+        #print("Its z ", z1)
+        #print("The leng between ",  getLengBetween2Pos([x1, y1,z1], [newX, newY, newZ]))
+        
+        #tAtomsNCB[tIdxNonCB]["_chem_comp_atom.model_Cartn_x"] = newX
+        #tAtomsNCB[tIdxNonCB]["_chem_comp_atom.model_Cartn_y"] = newY
+        #tAtomsNCB[tIdxNonCB]["_chem_comp_atom.model_Cartn_z"] = newZ
+        
+        deltaP = [newX-oldX, newY-oldY, newZ-oldZ]
+        
+        
+        return deltaP
+    
+def replaceAtomCoords(tAtom, tX, tY, tZ):
+    
+    # changes in all labels
+    #print("tX=", tX)
+    
+    tAtom["_chem_comp_atom.model_Cartn_x"] = tX
+    tAtom["_chem_comp_atom.model_Cartn_y"] = tY
+    tAtom["_chem_comp_atom.model_Cartn_z"] = tZ
+    
+    tAtom["_chem_comp_atom.x"] = tX
+    tAtom["_chem_comp_atom.y"] = tY
+    tAtom["_chem_comp_atom.z"] = tZ
+
+    tAtom["_chem_comp_atom.pdbx_model_Cartn_x_ideal"] = tX
+    tAtom["_chem_comp_atom.pdbx_model_Cartn_y_ideal"] = tY
+    tAtom["_chem_comp_atom.pdbx_model_Cartn_z_ideal"] = tZ
+    #print(tAtom)            
+
+# Equiv-class related algorithms
+
 def getLinkedGroups(tAtoms, tLinks, tMols):
     
     tGroups    = {}
@@ -497,3 +718,209 @@ def getLinkedGroups(tAtoms, tLinks, tMols):
         for aIdxA in tMols[aIdxM]:
             print("Atom : %s "%tAtoms[aIdxA]['_chem_comp_atom.atom_id'])
             
+def getLinkedGroups2(tAtoms, tLinks):
+    
+    tGroups    = {}
+    nAts       = len(tAtoms)
+    tGroups[0] = 0
+    for i in  range(1, nAts):
+        id_i = tAtoms[i]['_chem_comp_atom.atom_id']
+        tGroups[i] = i
+        for j in range(i):
+            id_j = tAtoms[j]['_chem_comp_atom.atom_id']
+            tGroups[j] = tGroups[tGroups[j]]
+            if id_j in tLinks[id_i]:
+                tGroups[tGroups[tGroups[j]]] = i
+    
+    for i in range(nAts):
+        tGroups[i] = tGroups[tGroups[i]];
+    
+    tMols = {}
+    
+    for iG in range(len(tGroups)):
+        idxM = tGroups[iG]
+        if not idxM in tMols:
+            tMols[idxM] = []
+        tMols[idxM].append(iG)
+
+    print("number of fragments is ", len(tMols))
+    aIdxF = 1
+    for aIdxM in tMols.keys():
+        print("Fragment ", aIdxF, " contains the following atoms: ")
+        aIdxF+=1
+        for aIdxA in tMols[aIdxM]:
+            print("Atom : %s "%tAtoms[aIdxA]['_chem_comp_atom.atom_id']) 
+    return tMols    
+
+# Graph-related algorithms 
+
+def aMolToAGraph(tAtoms, tBonds, tFileId):
+    
+    weightMap = {}
+    # Using periodic tables 
+    weightMap["B"] = 2
+    weightMap["C"] = 3
+    weightMap["N"] = 4
+    weightMap["O"] = 5
+    weightMap["S"] = 6
+    weightMap["SE"]= 7
+    weightMap["P"] = 8
+    weightMap["AS"] = 9
+    weightMap["SI"] = 9
+    weightMap["GA"] = 9
+    weightMap["GI"] = 9
+    weightMap["IN"] = 9
+    weightMap["OTHER"] =1
+    
+    
+    
+    aG = nx.Graph(name=tFileId)
+    # Add atoms info to a node
+    for aIdx, aAt in enumerate(tAtoms):
+        
+        aG.add_node(aIdx)
+        
+        for aK in aAt.keys():
+            aG.nodes[aIdx][aK] = aAt[aK]
+            elem = aAt["_chem_comp_atom.type_symbol"].upper()
+            #if not elem in weightMap:
+            #    aG.nodes[aIdx]["_chem_comp_atom.type_symbol"] = "FE"
+            
+    #print("=======================================")
+    #print("The node properties of the graph are : ")
+    #print(aG.nodes.data()) 
+    
+    for aB in tBonds:
+        idxA1 = int(aB["_chem_comp_bond.atom_serial_number_1"])
+        idxA2 = int(aB["_chem_comp_bond.atom_serial_number_2"])
+        elem1 = tAtoms[idxA1]["_chem_comp_atom.type_symbol"].upper()
+        elem2 = tAtoms[idxA2]["_chem_comp_atom.type_symbol"].upper()
+        aWeight = 0 
+        if elem1 in weightMap:
+            aWeight += weightMap[elem1]
+        else:
+            aWeight +=1
+        if elem2 in weightMap:
+            aWeight +=  weightMap[elem2]
+        else:
+            aWeight +=1    
+        
+        aG.add_edge(idxA1, idxA2, weight=aWeight)
+        for aK in aB.keys():
+            aG[idxA1][idxA2][aK] = aB[aK]
+    
+    #print("=======================================")
+    #print("The edge properties of the graph are : ")
+    #print(aG.edges.data())
+
+    return aG
+
+def MatchTwoGraphs(tG1, tG2):
+    
+    aGM = nx.algorithms.isomorphism.GraphMatcher(tG1, tG2, node_match= lambda n1,n2:n1['_chem_comp_atom.type_symbol']==n2['_chem_comp_atom.type_symbol'], edge_match= lambda e1,e2: e1['weight'] == e2['weight'])
+    
+    return aGM.is_isomorphic(), aGM.mapping.items()
+
+
+def cutRings(tMol, tBrokenIds):    
+    
+    origBonds = []
+    for aB in tMol["bonds"]:
+        origBonds.append(aB)
+    tmpBonds = []
+    extRings =[]
+    selectedAtms    = []
+    selectedRingMap = {}
+    ringAtomMap     = {}
+    numRingMap      = {}
+    for aRIdx in tMol["rings"]:
+        for aRA in tMol["rings"][aRIdx]:
+            aId = aRA["_chem_comp_ring_atom.atom_id"]
+            if not aId in numRingMap:
+                numRingMap[aId] = []
+            numRingMap[aId].append(aRIdx)
+    for aRIdx in tMol["rings"]:
+        #print(aRIdx)
+        for aRA in tMol["rings"][aRIdx]:
+            aId = aRA["_chem_comp_ring_atom.atom_id"]
+            if not aRIdx in extRings and len(numRingMap[aId])==1:
+                extRings.append(aRIdx)
+                selectedAtms.append(aRA["_chem_comp_ring_atom.atom_id"])
+                print("%s is selected"%aRA["_chem_comp_ring_atom.atom_id"])
+                break                                    
+        if not aRIdx in ringAtomMap:
+            ringAtomMap[aRIdx] = []
+        for aRA in tMol["rings"][aRIdx]:
+            aId = aRA["_chem_comp_ring_atom.atom_id"]
+            selectedRingMap[aId] = aRIdx
+            ringAtomMap[aRIdx].append(aId)
+            
+            
+    #print(selectedAtms)
+    #print(selectedRingMap)
+    #print(numRingMap)
+    
+    extRings =[]
+    for aB in tMol["bonds"]:
+        id1 = aB["_chem_comp_bond.atom_id_1"]
+        id2 = aB["_chem_comp_bond.atom_id_2"]
+        #print("Check bond between %s and %s "%(id1, id2))
+        lInc = False
+        if id1 in selectedAtms and id1 in selectedRingMap and id1 in numRingMap:
+            if not selectedRingMap[id1] in extRings and not len(numRingMap[id1]) > 1:
+                if id2 in ringAtomMap[selectedRingMap[id1]]:
+                    lInc = True
+                    extRings.append(selectedRingMap[id1])
+        elif id2 in selectedAtms and id2 in selectedRingMap and id2 in numRingMap:
+            if not selectedRingMap[id2] in extRings and not len(numRingMap[id2]) > 1:
+                if id1 in ringAtomMap[selectedRingMap[id2]]:
+                    lInc = True
+                    extRings.append(selectedRingMap[id2])
+         
+        if not lInc:
+            tmpBonds.append(aB)
+        else:
+            print("Bond between %s and %s is broken"%(id1, id2))
+            if not id1 in tBrokenIds:
+                tBrokenIds.append(id1)
+            if not id2 in tBrokenIds:
+                tBrokenIds.append(id2)
+            
+    tMol["bonds"] = [] 
+    for aB in tmpBonds:
+        tMol["bonds"].append(aB)
+    
+
+def setTreeNodeOrder(tConn, tStartId, tTree, tStartList):
+    
+    if not tStartId in tStartList: 
+        tStartList.append(tStartId)
+    #print("tStartList =", tStartList)
+    if tStartId in tConn :
+        #print("Start id ", tStartId)
+        #print("Its children ")
+        #print(tConn[tStartId])
+    
+        for aId in tConn[tStartId] :
+            #print(aId, " is a ch of ", tStartId)
+            if not aId in tStartList:
+                #print(aId, " is assigned ")
+                tTree[aId]["atom_back"] = tStartId
+                if not "atom_forward" in tTree[aId]:
+                    tTree[aId]["atom_forward"] =[]
+                #print("its connection ", tConn[aId] )
+                if len(tConn[aId]) > 1 :
+                    for aNId in tConn[aId]:
+                        if aNId != tStartId:
+                            #print("Next Lev ", aNId)
+                            tTree[aId]["atom_forward"].append(aNId)
+                            setTreeNodeOrder(tConn, aId, tTree, tStartList)
+                else:
+                    pass
+                    #print("No start")
+                    #print("Back to ", aId, " next" )
+       
+        return             
+          
+
+        

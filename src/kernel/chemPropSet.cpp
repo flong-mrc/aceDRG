@@ -9550,10 +9550,19 @@ namespace LIBMOL
                 for (std::vector<int>::iterator iNB = iAt->connAtoms.begin();
                                      iNB != iAt->connAtoms.end(); iNB++)
                 {
+                    double addC  =0.0;       // real charge contributed to metal atoms
                     if (!tAtoms[*iNB].isMetal)
                     {
                         std::cout << "NB atom : " << tAtoms[*iNB].id << std::endl;
-                        sumCh +=tAtoms[*iNB].charge;
+                        if (tAtoms[*iNB].connMAtoms.size()> 1 )
+                        {
+                            addC =  tAtoms[*iNB].charge/tAtoms[*iNB].connMAtoms.size();
+                        }
+                        else
+                        {
+                            addC = tAtoms[*iNB].charge;
+                        }
+                        sumCh += addC;                                   //tAtoms[*iNB].charge;
                         std::cout << " sumCh " << sumCh << std::endl;
                     }
 

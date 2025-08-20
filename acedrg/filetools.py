@@ -18,7 +18,12 @@ from builtins import object
 import os,os.path,sys
 import time
 import math
+import random 
 
+from gemmi import cif
+
+from rdkit import Chem
+from rdkit.Chem import AllChem
 
 from . utility  import countPrime
 from . utility  import setBoolDict
@@ -28,7 +33,7 @@ from . utility  import aLineToAlist2
 
 class FileTransformer(object) :
 
-    def __init__(self):
+    def __init__(self, tInMtConnFile=None):
 
         self.dataDescriptor  = {} 
         self.strDescriptors  = {} 
@@ -85,6 +90,8 @@ class FileTransformer(object) :
                             "_chem_comp.name", "_chem_comp.group",    \
                             "_chem_comp.number_atoms_all", "_chem_comp.number_atoms_nh", \
                             "_chem_comp.desc_level"]
+        
+        self.leaAtmMap   = {}
  
         self.rdkitSmiles  = {}
 
@@ -117,7 +124,39 @@ class FileTransformer(object) :
         self.PdbForMols       = {}
 
         self.hasCCP4Type      = False
+        
+        self.metConn          = {}
+        
+        if tInMtConnFile:
+            self.setMetConnList(tInMtConnFile)
 
+    def setMetConnList(self, tInMtConnFile):
+        
+        if os.path.isfile(tInMtConnFile):
+            try:
+                fM=open(tInMtConnFile, "r")
+            except IOError :
+                print("%s does not exist"%tInMtConnFile)
+            else:
+                allM = fM.readlines()
+                fM.close()
+                for aL in allM:
+                    strs = aL.strip().split()
+                    if len(strs)==3:
+                        if not strs[1] in self.metConn:
+                            self.metConn[strs[1]] = []
+                        self.metConn[strs[1]].append(strs[2])
+                        
+    def mmCifReaderGemmi(self, tInCifName):
+        """Replacement of the older mmCifReader"""
+        
+        if os.path.isfile(tInCifName):
+            aInCif = cif.read_file(tInCifName)
+            numBl = len(aInCif)
+            if numBl > 0:
+                pass 
+        
+        
     def mmCifReader(self, tFileName):
         """Read a detailed mmicif file to get basic information"""
 
@@ -249,6 +288,9 @@ class FileTransformer(object) :
             #    for aK in self.dataDescriptor.keys():
             #        print("Key : ", aK)
             #        print("values ", self.dataDescriptor[aK])
+            #print("Number of atoms ", len(self.atoms))
+            #for aA in self.atoms:
+            #    print(aA['_chem_comp_atom.atom_id'], " of ", aA['_chem_comp_atom.type_symbol'])
             
             """
             idKey = "_chem_comp_atom.atom_id"
@@ -261,9 +303,6 @@ class FileTransformer(object) :
                         print ("label : ", aKey, " Value : ", aAtom[aKey])
                     print ("===============================")
             """
-            
-            
-    
     def TmpChemCheck(self):
 
         """ 
@@ -316,7 +355,7 @@ class FileTransformer(object) :
             if len(speAtomIds):
                 for aId in speAtomIds:
                     if aId in atomVals:
-                        if atomVals[aId] > 3: 
+                        if atomVals[aId] > 7: 
                             print("Acedrg stops because RDKit does not accept the following: ")
                             print("%s  has total valence of %d "%(aId, atomVals[aId]))
                             sys.exit()        
@@ -622,7 +661,11 @@ class FileTransformer(object) :
             tAtoms = []
             tHAtoms = []
             for aAtom in self.atoms:
-                #print(aAtom.keys())
+                #print(aAtom)
+                if not "_chem_comp_atom.pdbx_leaving_atom_flag" in aAtom:
+                    aAtom["_chem_comp_atom.pdbx_leaving_atom_flag"] = "N"
+                if "_chem_comp_atom.atom_id" in aAtom and "_chem_comp_atom.pdbx_leaving_atom_flag" in aAtom:
+                    self.leaAtmMap[aAtom["_chem_comp_atom.atom_id"]] = aAtom["_chem_comp_atom.pdbx_leaving_atom_flag"]
                 if aAtom["_chem_comp_atom.type_symbol"] !="H" and aAtom["_chem_comp_atom.type_symbol"] !="D":
                     tAtoms.append(aAtom)
                 else:
@@ -692,7 +735,6 @@ class FileTransformer(object) :
                     for i in range(len(colIdx)):
                         aStr +="%s"%aChiral[colIdx[i]].ljust(8)
                     #print aStr
-        
         
         #if tProp =="strDescriptor":
         #    if len(self.strDescriptors["props"]):
@@ -1243,11 +1285,11 @@ class FileTransformer(object) :
                     self.nameMapingCifMol["H_alt"][nAtm] = aAtom["_chem_comp_atom.alt_atom_id"]
                 else:
                     self.nameMapingCifMol["H_alt"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
-                #self.nameMapingCifMol["H"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
+                self.nameMapingCifMol["H"][nAtm] = aAtom["_chem_comp_atom.atom_id"]
                 #print("NameMap ", nAtm, " : ", self.nameMapingCifMol["H"][nAtm])
                 #print("NameMap ", aAtom["_chem_comp_atom.atom_id"])
                 nAtm +=1
-
+            
 
             # Set up atom seq match for bond section
             mapIdNum = {}
@@ -1276,9 +1318,14 @@ class FileTransformer(object) :
             idxAtom = 1
             for aAtom in self.atoms:
                 if self.mmCifHasCoords :
-                    x = "%7.4f"%float(aAtom["_chem_comp_atom.x"])
-                    y = "%7.4f"%float(aAtom["_chem_comp_atom.y"])
-                    z = "%7.4f"%float(aAtom["_chem_comp_atom.z"])
+                    if aAtom["_chem_comp_atom.x"].find("?") ==-1 and aAtom["_chem_comp_atom.y"].find("?") ==-1 and aAtom["_chem_comp_atom.z"].find("?")==-1:
+                        x = "%7.4f"%float(aAtom["_chem_comp_atom.x"])
+                        y = "%7.4f"%float(aAtom["_chem_comp_atom.y"])
+                        z = "%7.4f"%float(aAtom["_chem_comp_atom.z"])
+                    else:
+                        x = "0.0000"
+                        y = "0.0000"
+                        z = "0.0000"
                 else:
                     x = "0.0000"
                     y = "0.0000"
@@ -1397,8 +1444,8 @@ class FileTransformer(object) :
             if len(chargeAtomList) != 0:
                 aL = "M CHG  %d "%len(chargeAtomList)
                 for aPair in chargeAtomList:
-                    print("atom serial number (mol format)  ", aPair[0], ", its new id ", self.atoms[aPair[0]-1]["_chem_comp_atom.atom_id"])
-                    print("Charge ", aPair[1])
+                    #print("atom serial number (mol format)  ", aPair[0], ", its new id ", self.atoms[aPair[0]-1]["_chem_comp_atom.atom_id"])
+                    #print("Charge ", aPair[1])
                     aL += " %d  %d "%(aPair[0], aPair[1])
                 tOutFile.write(aL + "\n")          
    
@@ -1471,6 +1518,8 @@ class FileTransformer(object) :
 
     def setAInitConfForMonCif(self, tInCifName, tOutCifName, tMol, tIdxConf):
         
+        
+        
         try:
             aInCif = open(tInCifName, "r")
         except IOError:
@@ -1490,7 +1539,7 @@ class FileTransformer(object) :
             lA  = False
             lK2 = False
             for aL in origCifLs:
-                if aL.find("_chem_comp_atom.pdbx_model_Cartn_z_ideal") !=-1:
+                if aL.find("_chem_comp_atom.pdbx_leaving_atom_flag") !=-1:
                     lK  = False
                     lA  = True
                     lK2 = False
@@ -1510,9 +1559,12 @@ class FileTransformer(object) :
             aConf  =  tMol.GetConformer(tIdxConf) 
             atoms  =  tMol.GetAtoms()
             atomPOS ={}
+            atomNameList=[]
             for aAtom in atoms:
                 idxA  = aAtom.GetIdx() 
                 name  = aAtom.GetProp("Name").strip() 
+                atomNameList.append(name)
+                
                 pos = aConf.GetAtomPosition(idxA)
                 posX ="%8.3f"%pos.x
                 posY ="%8.3f"%pos.y
@@ -1524,13 +1576,19 @@ class FileTransformer(object) :
             cifNewLs = []
             for aLA in cifLs["atoms"]:
                 strs = aLA.strip().split()
-                if len(strs)==12:
+                if len(strs)==13:
                     aName =strs[1]
-                    atmL  = "%s%s%s%s%s%s%s%s%s%s%s%s\n"\
+                    
+                    if not aName in atomNameList and aName[0] =="\"" and aName[-1]=="\"":
+                       tName = aName[1:-1]
+                       if tName in atomNameList:
+                           aName = tName
+                    
+                    atmL  = "%s%s%s%s%s%s%s%s%s%s%s%s%s\n"\
                             %(strs[0].ljust(8), strs[1].ljust(8), strs[2].ljust(8),
                               strs[3].ljust(6), strs[4].ljust(6), strs[5].ljust(6),
                               atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12),
-                              atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12))
+                              atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12), strs[12])
                     cifNewLs.append(atmL)
             
             try:
@@ -1547,7 +1605,85 @@ class FileTransformer(object) :
                     aOutCif.write(aL) 
                 aOutCif.close()
                 
+    def setAInitConfForMonCifNoRdkitConf(self, tInCifName, tOutCifName, tMol):
+        
+        try:
+            aInCif = open(tInCifName, "r")
+        except IOError:
+            print("%s  can not be open for reading "%tInCifName)
+            sys.exit()
+        else:
             
+            origCifLs = aInCif.readlines()
+            aInCif.close()
+            
+            cifLs ={}
+            cifLs["part1"] = []
+            cifLs["atoms"] = []
+            cifLs["part2"] = []
+            
+            lK  = True
+            lA  = False
+            lK2 = False
+            for aL in origCifLs:
+                if aL.find("_chem_comp_atom.pdbx_leaving_atom_flag") !=-1:
+                    lK  = False
+                    lA  = True
+                    lK2 = False
+                    cifLs["part1"].append(aL)
+                elif lA and aL.find("loop_") !=-1:
+                    lA  = False
+                    lK  = False
+                    lK2 = True
+                    cifLs["part2"].append(aL)
+                elif lK:
+                    cifLs["part1"].append(aL)
+                elif lA:
+                    cifLs["atoms"].append(aL)
+                elif lK2:
+                    cifLs["part2"].append(aL)
+            a2DMol = AllChem.Compute2DCoords(tMol) 
+            aConf  =  tMol.GetConformer(a2DMol) 
+            atoms  =  tMol.GetAtoms()
+            atomPOS ={}
+            for aAtom in atoms:
+                idxA  = aAtom.GetIdx() 
+                name  = aAtom.GetProp("Name").strip() 
+                pos = aConf.GetAtomPosition(idxA)
+                posX ="%8.3f"%pos.x
+                posY ="%8.3f"%pos.y
+                posZ ="%8.3f"%random.uniform(-1.0, 1.0)
+                atomPOS[name] = []
+                atomPOS[name].append(posX)
+                atomPOS[name].append(posY)
+                atomPOS[name].append(posZ)
+            cifNewLs = []
+            for aLA in cifLs["atoms"]:
+                strs = aLA.strip().split()
+                if len(strs)==13:
+                    aName =strs[1]
+                    
+                    atmL  = "%s%s%s%s%s%s%s%s%s%s%s%s%s\n"\
+                            %(strs[0].ljust(8), strs[1].ljust(8), strs[2].ljust(8),
+                              strs[3].ljust(6), strs[4].ljust(6), strs[5].ljust(6),
+                              atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12),
+                              atomPOS[aName][0].ljust(12), atomPOS[aName][1].ljust(12), atomPOS[aName][2].ljust(12), strs[12])
+                    cifNewLs.append(atmL)
+            
+            try:
+                aOutCif = open(tOutCifName, "w")
+            except IOError:
+                print("%s  can not be open for writing "%tOutCifName)
+                sys.exit()
+            else:
+                for aL in cifLs["part1"]:
+                    aOutCif.write(aL)
+                for aL in cifNewLs:
+                    aOutCif.write(aL) 
+                for aL in cifLs["part2"]:
+                    aOutCif.write(aL) 
+                aOutCif.close()
+               
 
     def MolToPDBFile(self, tOutFileName, idxMol, tMol, tDataDiscriptor=None, tMonoRoot="LIG", idxConf=0, tDelSign="", tUsingCoords=False):
 
@@ -1788,9 +1924,64 @@ class FileTransformer(object) :
                     l0  = True
         if aTS != "":
             tList.append(aTS.strip())   
-        
-
+    
     def aLineToAlist2(self, tL, tList):
+
+            aTS = ""
+            l1  = False
+            l2  = False 
+            for aS in tL:
+                if aS ==" ":
+                    if not l1 and not l2 and len(aTS)!=0:
+                        tList.append(aTS.strip())
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    #elif l1 and not l2 and len(aTS) !=0:
+                    #    print("2: ", aTS)
+                    #    tList.append(aTS.strip())
+                    #    aTS = ""
+                    #    l1 = False
+                    #    l2 = False
+                    elif l2 :
+                        aTS = aTS + aS
+                    elif l1 :
+                        aTS = aTS + aS
+                elif aS.find("\"") !=-1:
+                    if l2:
+                        aTS = "\"" + aTS + "\""
+                        tList.append(aTS.strip())
+                        aTS = ""
+                        l1 = False
+                        l2 = False
+                    elif l1:
+                        aTS = aTS + aS
+                    else:
+                        l2 = True
+                        l1 = False
+                elif aS.find("\'") !=-1:
+                    if l1:
+                        #if not l2:
+                        aTS = "\'" + aTS + "\'"
+                        tList.append(aTS)
+                        aTS = ""
+                        l1  = False
+                        l2  = False
+                    elif l2:
+                        aTS = aTS + aS
+                    else:
+                        l2 = False
+                        l1 = True
+                else:
+                    aTS = aTS + aS
+
+            if aTS != "":
+                tList.append(aTS.strip())
+            #print("Line = ", tL)
+            #print("List = ", tList)
+
+
+    def aLineToAlist3(self, tL, tList):
        
             aTS = ""
             l0  = False
@@ -1841,7 +2032,9 @@ class FileTransformer(object) :
                     aTS = aTS + aS
                     
             if aTS != "":
-                tList.append(aTS.strip())    
+                tList.append(aTS.strip()) 
+            print("Line = ", tL)
+            print("List = ", tList)
             
             
     def mol2Reader(self, tFileName):
@@ -2529,6 +2722,586 @@ class Ccp4MmCifObj (dict) :
                aReturn = aBond
                break
         return aReturn
+
+def outputOneMolInACif(tCif, tFileIdx, tMol) :
+    
+    if "atoms" and "bonds" in tMol :
+        
+        outputHeadSecInOneMol(tCif, tFileIdx, tMol["atoms"])
+        outputAtomsInOneMol(tCif, tFileIdx, tMol["atoms"])
+        outputBondsInOneMol(tCif, tFileIdx, tMol["bonds"])
+        tCif.close()
+
+def outputOneMolInACif2(tCif,  tFileIdx, tAtoms, tBonds, tAngs) :
+    
+    addBondLengToBonds(tAtoms, tBonds)
+        
+    outputHeadSecInOneMol(tCif, tFileIdx, tAtoms)
+    outputAtomsInOneMol(tCif, tFileIdx, tAtoms)
+    outputBondsInOneMol(tCif, tFileIdx, tBonds)
+    outputAngsInOneMol(tCif,tFileIdx, tAngs)
+    tCif.close()      
+    
+def outputOneMolFullDictInACif(tCif, tFileIdx, tMol):
+    
+    outputHeadSecInOneMol(tCif, tFileIdx, tMol["atoms"])
+    outputAtomsInOneMol(tCif, tFileIdx, tMol["atoms"])
+    outputBondsInOneMol(tCif, tFileIdx, tMol["bonds"])
+    if len(tMol["angles"]) > 0:
+        outputAngsInOneMol(tCif, tFileIdx, tMol["angles"])
+    if len(tMol["torsions"]) >0:
+        outputTorsInOneMol(tCif, tFileIdx, tMol["torsions"])
+    if len(tMol["chirs"]) > 0:
+        outputChirInOneMol(tCif, tFileIdx, tMol["chirs"])
+    if len(tMol["planes"]) > 0:
+        outputPlanInOneMol(tCif, tFileIdx, tMol["planes"])
+    if len(tMol["rings"]) > 0:
+        outputRingsInOneMol(tCif, tFileIdx, tMol["rings"])
+    
+def outputHeadSecInOneMol(tCif,  tFileIdx, tAtoms):
+    
+          
+        
+        sNAtms   = str(len(tAtoms))
+        tCif.write("data_comp_%s\n"%tFileIdx)
+        tCif.write("_chem_comp.pdbx_type        HETAIN\n")
+        tCif.write("loop_\n")
+        tCif.write("_chem_comp.id\n")
+        tCif.write("_chem_comp.three_letter_code\n")
+        tCif.write("_chem_comp.name\n")
+        tCif.write("_chem_comp.group\n")
+        tCif.write("_chem_comp.number_atoms_all\n")
+        aL = "%s%s%s%s%s\n"%(tFileIdx.ljust(6), tFileIdx.ljust(6), 
+                             tFileIdx.ljust(len(tFileIdx)+3), "NON-POLYMER".ljust(15),
+                             sNAtms.ljust(len(sNAtms)+3))
+        tCif.write(aL)
+        
+def outputAtomsInOneMol(tCif, tFileIdx, tAtoms):
+    
+    tCif.write("loop_\n")
+    
+    tCif.write("_chem_comp_atom.comp_id\n")
+    tCif.write("_chem_comp_atom.atom_id\n")
+    tCif.write("_chem_comp_atom.alt_atom_id\n")
+    tCif.write("_chem_comp_atom.type_symbol\n")
+    tCif.write("_chem_comp_atom.type_energy\n")
+    tCif.write("_chem_comp_atom.charge\n")
+    tCif.write("_chem_comp_atom.x\n")
+    tCif.write("_chem_comp_atom.y\n")
+    tCif.write("_chem_comp_atom.z\n")
+    tCif.write("_chem_comp_atom.model_Cartn_x\n")
+    tCif.write("_chem_comp_atom.model_Cartn_y\n")
+    tCif.write("_chem_comp_atom.model_Cartn_z\n")
+    tCif.write("_chem_comp_atom.pdbx_leaving_atom_flag\n")
+
+    for aA in tAtoms:
+        
+        aCId = tFileIdx.ljust(6)
+        aId = aA["_chem_comp_atom.atom_id"]
+        if len(aId) < 4:
+            aId = aId.ljust(6)
+        else: 
+            aId = aId.ljust(len(aId)+3)
+        
+        if not "_chem_comp_atom.alt_atom_id" in aA:
+            aA["_chem_comp_atom.alt_atom_id"] = aA["_chem_comp_atom.atom_id"]
+        aAId = aA["_chem_comp_atom.alt_atom_id"]
+        aAId = aAId.ljust(len(aAId)+3)
+        aElm = aA["_chem_comp_atom.type_symbol"].ljust(4)
+        aElm = aElm.upper()
+        
+        if not "_chem_comp_atom.type_energy" in aA:
+            aA["_chem_comp_atom.type_energy"] = aElm
+        aEn = aA["_chem_comp_atom.type_energy"]
+        aEn = aEn.upper()
+        aEn = aEn.ljust(len(aEn)+3)
+        
+        
+        if not "_chem_comp_atom.charge" in aA:
+            aA["_chem_comp_atom.charge"] = "0"
+            
+        aC = aA["_chem_comp_atom.charge"]
+        aC = aC.ljust(len(aC)+3)
+        
+        
+        if "_chem_comp_atom.model_Cartn_x" in aA:
+            
+            aX   = str(aA["_chem_comp_atom.model_Cartn_x"])
+            aY   = str(aA["_chem_comp_atom.model_Cartn_y"])
+            aZ   = str(aA["_chem_comp_atom.model_Cartn_z"])
+        elif "chem_comp_atom.x" in aA:
+        
+            aX   = str(aA["_chem_comp_atom.x"])
+            aY   = str(aA["_chem_comp_atom.y"])
+            aZ   = str(aA["_chem_comp_atom.z"]) 
+        elif "_chem_comp_atom.pdbx_model_Cartn_x_ideal" in aA:   
+            aX   = str(aA["_chem_comp_atom.pdbx_model_Cartn_x_ideal"])
+            aY   = str(aA["_chem_comp_atom.pdbx_model_Cartn_y_ideal"])
+            aZ   = str(aA["_chem_comp_atom.pdbx_model_Cartn_z_ideal"])
+            
+        if len(aX) > 7:
+            aX = aX[:7]
+        if len(aY) > 7:
+            aY = aY[:7]
+        if len(aZ) > 7:
+            aZ = aZ[:7]
+            
+        aX   = aX.ljust(len(aX)+3)
+        aY   = aY.ljust(len(aY)+3)
+        aZ   = aZ.ljust(len(aZ)+3)
+        
+        
+        if not "_chem_comp_atom.pdbx_leaving_atom_flag" in aA:
+            aA["_chem_comp_atom.pdbx_leaving_atom_flag"] = "N"
+        aN = aA["_chem_comp_atom.pdbx_leaving_atom_flag"].ljust(4)
+        
+        aL = "%s%s%s%s%s%s%s%s%s%s%s%s%s\n"%(aCId, aId, aAId, aElm, aEn, aC, 
+                                           aX, aY, aZ, aX, aY, aZ, aN)
+        
+        tCif.write(aL)
+        
+def addBondLengToBonds(tAtoms, tBonds):
+    
+    # Apply only to atoms in CB Mols
+    
+    idElmMap = {}
+    
+    for aAt in tAtoms:
+        aId  = aAt["_chem_comp_atom.atom_id"]
+        aElm = aAt["_chem_comp_atom.type_symbol"]
+        idElmMap[aId] = aElm 
+    
+    elms = ["B", "C"]
+    for aBo in tBonds:
+         
+        aId1 = aBo["_chem_comp_bond.atom_id_1"]
+        aElem1 = idElmMap[aId1] 
+        aId2 = aBo["_chem_comp_bond.atom_id_2"]
+        aElem2 = idElmMap[aId2]
+        
+        if  not aElem1 in elms or not aElem2 in elms:
+            if not  aElem1 =="H" and not aElem2 =="H":
+                aBo["_chem_comp_bond.value_dist"] = 2.1
+            else:
+                aBo["_chem_comp_bond.value_dist"] = 1.1   
+        else:
+            aBo["_chem_comp_bond.value_dist"] = 1.55
+                
+        
+            
+        
+def outputBondsInOneMol(tCif, tFileIdx, tBonds):
+    
+    tCif.write("loop_\n")
+    
+    tCif.write("_chem_comp_bond.comp_id\n")
+    tCif.write("_chem_comp_bond.atom_id_1\n")
+    tCif.write("_chem_comp_bond.atom_id_2\n")
+    tCif.write("_chem_comp_bond.value_order\n")
+    tCif.write("_chem_comp_bond.pdbx_aromatic_flag\n")
+    tCif.write("_chem_comp_bond.value_dist_nucleus\n")
+    tCif.write("_chem_comp_bond.value_dist_nucleus_esd\n")
+    tCif.write("_chem_comp_bond.value_dist\n")
+    tCif.write("_chem_comp_bond.value_dist_esd\n")
+    
+    aCId = tFileIdx.ljust(6) 
+    for aB in tBonds:
+        aId1 = aB["_chem_comp_bond.atom_id_1"]
+        aId1 = aId1.ljust(len(aId1)+3)
+        
+        aId2 = aB["_chem_comp_bond.atom_id_2"]
+        aId2 = aId2.ljust(len(aId2)+3)
+        if not "_chem_comp_bond.value_order" in aB:
+            aB["_chem_comp_bond.value_order"] = "SINGLE"
+        aOr  = aB["_chem_comp_bond.value_order"].ljust(10)
+        
+        if not "_chem_comp_bond.pdbx_aromatic_flag" in aB:
+            aB["_chem_comp_bond.pdbx_aromatic_flag"] = "n"
+        aAr = aB["_chem_comp_bond.pdbx_aromatic_flag"].ljust(4)
+        
+        # the following is just place holder
+        
+        if not "_chem_comp_bond.value_dist" in aB:
+            aB["_chem_comp_bond.value_dist"] = 1.5
+            
+        aLN = str(aB["_chem_comp_bond.value_dist"])
+       
+        if len(aLN) > 5:
+            aLN = aLN[:5]
+        aLN = aLN.ljust(len(aLN)+3)
+        
+        aB["_chem_comp_bond.value_dist_nucleus"] = aLN
+        
+        aNL = str(aB["_chem_comp_bond.value_dist_nucleus"]) 
+        if len(aNL) > 5:
+            aNL = aNL[:5]
+        aNL = aNL.ljust(len(aNL)+3)
+        
+        if not "_chem_comp_bond.value_dist_esd" in aB:
+            aB["_chem_comp_bond.value_dist_esd"] = 0.01
+        aSG = str(aB["_chem_comp_bond.value_dist_esd"])
+        aSG = aSG.ljust(len(aSG)+3)
+        
+        if not "_chem_comp_bond.value_dist_nucleus_esd" in aB:
+            aB["_chem_comp_bond.value_dist_nucleus_esd"] = 0.01
+        aNSG = str(aB["_chem_comp_bond.value_dist_nucleus_esd"])
+        aNSG = aNSG.ljust(len(aNSG)+3)
+        
+        
+        aL   = "%s%s%s%s%s%s%s%s%s\n"%(aCId, aId1, aId2, aOr, aAr, aNL, aNSG, aLN, aSG)
+        
+        tCif.write(aL)
+
+def outputAngsInOneMol(tCif, tFileIdx, tAngs):
+
+    tCif.write("loop_\n")
+    tCif.write("_chem_comp_angle.comp_id\n")
+    tCif.write("_chem_comp_angle.atom_id_1\n")
+    tCif.write("_chem_comp_angle.atom_id_2\n")
+    tCif.write("_chem_comp_angle.atom_id_3\n")
+    tCif.write("_chem_comp_angle.value_angle\n")
+    tCif.write("_chem_comp_angle.value_angle_esd\n")
+    
+    for aAn in tAngs:
+        aCId = tFileIdx.ljust(6)
+        aId1 = aAn["_chem_comp_angle.atom_id_1"]
+        aId2 = aAn["_chem_comp_angle.atom_id_2"]
+        aId3 = aAn["_chem_comp_angle.atom_id_3"]
+        aV   = str(aAn["_chem_comp_angle.value_angle"])
+        aS   = str(aAn["_chem_comp_angle.value_angle_esd"])
+        aL   = "%s%s%s%s%s%s\n"%(aCId.ljust(8), aId1.ljust(8), aId2.ljust(8), aId3.ljust(8), aV.ljust(len(aV)+3), aS.ljust(len(aV)+3)) 
+        tCif.write(aL)
+        
+def outputTorsInOneMol(tCif, tFileIdx, tTors):
+    
+    tCif.write("loop_\n")
+    tCif.write("_chem_comp_tor.comp_id\n")
+    tCif.write("_chem_comp_tor.id\n")
+    tCif.write("_chem_comp_tor.atom_id_1\n")
+    tCif.write("_chem_comp_tor.atom_id_2\n")
+    tCif.write("_chem_comp_tor.atom_id_3\n")
+    tCif.write("_chem_comp_tor.atom_id_4\n")
+    tCif.write("_chem_comp_tor.value_angle\n")
+    tCif.write("_chem_comp_tor.value_angle_esd\n")
+    tCif.write("_chem_comp_tor.period\n")
+    
+    for aTor in tTors:
+        aCId = tFileIdx.ljust(6)
+        aTId = aTor["_chem_comp_tor.id"].ljust(12)
+        aId1 = aTor["_chem_comp_tor.atom_id_1"].ljust(8)
+        aId2 = aTor["_chem_comp_tor.atom_id_2"].ljust(8)
+        aId3 = aTor["_chem_comp_tor.atom_id_3"].ljust(8)
+        aId4 = aTor["_chem_comp_tor.atom_id_4"].ljust(8)
+        aTV  = str(aTor["_chem_comp_tor.value_angle"])
+        aTV  = aTV.ljust(len(aTV)+3)
+        aTS  = str(aTor["_chem_comp_tor.value_angle_esd"]).ljust(8)
+        aTP  = str(aTor["_chem_comp_tor.period"]).ljust(4)
+        aL   = "%s%s%s%s%s%s%s%s%s\n"%(aCId, aTId,aId1, aId2, aId3, aId4, aTV, aTS, aTP)
+        tCif.write(aL)
+        
+
+def outputChirInOneMol(tCif, tFileIdx, tChirs):
+    
+    tCif.write("loop_\n")
+    tCif.write("_chem_comp_chir.comp_id\n")
+    tCif.write("_chem_comp_chir.id\n")
+    tCif.write("_chem_comp_chir.atom_id_centre\n")
+    tCif.write("_chem_comp_chir.atom_id_1\n")
+    tCif.write("_chem_comp_chir.atom_id_2\n")
+    tCif.write("_chem_comp_chir.atom_id_3\n")
+    tCif.write("_chem_comp_chir.volume_sign\n")
+    
+    for aCh in tChirs:
+        aCId  = tFileIdx.ljust(6)
+        aChId = aCh["_chem_comp_chir.id"].ljust(10)
+        aIdC  = aCh["_chem_comp_chir.atom_id_centre"].ljust(8)
+        aId1  = aCh["_chem_comp_chir.atom_id_1"].ljust(8)
+        aId2  = aCh["_chem_comp_chir.atom_id_2"].ljust(8)        
+        aId3  = aCh["_chem_comp_chir.atom_id_3"].ljust(8)
+        aV    = aCh["_chem_comp_chir.volume_sign"].ljust(12)
+        aL    = "%s%s%s%s%s%s%s\n"%(aCId, aChId, aIdC, aId1, aId2, aId3, aV)
+        tCif.write(aL)
+        
+
+def outputPlanInOneMol(tCif, tFileIdx, tPlans):
+    
+    tCif.write("loop_\n")
+    tCif.write("_chem_comp_plane_atom.comp_id\n")
+    tCif.write("_chem_comp_plane_atom.plane_id\n")
+    tCif.write("_chem_comp_plane_atom.atom_id\n")
+    tCif.write("_chem_comp_plane_atom.dist_esd\n")
+    
+    for aK in tPlans:
+        for aAt in tPlans[aK]:
+            aCId = tFileIdx.ljust(6)
+            aPId = aAt["_chem_comp_plane_atom.plane_id"].ljust(10)
+            aAId = aAt["_chem_comp_plane_atom.atom_id"].ljust(8)
+            aS   = str(aAt["_chem_comp_plane_atom.dist_esd"]).ljust(8)
+            aL   = "%s%s%s%s\n"%(aCId, aPId, aAId, aS)
+            tCif.write(aL)
+            
+            
+def outputRingsInOneMol(tCif, tFileIdx, tRings):
+    
+    tCif.write("loop_\n")
+    tCif.write("_chem_comp_ring_atom.comp_id\n")
+    tCif.write("_chem_comp_ring_atom.ring_serial_number\n")
+    tCif.write("_chem_comp_ring_atom.atom_id\n")
+    tCif.write("_chem_comp_ring_atom.is_aromatic_ring\n")
+    
+    for aK in tRings:
+        for aAt in tRings[aK]:
+            aCId = tFileIdx.ljust(6) 
+            aRId = aAt["_chem_comp_ring_atom.ring_serial_number"].ljust(10)
+            aAId = aAt["_chem_comp_ring_atom.atom_id"].ljust(8)
+            aAR  = aAt["_chem_comp_ring_atom.is_aromatic_ring"].ljust(6)
+            aL   = "%s%s%s%s\n"%(aCId, aRId, aAId, aAR)
+            tCif.write(aL)
+    
+def fromACrysToMolCifsGemmi(tInCifFN, tFileIdx, tMols):
+    if os.path.isfile(tInCifFN):
+        aInCif = cif.read_file(tInCifFN)
+        numBl = len(aInCif) 
+        
+        if numBl > 0:
+            #print("Those blocks are ")
+            for aBloc in aInCif:
+                if aBloc.name.find("comp_list")==-1 and aBloc.name.find("all_mols")==-1:
+                    aMol = {}
+                    aMol["fileIdx"] = tFileIdx 
+                    #print(aBloc.name)
+                    for aItem in aBloc:
+                        if aItem.loop is not None: 
+                            if aItem.loop.tags[0].find("_chem_comp_atom.") !=-1:
+                                aMol["atoms"] = []
+                                setAPropInAMol(aItem, aMol["atoms"])
+                                #print("number of atom is ", len(aMol["atoms"]))
+                            
+                            elif aItem.loop.tags[0].find("_chem_comp_bond.") !=-1:
+                                aMol["bonds"] = []
+                                setAPropInAMol(aItem, aMol["bonds"])
+                                #print("number of bonds is ", len(aMol["bonds"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_angle.") !=-1:
+                                aMol["angles"] = []
+                                setAPropInAMol(aItem, aMol["angles"])  
+                                #print("number of angles  is ", len(aMol["angles"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_ring.") !=-1:
+                                #print(aItem.loop.tags[0])
+                                aMol["rings"] = {}
+                                aMol["ringAtoms"] = []
+                                setAPropInAMol(aItem, aMol["ringAtoms"])
+                                
+                                for aRA in aMol["ringAtoms"]:
+                                    if "_chem_comp_ring.ring_serial_number" in aRA:
+                                        if not aRA["_chem_comp_ring.ring_serial_number"] in aMol["rings"]:
+                                            rIdx = aRA["_chem_comp_ring.ring_serial_number"]
+                                            #print(rIdx)
+                                            aMol["rings"][rIdx] = []
+                                        aMol["rings"][rIdx].append(aRA)
+                                    elif "_chem_comp_ring.ring_id" in aRA:
+                                        if not aRA["_chem_comp_ring.ring_id"] in aMol["rings"]:
+                                            rIdx = aRA["_chem_comp_ring.ring_id"].strip().split("_")[-1]
+                                            aRA["_chem_comp_ring.ring_serial_number"] = rIdx
+                                            #print(rIdx)
+                                            aMol["rings"][rIdx] = []
+                                        aMol["rings"][rIdx].append(aRA)    
+                                    
+                                
+                                #print("number of rings is ", len(aMol["rings"]))
+                    if "bonds" in aMol and len(aMol["bonds"]) > 0:
+                        setAtomConn(aMol["atoms"], aMol["bonds"])
+                    if "rings" in aMol and len(aMol["rings"]) > 0:
+                        setAtomRingConn(aMol["atoms"], aMol["rings"])
+                    tMols.append(aMol)  
+                    
+
+def fromCifTorMolGemmi(tInCifFN, tFileIdx, tMono, tMols):
+
+    try:
+        aInCif = cif.read_file(tInCifFN)
+    except IOError:
+        print("%s does not exist"%tInCifFN)
+    else:
+        numBl = len(aInCif) 
+        print(numBl)
+        print(tMono)
+        if numBl > 0:
+            print("Those blocks are ")
+            for aBloc in aInCif:
+                aBName = "comp_" + tMono
+                if aBloc.name.find(aBName)!=-1:
+                    aMol = {}
+                    aMol["fileIdx"] = tFileIdx 
+                    for aItem in aBloc:
+                        if aItem.loop is not None: 
+                            if aItem.loop.tags[0].find("_chem_comp_atom.") !=-1:
+                                aMol["atoms"] = []
+                                setAPropInAMol(aItem, aMol["atoms"])
+                                print("number of atom is ", len(aMol["atoms"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_bond.") !=-1:
+                                aMol["bonds"] = []
+                                setAPropInAMol(aItem, aMol["bonds"])
+                                print("number of bonds is ", len(aMol["bonds"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_angle.") !=-1:
+                                aMol["angles"] = []
+                                setAPropInAMol(aItem, aMol["angles"])  
+                                print("number of angles  is ", len(aMol["angles"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_tor") !=-1:
+                                aMol["torsions"] = []
+                                setAPropInAMol(aItem, aMol["torsions"])
+                                print("number of torsions  is ", len(aMol["torsions"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_chir.") !=-1:
+                                aMol["chirs"] = []
+                                setAPropInAMol(aItem, aMol["chirs"])  
+                                print("number of chir centers  is ", len(aMol["chirs"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_plane_atom.") !=-1:
+                                aMol["planes"] = {}
+                                aMol["planeAtoms"] = []
+                                setAPropInAMol(aItem, aMol["planeAtoms"])  
+                                #print("plane atoms")
+                                #¢print(aMol["planeAtoms"])
+                                for aPA in aMol["planeAtoms"]:
+                                    aPId = aPA["_chem_comp_plane_atom.plane_id"]
+                                    if not aPId  in aMol["planes"]:
+                                        aMol["planes"][aPId] = []
+                                    aMol["planes"][aPId].append(aPA)    
+                                print("number of planes  is ", len(aMol["planes"]))
+                            elif aItem.loop.tags[0].find("_chem_comp_ring_atom.") !=-1:
+                                #print(aItem.loop.tags[0])
+                                aMol["rings"] = {}
+                                aMol["ringAtoms"] = []
+                                setAPropInAMol(aItem, aMol["ringAtoms"])
+                                
+                                for aRA in aMol["ringAtoms"]:
+                                    if "_chem_comp_ring_atom.ring_serial_number" in aRA:
+                                        if not aRA["_chem_comp_ring_atom.ring_serial_number"] in aMol["rings"]:
+                                            rIdx = aRA["_chem_comp_ring_atom.ring_serial_number"]
+                                            #print(rIdx)
+                                            aMol["rings"][rIdx] = []
+                                        aMol["rings"][rIdx].append(aRA)
+                                    elif "_chem_comp_ring_atom.ring_id" in aRA:
+                                        if not aRA["_chem_comp_ring_atom.ring_id"] in aMol["rings"]:
+                                            rIdx = aRA["_chem_comp_ring_atom.ring_id"].strip().split("_")[-1]
+                                            aRA["_chem_comp_ring_atom.ring_serial_number"] = rIdx
+                                            #print(rIdx)
+                                            aMol["rings"][rIdx] = []
+                                        aMol["rings"][rIdx].append(aRA)  
+                        
+                                print("number of rings  is ", len(aMol["rings"])) 
+                    tMols.append(aMol)
+                
+
+def setAPropInAMol(tItem, tProps):
+    
+    nTs = len(tItem.loop.tags)
+    nVs = len(tItem.loop.values) 
+    if math.fmod(nVs, nTs) ==0:
+        #print("Number of columns =", nTs)
+        #print("Number of values =", nVs)
+        rIdx  = 0
+        vIdx = rIdx*nTs 
+        while vIdx < nVs:
+            aProp= {}
+            for aTag in tItem.loop.tags:
+                aProp[aTag] = tItem.loop.values[vIdx]
+                vIdx +=1 
+            
+            tProps.append(aProp)
+            
+            rIdx+=1
+            vIdx = rIdx*nTs
+
+def setAtomConn(tAtoms, tBonds):
+    
+    if "_chem_comp_bond.atom_serial_number_1" in tBonds[0]:
+        for aB in tBonds:
+            idxA1 = int(aB["_chem_comp_bond.atom_serial_number_1"])
+            idxA2 = int(aB["_chem_comp_bond.atom_serial_number_2"])
+            if not "_chem_comp_atom.atom_conn" in tAtoms[idxA1]:
+                tAtoms[idxA1]["_chem_comp_atom.atom_conn"] = []
+            tAtoms[idxA1]["_chem_comp_atom.atom_conn"].append(idxA2) 
+            if not "_chem_comp_atom.atom_conn" in tAtoms[idxA2]:
+                tAtoms[idxA2]["_chem_comp_atom.atom_conn"] = []
+            tAtoms[idxA2]["_chem_comp_atom.atom_conn"].append(idxA1)
+
+def setRingAtomSerialNumById(tAtoms, tRings):
+    
+    aIdSeriNumMap = {}
+    idxA = 0
+    for aAt in tAtoms:
+        aIdSeriNumMap[aAt["_chem_comp_atom.atom_id"]] = idxA
+        idxA+=1
+    
+    
+    for aR in tRings:
+        for aRA in tRings[aR]:
+            aRA["_chem_comp_ring.atom_serial_number"] = aIdSeriNumMap[aRA["_chem_comp_ring_atom.atom_id"]]
     
 
+def setAtomRingConn(tAtoms, tRings):
+    
+    if len(tRings) > 0:
+        if not "_chem_comp_ring.atom_serial_number" in tRings["1"][0]:
+            setRingAtomSerialNumById(tAtoms, tRings)
 
+    for rIdx in tRings:
+        rOrd = len(tRings[rIdx])
+        for aA in tRings[rIdx]:
+            idxA = int(aA["_chem_comp_ring.atom_serial_number"])
+            if not "_chem_comp_atom.in_rings" in tAtoms[idxA]:
+                tAtoms[idxA]["_chem_comp_atom.in_rings"] = {}
+            if not rOrd in tAtoms[idxA]["_chem_comp_atom.in_rings"]:
+                tAtoms[idxA]["_chem_comp_atom.in_rings"][rOrd] = []
+            tAtoms[idxA]["_chem_comp_atom.in_rings"][rOrd].append(rIdx)
+            
+def reWriteAcedrgDescriptorSec(tInFN, tOutFN, tSetDis):
+    
+    try:
+        tInF = open(tInFN, "r")
+    except IOError:
+            print("Error :%s can not be open for reading "%tInFN)
+            sys.exit(1)
+    else:
+        allLs = tInF.readlines()
+        tInF.close()
+        
+        
+        tOutF = open(tOutFN, "w")
+          
+        
+        lOK = True
+        loopLs = []
+        aSL = ""
+        for aL in allLs:
+            if aL.find("data_") !=-1 or aL.find("loop_") !=-1:
+                if len(loopLs) > 1:
+                    for aLL in loopLs:
+                        tOutF.write(aLL)
+                loopLs = []
+                loopLs.append(aL)
+            elif aL.find("_acedrg_chem_comp_descriptor") !=-1:
+                pass 
+            elif aL.find("servalcat") !=-1:
+                aSL = aL
+            else:
+                loopLs.append(aL)
+            
+        if len(loopLs) > 1:
+            for aLL in loopLs:
+                tOutF.write(aLL)
+                
+        for aL in tSetDis:
+            tOutF.write(aL)
+        
+        tOutF.write(aSL)
+        
+        
+def setupAMolTreeInCif(tCifName, tTree):
+    
+    fromCifTorMolGemmi(tCifName)
+        
+    
+
+       
+        
+        
